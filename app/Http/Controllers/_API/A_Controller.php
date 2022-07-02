@@ -13,6 +13,6 @@ class A_Controller extends Controller
     {
         //
         $members = Member::all();
-        return 'FROM A';
+        return 'FROM A ';
     }
 }
