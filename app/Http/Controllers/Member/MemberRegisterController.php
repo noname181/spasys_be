@@ -1,0 +1,33 @@
+<?php
+
+namespace App\Http\Controllers\Member;
+
+use App\Http\Requests\Member\MemberRegisterController\InvokeRequest;
+use App\Http\Controllers\Controller;
+use App\Models\Member;
+use App\Utils\Messages;
+use Illuminate\Support\Facades\Log;
+
+class MemberRegisterController extends Controller
+{
+    /**
+     *
+     * @param  \App\Http\Requests\Api\MemberRegisterController\InvokeRequest  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function __invoke(InvokeRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+            $mb_no = Member::insertGetId($validated);
+            return response()->json([
+                'message' => Messages::$MSG_0007,
+                'mb_token' => null, // FIXME I don't understand where to get it from
+                'mb_no' => $mb_no,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::$MSG_0001], 500);
+        }
+    }
+}
