@@ -19,11 +19,15 @@ class MemberRegisterController extends Controller
     {
         try {
             $validated = $request->validated();
-            $member = Member::insert($validated);
-            return response()->json(compact('member'));
+            $mb_no = Member::insertGetId($validated);
+            return response()->json([
+                'message' => Messages::$MSG_0007,
+                'mb_token' => null, // FIXME I don't understand where to get it from
+                'mb_no' => $mb_no,
+            ]);
         } catch (\Exception $e) {
             Log::error($e);
-            return response()->json(['message' => [Messages::$MSG_0001]], 500);
+            return response()->json(['message' => Messages::$MSG_0001], 500);
         }
     }
 }

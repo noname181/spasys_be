@@ -23,7 +23,7 @@ class BaseFormRequest extends FormRequest
                 'message' => "There is an error in the registration. \ nPlease check your input.",
                 'errors' => $validator->errors()->toArray(),
             ],
-            422
+            400
         ));
     }
 }
