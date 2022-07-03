@@ -10,9 +10,6 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
 class Member extends Authenticatable
-
-
-
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
@@ -27,6 +24,4 @@ class Member extends Authenticatable
         'mb_pw',
         'mb_token',
     ];
-
-
 }

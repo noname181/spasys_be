@@ -1,8 +1,6 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\API\AuthController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -14,6 +12,8 @@ use App\Http\Controllers\API\AuthController;
 |
 */
 
+Route::get('/hello', function () {
+    return "Wellcome to spasys1 api!";
+})->name('hello');
 
-Route::get('/login', [AuthController::class, 'index'])->name('login');
-
+Route::post('/register', \App\Http\Controllers\Member\MemberRegisterController::class)->name('member.register');
