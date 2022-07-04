@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Mail;
 class SendMailController extends Controller
 {
 
-    public function requestOtp(Request $request)
+    public function sendEmailOtp(Request $request)
     {
 
         $mb_otp = rand(1000, 9999);

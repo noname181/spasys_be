@@ -18,4 +18,4 @@ Route::get('/hello', function () {
 })->name('hello');
 
 Route::post('/register', \App\Http\Controllers\Member\MemberRegisterController::class)->name('member.register');
-Route::get('/request-otp', [\App\Http\Controllers\API\SendMailController::class, 'requestOtp']);
+Route::get('/send_email_otp', [\App\Http\Controllers\API\SendMailController::class, 'sendEmailOtp']);
