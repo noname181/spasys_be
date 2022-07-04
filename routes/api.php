@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\SendMailController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -17,3 +18,4 @@ Route::get('/hello', function () {
 })->name('hello');
 
 Route::post('/register', \App\Http\Controllers\Member\MemberRegisterController::class)->name('member.register');
+Route::get('/request_otp', [\App\Http\Controllers\API\SendMailController::class, 'requestOtp']);
