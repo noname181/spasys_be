@@ -40,6 +40,13 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'api' => [
+            'driver' => 'token',
+            'provider' => 'member',
+            "storage_key" => "mb_token",  // the database column
+            "input_key" => "mb_token",  // the query string component
+            'hash' => true,
+        ],
     ],
 
     /*
@@ -62,13 +69,12 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\User::class,
+            'model' => App\Models\Member::class,
         ],
-
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'member' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Member::class,
+        ]
     ],
 
     /*
