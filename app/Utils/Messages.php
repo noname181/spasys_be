@@ -17,4 +17,7 @@ class Messages
     const MSG_0011 = "The new password cannot be the same as the old password";
     const MSG_0012 = "Email does not exist";
     const MSG_0013 = "Member does not exist";
+    const MSG_0014 = "OTP does not exist";
+    const MSG_0015 = "Please enter {0}";
+    const MSG_0016 = "The format of {0} is incorrect.";
 }
