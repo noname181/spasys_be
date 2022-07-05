@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\SendMailController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -18,6 +19,8 @@ Route::get('/hello', function () {
 
 Route::post('/login', \App\Http\Controllers\Auth\AuthController::class)->name('login');
 Route::post('/register', \App\Http\Controllers\Member\MemberRegisterController::class)->name('member.register');
+Route::get('/send_email_otp', [\App\Http\Controllers\API\SendMailController::class, 'sendEmailOtp']);
+Route::get('/validate_otp', [\App\Http\Controllers\API\SendMailController::class, 'validateOtp']);
 
 Route::middleware('auth:api')->group(function () {
     Route::put('/change_password', \App\Http\Controllers\Auth\ChangePasswordController::class)->name('change_password');
