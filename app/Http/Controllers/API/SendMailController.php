@@ -31,7 +31,7 @@ class SendMailController extends Controller
 
             return response()->json(['status' => 200, 'message' => Messages::MSG_0007]);
         } else {
-            return response()->json(['status' => 400, 'message' => Messages::MSG_0012]);
+            return response()->json(['status' => 400, 'message' => Messages::MSG_0013]);
         }
     }
 
@@ -46,7 +46,7 @@ class SendMailController extends Controller
 
             return response()->json(['status' => 200, 'message' => Messages::MSG_0007]);
         } else {
-            return response()->json(['status' => 400, 'message' => Messages::MSG_0012]);
+            return response()->json(['status' => 400, 'message' => Messages::MSG_0013]);
         }
     }
 }
