@@ -6,15 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Models\Member;
 use App\Utils\Messages;
 use App\Utils\sendEmail;
+use App\Utils\CommonFunc;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
-
 class SendMailController extends Controller
 {
 
     public function sendEmailOtp(Request $request)
     {
-
+        if (empty($request->mb_no)) {
+            return response()->json(['status' => 422, 'message' => CommonFunc::renderMessage(Messages::MSG_0015, ['mb_no'])]);
+        }
+        
         $mb_otp = rand(1000, 9999);
         $member = Member::where('mb_no', '=', $request->mb_no)->first();
 
@@ -37,16 +40,55 @@ class SendMailController extends Controller
 
     public function validateOtp(Request $request)
     {
-
-        $member = Member::where([['mb_no', '=', $request->mb_no], ['mb_otp', '=', $request->mb_otp]])->first();
+        if (empty($request->mb_no)) {
+            return response()->json(['status' => 422, 'message' => CommonFunc::renderMessage(Messages::MSG_0015, ['mb_no'])]);
+        }
+        if (empty($request->mb_otp)) {
+            return response()->json(['status' => 422, 'message' => CommonFunc::renderMessage(Messages::MSG_0015, ['mb_otp'])]);
+        }
+        $member = Member::where('mb_no', '=', $request->mb_no)->first();
 
         if (!empty($member)) {
 
-            Member::where('mb_no', '=', $request->mb_no)->update(['mb_otp' => null]);
+            if ($request->mb_otp !== $member->mb_otp) {
+                return response()->json(['status' => 400, 'message' => Messages::MSG_0014]);
+            }
+
+            Member::where('mb_no', '=', $member->mb_no)->update(['mb_otp' => null]);
 
             return response()->json(['status' => 200, 'message' => Messages::MSG_0007]);
         } else {
             return response()->json(['status' => 400, 'message' => Messages::MSG_0013]);
+        }
+    }
+
+    public function forgotPassword(Request $request)
+    {
+
+        if (empty($request->mb_email)) {
+            return response()->json(['status' => 422, 'message' => CommonFunc::renderMessage(Messages::MSG_0015, ['mb_email'])]);
+        }
+
+        if (CommonFunc::isMail($request->mb_email) == false) {
+            return response()->json(['status' => 422, 'message' => CommonFunc::renderMessage(Messages::MSG_0016, ['mb_email'])]);
+        }
+
+        $mb_otp = rand(1000, 9999);
+        $member = Member::where('mb_email', '=', $request->mb_email)->first();
+
+        if (!empty($member)) {
+            // send otp in the email
+            $mail_details = [
+                'title' => 'Forgot Password OTP',
+                'body' => 'Your OTP is : ' . $mb_otp,
+            ];
+
+            Member::where('mb_email', '=', $member->mb_email)->update(['mb_otp' => $mb_otp]);
+            Mail::to($member->mb_email)->send(new sendEmail($mail_details));
+
+            return response()->json(['status' => 200, 'message' => Messages::MSG_0007]);
+        } else {
+            return response()->json(['status' => 400, 'message' => Messages::MSG_0012]);
         }
     }
 }
