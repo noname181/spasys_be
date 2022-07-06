@@ -19,5 +19,6 @@ class Messages
     const MSG_0013 = "Member does not exist";
     const MSG_0014 = "OTP does not exist";
     const MSG_0015 = "Please enter {0}";
-    const MSG_0016 = "The format of {0} is incorrect.";
+    const MSG_0016 = "The format of {0} is incorrect";
+    const MSG_0017 = "Not allowed";
 }
