@@ -12,6 +12,14 @@ class Member extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles, Tokenable;
 
+    const ROLE_ADMIN = 1;
+    const ROLE_MANAGER = 2;
+    const ROLE_OPERATOR = 3;
+    const ROLE_WORKER = 4;
+    const ROLE_SHOP_MANAGER = 5;
+    const ROLE_COMPANY_MANAGER = 6;
+    const ROLE_COMPANY_OPERATOR = 7;
+
     protected $table = "member";
 
 

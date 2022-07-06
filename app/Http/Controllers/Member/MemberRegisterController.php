@@ -13,7 +13,7 @@ class MemberRegisterController extends Controller
 {
     /**
      * Register member
-     * @param  \App\Http\Requests\Api\MemberRegisterController\InvokeRequest  $request
+     * @param  \App\Http\Requests\Member\MemberRegisterController\InvokeRequest  $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function __invoke(InvokeRequest $request)
