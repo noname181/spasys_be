@@ -24,9 +24,16 @@ Route::post('/validate_otp', [\App\Http\Controllers\Api\SendMailController::clas
 
 Route::middleware('auth')->group(function () {
     Route::put('/change_password', \App\Http\Controllers\Auth\ChangePasswordController::class)->name('change_password');
-    
+
     // Manger Role
     Route::middleware('role.manager')->group(function () {
-       Route::post('/create_company', \App\Http\Controllers\Company\CompanyRegisterController::class)->name('create_company');
-   });
+        Route::post('/create_company', \App\Http\Controllers\Company\CompanyRegisterController::class)->name('create_company');
+    });
+
+    Route::prefix('qna')->name('qna.')->group(function () {
+        Route::get('/', App\Http\Controllers\Qna\QnaController::class)->name('get_qna');
+        Route::get('/{qna}', [App\Http\Controllers\Qna\QnaController::class, 'getById'])->name('get_qna_by_id');
+        Route::post('/', [App\Http\Controllers\Qna\QnaController::class, 'register'])->name('register_qna');
+        Route::patch('/{qna}', [App\Http\Controllers\Qna\QnaController::class, 'update'])->name('update_qna');
+    });
 });

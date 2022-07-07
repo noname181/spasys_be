@@ -21,4 +21,5 @@ class Messages
     const MSG_0015 = "Please enter {0}";
     const MSG_0016 = "The format of {0} is incorrect";
     const MSG_0017 = "Not allowed";
+    const MSG_0018 = "Get data failed";
 }
