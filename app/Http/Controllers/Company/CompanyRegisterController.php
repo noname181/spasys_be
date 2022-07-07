@@ -37,15 +37,15 @@ class CompanyRegisterController extends Controller
 
             $validated['co_no'] = $co_no;
 
-            $c_file_insulance = join('/', ['company', $co_no, 'insulance']);
-            $c_file_license = join('/', ['company', $co_no, 'license']);
-            $c_file_contract = join('/', ['company', $co_no, 'contract']);
-            $c_file_bank_account = join('/', ['company', $co_no, 'bank_account']);
+            $c_file_insulance = join('/', ['files', 'contract', $co_no, 'insulance']);
+            $c_file_license = join('/', ['files', 'contract',  $co_no, 'license']);
+            $c_file_contract = join('/', ['files', 'contract',  $co_no, 'contract']);
+            $c_file_bank_account = join('/', ['files', 'contract',  $co_no, 'bank_account']);
 
-            $inl = Storage::disk('local')->put($c_file_insulance, $validated['c_file_insulance']);
-            $lic = Storage::disk('local')->put($c_file_license, $validated['c_file_license']);
-            $con = Storage::disk('local')->put($c_file_contract, $validated['c_file_contract']);
-            $bc = Storage::disk('local')->put($c_file_bank_account, $validated['c_file_bank_account']);
+            $inl = Storage::disk('public')->put($c_file_insulance, $validated['c_file_insulance']);
+            $lic = Storage::disk('public')->put($c_file_license, $validated['c_file_license']);
+            $con = Storage::disk('public')->put($c_file_contract, $validated['c_file_contract']);
+            $bc = Storage::disk('public')->put($c_file_bank_account, $validated['c_file_bank_account']);
 
             $c_no = Contract::insertGetId([
                 'co_no' => $validated['co_no'],
