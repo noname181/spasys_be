@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Storage;
 class CompanyRegisterController extends Controller
 {
     /**
-     * Register member
+     * Register company
      * @param  \App\Http\Requests\Company\CompanyRegisterController\InvokeRequest  $request
      * @return \Illuminate\Http\JsonResponse
      */
