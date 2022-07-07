@@ -22,10 +22,10 @@ class QnaController extends Controller
         try {
             $validated = $request->validated();
 
-            // If per_page is null set default data = 1
-            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 1;
-            // If page is null set default data = 15
-            $page = isset($validated['page']) ? $validated['page'] : 15;
+            // If per_page is null set default data = 15
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
             $qna = Qna::paginate($per_page, ['*'], 'page', $page);
 
             return response()->json($qna);
@@ -55,7 +55,7 @@ class QnaController extends Controller
         try {
             $validated = $request->validated();
             $qna_no = Qna::insertGetId([
-                'mb_no' => Auth()->user()->mb_no,
+                'mb_no' => $validated['mb_no'],
                 'qna_status' => 'wating',
                 'mb_no_target' => $validated['mb_no_target'],
                 'qna_title' => $validated['qna_title'],

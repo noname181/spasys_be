@@ -24,6 +24,12 @@ class QnaRegisterRequest extends BaseFormRequest
     public function rules()
     {
         return [
+            'mb_no' => [
+                'required',
+                'integer',
+                'max:255',
+                'exists:member,mb_no'
+            ],
             'qna_title' => [
                 'required',
                 'string',
