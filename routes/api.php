@@ -37,3 +37,14 @@ Route::middleware('auth')->group(function () {
         Route::patch('/{qna}', [App\Http\Controllers\Qna\QnaController::class, 'update'])->name('update_qna');
     });
 });
+
+Route::post('/notices', [\App\Http\Controllers\Api\NoticeController::class, 'create']);
+Route::get('/notices/{id}', [\App\Http\Controllers\Api\NoticeController::class, 'getNoticeById']);
+Route::patch('/notices', [\App\Http\Controllers\Api\NoticeController::class, 'update']);
+Route::get('/notices', [\App\Http\Controllers\Api\NoticeController::class,'__invoke']);
+
+// Route::prefix('notices')->name('notices.')->group(function () {
+//     Route::get('/', App\Http\Controllers\Api\NoticeController::class)->name('get_notice');
+//     Route::get('/{notices}', [App\Http\Controllers\Api\NoticeController::class, 'getById'])->name('get_notice_by_id');
+//     Route::post('/', [App\Http\Controllers\Api\NoticeController::class, 'create'])->name('register_notice');
+// });
