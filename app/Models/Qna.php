@@ -13,7 +13,7 @@ class Qna extends Model
 
     protected $primaryKey = 'qna_no';
 
-    public $timestamps = false;
+    public $timestamps = true;
 
     /**
      * The attributes that are mass assignable.
@@ -26,7 +26,6 @@ class Qna extends Model
         'qna_status',
         'mb_no_target',
         'qna_title',
-        'qna_content',
-        'qna_regtime'
+        'qna_content'
     ];
 }

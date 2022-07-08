@@ -11,9 +11,9 @@ class Company extends Model
 
     protected $table = "company";
 
-
     protected $primaryKey = 'co_no';
 
+    public $timestamps = true;
     /**
      * The attributes that are mass assignable.
      *

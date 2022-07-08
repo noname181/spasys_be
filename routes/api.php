@@ -37,6 +37,14 @@ Route::middleware('auth')->group(function () {
         Route::post('/', [App\Http\Controllers\Qna\QnaController::class, 'register'])->name('register_qna');
         Route::patch('/{qna}', [App\Http\Controllers\Qna\QnaController::class, 'update'])->name('update_qna');
     });
+
+    Route::prefix('banner')->name('banner.')->group(function () {
+        Route::get('/', App\Http\Controllers\Banner\BannerController::class)->name('get_banner');
+        Route::get('{banner}', [App\Http\Controllers\Banner\BannerController::class, 'getById'])->name('get_banner_by_id');
+        Route::post('/', [App\Http\Controllers\Banner\BannerController::class, 'register'])->name('register_banner');
+        Route::patch('{banner}', [App\Http\Controllers\Banner\BannerController::class, 'update'])->name('update_banner');
+    });
+
 });
 
 Route::post('/notices', [\App\Http\Controllers\Api\NoticeController::class, 'create']);

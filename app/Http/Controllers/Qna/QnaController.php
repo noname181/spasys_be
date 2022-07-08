@@ -59,8 +59,7 @@ class QnaController extends Controller
                 'qna_status' => 'wating',
                 'mb_no_target' => $validated['mb_no_target'],
                 'qna_title' => $validated['qna_title'],
-                'qna_content' => $validated['qna_content'],
-                'qna_regtime' => now(),
+                'qna_content' => $validated['qna_content']
             ]);
             return response()->json(['message' => Messages::MSG_0007, 'qna_no' => $qna_no], 201);
         } catch (\Exception $e) {

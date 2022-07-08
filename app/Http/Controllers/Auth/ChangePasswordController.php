@@ -37,7 +37,7 @@ class ChangePasswordController extends Controller
 
             $member['mb_pw'] = Hash::make($input['mb_new_pw']);
             // After change password . Remove token -> Login again
-            $member->mb_token = null;
+            $member->mb_token = '';
             $member->save();
 
             return response()->json([
