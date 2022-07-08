@@ -32,10 +32,12 @@ class BannerUpdateRequest extends BaseFormRequest
             'banner_lat' => [
                 'required',
                 'numeric',
+                'regex:/^[-]?[(\d+)]{1,4}(\.[(\d+)]{1,7})?$/'
             ],
             'banner_lng' => [
                 'required',
                 'numeric',
+                'regex:/^[-]?[(\d+)]{1,4}(\.[(\d+)]{1,7})?$/'
             ],
             'banner_start' => [
                 'required',
