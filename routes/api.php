@@ -21,6 +21,7 @@ Route::post('/register', \App\Http\Controllers\Member\MemberRegisterController::
 Route::post('/forgot_password', [\App\Http\Controllers\Api\SendMailController::class, 'forgotPassword']);
 Route::post('/send_email_otp', [\App\Http\Controllers\Api\SendMailController::class, 'sendEmailOtp']);
 Route::post('/validate_otp', [\App\Http\Controllers\Api\SendMailController::class, 'validateOtp']);
+Route::patch('/forgot_password', [\App\Http\Controllers\Api\SendMailController::class, 'sendPassword']);
 
 Route::middleware('auth')->group(function () {
     Route::put('/change_password', \App\Http\Controllers\Auth\ChangePasswordController::class)->name('change_password');
@@ -42,9 +43,3 @@ Route::post('/notices', [\App\Http\Controllers\Api\NoticeController::class, 'cre
 Route::get('/notices/{id}', [\App\Http\Controllers\Api\NoticeController::class, 'getNoticeById']);
 Route::patch('/notices', [\App\Http\Controllers\Api\NoticeController::class, 'update']);
 Route::get('/notices', [\App\Http\Controllers\Api\NoticeController::class,'__invoke']);
-
-// Route::prefix('notices')->name('notices.')->group(function () {
-//     Route::get('/', App\Http\Controllers\Api\NoticeController::class)->name('get_notice');
-//     Route::get('/{notices}', [App\Http\Controllers\Api\NoticeController::class, 'getById'])->name('get_notice_by_id');
-//     Route::post('/', [App\Http\Controllers\Api\NoticeController::class, 'create'])->name('register_notice');
-// });
