@@ -20,6 +20,7 @@ class MemberRegisterController extends Controller
     {
         try {
             $validated = $request->validated();
+            $validated['mb_token'] = '';
             $validated['mb_pw'] = Hash::make($validated['mb_pw']);
 
             $mb_no = Member::insertGetId($validated);

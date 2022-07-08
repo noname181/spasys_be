@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\AuthController\InvokeRequest;
 use App\Models\Member;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Utils\Messages;
 use Illuminate\Support\Facades\Log;
@@ -23,6 +22,11 @@ class AuthController extends Controller
         try {
 
             $member = Member::where('mb_id', $input['mb_id'])->first();
+            if(is_null($member)) {
+                return response()->json([
+                    'message' => Messages::MSG_0008,
+                ], 401);
+            }
             if (!Hash::check($input['mb_pw'], $member->mb_pw)) {
                 return response()->json([
                     'message' => Messages::MSG_0008,

@@ -14,6 +14,7 @@ class Contract extends Model
 
     protected $primaryKey = 'c_no';
 
+    public $timestamps = true;
     /**
      * The attributes that are mass assignable.
      *
