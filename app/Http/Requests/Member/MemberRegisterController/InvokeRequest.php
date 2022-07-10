@@ -79,6 +79,11 @@ class InvokeRequest extends BaseFormRequest
                 'string',
                 'max:1'
             ],
+            'mb_push_yn' => [
+                'required',
+                'string',
+                'max:1'
+            ],
         ];
     }
 
