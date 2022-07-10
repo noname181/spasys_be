@@ -37,7 +37,12 @@ class AuthController extends Controller
 
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'mb_token' => $token
+                'mb_token' => $token,
+                'mb_name' => $member['mb_name'],
+                'mb_email' => $member['mb_email'],
+                'mb_hp' => $member['mb_hp'],
+                'mb_tel' => $member['mb_tel'],
+                'mb_language' => $member['mb_language'],
             ]);
         } catch (\Exception $error) {
             Log::error($error);
