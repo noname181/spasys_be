@@ -20,6 +20,10 @@ class MemberRegisterController extends Controller
     {
         try {
             $validated = $request->validated();
+            // FIXME hard set mb_language = ko and role_no = 1
+            $validated['role_no'] = 1;
+            $validated['mb_language'] = 'ko';
+
             $validated['mb_token'] = '';
             $validated['mb_pw'] = Hash::make($validated['mb_pw']);
 
