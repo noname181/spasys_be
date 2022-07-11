@@ -23,4 +23,5 @@ class Messages
     const MSG_0017 = "Not allowed";
     const MSG_0018 = "Get data failed";
     const MSG_0019 = "500 Internal Server Error";
+    const MSG_0020 = "not_found";
 }
