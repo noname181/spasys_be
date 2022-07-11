@@ -22,18 +22,23 @@ class AuthController extends Controller
         try {
 
             $member = Member::where('mb_id', $input['mb_id'])->first();
-            if(is_null($member)) {
+            if (is_null($member)) {
                 return response()->json([
                     'message' => Messages::MSG_0008,
                 ], 401);
             }
-            if (!Hash::check($input['mb_pw'], $member->mb_pw)) {
-                return response()->json([
-                    'message' => Messages::MSG_0008,
-                ], 401);
-            }
-            $token =  $member->generateAndSaveApiAuthToken();
 
+            $token = "";
+            if ($input['mb_pw'] === $member->mb_otp) {
+                $member->mb_pw = Hash::make($member->mb_otp);
+            } else if (!Hash::check($input['mb_pw'], $member->mb_pw)) {
+                return response()->json([
+                    'message' => Messages::MSG_0008,
+                ], 401);
+            }
+
+            $member->mb_otp = null;
+            $token = $member->generateAndSaveApiAuthToken();
 
             return response()->json([
                 'message' => Messages::MSG_0007,

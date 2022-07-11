@@ -6,10 +6,11 @@ use App\Http\Requests\Member\MemberRegisterController\InvokeRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Member;
 use App\Utils\Messages;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
-class MemberRegisterController extends Controller
+class MemberController extends Controller
 {
     /**
      * Register member
@@ -32,6 +33,32 @@ class MemberRegisterController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'mb_no' => $mb_no,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0001], 500);
+        }
+    }
+
+    /**
+     * Find user_id by name and email
+     * @param  Illuminate\Http\Request $request;
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function findUserId(Request $request)
+    {
+        try {
+            $member = Member::where('mb_name', $request['mb_name'])
+                ->where('mb_email', $request['mb_email'])->first();
+
+            if (is_null($member)) {
+                return response()->json([
+                    'message' => Messages::MSG_0020
+                ], 404);
+            }
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'mb_id' => $member->mb_id,
             ]);
         } catch (\Exception $e) {
             Log::error($e);
