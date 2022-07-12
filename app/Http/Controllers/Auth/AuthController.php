@@ -43,6 +43,7 @@ class AuthController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'mb_token' => $token,
+                'mb_no' => $member['mb_no'],
                 'mb_name' => $member['mb_name'],
                 'mb_email' => $member['mb_email'],
                 'mb_hp' => $member['mb_hp'],

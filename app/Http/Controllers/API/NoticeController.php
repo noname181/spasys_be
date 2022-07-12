@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Models\Notice;
+use App\Models\File;
 use App\Utils\Messages;
 use App\Utils\CommonFunc;
 use Illuminate\Http\Request;
@@ -10,6 +11,7 @@ use PhpParser\Node\Stmt\TryCatch;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Notice\NoticeRequest;
 use App\Http\Requests\Notice\NoticeCreateRequest;
 use App\Http\Requests\Notice\NoticeUpdateRequest;
@@ -49,12 +51,31 @@ class NoticeController extends Controller
     {
         $validated = $request->validated();
         try {
+            DB::beginTransaction();
             $notice_no = Notice::insertGetId([
                 'mb_no' => $validated['mb_no'],
                 'notice_title' => $validated['notice_title'],
                 'notice_content' => $validated['notice_content'],
                 'notice_target' => $validated['notice_target'],
             ]);
+
+            $path = join('/', ['files', 'notice', $notice_no]);
+
+            $files = [];
+            foreach($validated['files'] as $key => $file) {
+                $url = Storage::disk('public')->put($path, $file);
+                $files[] = [
+                    'file_table' => 'notice',
+                    'file_table_key' => $notice_no,
+                    'file_name' => basename($url),
+                    'file_size' => $file->getSize(),
+                    'file_extension' => $file->extension(),
+                    'file_position' => $key,
+                    'file_url' => $url
+                ];
+            }
+            File::insert($files);
+
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
