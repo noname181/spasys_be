@@ -43,6 +43,14 @@ class NoticeCreateRequest extends BaseFormRequest
                 'string',
                 'max:255',
             ],
+            'files' => [
+                'array',
+                'required',
+            ],
+            'files.*' => [
+                'file',
+                'mimes:jpg,jpeg,png',
+            ],
         ];
     }
 
