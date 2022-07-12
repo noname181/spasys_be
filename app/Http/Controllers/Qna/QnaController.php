@@ -8,6 +8,8 @@ use App\Http\Requests\Qna\QnaUpdateRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Qna;
 use App\Utils\Messages;
+use App\Models\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 
 class QnaController extends Controller
@@ -54,13 +56,33 @@ class QnaController extends Controller
     {
         try {
             $validated = $request->validated();
+            // FIXME hard set mb_no = 1
             $qna_no = Qna::insertGetId([
-                'mb_no' => $validated['mb_no'],
+                'mb_no' => 1,
                 'qna_status' => 'wating',
                 'mb_no_target' => $validated['mb_no_target'],
                 'qna_title' => $validated['qna_title'],
                 'qna_content' => $validated['qna_content']
             ]);
+
+            $path = join('/', ['files', 'qna', $qna_no]);
+
+            $files = [];
+            foreach($validated['files'] as $key => $file) {
+                $url = Storage::disk('public')->put($path, $file);
+                $files[] = [
+                    'file_table' => 'qna',
+                    'file_table_key' => $qna_no,
+                    'file_name' => basename($url),
+                    'file_size' => $file->getSize(),
+                    'file_extension' => $file->extension(),
+                    'file_position' => $key,
+                    'file_url' => $url
+                ];
+            }
+
+            File::insert($files);
+
             return response()->json(['message' => Messages::MSG_0007, 'qna_no' => $qna_no], 201);
         } catch (\Exception $e) {
             Log::error($e);

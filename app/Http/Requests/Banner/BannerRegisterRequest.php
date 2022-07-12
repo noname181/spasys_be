@@ -68,8 +68,7 @@ class BannerRegisterRequest extends BaseFormRequest
                 'required',
             ],
             'files.*' => [
-                'file',
-                'mimes:jpg,jpeg,png',
+                'file'
             ],
         ];
     }

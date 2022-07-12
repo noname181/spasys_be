@@ -24,25 +24,34 @@ class QnaRegisterRequest extends BaseFormRequest
     public function rules()
     {
         return [
-            'mb_no' => [
+            // FIXME hard set mb_no = 1 and mb_no_target = 1
+            // 'mb_no' => [
+            //     'required',
+            //     'integer',
+            //     'max:255',
+            //     'exists:member,mb_no'
+            // ],
+            'mb_no_target' => [
                 'required',
-                'integer',
                 'max:255',
-                'exists:member,mb_no'
             ],
             'qna_title' => [
                 'required',
                 'string',
                 'max:255',
+                'min:7',
             ],
             'qna_content' => [
                 'required',
                 'string',
+                'min:7',
             ],
-            'mb_no_target' => [
+            'files' => [
+                'array',
                 'required',
-                'string',
-                'max:255',
+            ],
+            'files.*' => [
+                'file'
             ],
         ];
     }
