@@ -24,10 +24,6 @@ class NoticeCreateRequest extends BaseFormRequest
     public function rules()
     {
         return [
-            'mb_no' => [
-                'required',
-                'integer',
-            ],
             'notice_title' => [
                 'required',
                 'string',

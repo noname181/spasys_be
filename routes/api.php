@@ -46,9 +46,9 @@ Route::middleware('auth')->group(function () {
         Route::patch('{banner}', [App\Http\Controllers\Banner\BannerController::class, 'update'])->name('update_banner');
     });
 
+    Route::post('/notices', [\App\Http\Controllers\Api\NoticeController::class, 'create']);
+    Route::get('/notices/{id}', [\App\Http\Controllers\Api\NoticeController::class, 'getNoticeById']);
+    Route::patch('/notices', [\App\Http\Controllers\Api\NoticeController::class, 'update']);
+    Route::get('/notices', [\App\Http\Controllers\Api\NoticeController::class,'__invoke']);
 });
 
-Route::post('/notices', [\App\Http\Controllers\Api\NoticeController::class, 'create']);
-Route::get('/notices/{id}', [\App\Http\Controllers\Api\NoticeController::class, 'getNoticeById']);
-Route::patch('/notices', [\App\Http\Controllers\Api\NoticeController::class, 'update']);
-Route::get('/notices', [\App\Http\Controllers\Api\NoticeController::class,'__invoke']);

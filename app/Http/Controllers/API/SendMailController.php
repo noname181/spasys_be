@@ -82,8 +82,8 @@ class SendMailController extends Controller
                     'title' => 'Forgot Password OTP',
                     'body' => 'Your OTP is : ' . $mb_otp,
                 ];
-    
-                Member::where('mb_email', '=', $member->mb_email)->update(['mb_otp' => $mb_otp]);
+
+                Member::where('mb_email', '=', $member->mb_email)->update(['mb_otp' =>  Hash::make($mb_otp)]);
                 Mail::to($member->mb_email)->send(new sendEmail($mail_details));
     
                 return response()->json(['message' => Messages::MSG_0007], 200);
