@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Models\Notice;
 use App\Models\File;
+use App\Models\Member;
+use App\Models\Notice;
 use App\Utils\Messages;
 use App\Utils\CommonFunc;
 use Illuminate\Http\Request;
@@ -11,6 +12,7 @@ use PhpParser\Node\Stmt\TryCatch;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Notice\NoticeRequest;
 use App\Http\Requests\Notice\NoticeCreateRequest;
@@ -52,6 +54,7 @@ class NoticeController extends Controller
         $validated = $request->validated();
         try {
             DB::beginTransaction();
+            $member = Member::where('mb_id', Auth::user()->mb_id)->first();
             $notice_no = Notice::insertGetId([
                 'mb_no' => $validated['mb_no'],
                 'notice_title' => $validated['notice_title'],
