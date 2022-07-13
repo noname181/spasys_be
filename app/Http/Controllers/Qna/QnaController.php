@@ -5,13 +5,16 @@ namespace App\Http\Controllers\Qna;
 use App\Http\Requests\Qna\QnaRequest;
 use App\Http\Requests\Qna\QnaRegisterRequest;
 use App\Http\Requests\Qna\QnaUpdateRequest;
+use App\Http\Requests\Qna\QnaSearchRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Qna;
 use App\Utils\Messages;
 use App\Models\File;
+use DateTime;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Date;
 
 class QnaController extends Controller
 {
@@ -70,7 +73,7 @@ class QnaController extends Controller
             $path = join('/', ['files', 'qna', $qna_no]);
 
             $files = [];
-            foreach($validated['files'] as $key => $file) {
+            foreach ($validated['files'] as $key => $file) {
                 $url = Storage::disk('public')->put($path, $file);
                 $files[] = [
                     'file_table' => 'qna',
@@ -113,5 +116,50 @@ class QnaController extends Controller
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0002], 500);
         }
+    }
+
+    /**
+     * Get QnA
+     * @param  QnaSearchRequest $request
+     */
+    public function getQnA(QnaSearchRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+
+            // If per_page is null set default data = 15
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+            $qna = Qna::select('*');
+
+            if (isset($validated['from_date'])) {
+                $qna->where('created_at', '>=', Date::parse($this->formatDate($validated['from_date']))->startOfDay()->format('Y-m-d H:i:s'));
+            }
+
+            if (isset($validated['to_date'])) {
+                $qna->where('created_at', '<=', Date::parse($this->formatDate($validated['to_date']))->endOfDay()->format('Y-m-d H:i:s'));
+            }
+
+            if (isset($validated['search_string'])) {
+                $qna->where(function($query) use ($validated) {
+                    $query->where('qna_title', 'like', '%' . $validated['search_string'] . '%');
+                    $query->orWhere('qna_content', 'like', '%' . $validated['search_string'] . '%');
+                });
+            }
+
+            Log::error(Date::parse($this->formatDate($validated['to_date']))->endOfDay()->format('Y-m-d H:i:s'));
+
+            $qna = $qna->paginate($per_page, ['*'], 'page', $page);
+
+            return response()->json($qna);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    private function formatDate($dateStr) {
+        return DateTime::createFromFormat('j/n/Y', $dateStr)->format('Y-m-d');
     }
 }
