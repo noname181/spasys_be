@@ -33,10 +33,11 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::prefix('qna')->name('qna.')->group(function () {
-        Route::get('/', App\Http\Controllers\Qna\QnaController::class)->name('get_qna');
+        Route::get('/', App\Http\Controllers\Qna\QnaController::class)->name('get_qna_index');
         Route::get('/{qna}', [App\Http\Controllers\Qna\QnaController::class, 'getById'])->name('get_qna_by_id');
         Route::post('/', [App\Http\Controllers\Qna\QnaController::class, 'register'])->name('register_qna');
         Route::patch('/{qna}', [App\Http\Controllers\Qna\QnaController::class, 'update'])->name('update_qna');
+        Route::post('/get_qna', [App\Http\Controllers\Qna\QnaController::class, 'getQnA'])->name('get_qna');
     });
 
     Route::prefix('banner')->name('banner.')->group(function () {
