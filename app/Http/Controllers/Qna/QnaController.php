@@ -11,6 +11,7 @@ use App\Utils\Messages;
 use App\Models\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class QnaController extends Controller
 {
@@ -54,8 +55,9 @@ class QnaController extends Controller
      */
     public function register(QnaRegisterRequest $request)
     {
+        $validated = $request->validated();
         try {
-            $validated = $request->validated();
+            DB::beginTransaction();
             // FIXME hard set mb_no = 1
             $qna_no = Qna::insertGetId([
                 'mb_no' => 1,
@@ -83,8 +85,10 @@ class QnaController extends Controller
 
             File::insert($files);
 
+            DB::commit();
             return response()->json(['message' => Messages::MSG_0007, 'qna_no' => $qna_no], 201);
         } catch (\Exception $e) {
+            DB::rollback();
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0001], 500);
         }

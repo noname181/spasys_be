@@ -51,7 +51,8 @@ class QnaRegisterRequest extends BaseFormRequest
                 'required',
             ],
             'files.*' => [
-                'file'
+                'file',
+                'max:5119'
             ],
         ];
     }
