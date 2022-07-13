@@ -147,9 +147,7 @@ class QnaController extends Controller
                     $query->orWhere('qna_content', 'like', '%' . $validated['search_string'] . '%');
                 });
             }
-
-            Log::error(Date::parse($this->formatDate($validated['to_date']))->endOfDay()->format('Y-m-d H:i:s'));
-
+            
             $qna = $qna->paginate($per_page, ['*'], 'page', $page);
 
             return response()->json($qna);
