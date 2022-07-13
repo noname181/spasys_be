@@ -24,10 +24,6 @@ class NoticeCreateRequest extends BaseFormRequest
     public function rules()
     {
         return [
-            'mb_no' => [
-                'required',
-                'integer',
-            ],
             'notice_title' => [
                 'required',
                 'string',
@@ -49,6 +45,7 @@ class NoticeCreateRequest extends BaseFormRequest
             ],
             'files.*' => [
                 'file',
+                'max:5000',
                 'mimes:jpg,jpeg,png',
             ],
         ];
