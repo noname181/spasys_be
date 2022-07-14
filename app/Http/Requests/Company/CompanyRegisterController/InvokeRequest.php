@@ -140,22 +140,22 @@ class InvokeRequest extends BaseFormRequest
             ],
             'c_file_insulance' => [
                 'required',
-                'max:5000',
+                'max:5119',
                 'mimes:pdf,png,jpg,jpeg'
             ],
             'c_file_license' => [
                 'required',
-                'max:5000',
+                'max:5119',
                 'mimes:pdf,png,jpg,jpeg'
             ],
             'c_file_contract' => [
                 'required',
-                'max:5000',
+                'max:5119',
                 'mimes:pdf,png,jpg,jpeg'
             ],
             'c_file_bank_account' => [
                 'required',
-                'max:5000',
+                'max:5119',
                 'mimes:pdf,png,jpg,jpeg'
             ],
             'c_deposit_return_price' => [
