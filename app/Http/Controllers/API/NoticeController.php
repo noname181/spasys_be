@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use DateTime;
 use App\Models\File;
 use App\Models\Member;
 use App\Models\Notice;
@@ -13,9 +14,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Notice\NoticeRequest;
 use App\Http\Requests\Notice\NoticeCreateRequest;
+use App\Http\Requests\Notice\NoticeSearchRequest;
 use App\Http\Requests\Notice\NoticeUpdateRequest;
 
 class NoticeController extends Controller
@@ -56,7 +59,7 @@ class NoticeController extends Controller
             //DB::beginTransaction();
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
             $notice_no = Notice::insertGetId([
-                'mb_no' => $member->mb_no,
+                'mb_no' => $validated['mb_no'] ? $validated['mb_no'] : $member->mb_no,
                 'notice_title' => $validated['notice_title'],
                 'notice_content' => $validated['notice_content'],
                 'notice_target' => $validated['notice_target'],
@@ -112,7 +115,7 @@ class NoticeController extends Controller
 
         /**
      * Update Notice by id
-     * @param  Notice $qna
+     * @param  Notice $notice
      * @param  QnaUpdateRequest $request
      * @return \Illuminate\Http\Response
      */
@@ -129,5 +132,48 @@ class NoticeController extends Controller
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0002], 500);
         }
+    }
+
+     /**
+     * Get Notice
+     * @param  NoticeSearchRequest $request
+     */
+    public function getNotice(NoticeSearchRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+
+            // If per_page is null set default data = 15
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+            $notice = Notice::select('*');
+
+            if (isset($validated['from_date'])) {
+                $notice->where('created_at', '>=', Date::parse($this->formatDate($validated['from_date']))->startOfDay()->format('Y-m-d H:i:s'));
+            }
+
+            if (isset($validated['to_date'])) {
+                $notice->where('created_at', '<=', Date::parse($this->formatDate($validated['to_date']))->endOfDay()->format('Y-m-d H:i:s'));
+            }
+
+            if (isset($validated['search_string'])) {
+                $notice->where(function($query) use ($validated) {
+                    $query->where('notice_title', 'like', '%' . $validated['search_string'] . '%');
+                    $query->orWhere('notice_content', 'like', '%' . $validated['search_string'] . '%');
+                });
+            }
+            
+            $notice = $notice->paginate($per_page, ['*'], 'page', $page);
+
+            return response()->json($notice);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    private function formatDate($dateStr) {
+        return DateTime::createFromFormat('j/n/Y', $dateStr)->format('Y-m-d');
     }
 }
