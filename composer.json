@@ -15,6 +15,7 @@
         "laravel/sanctum": "^2.15",
         "laravel/tinker": "^2.5",
         "laravel/ui": "^3.4",
+        "phpoffice/phpspreadsheet": "^1.24",
         "pragmarx/google2fa-laravel": "^2.0",
         "seshac/otp-generator": "^0.0.7",
         "spatie/laravel-permission": "^5.5"
