@@ -16,6 +16,7 @@ Route::get('/hello', function () {
     return "Wellcome to spasys1 api!";
 })->name('hello');
 Route::post('/import_excel', \App\Http\Controllers\Excel\ImportExcelController::class)->name('import_excel');
+Route::get('/export_excel', [\App\Http\Controllers\Excel\ExportExcelController::class, 'exportExcel']);
 
 Route::post('/login', \App\Http\Controllers\Auth\AuthController::class)->name('login');
 Route::post('/register', \App\Http\Controllers\Member\MemberController::class)->name('member.register');
