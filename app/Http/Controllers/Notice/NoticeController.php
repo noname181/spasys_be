@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\Notice;
 
 use DateTime;
 use App\Models\File;
