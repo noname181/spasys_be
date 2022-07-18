@@ -13,7 +13,6 @@ use App\Utils\Messages;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Date;
 
 class BannerController extends Controller
 {
@@ -32,8 +31,6 @@ class BannerController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $banner = Banner::paginate($per_page, ['*'], 'page', $page);
             foreach ($banner->items() as $d) {
-                $d['banner_start'] = Date::parse($d['banner_start'])->format('Y.m.d H:i');
-                $d['banner_end'] = Date::parse($d['banner_end'])->format('Y.m.d H:i');
                 $d['files'] = $d->files()->get();
             }
             // $banner->
@@ -51,8 +48,6 @@ class BannerController extends Controller
      */
     public function getById(Banner $banner)
     {
-        $banner['banner_start'] = Date::parse($banner['banner_start'])->format('Y.m.d H:i');
-        $banner['banner_end'] = Date::parse($banner['banner_end'])->format('Y.m.d H:i');
         $banner['files'] = $banner->files()->get();
         return response()->json($banner);
     }
