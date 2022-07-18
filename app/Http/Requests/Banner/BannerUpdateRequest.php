@@ -41,11 +41,11 @@ class BannerUpdateRequest extends BaseFormRequest
             ],
             'banner_start' => [
                 'required',
-                'date',
+                'date_format:j/n/Y' 
             ],
             'banner_end' => [
                 'required',
-                'date',
+                'date_format:j/n/Y' 
             ],
             'banner_use_yn' => [
                 'required',

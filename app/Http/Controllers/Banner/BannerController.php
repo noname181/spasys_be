@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Banner;
 
+use DateTime;
 use App\Http\Requests\Banner\BannerRequest;
 use App\Http\Requests\Banner\BannerRegisterRequest;
 use App\Http\Requests\Banner\BannerUpdateRequest;
@@ -12,6 +13,7 @@ use App\Utils\Messages;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Date;
 
 class BannerController extends Controller
 {
@@ -29,7 +31,9 @@ class BannerController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $banner = Banner::paginate($per_page, ['*'], 'page', $page);
-            foreach($banner->items() as $d) {
+            foreach ($banner->items() as $d) {
+                $d['banner_start'] = Date::parse($d['banner_start'])->format('Y.m.d H:i');
+                $d['banner_end'] = Date::parse($d['banner_end'])->format('Y.m.d H:i');
                 $d['files'] = $d->files()->get();
             }
             // $banner->
@@ -47,6 +51,8 @@ class BannerController extends Controller
      */
     public function getById(Banner $banner)
     {
+        $banner['banner_start'] = Date::parse($banner['banner_start'])->format('Y.m.d H:i');
+        $banner['banner_end'] = Date::parse($banner['banner_end'])->format('Y.m.d H:i');
         $banner['files'] = $banner->files()->get();
         return response()->json($banner);
     }
@@ -65,8 +71,8 @@ class BannerController extends Controller
                 'banner_title' => $validated['banner_title'],
                 'banner_lat' => $validated['banner_lat'],
                 'banner_lng' => $validated['banner_lng'],
-                'banner_start' => $validated['banner_start'],
-                'banner_end' => $validated['banner_end'],
+                'banner_start' => DateTime::createFromFormat('j/n/Y', $validated['banner_start']),
+                'banner_end' => DateTime::createFromFormat('j/n/Y', $validated['banner_end']),
                 'banner_use_yn' => $validated['banner_use_yn'],
                 'banner_sliding_yn' => $validated['banner_sliding_yn'],
                 'mb_no' => $validated['mb_no']
@@ -75,7 +81,7 @@ class BannerController extends Controller
             $path = join('/', ['files', 'banner', $banner_no]);
 
             $files = [];
-            foreach($validated['files'] as $key => $file) {
+            foreach ($validated['files'] as $key => $file) {
                 $url = Storage::disk('public')->put($path, $file);
                 $files[] = [
                     'file_table' => 'banner',
@@ -113,8 +119,8 @@ class BannerController extends Controller
                 'banner_title' => $validated['banner_title'],
                 'banner_lat' => $validated['banner_lat'],
                 'banner_lng' => $validated['banner_lng'],
-                'banner_start' => $validated['banner_start'],
-                'banner_end' => $validated['banner_end'],
+                'banner_start' => DateTime::createFromFormat('j/n/Y', $validated['banner_start']),
+                'banner_end' => DateTime::createFromFormat('j/n/Y', $validated['banner_end']),
                 'banner_use_yn' => $validated['banner_use_yn'],
                 'banner_sliding_yn' => $validated['banner_sliding_yn'],
                 'mb_no' => $validated['mb_no'],
