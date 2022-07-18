@@ -12,8 +12,17 @@ class Banner extends Model
     protected $table = "banner";
 
     protected $primaryKey = 'banner_no';
-
+    
     public $timestamps = true;
+
+    protected $casts = [
+        'created_at' => "date:Y.m.d H:i",
+        'updated_at' => "date:Y.m.d H:i",
+        'banner_start' => "date:Y.m.d H:i",
+        'banner_end' => "date:Y.m.d H:i",
+    ];
+
+    // public $timestamps = true;
     /**
      * The attributes that are mass assignable.
      *
@@ -21,7 +30,7 @@ class Banner extends Model
      */
     protected $fillable = [
         'banner_no',
-        'banner_title', 
+        'banner_title',
         'banner_location',
         'banner_start',
         'banner_end',
@@ -34,5 +43,4 @@ class Banner extends Model
     {
         return $this->hasMany(File::class, 'file_table_key');
     }
-    
 }

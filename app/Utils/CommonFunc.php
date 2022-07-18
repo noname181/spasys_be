@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Utils;
+use DateTime;
 
 class CommonFunc
 {
@@ -15,13 +16,12 @@ class CommonFunc
         return $msg;
     }
 
-    function isMail($email) {
-        $regex = '/^([a-z0-9A-Z](\.?[a-z0-9A-Z]){1,})\@\w+([\.-]?\w+)(\.\w{2,3})+$/'; 
+    function isMail($email)
+    {
+        $regex = '/^([a-z0-9A-Z](\.?[a-z0-9A-Z]){1,})\@\w+([\.-]?\w+)(\.\w{2,3})+$/';
         if (preg_match($regex, $email)) {
             return true;
-        } else { 
+        } else {
             return false;
-        }           
-      }
-    
-}
+        }
+    }
