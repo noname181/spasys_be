@@ -49,9 +49,15 @@ Route::middleware('auth')->group(function () {
         Route::patch('{banner}', [App\Http\Controllers\Banner\BannerController::class, 'update'])->name('update_banner');
     });
 
-    Route::post('/notices', [\App\Http\Controllers\Api\NoticeController::class, 'create']);
-    Route::get('/notices/{id}', [\App\Http\Controllers\Api\NoticeController::class, 'getNoticeById']);
-    Route::patch('/notices', [\App\Http\Controllers\Api\NoticeController::class, 'update']);
-    Route::get('/notices', [\App\Http\Controllers\Api\NoticeController::class,'__invoke']);
-    Route::post('/get_notices', [\App\Http\Controllers\Api\NoticeController::class, 'getNotice']);
+    Route::post('/notices', [\App\Http\Controllers\Notice\NoticeController::class, 'create']);
+    Route::get('/notices/{id}', [\App\Http\Controllers\Notice\NoticeController::class, 'getNoticeById']);
+    Route::patch('/notices', [\App\Http\Controllers\Notice\NoticeController::class, 'update']);
+    Route::get('/notices', [\App\Http\Controllers\Notice\NoticeController::class,'__invoke']);
+    Route::post('/get_notices', [\App\Http\Controllers\Notice\NoticeController::class, 'getNotice']);
+
+    Route::prefix('adjustment_group')->name('adjustment_group.')->group(function () {
+        Route::post('/', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create'])->name('register_adjustment_group');
+        Route::patch('{adjustment}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'update'])->name('update_adjustment_group');
+    });
+    
 });
