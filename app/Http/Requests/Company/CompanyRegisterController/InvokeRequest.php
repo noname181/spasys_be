@@ -27,7 +27,8 @@ class InvokeRequest extends BaseFormRequest
             'co_name' => [
                 'required',
                 'string',
-                'max:255'
+                'max:255',
+                'min:3'
             ],
             'co_country' => [
                 'required',
@@ -42,19 +43,19 @@ class InvokeRequest extends BaseFormRequest
             'co_license' => [
                 'required',
                 'string',
-                'max:255',
-                'unique:company,co_license'
+                'max:255'
             ],
             'co_owner' => [
                 'required',
                 'string',
                 'max:255'
             ],
-            'co_close_yn' => [
-                'required',
-                'string',
-                'max:1'
-            ],
+            // FIXME no found
+            // 'co_close_yn' => [
+            //     'required',
+            //     'string',
+            //     'max:1'
+            // ],
             'co_homepage' => [
                 'required',
                 'string',
@@ -65,115 +66,21 @@ class InvokeRequest extends BaseFormRequest
                 'string',
                 'max:255',
                 'email',
-                'unique:company,co_email'
             ],
             'co_etc' => [
                 'required',
                 'string',
             ],
-
-
-            'c_start_date' => [
-                'required',
-                'date',
-            ],
-            'c_end_date' => [
-                'required',
-                'date',
-            ],
-            'c_transaction_yn' => [
+            'co_address' => [
                 'required',
                 'string',
-                'max:1'
+                'max:255',
             ],
-            'c_payment_cycle' => [
+            'co_address_detail' => [
                 'required',
                 'string',
-                'max:255'
-            ],
-            'c_money_type' => [
-                'required',
-                'string',
-                'max:255'
-            ],
-            'c_payment_group' => [
-                'required',
-                'string',
-                'max:255'
-            ],
-            'c_calculate_deadline_yn' => [
-                'required',
-                'string',
-                'max:1'
-            ],
-            'c_integrated_calculate_yn' => [
-                'required',
-                'string',
-                'max:1'
-            ],
-            'c_calculate_method' => [
-                'required',
-                'string',
-                'max:255'
-            ],
-            'c_card_number' => [
-                'required',
-                'string',
-                'max:255'
-            ],
-            'c_deposit_day' => [
-                'required',
-                'integer'
-            ],
-            'c_account_number' => [
-                'required',
-                'string',
-                'max:255'
-            ],
-            'c_deposit_price' => [
-                'required',
-                'integer'
-            ],
-            'c_deposit_date' => [
-                'required',
-                'date'
-            ],
-            'c_file_insulance' => [
-                'required',
-                'max:5119',
-                'mimes:pdf,png,jpg,jpeg'
-            ],
-            'c_file_license' => [
-                'required',
-                'max:5119',
-                'mimes:pdf,png,jpg,jpeg'
-            ],
-            'c_file_contract' => [
-                'required',
-                'max:5119',
-                'mimes:pdf,png,jpg,jpeg'
-            ],
-            'c_file_bank_account' => [
-                'required',
-                'max:5119',
-                'mimes:pdf,png,jpg,jpeg'
-            ],
-            'c_deposit_return_price' => [
-                'required',
-                'integer'
-            ],
-            'c_deposit_return_date' => [
-                'required',
-                'date'
-            ],
-            'c_deposit_return_reg_date' => [
-                'required',
-                'date'
-            ],
-            'c_deposit_return_expiry_date' => [
-                'required',
-                'date'
-            ],
+                'max:255',
+            ]
         ];
     }
 
