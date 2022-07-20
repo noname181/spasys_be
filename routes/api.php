@@ -31,7 +31,10 @@ Route::middleware('auth')->group(function () {
 
     // Manger Role
     Route::middleware('role.manager')->group(function () {
-        Route::post('/create_company', \App\Http\Controllers\Company\CompanyRegisterController::class)->name('create_company');
+        Route::post('/register_company', \App\Http\Controllers\Company\CompanyController::class)->name('register_company');
+        Route::get('/get_company', [App\Http\Controllers\Company\CompanyController::class, 'getCompany'])->name('get_company');
+        Route::patch('/update_company/{company}', [App\Http\Controllers\Company\CompanyController::class, 'updateCompany'])->name('update_company');
+        Route::post('/register_contract', \App\Http\Controllers\Contract\ContractController::class)->name('register_contract');
     });
 
     Route::prefix('qna')->name('qna.')->group(function () {

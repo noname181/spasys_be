@@ -1,21 +1,21 @@
 <?php
 
-namespace App\Http\Controllers\Company;
+namespace App\Http\Controllers\Contract;
 
-use App\Http\Requests\Company\CompanyRegisterController\InvokeRequest;
+use App\Http\Requests\Contract\ContractRegisterController\InvokeRequest;
 use App\Http\Controllers\Controller;
-use App\Models\Company;
 use App\Models\Contract;
 use App\Utils\Messages;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
-class CompanyRegisterController extends Controller
+class ContractController extends Controller
 {
     /**
      * Register company
-     * @param  \App\Http\Requests\Company\CompanyRegisterController\InvokeRequest  $request
+     * @param  App\Http\Requests\Contract\ContractRegisterController\InvokeRequest  $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function __invoke(InvokeRequest $request)
@@ -23,19 +23,7 @@ class CompanyRegisterController extends Controller
         $validated = $request->validated();
         try {
             DB::beginTransaction();
-            $co_no = Company::insertGetId([
-                'co_name' => $validated['co_name'],
-                'co_country' => $validated['co_country'],
-                'co_service' => $validated['co_service'],
-                'co_owner' => $validated['co_owner'],
-                'co_license' => $validated['co_license'],
-                'co_close_yn' => $validated['co_close_yn'],
-                'co_homepage' => $validated['co_homepage'],
-                'co_email' => $validated['co_email'],
-                'co_etc' => $validated['co_etc']
-            ]);
-
-            $validated['co_no'] = $co_no;
+            $co_no = $validated['co_no'];
 
             $c_file_insulance = join('/', ['files', 'contract', $co_no, 'insulance']);
             $c_file_license = join('/', ['files', 'contract',  $co_no, 'license']);
@@ -49,6 +37,7 @@ class CompanyRegisterController extends Controller
 
             $c_no = Contract::insertGetId([
                 'co_no' => $validated['co_no'],
+                'mb_no' => Auth::user()->mb_no,
                 'c_start_date' => $validated['c_start_date'],
                 'c_end_date' => $validated['c_end_date'],
                 'c_transaction_yn' => $validated['c_transaction_yn'],
@@ -76,7 +65,6 @@ class CompanyRegisterController extends Controller
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'co_no' => $co_no,
                 'c_no' => $c_no,
             ]);
         } catch (\Exception $e) {

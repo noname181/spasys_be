@@ -21,7 +21,7 @@ class Company extends Model
      */
     protected $fillable = [
         'co_no',
-        'mb_no', 
+        'mb_no',
         'co_name',
         'co_country',
         'co_service',
@@ -32,4 +32,9 @@ class Company extends Model
         'co_email',
         'co_etc'
     ];
+
+    public function co_address()
+    {
+        return $this->hasOne(COAddress::class, 'co_no');
+    }
 }
