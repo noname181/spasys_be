@@ -45,7 +45,7 @@ return [
             'provider' => 'member',
             "storage_key" => "mb_token",  // the database column
             "input_key" => "mb_token",  // the query string component
-            'hash' => true,
+            'hash' => false,
         ],
     ],
 

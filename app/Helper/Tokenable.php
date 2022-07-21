@@ -10,7 +10,8 @@ trait Tokenable
     {
         $token = Str::random(60);
 
-        $this->mb_token = hash('sha256', $token);
+        // $this->mb_token = hash('sha256', $token);
+        $this->mb_token = $token;
         $this->save();
 
         return $token;
