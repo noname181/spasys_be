@@ -38,7 +38,10 @@ class AuthController extends Controller
             }
 
             $member->mb_otp = null;
-            $token = $member->generateAndSaveApiAuthToken();
+            if(!$member['mb_token'])
+                $token = $member->generateAndSaveApiAuthToken();
+            else
+                $token = $member['mb_token'];
 
             return response()->json([
                 'message' => Messages::MSG_0007,

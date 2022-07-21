@@ -30,12 +30,11 @@ Route::middleware('auth')->group(function () {
     Route::put('/change_password', \App\Http\Controllers\Auth\ChangePasswordController::class)->name('change_password');
 
     // Manger Role
-    Route::middleware('role.manager')->group(function () {
-        Route::post('/register_company', \App\Http\Controllers\Company\CompanyController::class)->name('register_company');
-        Route::get('/get_company', [App\Http\Controllers\Company\CompanyController::class, 'getCompany'])->name('get_company');
-        Route::patch('/update_company/{company}', [App\Http\Controllers\Company\CompanyController::class, 'updateCompany'])->name('update_company');
-        Route::post('/register_contract', \App\Http\Controllers\Contract\ContractController::class)->name('register_contract');
-    });
+    Route::post('/register_company', \App\Http\Controllers\Company\CompanyController::class)->name('register_company');
+    Route::get('/get_company', [App\Http\Controllers\Company\CompanyController::class, 'getCompany'])->name('get_company');
+    Route::patch('/update_company/{company}', [App\Http\Controllers\Company\CompanyController::class, 'updateCompany'])->name('update_company');
+    Route::post('/register_contract', \App\Http\Controllers\Contract\ContractController::class)->name('register_contract');
+
 
     Route::prefix('qna')->name('qna.')->group(function () {
         Route::get('/', App\Http\Controllers\Qna\QnaController::class)->name('get_qna_index');
