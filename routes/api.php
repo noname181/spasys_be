@@ -19,7 +19,6 @@ Route::post('/import_excel', \App\Http\Controllers\Excel\ImportExcelController::
 Route::get('/export_excel', [\App\Http\Controllers\Excel\ExportExcelController::class, 'exportExcel']);
 
 Route::post('/login', \App\Http\Controllers\Auth\AuthController::class)->name('login');
-Route::post('/register', \App\Http\Controllers\Member\MemberController::class)->name('member.register');
 Route::post('/forgot_password', [\App\Http\Controllers\Api\SendMailController::class, 'forgotPassword']);
 Route::post('/send_email_otp', [\App\Http\Controllers\Api\SendMailController::class, 'sendEmailOtp']);
 Route::post('/validate_otp', [\App\Http\Controllers\Api\SendMailController::class, 'validateOtp']);
@@ -27,6 +26,7 @@ Route::patch('/forgot_password', [\App\Http\Controllers\Api\SendMailController::
 Route::get('/find_id', [\App\Http\Controllers\Member\MemberController::class, 'findUserId'])->name('member.findUserId');
 
 Route::middleware('auth')->group(function () {
+    Route::post('/register', \App\Http\Controllers\Member\MemberController::class)->name('member.register');
     Route::put('/change_password', \App\Http\Controllers\Auth\ChangePasswordController::class)->name('change_password');
 
     // Manger Role
