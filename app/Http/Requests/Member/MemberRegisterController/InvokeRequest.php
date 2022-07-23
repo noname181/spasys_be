@@ -42,6 +42,7 @@ class InvokeRequest extends BaseFormRequest
                 'required',
                 'string',
                 'max:20',
+                'min:4',
             ],
             'mb_email' => [
                 'required',
@@ -82,6 +83,10 @@ class InvokeRequest extends BaseFormRequest
                 'required',
                 'string',
                 'max:1'
+            ],
+            'mb_service_no_array' => [
+                'required',
+                'string'
             ],
         ];
     }

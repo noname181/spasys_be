@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Member;
 use App\Utils\Messages;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
@@ -21,6 +22,11 @@ class MemberController extends Controller
     {
         try {
             $validated = $request->validated();
+            $roleNoOfUserLogin = Auth::user()->role_no;
+            if($roleNoOfUserLogin == Member::ROLE_ADMIN) {
+                $validated['mb_type'] = Member::SPASYS;
+                $validated['mb_parent'] = Member::ADMIN;
+            }
             // FIXME hard set mb_language = ko and role_no = 1
             $validated['role_no'] = 1;
             $validated['mb_language'] = 'ko';

@@ -20,6 +20,9 @@ class Member extends Authenticatable
     const ROLE_COMPANY_MANAGER = 6;
     const ROLE_COMPANY_OPERATOR = 7;
 
+    const SPASYS = 'spasys';
+    const ADMIN = 'admin';
+
     protected $table = "member";
 
 
