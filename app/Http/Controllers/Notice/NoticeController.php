@@ -59,7 +59,7 @@ class NoticeController extends Controller
             //DB::beginTransaction();
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
             $notice_no = Notice::insertGetId([
-                'mb_no' => $validated['mb_no'] ? $validated['mb_no'] : $member->mb_no,
+                'mb_no' => $member->mb_no,
                 'notice_title' => $validated['notice_title'],
                 'notice_content' => $validated['notice_content'],
                 'notice_target' => $validated['notice_target'],
@@ -163,7 +163,7 @@ class NoticeController extends Controller
                     $query->orWhere('notice_content', 'like', '%' . $validated['search_string'] . '%');
                 });
             }
-            
+
             $notice = $notice->paginate($per_page, ['*'], 'page', $page);
 
             return response()->json($notice);
