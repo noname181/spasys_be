@@ -29,8 +29,8 @@ class AuthController extends Controller
             }
 
             $token = "";
-            if ($input['mb_pw'] === $member->mb_otp) {
-                $member->mb_pw = Hash::make($member->mb_otp);
+            if (Hash::check($input['mb_pw'], $member->mb_otp)) {
+                $member->mb_pw = $member->mb_otp;
             } else if (!Hash::check($input['mb_pw'], $member->mb_pw)) {
                 return response()->json([
                     'message' => Messages::MSG_0008,
@@ -43,6 +43,7 @@ class AuthController extends Controller
             else
                 $token = $member['mb_token'];
 
+            $member->save();
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'mb_token' => $token,
