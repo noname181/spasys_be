@@ -10,6 +10,7 @@ use App\Utils\Messages;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 class CompanyController extends Controller
 {
@@ -57,7 +58,7 @@ class CompanyController extends Controller
         }
     }
 
-    public function getCompany()
+    public function getCompany($co_no)
     {
         try {
             $company = Company::select([
@@ -74,8 +75,8 @@ class CompanyController extends Controller
                 'co_address.ca_address as co_address',
                 'co_address.ca_address_detail as co_address_detail',
             ])->join('co_address', 'co_address.co_no', 'company.co_no')
-                ->where('company.mb_no', Auth::user()->mb_no)
-                ->where('co_address.mb_no', Auth::user()->mb_no)
+                ->where('company.co_no', $co_no)
+                ->where('co_address.co_no', $co_no)
                 ->first();
 
             return response()->json([
