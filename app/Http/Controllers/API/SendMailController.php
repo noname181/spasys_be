@@ -13,6 +13,7 @@ use App\Http\Requests\SendMail\SendMailOtpRequest;
 use App\Http\Requests\SendMail\ValidateOtpRequest;
 use App\Http\Requests\SendMail\ForgotPasswordRequest;
 use App\Http\Requests\SendMail\ForgotPasswordPatchRequest;
+use Illuminate\Support\Str;
 
 class SendMailController extends Controller
 {
@@ -21,8 +22,8 @@ class SendMailController extends Controller
     {
         try {
             $validated = $request->validated();
-            $mb_otp = rand(1000, 9999);
-            $member = Member::where('mb_no', '=', $validated['mb_no'])->first();
+            $mb_otp = Str::lower(Str::random(6));
+            $member = Member::where([['mb_no', '=', $validated['mb_no']], ['mb_id', '=', $validated['mb_id']]])->first();
     
             if (!empty($member)) {
                 // send otp in the email
@@ -31,7 +32,7 @@ class SendMailController extends Controller
                     'body' => 'Your OTP is : ' . $mb_otp,
                 ];
     
-                Member::where('mb_no', '=', $validated['mb_no'])->update(['mb_otp' => $mb_otp]);
+                Member::where('mb_no', '=', $validated['mb_no'])->update(['mb_otp' => Hash::make($mb_otp)]);
     
                 Mail::to($member->mb_email)->send(new sendEmail($mail_details));
     
