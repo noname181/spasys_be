@@ -29,4 +29,9 @@ class Notice extends Model
         'created_at',
         'updated_at',
     ];
+
+    protected $casts = [
+        'created_at' => "date:Y.m.d H:i",
+        'updated_at' => "date:Y.m.d H:i",
+    ];
 }
