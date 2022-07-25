@@ -27,6 +27,8 @@ Route::get('/find_id', [\App\Http\Controllers\Member\MemberController::class, 'f
 
 Route::middleware('auth')->group(function () {
     Route::post('/register', \App\Http\Controllers\Member\MemberController::class)->name('member.register');
+    Route::patch('/member/update', [\App\Http\Controllers\Member\MemberController::class, 'updateProfile'])->name('member.update');
+    Route::get('/profile', [\App\Http\Controllers\Member\MemberController::class, 'getProfile'])->name('member.profile');
     Route::put('/change_password', \App\Http\Controllers\Auth\ChangePasswordController::class)->name('change_password');
 
     // Manger Role

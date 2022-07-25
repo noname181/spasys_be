@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Member;
 
 use App\Http\Requests\Member\MemberRegisterController\InvokeRequest;
+use App\Http\Requests\Member\MemberUpdate\MemberUpdateRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Member;
 use App\Utils\Messages;
@@ -68,7 +69,47 @@ class MemberController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
-            return response()->json(['message' => Messages::MSG_0001], 500);
+            return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
+
+    /**
+     * Get Profiles
+     */
+    public function getProfile() {
+        try {
+            $member = Member::where('mb_no', Auth::user()->mb_no)->first();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'profile' => $member,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+    /**
+     * Update Profiles
+     */
+    public function updateProfile(MemberUpdateRequest $request) {
+        try {
+            $validated = $request->validated();
+            $member = Member::where('mb_no', Auth::user()->mb_no)->first();
+            $member['mb_email'] = $validated['mb_email'];
+            $member['mb_tel'] = $validated['mb_tel'];
+            $member['mb_hp'] = $validated['mb_hp'];
+            $member['mb_push_yn'] = $validated['mb_push_yn'];
+            $member['mb_service_no_array'] = $validated['mb_service_no_array'];
+            $member->save();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'profile' => $member,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
 }
