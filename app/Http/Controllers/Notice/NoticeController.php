@@ -37,7 +37,11 @@ class NoticeController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $notice = Notice::paginate($per_page, ['*'], 'page', $page);
+            $notice = Notice::with('files')->paginate($per_page, ['*'], 'page', $page);
+
+            // foreach ($notice->items() as $d) {
+            //     $d['files'] = $d->files()->get();
+            // }
 
             return response()->json($notice);
         } catch (\Exception $e) {
@@ -55,6 +59,7 @@ class NoticeController extends Controller
     public function create(NoticeCreateRequest $request)
     {
         $validated = $request->validated();
+
         try {
             //DB::beginTransaction();
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
@@ -68,11 +73,13 @@ class NoticeController extends Controller
             $path = join('/', ['files', 'notice', $notice_no]);
 
             $files = [];
+
             foreach($validated['files'] as $key => $file) {
                 $url = Storage::disk('public')->put($path, $file);
                 $files[] = [
                     'file_table' => 'notice',
                     'file_table_key' => $notice_no,
+                    'file_name_old' => $file->getClientOriginalName(),
                     'file_name' => basename($url),
                     'file_size' => $file->getSize(),
                     'file_extension' => $file->extension(),
@@ -80,12 +87,14 @@ class NoticeController extends Controller
                     'file_url' => $url
                 ];
             }
+
             File::insert($files);
 
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'notice_no' => $notice_no,
+                'file' => $files,
+                'notice_no' => $notice_no
             ], 201);
         } catch (\Throwable $e) {
             DB::rollback();

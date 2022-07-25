@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\File;
 
 class Notice extends Model
 {
@@ -22,7 +23,7 @@ class Notice extends Model
      */
     protected $fillable = [
         'notice_no',
-        'mb_no', 
+        'mb_no',
         'notice_title',
         'notice_content',
         'notice_target',
@@ -34,4 +35,10 @@ class Notice extends Model
         'created_at' => "date:Y.m.d H:i",
         'updated_at' => "date:Y.m.d H:i",
     ];
+
+    public function files()
+    {
+        return $this->hasMany(File::class, 'file_table_key', 'notice_no')->where('file_table', 'notice');
+    }
+
 }
