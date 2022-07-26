@@ -33,6 +33,11 @@ class Company extends Model
         'co_etc'
     ];
 
+    protected $casts = [
+        'created_at' => "date:Y.m.d",
+        'updated_at' => "date:Y.m.d",
+    ];
+
     public function co_address()
     {
         return $this->hasOne(COAddress::class, 'co_no');
