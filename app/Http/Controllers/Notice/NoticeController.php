@@ -128,18 +128,68 @@ class NoticeController extends Controller
      * @param  QnaUpdateRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function update(Notice $notice, NoticeUpdateRequest $request)
+    public function update(NoticeUpdateRequest $request)
     {
+        // return $request->hasFile('files');
         try {
             $validated = $request->validated();
-            $notice->update([
-                "notice_no" => $validated['notice_no'],
-                "notice_content" => $validated['notice_content']
+            $notice = Notice::where('notice_no', $validated['notice_no'])
+                ->where('mb_no', Auth::user()->mb_no)
+                ->update([
+                    'notice_title' => $validated['notice_title'],
+                    'notice_content' => $validated['notice_content'],
             ]);
+
+            //FILE PART
+
+            $path = join('/', ['files', 'notice', $validated['notice_no']]);
+
+            // remove old image
+
+            if($request->remove_files){
+                foreach($request->remove_files as $key => $file_no) {
+                    $file = File::where('file_no', $file_no)->get()->first();
+                    $url = Storage::disk('public')->delete($path. '/' . $file->file_name);
+                    $file->delete();
+                }
+            }
+
+
+            if($request->hasFile('files')){
+                $files = [];
+
+                $max_position_file = File::where('file_table', 'notice')->where('file_table_key', $validated['notice_no'])->orderBy('file_position', 'DESC')->get()->first();
+                if($max_position_file)
+                    $i = $max_position_file->file_position + 1;
+                else
+                    $i = 0;
+
+                foreach($validated['files'] as $key => $file) {
+                    $url = Storage::disk('public')->put($path, $file);
+                    $files[] = [
+                        'file_table' => 'notice',
+                        'file_table_key' => $validated['notice_no'],
+                        'file_name_old' => $file->getClientOriginalName(),
+                        'file_name' => basename($url),
+                        'file_size' => $file->getSize(),
+                        'file_extension' => $file->extension(),
+                        'file_position' => $i,
+                        'file_url' => $url
+                    ];
+                    $i++;
+                }
+
+               File::insert($files);
+
+            }
+
+
+            DB::commit();
+
             return response()->json(['message' => Messages::MSG_0007], 200);
         } catch (\Exception $e) {
             Log::error($e);
-            return response()->json(['message' => Messages::MSG_0002], 500);
+            return response()->json(['message' => Messages::MSG_0005], 500);
         }
     }
 

@@ -54,7 +54,7 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/notices', [\App\Http\Controllers\Notice\NoticeController::class, 'create']);
     Route::get('/notices/{id}', [\App\Http\Controllers\Notice\NoticeController::class, 'getNoticeById']);
-    Route::patch('/notices', [\App\Http\Controllers\Notice\NoticeController::class, 'update']);
+    Route::patch('/update_notices', [\App\Http\Controllers\Notice\NoticeController::class, 'update']);
     Route::get('/notices', [\App\Http\Controllers\Notice\NoticeController::class,'__invoke']);
     Route::post('/get_notices', [\App\Http\Controllers\Notice\NoticeController::class, 'getNotice']);
 

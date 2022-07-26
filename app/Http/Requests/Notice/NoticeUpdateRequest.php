@@ -28,10 +28,23 @@ class NoticeUpdateRequest extends BaseFormRequest
                 'required',
                 'integer',
             ],
+            'notice_title' => [
+                'required',
+                'string',
+                'max:255',
+            ],
             'notice_content' => [
                 'required',
                 'string',
                 'max:255',
+            ],
+            'files' => [
+                'array',
+            ],
+            'files.*' => [
+                'file',
+                'max:5000',
+                'mimes:jpg,jpeg,png',
             ],
         ];
     }
