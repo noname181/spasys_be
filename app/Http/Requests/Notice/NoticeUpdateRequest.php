@@ -36,7 +36,6 @@ class NoticeUpdateRequest extends BaseFormRequest
             'notice_content' => [
                 'required',
                 'string',
-                'max:255',
             ],
             'files' => [
                 'array',
