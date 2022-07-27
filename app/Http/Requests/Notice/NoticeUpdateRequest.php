@@ -43,7 +43,7 @@ class NoticeUpdateRequest extends BaseFormRequest
             'files.*' => [
                 'file',
                 'max:5000',
-                'mimes:jpg,jpeg,png',
+                'mimes:jpg,jpeg,png,pdf',
             ],
         ];
     }

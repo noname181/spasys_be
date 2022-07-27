@@ -56,7 +56,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/notices/{id}', [\App\Http\Controllers\Notice\NoticeController::class, 'getNoticeById']);
     Route::patch('/update_notices', [\App\Http\Controllers\Notice\NoticeController::class, 'update']);
     Route::get('/notices', [\App\Http\Controllers\Notice\NoticeController::class,'__invoke']);
+    Route::post('/search_notices', [\App\Http\Controllers\Notice\NoticeController::class,'searchNotice']);
     Route::post('/get_notices', [\App\Http\Controllers\Notice\NoticeController::class, 'getNotice']);
+    Route::post('/delete', [\App\Http\Controllers\Notice\NoticeController::class, 'delete']);
 
     Route::prefix('adjustment_group')->name('adjustment_group.')->group(function () {
         Route::post('/', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create'])->name('register_adjustment_group');
