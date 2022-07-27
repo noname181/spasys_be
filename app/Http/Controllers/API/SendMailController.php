@@ -23,7 +23,7 @@ class SendMailController extends Controller
         try {
             $validated = $request->validated();
             $mb_otp = Str::lower(Str::random(6));
-            $member = Member::where([['mb_no', '=', $validated['mb_no']], ['mb_id', '=', $validated['mb_id']]])->first();
+            $member = Member::where([['mb_email', '=', $validated['mb_email']], ['mb_id', '=', $validated['mb_id']]])->first();
     
             if (!empty($member)) {
                 // send otp in the email
@@ -32,7 +32,7 @@ class SendMailController extends Controller
                     'body' => 'Your OTP is : ' . $mb_otp,
                 ];
     
-                Member::where('mb_no', '=', $validated['mb_no'])->update(['mb_otp' => Hash::make($mb_otp)]);
+                Member::where('mb_email', '=', $validated['mb_email'])->update(['mb_otp' => Hash::make($mb_otp)]);
     
                 Mail::to($member->mb_email)->send(new sendEmail($mail_details));
     
