@@ -68,4 +68,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/register_manager', [App\Http\Controllers\Manager\ManagerController::class, 'create'])->name('register_manager');
     Route::delete('/delete_manager/{manager}', [App\Http\Controllers\Manager\ManagerController::class, 'delete'])->name('delete_manager');
     Route::patch('/update_manager/{manager}', [App\Http\Controllers\Manager\ManagerController::class, 'update'])->name('update_manager');
+
+    Route::post('/create_menu', [\App\Http\Controllers\Menu\MenuController::class, 'create']);
+    Route::post('/menu', [\App\Http\Controllers\Menu\MenuController::class, 'menu']);
+    Route::get('/menu/{menu_no}', [\App\Http\Controllers\Menu\MenuController::class, 'get_menu']);
 });
