@@ -24,30 +24,26 @@ class AdjustmentGroupCreateRequest extends BaseFormRequest
     public function rules()
     {
         return [
-            'co_no' => [
+            '*.co_no' => [
                 'required',
                 'integer',
             ],
-            'mb_no' => [
-                'required',
-                'integer',
-            ],
-            'ag_name' => [
+            '*.ag_name' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'ag_manager' => [
+            '*.ag_manager' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'ag_hp' => [
+            '*.ag_hp' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'ag_email' => [
+            '*.ag_email' => [
                 'required',
                 'string',
                 'max:255',

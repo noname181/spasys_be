@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Adjustment;
 
 use App\Models\Member;
 use App\Utils\Messages;
+use Illuminate\Http\Request;
 use App\Models\AdjustmentGroup;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -24,21 +25,26 @@ class AdjustmentGroupController extends Controller
     {
 
         try {
-
+            DB::beginTransaction();
+            $member = Member::where('mb_id', Auth::user()->mb_id)->first();
             $validated = $request->validated();
-            $ag_no = AdjustmentGroup::insertGetId([
-                'mb_no' => $validated['mb_no'],
-                'co_no' => $validated['co_no'],
-                'ag_name' => $validated['ag_name'],
-                'ag_hp' => $validated['ag_hp'],
-                'ag_manager' => $validated['ag_manager'],
-                'ag_email' => $validated['ag_email'],
-                'ag_regtime' =>  date('Y-m-d')
-            ]);
+            $answers = [];
+            foreach ($validated  as $value) {
+                $answers[] = [
+                    'mb_no' => $member->mb_no,
+                    'co_no' => $value['co_no'],
+                    'ag_name' => $value['ag_name'],
+                    'ag_hp' => $value['ag_hp'],
+                    'ag_manager' => $value['ag_manager'],
+                    'ag_email' => $value['ag_email'],
+                    'ag_regtime' =>  date('Y-m-d')
+                ];
+            }
+           AdjustmentGroup::insert($answers);
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'ag_no' => $ag_no,
+                'ag_no' =>  $request->all(),
             ], 201);
         } catch (\Throwable $e) {
             DB::rollback();
