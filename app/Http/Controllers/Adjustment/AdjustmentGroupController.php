@@ -17,6 +17,34 @@ class AdjustmentGroupController extends Controller
 {
 
     /**
+     *  getAdjustmentGroup
+     * @param $co_no
+     * @return \Illuminate\Http\Response
+     */
+    public function getAdjustmentGroup($co_no)
+    {
+        try {
+            $adjustmentGroup = AdjustmentGroup::select([
+                'ag_no',
+                'ag_name',
+                'ag_manager',
+                'ag_email',
+                'ag_hp',
+            ])
+            ->where('co_no', $co_no)
+            ->get();
+
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'adjustmentGroup' => $adjustmentGroup
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+    /**
      * create AdjustmentGroup
      * @param  AdjustmentGroupCreateRequest $request
      * @return \Illuminate\Http\Response
@@ -29,7 +57,7 @@ class AdjustmentGroupController extends Controller
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
             $validated = $request->validated();
             $answers = [];
-            foreach ($validated  as $value) {
+            foreach ($validated as $value) {
                 $answers[] = [
                     'mb_no' => $member->mb_no,
                     'co_no' => $value['co_no'],
@@ -40,11 +68,10 @@ class AdjustmentGroupController extends Controller
                     'ag_regtime' =>  date('Y-m-d')
                 ];
             }
-           AdjustmentGroup::insert($answers);
+            AdjustmentGroup::insert($answers);
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'ag_no' =>  $request->all(),
             ], 201);
         } catch (\Throwable $e) {
             DB::rollback();
