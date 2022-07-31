@@ -60,16 +60,24 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/notices', [\App\Http\Controllers\Notice\NoticeController::class, 'create']);
     Route::get('/notices/{id}', [\App\Http\Controllers\Notice\NoticeController::class, 'getNoticeById']);
-    Route::patch('/notices', [\App\Http\Controllers\Notice\NoticeController::class, 'update']);
+    Route::patch('/update_notices', [\App\Http\Controllers\Notice\NoticeController::class, 'update']);
     Route::get('/notices', [\App\Http\Controllers\Notice\NoticeController::class,'__invoke']);
+    Route::post('/search_notices', [\App\Http\Controllers\Notice\NoticeController::class,'searchNotice']);
     Route::post('/get_notices', [\App\Http\Controllers\Notice\NoticeController::class, 'getNotice']);
+    Route::post('/delete', [\App\Http\Controllers\Notice\NoticeController::class, 'delete']);
 
     Route::prefix('adjustment_group')->name('adjustment_group.')->group(function () {
         Route::post('/', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create'])->name('register_adjustment_group');
+        Route::post('/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create_with_co_no'])->name('register_adjustment_group');
         Route::patch('{adjustment}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'update'])->name('update_adjustment_group');
+        Route::get('/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'get_all'])->name('get_all_adjustment_group');
     });
 
     Route::post('/register_manager', [App\Http\Controllers\Manager\ManagerController::class, 'create'])->name('register_manager');
     Route::delete('/delete_manager/{manager}', [App\Http\Controllers\Manager\ManagerController::class, 'delete'])->name('delete_manager');
     Route::patch('/update_manager/{manager}', [App\Http\Controllers\Manager\ManagerController::class, 'update'])->name('update_manager');
+
+    Route::post('/create_menu', [\App\Http\Controllers\Menu\MenuController::class, 'create']);
+    Route::post('/menu', [\App\Http\Controllers\Menu\MenuController::class, 'menu']);
+    Route::get('/menu/{menu_no}', [\App\Http\Controllers\Menu\MenuController::class, 'get_menu']);
 });

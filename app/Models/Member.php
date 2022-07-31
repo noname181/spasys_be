@@ -53,4 +53,9 @@ class Member extends Authenticatable
         'mb_language',
         'mb_hp'
     ];
+
+    protected $casts = [
+        'created_at' => "date:Y.m.d H:i",
+        'updated_at' => "date:Y.m.d H:i",
+    ];
 }

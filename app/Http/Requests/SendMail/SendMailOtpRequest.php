@@ -24,9 +24,9 @@ class SendMailOtpRequest extends BaseFormRequest
     public function rules()
     {
         return [
-            'mb_no' => [
+            'mb_email' => [
                 'required',
-                'integer',
+                'email',
             ],
             'mb_id' => [
                 'required',

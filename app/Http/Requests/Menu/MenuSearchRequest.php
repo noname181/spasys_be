@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Notice;
+namespace App\Http\Requests\Menu;
 
 use App\Http\Requests\BaseFormRequest;
 
-class NoticeCreateRequest extends BaseFormRequest
+class MenuSearchRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,29 +24,29 @@ class NoticeCreateRequest extends BaseFormRequest
     public function rules()
     {
         return [
-            'notice_title' => [
-                'required',
+            'per_page' => [
+                'nullable',
+                'int',
+            ],
+            'page' => [
+                'nullable',
+                'int',
+            ],
+            'service_no' => [
+                'int',
+                'nullable',
+            ],
+            'menu_depth' => [
                 'string',
-                'max:255',
+                'nullable',
             ],
-            'notice_content' => [
-                'required',
+            'menu_name' => [
                 'string',
-                'max:255',
+                'nullable',
             ],
-            'notice_target' => [
-                'required',
+            'menu_device' => [
                 'string',
-                'max:255',
-            ],
-            'files' => [
-                'array',
-                'required',
-            ],
-            'files.*' => [
-                'file',
-                'max:5000',
-                'mimes:jpg,jpeg,png,pdf',
+                'nullable',
             ],
         ];
     }

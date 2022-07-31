@@ -6,6 +6,7 @@ use App\Http\Requests\Company\CompanyRegisterController\InvokeRequest;
 use App\Http\Requests\Company\CompaniesRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Models\AdjustmentGroup;
 use App\Models\COAddress;
 use App\Utils\Messages;
 use Illuminate\Support\Facades\Auth;
@@ -27,6 +28,8 @@ class CompanyController extends Controller
             $co_no = Company::insertGetId([
                 'mb_no' => Auth::user()->mb_no,
                 'co_name' => $validated['co_name'],
+                'co_address' => $validated['co_address'],
+                'co_address_detail' => $validated['co_address_detail'],
                 'co_country' => $validated['co_country'],
                 'co_service' => $validated['co_service'],
                 'co_owner' => $validated['co_owner'],
@@ -36,24 +39,25 @@ class CompanyController extends Controller
                 'co_etc' => $validated['co_etc']
             ]);
 
-            $validated['co_no'] = $co_no;
+            $company = Company::where('co_no', $co_no)->first();
 
-            $ca_no = COAddress::insertGetId([
-                'co_no' => $validated['co_no'],
-                'mb_no' => Auth::user()->mb_no,
-                'ca_address' => $validated['co_address'],
-                'ca_address_detail' => $validated['co_address_detail']
-            ]);
+            // $ca_no = COAddress::insertGetId([
+            //     'co_no' => $validated['co_no'],
+            //     'mb_no' => Auth::user()->mb_no,
+            //     'ca_address' => $validated['co_address'],
+            //     'ca_address_detail' => $validated['co_address_detail']
+            // ]);
 
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'co_no' => $co_no,
-                'ca_no' => $ca_no,
+                'company' => $company,
+                // 'ca_no' => $ca_no,
             ]);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -67,11 +71,12 @@ class CompanyController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $companies = Company::with('co_address')->orderBy('co_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
-           
+            $companies = Company::orderBy('co_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
+
             return response()->json($companies);
         } catch (\Exception $e) {
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -83,6 +88,8 @@ class CompanyController extends Controller
                 'company.co_no',
                 'company.mb_no',
                 'company.co_name',
+                'company.co_address',
+                'company.co_address_detail',
                 'company.co_country',
                 'company.co_service',
                 'company.co_license',
@@ -90,16 +97,19 @@ class CompanyController extends Controller
                 'company.co_homepage',
                 'company.co_email',
                 'company.co_etc',
-                'co_address.ca_address as co_address',
-                'co_address.ca_address_detail as co_address_detail',
-            ])->join('co_address', 'co_address.co_no', 'company.co_no')
-                ->where('company.co_no', $co_no)
-                ->where('co_address.co_no', $co_no)
+                // 'co_address.ca_address as co_address',
+                // 'co_address.ca_address_detail as co_address_detail',
+            // ])->join('co_address', 'co_address.co_no', 'company.co_no')
+            ])->where('company.co_no', $co_no)
+                // ->where('co_address.co_no', $co_no)
                 ->first();
+
+            $adjustment_groups = AdjustmentGroup::select(['ag_no', 'co_no', 'ag_name', 'ag_manager', 'ag_hp', 'ag_email'])->where('co_no', $co_no)->get();
 
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'company' => $company
+                'company' => $company,
+                'adjustment_groups' => $adjustment_groups
             ]);
         } catch (\Exception $e) {
             DB::rollback();
@@ -123,6 +133,8 @@ class CompanyController extends Controller
                 ->where('mb_no', Auth::user()->mb_no)
                 ->update([
                     'co_name' => $validated['co_name'],
+                    'co_address' => $validated['co_address'],
+                    'co_address_detail' => $validated['co_address_detail'],
                     'co_country' => $validated['co_country'],
                     'co_service' => $validated['co_service'],
                     'co_owner' => $validated['co_owner'],
@@ -133,12 +145,12 @@ class CompanyController extends Controller
                 ]);
 
 
-            COAddress::where('co_no', $company->co_no)
-                ->where('mb_no', Auth::user()->mb_no)
-                ->update([
-                    'ca_address' => $validated['co_address'],
-                    'ca_address_detail' => $validated['co_address_detail']
-                ]);
+            // COAddress::where('co_no', $company->co_no)
+            //     ->where('mb_no', Auth::user()->mb_no)
+            //     ->update([
+            //         'ca_address' => $validated['co_address'],
+            //         'ca_address_detail' => $validated['co_address_detail']
+            //     ]);
 
             DB::commit();
             return response()->json([
