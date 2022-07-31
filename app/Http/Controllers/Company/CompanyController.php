@@ -7,7 +7,7 @@ use App\Http\Requests\Company\CompaniesRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\AdjustmentGroup;
-use App\Models\COAddress;
+use App\Models\CoAddress;
 use App\Utils\Messages;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -105,15 +105,18 @@ class CompanyController extends Controller
                 ->first();
 
             $adjustment_groups = AdjustmentGroup::select(['ag_no', 'co_no', 'ag_name', 'ag_manager', 'ag_hp', 'ag_email'])->where('co_no', $co_no)->get();
+            $co_address = CoAddress::select(['ca_no', 'co_no', 'ca_name', 'ca_manager', 'ca_hp', 'ca_address', 'ca_address_detail'])->where('co_no', $co_no)->get();
 
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'company' => $company,
-                'adjustment_groups' => $adjustment_groups
+                'adjustment_groups' => $adjustment_groups,
+                'co_address' => $co_address
             ]);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
