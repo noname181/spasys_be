@@ -71,11 +71,12 @@ class CompanyController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $companies = Company::with('co_address')->orderBy('co_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
+            $companies = Company::orderBy('co_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
 
             return response()->json($companies);
         } catch (\Exception $e) {
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
