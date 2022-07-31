@@ -61,9 +61,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/delete', [\App\Http\Controllers\Notice\NoticeController::class, 'delete']);
 
     Route::prefix('adjustment_group')->name('adjustment_group.')->group(function () {
-        Route::get('/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'getAdjustmentGroup'])->name('get_adjustment_group');
         Route::post('/', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create'])->name('register_adjustment_group');
+        Route::post('/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create_with_co_no'])->name('register_adjustment_group');
         Route::patch('{adjustment}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'update'])->name('update_adjustment_group');
+        Route::get('/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'get_all'])->name('get_all_adjustment_group');
     });
 
     Route::post('/register_manager', [App\Http\Controllers\Manager\ManagerController::class, 'create'])->name('register_manager');

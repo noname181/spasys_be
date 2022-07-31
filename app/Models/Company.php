@@ -23,6 +23,9 @@ class Company extends Model
         'co_no',
         'mb_no',
         'co_name',
+        'co_address',
+        'co_address_detail',
+        'co_post_number',
         'co_country',
         'co_service',
         'co_license',
@@ -38,8 +41,4 @@ class Company extends Model
         'updated_at' => "date:Y.m.d",
     ];
 
-    public function co_address()
-    {
-        return $this->hasOne(COAddress::class, 'co_no');
-    }
 }
