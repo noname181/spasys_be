@@ -26,14 +26,14 @@ class QnaSearchRequest extends BaseFormRequest
         return [
             'from_date' => [
                 'string',
-                'date_format:j/n/Y'
+                'date_format:n/j/Y'
             ],
             'to_date' => [
                 'string',
-                'date_format:j/n/Y'
+                'date_format:n/j/Y'
             ],
             'search_string' => [
-                'string',
+                '',
             ],
             'per_page' => [
                 'nullable',
