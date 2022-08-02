@@ -1,30 +1,30 @@
 <?php
 
-namespace App\Http\Controllers\Adjustment;
+namespace App\Http\Controllers\CoAddress;
 
 use App\Models\Member;
 use App\Utils\Messages;
 use Illuminate\Http\Request;
-use App\Models\AdjustmentGroup;
+use App\Models\CoAddress;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\Adjustment\AdjustmentGroupCreateRequest;
-use App\Http\Requests\Adjustment\AdjustmentGroupUpdateRequest;
+use App\Http\Requests\CoAddress\CoAddressCreateRequest;
+use App\Http\Requests\CoAddress\CoAddressUpdateRequest;
 
-class AdjustmentGroupController extends Controller
+class CoAddressController extends Controller
 {
 
     /**
-     *  getAdjustmentGroup
+     *  getCoAddress
      * @param $co_no
      * @return \Illuminate\Http\Response
      */
-    public function getAdjustmentGroup($co_no)
+    public function getCoAddress($co_no)
     {
         try {
-            $adjustmentGroup = AdjustmentGroup::select([
+            $coAddress = CoAddress::select([
                 'ag_no',
                 'ag_name',
                 'ag_manager',
@@ -36,7 +36,7 @@ class AdjustmentGroupController extends Controller
 
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'adjustmentGroup' => $adjustmentGroup
+                'coAddress' => $coAddress
             ]);
         } catch (\Exception $e) {
             DB::rollback();
@@ -45,11 +45,11 @@ class AdjustmentGroupController extends Controller
         }
     }
     /**
-     * create AdjustmentGroup
-     * @param  AdjustmentGroupCreateRequest $request
+     * create CoAddress
+     * @param  CoAddressCreateRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function create(AdjustmentGroupCreateRequest $request)
+    public function create(CoAddressCreateRequest $request)
     {
 
         try {
@@ -59,23 +59,25 @@ class AdjustmentGroupController extends Controller
 
             foreach ($validated  as $value) {
 
-                if(isset($value['ag_no'])){
-                    AdjustmentGroup::where('ag_no', $value['ag_no'])->update([
+                if(isset($value['ca_no'])){
+                    CoAddress::where('ca_no', $value['ca_no'])->update([
                         'mb_no' => $member->mb_no,
                         'co_no' => $value['co_no'],
-                        'ag_name' => $value['ag_name'],
-                        'ag_hp' => $value['ag_hp'],
-                        'ag_manager' => $value['ag_manager'],
-                        'ag_email' => $value['ag_email'],
+                        'ca_name' => $value['ca_name'],
+                        'ca_hp' => $value['ca_hp'],
+                        'ca_manager' => $value['ca_manager'],
+                        'ca_address' => $value['ca_address'],
+                        'ca_address_detail' => $value['ca_address_detail'],
                     ]);
                 }else {
-                    $AdjustmentGroup = AdjustmentGroup::insertGetId([
+                    $CoAddress = CoAddress::insertGetId([
                         'mb_no' => $member->mb_no,
                         'co_no' => $value['co_no'],
-                        'ag_name' => $value['ag_name'],
-                        'ag_hp' => $value['ag_hp'],
-                        'ag_manager' => $value['ag_manager'],
-                        'ag_email' => $value['ag_email'],
+                        'ca_name' => $value['ca_name'],
+                        'ca_hp' => $value['ca_hp'],
+                        'ca_manager' => $value['ca_manager'],
+                        'ca_address' => $value['ca_address'],
+                        'ca_address_detail' => $value['ca_address_detail'],
                     ]);
                 }
 
@@ -84,7 +86,7 @@ class AdjustmentGroupController extends Controller
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'ag_no' =>  $request->all(),
+                'ca_no' =>  $request->all(),
             ], 201);
         } catch (\Throwable $e) {
             DB::rollback();
@@ -94,7 +96,7 @@ class AdjustmentGroupController extends Controller
         }
     }
 
-    public function create_with_co_no($co_no, AdjustmentGroupCreateRequest $request)
+    public function create_with_co_no($co_no, CoAddressCreateRequest $request)
     {
 
         try {
@@ -105,13 +107,14 @@ class AdjustmentGroupController extends Controller
             foreach ($validated  as $value) {
 
 
-                $AdjustmentGroup = AdjustmentGroup::insertGetId([
+                $CoAddress = CoAddress::insertGetId([
                     'mb_no' => $member->mb_no,
                     'co_no' => $co_no,
-                    'ag_name' => $value['ag_name'],
-                    'ag_hp' => $value['ag_hp'],
-                    'ag_manager' => $value['ag_manager'],
-                    'ag_email' => $value['ag_email'],
+                    'ca_name' => $value['ca_name'],
+                    'ca_hp' => $value['ca_hp'],
+                    'ca_manager' => $value['ca_manager'],
+                    'ca_address' => $value['ca_address'],
+                    'ca_address_detail' => $value['ca_address_detail'],
                 ]);
 
 
@@ -131,16 +134,16 @@ class AdjustmentGroupController extends Controller
     }
 
     /**
-     * Update AdjustmentGroup by id
-     * @param  AdjustmentGroup $adjustmentGroup
-     * @param  AdjustmentGroupUpdateRequest $request
+     * Update CoAddress by id
+     * @param  CoAddress $coAddress
+     * @param  CoAddressUpdateRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function update(AdjustmentGroup $adjustmentGroup, AdjustmentGroupUpdateRequest $request)
+    public function update(CoAddress $coAddress, CoAddressUpdateRequest $request)
     {
         try {
             $validated = $request->validated();
-            $adjustmentGroup->update([
+            $coAddress->update([
                 'mb_no' => $validated['mb_no'],
                 'co_no' => $validated['co_no'],
                 'ag_name' => $validated['ag_name'],
@@ -158,9 +161,9 @@ class AdjustmentGroupController extends Controller
 
     public function get_all($co_no){
         try {
-            $adjustment_groups = AdjustmentGroup::select(['ag_no', 'co_no', 'ag_name', 'ag_manager', 'ag_hp', 'ag_email'])->where('co_no', $co_no)->get();
+            $co_address = CoAddress::select(['ca_no', 'co_no', 'ca_name', 'ca_manager', 'ca_hp', 'ca_address', 'ca_address_detail'])->where('co_no', $co_no)->get();
 
-            return response()->json(['adjustment_groups' => $adjustment_groups], 200);
+            return response()->json(['co_address' => $co_address], 200);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);

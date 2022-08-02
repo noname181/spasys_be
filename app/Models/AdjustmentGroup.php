@@ -21,13 +21,12 @@ class AdjustmentGroup extends Model
      * @var string[]
      */
     protected $fillable = [
-        'ag_no', 
+        'ag_no',
         'co_no',
         'mb_no',
         'ag_name',
         'ag_manager',
         'ag_email',
-        'ag_regtime',
         'ag_hp',
     ];
 }

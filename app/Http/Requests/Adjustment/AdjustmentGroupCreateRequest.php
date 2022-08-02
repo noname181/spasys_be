@@ -25,7 +25,6 @@ class AdjustmentGroupCreateRequest extends BaseFormRequest
     {
         return [
             '*.co_no' => [
-                'required',
                 'integer',
             ],
             '*.ag_name' => [
@@ -48,6 +47,9 @@ class AdjustmentGroupCreateRequest extends BaseFormRequest
                 'string',
                 'max:255',
                 'email',
+            ],
+            '*.ag_no' => [
+                'integer',
             ],
         ];
     }

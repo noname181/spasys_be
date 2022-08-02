@@ -1,20 +1,20 @@
 <?php
 
-namespace App\Http\Requests\Contract\ContractRegisterController;
+namespace App\Http\Requests\Contract\ContractUpdateController;
 
 use App\Http\Requests\BaseFormRequest;
 
-class InvokeRequest extends BaseFormRequest
+class ContractUpdateRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      *
      * @return bool
      */
-    public function authorize()
-    {
-        return true;
-    }
+    // public function authorize()
+    // {
+    //     return true;
+    // }
 
     /**
      * Get the validation rules that apply to the request.
@@ -26,11 +26,15 @@ class InvokeRequest extends BaseFormRequest
         return [
             'co_no' => [
                 'required',
-                'integer',
+                'int',
+            ],
+            'c_start_date' => [
+                'required',
+                'date_format:n/j/Y' 
             ],
             'c_end_date' => [
                 'required',
-                'date',
+                'date_format:n/j/Y' 
             ],
             'c_transaction_yn' => [
                 'required',
@@ -90,23 +94,19 @@ class InvokeRequest extends BaseFormRequest
                 'date'
             ],
             'c_file_insulance' => [
-                'required',
-                'max:5119',
+                'max:2048',
                 'mimes:pdf,png,jpg,jpeg'
             ],
             'c_file_license' => [
-                'required',
-                'max:5119',
+                'max:2048',
                 'mimes:pdf,png,jpg,jpeg'
             ],
             'c_file_contract' => [
-                'required',
-                'max:5119',
+                'max:2048',
                 'mimes:pdf,png,jpg,jpeg'
             ],
             'c_file_bank_account' => [
-                'required',
-                'max:5119',
+                'max:2048',
                 'mimes:pdf,png,jpg,jpeg'
             ],
             'c_deposit_return_price' => [
@@ -115,15 +115,15 @@ class InvokeRequest extends BaseFormRequest
             ],
             'c_deposit_return_date' => [
                 'required',
-                'date'
+                'date_format:n/j/Y' 
             ],
             'c_deposit_return_reg_date' => [
                 'required',
-                'date'
+                'date_format:n/j/Y' 
             ],
             'c_deposit_return_expiry_date' => [
                 'required',
-                'date'
+                'date_format:n/j/Y' 
             ],
         ];
     }

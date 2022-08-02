@@ -22,7 +22,7 @@ class COAddress extends Model
     protected $fillable = [
         'ca_no',
         'co_no',
-        'mb_no', 
+        'mb_no',
         'ca_address',
         'ca_address_detail',
         'ca_post_number',
