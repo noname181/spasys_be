@@ -26,10 +26,14 @@ Route::patch('/forgot_password', [\App\Http\Controllers\Api\SendMailController::
 Route::get('/find_id', [\App\Http\Controllers\Member\MemberController::class, 'findUserId'])->name('member.findUserId');
 
 Route::middleware('auth')->group(function () {
-    Route::post('/register', \App\Http\Controllers\Member\MemberController::class)->name('member.register');
-    Route::patch('/member/update', [\App\Http\Controllers\Member\MemberController::class, 'updateProfile'])->name('member.update');
-    Route::get('/profile', [\App\Http\Controllers\Member\MemberController::class, 'getProfile'])->name('member.profile');
-    Route::put('/change_password', \App\Http\Controllers\Auth\ChangePasswordController::class)->name('change_password');
+    Route::prefix('member')->name('member.')->group(function () {
+        Route::post('/register', \App\Http\Controllers\Member\MemberController::class)->name('register');
+        Route::patch('/update', [\App\Http\Controllers\Member\MemberController::class, 'updateProfile'])->name('update');
+        Route::get('/profile', [\App\Http\Controllers\Member\MemberController::class, 'getProfile'])->name('profile');
+        Route::put('/change_password', \App\Http\Controllers\Auth\ChangePasswordController::class)->name('change_password');
+        Route::post('/all', [\App\Http\Controllers\Member\MemberController::class, 'getMembers'])->name('members');
+        Route::get('/{mb_no}', [\App\Http\Controllers\Member\MemberController::class, 'getMember'])->name('member');
+    });
 
     // Manger Role
     Route::post('/register_company', \App\Http\Controllers\Company\CompanyController::class)->name('register_company');
