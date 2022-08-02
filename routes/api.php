@@ -80,6 +80,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/{co_no}', [App\Http\Controllers\CoAddress\CoAddressController::class, 'get_all'])->name('get_all_co_address');
     });
 
+    Route::get('/get_manager/{co_no}', [App\Http\Controllers\Manager\ManagerController::class, 'getManager'])->name('get_manager');
     Route::post('/register_manager', [App\Http\Controllers\Manager\ManagerController::class, 'create'])->name('register_manager');
     Route::delete('/delete_manager/{manager}', [App\Http\Controllers\Manager\ManagerController::class, 'delete'])->name('delete_manager');
     Route::patch('/update_manager/{manager}', [App\Http\Controllers\Manager\ManagerController::class, 'update'])->name('update_manager');

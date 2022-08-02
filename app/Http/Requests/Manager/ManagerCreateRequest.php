@@ -24,35 +24,38 @@ class ManagerCreateRequest extends BaseFormRequest
     public function rules()
     {
         return [
-            'm_position' => [
+            '*.m_no' => [
+                'integer',
+            ],
+            '*.m_position' => [
                 'string',
                 'max:255',
             ],
-            'm_name' => [
+            '*.m_name' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'm_duty1' => [
+            '*.m_duty1' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'm_duty2' => [
+            '*.m_duty2' => [
                 'required',
                 'string',
                 'max:255',
             ],            
-            'm_hp' => [
+            '*.m_hp' => [
                 'required',
                 'string',
                 'max:255',
                 'regex:/[0-9]{3}-[0-9]{4}-[0-9]{4}$/',
             ],
-            'm_etc' => [
+            '*.m_etc' => [
                 'string',
             ],
-            'm_email' => [
+            '*.m_email' => [
                 'string',
                 'max:255',
                 'email',
