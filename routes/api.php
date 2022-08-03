@@ -33,6 +33,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/change_password', \App\Http\Controllers\Auth\ChangePasswordController::class)->name('change_password');
         Route::post('/all', [\App\Http\Controllers\Member\MemberController::class, 'getMembers'])->name('members');
         Route::get('/{mb_no}', [\App\Http\Controllers\Member\MemberController::class, 'getMember'])->name('member');
+        Route::patch('/update_by_id', [\App\Http\Controllers\Member\MemberController::class, 'updateProfileById'])->name('update_profile_by_id');
     });
 
     // Manger Role

@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers\Member;
 
-use App\Http\Requests\Member\MemberRegisterController\InvokeRequest;
-use App\Http\Requests\Member\MemberUpdate\MemberUpdateRequest;
-use App\Http\Requests\Member\MemberSearchRequest;
-use App\Http\Controllers\Controller;
 use App\Models\Member;
 use App\Utils\Messages;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
+use App\Http\Requests\Member\MemberSearchRequest;
+use App\Http\Requests\Member\MemberUpdate\MemberUpdateRequest;
+use App\Http\Requests\Member\MemberUpdate\MemberUpdateByIdRequest;
+use App\Http\Requests\Member\MemberRegisterController\InvokeRequest;
 
 class MemberController extends Controller
 {
@@ -170,6 +171,25 @@ class MemberController extends Controller
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
+    }
+
+
+    /**
+     * Update Profiles By Id
+     */
+    public function updateProfileById(MemberUpdateByIdRequest $request) {
+            $validated = $request->validated();
+            $member = Member::where('mb_no', $validated['mb_no'])->first();
+            $member['mb_email'] = $validated['mb_email'];
+            $member['mb_tel'] = $validated['mb_tel'];
+            $member['mb_hp'] = $validated['mb_hp'];
+            $member['mb_push_yn'] = $validated['mb_push_yn'];
+            $member['mb_service_no_array'] = $validated['mb_service_no_array'];
+            $member->save();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'profile' => $member,
+            ]);
     }
 
 }
