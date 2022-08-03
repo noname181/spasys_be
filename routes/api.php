@@ -36,9 +36,11 @@ Route::middleware('auth')->group(function () {
     });
 
     // Manger Role
+    Route::post('/get_companies', [App\Http\Controllers\Company\CompanyController::class, 'getcompanies'])->name('get_companies');
     Route::post('/register_company', \App\Http\Controllers\Company\CompanyController::class)->name('register_company');
     Route::get('/get_company/{co_no}', [App\Http\Controllers\Company\CompanyController::class, 'getCompany'])->name('get_company');
     Route::patch('/update_company/{company}', [App\Http\Controllers\Company\CompanyController::class, 'updateCompany'])->name('update_company');
+    Route::post('/register_contract', \App\Http\Controllers\Contract\ContractController::class)->name('register_contract');
     
     Route::prefix('service')->name('service.')->group(function () {
         Route::post('/', \App\Http\Controllers\Service\ServiceController::class)->name('registe_update_services');
