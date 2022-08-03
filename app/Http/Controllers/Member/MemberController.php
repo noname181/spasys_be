@@ -13,6 +13,7 @@ use App\Http\Requests\Member\MemberSearchRequest;
 use App\Http\Requests\Member\MemberUpdate\MemberUpdateRequest;
 use App\Http\Requests\Member\MemberUpdate\MemberUpdateByIdRequest;
 use App\Http\Requests\Member\MemberRegisterController\InvokeRequest;
+use App\Http\Requests\Member\MemberRegisterController\CreateAccountRequest;
 
 class MemberController extends Controller
 {
@@ -26,7 +27,7 @@ class MemberController extends Controller
         try {
             $validated = $request->validated();
             $roleNoOfUserLogin = Auth::user()->role_no;
-            if($roleNoOfUserLogin == Member::ROLE_ADMIN) {
+            if ($roleNoOfUserLogin == Member::ROLE_ADMIN) {
                 $validated['mb_type'] = Member::SPASYS;
                 $validated['mb_parent'] = Member::ADMIN;
             }
@@ -78,7 +79,8 @@ class MemberController extends Controller
     /**
      * Get Profiles
      */
-    public function getProfile() {
+    public function getProfile()
+    {
         try {
             $member = Member::where('mb_no', Auth::user()->mb_no)->first();
             return response()->json([
@@ -91,10 +93,11 @@ class MemberController extends Controller
         }
     }
 
-     /**
+    /**
      * Get Member
      */
-    public function getMember($mb_no) {
+    public function getMember($mb_no)
+    {
         try {
             $member = Member::where('mb_no', $mb_no)->first();
             return response()->json([
@@ -107,10 +110,11 @@ class MemberController extends Controller
         }
     }
 
-     /**
+    /**
      * Get Members
      */
-    public function getMembers(MemberSearchRequest $request) {
+    public function getMembers(MemberSearchRequest $request)
+    {
         try {
             $validated = $request->validated();
 
@@ -139,9 +143,9 @@ class MemberController extends Controller
             //         $query->where(DB::raw('lower(co_service)'), 'like', '%' . strtolower($validated['co_service']) . '%');
             //     });
             // }
-            
+
             $members = $members->paginate($per_page, ['*'], 'page', $page);
-            
+
             return response()->json($members);
         } catch (\Exception $e) {
             Log::error($e);
@@ -153,7 +157,8 @@ class MemberController extends Controller
     /**
      * Update Profiles
      */
-    public function updateProfile(MemberUpdateRequest $request) {
+    public function updateProfile(MemberUpdateRequest $request)
+    {
         try {
             $validated = $request->validated();
             $member = Member::where('mb_no', Auth::user()->mb_no)->first();
@@ -177,19 +182,50 @@ class MemberController extends Controller
     /**
      * Update Profiles By Id
      */
-    public function updateProfileById(MemberUpdateByIdRequest $request) {
-            $validated = $request->validated();
-            $member = Member::where('mb_no', $validated['mb_no'])->first();
-            $member['mb_email'] = $validated['mb_email'];
-            $member['mb_tel'] = $validated['mb_tel'];
-            $member['mb_hp'] = $validated['mb_hp'];
-            $member['mb_push_yn'] = $validated['mb_push_yn'];
-            $member['mb_service_no_array'] = $validated['mb_service_no_array'];
-            $member->save();
-            return response()->json([
-                'message' => Messages::MSG_0007,
-                'profile' => $member,
-            ]);
+    public function updateProfileById(MemberUpdateByIdRequest $request)
+    {
+        $validated = $request->validated();
+        $member = Member::where('mb_no', $validated['mb_no'])->first();
+        $member['mb_email'] = $validated['mb_email'];
+        $member['mb_tel'] = $validated['mb_tel'];
+        $member['mb_hp'] = $validated['mb_hp'];
+        $member['mb_push_yn'] = $validated['mb_push_yn'];
+        $member['mb_service_no_array'] = $validated['mb_service_no_array'];
+        $member->save();
+        return response()->json([
+            'message' => Messages::MSG_0007,
+            'profile' => $member,
+        ]);
     }
 
+    /**
+     * Create Account
+     */
+    public function createAccount(CreateAccountRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+            $roleNoOfUserLogin = Auth::user()->role_no;
+            if ($roleNoOfUserLogin == Member::ROLE_ADMIN) {
+                $validated['mb_type'] = Member::SPASYS;
+                $validated['mb_parent'] = Member::ADMIN;
+            }
+            // FIXME hard set mb_language = ko and role_no = 1
+            $validated['role_no'] = 2;
+            $validated['mb_language'] = 'ko';
+
+            $validated['mb_token'] = '';
+            $validated['mb_pw'] = Hash::make($validated['mb_pw']);
+
+            $mb_no = Member::insertGetId($validated);
+
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'mb_no' => $mb_no,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0001], 500);
+        }
+    }
 }
