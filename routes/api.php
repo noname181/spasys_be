@@ -26,10 +26,14 @@ Route::patch('/forgot_password', [\App\Http\Controllers\Api\SendMailController::
 Route::get('/find_id', [\App\Http\Controllers\Member\MemberController::class, 'findUserId'])->name('member.findUserId');
 
 Route::middleware('auth')->group(function () {
-    Route::post('/register', \App\Http\Controllers\Member\MemberController::class)->name('member.register');
-    Route::patch('/member/update', [\App\Http\Controllers\Member\MemberController::class, 'updateProfile'])->name('member.update');
-    Route::get('/profile', [\App\Http\Controllers\Member\MemberController::class, 'getProfile'])->name('member.profile');
-    Route::put('/change_password', \App\Http\Controllers\Auth\ChangePasswordController::class)->name('change_password');
+    Route::prefix('member')->name('member.')->group(function () {
+        Route::post('/register', \App\Http\Controllers\Member\MemberController::class)->name('register');
+        Route::patch('/update', [\App\Http\Controllers\Member\MemberController::class, 'updateProfile'])->name('update');
+        Route::get('/profile', [\App\Http\Controllers\Member\MemberController::class, 'getProfile'])->name('profile');
+        Route::put('/change_password', \App\Http\Controllers\Auth\ChangePasswordController::class)->name('change_password');
+        Route::post('/all', [\App\Http\Controllers\Member\MemberController::class, 'getMembers'])->name('members');
+        Route::get('/{mb_no}', [\App\Http\Controllers\Member\MemberController::class, 'getMember'])->name('member');
+    });
 
     // Manger Role
     Route::post('/register_company', \App\Http\Controllers\Company\CompanyController::class)->name('register_company');
@@ -44,15 +48,16 @@ Route::middleware('auth')->group(function () {
     Route::prefix('contract')->name('contract.')->group(function () {
         Route::patch('/{contract}', [App\Http\Controllers\Contract\ContractController::class, 'updateContract'])->name('update_contract');
         Route::post('/', \App\Http\Controllers\Contract\ContractController::class)->name('register_contract');
-        Route::get('/{co_no}', [App\Http\Controllers\Contract\ContractController::class, 'getContract'])->name('get_contract');    
+        Route::get('/{co_no}', [App\Http\Controllers\Contract\ContractController::class, 'getContract'])->name('get_contract');
     });
 
     Route::prefix('qna')->name('qna.')->group(function () {
         Route::get('/', App\Http\Controllers\Qna\QnaController::class)->name('get_qna_index');
         Route::get('/{qna}', [App\Http\Controllers\Qna\QnaController::class, 'getById'])->name('get_qna_by_id');
         Route::post('/', [App\Http\Controllers\Qna\QnaController::class, 'register'])->name('register_qna');
-        Route::patch('/{qna}', [App\Http\Controllers\Qna\QnaController::class, 'update'])->name('update_qna');
-        Route::post('/get_qna', [App\Http\Controllers\Qna\QnaController::class, 'getQnA'])->name('get_qna');
+        Route::post('/reply_qna', [App\Http\Controllers\Qna\QnaController::class, 'reply_qna'])->name('reply_qna');
+        Route::patch('/', [App\Http\Controllers\Qna\QnaController::class, 'update'])->name('update_qna');
+        Route::post('/get_qnas', [App\Http\Controllers\Qna\QnaController::class, 'getQnA'])->name('get_qna');
     });
 
     Route::prefix('banner')->name('banner.')->group(function () {
@@ -77,6 +82,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'get_all'])->name('get_all_adjustment_group');
     });
 
+    Route::prefix('co_address')->name('co_address.')->group(function () {
+        Route::post('/', [App\Http\Controllers\CoAddress\CoAddressController::class, 'create'])->name('register_co_address');
+        Route::post('/{co_no}', [App\Http\Controllers\CoAddress\CoAddressController::class, 'create_with_co_no'])->name('register_co_address');
+        Route::get('/{co_no}', [App\Http\Controllers\CoAddress\CoAddressController::class, 'get_all'])->name('get_all_co_address');
+    });
+
+    Route::get('/get_manager/{co_no}', [App\Http\Controllers\Manager\ManagerController::class, 'getManager'])->name('get_manager');
     Route::post('/register_manager', [App\Http\Controllers\Manager\ManagerController::class, 'create'])->name('register_manager');
     Route::delete('/delete_manager/{manager}', [App\Http\Controllers\Manager\ManagerController::class, 'delete'])->name('delete_manager');
     Route::patch('/update_manager/{manager}', [App\Http\Controllers\Manager\ManagerController::class, 'update'])->name('update_manager');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Member;
 
 use App\Http\Requests\Member\MemberRegisterController\InvokeRequest;
 use App\Http\Requests\Member\MemberUpdate\MemberUpdateRequest;
+use App\Http\Requests\Member\MemberSearchRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Member;
 use App\Utils\Messages;
@@ -88,6 +89,65 @@ class MemberController extends Controller
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
+
+     /**
+     * Get Member
+     */
+    public function getMember($mb_no) {
+        try {
+            $member = Member::where('mb_no', $mb_no)->first();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'member' => $member,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+     /**
+     * Get Members
+     */
+    public function getMembers(MemberSearchRequest $request) {
+        try {
+            $validated = $request->validated();
+
+            // If per_page is null set default data = 15
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+            $members = Member::with('company')->orderBy('mb_no', 'DESC');
+
+            if (isset($validated['from_date'])) {
+                $members->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            }
+
+            if (isset($validated['to_date'])) {
+                $members->where('updated_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            }
+
+            // if (isset($validated['co_name'])) {
+            //     $members->where(function($query) use ($validated) {
+            //         $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+            //     });
+            // }
+
+            // if (isset($validated['co_service'])) {
+            //     $members->where(function($query) use ($validated) {
+            //         $query->where(DB::raw('lower(co_service)'), 'like', '%' . strtolower($validated['co_service']) . '%');
+            //     });
+            // }
+            
+            $members = $members->paginate($per_page, ['*'], 'page', $page);
+            
+            return response()->json($members);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
 
     /**
      * Update Profiles

@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use App\Helper\Tokenable;
+use App\Models\Company;
 
 class Member extends Authenticatable
 {
@@ -58,4 +59,9 @@ class Member extends Authenticatable
         'created_at' => "date:Y.m.d H:i",
         'updated_at' => "date:Y.m.d H:i",
     ];
+
+    public function company()
+    {
+        return $this->belongsTo(company::class, 'co_no', 'co_no');
+    }
 }

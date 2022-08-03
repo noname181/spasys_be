@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Qna;
+namespace App\Http\Requests\Member;
 
 use App\Http\Requests\BaseFormRequest;
 
-class QnaUpdateRequest extends BaseFormRequest
+class MemberSearchRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,35 +24,38 @@ class QnaUpdateRequest extends BaseFormRequest
     public function rules()
     {
         return [
-            'qna_title' => [
-                'required',
+            'from_date' => [
                 'string',
+                'date_format:n/j/Y'
             ],
-            'qna_content' => [
-                'required',
+            'to_date' => [
                 'string',
+                'date_format:n/j/Y'
             ],
-            'qna_status' => [
-                'required',
+            'co_name' => [
                 'string',
-                'max:255',
+                'nullable',
             ],
-            'qna_no' => [
-                'required',
-                'integer',
+            'shop_name' => [
+                'string',
+                'nullable',
             ],
-            'files' => [
-                'array',
+            'mb_name' => [
+                'string',
+                'nullable',
             ],
-            'files.*' => [
-                'file',
-                'max:5000',
-                'mimes:jpg,jpeg,png,pdf',
+            'per_page' => [
+                'nullable',
+                'int',
+            ],
+            'page' => [
+                'nullable',
+                'int',
             ],
         ];
     }
 
-    /**
+        /**
      * Get custom attributes for validator errors.
      *
      * @return array

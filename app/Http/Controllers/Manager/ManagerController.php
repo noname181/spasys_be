@@ -26,25 +26,79 @@ class ManagerController extends Controller
 
         try {
 
+            // DB::beginTransaction();
+            // $member = Member::where('mb_id', Auth::user()->mb_id)->first();
+            // $validated = $request->validated();
+            // $m_no = Manager::insertGetId([
+            //     'mb_no' => $member->mb_no,
+            //     'm_position' => $validated['m_position'],
+            //     'co_no' => 1,
+            //     'm_name' => $validated['m_name'],
+            //     'm_duty1' => $validated['m_duty1'],
+            //     'm_duty2' => $validated['m_duty2'],
+            //     'm_hp' => $validated['m_hp'],
+            //     'm_email' => $validated['m_email'],
+            //     'm_etc' => $validated['m_etc'],
+            //     'm_regtime' => date('y-m-d h-i-s')
+            // ]);
+            // DB::commit();
+            // return response()->json([
+            //     'message' => Messages::MSG_0007,
+            //     'm_no' => $m_no,
+            // ], 201);
+
             DB::beginTransaction();
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
             $validated = $request->validated();
-            $m_no = Manager::insertGetId([
-                'mb_no' => $member->mb_no,
-                'm_position' => $validated['m_position'],
-                'co_no' => 1,
-                'm_name' => $validated['m_name'],
-                'm_duty1' => $validated['m_duty1'],
-                'm_duty2' => $validated['m_duty2'],
-                'm_hp' => $validated['m_hp'],
-                'm_email' => $validated['m_email'],
-                'm_etc' => $validated['m_etc'],
-                'm_regtime' => date('y-m-d h-i-s')
-            ]);
+            $managerCreate = [];
+            $managerUpdate = [];
+            foreach ($validated as $value) {
+
+                if ( isset($value['m_no'])) {
+                    $managerUpdate[] = [
+                        'm_no' => $value['m_no'],
+                        'mb_no' => $member->mb_no,
+                        'm_position' => $value['m_position'],
+                        'co_no' => 20,
+                        'm_name' => $value['m_name'],
+                        'm_duty1' => $value['m_duty1'],
+                        'm_duty2' => $value['m_duty2'],
+                        'm_hp' => $value['m_hp'],
+                        'm_email' => $value['m_email'],
+                        'm_etc' => $value['m_etc'],
+                        'm_regtime' => date('y-m-d h-i-s')
+                    ];
+                } else {
+                    $managerCreate[] = [
+                        'mb_no' => $member->mb_no,
+                        'm_position' => $value['m_position'],
+                        'co_no' => 20,
+                        'm_name' => $value['m_name'],
+                        'm_duty1' => $value['m_duty1'],
+                        'm_duty2' => $value['m_duty2'],
+                        'm_hp' => $value['m_hp'],
+                        'm_email' => $value['m_email'],
+                        'm_etc' => $value['m_etc'],
+                        'm_regtime' => date('y-m-d h-i-s')
+                    ];
+                }
+            }
+            Manager::insert($managerCreate);
+            foreach ($managerUpdate as $data) {
+                $manager = Manager::where('m_no', $data['m_no'])->get()->first();
+                $manager->update([
+                    "m_position" => $data['m_position'],
+                    "m_name" => $data['m_name'],
+                    "m_duty1" => $data['m_duty1'],
+                    "m_duty2" => $data['m_duty2'],
+                    "m_hp" => $data['m_hp'],
+                    "m_email" => $data['m_email'],
+                    "m_etc" => $data['m_etc'],
+                ]);
+            }
             DB::commit();
             return response()->json([
-                'message' => Messages::MSG_0007,
-                'm_no' => $m_no,
+                'message' =>  Messages::MSG_0007,
             ], 201);
         } catch (\Throwable $e) {
             DB::rollback();
@@ -93,6 +147,36 @@ class ManagerController extends Controller
         } catch (\Exception $e) {
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0002], 500);
+        }
+    }
+
+     /**
+     * Get Manager by id
+     * @param  $co_no
+     * @return \Illuminate\Http\Response
+     */
+    public function getManager($co_no)
+    {
+        try {
+            $manager = Manager::select([
+                'm_no',
+                'm_position',
+                'm_name',
+                'm_duty1',
+                'm_duty2',
+                'm_hp',
+                'm_email',
+                'm_etc',
+            ])->where('co_no', $co_no)->get();
+
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'manager' => $manager
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
 }

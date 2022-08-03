@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Qna;
+namespace App\Http\Requests\CoAddress;
 
 use App\Http\Requests\BaseFormRequest;
 
-class QnaUpdateRequest extends BaseFormRequest
+class CoAddressCreateRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,35 +24,41 @@ class QnaUpdateRequest extends BaseFormRequest
     public function rules()
     {
         return [
-            'qna_title' => [
-                'required',
-                'string',
+            '*.co_no' => [
+                'integer',
             ],
-            'qna_content' => [
-                'required',
-                'string',
-            ],
-            'qna_status' => [
+            '*.ca_name' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'qna_no' => [
+            '*.ca_manager' => [
                 'required',
+                'string',
+                'max:255',
+            ],
+            '*.ca_hp' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            '*.ca_address' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            '*.ca_address_detail' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            '*.ca_no' => [
                 'integer',
-            ],
-            'files' => [
-                'array',
-            ],
-            'files.*' => [
-                'file',
-                'max:5000',
-                'mimes:jpg,jpeg,png,pdf',
             ],
         ];
     }
 
-    /**
+        /**
      * Get custom attributes for validator errors.
      *
      * @return array

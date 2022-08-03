@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Company;
 
 use App\Http\Requests\Company\CompanyRegisterController\InvokeRequest;
-use App\Http\Requests\Company\CompaniesRequest;
+use App\Http\Requests\Company\CompanyRequest;
+use App\Http\Requests\Company\CompanySearchRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\AdjustmentGroup;
-use App\Models\COAddress;
+use App\Models\CoAddress;
 use App\Utils\Messages;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -62,7 +63,7 @@ class CompanyController extends Controller
         }
     }
 
-    public function getCompanies(CompaniesRequest $request)
+    public function getCompanies(CompanySearchRequest $request)
     {
         try {
             $validated = $request->validated();
@@ -71,8 +72,30 @@ class CompanyController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $companies = Company::orderBy('co_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
+            $companies = Company::orderBy('co_no', 'DESC');
 
+            if (isset($validated['from_date'])) {
+                $companies->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            }
+
+            if (isset($validated['to_date'])) {
+                $companies->where('updated_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            }
+
+            if (isset($validated['co_name'])) {
+                $companies->where(function($query) use ($validated) {
+                    $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                });
+            }
+
+            if (isset($validated['co_service'])) {
+                $companies->where(function($query) use ($validated) {
+                    $query->where(DB::raw('lower(co_service)'), 'like', '%' . strtolower($validated['co_service']) . '%');
+                });
+            }
+            
+            $companies = $companies->paginate($per_page, ['*'], 'page', $page);
+            
             return response()->json($companies);
         } catch (\Exception $e) {
             Log::error($e);
@@ -105,15 +128,18 @@ class CompanyController extends Controller
                 ->first();
 
             $adjustment_groups = AdjustmentGroup::select(['ag_no', 'co_no', 'ag_name', 'ag_manager', 'ag_hp', 'ag_email'])->where('co_no', $co_no)->get();
+            $co_address = CoAddress::select(['ca_no', 'co_no', 'ca_name', 'ca_manager', 'ca_hp', 'ca_address', 'ca_address_detail'])->where('co_no', $co_no)->get();
 
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'company' => $company,
-                'adjustment_groups' => $adjustment_groups
+                'adjustment_groups' => $adjustment_groups,
+                'co_address' => $co_address
             ]);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
