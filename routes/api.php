@@ -34,6 +34,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/all', [\App\Http\Controllers\Member\MemberController::class, 'getMembers'])->name('members');
         Route::get('/{mb_no}', [\App\Http\Controllers\Member\MemberController::class, 'getMember'])->name('member');
         Route::patch('/update_by_id', [\App\Http\Controllers\Member\MemberController::class, 'updateProfileById'])->name('update_profile_by_id');
+        Route::post('/create_account',[\App\Http\Controllers\Member\MemberController::class, 'createAccount'])->name('create_account');
     });
 
     // Manger Role
