@@ -32,6 +32,12 @@ class CreateAccountRequest extends BaseFormRequest
                 'regex:/^[a-zA-Z]{1,}([0-9]*)?$/',
                 'unique:member,mb_id'
             ],
+            'mb_name' => [
+                'required',
+                'string',
+                'max:20',
+                'min:4',
+            ],
             'mb_pw' => [
                 'required',
                 'string',
