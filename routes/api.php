@@ -52,6 +52,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [App\Http\Controllers\Service\ServiceController::class, 'getServices'])->name('get_services');
     });
 
+    Route::prefix('push')->name('push.')->group(function () {
+        Route::post('/create', \App\Http\Controllers\Push\PushController::class)->name('create');
+        Route::patch('/update/{push}', [App\Http\Controllers\Push\PushController::class, 'updatePush'])->name('update');
+    });
 
     Route::prefix('contract')->name('contract.')->group(function () {
         Route::patch('/{contract}', [App\Http\Controllers\Contract\ContractController::class, 'updateContract'])->name('update_contract');
