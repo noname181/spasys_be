@@ -271,4 +271,21 @@ class MemberController extends Controller
         }
     }
 
+    /**
+     * Get members not paginate
+     */
+
+    public function list_members()
+    {
+        try {
+            $members = Member::all();
+        
+            return response()->json(["member" => $members]);
+        }catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+        
+    }
+
 }
