@@ -8,16 +8,20 @@ use App\Http\Requests\Menu\MenuUpdateRequest;
 
 use App\Models\Member;
 use App\Models\Menu;
+use App\Models\Service;
+
 use App\Utils\Messages;
 use App\Utils\CommonFunc;
+use App\Http\Controllers\Controller;
+
 use Illuminate\Http\Request;
-use PhpParser\Node\Stmt\TryCatch;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
+
+use PhpParser\Node\Stmt\TryCatch;
 
 class MenuController extends Controller
 {
@@ -37,16 +41,14 @@ class MenuController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $menu = Menu::with('service')->orderBy('menu_no', 'DESC');
 
-            if (isset($validated['service_no'])) {
-                $menu->where('service_no', $validated['service_no']);
-            }
+            
 
             if (isset($validated['menu_depth'])) {
                 $menu->where('menu_depth', $validated['menu_depth']);
             }
 
             if (isset($validated['menu_device'])) {
-                $menu->where('menu_device', $validated['menu_device']);
+                $menu->where(DB::raw('lower(menu_device)'), strtolower($validated['menu_device']));
             }
 
             if (isset($validated['menu_name'])) {
@@ -57,6 +59,21 @@ class MenuController extends Controller
             $sql = $menu->toSql();
         
             $menu = $menu->paginate($per_page, ['*'], 'page', $page);
+
+            if (isset($validated['service_no'])) {
+                $service = Service::where('service_no', $validated['service_no'])->first();
+
+
+                $menu->setCollection(
+                    $menu->getCollection()->filter(function ($item) use ($service) {
+                        $service_no_array = $item->service_no_array;
+                        $service_no_array = explode(" ", $service_no_array);
+    
+                        return in_array($service->service_no, $service_no_array);
+                    })
+                );
+                
+            }
 
             
             // 'from_date' => date('Y-m-d H:i:s', strtotime($validated['from_date'])),
