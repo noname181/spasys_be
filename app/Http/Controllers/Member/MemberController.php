@@ -187,6 +187,7 @@ class MemberController extends Controller
         $validated = $request->validated();
         $member = Member::where('mb_no', $validated['mb_no'])->first();
         $member['mb_email'] = $validated['mb_email'];
+        $member['mb_name'] = $validated['mb_name'];
         $member['mb_tel'] = $validated['mb_tel'];
         $member['mb_hp'] = $validated['mb_hp'];
         $member['mb_push_yn'] = $validated['mb_push_yn'];

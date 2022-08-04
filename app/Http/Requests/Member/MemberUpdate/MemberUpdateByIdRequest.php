@@ -38,6 +38,11 @@ class MemberUpdateByIdRequest extends BaseFormRequest
                 'max:255',
                 'email',
             ],
+            'mb_name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
             'mb_tel' => [
                 'string',
                 'max:255',
