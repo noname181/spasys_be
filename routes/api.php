@@ -31,10 +31,12 @@ Route::middleware('auth')->group(function () {
         Route::patch('/update', [\App\Http\Controllers\Member\MemberController::class, 'updateProfile'])->name('update');
         Route::get('/profile', [\App\Http\Controllers\Member\MemberController::class, 'getProfile'])->name('profile');
         Route::put('/change_password', \App\Http\Controllers\Auth\ChangePasswordController::class)->name('change_password');
+
         Route::post('/all', [\App\Http\Controllers\Member\MemberController::class, 'getMembers'])->name('members');
         Route::get('/{mb_no}', [\App\Http\Controllers\Member\MemberController::class, 'getMember'])->name('member');
         Route::patch('/update_by_id', [\App\Http\Controllers\Member\MemberController::class, 'updateProfileById'])->name('update_profile_by_id');
         Route::post('/create_account',[\App\Http\Controllers\Member\MemberController::class, 'createAccount'])->name('create_account');
+        Route::post('/spasys', [\App\Http\Controllers\Member\MemberController::class, 'getSpasys'])->name('get_spasys');
     });
 
     // Manger Role

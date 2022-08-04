@@ -4,12 +4,16 @@ namespace App\Http\Controllers\Member;
 
 use App\Models\Member;
 use App\Utils\Messages;
+use App\Http\Controllers\Controller;
+
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+
 use App\Http\Requests\Member\MemberSearchRequest;
+use App\Http\Requests\Member\MemberSpasysSearchRequest;
 use App\Http\Requests\Member\MemberUpdate\MemberUpdateRequest;
 use App\Http\Requests\Member\MemberUpdate\MemberUpdateByIdRequest;
 use App\Http\Requests\Member\MemberRegisterController\InvokeRequest;
@@ -229,4 +233,42 @@ class MemberController extends Controller
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
+
+    /**
+     * Get Spasys Members
+     */
+    public function getSpasys(MemberSpasysSearchRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+
+            // If per_page is null set default data = 15
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+            $spasys = Member::where('role_no', 2)->orderBy('mb_no', 'DESC');
+
+        
+            if (isset($validated['mb_name'])) {
+                $spasys->where(function($query) use ($validated) {
+                    $query->where(DB::raw('lower(mb_name)'), 'like', '%' . strtolower($validated['mb_name']) . '%');
+                });
+            }
+
+            if (isset($validated['mb_id'])) {
+                $spasys->where(function($query) use ($validated) {
+                    $query->where(DB::raw('lower(mb_id)'), 'like', '%' . strtolower($validated['mb_id']) . '%');
+                });
+            }
+        
+
+            $spasys = $spasys->paginate($per_page, ['*'], 'page', $page);
+
+            return response()->json($spasys);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
 }
