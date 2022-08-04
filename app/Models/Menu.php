@@ -23,9 +23,10 @@ class Menu extends Model
      */
     protected $fillable = [
         'menu_no',
-        'mb_no',
+        'mb_no', 
         'menu_name',
         'menu_depth',
+        'menu_parent_no',
         'menu_url',
         'menu_device',
         'menu_use_yn',

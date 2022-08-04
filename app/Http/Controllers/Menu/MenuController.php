@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Menu;
 
 use App\Http\Requests\Menu\MenuCreateRequest;
 use App\Http\Requests\Menu\MenuSearchRequest;
+use App\Http\Requests\Menu\MenuUpdateRequest;
 
 use App\Models\Member;
 use App\Models\Menu;
@@ -54,13 +55,13 @@ class MenuController extends Controller
                 });
             }
             $sql = $menu->toSql();
-
+        
             $menu = $menu->paginate($per_page, ['*'], 'page', $page);
 
-
+            
             // 'from_date' => date('Y-m-d H:i:s', strtotime($validated['from_date'])),
-            // 'to_date' => date('Y-m-d 23:59:00', strtotime($validated['to_date']))
-
+            // 'to_date' => date('Y-m-d 23:59:00', strtotime($validated['to_date']))                 
+           
             return response()->json($menu);
         } catch (\Exception $e) {
             Log::error($e);
@@ -69,32 +70,59 @@ class MenuController extends Controller
         }
     }
     public function create(MenuCreateRequest $request)
-    {
+    {   
 
-
+        
         $validated = $request->validated();
-
-        $service_no_array = explode(" ", $validated['menu_service_no_array']);
-
+       
         try {
-            //DB::beginTransaction();
+            DB::beginTransaction();
+
+            
+            $main_menu = Menu::first();
+            if(!$main_menu){
+                $main_menu_id = 101;
+            }else {
+                $main_menu_id = Menu::orderBy('main_menu_id', 'DESC')->first()->main_menu_id;
+            }
+        
+           
+            if($request->menu_parent_no){
+                $sub_menu = Menu::where('menu_parent_no', $validated['menu_parent_no'])->orderBy('sub_menu_id', 'DESC')->first();
+
+                if(!$sub_menu){
+                    $sub_menu_id = 101;
+                }else {
+                    $sub_menu_id = $sub_menu->sub_menu_id + 1;
+                }
+                
+            }else {
+                $sub_menu_id = 100;
+            }
+           
+            
+
+            $menu_id = (string)$main_menu_id . (string)$sub_menu_id;
 
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
-
-            foreach ($service_no_array as $service_no){
-                $menu_no = Menu::insertGetId([
-                    'mb_no' => $member->mb_no,
-                    'menu_name' => $validated['menu_name'],
-                    'menu_depth' => $validated['menu_depth'],
-                    'menu_url' => $validated['menu_url'],
-                    'menu_device' => $validated['menu_device'],
-                    'menu_use_yn' => $validated['menu_use_yn'],
-                    'service_no' => $service_no,
+          
+            $menu_no = Menu::insertGetId([
+                'mb_no' => $member->mb_no,
+                'menu_name' => $validated['menu_name'],
+                'main_menu_id' => $main_menu_id,
+                'sub_menu_id' => $sub_menu_id,
+                'menu_id' => intval($menu_id),
+                'menu_depth' => $validated['menu_depth'],
+                'menu_parent_no' => $request->menu_parent_no ? $validated['menu_parent_no'] : NULL,
+                'menu_url' => $validated['menu_url'],
+                'menu_device' => $validated['menu_device'],
+                'menu_use_yn' => $validated['menu_use_yn'],
+                'service_no_array' => $validated['menu_service_no_array'],
                 ]);
-            }
+            
 
-
-            // DB::commit();
+          
+            DB::commit();
             // return $menu_no->toSql();
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -107,9 +135,40 @@ class MenuController extends Controller
     }
 
     public function get_menu($menu_no)
-    {
-        $menu = Menu::where('menu_no', $menu_no)->first();
-        return $menu;
+    { 
+        try {
+            $menu = Menu::where('menu_no', $menu_no)->first();
+            $menu_main = Menu::where('menu_depth', '상위')->get();
 
+            return response()->json(['menu' => $menu, 'menu_main' => $menu_main]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0002], 500);
+        }
+    }
+
+    public function get_menu_main()
+    { 
+        try {
+            $menu_main = Menu::where('menu_depth', '상위')->get();
+            return response()->json($menu_main);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0002], 500);
+        }
+    }
+
+    public function update_menu(MenuUpdateRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+            $menu = Menu::where('menu_no', $validated['menu_no'])
+                ->update($validated);
+
+            return response()->json(['message' => Messages::MSG_0007], 200);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $validated;
+        }
     }
 }

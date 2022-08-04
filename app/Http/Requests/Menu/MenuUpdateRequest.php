@@ -4,7 +4,7 @@ namespace App\Http\Requests\Menu;
 
 use App\Http\Requests\BaseFormRequest;
 
-class MenuSearchRequest extends BaseFormRequest
+class MenuUpdateRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,29 +24,42 @@ class MenuSearchRequest extends BaseFormRequest
     public function rules()
     {
         return [
-            'per_page' => [
-                'nullable',
-                'int',
-            ],
-            'page' => [
-                'nullable',
-                'int',
-            ],
-            'service_no' => [
-                'int',
-                'nullable',
-            ],
-            'menu_depth' => [
-                'string',
-                'nullable',
+            'menu_no' => [
+                'required',
+                'integer',
             ],
             'menu_name' => [
+                'required',
                 'string',
+                'max:255',
+            ],
+            'menu_depth' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'menu_parent_no' => [
                 'nullable',
+                'integer',
+            ],
+            'menu_url' => [
+                'required',
+                'string',
+                'max:255',
             ],
             'menu_device' => [
+                'required',
                 'string',
-                'nullable',
+                'max:255',
+            ],
+            'menu_use_yn' => [
+                'required',
+                'string',
+                'max:1',
+            ],
+            'service_no_array' => [
+                'required',
+                'string',
             ],
         ];
     }

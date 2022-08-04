@@ -101,4 +101,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/create_menu', [\App\Http\Controllers\Menu\MenuController::class, 'create']);
     Route::post('/menu', [\App\Http\Controllers\Menu\MenuController::class, 'menu']);
     Route::get('/menu/{menu_no}', [\App\Http\Controllers\Menu\MenuController::class, 'get_menu']);
+    Route::post('/update_menu', [\App\Http\Controllers\Menu\MenuController::class, 'update_menu']);
+    Route::get('/menu_main', [\App\Http\Controllers\Menu\MenuController::class, 'get_menu_main']);
 });
