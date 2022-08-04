@@ -20,7 +20,7 @@ class RoleController extends Controller
     public function __invoke(RoleRequest $request)
     {
         $validated = $request->validated();
-        // try {
+        try {
             DB::beginTransaction();
             $ids = [];
             $i = 0;
@@ -44,11 +44,11 @@ class RoleController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007,
             ]);
-        // } catch (\Exception $e) {
-        //     DB::rollback();
-        //     Log::error($e);
-        //     return response()->json(['message' => Messages::MSG_0001], 500);
-        // }
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0001], 500);
+        }
     }
 
     public function getRoles()
