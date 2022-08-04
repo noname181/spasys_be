@@ -59,27 +59,25 @@ class ManagerController extends Controller
                         'm_no' => $value['m_no'],
                         'mb_no' => $member->mb_no,
                         'm_position' => $value['m_position'],
-                        'co_no' => 20,
+                        'co_no' => $value['co_no'],
                         'm_name' => $value['m_name'],
                         'm_duty1' => $value['m_duty1'],
                         'm_duty2' => $value['m_duty2'],
                         'm_hp' => $value['m_hp'],
                         'm_email' => $value['m_email'],
                         'm_etc' => $value['m_etc'],
-                        'm_regtime' => date('y-m-d h-i-s')
                     ];
                 } else {
                     $managerCreate[] = [
                         'mb_no' => $member->mb_no,
                         'm_position' => $value['m_position'],
-                        'co_no' => 20,
                         'm_name' => $value['m_name'],
                         'm_duty1' => $value['m_duty1'],
                         'm_duty2' => $value['m_duty2'],
                         'm_hp' => $value['m_hp'],
                         'm_email' => $value['m_email'],
                         'm_etc' => $value['m_etc'],
-                        'm_regtime' => date('y-m-d h-i-s')
+                        'co_no' => $value['co_no'],
                     ];
                 }
             }
@@ -160,6 +158,7 @@ class ManagerController extends Controller
         try {
             $manager = Manager::select([
                 'm_no',
+                'co_no',
                 'm_position',
                 'm_name',
                 'm_duty1',

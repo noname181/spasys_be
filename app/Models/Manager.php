@@ -30,6 +30,5 @@ class Manager extends Model
         'm_hp',
         'm_email',
         'm_etc',
-        'm_regtime',
     ];
 }

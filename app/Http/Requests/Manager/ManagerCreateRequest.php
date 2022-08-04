@@ -27,6 +27,9 @@ class ManagerCreateRequest extends BaseFormRequest
             '*.m_no' => [
                 'integer',
             ],
+            '*.co_no' => [
+                'integer',
+            ],
             '*.m_position' => [
                 'string',
                 'max:255',
