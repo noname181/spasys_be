@@ -57,12 +57,12 @@ class ServiceController extends Controller
     public function getServices()
     {
         try {
-            $service = Service::where('mb_no', Auth::user()->mb_no)->get();
+            $services = Service::all();
 
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'services' => $service
+                'services' => $services
             ]);
         } catch (\Exception $e) {
             DB::rollback();
