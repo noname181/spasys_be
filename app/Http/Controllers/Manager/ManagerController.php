@@ -50,13 +50,10 @@ class ManagerController extends Controller
             DB::beginTransaction();
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
             $validated = $request->validated();
-            $managerCreate = [];
-            $managerUpdate = [];
-            foreach ($validated as $value) {
 
-                if ( isset($value['m_no'])) {
-                    $managerUpdate[] = [
-                        'm_no' => $value['m_no'],
+            foreach ($validated as $value) {
+                if (isset($value['m_no'])) {
+                    Manager::where('m_no', $value['m_no'])->update([
                         'mb_no' => $member->mb_no,
                         'm_position' => $value['m_position'],
                         'co_no' => $value['co_no'],
@@ -66,9 +63,10 @@ class ManagerController extends Controller
                         'm_hp' => $value['m_hp'],
                         'm_email' => $value['m_email'],
                         'm_etc' => $value['m_etc'],
-                    ];
+                    ]);
+                   
                 } else {
-                    $managerCreate[] = [
+                    $Manager = Manager::insertGetId([
                         'mb_no' => $member->mb_no,
                         'm_position' => $value['m_position'],
                         'm_name' => $value['m_name'],
@@ -78,22 +76,11 @@ class ManagerController extends Controller
                         'm_email' => $value['m_email'],
                         'm_etc' => $value['m_etc'],
                         'co_no' => $value['co_no'],
-                    ];
+                    ]);
+                  
                 }
             }
-            Manager::insert($managerCreate);
-            foreach ($managerUpdate as $data) {
-                $manager = Manager::where('m_no', $data['m_no'])->get()->first();
-                $manager->update([
-                    "m_position" => $data['m_position'],
-                    "m_name" => $data['m_name'],
-                    "m_duty1" => $data['m_duty1'],
-                    "m_duty2" => $data['m_duty2'],
-                    "m_hp" => $data['m_hp'],
-                    "m_email" => $data['m_email'],
-                    "m_etc" => $data['m_etc'],
-                ]);
-            }
+           
             DB::commit();
             return response()->json([
                 'message' =>  Messages::MSG_0007,

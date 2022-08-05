@@ -112,4 +112,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/menu/{menu_no}', [\App\Http\Controllers\Menu\MenuController::class, 'get_menu']);
     Route::post('/update_menu', [\App\Http\Controllers\Menu\MenuController::class, 'update_menu']);
     Route::get('/menu_main', [\App\Http\Controllers\Menu\MenuController::class, 'get_menu_main']);
+
+    Route::prefix('role')->name('role.')->group(function () {
+        Route::post('/', \App\Http\Controllers\Role\RoleController::class)->name('registe_update_role');
+        Route::get('/', [App\Http\Controllers\Role\RoleController::class, 'getRoles'])->name('get_role');
+    });
 });
