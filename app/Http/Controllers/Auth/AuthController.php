@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\AuthController\InvokeRequest;
+
 use App\Models\Member;
-use Illuminate\Support\Facades\Hash;
 use App\Utils\Messages;
+
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
@@ -44,6 +46,7 @@ class AuthController extends Controller
                 $token = $member['mb_token'];
 
             $member->save();
+
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'mb_token' => $token,

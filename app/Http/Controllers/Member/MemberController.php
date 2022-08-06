@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Member;
 
 use App\Models\Member;
+use App\Models\Service;
 use App\Utils\Messages;
 use App\Http\Controllers\Controller;
 
@@ -88,9 +89,12 @@ class MemberController extends Controller
     {
         try {
             $member = Member::where('mb_no', Auth::user()->mb_no)->first();
+            $services = Service::select(['service_no', 'service_name'])->where('service_use_yn', 'y')->get();
+
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'profile' => $member,
+                'services' => $services
             ]);
         } catch (\Exception $e) {
             Log::error($e);
@@ -173,9 +177,13 @@ class MemberController extends Controller
             $member['mb_push_yn'] = $validated['mb_push_yn'];
             $member['mb_service_no_array'] = $validated['mb_service_no_array'];
             $member->save();
+
+            $services = Service::select(['service_no', 'service_name'])->where('service_use_yn', 'y')->get();
+
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'profile' => $member,
+                'services' => $services,
             ]);
         } catch (\Exception $e) {
             Log::error($e);

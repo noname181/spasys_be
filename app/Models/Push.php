@@ -14,7 +14,7 @@ class Push extends Model
 
     protected $primaryKey = 'push_no';
 
-    public $timestamps = false;
+    public $timestamps = true;
     /**
      * The attributes that are mass assignable.
      *
@@ -25,10 +25,14 @@ class Push extends Model
         'push_no',
         'push_title', 
         'push_content',
-        'push_time_no',
+        'push_time',
         'push_must_yn',
         'push_use_yn',
-        'mb_no',
-        'push_regtime'
+        'mb_no'
+    ];
+
+    protected $casts = [
+        'created_at' => "date:Y.m.d H:i",
+        'updated_at' => "date:Y.m.d H:i",
     ];
 }
