@@ -37,6 +37,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/{mb_no}', [\App\Http\Controllers\Member\MemberController::class, 'getMember'])->name('member');
         Route::patch('/update_by_id', [\App\Http\Controllers\Member\MemberController::class, 'updateProfileById'])->name('update_profile_by_id');
         Route::post('/create_account',[\App\Http\Controllers\Member\MemberController::class, 'createAccount'])->name('create_account');
+        Route::patch('/update_account/{memeber}',[\App\Http\Controllers\Member\MemberController::class, 'updateAccount'])->name('update_account');
+        Route::delete('/delete_account/{memeber}',[\App\Http\Controllers\Member\MemberController::class, 'deleteAccount'])->name('delete_account');
         Route::post('/spasys', [\App\Http\Controllers\Member\MemberController::class, 'getSpasys'])->name('get_spasys');
     });
 

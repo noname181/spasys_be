@@ -5,13 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Spatie\Permission\Traits\HasRoles;
 use App\Helper\Tokenable;
 use App\Models\Company;
 
 class Member extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles, Tokenable;
+    use HasFactory, Notifiable, Tokenable;
 
     const ROLE_ADMIN = 1;
     const ROLE_MANAGER = 2;
@@ -47,7 +46,7 @@ class Member extends Authenticatable
      */
     protected $fillable = [
         'mb_id',
-        'role_no', 
+        'role_no',
         'mb_name',
         'mb_email',
         'mb_pw',

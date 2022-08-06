@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Log;
 
 use App\Http\Requests\Member\MemberSearchRequest;
 use App\Http\Requests\Member\MemberSpasysSearchRequest;
+use App\Http\Requests\Member\MemberSpasysUpdateRequest;
 use App\Http\Requests\Member\MemberUpdate\MemberUpdateRequest;
 use App\Http\Requests\Member\MemberUpdate\MemberUpdateByIdRequest;
 use App\Http\Requests\Member\MemberRegisterController\InvokeRequest;
@@ -235,6 +236,51 @@ class MemberController extends Controller
     }
 
     /**
+     * Update Account
+     */
+    public function updateAccount(MemberSpasysUpdateRequest $request, Member $memeber)
+    {
+        $validated = $request->validated();
+        try {
+            if(isset($validated['mb_pw'])) {
+                // Logout when change pw
+                $memeber->mb_token = '';
+                $memeber->mb_pw =  Hash::make($validated['mb_pw']);
+            }
+            if($validated['mb_id'] != $memeber->mb_id) {
+                // Logout when change mb_id
+                $memeber->mb_token = '';
+            }
+            $memeber->mb_name = $validated['mb_name'];
+            $memeber->mb_id = $validated['mb_id'];
+            $memeber->mb_note = $validated['mb_note'];
+            $memeber->save();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'memeber' => $memeber,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0002], 500);
+        }
+    }
+
+    /**
+     * Delete Account
+     */
+    public function deleteAccount(Member $memeber)
+    {
+        try {
+            $memeber->delete();
+            return response()->json([
+                'message' => Messages::MSG_0007
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0003], 500);
+        }
+    }
+    /**
      * Get Spasys Members
      */
     public function getSpasys(MemberSpasysSearchRequest $request)
@@ -248,7 +294,7 @@ class MemberController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $spasys = Member::where('role_no', 2)->orderBy('mb_no', 'DESC');
 
-        
+
             if (isset($validated['mb_name'])) {
                 $spasys->where(function($query) use ($validated) {
                     $query->where(DB::raw('lower(mb_name)'), 'like', '%' . strtolower($validated['mb_name']) . '%');
@@ -260,7 +306,7 @@ class MemberController extends Controller
                     $query->where(DB::raw('lower(mb_id)'), 'like', '%' . strtolower($validated['mb_id']) . '%');
                 });
             }
-        
+
 
             $spasys = $spasys->paginate($per_page, ['*'], 'page', $page);
 
@@ -279,13 +325,13 @@ class MemberController extends Controller
     {
         try {
             $members = Member::all();
-        
+
             return response()->json(["member" => $members]);
         }catch (\Exception $e) {
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
-        
+
     }
 
 }
