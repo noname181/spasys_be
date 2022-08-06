@@ -22,11 +22,8 @@ class ServiceController extends Controller
         $validated = $request->validated();
         try {
             DB::beginTransaction();
-            $ids = [];
-            $i = 0;
             foreach ($validated['services'] as $val) {
-                Log::error($val);
-                $service = Service::updateOrCreate(
+                Service::updateOrCreate(
                     [
                         'service_no' => isset($val['service_no']) ? $val['service_no'] : null,
                     ],
@@ -38,10 +35,7 @@ class ServiceController extends Controller
                         'service_use_yn' => $val['service_use_yn'],
                     ],
                 );
-                $ids[] = $service->service_no;
-                $i++;
             }
-            Service::whereNotIn('service_no', $ids)->where('mb_no', Auth::user()->mb_no)->delete();
 
             DB::commit();
             return response()->json([
@@ -58,16 +52,26 @@ class ServiceController extends Controller
     {
         try {
             $services = Service::all();
-
-            DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'services' => $services
             ]);
         } catch (\Exception $e) {
-            DB::rollback();
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+    public function deleteService(Service $service)
+    {
+        try {
+            $service->delete();
+            return response()->json([
+                'message' => Messages::MSG_0007
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0006], 500);
         }
     }
 }

@@ -52,6 +52,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('service')->name('service.')->group(function () {
         Route::post('/', \App\Http\Controllers\Service\ServiceController::class)->name('registe_update_services');
         Route::get('/', [App\Http\Controllers\Service\ServiceController::class, 'getServices'])->name('get_services');
+        Route::delete('/{service}', [App\Http\Controllers\Service\ServiceController::class, 'deleteService'])->name('delete_services');
     });
 
     Route::prefix('push')->name('push.')->group(function () {
@@ -118,5 +119,6 @@ Route::middleware('auth')->group(function () {
     Route::prefix('role')->name('role.')->group(function () {
         Route::post('/', \App\Http\Controllers\Role\RoleController::class)->name('registe_update_role');
         Route::get('/', [App\Http\Controllers\Role\RoleController::class, 'getRoles'])->name('get_role');
+        Route::delete('/{role}', [App\Http\Controllers\Role\RoleController::class, 'deleteRole'])->name('delete_role');
     });
 });

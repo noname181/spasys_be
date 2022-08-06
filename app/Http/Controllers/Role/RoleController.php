@@ -7,7 +7,6 @@ use App\Utils\Messages;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Role\RoleRequest;
 
 class RoleController extends Controller
@@ -22,11 +21,8 @@ class RoleController extends Controller
         $validated = $request->validated();
         try {
             DB::beginTransaction();
-            $ids = [];
-            $i = 0;
             foreach ($validated['roles'] as $val) {
-                Log::error($val);
-                $role = Role::updateOrCreate(
+                Role::updateOrCreate(
                     [
                         'role_no' => isset($val['role_no']) ? $val['role_no'] : null,
                     ],
@@ -37,8 +33,6 @@ class RoleController extends Controller
                         'role_use_yn' => $val['role_use_yn'],
                     ],
                 );
-                $ids[] = $role->role_no;
-                $i++;
             }
             DB::commit();
             return response()->json([
@@ -56,15 +50,26 @@ class RoleController extends Controller
         try {
             $role = Role::get();
 
-            DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'roles' => $role
             ]);
         } catch (\Exception $e) {
-            DB::rollback();
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+    public function deleteRole(Role $role)
+    {
+        try {
+            $role->delete();
+            return response()->json([
+                'message' => Messages::MSG_0007
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0006], 500);
         }
     }
 }
