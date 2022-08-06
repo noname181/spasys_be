@@ -30,4 +30,9 @@ class Push extends Model
         'push_use_yn',
         'mb_no'
     ];
+
+    protected $casts = [
+        'created_at' => "date:Y.m.d H:i",
+        'updated_at' => "date:Y.m.d H:i",
+    ];
 }
