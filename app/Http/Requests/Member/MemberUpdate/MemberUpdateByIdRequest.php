@@ -32,6 +32,14 @@ class MemberUpdateByIdRequest extends BaseFormRequest
                 'integer',
                 'max:255',
             ],
+            'co_no' => [
+                'required',
+                'integer',
+            ],
+            'role_no' => [
+                'required',
+                'string',
+            ],
             'mb_email' => [
                 'required',
                 'string',

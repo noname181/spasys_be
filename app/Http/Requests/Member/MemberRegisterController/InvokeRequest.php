@@ -32,12 +32,20 @@ class InvokeRequest extends BaseFormRequest
                 'regex:/^[a-zA-Z]{1,}([0-9]*)?$/',
                 'unique:member,mb_id'
             ],
+            'co_no' => [
+                'required',
+                'integer',
+            ],
             // FIXME hard set role_no = 1
             // 'role_no' => [
             //     'required',
             //     'integer',
             //     'exists:role,role_no'
             // ],
+            'role_no' => [
+                'required',
+                'string',
+            ],
             'mb_name' => [
                 'required',
                 'string',

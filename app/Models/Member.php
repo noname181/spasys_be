@@ -14,15 +14,19 @@ class Member extends Authenticatable
     use HasFactory, Notifiable, Tokenable;
 
     const ROLE_ADMIN = 1;
-    const ROLE_MANAGER = 2;
-    const ROLE_OPERATOR = 3;
-    const ROLE_WORKER = 4;
-    const ROLE_SHOP_MANAGER = 5;
-    const ROLE_COMPANY_MANAGER = 6;
-    const ROLE_COMPANY_OPERATOR = 7;
+    const ROLE_SPASYS_ADMIN = 2;
+    const ROLE_SPASYS_MANAGER = 3;
+    const ROLE_SPASYS_OPERATOR = 4;
+    const ROLE_SPASYS_WORKER = 5;
+    const ROLE_AGENCY_MANAGER = 6;
+    const ROLE_AGENCY_OPERATOR = 7;
+    const ROLE_SHOP_MANAGER = 8;
+    const ROLE_SHOP_OPERATOR = 9;
 
-    const SPASYS = 'spasys';
     const ADMIN = 'admin';
+    const SPASYS = 'spasys';
+    const AGENCY = 'agency';
+    const SHOP = 'shop';
 
     protected $table = "member";
 

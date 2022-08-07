@@ -34,13 +34,34 @@ class MemberController extends Controller
         try {
             $validated = $request->validated();
             $roleNoOfUserLogin = Auth::user()->role_no;
+
+            // FIXME hard set mb_language = ko and role_no = 1
+
+            $validated['mb_language'] = 'ko';
+
             if ($roleNoOfUserLogin == Member::ROLE_ADMIN) {
                 $validated['mb_type'] = Member::SPASYS;
                 $validated['mb_parent'] = Member::ADMIN;
+            }else if ($roleNoOfUserLogin == Member::ROLE_SPASYS_ADMIN) {
+                $validated['mb_type'] = Member::AGENCY;
+                $validated['mb_parent'] = Member::SPASYS;
+                if($validated['role_no'] == "관리자"){
+                    $validated['role_no'] = Member::ROLE_AGENCY_MANAGER;
+                }else {
+                    $validated['role_no'] = Member::ROLE_AGENCY_OPERATOR;
+                }
+            }else if ($roleNoOfUserLogin == Member::ROLE_AGENCY_MANAGER) {
+                $validated['mb_type'] = Member::SHOP;
+                $validated['mb_parent'] = Member::AGENCY;
+                if($validated['role_no'] == "관리자"){
+                    $validated['role_no'] = Member::ROLE_AGENCY_MANAGER;
+                }else {
+                    $validated['role_no'] = Member::ROLE_AGENCY_OPERATOR;
+                }
+            }else {
+                $validated['role_no'] = 1;
             }
-            // FIXME hard set mb_language = ko and role_no = 1
-            $validated['role_no'] = 1;
-            $validated['mb_language'] = 'ko';
+
 
             $validated['mb_token'] = '';
             $validated['mb_pw'] = Hash::make($validated['mb_pw']);
@@ -113,7 +134,14 @@ class MemberController extends Controller
     public function getMember($mb_no)
     {
         try {
-            $member = Member::where('mb_no', $mb_no)->first();
+            $member = Member::with('company')->where('mb_no', $mb_no)->first();
+            if($member->role_no == Member::ROLE_SPASYS_MANAGER || $member->role_no == Member::ROLE_AGENCY_MANAGER){
+                $member->role_no = '관리자';
+            }else if($member->role_no == Member::ROLE_SPASYS_OPERATOR || $member->role_no == Member::ROLE_AGENCY_OPERATOR){
+                $member->role_no = '운영자';
+            }else if($member->role_no == Member::ROLE_SPASYS_WORKER){
+                $member->role_no = '작업자';
+            }
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'member' => $member,
@@ -210,7 +238,34 @@ class MemberController extends Controller
         $member['mb_hp'] = $validated['mb_hp'];
         $member['mb_push_yn'] = $validated['mb_push_yn'];
         $member['mb_service_no_array'] = $validated['mb_service_no_array'];
+        $member['co_no'] = $validated['co_no'];
+
+        $roleNoOfUserLogin = Auth::user()->role_no;
+        if ($roleNoOfUserLogin == Member::ROLE_ADMIN) {
+            $validated['mb_type'] = Member::SPASYS;
+            $validated['mb_parent'] = Member::ADMIN;
+        }else if ($roleNoOfUserLogin == Member::ROLE_SPASYS_ADMIN) {
+            $validated['mb_type'] = Member::AGENCY;
+            $validated['mb_parent'] = Member::SPASYS;
+            if($validated['role_no'] == "관리자"){
+                $validated['role_no'] = Member::ROLE_AGENCY_MANAGER;
+            }else {
+                $validated['role_no'] = Member::ROLE_AGENCY_OPERATOR;
+            }
+        }else {
+            $validated['role_no'] = 1;
+        }
+
         $member->save();
+
+        if($member->role_no == Member::ROLE_SPASYS_MANAGER || $member->role_no == Member::ROLE_AGENCY_MANAGER){
+            $member->role_no = '관리자';
+        }else if($member->role_no == Member::ROLE_SPASYS_OPERATOR || $member->role_no == Member::ROLE_AGENCY_OPERATOR){
+            $member->role_no = '운영자';
+        }else if($member->role_no == Member::ROLE_SPASYS_WORKER){
+            $member->role_no = '작업자';
+        }
+
         return response()->json([
             'message' => Messages::MSG_0007,
             'profile' => $member,
