@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Helper\Tokenable;
 use App\Models\Company;
+use App\Models\Role;
 
 class Member extends Authenticatable
 {
@@ -61,6 +62,11 @@ class Member extends Authenticatable
 
     public function company()
     {
-        return $this->belongsTo(company::class, 'co_no', 'co_no');
+        return $this->belongsTo(Company::class, 'co_no', 'co_no');
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'role_no', 'role_no');
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Member;
 
 use App\Models\Member;
 use App\Models\Service;
+use App\Models\Company;
 use App\Utils\Messages;
 use App\Http\Controllers\Controller;
 
@@ -72,12 +73,16 @@ class MemberController extends Controller
                     'message' => Messages::MSG_0020
                 ], 404);
             }
+            $length = strlen($member->mb_id);
+            $start = floor($length/4);
+            $end = floor($length/2) + $start;
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'mb_id' => $member->mb_id,
+                'mb_id' => substr_replace($member->mb_id, str_repeat('*', $end - $start + 1), $start , $end - $start + 1),
             ]);
         } catch (\Exception $e) {
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -231,11 +236,21 @@ class MemberController extends Controller
             $validated['mb_token'] = '';
             $validated['mb_pw'] = Hash::make($validated['mb_pw']);
 
+            $com_no = Company::insertGetId([
+                'mb_no' => Auth::user()->mb_no,
+                'co_type' => Member::SPASYS,
+                'co_name' => $validated['mb_name'],
+                'co_etc' => $validated['mb_note']
+            ]);
+
+            $validated['co_no'] = $com_no;
+
             $mb_no = Member::insertGetId($validated);
 
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'mb_no' => $mb_no,
+                'co_no' => $com_no
             ]);
         } catch (\Exception $e) {
             Log::error($e);
@@ -243,13 +258,14 @@ class MemberController extends Controller
         }
     }
 
-    /**
+        /**
      * Update Account
      */
     public function updateAccount(MemberSpasysUpdateRequest $request, Member $memeber)
     {
         $validated = $request->validated();
         try {
+            DB::beginTransaction();
             if(isset($validated['mb_pw'])) {
                 // Logout when change pw
                 $memeber->mb_token = '';
@@ -263,12 +279,21 @@ class MemberController extends Controller
             $memeber->mb_id = $validated['mb_id'];
             $memeber->mb_note = $validated['mb_note'];
             $memeber->save();
+
+            Company::where('co_no', $memeber->co_no)->update([
+                'co_name' => $memeber->mb_name,
+                'co_etc' => $memeber->mb_note
+            ]);
+
+            DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'memeber' => $memeber,
             ]);
         } catch (\Exception $e) {
+            DB::rollback();
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0002], 500);
         }
     }
@@ -276,18 +301,23 @@ class MemberController extends Controller
     /**
      * Delete Account
      */
-    public function deleteAccount(Member $memeber)
+    public function deleteAccount($mb_no)
     {
         try {
-            $memeber->delete();
+            $member = Member::where('mb_no', $mb_no)->first();
+            $co_no = $member->co_no;
+            $member->delete();
+            Company::where('co_no', $co_no)->delete();
             return response()->json([
                 'message' => Messages::MSG_0007
             ]);
         } catch (\Exception $e) {
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0003], 500);
         }
     }
+
     /**
      * Get Spasys Members
      */
@@ -300,7 +330,7 @@ class MemberController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $spasys = Member::where('role_no', 2)->orderBy('mb_no', 'DESC');
+            $spasys = Member::with('company')->where('role_no', 2)->orderBy('mb_no', 'DESC');
 
 
             if (isset($validated['mb_name'])) {

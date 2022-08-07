@@ -31,7 +31,7 @@ class MemberSpasysUpdateRequest extends BaseFormRequest
                 'max:20',
                 'min:4',
                 'regex:/^[a-zA-Z]{1,}([0-9]*)?$/',
-                'unique:member,mb_id,'.Auth::user()->mb_no.',mb_no'
+                'unique:member,mb_id,'.$this->mb_no.',mb_no'
             ],
             'mb_name' => [
                 'required',
