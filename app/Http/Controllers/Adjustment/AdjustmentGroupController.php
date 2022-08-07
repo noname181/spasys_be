@@ -49,7 +49,7 @@ class AdjustmentGroupController extends Controller
      * @param  AdjustmentGroupCreateRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function create(AdjustmentGroupCreateRequest $request)
+    public function create($co_no, AdjustmentGroupCreateRequest $request)
     {
 
         try {
@@ -62,7 +62,7 @@ class AdjustmentGroupController extends Controller
                 if(isset($value['ag_no'])){
                     AdjustmentGroup::where('ag_no', $value['ag_no'])->update([
                         'mb_no' => $member->mb_no,
-                        'co_no' => $value['co_no'],
+                        'co_no' => $co_no,
                         'ag_name' => $value['ag_name'],
                         'ag_hp' => $value['ag_hp'],
                         'ag_manager' => $value['ag_manager'],
@@ -71,7 +71,7 @@ class AdjustmentGroupController extends Controller
                 }else {
                     $AdjustmentGroup = AdjustmentGroup::insertGetId([
                         'mb_no' => $member->mb_no,
-                        'co_no' => $value['co_no'],
+                        'co_no' => $co_no,
                         'ag_name' => $value['ag_name'],
                         'ag_hp' => $value['ag_hp'],
                         'ag_manager' => $value['ag_manager'],

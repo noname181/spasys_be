@@ -93,9 +93,9 @@ class CompanyController extends Controller
                     $query->where(DB::raw('lower(co_service)'), 'like', '%' . strtolower($validated['co_service']) . '%');
                 });
             }
-            
+
             $companies = $companies->paginate($per_page, ['*'], 'page', $page);
-            
+
             return response()->json($companies);
         } catch (\Exception $e) {
             Log::error($e);
@@ -127,15 +127,19 @@ class CompanyController extends Controller
                 // ->where('co_address.co_no', $co_no)
                 ->first();
 
-            $adjustment_groups = AdjustmentGroup::select(['ag_no', 'co_no', 'ag_name', 'ag_manager', 'ag_hp', 'ag_email'])->where('co_no', $co_no)->get();
-            $co_address = CoAddress::select(['ca_no', 'co_no', 'ca_name', 'ca_manager', 'ca_hp', 'ca_address', 'ca_address_detail'])->where('co_no', $co_no)->get();
+                $adjustment_groups = AdjustmentGroup::select(['ag_no', 'co_no', 'ag_name', 'ag_manager', 'ag_hp', 'ag_email'])->where('co_no', $co_no)->get();
+                $co_address = CoAddress::select(['ca_no', 'co_no', 'ca_name', 'ca_manager', 'ca_hp', 'ca_address', 'ca_address_detail'])->where('co_no', $co_no)->get();
+                $forwarder_info = ForwarderInfo::select(['fi_no', 'co_no', 'fi_name', 'fi_manager', 'fi_hp', 'fi_address', 'fi_address_detail'])->where('co_no', $co_no)->get();
+                $customs_info = CustomsInfo::select(['ci_no', 'co_no', 'ci_name', 'ci_manager', 'ci_hp', 'ci_address', 'ci_address_detail'])->where('co_no', $co_no)->get();
 
-            return response()->json([
-                'message' => Messages::MSG_0007,
-                'company' => $company,
-                'adjustment_groups' => $adjustment_groups,
-                'co_address' => $co_address
-            ]);
+                return response()->json([
+                    'message' => Messages::MSG_0007,
+                    'company' => $company,
+                    'adjustment_groups' => $adjustment_groups,
+                    'co_address' => $co_address,
+                    'forwarder_info' => $forwarder_info,
+                    'customs_info' => $customs_info,
+                ]);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
