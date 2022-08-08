@@ -12,7 +12,7 @@ class Banner extends Model
     protected $table = "banner";
 
     protected $primaryKey = 'banner_no';
-    
+
     public $timestamps = true;
 
     protected $casts = [
@@ -41,6 +41,6 @@ class Banner extends Model
 
     public function files()
     {
-        return $this->hasMany(File::class, 'file_table_key');
+        return $this->hasMany(File::class, 'file_table_key', 'banner_no')->where('file_table', 'banner');
     }
 }

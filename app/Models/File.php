@@ -29,10 +29,4 @@ class File extends Model
         'file_position',
         'file_url'
     ];
-
-    public function files()
-    {
-        return $this->hasMany('App\Comment');
-    }
-    
 }

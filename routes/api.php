@@ -121,4 +121,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [App\Http\Controllers\Role\RoleController::class, 'getRoles'])->name('get_role');
         Route::delete('/{role}', [App\Http\Controllers\Role\RoleController::class, 'deleteRole'])->name('delete_role');
     });
+
+    Route::prefix('manual')->name('manual.')->group(function () {
+        Route::post('/', [App\Http\Controllers\Manual\ManualController::class, 'create'])->name('register_manual');
+        Route::get('/{manual}', [App\Http\Controllers\Manual\ManualController::class, 'getManualById'])->name('get_role');
+        Route::patch('/{manual}', [App\Http\Controllers\Manual\ManualController::class, 'update'])->name('update_manual');
+        Route::post('/suneditor', [App\Http\Controllers\Manual\ManualController::class, 'suneditor'])->name('update_manual');
+    });
+
 });
