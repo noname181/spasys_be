@@ -27,7 +27,7 @@ class Menu extends Model
      */
     protected $fillable = [
         'menu_no',
-        'mb_no', 
+        'mb_no',
         'menu_name',
         'menu_depth',
         'menu_parent_no',
@@ -48,6 +48,11 @@ class Menu extends Model
         return $this->hasOne(Service::class, 'service_no', 'service_no');
     }
 
+    public function menu_parent()
+    {
+        return $this->hasOne(Menu::class, 'menu_no', 'menu_parent_no');
+    }
+
     public function getServiceNameArrayAttribute()
     {
         $service_no_array = $this->service_no_array;
@@ -61,7 +66,7 @@ class Menu extends Model
             }else {
                 $service_array[] = "";
             }
-            
+
         }
 
         return implode("/",$service_array);
