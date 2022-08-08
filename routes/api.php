@@ -48,6 +48,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/get_company/{co_no}', [App\Http\Controllers\Company\CompanyController::class, 'getCompany'])->name('get_company');
     Route::patch('/update_company/{company}', [App\Http\Controllers\Company\CompanyController::class, 'updateCompany'])->name('update_company');
     Route::post('/register_contract', \App\Http\Controllers\Contract\ContractController::class)->name('register_contract');
+    Route::post('/get_agency_companies', [\App\Http\Controllers\Company\CompanyController::class, 'getAgencyCompanies'])->name('get_agency_companies');
+    Route::post('/get_shop_companies', [\App\Http\Controllers\Company\CompanyController::class, 'getShopCompanies'])->name('get_shop_companies');
 
     Route::prefix('service')->name('service.')->group(function () {
         Route::post('/', \App\Http\Controllers\Service\ServiceController::class)->name('registe_update_services');
@@ -93,14 +95,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/delete', [\App\Http\Controllers\Notice\NoticeController::class, 'delete']);
 
     Route::prefix('adjustment_group')->name('adjustment_group.')->group(function () {
-        Route::post('/', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create'])->name('register_adjustment_group');
+        Route::post('/create_or_update/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create'])->name('register_adjustment_group');
         Route::post('/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create_with_co_no'])->name('register_adjustment_group');
         Route::patch('{adjustment}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'update'])->name('update_adjustment_group');
         Route::get('/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'get_all'])->name('get_all_adjustment_group');
     });
 
     Route::prefix('co_address')->name('co_address.')->group(function () {
-        Route::post('/', [App\Http\Controllers\CoAddress\CoAddressController::class, 'create'])->name('register_co_address');
+        Route::post('/create_or_update/{co_no}', [App\Http\Controllers\CoAddress\CoAddressController::class, 'create'])->name('register_co_address');
         Route::post('/{co_no}', [App\Http\Controllers\CoAddress\CoAddressController::class, 'create_with_co_no'])->name('register_co_address');
         Route::get('/{co_no}', [App\Http\Controllers\CoAddress\CoAddressController::class, 'get_all'])->name('get_all_co_address');
     });
@@ -129,4 +131,15 @@ Route::middleware('auth')->group(function () {
         Route::post('/suneditor', [App\Http\Controllers\Manual\ManualController::class, 'suneditor'])->name('update_manual');
     });
 
+    Route::prefix('forwarder_info')->name('forwarder_info.')->group(function () {
+        Route::post('/create_or_update/{co_no}', [App\Http\Controllers\ForwarderInfo\ForwarderInfoController::class, 'create'])->name('register_forwarder_info');
+        Route::post('/{co_no}', [App\Http\Controllers\ForwarderInfo\ForwarderInfoController::class, 'create_with_co_no'])->name('register_forwarder_info');
+        Route::get('/{co_no}', [App\Http\Controllers\ForwarderInfo\ForwarderInfoController::class, 'get_all'])->name('get_all_forwarder_info');
+    });
+
+    Route::prefix('customs_info')->name('customs_info.')->group(function () {
+        Route::post('/create_or_update/{co_no}', [App\Http\Controllers\CustomsInfo\CustomsInfoController::class, 'create'])->name('register_customs_info');
+        Route::post('/{co_no}', [App\Http\Controllers\CustomsInfo\CustomsInfoController::class, 'create_with_co_no'])->name('register_customs_info');
+        Route::get('/{co_no}', [App\Http\Controllers\CustomsInfo\CustomsInfoController::class, 'get_all'])->name('get_all_customs_info');
+    });
 });

@@ -49,7 +49,7 @@ class CoAddressController extends Controller
      * @param  CoAddressCreateRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function create(CoAddressCreateRequest $request)
+    public function create($co_no, CoAddressCreateRequest $request)
     {
 
         try {
@@ -62,7 +62,7 @@ class CoAddressController extends Controller
                 if(isset($value['ca_no'])){
                     CoAddress::where('ca_no', $value['ca_no'])->update([
                         'mb_no' => $member->mb_no,
-                        'co_no' => $value['co_no'],
+                        'co_no' => $co_no,
                         'ca_name' => $value['ca_name'],
                         'ca_hp' => $value['ca_hp'],
                         'ca_manager' => $value['ca_manager'],
@@ -72,7 +72,7 @@ class CoAddressController extends Controller
                 }else {
                     $CoAddress = CoAddress::insertGetId([
                         'mb_no' => $member->mb_no,
-                        'co_no' => $value['co_no'],
+                        'co_no' => $co_no,
                         'ca_name' => $value['ca_name'],
                         'ca_hp' => $value['ca_hp'],
                         'ca_manager' => $value['ca_manager'],

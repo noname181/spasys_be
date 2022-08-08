@@ -41,7 +41,7 @@ class MenuController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $menu = Menu::with('service')->orderBy('menu_no', 'DESC');
 
-
+            
 
             if (isset($validated['menu_depth'])) {
                 $menu->where('menu_depth', $validated['menu_depth']);
@@ -57,7 +57,7 @@ class MenuController extends Controller
                 });
             }
             $sql = $menu->toSql();
-
+        
             $menu = $menu->paginate($per_page, ['*'], 'page', $page);
 
             if (isset($validated['service_no'])) {
@@ -68,17 +68,17 @@ class MenuController extends Controller
                     $menu->getCollection()->filter(function ($item) use ($service) {
                         $service_no_array = $item->service_no_array;
                         $service_no_array = explode(" ", $service_no_array);
-
+    
                         return in_array($service->service_no, $service_no_array);
                     })
                 );
-
+                
             }
 
-
+            
             // 'from_date' => date('Y-m-d H:i:s', strtotime($validated['from_date'])),
-            // 'to_date' => date('Y-m-d 23:59:00', strtotime($validated['to_date']))
-
+            // 'to_date' => date('Y-m-d 23:59:00', strtotime($validated['to_date']))                 
+           
             return response()->json($menu);
         } catch (\Exception $e) {
             Log::error($e);
@@ -87,23 +87,24 @@ class MenuController extends Controller
         }
     }
     public function create(MenuCreateRequest $request)
-    {
+    {   
 
-
+        
         $validated = $request->validated();
-
+       
         try {
             DB::beginTransaction();
-
-
+    
             $main_menu = Menu::first();
             if(!$main_menu){
                 $main_menu_id = 101;
+            }else if($validated['menu_depth'] == '하위'){
+                $main_menu_id = Menu::where('menu_no', $validated['menu_parent_no'])->first()->main_menu_id;
             }else {
-                $main_menu_id = Menu::orderBy('main_menu_id', 'DESC')->first()->main_menu_id;
+                $main_menu_id = Menu::where('menu_depth', '상위')->orderBy('main_menu_id', 'DESC')->first()->main_menu_id + 1;
             }
-
-
+        
+           
             if($request->menu_parent_no){
                 $sub_menu = Menu::where('menu_parent_no', $validated['menu_parent_no'])->orderBy('sub_menu_id', 'DESC')->first();
 
@@ -112,17 +113,17 @@ class MenuController extends Controller
                 }else {
                     $sub_menu_id = $sub_menu->sub_menu_id + 1;
                 }
-
+                
             }else {
                 $sub_menu_id = 100;
             }
-
-
+           
+            
 
             $menu_id = (string)$main_menu_id . (string)$sub_menu_id;
 
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
-
+          
             $menu_no = Menu::insertGetId([
                 'mb_no' => $member->mb_no,
                 'menu_name' => $validated['menu_name'],
@@ -136,9 +137,9 @@ class MenuController extends Controller
                 'menu_use_yn' => $validated['menu_use_yn'],
                 'service_no_array' => $validated['menu_service_no_array'],
                 ]);
+            
 
-
-
+          
             DB::commit();
             // return $menu_no->toSql();
             return response()->json([
@@ -152,7 +153,7 @@ class MenuController extends Controller
     }
 
     public function get_menu($menu_no)
-    {
+    { 
         try {
             $menu = Menu::where('menu_no', $menu_no)->first();
             $menu_main = Menu::select(['menu_no', 'menu_name', 'service_no_array'])->where('menu_depth', '상위')->get();
@@ -166,7 +167,7 @@ class MenuController extends Controller
     }
 
     public function get_menu_main()
-    {
+    { 
         try {
             $menu_main = Menu::select(['menu_no', 'menu_name', 'service_no_array'])->where('menu_depth', '상위')->get();
             return response()->json($menu_main);

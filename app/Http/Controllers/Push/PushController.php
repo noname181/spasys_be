@@ -31,7 +31,7 @@ class PushController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
-    
+
     /**
      * Get Push detail by id
      */
@@ -86,7 +86,7 @@ class PushController extends Controller
                 'push_use_yn' => $validated['push_use_yn'],
             ];
 
-            $push = Push::where(['mb_no' => Auth::user()->mb_no, 'push_no' => $push->push_no])
+            $push = Push::where(['push_no' => $push->push_no])
                 ->update($update);
             return response()->json([
                 'message' => Messages::MSG_0007,
