@@ -36,6 +36,10 @@ class PermissionRequest extends BaseFormRequest
                 'nullable',
                 'integer',
             ],
+            'menu' => [
+                'nullable',
+                'array',
+            ],
         ];
     }
 
