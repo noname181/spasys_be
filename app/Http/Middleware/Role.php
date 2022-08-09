@@ -8,7 +8,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class RoleManager
+class Role
 {
     /**
      * Handle an incoming request.
@@ -16,15 +16,19 @@ class RoleManager
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next, ...$roles)
     {
         if (!Auth::check()){
             return response()->json(['message' => 'Unauthorized'], 401);
         }
-        $user = Auth::user();
-        if($user->role_no === Member::ROLE_MANAGER) {
-            return $next($request);
+        $user_role = Auth::user()->role->role_eng;
+
+        foreach($roles as $role) {
+            if($user_role == $role){
+                return $next($request);
+            }
         }
-        return response()->json(['message' => Messages::MSG_0017], 403);
+
+        return response()->json(['message' => Messages::MSG_0017], 405);
     }
 }

@@ -61,4 +61,9 @@ class CreateAccountRequest extends BaseFormRequest
         return [
         ];
     }
+
+    public function messages()
+    {
+        return ['mb_id.unique' => 'The ID is already in used'];
+    }
 }

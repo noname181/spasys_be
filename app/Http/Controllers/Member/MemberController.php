@@ -59,7 +59,7 @@ class MemberController extends Controller
                     $validated['role_no'] = Member::ROLE_AGENCY_OPERATOR;
                 }
             }else {
-                $validated['role_no'] = 1;
+                $validated['role_no'] = 0;
             }
 
 
@@ -174,23 +174,30 @@ class MemberController extends Controller
                 $members->where('updated_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
             }
 
-            // if (isset($validated['co_name'])) {
-            //     $members->where(function($query) use ($validated) {
-            //         $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
-            //     });
-            // }
+            if (isset($validated['co_name'])) {
+                $members->whereHas('company', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                });
+            }
 
-            // if (isset($validated['co_service'])) {
-            //     $members->where(function($query) use ($validated) {
-            //         $query->where(DB::raw('lower(co_service)'), 'like', '%' . strtolower($validated['co_service']) . '%');
-            //     });
-            // }
+            if (isset($validated['mb_name'])) {
+                $members->where(function($query) use ($validated) {
+                    $query->where(DB::raw('lower(mb_name)'), 'like', '%' . strtolower($validated['mb_name']) . '%');
+                });
+            }
+
+            if (isset($validated['mb_id'])) {
+                $members->where(function($query) use ($validated) {
+                    $query->where(DB::raw('lower(mb_id)'), 'like', '%' . strtolower($validated['mb_id']) . '%');
+                });
+            }
 
             $members = $members->paginate($per_page, ['*'], 'page', $page);
 
             return response()->json($members);
         } catch (\Exception $e) {
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -363,6 +370,26 @@ class MemberController extends Controller
             $co_no = $member->co_no;
             $member->delete();
             Company::where('co_no', $co_no)->delete();
+            return response()->json([
+                'message' => Messages::MSG_0007
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0003], 500);
+        }
+    }
+
+    /**
+     * Delete Account
+     */
+    public function deleteMember($mb_no)
+    {
+        try {
+            $member = Member::where('mb_no', $mb_no)->first();
+            $co_no = $member->co_no;
+            $member->delete();
+
             return response()->json([
                 'message' => Messages::MSG_0007
             ]);

@@ -44,6 +44,10 @@ class MemberSearchRequest extends BaseFormRequest
                 'string',
                 'nullable',
             ],
+            'mb_id' => [
+                'string',
+                'nullable',
+            ],
             'per_page' => [
                 'nullable',
                 'int',
