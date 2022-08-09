@@ -31,68 +31,83 @@ class PermissionController extends Controller
      */
 
     public function getMenu(PermissionRequest $request){
-        $validated = $request->validated();
-        $roles = Role::where('role_no', '!=', 1)->get();
-        $services = Service::where('service_no', '!=', 1)->get();
-        $permission = Permission::where('role_no', $request->role_no ? $request->role_no : $roles[0]->role_no)->where('service_no', $request->service_no ? $request->service_no : $services[0]->service_no);
 
-
-
-        if(isset($request->menu_device)){
-            $permission->where(function($q) use($request){
-                $q->where('menu_device', $request->menu_device)->orWhere('menu_device', '전체');
-            });
+        try {
+            $validated = $request->validated();
+        
+            $roles = Role::where('role_no', '!=', 1)->get();
+            $services = Service::where('service_no', '!=', 1)->where('service_use_yn', 'y')->get();
+            $permission = Permission::where('role_no', isset($validated['role_no']) ? $validated['role_no'] : $roles[0]->role_no)
+            ->where('service_no', isset($validated['service_no']) ? $validated['service_no'] : $services[0]->service_no);
+    
+            if(isset($validated['menu_device'])){
+                $permission->where(function($q) use($validated){
+                    $q->where('menu_device', $validated['menu_device'])->orWhere('menu_device', '전체');
+                });
+            }
+            
+            $permission = $permission->get();
+    
+            $array_menu_no = [];
+            foreach($permission as $per){
+                $array_menu_no[] = $per->menu_no;
+            }
+    
+            $menu = Menu::with('menu_parent')->where(function($q) use($validated){
+                $q->where('menu_device', $validated['menu_device'])->orWhere('menu_device', '전체');
+            })->where('menu_depth', '하위')->get();
+            
+            if (isset($validated['service_no'])) {
+                $menu->filter(function ($item) use ($validated) {
+                    $service_no_array = $item->service_no_array;
+                    $service_no_array = explode(" ", $service_no_array);
+    
+                    return in_array($validated['service_no'], $service_no_array);
+                });
+            }
+    
+            return response()->json([
+                'menu' => $menu,
+                'roles' => $roles,
+                'services' => $services,
+                'array_menu_no' => $array_menu_no,
+                'permission' => $permission
+            ]);
+        }catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0018], 500);
         }
-
-        $permission = $permission->get();
-
-        $array_menu_no = [];
-        foreach($permission as $per){
-            $array_menu_no[] = $per->menu_no;
-        }
-
-        $menu = Menu::with('menu_parent')->where(function($q) use($validated){
-            $q->where('menu_device', $validated['menu_device'])->orWhere('menu_device', '전체');
-        })->where('menu_depth', '하위')->get();
-
-        if (isset($validated['service_no'])) {
-            $menu->filter(function ($item) use ($validated) {
-                $service_no_array = $item->service_no_array;
-                $service_no_array = explode(" ", $service_no_array);
-
-                return in_array($validated['service_no'], $service_no_array);
-            });
-        }
-
-        return response()->json([
-            'menu' => $menu,
-            'roles' => $roles,
-            'services' => $services,
-            'array_menu_no' => $array_menu_no,
-            'permission' => $permission
-        ]);
+        
     }
 
-    public function savePermission(Request $request){
-
+    public function savePermission(PermissionRequest $request){
+        $validated = $request->validated();
+        
         try {
             DB::beginTransaction();
 
             $ids = [];
             foreach($request->menu as $menu){
-                $is_exist = Permission::where('role_no', $request->role_no)->where('menu_no', $menu['menu_no'])->where('menu_device', $menu['menu_device'])->where('service_no', $request->service_no)->first();
+                $is_exist = Permission::where('role_no', $validated['role_no'])
+                ->where('menu_no', $menu['menu_no'])
+                ->where('menu_device', $menu['menu_device'])
+                ->where('service_no', $validated['service_no'])->first();
                 if(!$is_exist){
                     Permission::insertGetId([
-                        'role_no' => $request->role_no,
+                        'role_no' => $validated['role_no'],
                         'menu_no' => $menu['menu_no'],
                         'menu_device' => $menu['menu_device'],
-                        'service_no' => $request->service_no
+                        'service_no' => $validated['service_no']
                     ]);
                 }
                 $ids[] = $menu['menu_no'];
             }
 
-            Permission::where('role_no', $request->role_no)->where('menu_device', $menu['menu_device'])->where('service_no', $request->service_no)->whereNotIn('menu_no', $ids)->delete();
+            Permission::where('role_no', $validated['role_no'])
+            ->where('menu_device', $menu['menu_device'])
+            ->where('service_no', $validated['service_no'])
+            ->whereNotIn('menu_no', $ids)->delete();
 
             DB::commit();
             return response()->json([
@@ -105,7 +120,7 @@ class PermissionController extends Controller
             return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
-
+        
     }
 
 }
