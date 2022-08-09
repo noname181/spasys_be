@@ -39,7 +39,7 @@ class MenuController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $menu = Menu::with('service')->orderBy('menu_no', 'DESC');
+            $menu = Menu::with('service')->orderBy('menu_id', 'ASC');
 
             
 
@@ -98,10 +98,13 @@ class MenuController extends Controller
             $main_menu = Menu::first();
             if(!$main_menu){
                 $main_menu_id = 101;
+                $main_menu_level = 1;
             }else if($validated['menu_depth'] == '하위'){
                 $main_menu_id = Menu::where('menu_no', $validated['menu_parent_no'])->first()->main_menu_id;
+                $main_menu_level = Menu::where('menu_no', $validated['menu_parent_no'])->first()->main_menu_level;
             }else {
                 $main_menu_id = Menu::where('menu_depth', '상위')->orderBy('main_menu_id', 'DESC')->first()->main_menu_id + 1;
+                $main_menu_level = Menu::where('menu_depth', '상위')->orderBy('main_menu_level', 'DESC')->first()->main_menu_level + 1;
             }
         
            
@@ -110,17 +113,26 @@ class MenuController extends Controller
 
                 if(!$sub_menu){
                     $sub_menu_id = 101;
+                    $sub_menu_level = 1;
                 }else {
                     $sub_menu_id = $sub_menu->sub_menu_id + 1;
+                    $sub_menu_level = $sub_menu->sub_menu_level + 1;
                 }
                 
             }else {
                 $sub_menu_id = 100;
+                $sub_menu_id = 0;
             }
            
             
 
             $menu_id = (string)$main_menu_id . (string)$sub_menu_id;
+            if(empty($sub_menu_level)){
+                $menu_level = (string)$main_menu_level;
+            }else {
+                $menu_level = (string)$main_menu_level .'_'. (string)$sub_menu_level;
+            }
+            
 
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
           
@@ -130,6 +142,9 @@ class MenuController extends Controller
                 'main_menu_id' => $main_menu_id,
                 'sub_menu_id' => $sub_menu_id,
                 'menu_id' => intval($menu_id),
+                'main_menu_level' => $main_menu_level,
+                'sub_menu_level' => $sub_menu_level,
+                'menu_level' => $menu_level,
                 'menu_depth' => $validated['menu_depth'],
                 'menu_parent_no' => $request->menu_parent_no ? $validated['menu_parent_no'] : NULL,
                 'menu_url' => $validated['menu_url'],
