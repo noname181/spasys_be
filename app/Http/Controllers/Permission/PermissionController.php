@@ -88,7 +88,7 @@ class PermissionController extends Controller
             DB::beginTransaction();
 
             $ids = [];
-            foreach($request->menu as $menu){
+            foreach($validated['menu'] as $menu){
                 $is_exist = Permission::where('role_no', $validated['role_no'])
                 ->where('menu_no', $menu['menu_no'])
                 ->where('menu_device', $menu['menu_device'])
