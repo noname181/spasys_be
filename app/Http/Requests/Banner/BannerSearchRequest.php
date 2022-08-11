@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Qna;
+namespace App\Http\Requests\Banner;
 
 use App\Http\Requests\BaseFormRequest;
 
-class QnaSearchRequest extends BaseFormRequest
+class BannerSearchRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -33,21 +33,6 @@ class QnaSearchRequest extends BaseFormRequest
                 'date_format:n/j/Y'
             ],
             'search_string' => [
-                '',
-            ],
-            'qna_title' => [
-                '',
-            ],
-            'qna_content' => [
-                '',
-            ],
-            'qna_status1' => [
-                '',
-            ],
-            'qna_status2' => [
-                '',
-            ],
-            'qna_status3' => [
                 '',
             ],
             'per_page' => [

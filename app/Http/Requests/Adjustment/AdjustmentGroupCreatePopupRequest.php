@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Menu;
+namespace App\Http\Requests\Adjustment;
 
 use App\Http\Requests\BaseFormRequest;
 
-class MenuCreateRequest extends BaseFormRequest
+class AdjustmentGroupCreatePopupRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,40 +24,31 @@ class MenuCreateRequest extends BaseFormRequest
     public function rules()
     {
         return [
-            'menu_name' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'menu_depth' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'menu_parent_no' => [
-                'nullable',
+            'co_no' => [
                 'integer',
             ],
-            'menu_url' => [
+            'ag_name' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'menu_device' => [
+            'ag_manager' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'menu_use_yn' => [
+            'ag_hp' => [
                 'required',
-                'string',
-                'max:1',
-            ],
-            'menu_service_no_array' => [
-                'nullable',
                 'string',
                 'max:255',
             ],
+            'ag_email' => [
+                'required',
+                'string',
+                'max:255',
+                'email',
+            ],
+
         ];
     }
 

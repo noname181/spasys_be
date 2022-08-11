@@ -12,6 +12,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\CoAddress\CoAddressCreateRequest;
 use App\Http\Requests\CoAddress\CoAddressUpdateRequest;
+use App\Http\Requests\CoAddress\CoAddressUpdatePopupRequest;
+use App\Http\Requests\CoAddress\CoAddressCreatePopupRequest;
 
 class CoAddressController extends Controller
 {
@@ -56,11 +58,12 @@ class CoAddressController extends Controller
             DB::beginTransaction();
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
             $validated = $request->validated();
-
+            $ids = [];
             foreach ($validated  as $value) {
 
                 if(isset($value['ca_no'])){
-                    CoAddress::where('ca_no', $value['ca_no'])->update([
+                    $ca = CoAddress::where('ca_no', $value['ca_no']);
+                    $ca->update([
                         'mb_no' => $member->mb_no,
                         'co_no' => $co_no,
                         'ca_name' => $value['ca_name'],
@@ -69,8 +72,9 @@ class CoAddressController extends Controller
                         'ca_address' => $value['ca_address'],
                         'ca_address_detail' => $value['ca_address_detail'],
                     ]);
+                    $id = $ca->first()->ca_no;
                 }else {
-                    $CoAddress = CoAddress::insertGetId([
+                    $id = CoAddress::insertGetId([
                         'mb_no' => $member->mb_no,
                         'co_no' => $co_no,
                         'ca_name' => $value['ca_name'],
@@ -80,8 +84,12 @@ class CoAddressController extends Controller
                         'ca_address_detail' => $value['ca_address_detail'],
                     ]);
                 }
+                $ids[] = $id;
 
             }
+
+            CoAddress::where('co_no', $co_no)
+            ->whereNotIn('ca_no', $ids)->delete();
 
             DB::commit();
             return response()->json([
@@ -133,6 +141,36 @@ class CoAddressController extends Controller
         }
     }
 
+	 public function create_with_popup($co_no, CoAddressCreatePopupRequest $request)
+    {
+
+        try {
+            //DB::beginTransaction();
+            $member = Member::where('mb_id', Auth::user()->mb_id)->first();
+            $validated = $request->validated();
+			$CoAddress = CoAddress::insertGetId([
+				'mb_no' => $member->mb_no,
+				'co_no' => $co_no,
+				'ca_name' => $validated['ca_name'],
+				'ca_hp' => $validated['ca_hp'],
+				'ca_manager' => $validated['ca_manager'],
+				'ca_address' => $validated['ca_address'],
+				'ca_address_detail' => $validated['ca_address_detail'],
+			]);
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'ca_no' =>  $CoAddress,
+            ], 201);
+        } catch (\Throwable $e) {
+            DB::rollback();
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0001], 500);
+
+        }
+    }
+
     /**
      * Update CoAddress by id
      * @param  CoAddress $coAddress
@@ -155,6 +193,26 @@ class CoAddressController extends Controller
             return response()->json(['message' => Messages::MSG_0007], 200);
         } catch (\Exception $e) {
             Log::error($e);
+            return response()->json(['message' => Messages::MSG_0002], 500);
+        }
+    }
+
+	public function updateCA(CoAddress $coAddress, CoAddressUpdatePopupRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+            $coAddress = CoAddress::where('ca_no', $validated['ca_no'])->where('mb_no', Auth::user()->mb_no)->update([
+                'ca_name' => $validated['ca_name'],
+                'ca_hp' => $validated['ca_hp'],
+                'ca_manager' => $validated['ca_manager'],
+				'ca_address' => $validated['ca_address'],
+				'ca_address_detail' => $validated['ca_address_detail'],
+
+            ]);
+            return response()->json(['message' => Messages::MSG_0007], 200);
+        } catch (\Exception $e) {
+            Log::error($e);
+			return $e;
             return response()->json(['message' => Messages::MSG_0002], 500);
         }
     }

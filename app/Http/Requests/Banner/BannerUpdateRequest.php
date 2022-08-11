@@ -24,28 +24,42 @@ class BannerUpdateRequest extends BaseFormRequest
     public function rules()
     {
         return [
+            'banner_no' => [
+                'required',
+                'integer',
+            ],
             'banner_title' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'banner_lat' => [
+            // 'banner_lat' => [
+            //     'required',
+            //     'numeric',
+            //     'regex:/^[-]?[(\d+)]{1,4}(\.[(\d+)]{1,7})?$/'
+            // ],
+            // 'banner_lng' => [
+            //     'required',
+            //     'numeric',
+            //     'regex:/^[-]?[(\d+)]{1,4}(\.[(\d+)]{1,7})?$/'
+            // ],
+            'banner_position' => [
                 'required',
-                'numeric',
-                'regex:/^[-]?[(\d+)]{1,4}(\.[(\d+)]{1,7})?$/'
+                'string',
+                'max:255',
             ],
-            'banner_lng' => [
+            'banner_position_detail' => [
                 'required',
-                'numeric',
-                'regex:/^[-]?[(\d+)]{1,4}(\.[(\d+)]{1,7})?$/'
+                'string',
+                'max:255',
             ],
             'banner_start' => [
                 'required',
-                'date_format:j/n/Y' 
+                'date_format:n/j/Y'
             ],
             'banner_end' => [
                 'required',
-                'date_format:j/n/Y' 
+                'date_format:n/j/Y'
             ],
             'banner_use_yn' => [
                 'required',
@@ -57,12 +71,25 @@ class BannerUpdateRequest extends BaseFormRequest
                 'string',
                 'max:1',
             ],
-            'mb_no' => [
+            'banner_link1' => [
                 'required',
-                'integer',
+                'string',
                 'max:255',
-                'exists:member,mb_no'
             ],
+            'banner_link2' => [
+
+                'max:255',
+            ],
+            'banner_link3' => [
+
+                'max:255',
+            ],
+            // 'mb_no' => [
+            //     'required',
+            //     'integer',
+            //     'max:255',
+            //     'exists:member,mb_no'
+            // ],
         ];
     }
 

@@ -24,11 +24,15 @@ class AdjustmentGroupUpdateRequest extends BaseFormRequest
     public function rules()
     {
         return [
-            'co_no' => [
-                'required',
-                'integer',
-            ],
-            'mb_no' => [
+            // 'co_no' => [
+            //     'required',
+            //     'integer',
+            // ],
+            // 'mb_no' => [
+            //     'required',
+            //     'integer',
+            // ],
+            'ag_no' => [
                 'required',
                 'integer',
             ],

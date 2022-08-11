@@ -51,6 +51,9 @@ class QnaController extends Controller
      */
     public function getById(Qna $qna)
     {
+        $qna['files'] = $qna->files()->get();
+        $qna['mb_no_target'] = $qna->mb_no_target()->first();
+        $qna['mb_no'] = $qna->mb_no()->first();
         return response()->json($qna);
     }
 
@@ -267,6 +270,24 @@ class QnaController extends Controller
                 $qna->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
             }
 
+            if (isset($validated['qna_title'])) {
+                $qna->where('qna_title', 'like', '%' . $validated['qna_title'] . '%');
+            }
+
+            if (isset($validated['qna_content'])) {
+                $qna->where('qna_content', 'like', '%' . $validated['qna_content'] . '%');
+            }
+
+            if (isset($validated['qna_status1']) || isset($validated['qna_status2']) || isset($validated['qna_status3'])) {
+                $qna->where(function($query) use ($validated) {
+                    $query->orwhere('qna_status', '=', $validated['qna_status1']);
+                    $query->orWhere('qna_status', '=', $validated['qna_status2']);
+                    $query->orWhere('qna_status', '=', $validated['qna_status3']);
+                });
+            }
+
+
+
             if (isset($validated['search_string'])) {
                 $qna->where(function($query) use ($validated) {
                     $query->where('qna_title', 'like', '%' . $validated['search_string'] . '%');
@@ -281,7 +302,8 @@ class QnaController extends Controller
             return response()->json($qna);
         } catch (\Exception $e) {
             Log::error($e);
-            return response()->json(['message' => Messages::MSG_0018], 500);
+            return $e;
+            //return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
 

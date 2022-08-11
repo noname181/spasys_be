@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Menu;
+namespace App\Http\Requests\ForwarderInfo;
 
 use App\Http\Requests\BaseFormRequest;
 
-class MenuCreateRequest extends BaseFormRequest
+class ForwarderInfoCreatePopupRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,40 +24,35 @@ class MenuCreateRequest extends BaseFormRequest
     public function rules()
     {
         return [
-            'menu_name' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'menu_depth' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'menu_parent_no' => [
-                'nullable',
+            'co_no' => [
                 'integer',
             ],
-            'menu_url' => [
+            'fi_name' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'menu_device' => [
+            'fi_manager' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'menu_use_yn' => [
+            'fi_hp' => [
                 'required',
-                'string',
-                'max:1',
-            ],
-            'menu_service_no_array' => [
-                'nullable',
                 'string',
                 'max:255',
             ],
+            'fi_address' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'fi_address_detail' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
         ];
     }
 

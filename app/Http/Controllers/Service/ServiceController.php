@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Service;
 use App\Http\Requests\Service\ServiceRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Service;
+use App\Models\Menu;
 use App\Utils\Messages;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -22,8 +23,11 @@ class ServiceController extends Controller
         $validated = $request->validated();
         try {
             DB::beginTransaction();
+            $ids = [];
+            $i = 0;
             foreach ($validated['services'] as $val) {
-                Service::updateOrCreate(
+                Log::error($val);
+                $service = Service::updateOrCreate(
                     [
                         'service_no' => isset($val['service_no']) ? $val['service_no'] : null,
                     ],
@@ -35,7 +39,10 @@ class ServiceController extends Controller
                         'service_use_yn' => $val['service_use_yn'],
                     ],
                 );
+                $ids[] = $service->service_no;
+                $i++;
             }
+            Service::whereNotIn('service_no', $ids)->where('mb_no', Auth::user()->mb_no)->delete();
 
             DB::commit();
             return response()->json([

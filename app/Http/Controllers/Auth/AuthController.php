@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\AuthController\InvokeRequest;
 
 use App\Models\Member;
+use App\Models\Service;
 use App\Utils\Messages;
 
 use Illuminate\Support\Facades\Hash;
@@ -23,7 +24,7 @@ class AuthController extends Controller
         $input = $request->validated();
         try {
 
-            $member = Member::where('mb_id', $input['mb_id'])->first();
+            $member = Member::with('role')->where('mb_id', $input['mb_id'])->first();
             if (is_null($member)) {
                 return response()->json([
                     'message' => Messages::MSG_0008,
@@ -55,6 +56,9 @@ class AuthController extends Controller
                 'mb_hp' => $member['mb_hp'],
                 'mb_tel' => $member['mb_tel'],
                 'mb_language' => $member['mb_language'],
+                'mb_type' => $member['mb_type'],
+                'role_name' => $member['role']['role_name'],
+                'role_no' => $member['role_no'],
             ]);
         } catch (\Exception $error) {
             Log::error($error);

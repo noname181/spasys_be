@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\CustomsInfo;
+namespace App\Http\Requests\ForwarderInfo;
 
 use App\Http\Requests\BaseFormRequest;
 
-class CustomsInfoUpdateRequest extends BaseFormRequest
+class ForwarderInfoUpdatePopupRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,32 +27,32 @@ class CustomsInfoUpdateRequest extends BaseFormRequest
         /*'co_no' => [
             'integer',
         ],*/
-        '*.ci_name' => [
+        'fi_name' => [
             'required',
             'string',
             'max:255',
         ],
-        '*.ci_manager' => [
+        'fi_manager' => [
             'required',
             'string',
             'max:255',
         ],
-        '*.ci_hp' => [
+        'fi_hp' => [
             'required',
             'string',
             'max:255',
         ],
-        '*.ci_address' => [
+        'fi_address' => [
             'required',
             'string',
             'max:255',
         ],
-        '*.ci_address_detail' => [
+        'fi_address_detail' => [
             'required',
             'string',
             'max:255',
         ],
-        '*.ci_no' => [
+        'fi_no' => [
             'integer',
         ],
     ];

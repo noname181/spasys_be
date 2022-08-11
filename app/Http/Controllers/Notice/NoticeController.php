@@ -135,7 +135,6 @@ class NoticeController extends Controller
      */
     public function getNoticeById(Request $request)
     {
-
         $notice = Notice::find($request);
         if (!empty($notice)) {
             return response()->json(

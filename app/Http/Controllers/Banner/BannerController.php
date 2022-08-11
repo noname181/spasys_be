@@ -6,6 +6,7 @@ use DateTime;
 use App\Http\Requests\Banner\BannerRequest;
 use App\Http\Requests\Banner\BannerRegisterRequest;
 use App\Http\Requests\Banner\BannerUpdateRequest;
+use App\Http\Requests\Banner\BannerSearchRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Banner;
 use App\Models\File;
@@ -13,6 +14,8 @@ use App\Utils\Messages;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Member;
 
 class BannerController extends Controller
 {
@@ -59,32 +62,44 @@ class BannerController extends Controller
      */
     public function register(BannerRegisterRequest $request)
     {
+
         $validated = $request->validated();
+
         try {
-            DB::beginTransaction();
+            //DB::beginTransaction();
+            //DateTime::createFromFormat('j/n/Y', ''),
+            $member = Member::where('mb_id', Auth::user()->mb_id)->first();
             $banner_no = Banner::insertGetId([
                 'banner_title' => $validated['banner_title'],
-                'banner_lat' => $validated['banner_lat'],
-                'banner_lng' => $validated['banner_lng'],
-                'banner_start' => DateTime::createFromFormat('j/n/Y', $validated['banner_start']),
-                'banner_end' => DateTime::createFromFormat('j/n/Y', $validated['banner_end']),
+                'banner_lat' => '',
+                'banner_lng' => '',
+                'banner_position' => $validated['banner_position'],
+                'banner_position_detail' => $validated['banner_position_detail'],
+                'banner_start' => date('Y-m-d H:i:s', strtotime($validated['banner_start'])),
+                'banner_end' => date('Y-m-d H:i:s', strtotime($validated['banner_end'])),
                 'banner_use_yn' => $validated['banner_use_yn'],
                 'banner_sliding_yn' => $validated['banner_sliding_yn'],
-                'mb_no' => $validated['mb_no']
+                'banner_link1' => $validated['banner_link1'],
+                'banner_link2' => $validated['banner_link2'] ? $validated['banner_link2'] : '',
+                'banner_link3' => $validated['banner_link3'] ? $validated['banner_link3'] : '',
+                'mb_no' => $member->mb_no
             ]);
 
             $path = join('/', ['files', 'banner', $banner_no]);
 
             $files = [];
-            foreach ($validated['files'] as $key => $file) {
+
+            for($i = 1;$i <= 3;$i++){
+                $file = $validated['bannerFiles'.$i.''];
                 $url = Storage::disk('public')->put($path, $file);
                 $files[] = [
                     'file_table' => 'banner',
                     'file_table_key' => $banner_no,
                     'file_name' => basename($url),
+                    'file_name_old' => $file->getClientOriginalName(),
                     'file_size' => $file->getSize(),
                     'file_extension' => $file->extension(),
-                    'file_position' => $key,
+                    'file_position' => $i,
                     'file_url' => $url
                 ];
             }
@@ -96,7 +111,8 @@ class BannerController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return response()->json(['message' => Messages::MSG_0001], 500);
+            return $e;
+            //return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
 
@@ -109,21 +125,115 @@ class BannerController extends Controller
     public function update(Banner $banner, BannerUpdateRequest $request)
     {
         try {
+
+            //DB::enableQueryLog();
+
             $validated = $request->validated();
-            $banner->update([
+            $member = Member::where('mb_id', Auth::user()->mb_id)->first();
+            $banner = Banner::where('banner_no', $validated['banner_no'])->update([
                 'banner_title' => $validated['banner_title'],
-                'banner_lat' => $validated['banner_lat'],
-                'banner_lng' => $validated['banner_lng'],
-                'banner_start' => DateTime::createFromFormat('j/n/Y', $validated['banner_start']),
-                'banner_end' => DateTime::createFromFormat('j/n/Y', $validated['banner_end']),
+                'banner_lat' => '',
+                'banner_lng' => '',
+                'banner_start' => date('Y-m-d H:i:s', strtotime($validated['banner_start'])),
+                'banner_end' => date('Y-m-d H:i:s', strtotime($validated['banner_end'])),
+                'banner_position' => $validated['banner_position'],
+                'banner_position_detail' => $validated['banner_position_detail'],
                 'banner_use_yn' => $validated['banner_use_yn'],
                 'banner_sliding_yn' => $validated['banner_sliding_yn'],
-                'mb_no' => $validated['mb_no'],
+                'banner_link1' => $validated['banner_link1'],
+                'banner_link2' => $validated['banner_link2'] ? $validated['banner_link2'] : '',
+                'banner_link3' => $validated['banner_link3'] ? $validated['banner_link3'] : '',
+                'mb_no' => $member->mb_no,
             ]);
+            //return DB::getQueryLog();
+             //FILE PART
+
+             $path = join('/', ['files', 'banner', $validated['banner_no']]);
+
+             // remove old image
+
+             if($request->remove_files){
+                 foreach($request->remove_files as $key => $file_no) {
+                     $file = File::where('file_no', $file_no)->get()->first();
+                     $url = Storage::disk('public')->delete($path. '/' . $file->file_name);
+                     $file->delete();
+                 }
+             }
+
+             if($request->hasFile('files')){
+                 $files = [];
+
+                 $max_position_file = File::where('file_table', 'banner')->where('file_table_key', $validated['banner_no'])->orderBy('file_position', 'DESC')->get()->first();
+                 if($max_position_file)
+                     $i = $max_position_file->file_position + 1;
+                 else
+                     $i = 0;
+
+                 foreach($validated['files'] as $key => $file) {
+                     $url = Storage::disk('public')->put($path, $file);
+                     $files[] = [
+                         'file_table' => 'banner',
+                         'file_table_key' => $validated['banner_no'],
+                         'file_name_old' => $file->getClientOriginalName(),
+                         'file_name' => basename($url),
+                         'file_size' => $file->getSize(),
+                         'file_extension' => $file->extension(),
+                         'file_position' => $i,
+                         'file_url' => $url
+                     ];
+                     $i++;
+                 }
+
+                File::insert($files);
+
+             }
+
             return response()->json(['message' => Messages::MSG_0007], 200);
         } catch (\Exception $e) {
             Log::error($e);
-            return response()->json(['message' => Messages::MSG_0002], 500);
+            return $e;
+            //return response()->json(['message' => Messages::MSG_0002], 500);
+        }
+    }
+
+    public function getBanner(BannerSearchRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+
+            // If per_page is null set default data = 15
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+            $banner = Banner::with('mb_no')->with('files')->orderBy('banner_no', 'DESC');
+
+            if (isset($validated['from_date'])) {
+                $banner->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            }
+
+            if (isset($validated['to_date'])) {
+                $banner->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            }
+
+            if (isset($validated['search_string'])) {
+                $banner->where(function($query) use ($validated) {
+                    $query->where('banner_title', 'like', '%' . $validated['search_string'] . '%');
+                });
+            }
+
+            $members = Member::where('mb_no', '!=', 0)->get();
+
+            $banner = $banner->paginate($per_page, ['*'], 'page', $page);
+
+            $custom = collect(['my_data' => 'My custom data here']);
+
+            $data = $custom->merge($banner);
+
+            return response()->json($data);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
 }

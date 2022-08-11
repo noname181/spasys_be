@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Menu;
+namespace App\Http\Requests\CoAddress;
 
 use App\Http\Requests\BaseFormRequest;
 
-class MenuCreateRequest extends BaseFormRequest
+class CoAddressUpdatePopupRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,39 +24,37 @@ class MenuCreateRequest extends BaseFormRequest
     public function rules()
     {
         return [
-            'menu_name' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'menu_depth' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'menu_parent_no' => [
-                'nullable',
+            /*'*.co_no' => [
                 'integer',
-            ],
-            'menu_url' => [
+            ],*/
+            'ca_name' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'menu_device' => [
+            'ca_manager' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'menu_use_yn' => [
+            'ca_hp' => [
                 'required',
                 'string',
-                'max:1',
+                'max:255',
             ],
-            'menu_service_no_array' => [
-                'nullable',
+            'ca_address' => [
+                'required',
                 'string',
                 'max:255',
+            ],
+            'ca_address_detail' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'ca_no' => [
+                'integer',
+				'required',
             ],
         ];
     }

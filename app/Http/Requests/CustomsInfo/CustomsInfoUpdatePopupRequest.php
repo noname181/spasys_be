@@ -4,7 +4,7 @@ namespace App\Http\Requests\CustomsInfo;
 
 use App\Http\Requests\BaseFormRequest;
 
-class CustomsInfoUpdateRequest extends BaseFormRequest
+class CustomsInfoUpdatePopupRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,32 +27,32 @@ class CustomsInfoUpdateRequest extends BaseFormRequest
         /*'co_no' => [
             'integer',
         ],*/
-        '*.ci_name' => [
+        'ci_name' => [
             'required',
             'string',
             'max:255',
         ],
-        '*.ci_manager' => [
+        'ci_manager' => [
             'required',
             'string',
             'max:255',
         ],
-        '*.ci_hp' => [
+        'ci_hp' => [
             'required',
             'string',
             'max:255',
         ],
-        '*.ci_address' => [
+        'ci_address' => [
             'required',
             'string',
             'max:255',
         ],
-        '*.ci_address_detail' => [
+        'ci_address_detail' => [
             'required',
             'string',
             'max:255',
         ],
-        '*.ci_no' => [
+        'ci_no' => [
             'integer',
         ],
     ];

@@ -29,23 +29,23 @@ class BannerRegisterRequest extends BaseFormRequest
                 'string',
                 'max:255',
             ],
-            'banner_lat' => [
-                'required',
-                'numeric',
-                'regex:/^[-]?[(\d+)]{1,4}(\.[(\d+)]{1,7})?$/'
-            ],
-            'banner_lng' => [
-                'required',
-                'numeric',
-                'regex:/^[-]?[(\d+)]{1,4}(\.[(\d+)]{1,7})?$/'
-            ],
+            // 'banner_lat' => [
+            //     'required',
+            //     'numeric',
+            //     'regex:/^[-]?[(\d+)]{1,4}(\.[(\d+)]{1,7})?$/'
+            // ],
+            // 'banner_lng' => [
+            //     'required',
+            //     'numeric',
+            //     'regex:/^[-]?[(\d+)]{1,4}(\.[(\d+)]{1,7})?$/'
+            // ],
             'banner_start' => [
                 'required',
-                'date_format:j/n/Y' 
+                'date_format:j/n/Y'
             ],
             'banner_end' => [
                 'required',
-                'date_format:j/n/Y' 
+                'date_format:j/n/Y'
             ],
             'banner_use_yn' => [
                 'required',
@@ -57,18 +57,52 @@ class BannerRegisterRequest extends BaseFormRequest
                 'string',
                 'max:1',
             ],
-            'mb_no' => [
+            'banner_position' => [
                 'required',
-                'integer',
+                'string',
                 'max:255',
-                'exists:member,mb_no'
             ],
-            'files' => [
-                'array',
+            'banner_position_detail' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'banner_link1' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'banner_link2' => [
+
+                'max:255',
+            ],
+            'banner_link3' => [
+
+                'max:255',
+            ],
+            // 'mb_no' => [
+            //     'required',
+            //     'integer',
+            //     'max:255',
+            //     'exists:member,mb_no'
+            // ],
+            'bannerFiles1' => [
                 'required',
             ],
-            'files.*' => [
+            'bannerFiles1.*' => [
                 'file'
+            ],
+            'bannerFiles2' => [
+                ''
+            ],
+            'bannerFiles2.*' => [
+                ''
+            ],
+            'bannerFiles3' => [
+                ''
+            ],
+            'bannerFiles3.*' => [
+                ''
             ],
         ];
     }

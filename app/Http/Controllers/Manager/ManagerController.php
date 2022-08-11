@@ -64,7 +64,7 @@ class ManagerController extends Controller
                         'm_email' => $value['m_email'],
                         'm_etc' => $value['m_etc'],
                     ]);
-                   
+
                 } else {
                     $Manager = Manager::insertGetId([
                         'mb_no' => $member->mb_no,
@@ -77,10 +77,10 @@ class ManagerController extends Controller
                         'm_etc' => $value['m_etc'],
                         'co_no' => $value['co_no'],
                     ]);
-                  
+
                 }
             }
-           
+
             DB::commit();
             return response()->json([
                 'message' =>  Messages::MSG_0007,

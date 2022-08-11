@@ -99,6 +99,7 @@ class Authenticate
         try {
             $this->authenticate($request, $guards);
         } catch (\Illuminate\Auth\AuthenticationException $e) {
+            return $e;
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 

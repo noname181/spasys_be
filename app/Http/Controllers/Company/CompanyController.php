@@ -83,7 +83,7 @@ class CompanyController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $companies = Company::with('contract')->orderBy('co_no', 'DESC');
+            $companies = Company::with('contract')->where('co_type', '!=', 'spasys')->orderBy('co_no', 'DESC');
 
             if (isset($validated['from_date'])) {
                 $companies->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
@@ -197,6 +197,7 @@ class CompanyController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'company' => $comp,
+                'sql' => $company->co_no,
             ]);
         } catch (\Exception $e) {
             DB::rollback();
