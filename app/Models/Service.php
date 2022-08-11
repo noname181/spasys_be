@@ -13,7 +13,7 @@ class Service extends Model
 
     protected $primaryKey = 'service_no';
 
-    public $timestamps = true;
+    public $timestamps = false;
 
     /**
      * The attributes that are mass assignable.
@@ -26,6 +26,11 @@ class Service extends Model
         'service_name',
         'service_eng',
         'service_use_yn',
-        'service_regtime',
     ];
+
+    protected $casts = [
+        'created_at' => "date:Y.m.d H:i",
+        'updated_at' => "date:Y.m.d H:i",
+    ];
+
 }

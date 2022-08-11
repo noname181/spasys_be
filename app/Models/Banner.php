@@ -18,8 +18,8 @@ class Banner extends Model
     protected $casts = [
         'created_at' => "date:Y.m.d H:i",
         'updated_at' => "date:Y.m.d H:i",
-        'banner_start' => "date:Y.m.d H:i",
-        'banner_end' => "date:Y.m.d H:i",
+        'banner_start' => "date:Y.m.d",
+        'banner_end' => "date:Y.m.d",
     ];
 
     // public $timestamps = true;
@@ -35,12 +35,22 @@ class Banner extends Model
         'banner_start',
         'banner_end',
         'banner_use_yn',
+        'banner_position',
+        'banner_position_detail',
         'banner_sliding_yn',
+        'banner_link1',
+        'banner_link2',
+        'banner_link3',
         'mb_no'
     ];
 
     public function files()
     {
         return $this->hasMany(File::class, 'file_table_key', 'banner_no')->where('file_table', 'banner');
+    }
+
+    public function mb_no()
+    {
+        return $this->hasOne(Member::class, 'mb_no', 'mb_no');
     }
 }

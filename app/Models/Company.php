@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Contract;
 
 class Company extends Model
 {
@@ -40,5 +41,10 @@ class Company extends Model
         'created_at' => "date:Y.m.d",
         'updated_at' => "date:Y.m.d",
     ];
+
+    public function contract()
+    {
+        return $this->hasOne(Contract::class, 'co_no', 'co_no');
+    }
 
 }

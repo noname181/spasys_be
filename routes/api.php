@@ -93,6 +93,7 @@ Route::middleware('auth')->group(function () {
         Route::get('{banner}', [App\Http\Controllers\Banner\BannerController::class, 'getById'])->name('get_banner_by_id');
         Route::post('/', [App\Http\Controllers\Banner\BannerController::class, 'register'])->name('register_banner');
         Route::patch('{banner}', [App\Http\Controllers\Banner\BannerController::class, 'update'])->name('update_banner');
+        Route::post('/get_banners', [App\Http\Controllers\Banner\BannerController::class, 'getBanner'])->name('get_banner');
     });
 
     Route::post('/notices', [\App\Http\Controllers\Notice\NoticeController::class, 'create']);
@@ -106,13 +107,22 @@ Route::middleware('auth')->group(function () {
     Route::prefix('adjustment_group')->name('adjustment_group.')->group(function () {
         Route::post('/create_or_update/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create'])->name('register_adjustment_group');
         Route::post('/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create_with_co_no'])->name('register_adjustment_group');
-        Route::patch('{adjustment}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'update'])->name('update_adjustment_group');
+		//popup
+		Route::post('/create_popup/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create_with_popup'])->name('register_adjustment_group_popup');
+        //Route::patch('{adjustment}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'update'])->name('update_adjustment_group');
+        Route::patch('/update_adjustment_group', [\App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'updateAG']);
+		//
         Route::get('/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'get_all'])->name('get_all_adjustment_group');
+        Route::delete('/{ag_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'delete'])->name('delete_adjustment_group');
     });
 
     Route::prefix('co_address')->name('co_address.')->group(function () {
         Route::post('/create_or_update/{co_no}', [App\Http\Controllers\CoAddress\CoAddressController::class, 'create'])->name('register_co_address');
         Route::post('/{co_no}', [App\Http\Controllers\CoAddress\CoAddressController::class, 'create_with_co_no'])->name('register_co_address');
+		//popup
+		Route::post('/create_popup/{co_no}', [App\Http\Controllers\CoAddress\CoAddressController::class, 'create_with_popup'])->name('register_co_address_popup');
+		Route::patch('/update_co_address', [\App\Http\Controllers\CoAddress\CoAddressController::class, 'updateCA']);
+		//
         Route::get('/{co_no}', [App\Http\Controllers\CoAddress\CoAddressController::class, 'get_all'])->name('get_all_co_address');
     });
 
@@ -125,6 +135,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/menu', [\App\Http\Controllers\Menu\MenuController::class, 'menu']);
     Route::get('/menu/{menu_no}', [\App\Http\Controllers\Menu\MenuController::class, 'get_menu']);
     Route::post('/update_menu', [\App\Http\Controllers\Menu\MenuController::class, 'update_menu']);
+    Route::delete('/delete_menu/{menu_no}', [\App\Http\Controllers\Menu\MenuController::class, 'delete_menu']);
     Route::get('/menu_main', [\App\Http\Controllers\Menu\MenuController::class, 'get_menu_main']);
 
     Route::prefix('role')->name('role.')->group(function () {

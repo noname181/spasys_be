@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Member;
 
 class Role extends Model
 {
@@ -28,9 +29,13 @@ class Role extends Model
     ];
 
     protected $casts = [
-        'role_regtime' => "date:Y.m.d",
         'created_at' => "date:Y.m.d",
         'updated_at' => "date:Y.m.d",
     ];
+
+    public function member()
+    {
+        return $this->hasMany(Member::class, 'role_no', 'role_no');
+    }
 
 }

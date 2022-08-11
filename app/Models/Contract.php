@@ -22,7 +22,7 @@ class Contract extends Model
      */
     protected $fillable = [
         'co_no',
-        'mb_no', 
+        'mb_no',
         'c_calculate_deadline_yn',
         'c_integrated_calculate_yn',
         'c_payment_cycle',
@@ -46,4 +46,10 @@ class Contract extends Model
         'c_deposit_return_reg_date',
         'c_deposit_return_expiry_date'
     ];
+
+    protected $casts = [
+        'c_start_date' => "date:Y.m.d H:i",
+        'c_end_date' => "date:Y.m.d H:i",
+    ];
+
 }
