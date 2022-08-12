@@ -24,10 +24,20 @@ class ReportRequest extends BaseFormRequest
     public function rules()
     {
         return [
-            'reports' => [
-                'array',
+            'item_no' => [
+                'integer',
+                'required'
             ],
-            'reports.*.rp_content' => [
+            'rp_cate' => [
+                'string',
+                'required'
+            ],
+            'report.content.*.rp_content' => [
+                'string',
+                'required',
+                'max:300'
+            ],
+            'report.content.*.rp_file' => [
                 'string',
                 'required',
                 'max:300'
