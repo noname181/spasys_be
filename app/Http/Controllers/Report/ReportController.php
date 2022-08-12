@@ -11,6 +11,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Report\ReportRequest;
+use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
@@ -19,45 +20,78 @@ class ReportController extends Controller
      * @param  App\Http\Requests\ReportRequest  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function __invoke(ReportRequest $request)
+    public function __invoke(Request $request)
     {
-        $validated = $request->validated();
-        // try {
-
-            $files = [];
-            $reports = [];
-            DB::beginTransaction();
-            foreach ($validated['reports'] as $val) {
+     
+            $data = [];
+            $i = 0;
+            foreach($request->rp_content as $rp_content){
                 $report_no = Report::insertGetId([
                     'mb_no' => Auth::user()->mb_no,
-                    'item_no' => 1,
-                    'rp_cate' => 1,
+                    'item_no' => $request->item_no,
+                    'rp_cate' => $request->rp_cate,
+                    'rp_content' => $rp_content
                 ]);
+                $file = 'file' . (string)$i;
+                $files = [];
+                $path = join('/', ['files', 'report', $report_no]);
+                $index = 0;
+                foreach($request->$file as $file){
+                    $url = Storage::disk('public')->put($path, $file);
+                    $files[] = [
+                        'file_table' => 'report',
+                        'file_table_key' => $report_no,
+                        'file_name_old' => $file->getClientOriginalName(),
+                        'file_name' => basename($url),
+                        'file_size' => $file->getSize(),
+                        'file_extension' => $file->extension(),
+                        'file_position' => $index,
+                        'file_url' => $url
+                    ];
+                    $index++;
+                    File::insert($files);
+                }
+                $i++;
+            }
+        
+        // $validated = $request->validated();
+        // // try {
+
+        //     $files = [];
+        //     $reports = [];
+        //     DB::beginTransaction();
+        //     foreach ($validated['reports'] as $val) {
+        //         $report_no = Report::insertGetId([
+        //             'mb_no' => Auth::user()->mb_no,
+        //             'item_no' => 1,
+        //             'rp_cate' => 1,
+        //         ]);
 
 
            
-            $path = join('/', ['files', 'report', $report_no]);
+        //     $path = join('/', ['files', 'report', $report_no]);
             
-            foreach ($val['files'] as $key => $file) {
-                $url = Storage::disk('public')->put($path, $file);
-                $files[] = [
-                    'file_table' => 'report',
-                    'file_table_key' => $report_no,
-                    'file_name_old' => $file['file_name_old'],
-                    'file_name' => $file['file_name'],
-                    'file_size' => $file['file_size'],
-                    'file_extension' => $file['file_extension'],
-                    'file_position' => $key,
-                    'file_url' => $url
-                ];
-            }
-            File::insert($files);
-        };
-            DB::commit();
-            return response()->json([
-                'message' => Messages::MSG_0007,
-                'validated' => $validated
-            ]);
+        //     foreach ($val['files'] as $key => $file) {
+        //         $url = Storage::disk('public')->put($path, $file);
+        //         $files[] = [
+        //             'file_table' => 'report',
+        //             'file_table_key' => $report_no,
+        //             'file_name_old' => $file['file_name_old'],
+        //             'file_name' => $file['file_name'],
+        //             'file_size' => $file['file_size'],
+        //             'file_extension' => $file['file_extension'],
+        //             'file_position' => $key,
+        //             'file_url' => $url
+        //         ];
+        //     }
+        //     File::insert($files);
+        // };
+        //     DB::commit();
+        //     return response()->json([
+        //         'message' => Messages::MSG_0007,
+        //         'validated' => $validated
+        //     ]);
+        return $data;
         // } catch (\Exception $e) {
         //     DB::rollback();
         //     Log::error($e);

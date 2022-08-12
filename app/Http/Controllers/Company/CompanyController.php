@@ -48,7 +48,14 @@ class CompanyController extends Controller
                 'co_homepage' => $validated['co_homepage'],
                 'co_email' => $validated['co_email'],
                 'co_etc' => $validated['co_etc'],
-                'co_type' => $co_type
+                'co_type' => $co_type,
+                'c_payment_cycle' => $validated['c_payment_cycle'],
+                'c_calculate_method1' => $validated['c_calculate_method1'],
+                'c_calculate_method2' => $validated['c_calculate_method2'],
+                'c_calculate_method3' => $validated['c_calculate_method3'],
+                'c_calculate_method4' => $validated['c_calculate_method4'],
+                'c_transaction_yn' => $validated['c_transaction_yn'],
+                'co_close_yn' => $validated['co_close_yn'],
             ]);
 
             $company = Company::where('co_no', $co_no)->first();
@@ -77,6 +84,7 @@ class CompanyController extends Controller
     public function getCompanies(CompanySearchRequest $request)
     {
         try {
+            DB::enableQueryLog();
             $validated = $request->validated();
 
             // If per_page is null set default data = 15
@@ -104,8 +112,33 @@ class CompanyController extends Controller
                     $query->where(DB::raw('lower(co_service)'), 'like', '%' . strtolower($validated['co_service']) . '%');
                 });
             }
+            if (isset($validated['c_payment_cycle'])) {
+                $companies->whereHas('contract',function($query) use ($validated) {
+                    $query->where('c_payment_cycle', '=', $validated['c_payment_cycle']);
+                });
+            }
+            if (isset($validated['c_calculate_method1']) || isset($validated['c_calculate_method2']) || isset($validated['c_calculate_method3']) || isset($validated['c_calculate_method4'])) {
+                $companies->whereHas('contract',function($query) use ($validated) {
+                    $query->where('c_calculate_method', '=', $validated['c_calculate_method1']);
+                    $query->orwhere('c_calculate_method', '=', $validated['c_calculate_method2']);
+                    $query->orwhere('c_calculate_method', '=', $validated['c_calculate_method3']);
+                    $query->orwhere('c_calculate_method', '=', $validated['c_calculate_method4']);
+                });
+            }
+            if (isset($validated['c_transaction_yn'])) {
+                $companies->whereHas('contract',function($query) use ($validated) {
+                    $query->where('c_transaction_yn', '=', $validated['c_transaction_yn']);
+                });
+            }
+            if (isset($validated['co_close_yn'])) {
+                $companies->where(function($query) use ($validated) {
+                    $query->orwhere('co_close_yn', '=', $validated['co_close_yn']);
+                });
+            }
 
             $companies = $companies->paginate($per_page, ['*'], 'page', $page);
+
+           
 
             return response()->json($companies);
         } catch (\Exception $e) {

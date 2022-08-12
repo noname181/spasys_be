@@ -48,6 +48,27 @@ class CompanySearchRequest extends BaseFormRequest
                 'nullable',
                 'int',
             ],
+            'c_payment_cycle' => [
+                '',
+            ],
+            'c_calculate_method1' => [
+                '',
+            ],
+            'c_calculate_method2' => [
+                '',
+            ],
+            'c_calculate_method3' => [
+                '',
+            ],
+            'c_calculate_method4' => [
+                '',
+            ],
+            'c_transaction_yn' => [
+                '',
+            ],
+            'co_close_yn' => [
+                '',
+            ],
         ];
     }
 
