@@ -104,6 +104,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/get_notices', [\App\Http\Controllers\Notice\NoticeController::class, 'getNotice']);
     Route::post('/delete', [\App\Http\Controllers\Notice\NoticeController::class, 'delete']);
 
+    Route::get('/import_schedule', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'__invoke']);
+    // Route::get('/import_schedule/{id}', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class, 'getImportScheduleById']);
+    // Route::post('/search_import_schedule', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'searchImportSchedule']);
+
     Route::prefix('adjustment_group')->name('adjustment_group.')->group(function () {
         Route::post('/create_or_update/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create'])->name('register_adjustment_group');
         Route::post('/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create_with_co_no'])->name('register_adjustment_group_co_no');
@@ -167,5 +171,11 @@ Route::middleware('auth')->group(function () {
     Route::prefix('permission')->name('permission.')->group(function () {
         Route::post('/', [\App\Http\Controllers\Permission\PermissionController::class, 'getMenu'])->name('get_menu');
         Route::post('/save', [\App\Http\Controllers\Permission\PermissionController::class, 'savePermission'])->name('save_permission');
+    });
+
+    Route::prefix('report')->name('report.')->group(function () {
+        Route::post('/', \App\Http\Controllers\Report\ReportController::class)->name('registe_update_report');
+        Route::get('/', [App\Http\Controllers\Report\ReportController::class, 'getReports'])->name('get_report');
+        Route::delete('/{report}', [App\Http\Controllers\Report\ReportController::class, 'deleteReport'])->name('delete_report');
     });
 });
