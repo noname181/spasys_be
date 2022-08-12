@@ -1,10 +1,22 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\ImportSchedule;
 
+use DateTime;
+use App\Models\File;
 use App\Models\ImportSchedule;
+use App\Utils\Messages;
+use App\Utils\CommonFunc;
 use Illuminate\Http\Request;
-use App\Http\Requests\Notice\NoticeRequest;
+use PhpParser\Node\Stmt\TryCatch;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Filesystem\Filesystem;
+use App\Http\Requests\ImportSchedule\ImportScheduleRequest;
 
 class ImportScheduleController extends Controller
 {
@@ -13,7 +25,7 @@ class ImportScheduleController extends Controller
      * @param  \App\Http\Requests\ImportSchedule\ImportScheduleRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function __invoke(QnaRequest $request)
+    public function __invoke(ImportScheduleRequest $request)
     {
         try {
             $validated = $request->validated();
