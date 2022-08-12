@@ -171,4 +171,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/', [\App\Http\Controllers\Permission\PermissionController::class, 'getMenu'])->name('get_menu');
         Route::post('/save', [\App\Http\Controllers\Permission\PermissionController::class, 'savePermission'])->name('save_permission');
     });
+
+    Route::prefix('report')->name('report.')->group(function () {
+        Route::post('/', \App\Http\Controllers\Report\ReportController::class)->name('registe_update_report');
+        Route::get('/', [App\Http\Controllers\Report\ReportController::class, 'getReports'])->name('get_report');
+        Route::delete('/{report}', [App\Http\Controllers\Report\ReportController::class, 'deleteReport'])->name('delete_report');
+    });
 });
