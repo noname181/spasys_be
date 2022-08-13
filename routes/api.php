@@ -111,7 +111,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('adjustment_group')->name('adjustment_group.')->group(function () {
         Route::post('/create_or_update/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create'])->name('register_adjustment_group');
         Route::post('/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create_with_co_no'])->name('register_adjustment_group_co_no');
-		//popup
+		//popup mobile
 		Route::post('/create_popup/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create_with_popup'])->name('register_adjustment_group_popup_popup');
         //Route::patch('{adjustment}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'update'])->name('update_adjustment_group');
         Route::patch('/update_adjustment_group', [\App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'updateAG']);
@@ -123,7 +123,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('co_address')->name('co_address.')->group(function () {
         Route::post('/create_or_update/{co_no}', [App\Http\Controllers\CoAddress\CoAddressController::class, 'create'])->name('register_co_address');
         Route::post('/{co_no}', [App\Http\Controllers\CoAddress\CoAddressController::class, 'create_with_co_no'])->name('register_co_address_no_no');
-		//popup
+		//popup mobile
 		Route::post('/create_popup/{co_no}', [App\Http\Controllers\CoAddress\CoAddressController::class, 'create_with_popup'])->name('register_co_address_popup');
 		Route::patch('/update_co_address', [\App\Http\Controllers\CoAddress\CoAddressController::class, 'updateCA']);
 		//
@@ -133,6 +133,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/get_manager/{co_no}', [App\Http\Controllers\Manager\ManagerController::class, 'getManager'])->name('get_manager');
     Route::post('/register_manager', [App\Http\Controllers\Manager\ManagerController::class, 'create'])->name('register_manager');
     Route::post('/register_manager/mobile', [App\Http\Controllers\Manager\ManagerController::class, 'create_mobile'])->name('register_manager_mobile');
+    //popup mobile
+    Route::post('/register_manager/create_popup/{co_no}', [App\Http\Controllers\Manager\ManagerController::class, 'create_with_popup'])->name('register_manager_popup');
+    Route::patch('/register_manager/update_register_manager', [App\Http\Controllers\Manager\ManagerController::class, 'updateRM'])->name('update_manager_popup');
+    //
     Route::delete('/delete_manager/{manager}', [App\Http\Controllers\Manager\ManagerController::class, 'delete'])->name('delete_manager');
     Route::patch('/update_manager/{manager}', [App\Http\Controllers\Manager\ManagerController::class, 'update'])->name('update_manager');
 
