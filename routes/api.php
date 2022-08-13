@@ -105,7 +105,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/delete', [\App\Http\Controllers\Notice\NoticeController::class, 'delete']);
 
     Route::get('/import_schedule', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'__invoke']);
-    Route::post('/get_import_schedule', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'get_import_schedule']);
+    Route::post('/get_import_schedule', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'getImportSchedule']);
     // Route::get('/import_schedule/{id}', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class, 'getImportScheduleById']);
 
     Route::prefix('adjustment_group')->name('adjustment_group.')->group(function () {
