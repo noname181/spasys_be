@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 use App\Http\Requests\Manager\ManagerCreateRequest;
 use App\Http\Requests\Manager\ManagerUpdateRequest;
 use App\Http\Requests\Manager\ManagerUpdatePopupRequest;
@@ -187,15 +187,18 @@ class ManagerController extends Controller
      * @param  Manager $manager
      * @return \Illuminate\Http\Response
      */
-    public function delete(Manager $manager)
+    public function delete(Request $request)
     {
+      
         try {
-            Manager::where('m_no', $manager->m_no)->delete();
+            Manager::where('m_no', $request->m_no)->delete();
             return response()->json(['message' => Messages::MSG_0007], 200);
         } catch (\Exception $e) {
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0003], 500);
         }
+        
     }
 
 
