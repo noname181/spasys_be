@@ -32,9 +32,11 @@ class ImportScheduleSearchRequest extends BaseFormRequest
                 'string',
                 'date_format:n/j/Y'
             ],
-            'search_string' => [
-                'string',
-                'nullable',
+            'm_bl' => [
+                '',
+            ],
+            'h_bl' => [
+                '',
             ],
             'per_page' => [
                 'nullable',
