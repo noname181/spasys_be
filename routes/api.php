@@ -192,6 +192,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/', \App\Http\Controllers\Item\ItemController::class)->name('create_or_update');
         Route::get('/{item}', [App\Http\Controllers\Item\ItemController::class, 'getItemById'])->name('get_item_by_id');
         Route::delete('/item_channel/{item_channel}', [App\Http\Controllers\Item\ItemController::class, 'deleteItemChannel'])->name('delete_item_channel');
+    });
 
     Route::prefix('rate_data_send_meta')->name('rate_data_send_meta.')->group(function () {
         Route::post('/', \App\Http\Controllers\RateDataSendMeta\RateDataSendMetaController::class)->name('registe_rdsm');
