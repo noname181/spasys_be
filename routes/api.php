@@ -186,4 +186,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/{report_no}', [App\Http\Controllers\Report\ReportController::class, 'getReport'])->name('get_report');
         Route::delete('/{report}', [App\Http\Controllers\Report\ReportController::class, 'deleteReport'])->name('delete_report');
     });
+
+    Route::prefix('rate_data_send_meta')->name('rate_data_send_meta.')->group(function () {
+        Route::post('/', \App\Http\Controllers\RateDataSendMeta\RateDataSendMetaController::class)->name('registe_rdsm');
+        Route::get('/{rdsm_no}', [App\Http\Controllers\RateDataSendMeta\RateDataSendMetaController::class, 'getRDSM'])->name('get_rdsm');
+        Route::patch('/{rdsm}', [\App\Http\Controllers\RateDataSendMeta\RateDataSendMetaController::class, 'updateRDSM']);
+		//
+    });
 });
