@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Collection;
 
 class ReportController extends Controller
 {
@@ -206,6 +207,19 @@ class ReportController extends Controller
             $reports = Report::with('files');
 
             $reports = $reports->paginate($per_page, ['*'], 'page', $page);
+
+            $data = new Collection();
+
+            foreach($reports->getCollection() as $report){
+                if(isset($report->rp_parent_no)){
+                    $report->rp_no = $report->rp_parent_no;
+                    $data->push($report);
+                }else {
+                    $data->push($report);
+                }
+            }
+
+            $reports->setCollection($data);
 
             return response()->json($reports);
         } catch (\Exception $e) {
