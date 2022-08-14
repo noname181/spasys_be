@@ -41,8 +41,8 @@ class ContractController extends Controller
             $c_no = Contract::insertGetId([
                 'co_no' => $validated['co_no'],
                 'mb_no' => Auth::user()->mb_no,
-                'c_start_date' => DateTime::createFromFormat('n/j/Y', $validated['c_start_date']),
-                'c_end_date' => DateTime::createFromFormat('n/j/Y', $validated['c_end_date']),
+                'c_start_date' => DateTime::createFromFormat('Y-m-d', $validated['c_start_date']),
+                'c_end_date' => DateTime::createFromFormat('Y-m-d', $validated['c_end_date']),
                 'c_transaction_yn' => $validated['c_transaction_yn'],
                 'c_payment_cycle' => $validated['c_payment_cycle'],
                 'c_money_type' => $validated['c_money_type'],
@@ -54,15 +54,15 @@ class ContractController extends Controller
                 'c_deposit_day' => $validated['c_deposit_day'],
                 'c_account_number' => $validated['c_account_number'],
                 'c_deposit_price' => $validated['c_deposit_price'],
-                'c_deposit_date' => DateTime::createFromFormat('n/j/Y', $validated['c_deposit_date']),
+                'c_deposit_date' => DateTime::createFromFormat('Y-m-d', $validated['c_deposit_date']),
                 'c_file_insulance' => $inl,
                 'c_file_license' => $lic,
                 'c_file_contract' => $con,
                 'c_file_bank_account' => $bc,
                 'c_deposit_return_price' => $validated['c_deposit_return_price'],
-                'c_deposit_return_date' => DateTime::createFromFormat('n/j/Y', $validated['c_deposit_return_date']),
-                'c_deposit_return_reg_date' => DateTime::createFromFormat('n/j/Y', $validated['c_deposit_return_reg_date']),
-                'c_deposit_return_expiry_date' => DateTime::createFromFormat('n/j/Y', $validated['c_deposit_return_expiry_date']),
+                'c_deposit_return_date' => DateTime::createFromFormat('Y-m-d', $validated['c_deposit_return_date']),
+                'c_deposit_return_reg_date' => DateTime::createFromFormat('Y-m-d', $validated['c_deposit_return_reg_date']),
+                'c_deposit_return_expiry_date' => DateTime::createFromFormat('Y-m-d', $validated['c_deposit_return_expiry_date']),
             ]);
 
             DB::commit();
@@ -122,8 +122,8 @@ class ContractController extends Controller
             }
 
             $update = [
-                'c_start_date' => DateTime::createFromFormat('n/j/Y', $validated['c_start_date']),
-                'c_end_date' => DateTime::createFromFormat('n/j/Y', $validated['c_end_date']),
+                'c_start_date' => DateTime::createFromFormat('Y-m-d', $validated['c_start_date']),
+                'c_end_date' => DateTime::createFromFormat('Y-m-d', $validated['c_end_date']),
                 'c_transaction_yn' => $validated['c_transaction_yn'],
                 'c_payment_cycle' => $validated['c_payment_cycle'],
                 'c_money_type' => $validated['c_money_type'],
@@ -135,11 +135,11 @@ class ContractController extends Controller
                 'c_deposit_day' => $validated['c_deposit_day'],
                 'c_account_number' => $validated['c_account_number'],
                 'c_deposit_price' => $validated['c_deposit_price'],
-                'c_deposit_date' =>  DateTime::createFromFormat('n/j/Y', $validated['c_deposit_date']),
+                'c_deposit_date' =>  DateTime::createFromFormat('Y-m-d', $validated['c_deposit_date']),
                 'c_deposit_return_price' => $validated['c_deposit_return_price'],
-                'c_deposit_return_date' => DateTime::createFromFormat('n/j/Y', $validated['c_deposit_return_date']),
-                'c_deposit_return_reg_date' =>  DateTime::createFromFormat('n/j/Y', $validated['c_deposit_return_reg_date']),
-                'c_deposit_return_expiry_date' => DateTime::createFromFormat('n/j/Y', $validated['c_deposit_return_expiry_date']),
+                'c_deposit_return_date' => DateTime::createFromFormat('Y-m-d', $validated['c_deposit_return_date']),
+                'c_deposit_return_reg_date' =>  DateTime::createFromFormat('Y-m-d', $validated['c_deposit_return_reg_date']),
+                'c_deposit_return_expiry_date' => DateTime::createFromFormat('Y-m-d', $validated['c_deposit_return_expiry_date']),
             ];
 
             $update = array_merge($update, $files);
