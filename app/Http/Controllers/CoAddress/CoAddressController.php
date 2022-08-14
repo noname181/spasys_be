@@ -228,4 +228,16 @@ class CoAddressController extends Controller
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
+
+    public function delete($ca_no){
+        try {
+            $co_address = CoAddress::where('ca_no', $ca_no)->delete();
+
+            return response()->json(['message' => Messages::MSG_0007], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
 }

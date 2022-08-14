@@ -170,4 +170,16 @@ class ForwarderInfoController extends Controller
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
+
+    public function delete($fi_no){
+        try {
+            $forwarder_info = ForwarderInfo::where('fi_no', $fi_no)->delete();
+
+            return response()->json(['message' => Messages::MSG_0007], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
 }

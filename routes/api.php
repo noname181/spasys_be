@@ -105,13 +105,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/delete', [\App\Http\Controllers\Notice\NoticeController::class, 'delete']);
 
     Route::get('/import_schedule', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'__invoke']);
-    Route::post('/get_import_schedule', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'get_import_schedule']);
+    Route::post('/get_import_schedule', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'getImportSchedule']);
     // Route::get('/import_schedule/{id}', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class, 'getImportScheduleById']);
 
     Route::prefix('adjustment_group')->name('adjustment_group.')->group(function () {
         Route::post('/create_or_update/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create'])->name('register_adjustment_group');
         Route::post('/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create_with_co_no'])->name('register_adjustment_group_co_no');
-		//popup
+		//popup mobile
 		Route::post('/create_popup/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create_with_popup'])->name('register_adjustment_group_popup_popup');
         //Route::patch('{adjustment}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'update'])->name('update_adjustment_group');
         Route::patch('/update_adjustment_group', [\App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'updateAG']);
@@ -123,17 +123,22 @@ Route::middleware('auth')->group(function () {
     Route::prefix('co_address')->name('co_address.')->group(function () {
         Route::post('/create_or_update/{co_no}', [App\Http\Controllers\CoAddress\CoAddressController::class, 'create'])->name('register_co_address');
         Route::post('/{co_no}', [App\Http\Controllers\CoAddress\CoAddressController::class, 'create_with_co_no'])->name('register_co_address_no_no');
-		//popup
+		//popup mobile
 		Route::post('/create_popup/{co_no}', [App\Http\Controllers\CoAddress\CoAddressController::class, 'create_with_popup'])->name('register_co_address_popup');
 		Route::patch('/update_co_address', [\App\Http\Controllers\CoAddress\CoAddressController::class, 'updateCA']);
 		//
         Route::get('/{co_no}', [App\Http\Controllers\CoAddress\CoAddressController::class, 'get_all'])->name('get_all_co_address');
+        Route::delete('/{ca_no}', [App\Http\Controllers\CoAddress\CoAddressController::class, 'delete'])->name('delete_co_address');
     });
 
     Route::get('/get_manager/{co_no}', [App\Http\Controllers\Manager\ManagerController::class, 'getManager'])->name('get_manager');
     Route::post('/register_manager', [App\Http\Controllers\Manager\ManagerController::class, 'create'])->name('register_manager');
     Route::post('/register_manager/mobile', [App\Http\Controllers\Manager\ManagerController::class, 'create_mobile'])->name('register_manager_mobile');
-    Route::delete('/delete_manager/{manager}', [App\Http\Controllers\Manager\ManagerController::class, 'delete'])->name('delete_manager');
+    //popup mobile
+    Route::post('/register_manager/create_popup/{co_no}', [App\Http\Controllers\Manager\ManagerController::class, 'create_with_popup'])->name('register_manager_popup');
+    Route::patch('/register_manager/update_register_manager', [App\Http\Controllers\Manager\ManagerController::class, 'updateRM'])->name('update_manager_popup');
+    //
+    Route::post('/delete_manager', [App\Http\Controllers\Manager\ManagerController::class, 'delete'])->name('delete_manager');
     Route::patch('/update_manager/{manager}', [App\Http\Controllers\Manager\ManagerController::class, 'update'])->name('update_manager');
 
     Route::post('/create_menu', [\App\Http\Controllers\Menu\MenuController::class, 'create']);
@@ -160,12 +165,14 @@ Route::middleware('auth')->group(function () {
         Route::post('/create_or_update/{co_no}', [App\Http\Controllers\ForwarderInfo\ForwarderInfoController::class, 'create'])->name('register_forwarder_info');
         Route::post('/{co_no}', [App\Http\Controllers\ForwarderInfo\ForwarderInfoController::class, 'create_with_co_no'])->name('create_with_co_no');
         Route::get('/{co_no}', [App\Http\Controllers\ForwarderInfo\ForwarderInfoController::class, 'get_all'])->name('get_all_forwarder_info');
+        Route::delete('/{fi_no}', [App\Http\Controllers\ForwarderInfo\ForwarderInfoController::class, 'delete'])->name('delete_forwarder_info');
     });
 
     Route::prefix('customs_info')->name('customs_info.')->group(function () {
         Route::post('/create_or_update/{co_no}', [App\Http\Controllers\CustomsInfo\CustomsInfoController::class, 'create'])->name('register_customs_info');
         Route::post('/{co_no}', [App\Http\Controllers\CustomsInfo\CustomsInfoController::class, 'create_with_co_no'])->name('create_with_co_no');
         Route::get('/{co_no}', [App\Http\Controllers\CustomsInfo\CustomsInfoController::class, 'get_all'])->name('get_all_customs_info');
+        Route::delete('/{ci_no}', [App\Http\Controllers\CustomsInfo\CustomsInfoController::class, 'delete'])->name('delete_customs_info');
     });
 
     Route::prefix('permission')->name('permission.')->group(function () {
@@ -175,7 +182,7 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('report')->name('report.')->group(function () {
         Route::post('/', \App\Http\Controllers\Report\ReportController::class)->name('registe_update_report');
-        Route::get('/', [App\Http\Controllers\Report\ReportController::class, 'getReports'])->name('get_reports');
+        Route::post('/all', [App\Http\Controllers\Report\ReportController::class, 'getReports'])->name('get_reports');
         Route::get('/{report_no}', [App\Http\Controllers\Report\ReportController::class, 'getReport'])->name('get_report');
         Route::delete('/{report}', [App\Http\Controllers\Report\ReportController::class, 'deleteReport'])->name('delete_report');
     });
@@ -185,5 +192,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/', \App\Http\Controllers\Item\ItemController::class)->name('create_or_update');
         Route::get('/{item}', [App\Http\Controllers\Item\ItemController::class, 'getItemById'])->name('get_item_by_id');
         Route::delete('/item_channel/{item_channel}', [App\Http\Controllers\Item\ItemController::class, 'deleteItemChannel'])->name('delete_item_channel');
+
+    Route::prefix('rate_data_send_meta')->name('rate_data_send_meta.')->group(function () {
+        Route::post('/', \App\Http\Controllers\RateDataSendMeta\RateDataSendMetaController::class)->name('registe_rdsm');
+        Route::get('/{rdsm_no}', [App\Http\Controllers\RateDataSendMeta\RateDataSendMetaController::class, 'getRDSM'])->name('get_rdsm');
+        Route::patch('/{rdsm}', [\App\Http\Controllers\RateDataSendMeta\RateDataSendMetaController::class, 'updateRDSM']);
     });
 });

@@ -58,7 +58,7 @@ class ServiceController extends Controller
     public function getServices()
     {
         try {
-            $services = Service::all();
+            $services = Service::where('service_use_yn', 'y')->get();
             $menu_main = Menu::select(['menu_no', 'menu_name', 'service_no_array'])->where('menu_depth', '상위')->get();
 
             DB::commit();

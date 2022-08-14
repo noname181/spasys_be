@@ -1,12 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Member\MemberUpdate;
+namespace App\Http\Requests\Manager;
 
 use App\Http\Requests\BaseFormRequest;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
-class MemberUpdateByIdRequest extends BaseFormRequest
+class ManagerUpdatePopupRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,61 +24,56 @@ class MemberUpdateByIdRequest extends BaseFormRequest
     public function rules()
     {
         return [
-            'mb_no' => [
+            'm_no' => [
                 'required',
-                'integer',
-                'max:255',
+                'int'
             ],
-            'co_no' => [
-                'required',
-                'integer',
-            ],
-            'role_no' => [
-                'required',
-                'string',
-            ],
-            'mb_email' => [
-                'required',
-                'string',
-                'max:255',
-                'email',
-            ],
-            'mb_name' => [
+            'm_position' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'mb_tel' => [
+            'm_name' => [
+                'required',
                 'string',
                 'max:255',
-                'regex:/^\(\+[0-9]{2}\) [0-9]{2}-[0-9]{4}-[0-9]{4}$/'
             ],
-            'mb_hp' => [
+            'm_duty1' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'm_duty2' => [
+                'required',
+                'string',
+                'max:255',
+            ],            
+            'm_hp' => [
                 'required',
                 'string',
                 'max:255',
                 'regex:/[0-9]{3}-[0-9]{4}-[0-9]{4}$/',
             ],
-            'mb_push_yn' => [
+            'm_etc' => [
                 'required',
                 'string',
-                'max:1'
             ],
-            'mb_service_no_array' => [
+            'm_email' => [
                 'required',
-                'string'
+                'string',
+                'max:255',
+                'email',
             ],
         ];
     }
 
-    /**
+        /**
      * Get custom attributes for validator errors.
      *
      * @return array
      */
     public function attributes()
     {
-        return [
-        ];
+        return [];
     }
 }

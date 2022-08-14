@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Banner;
+namespace App\Http\Requests\Item;
 
 use App\Http\Requests\BaseFormRequest;
 
-class BannerSearchRequest extends BaseFormRequest
+class ItemSearchRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,14 +26,15 @@ class BannerSearchRequest extends BaseFormRequest
         return [
             'from_date' => [
                 'string',
-                'date_format:Y-m-d'
+                'date_format:n/j/Y'
             ],
             'to_date' => [
                 'string',
-                'date_format:Y-m-d'
+                'date_format:n/j/Y'
             ],
             'search_string' => [
-                '',
+                'string',
+                'nullable',
             ],
             'per_page' => [
                 'nullable',
@@ -46,7 +47,7 @@ class BannerSearchRequest extends BaseFormRequest
         ];
     }
 
-    /**
+        /**
      * Get custom attributes for validator errors.
      *
      * @return array

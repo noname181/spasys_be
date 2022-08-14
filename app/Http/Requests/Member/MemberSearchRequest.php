@@ -26,11 +26,11 @@ class MemberSearchRequest extends BaseFormRequest
         return [
             'from_date' => [
                 'string',
-                'date_format:n/j/Y'
+                'date_format:Y-m-d'
             ],
             'to_date' => [
                 'string',
-                'date_format:n/j/Y'
+                'date_format:Y-m-d'
             ],
             'co_name' => [
                 'string',
