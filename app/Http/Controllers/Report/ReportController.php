@@ -25,22 +25,27 @@ class ReportController extends Controller
         try {
             $reports = [];
             $i = 0;
+            $parent_no;
             DB::beginTransaction();
-            if(!$request->rp_no){
+            if (!$request->rp_no) {
                 foreach ($request->rp_content as $rp_content) {
                     $report_no = Report::insertGetId([
                         'mb_no' => Auth::user()->mb_no,
                         'item_no' => $request->item_no,
                         'rp_cate' => $request->rp_cate,
                         'rp_content' => $rp_content,
+                        'rp_parent_no' => empty($parent_no) ? null : $parent_no,
                     ]);
+                    if ($i == 0) {
+                        $parent_no = $report_no;
+                    }
                     $reports[] = $report_no;
                     $filename = 'file' . (string) $i;
                     $files = [];
                     $path = join('/', ['files', 'report', $report_no]);
                     $index = 0;
                     foreach ($request->$filename as $file) {
-                        if($file != 'undefined'){
+                        if ($file != 'undefined') {
                             $url = Storage::disk('public')->put($path, $file);
                             $files[] = [
                                 'file_table' => 'report',
@@ -60,49 +65,112 @@ class ReportController extends Controller
                     }
                     $i++;
                 }
-            }else {
-                $report = Report::where('rp_no', $request->rp_no)->update([
-                    'item_no' => $request->item_no,
-                    'rp_cate' => $request->rp_cate,
-                    'rp_content' => $request->rp_content[0],
-                ]);
+            } else {
 
-                $files_no = [];
-                foreach ($request->file_no0 as $file_no) {
-                    $files_no[] = $file_no;
-                }
-                $files = File::where('file_table', 'report')->where('file_table_key', $request->rp_no)->get();
-                $path = join('/', ['files', 'report', $request->rp_no]);
+                foreach ($request->rp_content as $rp_content) {
+                    $report = Report::where('rp_no', $request->rp_file_no[$i])->update([
+                        'item_no' => $request->item_no,
+                        'rp_cate' => $request->rp_cate,
+                        'rp_content' => $request->rp_content[$i],
+                    ]);
 
-                foreach ($files as $file) {
-                    if (!in_array($file->file_no, $files_no)){
-                        Storage::disk('public')->delete($path. '/' . $file->file_name);
-                    }
-                }
-                File::where('file_table', 'report')->where('file_table_key', $request->rp_no)
-                ->whereNotIn('file_no', $files_no)->delete();
+                    $files = [];
+                    $path = join('/', ['files', 'report', $request->rp_file_no[$i]]);
 
-                $i = File::where('file_table', 'report')->where('file_table_key', $request->rp_no)->orderBy('file_position', 'DESC')->first()->file_position;
-                $files = [];
-                foreach ($request->file0 as $file) {
-                    if($file != 'undefined'){
-                        $url = Storage::disk('public')->put($path, $file);
-                        $files[] = [
-                            'file_table' => 'report',
-                            'file_table_key' => $request->rp_no,
-                            'file_name_old' => $file->getClientOriginalName(),
-                            'file_name' => basename($url),
-                            'file_size' => $file->getSize(),
-                            'file_extension' => $file->extension(),
-                            'file_position' => $i,
-                            'file_url' => $url,
-                        ];
-                        $i++;
-                        File::insert($files);
-                        $files = [];
+                    $files_no = [];
+                    $file_name = 'file_no' . (string) $i;
+
+                    if ($request->$file_name) {
+                        foreach ($request->$file_name as $file_no) {
+                            $files_no[] = $file_no;
+                        }
                     }
 
+                    $files = File::where('file_table', 'report')->where('file_table_key', $request->rp_file_no[$i])->get();
+                    $path = join('/', ['files', 'report', $request->rp_file_no[$i]]);
+
+                    foreach ($files as $file) {
+                        if (!in_array($file->file_no, $files_no)) {
+                            Storage::disk('public')->delete($path . '/' . $file->file_name);
+                        }
+                    }
+
+                    File::where('file_table', 'report')->where('file_table_key', $request->rp_file_no[$i])
+                        ->whereNotIn('file_no', $files_no)->delete();
+
+                    $file_position = File::where('file_table', 'report')->where('file_table_key', $request->rp_file_no[$i])->orderBy('file_position', 'DESC')->first();
+
+                    $index = $file_position ? $file_position->file_position : 0;
+                    $files = [];
+
+                    $filename = 'file' . (string) $i;
+
+                    foreach ($request->$filename as $file) {
+                        if ($file != 'undefined') {
+                            $url = Storage::disk('public')->put($path, $file);
+                            $files[] = [
+                                'file_table' => 'report',
+                                'file_table_key' => $request->rp_no,
+                                'file_name_old' => $file->getClientOriginalName(),
+                                'file_name' => basename($url),
+                                'file_size' => $file->getSize(),
+                                'file_extension' => $file->extension(),
+                                'file_position' => $index,
+                                'file_url' => $url,
+                            ];
+                            $index++;
+                            File::insert($files);
+                            $files = [];
+                        }
+
+                    }
+
+
+                    $i++;
                 }
+
+                // $report = Report::where('rp_no', $request->rp_no)->update([
+                //     'item_no' => $request->item_no,
+                //     'rp_cate' => $request->rp_cate,
+                //     'rp_content' => $request->rp_content[0],
+                // ]);
+
+                // $files_no = [];
+                // foreach ($request->file_no0 as $file_no) {
+                //     $files_no[] = $file_no;
+                // }
+                // $files = File::where('file_table', 'report')->where('file_table_key', $request->rp_no)->get();
+                // $path = join('/', ['files', 'report', $request->rp_no]);
+
+                // foreach ($files as $file) {
+                //     if (!in_array($file->file_no, $files_no)){
+                //         Storage::disk('public')->delete($path. '/' . $file->file_name);
+                //     }
+                // }
+                // File::where('file_table', 'report')->where('file_table_key', $request->rp_no)
+                // ->whereNotIn('file_no', $files_no)->delete();
+
+                // $i = File::where('file_table', 'report')->where('file_table_key', $request->rp_no)->orderBy('file_position', 'DESC')->first()->file_position;
+                // $files = [];
+                // foreach ($request->file0 as $file) {
+                //     if($file != 'undefined'){
+                //         $url = Storage::disk('public')->put($path, $file);
+                //         $files[] = [
+                //             'file_table' => 'report',
+                //             'file_table_key' => $request->rp_no,
+                //             'file_name_old' => $file->getClientOriginalName(),
+                //             'file_name' => basename($url),
+                //             'file_size' => $file->getSize(),
+                //             'file_extension' => $file->extension(),
+                //             'file_position' => $i,
+                //             'file_url' => $url,
+                //         ];
+                //         $i++;
+                //         File::insert($files);
+                //         $files = [];
+                //     }
+
+                // }
             }
 
             DB::commit();
@@ -120,7 +188,7 @@ class ReportController extends Controller
 
     public function getReport($rp_no)
     {
-        $report = Report::with('files')->where('rp_no', $rp_no)->first();
+        $report = Report::with('files')->where('rp_no', $rp_no)->orWhere('rp_parent_no', $rp_no)->get();
 
         return response()->json(['report' => $report]);
 

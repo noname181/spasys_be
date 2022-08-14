@@ -30,11 +30,11 @@ class ContractUpdateRequest extends BaseFormRequest
             ],
             'c_start_date' => [
                 'required',
-                'date_format:n/j/Y' 
+                'date_format:Y-m-d'
             ],
             'c_end_date' => [
                 'required',
-                'date_format:n/j/Y' 
+                'date_format:Y-m-d'
             ],
             'c_transaction_yn' => [
                 'required',
@@ -115,15 +115,15 @@ class ContractUpdateRequest extends BaseFormRequest
             ],
             'c_deposit_return_date' => [
                 'required',
-                'date_format:n/j/Y' 
+                'date_format:Y-m-d'
             ],
             'c_deposit_return_reg_date' => [
                 'required',
-                'date_format:n/j/Y' 
+                'date_format:Y-m-d'
             ],
             'c_deposit_return_expiry_date' => [
                 'required',
-                'date_format:n/j/Y' 
+                'date_format:Y-m-d'
             ],
         ];
     }
