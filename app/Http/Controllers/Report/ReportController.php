@@ -206,6 +206,20 @@ class ReportController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $reports = Report::with('files');
 
+            // if (isset($validated['from_date'])) {
+            //     $notices->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            // }
+
+            // if (isset($validated['to_date'])) {
+            //     $notices->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            // }
+
+            if (isset($validated['rp_cate'])) {
+                $reports->where(function($query) use ($validated) {
+                    $query->where('rp_cate', 'like', '%' . $validated['rp_cate'] . '%');
+                });
+            }
+
             $reports = $reports->paginate($per_page, ['*'], 'page', $page);
 
             $data = new Collection();

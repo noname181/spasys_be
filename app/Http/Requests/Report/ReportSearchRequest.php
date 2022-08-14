@@ -34,7 +34,7 @@ class ReportSearchRequest extends BaseFormRequest
             ],
             'shop_name' => [
                 'string',
-                'string',
+                'nullable',
             ],
             'shipper_name' => [
                 'nullable',
