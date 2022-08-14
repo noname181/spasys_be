@@ -46,7 +46,16 @@ class RateDataSendMetaController extends Controller
     public function getRDSM($rdsm_no)
     {
         try {
-            $rate_data_send_meta = RateDataSendMeta::where('rdsm_no', $rdsm_no)->first();
+            $rate_data_send_meta = RateDataSendMeta::select([
+                'rdsm_biz_name',
+                'rdsm_owner_name',
+                'rdsm_biz_number',
+                'rdsm_biz_email',
+                'rdsm_biz_address',
+                'rdsm_biz_address_detail',
+                'rdsm_name',
+                'rdsm_hp',
+            ])->where('rdsm_no', $rdsm_no)->first();
             return response()->json(['message' => Messages::MSG_0007, 'rate_data_send_meta' => $rate_data_send_meta], 201);
         } catch (\Exception $e) {
             DB::rollback();
