@@ -110,7 +110,7 @@ class ReportController extends Controller
                             $url = Storage::disk('public')->put($path, $file);
                             $files[] = [
                                 'file_table' => 'report',
-                                'file_table_key' => $request->rp_no,
+                                'file_table_key' => $request->rp_file_no[$i],
                                 'file_name_old' => $file->getClientOriginalName(),
                                 'file_name' => basename($url),
                                 'file_size' => $file->getSize(),
