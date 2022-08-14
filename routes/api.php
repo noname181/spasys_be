@@ -182,7 +182,7 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('report')->name('report.')->group(function () {
         Route::post('/', \App\Http\Controllers\Report\ReportController::class)->name('registe_update_report');
-        Route::get('/', [App\Http\Controllers\Report\ReportController::class, 'getReports'])->name('get_reports');
+        Route::post('/all', [App\Http\Controllers\Report\ReportController::class, 'getReports'])->name('get_reports');
         Route::get('/{report_no}', [App\Http\Controllers\Report\ReportController::class, 'getReport'])->name('get_report');
         Route::delete('/{report}', [App\Http\Controllers\Report\ReportController::class, 'deleteReport'])->name('delete_report');
     });

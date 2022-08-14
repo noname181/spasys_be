@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Report;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Report\ReportRequest;
+use App\Http\Requests\Report\ReportSearchRequest;
 use App\Models\File;
 use App\Models\Report;
 use App\Utils\Messages;
@@ -125,7 +126,6 @@ class ReportController extends Controller
 
                     }
 
-
                     $i++;
                 }
 
@@ -194,81 +194,26 @@ class ReportController extends Controller
 
     }
 
-    public function getReports()
+    public function getReports(ReportSearchRequest $request)
     {
-        // try {
-        $reports = DB::table('report')
-            ->select(['report.*'])
-            ->join('file', 'file.file_table_key', '=', 'report.rp_no')
-            ->where([
-                'report.mb_no' => Auth::user()->mb_no,
-                'file.file_table' => 'report',
-            ])
-            ->distinct()
-            ->get();
-        $files = DB::table('report')
-            ->select(['file.*'])
-            ->join('file', 'file.file_table_key', '=', 'report.rp_no')
-            ->where([
-                'report.mb_no' => Auth::user()->mb_no,
-                'file.file_table' => 'report',
-            ])
-            ->get();
+        try {
+            $validated = $request->validated();
 
-        $responses = [];
+            // If per_page is null set default data = 15
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 5;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+            $reports = Report::with('files');
 
-        foreach ($reports as $report) {
-            $response = [];
-            foreach ($files as $file) {
-                if ($file->file_table_key == $report->rp_no) {
-                    $response['rp_no'] = $report->rp_no;
-                    $response['rp_content'] = $report->rp_content;
-                    $response['files'][] = [
-                        'file_no' => $file->file_no,
-                        'file_table' => $file->file_table,
-                        'file_table_key' => $file->file_table_key,
-                        'file_name_old' => $file->file_name_old,
-                        'file_name' => $file->file_name,
-                        'file_size' => $file->file_size,
-                        'file_position' => $file->file_position,
-                        'file_extension' => $file->file_extension,
-                        'file_url' => $file->file_url,
-                    ];
-                }
+            $reports = $reports->paginate($per_page, ['*'], 'page', $page);
 
-            }
-            $responses[] = $response;
+            return response()->json($reports);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+
         }
-
-        // if (count($reports) > 0) {
-        //     //$response['rp_no'] = $rp_no;
-        //     $response['rp_cate'] = $reports[0]->rp_cate;
-
-        //     foreach ($reports as $value) {
-
-        //         $response['files'][] = [
-        //             'rp_content' => $value->rp_content,
-        //             'file_no' => $value->file_no,
-        //             'file_table' => $value->file_table,
-        //             'file_table_key' => $value->file_table_key,
-        //             'file_name_old' => $value->file_name_old,
-        //             'file_name' => $value->file_name,
-        //             'file_size' => $value->file_size,
-        //             'file_position' => $value->file_position,
-        //             'file_extension' => $value->file_extension,
-        //             'file_url' => $value->file_url,
-        //         ];
-        //     }
-        // }
-
-        return response()->json([
-            'message' => Messages::MSG_0007,
-            'reports' => $responses,
-        ]);
-        // } catch (\Exception $e) {
-        //     Log::error($e);
-        //     return response()->json(['message' => Messages::MSG_0020], 500);
-        // }
     }
 
     public function deleteReport(Report $Report)
