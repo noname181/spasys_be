@@ -26,15 +26,17 @@ class ImportScheduleSearchRequest extends BaseFormRequest
         return [
             'from_date' => [
                 'string',
-                'date_format:Y-m-d'
+                'date_format:Y-m-d',
             ],
             'to_date' => [
                 'string',
                 'date_format:Y-m-d'
             ],
-            'search_string' => [
-                'string',
-                'nullable',
+            'm_bl' => [
+                '',
+            ],
+            'h_bl' => [
+                '',
             ],
             'per_page' => [
                 'nullable',

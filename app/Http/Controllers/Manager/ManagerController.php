@@ -10,10 +10,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 use App\Http\Requests\Manager\ManagerCreateRequest;
 use App\Http\Requests\Manager\ManagerUpdateRequest;
-
+use App\Http\Requests\Manager\ManagerUpdatePopupRequest;
 use App\Http\Requests\Manager\ManagerMobileCreateRequest;
 
 class ManagerController extends Controller
@@ -94,6 +94,61 @@ class ManagerController extends Controller
         }
     }
 
+    public function updateRM(Manager $manager, ManagerUpdatePopupRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+            $m_no = Manager::where('m_no', $validated['m_no'])->where('mb_no', Auth::user()->mb_no)->update([
+                'm_name' => $validated['m_name'],
+                'm_hp' => $validated['m_hp'],
+                'm_position' => $validated['m_position'],
+				'm_duty1' => $validated['m_duty1'],
+				'm_duty2' => $validated['m_duty2'],
+                'm_email' => $validated['m_email'],
+                'm_etc' => $validated['m_etc'],
+
+            ]);
+            return response()->json(['message' => Messages::MSG_0007], 200);
+        } catch (\Exception $e) {
+            Log::error($e);
+			return $e;
+            return response()->json(['message' => Messages::MSG_0002], 500);
+        }
+    }
+
+    public function create_with_popup($co_no,ManagerMobileCreateRequest $request)
+    {
+
+        try {
+
+            //DB::beginTransaction();
+            $member = Member::where('mb_id', Auth::user()->mb_id)->first();
+            $validated = $request->validated();
+            $m_no = Manager::insertGetId([
+                'mb_no' => $member->mb_no,
+                'm_position' => $validated['m_position'],
+                'co_no' => $co_no,
+                'm_name' => $validated['m_name'],
+                'm_duty1' => $validated['m_duty1'],
+                'm_duty2' => $validated['m_duty2'],
+                'm_hp' => $validated['m_hp'],
+                'm_email' => $validated['m_email'],
+                'm_etc' => $validated['m_etc'],
+                'created_at' => date('y-m-d h-i-s')
+            ]);
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'm_no' => $m_no,
+            ], 201);
+        } catch (\Throwable $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0001], 500);
+        }
+    }
+
     public function create_mobile(ManagerMobileCreateRequest $request)
     {
 
@@ -132,15 +187,18 @@ class ManagerController extends Controller
      * @param  Manager $manager
      * @return \Illuminate\Http\Response
      */
-    public function delete(Manager $manager)
+    public function delete(Request $request)
     {
+      
         try {
-            Manager::where('m_no', $manager->m_no)->delete();
+            Manager::where('m_no', $request->m_no)->delete();
             return response()->json(['message' => Messages::MSG_0007], 200);
         } catch (\Exception $e) {
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0003], 500);
         }
+        
     }
 
 
