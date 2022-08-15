@@ -44,6 +44,10 @@ class ImportScheduleSearchRequest extends BaseFormRequest
                 'nullable',
                 'string',
             ],
+            'logistic_manage_number' => [
+                'nullable',
+                'string',
+            ],
             'per_page' => [
                 'nullable',
                 'int',
