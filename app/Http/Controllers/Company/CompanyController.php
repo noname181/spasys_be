@@ -287,7 +287,7 @@ class CompanyController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $companies = Company::with('contract')->where('mb_no', Auth::user()->mb_no)->orderBy('co_no', 'DESC');
+            $companies = Company::with('contract')->where('co_type', 'shop')->orderBy('co_no', 'DESC');
 
             if (isset($validated['from_date'])) {
                 $companies->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
