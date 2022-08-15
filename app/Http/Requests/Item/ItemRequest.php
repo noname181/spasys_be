@@ -29,6 +29,11 @@ class ItemRequest extends BaseFormRequest
                 'string',
                 'max:255',
             ],
+            'item_service_name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
             'co_no' => [
                 'required',
                 'int',
