@@ -22,6 +22,7 @@ class ItemController extends Controller
      */
     public function __invoke(ItemRequest $request)
     {
+
         $validated = $request->validated();
         try {
             DB::beginTransaction();
@@ -45,8 +46,6 @@ class ItemController extends Controller
                     'item_cate2' => $validated['item_cate2'],
                     'item_cate3' => $validated['item_cate3'],
                     'item_url' => $validated['item_url'],
-                    'item_table' => '', // FIXME no information,
-                    'item_key' => 0 // FIXME no information,
                 ]);
 
                 $item_channels = [];
@@ -85,8 +84,6 @@ class ItemController extends Controller
                     'item_cate2' => $validated['item_cate2'],
                     'item_cate3' => $validated['item_cate3'],
                     'item_url' => $validated['item_url'],
-                    'item_table' => '', // FIXME no information,
-                    'item_key' => 0 // FIXME no information,
                 ];
                 $item->update($update);
 
@@ -127,6 +124,7 @@ class ItemController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0019], 500);
         }
     }

@@ -88,21 +88,36 @@ class ReportController extends Controller
                         }
                     }
 
-                    $files = File::where('file_table', 'report')->where('file_table_key', $request->rp_file_no[$i])->get();
-                    $path = join('/', ['files', 'report', $request->rp_file_no[$i]]);
 
-                    foreach ($files as $file) {
-                        if (!in_array($file->file_no, $files_no)) {
-                            Storage::disk('public')->delete($path . '/' . $file->file_name);
+                    if($request->rp_file_no[$i] != 'undefined'){
+                        $files = File::where('file_table', 'report')->where('file_table_key', $request->rp_file_no[$i])->get();
+                        $path = join('/', ['files', 'report', $request->rp_file_no[$i]]);
+
+                        foreach ($files as $file) {
+                            if (!in_array($file->file_no, $files_no)) {
+                                Storage::disk('public')->delete($path . '/' . $file->file_name);
+                            }
                         }
+
+                        File::where('file_table', 'report')->where('file_table_key', $request->rp_file_no[$i])
+                            ->whereNotIn('file_no', $files_no)->delete();
+
+                        $file_position = File::where('file_table', 'report')->where('file_table_key', $request->rp_file_no[$i])->orderBy('file_position', 'DESC')->first();
+                        $index = $file_position->file_position;
+                    }else {
+
+                        $report_no = Report::insertGetId([
+                            'mb_no' => Auth::user()->mb_no,
+                            'item_no' => $request->item_no,
+                            'rp_cate' => $request->rp_cate,
+                            'rp_content' => $rp_content[$i],
+                            'rp_parent_no' => $request->rp_no,
+                        ]);
+                        $index =  0;
+
                     }
 
-                    File::where('file_table', 'report')->where('file_table_key', $request->rp_file_no[$i])
-                        ->whereNotIn('file_no', $files_no)->delete();
 
-                    $file_position = File::where('file_table', 'report')->where('file_table_key', $request->rp_file_no[$i])->orderBy('file_position', 'DESC')->first();
-
-                    $index = $file_position ? $file_position->file_position : 0;
                     $files = [];
 
                     $filename = 'file' . (string) $i;
@@ -112,7 +127,7 @@ class ReportController extends Controller
                             $url = Storage::disk('public')->put($path, $file);
                             $files[] = [
                                 'file_table' => 'report',
-                                'file_table_key' => $request->rp_file_no[$i],
+                                'file_table_key' => $request->rp_file_no[$i] != 'undefined' ? $request->rp_file_no[$i] : $report_no,
                                 'file_name_old' => $file->getClientOriginalName(),
                                 'file_name' => basename($url),
                                 'file_size' => $file->getSize(),
