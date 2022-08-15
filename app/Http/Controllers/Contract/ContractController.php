@@ -106,18 +106,22 @@ class ContractController extends Controller
             $files = [];
             if (isset($validated['c_file_insulance'])) {
                 $c_file_insulance = join('/', ['files', 'company', $co_no, 'insulance']);
+                Storage::disk('public')->delete($contract->c_file_insulance);
                 $files['c_file_insulance'] = Storage::disk('public')->put($c_file_insulance, $validated['c_file_insulance']);
             }
             if (isset($validated['c_file_license'])) {
                 $c_file_license = join('/', ['files', 'company',  $co_no, 'license']);
+                Storage::disk('public')->delete($contract->c_file_license);
                 $files['c_file_license'] = Storage::disk('public')->put($c_file_license, $validated['c_file_license']);
             }
             if (isset($validated['c_file_contract'])) {
                 $c_file_contract = join('/', ['files', 'company',  $co_no, 'contract']);
+                Storage::disk('public')->delete($contract->c_file_contract);
                 $files['c_file_contract'] = Storage::disk('public')->put($c_file_contract, $validated['c_file_contract']);
             }
             if (isset($validated['c_file_bank_account'])) {
                 $c_file_bank_account = join('/', ['files', 'company',  $co_no, 'bank_account']);
+                Storage::disk('public')->delete($contract->c_file_bank_account);
                 $files['c_file_bank_account'] = Storage::disk('public')->put($c_file_bank_account, $validated['c_file_bank_account']);
             }
 

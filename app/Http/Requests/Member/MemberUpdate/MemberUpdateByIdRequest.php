@@ -25,7 +25,6 @@ class MemberUpdateByIdRequest extends BaseFormRequest
      */
     public function rules()
     {
-        Log::error($this->user);
         return [
             'mb_no' => [
                 'required',

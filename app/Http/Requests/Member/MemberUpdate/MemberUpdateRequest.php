@@ -25,7 +25,6 @@ class MemberUpdateRequest extends BaseFormRequest
      */
     public function rules()
     {
-        Log::error($this->user);
         return [
             'mb_email' => [
                 'required',

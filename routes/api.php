@@ -187,10 +187,16 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{report}', [App\Http\Controllers\Report\ReportController::class, 'deleteReport'])->name('delete_report');
     });
 
+    Route::prefix('item')->name('item.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Item\ItemController::class, 'searchItems'])->name('search');
+        Route::post('/', \App\Http\Controllers\Item\ItemController::class)->name('create_or_update');
+        Route::get('/{item}', [App\Http\Controllers\Item\ItemController::class, 'getItemById'])->name('get_item_by_id');
+        Route::delete('/item_channel/{item_channel}', [App\Http\Controllers\Item\ItemController::class, 'deleteItemChannel'])->name('delete_item_channel');
+    });
+
     Route::prefix('rate_data_send_meta')->name('rate_data_send_meta.')->group(function () {
         Route::post('/', \App\Http\Controllers\RateDataSendMeta\RateDataSendMetaController::class)->name('registe_rdsm');
         Route::get('/{rdsm_no}', [App\Http\Controllers\RateDataSendMeta\RateDataSendMetaController::class, 'getRDSM'])->name('get_rdsm');
         Route::patch('/{rdsm}', [\App\Http\Controllers\RateDataSendMeta\RateDataSendMetaController::class, 'updateRDSM']);
-		//
     });
 });
