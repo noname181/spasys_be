@@ -36,7 +36,7 @@ class ImportScheduleController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $import_schedule = ImportSchedule::with('files')->paginate($per_page, ['*'], 'page', $page);
+            $import_schedule = ImportSchedule::with('co_no')->with('files')->paginate($per_page, ['*'], 'page', $page);
 
             return response()->json($import_schedule);
         } catch (\Exception $e) {
@@ -58,7 +58,7 @@ class ImportScheduleController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $import_schedule = ImportSchedule::with('files')->orderBy('is_no', 'DESC');
+            $import_schedule = ImportSchedule::with('co_no')->with('files')->orderBy('is_no', 'DESC');
 
             if (isset($validated['from_date'])) {
                 $import_schedule->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
@@ -66,6 +66,12 @@ class ImportScheduleController extends Controller
 
             if (isset($validated['to_date'])) {
                 $import_schedule->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            }
+
+            if (isset($validated['co_name'])) {
+                $import_schedule->whereHas('co_no', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                });
             }
 
             if (isset($validated['m_bl'])) {

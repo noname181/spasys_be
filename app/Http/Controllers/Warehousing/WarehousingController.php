@@ -36,7 +36,7 @@ class WarehousingController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $warehousing = Warehousing::paginate($per_page, ['*'], 'page', $page);
+            $warehousing = Warehousing::with('mb_no')->with('co_no')->paginate($per_page, ['*'], 'page', $page);
 
             return response()->json($warehousing);
         } catch (\Exception $e) {
@@ -58,7 +58,7 @@ class WarehousingController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $warehousing = Warehousing::orderBy('w_no', 'DESC');
+            $warehousing = Warehousing::with('mb_no')->with('co_no')->orderBy('w_no', 'DESC');
 
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
@@ -66,6 +66,18 @@ class WarehousingController extends Controller
 
             if (isset($validated['to_date'])) {
                 $warehousing->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            }
+
+            if (isset($validated['mb_name'])) {
+                $warehousing->where(function($query) use ($validated) {
+                    $query->where(DB::raw('lower(mb_name)'), 'like', '%' . strtolower($validated['mb_name']) . '%');
+                });
+            }
+
+            if (isset($validated['co_name'])) {
+                $warehousing->whereHas('co_no', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                });
             }
 
             if (isset($validated['w_schedule_number'])) {

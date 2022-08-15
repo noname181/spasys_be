@@ -32,6 +32,14 @@ class WarehousingSearchRequest extends BaseFormRequest
                 'string',
                 'date_format:Y-m-d'
             ],
+            'mb_name' => [
+                'nullable',
+                'string',
+            ],
+            'co_name' => [
+                'nullable',
+                'string',
+            ],
             'w_schedule_number' => [
                 'nullable',
                 'string',
