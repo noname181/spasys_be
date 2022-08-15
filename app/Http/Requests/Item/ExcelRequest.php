@@ -4,7 +4,7 @@ namespace App\Http\Requests\Item;
 
 use App\Http\Requests\BaseFormRequest;
 
-class ItemRequest extends BaseFormRequest
+class ExcelRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -13,7 +13,7 @@ class ItemRequest extends BaseFormRequest
      */
     public function authorize()
     {
-        return true;
+        return false;
     }
 
     /**
@@ -21,112 +21,81 @@ class ItemRequest extends BaseFormRequest
      *
      * @return array
      */
-    public function rules()
+    public static function rules()
     {
         return [
-            'item_brand' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'item_service_name' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'co_no' => [
-                'required',
-                'int',
-            ],
-            'item_name' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'item_option1' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'item_option2' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'item_cargo_bar_code' => [
-                'string',
-                'nullable',
-                'max:255',
-            ],
-            'item_upc_code' => [
-                'string',
-                'nullable',
-                'max:255',
-            ],
-            'item_bar_code' => [
-                'string',
-                'nullable',
-                'max:255',
-            ],
-            'item_weight' => [
-                'integer',
-                'nullable',
-            ],
-            'item_price1' => [
-                'integer',
-                'nullable',
-            ],
-            'item_price2' => [
-                'integer',
-                'nullable',
-            ],
-            'item_price3' => [
-                'integer',
-                'nullable',
-            ],
-            'item_price4' => [
-                'integer',
-                'nullable',
-            ],
-            'item_cate1' => [
-                'string',
-                'nullable',
-                'max:255',
-            ],
-            'item_cate2' => [
-                'string',
-                'nullable',
-                'max:255',
-            ],
-            'item_cate3' => [
-                'string',
-                'nullable',
-                'max:255',
-            ],
-            'item_url' => [
-                'string',
-                'nullable',
-                'max:255',
-            ],
-            'item_channels' => [
-                'array',
-                'nullable'
-            ],
-            'item_channels.*.item_channel_name' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'item_channels.*.item_channel_code' => [
+            'A' => [
                 'required',
                 'integer',
             ],
-            'file' => [
-                'file',
-                'nullable',
-                'max:5000',
-                'mimes:jpg,jpeg,png,pdf',
+            'B' => [
+                'required',
+                'max:255',
             ],
+            'C' => [
+                'required',
+                'max:255',
+            ],
+            'D' => [
+                'required',
+                'max:255',
+            ],
+            'E' => [
+                'required',
+                'max:255',
+            ],
+            'F' => [
+                'required',
+                'max:255',
+            ],
+            'G' => [
+                'max:255',
+                'nullable',
+            ],
+            'H' => [
+                'max:255',
+                'nullable',
+            ],
+            'I' => [
+                'max:255',
+                'nullable',
+            ],
+            'J' => [
+                'integer',
+                'nullable',
+            ],
+            'K' => [
+                'integer',
+                'nullable',
+            ],
+            'L' => [
+                'integer',
+                'nullable',
+            ],
+            'M' => [
+                'integer',
+                'nullable',
+            ],
+            'N' => [
+                'integer',
+                'nullable',
+            ],
+            'O' => [
+                'nullable',
+                'max:255',
+            ],
+            'P' => [
+                'nullable',
+                'max:255',
+            ],
+            'Q' => [
+                'nullable',
+                'max:255',
+            ],
+            'R' => [
+                'nullable',
+                'max:255',
+            ]
         ];
     }
 
