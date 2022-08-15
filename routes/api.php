@@ -166,6 +166,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/{co_no}', [App\Http\Controllers\ForwarderInfo\ForwarderInfoController::class, 'create_with_co_no'])->name('create_with_co_no');
         Route::get('/{co_no}', [App\Http\Controllers\ForwarderInfo\ForwarderInfoController::class, 'get_all'])->name('get_all_forwarder_info');
         Route::delete('/{fi_no}', [App\Http\Controllers\ForwarderInfo\ForwarderInfoController::class, 'delete'])->name('delete_forwarder_info');
+
+        Route::post('/create_popup/{fi_no}', [App\Http\Controllers\ForwarderInfo\ForwarderInfoController::class, 'create_with_popup'])->name('register_forwarder_info_popup');
+        Route::patch('/update_forwarder_info', [\App\Http\Controllers\ForwarderInfo\ForwarderInfoController::class, 'updateFI']);
     });
 
     Route::prefix('customs_info')->name('customs_info.')->group(function () {
@@ -173,6 +176,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/{co_no}', [App\Http\Controllers\CustomsInfo\CustomsInfoController::class, 'create_with_co_no'])->name('create_with_co_no');
         Route::get('/{co_no}', [App\Http\Controllers\CustomsInfo\CustomsInfoController::class, 'get_all'])->name('get_all_customs_info');
         Route::delete('/{ci_no}', [App\Http\Controllers\CustomsInfo\CustomsInfoController::class, 'delete'])->name('delete_customs_info');
+
+        Route::post('/create_popup/{ci_no}', [App\Http\Controllers\CustomsInfo\CustomsInfoController::class, 'create_with_popup'])->name('register_customs_info_popup');
+        Route::patch('/update_customs_info', [\App\Http\Controllers\CustomsInfo\CustomsInfoController::class, 'updateCI']);
     });
 
     Route::prefix('permission')->name('permission.')->group(function () {
