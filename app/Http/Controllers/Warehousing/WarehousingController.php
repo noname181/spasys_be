@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\ImportSchedule;
+namespace App\Http\Controllers\Warehousing;
 
 use DateTime;
 use App\Models\File;
 use App\Models\Member;
-use App\Models\ImportSchedule;
+use App\Models\Warehousing;
 use App\Utils\Messages;
 use App\Utils\CommonFunc;
 use Illuminate\Http\Request;
@@ -17,17 +17,17 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Filesystem\Filesystem;
-use App\Http\Requests\ImportSchedule\ImportScheduleRequest;
-use App\Http\Requests\ImportSchedule\ImportScheduleSearchRequest;
+use App\Http\Requests\Warehousing\WarehousingRequest;
+use App\Http\Requests\Warehousing\WarehousingSearchRequest;
 
-class ImportScheduleController extends Controller
+class WarehousingController extends Controller
 {
     /**
      * Fetch data
-     * @param  \App\Http\Requests\ImportSchedule\ImportScheduleRequest $request
+     * @param  \App\Http\Requests\Warehousing\WarehousingRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function __invoke(ImportScheduleRequest $request)
+    public function __invoke(WarehousingRequest $request)
     {
         try {
             $validated = $request->validated();
@@ -36,9 +36,9 @@ class ImportScheduleController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $import_schedule = ImportSchedule::with('co_no')->with('files')->paginate($per_page, ['*'], 'page', $page);
+            $warehousing = Warehousing::with('mb_no')->with('co_no')->paginate($per_page, ['*'], 'page', $page);
 
-            return response()->json($import_schedule);
+            return response()->json($warehousing);
         } catch (\Exception $e) {
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0018], 500);
@@ -46,10 +46,10 @@ class ImportScheduleController extends Controller
     }
 
     /**
-     * Get ImportSchedule
-     * @param  ImportScheduleSearchRequest $request
+     * Get Warehousing
+     * @param  WarehousingSearchRequest $request
      */
-    public function getImportSchedule(ImportScheduleSearchRequest $request)
+    public function getWarehousing(WarehousingSearchRequest $request)
     {
         try {
             $validated = $request->validated();
@@ -58,46 +58,44 @@ class ImportScheduleController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $import_schedule = ImportSchedule::with('co_no')->with('files')->orderBy('is_no', 'DESC');
+            $warehousing = Warehousing::with('mb_no')->with('co_no')->orderBy('w_no', 'DESC');
 
             if (isset($validated['from_date'])) {
-                $import_schedule->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
 
             if (isset($validated['to_date'])) {
-                $import_schedule->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                $warehousing->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            }
+
+            if (isset($validated['mb_name'])) {
+                $warehousing->where(function($query) use ($validated) {
+                    $query->where(DB::raw('lower(mb_name)'), 'like', '%' . strtolower($validated['mb_name']) . '%');
+                });
             }
 
             if (isset($validated['co_name'])) {
-                $import_schedule->whereHas('co_no', function($q) use($validated) {
+                $warehousing->whereHas('co_no', function($q) use($validated) {
                     return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
                 });
             }
 
-            if (isset($validated['m_bl'])) {
-                $import_schedule->where('m_bl', 'like', '%' . $validated['m_bl'] . '%');
+            if (isset($validated['w_schedule_number'])) {
+                $warehousing->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
             }
 
-            if (isset($validated['h_bl'])) {
-                $import_schedule->where('h_bl', 'like', '%' . $validated['h_bl'] . '%');
-            }
-
-            if (isset($validated['logistic_manage_number'])) {
-                $import_schedule->where('logistic_manage_number', 'like', '%' . $validated['logistic_manage_number'] . '%');
-            }
-
-            // if (isset($validated['import_schedule_status1']) || isset($validated['import_schedule_status2'])) {
-            //     $import_schedule->where(function($query) use ($validated) {
-            //         $query->orwhere('import_schedule_status', '=', $validated['import_schedule_status1']);
-            //         $query->orWhere('import_schedule_status', '=', $validated['import_schedule_status2']);
+            // if (isset($validated['warehousing_status1']) || isset($validated['warehousing_status2'])) {
+            //     $warehousing->where(function($query) use ($validated) {
+            //         $query->orwhere('warehousing_status', '=', $validated['warehousing_status1']);
+            //         $query->orWhere('warehousing_status', '=', $validated['warehousing_status2']);
             //     });
             // }
 
             $members = Member::where('mb_no', '!=', 0)->get();
 
-            $import_schedule = $import_schedule->paginate($per_page, ['*'], 'page', $page);
+            $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
 
-            return response()->json($import_schedule);
+            return response()->json($warehousing);
         } catch (\Exception $e) {
             Log::error($e);
             return $e;
@@ -129,10 +127,10 @@ class ImportScheduleController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\ImportSchedule  $importSchedule
+     * @param  \App\Models\Warehousing  $warehousing
      * @return \Illuminate\Http\Response
      */
-    public function show(ImportSchedule $importSchedule)
+    public function show(Warehousing $warehousing)
     {
         //
     }
@@ -140,10 +138,10 @@ class ImportScheduleController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\ImportSchedule  $importSchedule
+     * @param  \App\Models\Warehousing  $warehousing
      * @return \Illuminate\Http\Response
      */
-    public function edit(ImportSchedule $importSchedule)
+    public function edit(Warehousing $warehousing)
     {
         //
     }
@@ -152,10 +150,10 @@ class ImportScheduleController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\ImportSchedule  $importSchedule
+     * @param  \App\Models\Warehousing  $warehousing
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, ImportSchedule $importSchedule)
+    public function update(Request $request, Warehousing $warehousing)
     {
         //
     }
@@ -163,10 +161,10 @@ class ImportScheduleController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\ImportSchedule  $importSchedule
+     * @param  \App\Models\Warehousing  $warehousing
      * @return \Illuminate\Http\Response
      */
-    public function destroy(ImportSchedule $importSchedule)
+    public function destroy(Warehousing $warehousing)
     {
         //
     }

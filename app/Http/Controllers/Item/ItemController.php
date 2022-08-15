@@ -22,6 +22,7 @@ class ItemController extends Controller
      */
     public function __invoke(ItemRequest $request)
     {
+
         $validated = $request->validated();
         try {
             DB::beginTransaction();
@@ -29,7 +30,9 @@ class ItemController extends Controller
             if (!isset($item_no)) {
                 $item_no = Item::insertGetId([
                     'mb_no' => Auth::user()->mb_no,
+                    'co_no' => $validated['co_no'],
                     'item_brand' => $validated['item_brand'],
+                    'item_service_name' => $validated['item_service_name'],
                     'item_name' => $validated['item_name'],
                     'item_option1' => $validated['item_option1'],
                     'item_option2' => $validated['item_option2'],
@@ -45,8 +48,6 @@ class ItemController extends Controller
                     'item_cate2' => $validated['item_cate2'],
                     'item_cate3' => $validated['item_cate3'],
                     'item_url' => $validated['item_url'],
-                    'item_table' => '', // FIXME no information,
-                    'item_key' => 0 // FIXME no information,
                 ]);
 
                 $item_channels = [];
@@ -69,7 +70,9 @@ class ItemController extends Controller
 
                 $update = [
                     'mb_no' => Auth::user()->mb_no,
+                    'co_no' => $validated['co_no'],
                     'item_brand' => $validated['item_brand'],
+                    'item_service_name' => $validated['item_service_name'],
                     'item_name' => $validated['item_name'],
                     'item_option1' => $validated['item_option1'],
                     'item_option2' => $validated['item_option2'],
@@ -85,8 +88,6 @@ class ItemController extends Controller
                     'item_cate2' => $validated['item_cate2'],
                     'item_cate3' => $validated['item_cate3'],
                     'item_url' => $validated['item_url'],
-                    'item_table' => '', // FIXME no information,
-                    'item_key' => 0 // FIXME no information,
                 ];
                 $item->update($update);
 
@@ -127,6 +128,7 @@ class ItemController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0019], 500);
         }
     }
@@ -153,7 +155,7 @@ class ItemController extends Controller
     public function getItemById(Item $item)
     {
         try {
-            $file = $item->file()->first();
+            $file = $item->file()->first();      
             $item_channels = $item->item_channels()->get();
             $item['item_channels'] = $item_channels;
             $item['file'] = $file;
