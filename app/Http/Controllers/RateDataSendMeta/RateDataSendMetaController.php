@@ -56,7 +56,7 @@ class RateDataSendMetaController extends Controller
                 'rdsm_name',
                 'rdsm_hp',
             ])->where('rdsm_no', $rdsm_no)->first();
-            return response()->json(['message' => Messages::MSG_0007, 'rate_data_send_meta' => $rate_data_send_meta], 201);
+            return response()->json(['message' => Messages::MSG_0007, 'rate_data_send_meta' => $rate_data_send_meta], 200);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
@@ -83,7 +83,7 @@ class RateDataSendMetaController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'rate_data_send_meta' => $rate_data_send_meta,
-            ]);
+            ], 200);
         } catch (\Exception $e) {
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0002], 500);
