@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\ImportSchedule;
+namespace App\Http\Requests\Warehousing;
 
 use App\Http\Requests\BaseFormRequest;
 
-class ImportScheduleSearchRequest extends BaseFormRequest
+class WarehousingSearchRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -32,19 +32,15 @@ class ImportScheduleSearchRequest extends BaseFormRequest
                 'string',
                 'date_format:Y-m-d'
             ],
+            'mb_name' => [
+                'nullable',
+                'string',
+            ],
             'co_name' => [
                 'nullable',
                 'string',
             ],
-            'm_bl' => [
-                'nullable',
-                'string',
-            ],
-            'h_bl' => [
-                'nullable',
-                'string',
-            ],
-            'logistic_manage_number' => [
+            'w_schedule_number' => [
                 'nullable',
                 'string',
             ],
