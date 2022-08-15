@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\ImportSchedule;
+namespace App\Http\Requests\Warehousing;
 
 use App\Http\Requests\BaseFormRequest;
 
-class ImportScheduleSearchRequest extends BaseFormRequest
+class WarehousingRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,22 +24,6 @@ class ImportScheduleSearchRequest extends BaseFormRequest
     public function rules()
     {
         return [
-            'from_date' => [
-                'string',
-                'date_format:Y-m-d',
-            ],
-            'to_date' => [
-                'string',
-                'date_format:Y-m-d'
-            ],
-            'm_bl' => [
-                'nullable',
-                'string',
-            ],
-            'h_bl' => [
-                'nullable',
-                'string',
-            ],
             'per_page' => [
                 'nullable',
                 'int',
@@ -51,7 +35,7 @@ class ImportScheduleSearchRequest extends BaseFormRequest
         ];
     }
 
-        /**
+    /**
      * Get custom attributes for validator errors.
      *
      * @return array
