@@ -7,6 +7,7 @@ use App\Http\Requests\Contract\ContractRegisterController\ContractRegisterReques
 use App\Http\Requests\Contract\ContractUpdateController\ContractUpdateRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Contract;
+use App\Models\Service;
 use App\Utils\Messages;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Auth;
@@ -81,9 +82,11 @@ class ContractController extends Controller
     {
         try {
             $contract = Contract::where(['mb_no' => Auth::user()->mb_no, 'co_no' => $co_no])->first();
+            $services = Service::where('service_use_yn', 'y')->where('service_no', '!=', 1)->get();
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'contract' => $contract
+                'contract' => $contract,
+                'services' => $services
             ]);
         } catch (\Exception $e) {
             Log::error($e);
