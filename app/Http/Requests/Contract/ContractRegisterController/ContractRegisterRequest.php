@@ -71,20 +71,20 @@ class ContractRegisterRequest extends BaseFormRequest
                 'string',
                 'max:255'
             ],
-            'c_card_number' => [
-                'required',
-                'string',
-                'max:255'
-            ],
+            // 'c_card_number' => [
+            //     'required',
+            //     'string',
+            //     'max:255'
+            // ],
             'c_deposit_day' => [
                 'required',
                 'integer'
             ],
-            'c_account_number' => [
-                'required',
-                'string',
-                'max:255'
-            ],
+            // 'c_account_number' => [
+            //     'required',
+            //     'string',
+            //     'max:255'
+            // ],
             'c_deposit_price' => [
                 'required',
                 'integer'
