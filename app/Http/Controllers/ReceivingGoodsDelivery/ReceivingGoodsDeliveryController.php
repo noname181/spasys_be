@@ -76,8 +76,8 @@ class ReceivingGoodsDeliveryController extends Controller
                 'rgd_tracking_code' => $validated['rgd_tracking_code'],
                 'rgd_delivery_man' => $validated['rgd_delivery_man'],
                 'rgd_delivery_man_hp' => $validated['rgd_delivery_man_hp'],
-                'rgd_delivery_schedule_day' => $validated['rgd_delivery_schedule_day'],
-                'rgd_arrive_day' => $validated['rgd_arrive_day'],
+                'rgd_delivery_schedule_day' => 'rgd_delivery_schedule_day',
+                'rgd_arrive_day' => 'rgd_arrive_day',
             ]);
 
             WarehousingRequest::insert([

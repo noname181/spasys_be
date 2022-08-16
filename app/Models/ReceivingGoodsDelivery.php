@@ -46,6 +46,8 @@ class ReceivingGoodsDelivery extends Model
     ];
 
     protected $casts = [
+        'rgd_delivery_schedule_day' => "date:Y.m.d",
+        'rgd_arrive_day' => "date:Y.m.d",
         'created_at' => "date:Y.m.d H:i",
         'updated_at' => "date:Y.m.d H:i",
     ];

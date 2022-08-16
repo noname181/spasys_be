@@ -39,6 +39,7 @@ class Warehousing extends Model
     ];
 
     protected $casts = [
+        'w_schedule_day'=> "date:Y.m.d",
         'created_at' => "date:Y.m.d H:i",
         'updated_at' => "date:Y.m.d H:i",
     ];
