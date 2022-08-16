@@ -219,19 +219,19 @@ class ReportController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 5;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $reports = Report::with('files');
+            $reports = Report::with(['files', 'reports_child']);
 
-            // if (isset($validated['from_date'])) {
-            //     $notices->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
-            // }
+            if (isset($validated['from_date'])) {
+                $reports->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            }
 
-            // if (isset($validated['to_date'])) {
-            //     $notices->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
-            // }
+            if (isset($validated['to_date'])) {
+                $reports->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            }
 
             if (isset($validated['rp_cate'])) {
                 $reports->where(function($query) use ($validated) {
-                    $query->where('rp_cate', 'like', '%' . $validated['rp_cate'] . '%');
+                    $query->where('rp_cate', 'like', '%' . $validated['rp_cate'] . '%')->where('rp_parent_no', NULL);
                 });
             }
 
@@ -239,16 +239,7 @@ class ReportController extends Controller
 
             $data = new Collection();
 
-            foreach($reports->getCollection() as $report){
-                if(isset($report->rp_parent_no)){
-                    $report->rp_no = $report->rp_parent_no;
-                    $data->push($report);
-                }else {
-                    $data->push($report);
-                }
-            }
-
-            $reports->setCollection($data);
+            
 
             return response()->json($reports);
         } catch (\Exception $e) {
