@@ -80,6 +80,13 @@ class ReceivingGoodsDeliveryController extends Controller
                 'rgd_arrive_day' => DateTime::createFromFormat('Y-m-d', $validated['rgd_arrive_day']),
             ]);
 
+            Warehousing::insert([
+                'mb_no' => $member->mb_no,
+                'w_schedule_number' => 'w_schedule_number',
+                'w_schedule_day' => 'w_schedule_day',
+                'connection_number' => 'connection_number',
+            ]);
+
             WarehousingRequest::insert([
                 'mb_no' => $member->mb_no,
                 'wr_contents' => 'wr_contents',
