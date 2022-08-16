@@ -110,6 +110,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/warehousing', [\App\Http\Controllers\Warehousing\WarehousingController::class,'__invoke']);
     Route::post('/get_warehousing', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousing']);
 
+    Route::get('/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'__invoke']);
+    Route::post('/get_rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'getReceivingGoodsDelivery']);
+    Route::get('/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create']);
+
     Route::prefix('adjustment_group')->name('adjustment_group.')->group(function () {
         Route::post('/create_or_update/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create'])->name('register_adjustment_group');
         Route::post('/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create_with_co_no'])->name('register_adjustment_group_co_no');
@@ -200,11 +204,17 @@ Route::middleware('auth')->group(function () {
         Route::post('/', \App\Http\Controllers\Item\ItemController::class)->name('create_or_update');
         Route::get('/{item}', [App\Http\Controllers\Item\ItemController::class, 'getItemById'])->name('get_item_by_id');
         Route::delete('/item_channel/{item_channel}', [App\Http\Controllers\Item\ItemController::class, 'deleteItemChannel'])->name('delete_item_channel');
+        Route::post('/import_excel', [App\Http\Controllers\Item\ItemController::class, 'importItems'])->name('import_items');
     });
 
     Route::prefix('rate_data_send_meta')->name('rate_data_send_meta.')->group(function () {
         Route::post('/', \App\Http\Controllers\RateDataSendMeta\RateDataSendMetaController::class)->name('registe_rdsm');
         Route::get('/{rdsm_no}', [App\Http\Controllers\RateDataSendMeta\RateDataSendMetaController::class, 'getRDSM'])->name('get_rdsm');
         Route::patch('/{rdsm}', [\App\Http\Controllers\RateDataSendMeta\RateDataSendMetaController::class, 'updateRDSM']);
+    });
+
+    Route::prefix('rate_data')->name('rate_data.')->group(function () {
+        Route::post('/', \App\Http\Controllers\RateData\RateDataController::class)->name('registe_rate_data');
+        Route::get('/{rm_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateData'])->name('get_rate_data');
     });
 });

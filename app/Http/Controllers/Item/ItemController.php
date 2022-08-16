@@ -9,10 +9,14 @@ use App\Models\Item;
 use App\Models\File;
 use App\Models\ItemChannel;
 use App\Utils\Messages;
+use App\Http\Requests\Item\ExcelRequest;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class ItemController extends Controller
 {
@@ -91,18 +95,19 @@ class ItemController extends Controller
                 ];
                 $item->update($update);
 
-                foreach ($validated['item_channels'] as $item_channel) {
-                    ItemChannel::updateOrCreate(
-                        [
-                            'item_channel_no' => $item_channel['item_channel_no'] ?: null,
-                        ],
-                        [
-                            'item_no' => $item_no,
-                            'item_channel_code' => $item_channel['item_channel_code'],
-                            'item_channel_name' => $item_channel['item_channel_name']
-                        ]
-                    );
-                }
+                if(!empty($validated['item_channels'])) 
+                    foreach ($validated['item_channels'] as $item_channel) {
+                        ItemChannel::updateOrCreate(
+                            [
+                                'item_channel_no' => $item_channel['item_channel_no'] ?: null,
+                            ],
+                            [
+                                'item_no' => $item_no,
+                                'item_channel_code' => $item_channel['item_channel_code'],
+                                'item_channel_name' => $item_channel['item_channel_name']
+                            ]
+                        );
+                    }
             }
 
             // Insert file
@@ -155,7 +160,7 @@ class ItemController extends Controller
     public function getItemById(Item $item)
     {
         try {
-            $file = $item->file()->first();      
+            $file = $item->file()->first();
             $item_channels = $item->item_channels()->get();
             $item['item_channels'] = $item_channels;
             $item['file'] = $file;
@@ -166,7 +171,8 @@ class ItemController extends Controller
         }
     }
 
-    public function deleteItemChannel(ItemChannel $itemChannel) {
+    public function deleteItemChannel(ItemChannel $itemChannel)
+    {
         try {
             $itemChannel->delete();
             return response()->json([
@@ -175,6 +181,119 @@ class ItemController extends Controller
         } catch (\Exception $e) {
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0006], 500);
+        }
+    }
+
+    public function importItems(Request $request)
+    {
+        try {
+            $f = Storage::disk('public')->put('files/tmp', $request['file']);
+
+            $path = storage_path('app/public') . '/' . $f;
+            $reader = IOFactory::createReaderForFile($path);
+            $reader->setReadDataOnly(true);
+            $spreadsheet = $reader->load($path);
+
+            $sheet = $spreadsheet->getSheet(0);
+            $datas = $sheet->toArray(null, true, true, true);
+            $results[$sheet->getTitle()] = [];
+            $errors[$sheet->getTitle()] = [];
+            foreach ($datas as $key => $d) {
+                if($key == 1) {
+                    continue;
+                }
+                $validator = Validator::make($d, ExcelRequest::rules());
+                if ($validator->fails()) {
+                    $errors[$sheet->getTitle()][] = $validator->errors();
+                } else {
+                    $item_no = Item::insertGetId([
+                        'mb_no' => Auth::user()->mb_no,
+                        'co_no' => $d['A'],
+                        'item_brand' => $d['B'],
+                        'item_service_name' => $d['C'],
+                        'item_name' => $d['D'],
+                        'item_option1' => $d['E'],
+                        'item_option2' => $d['F'],
+                        'item_cargo_bar_code' => $d['G'],
+                        'item_upc_code' => $d['H'],
+                        'item_bar_code' => $d['I'],
+                        'item_weight' => $d['J'],
+                        'item_url' => $d['K'],
+                        'item_price1' => $d['L'],
+                        'item_price2' => $d['M'],
+                        'item_price3' => $d['N'],
+                        'item_price4' => $d['O'],
+                        'item_cate1' => $d['P'],
+                        'item_cate2' => $d['Q'],
+                        'item_cate3' => $d['R']
+                    ]);
+
+                    // Check validator item_channel
+                    $flgCheck = false;
+                    $i = 0;
+                    $item_channel = [];
+                    $item_channels = [];
+                    foreach ($d as $k => $val) {
+                        if ($k === 'S') {
+                            $flgCheck = true;
+                        }
+                        if ($flgCheck) {
+                            if ($i === 0) {
+                                $item_channel[$k] = $val;
+                                $i = $i + 1;
+                            }else if ($i === 1) {
+                                $item_channel[$k] = $val;
+                                $i = 0; // reset $i
+                                $j = 0;
+                                $validate = [];
+
+                                $v = [];
+                                foreach ($item_channel as $i_key_channel => $v_key_channel) {
+                                    if ($j === 0) {
+                                        $validate[$i_key_channel] = [
+                                            'required',
+                                            'max:255',
+                                        ];
+                                        $j = $j + 1;
+                                        if(isset($v_key_channel)) {
+                                            $v['item_channel_name'] = $v_key_channel;
+                                        }
+                                    } else if ($j === 1) {
+                                        $validate[$i_key_channel] = [
+                                            'required',
+                                            'integer',
+                                        ];
+                                        if(isset($v_key_channel)) {
+                                            $v['item_channel_code'] = $v_key_channel;
+                                        }
+                                    }
+                                }
+                                Log::error(count($v));
+                                if (count($v) >= 1) {
+                                    $validator = Validator::make($d, $validate);
+                                    if ($validator->fails()) {
+                                        $errors[$sheet->getTitle()][] = $validator->errors();
+                                        Log::error($validator->errors());
+                                    } else {
+                                        $item_channels[] = array_merge($v, ['item_no' => $item_no]);
+                                    }
+                                }
+                                $item_channel = [];
+                            }
+                        }
+                    }
+                    ItemChannel::insert($item_channels);
+                }
+            }
+
+            Storage::disk('public')->delete($f);
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'errors' => $errors
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0004], 500);
         }
     }
 }
