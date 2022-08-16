@@ -95,18 +95,19 @@ class ItemController extends Controller
                 ];
                 $item->update($update);
 
-                foreach ($validated['item_channels'] as $item_channel) {
-                    ItemChannel::updateOrCreate(
-                        [
-                            'item_channel_no' => $item_channel['item_channel_no'] ?: null,
-                        ],
-                        [
-                            'item_no' => $item_no,
-                            'item_channel_code' => $item_channel['item_channel_code'],
-                            'item_channel_name' => $item_channel['item_channel_name']
-                        ]
-                    );
-                }
+                if(!empty($validated['item_channels'])) 
+                    foreach ($validated['item_channels'] as $item_channel) {
+                        ItemChannel::updateOrCreate(
+                            [
+                                'item_channel_no' => $item_channel['item_channel_no'] ?: null,
+                            ],
+                            [
+                                'item_no' => $item_no,
+                                'item_channel_code' => $item_channel['item_channel_code'],
+                                'item_channel_name' => $item_channel['item_channel_name']
+                            ]
+                        );
+                    }
             }
 
             // Insert file
