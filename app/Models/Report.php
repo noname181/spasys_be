@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\File;
+use App\Models\Report;
 class Report extends Model
 {
     use HasFactory;
@@ -35,6 +36,10 @@ class Report extends Model
 
     public function files(){
         return $this->HasMany(File::class, 'file_table_key', 'rp_no')->where('file_table', 'report');
+    }
+
+    public function reports_child(){
+        return $this->HasMany(Report::class, 'rp_parent_no','rp_no')->with('files');
     }
 
 }
