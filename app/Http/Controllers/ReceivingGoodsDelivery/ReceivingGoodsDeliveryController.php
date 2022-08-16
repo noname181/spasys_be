@@ -26,7 +26,7 @@ class ReceivingGoodsDeliveryController extends Controller
      * @param  \App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function __invoke(RgdRequest $request)
+    public function __invoke(ReceivingGoodsDeliveryRequest $request)
     {
         try {
             $validated = $request->validated();
@@ -49,7 +49,7 @@ class ReceivingGoodsDeliveryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(RgdCreateRequest $request)
+    public function create(ReceivingGoodsDeliveryCreateRequest $request)
     {
         $validated = $request->validated();
 
