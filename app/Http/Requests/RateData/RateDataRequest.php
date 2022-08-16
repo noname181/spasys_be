@@ -67,11 +67,6 @@ class RateDataRequest extends BaseFormRequest
                 'string',
                 'max:255',
             ],
-            '*.rd_data3' => [
-                'required',
-                'string',
-                'max:255',
-            ]
         ];
     }
 
