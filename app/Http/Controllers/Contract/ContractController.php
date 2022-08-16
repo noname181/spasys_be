@@ -7,6 +7,7 @@ use App\Http\Requests\Contract\ContractRegisterController\ContractRegisterReques
 use App\Http\Requests\Contract\ContractUpdateController\ContractUpdateRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Contract;
+use App\Models\Company;
 use App\Models\Service;
 use App\Utils\Messages;
 use Illuminate\Http\Client\Request;
@@ -81,7 +82,9 @@ class ContractController extends Controller
     public function getContract($co_no)
     {
         try {
-            $contract = Contract::where(['mb_no' => Auth::user()->mb_no, 'co_no' => $co_no])->first();
+            $co_service = Company::where('co_no', $co_no)->first()->co_service;
+            $contract = Contract::where(['co_no' => $co_no])->first();
+            $contract->co_service = $co_service;
             $services = Service::where('service_use_yn', 'y')->where('service_no', '!=', 1)->get();
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -151,8 +154,10 @@ class ContractController extends Controller
 
             $update = array_merge($update, $files);
 
-            $contract = Contract::where(['mb_no' => Auth::user()->mb_no, 'co_no' => $co_no, 'c_no' => $contract->c_no])
+            $contract = Contract::where(['co_no' => $co_no, 'c_no' => $contract->c_no])
                 ->update($update);
+
+            $company = Company::where('co_no', $co_no)->update(['co_service' => $validated['co_service']]);
 
             DB::commit();
             return response()->json([
