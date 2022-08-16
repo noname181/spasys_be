@@ -64,6 +64,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/', \App\Http\Controllers\Service\ServiceController::class)->name('registe_update_services');
         Route::get('/', [App\Http\Controllers\Service\ServiceController::class, 'getServices'])->name('get_services');
         Route::delete('/{service}', [App\Http\Controllers\Service\ServiceController::class, 'deleteService'])->name('delete_services');
+        Route::get('/active', [App\Http\Controllers\Service\ServiceController::class, 'getActiveServices'])->name('get_active_services');
     });
 
     Route::prefix('push')->name('push.')->group(function () {

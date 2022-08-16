@@ -74,6 +74,22 @@ class ServiceController extends Controller
         }
     }
 
+    public function getActiveServices()
+    {
+        try {
+            $services = Service::where('service_use_yn', 'y')->get();
+
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'services' => $services,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
     public function deleteService(Service $service)
     {
         try {

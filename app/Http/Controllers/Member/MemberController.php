@@ -135,6 +135,7 @@ class MemberController extends Controller
     {
         try {
             $member = Member::with('company')->where('mb_no', $mb_no)->first();
+            $services = Service::where('service_use_yn', 'y')->get();
             if($member->role_no == Member::ROLE_SPASYS_MANAGER || $member->role_no == Member::ROLE_AGENCY_MANAGER){
                 $member->role_no = '관리자';
             }else if($member->role_no == Member::ROLE_SPASYS_OPERATOR || $member->role_no == Member::ROLE_AGENCY_OPERATOR){
@@ -145,6 +146,7 @@ class MemberController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'member' => $member,
+                'services' => $services
             ]);
         } catch (\Exception $e) {
             Log::error($e);
@@ -239,6 +241,7 @@ class MemberController extends Controller
     {
         $validated = $request->validated();
         $member = Member::where('mb_no', $validated['mb_no'])->first();
+        $services = Service::where('service_use_yn', 'y')->get();
         $member['mb_email'] = $validated['mb_email'];
         $member['mb_name'] = $validated['mb_name'];
         $member['mb_tel'] = $validated['mb_tel'];
@@ -276,6 +279,7 @@ class MemberController extends Controller
         return response()->json([
             'message' => Messages::MSG_0007,
             'profile' => $member,
+            'services' => $services
         ]);
     }
 
