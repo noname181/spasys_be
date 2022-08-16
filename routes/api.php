@@ -110,6 +110,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/warehousing', [\App\Http\Controllers\Warehousing\WarehousingController::class,'__invoke']);
     Route::post('/get_warehousing', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousing']);
 
+    Route::get('/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'__invoke']);
+    Route::post('/get_rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'getReceivingGoodsDelivery']);
+    Route::get('/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create']);
+
     Route::prefix('adjustment_group')->name('adjustment_group.')->group(function () {
         Route::post('/create_or_update/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create'])->name('register_adjustment_group');
         Route::post('/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create_with_co_no'])->name('register_adjustment_group_co_no');
