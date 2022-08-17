@@ -24,6 +24,12 @@ class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
     public function rules()
     {
         return [
+            'wr_contents' => [
+                '',
+            ],
+            'location.*.rgd_no' => [
+                '',
+            ],
             'location.*.rgd_contents' => [
                 'required',
                 'string',
