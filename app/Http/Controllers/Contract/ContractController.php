@@ -43,6 +43,7 @@ class ContractController extends Controller
             $c_no = Contract::insertGetId([
                 'co_no' => $validated['co_no'],
                 'mb_no' => Auth::user()->mb_no,
+                'co_service' => $validated['co_service'],
                 'c_start_date' => DateTime::createFromFormat('Y-m-d', $validated['c_start_date']),
                 'c_end_date' => DateTime::createFromFormat('Y-m-d', $validated['c_end_date']),
                 'c_transaction_yn' => $validated['c_transaction_yn'],

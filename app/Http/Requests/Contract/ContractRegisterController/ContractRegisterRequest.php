@@ -28,6 +28,10 @@ class ContractRegisterRequest extends BaseFormRequest
                 'required',
                 'int',
             ],
+            'co_service' => [
+                'required',
+                'string',
+            ],
             'c_start_date' => [
                 'required',
                 'date_format:Y-m-d'
