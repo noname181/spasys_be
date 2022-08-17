@@ -82,7 +82,7 @@ class ContractUpdateRequest extends BaseFormRequest
             ],
             'c_deposit_day' => [
                 'required',
-                'integer'
+                'string'
             ],
             'c_account_number' => [
                 'required',
