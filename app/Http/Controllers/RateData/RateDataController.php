@@ -22,9 +22,9 @@ class RateDataController extends Controller
     public function __invoke(RateDataRequest $request)
     {
         $validated = $request->validated();
-        try {
+        // try {
             DB::beginTransaction();
-            foreach ($validated as $val) {
+            foreach ($validated['rate_data'] as $val) {
                 Log::error($val);
                 $rdsm_no = RateData::updateOrCreate(
                     [
@@ -39,6 +39,7 @@ class RateDataController extends Controller
                         'rd_cate3' => $val['rd_cate3'],
                         'rd_data1' => $val['rd_data1'],
                         'rd_data2' => $val['rd_data2'],
+                        'rd_data3' => ''
                     ],
                 );
             }
@@ -47,11 +48,11 @@ class RateDataController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007,
             ], 201);
-        } catch (\Exception $e) {
-            DB::rollback();
-            Log::error($e);
-            return response()->json(['message' => Messages::MSG_0001], 500);
-        }
+        // } catch (\Exception $e) {
+        //     DB::rollback();
+        //     Log::error($e);
+        //     return response()->json(['message' => Messages::MSG_0001], 500);
+        // }
     }
 
     public function getRateData($rm_no)

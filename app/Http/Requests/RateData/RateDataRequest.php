@@ -24,45 +24,48 @@ class RateDataRequest extends BaseFormRequest
     public function rules()
     {
         return [
-            '*.rd_no' => [
+            'rate_data' => [
+                'array',
+            ],
+            'rate_data.*.rd_no' => [
                 'int',
                 'nullable'
             ],
-            '*.rm_no' => [
+            'rate_data.*.rm_no' => [
                 'required',
-                'integer',
+                'int',
             ],
-            '*.rd_cate_meta1' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            '*.rd_cate_meta2' => [
+            'rate_data.*.rd_cate_meta1' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            '*.rd_cate1' => [
+            'rate_data.*.rd_cate_meta2' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            '*.rd_cate2' => [
+            'rate_data.*.rd_cate1' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            '*.rd_cate3' => [
+            'rate_data.*.rd_cate2' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            '*.rd_data1' => [
+            'rate_data.*.rd_cate3' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            '*.rd_data2' => [
+            'rate_data.*.rd_data1' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'rate_data.*.rd_data2' => [
                 'required',
                 'string',
                 'max:255',
