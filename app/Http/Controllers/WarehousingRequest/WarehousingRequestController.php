@@ -75,13 +75,30 @@ class WarehousingRequestController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
+     * Register qna
+     * @param  WarehousingRequestRegisterRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function register(WarehousingRequestRegisterRequest $request)
     {
-        //
+        $validated = $request->validated();
+        try {
+            //DB::beginTransaction();
+            // FIXME hard set mb_no = 1
+            $member = Member::where('mb_id', Auth::user()->mb_id)->first();
+            $wr_no = WarehousingRequest::insertGetId([
+                'mb_no' => $member->mb_no,
+                'wr_type' => $validated['wr_type'],
+                'wr_contents' => $validated['wr_contents'],
+            ]);
+
+            DB::commit();
+            return response()->json(['message' => Messages::MSG_0007, 'wr_no' => $wr_no], 201);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0001], 500);
+        }
     }
 
     /**
