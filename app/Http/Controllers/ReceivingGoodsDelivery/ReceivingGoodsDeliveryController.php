@@ -50,7 +50,76 @@ class ReceivingGoodsDeliveryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(ReceivingGoodsDeliveryCreateRequest $request)
+    public function create_warehousing(ReceivingGoodsDeliveryCreateRequest $request)
+    {
+        $validated = $request->validated();
+
+        try {
+            //DB::beginTransaction();
+            $warehousing = Warehousing::where('w_no', $validated['w_no'])->first();
+            $warehousing_item = WarehousingItem::where('wi_no', $validated['wi_no'])->first();
+            $warehousing_request = WarehousingRequest::where('wr_no', $validated['wr_no'])->first();
+            $item = Item::where('item_no', $validated['item_no'])->first();
+            $member = Member::where('mb_id', Auth::user()->mb_id)->first();
+
+            
+            $rgd_no = ReceivingGoodsDelivery::insertGetId([
+                'mb_no' => $member->mb_no,
+                'w_no' => $warehousing->w_no,
+                'rgd_contents' => $validated['rgd_contents'],
+                'rgd_address' => $validated['rgd_address'],
+                'rgd_address_detail' => $validated['rgd_address_detail'],
+                'rgd_receiver' => $validated['rgd_receiver'],
+                'rgd_hp' => $validated['rgd_hp'],
+                'rgd_memo' => $validated['rgd_memo'],
+                'rgd_status1' => $validated['rgd_status1'],
+                'rgd_status2' => $validated['rgd_status2'],
+                'rgd_status3' => $validated['rgd_status3'],
+                'rgd_delivery_company' => $validated['rgd_delivery_company'],
+                'rgd_tracking_code' => $validated['rgd_tracking_code'],
+                'rgd_delivery_man' => $validated['rgd_delivery_man'],
+                'rgd_delivery_man_hp' => $validated['rgd_delivery_man_hp'],
+                'rgd_delivery_schedule_day' => DateTime::createFromFormat('Y-m-d', $validated['rgd_delivery_schedule_day']),
+                'rgd_arrive_day' => DateTime::createFromFormat('Y-m-d', $validated['rgd_arrive_day']),
+            ]);
+
+            Warehousing::insert([
+                'mb_no' => $member->mb_no,
+                'w_schedule_number' => 'w_schedule_number',
+                'w_schedule_day' => 'w_schedule_day',
+                'connection_number' => 'connection_number',
+            ]);
+
+            WarehousingRequest::insert([
+                'mb_no' => $member->mb_no,
+                'wr_contents' => 'wr_contents',
+            ]);
+            
+            $warehousing_items = [];
+            foreach ($validated['warehousing_items'] as $warehousing_item) {
+                if (isset($warehousing_item['wi_number'])) {
+                    $warehousing_items[] = [
+                        'item_no' => $item_no,
+                        'w_no' => $warehousing->w_no,
+                        'wi_number' => $warehousing_item['wi_number'],
+                    ];
+                }
+            }
+            WarehousingItem::insert($warehousing_items);
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'notice_no' => $notice_no
+            ], 201);
+        } catch (\Throwable $e) {
+            DB::rollback();
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0001], 500);
+        }
+    }
+
+    public function create_import_schedule(ReceivingGoodsDeliveryCreateRequest $request)
     {
         $validated = $request->validated();
 
