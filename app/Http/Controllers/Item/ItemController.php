@@ -138,6 +138,21 @@ class ItemController extends Controller
         }
     }
 
+    public function getItems(ItemSearchRequest $request)
+    {
+        $validated = $request->validated();
+        try {
+            $items = Item::where('item_service_name', '유통가공')->get();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'items' => $items,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
     public function searchItems(ItemSearchRequest $request)
     {
         $validated = $request->validated();
@@ -146,9 +161,7 @@ class ItemController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $item = Item::with('file');
-
-            $item = $item->paginate($per_page, ['*'], 'page', $page);
+            $item = Item::with('file')->paginate($per_page, ['*'], 'page', $page);
             return response()->json($item);
         } catch (\Exception $e) {
             Log::error($e);
