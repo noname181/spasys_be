@@ -85,17 +85,17 @@ class ContractController extends Controller
         try {
             $co_service = Company::where('co_no', $co_no)->first()->co_service;
             $contract = Contract::where(['co_no' => $co_no])->first();
-            if(!empty($co_service))
-                $contract->co_service = $co_service;
+               
             $services = Service::where('service_use_yn', 'y')->where('service_no', '!=', 1)->get();
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'contract' => $contract,
-                'services' => $services
+                'services' => $services,
+                'co_service' => $co_service
             ]);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+            return  $e;
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
