@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Filesystem\Filesystem;
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryRequest;
+use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryCreateRequest;
 
 class ReceivingGoodsDeliveryController extends Controller
 {
@@ -60,6 +61,8 @@ class ReceivingGoodsDeliveryController extends Controller
             $warehousing_request = WarehousingRequest::where('wr_no', $validated['wr_no'])->first();
             $item = Item::where('item_no', $validated['item_no'])->first();
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
+
+            
             $rgd_no = ReceivingGoodsDelivery::insertGetId([
                 'mb_no' => $member->mb_no,
                 'w_no' => $warehousing->w_no,

@@ -24,75 +24,73 @@ class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
     public function rules()
     {
         return [
-            'rgd_contents' => [
+            'location.*.rgd_contents' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'rgd_address' => [
+            'location.*.rgd_address' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'rgd_address_detail' => [
+            'location.*.rgd_address_detail' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'rgd_receiver' => [
+            'location.*.rgd_receiver' => [
                 'required',
                 'string',
                 'max:255',
             ],            
-            'rgd_hp' => [
+            'location.*.rgd_hp' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'rgd_memo' => [
+            'location.*.rgd_memo' => [
                 'required',
                 'string',
             ],
-            'rgd_status1' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'rgd_status2' => [
+            'location.*.rgd_status1' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'rgd_status3' => [
+            'location.*.rgd_status2' => [
+               ''
+            ],
+            'location.*.rgd_status3' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'rgd_delivery_company' => [
+            'location.*.rgd_delivery_company' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'rgd_tracking_code' => [
+            'location.*.rgd_tracking_code' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'rgd_delivery_man' => [
+            'location.*.rgd_delivery_man' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'rgd_delivery_man_hp' => [
+            'location.*.rgd_delivery_man_hp' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'rgd_delivery_schedule_day' => [
+            'location.*.rgd_delivery_schedule_day' => [
                 'required',
                 'date_format:Y-m-d'
             ],
-            'rgd_arrive_day' => [
+            'location.*.rgd_arrive_day' => [
                 'required',
                 'date_format:Y-m-d'
             ],
