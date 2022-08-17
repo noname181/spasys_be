@@ -66,7 +66,7 @@ class ContractController extends Controller
                 'c_deposit_return_reg_date' => DateTime::createFromFormat('Y-m-d', $validated['c_deposit_return_reg_date']),
                 'c_deposit_return_expiry_date' => DateTime::createFromFormat('Y-m-d', $validated['c_deposit_return_expiry_date']),
             ]);
-
+            $company = Company::where('co_no', $co_no)->update(['co_service' => $validated['co_service']]);
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
