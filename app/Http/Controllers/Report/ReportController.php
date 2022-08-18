@@ -103,7 +103,7 @@ class ReportController extends Controller
                             ->whereNotIn('file_no', $files_no)->delete();
 
                         $file_position = File::where('file_table', 'report')->where('file_table_key', $request->rp_file_no[$i])->orderBy('file_position', 'DESC')->first();
-                        $index = $file_position->file_position;
+                        $index = $file_position ? $file_position->file_position : 0;
                     }else {
 
                         $report_no = Report::insertGetId([

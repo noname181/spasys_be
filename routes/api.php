@@ -224,4 +224,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/', \App\Http\Controllers\RateData\RateDataController::class)->name('registe_rate_data');
         Route::get('/{rm_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateData'])->name('get_rate_data');
     });
+
+    Route::prefix('alarm')->name('alarm.')->group(function () {
+        Route::post('/', \App\Http\Controllers\Alarm\AlarmController::class)->name('registe_or_update_alarm');
+        Route::get('/{alarm}', [App\Http\Controllers\Alarm\AlarmController::class, 'getAlarmById'])->name('get_alarm_by_id');
+        Route::get('/', [App\Http\Controllers\Alarm\AlarmController::class, 'searchAlarms'])->name('search');
+    });
 });

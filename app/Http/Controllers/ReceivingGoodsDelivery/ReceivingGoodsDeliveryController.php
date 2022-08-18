@@ -63,7 +63,6 @@ class ReceivingGoodsDeliveryController extends Controller
             $item = Item::where('item_no', $validated['item_no'])->first();
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
 
-            
             $rgd_no = ReceivingGoodsDelivery::insertGetId([
                 'mb_no' => $member->mb_no,
                 'w_no' => $warehousing->w_no,
@@ -131,8 +130,9 @@ class ReceivingGoodsDeliveryController extends Controller
 
            
                 foreach ($validated['location'] as $rgd) {
+
                     if (!isset($rgd['rgd_no'])) {
-                        
+
                         $rgd_no = ReceivingGoodsDelivery::insertGetId([
                             'mb_no' => $member->mb_no,
                             'is_no' => $rgd['is_no'],
@@ -153,8 +153,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_delivery_schedule_day' => DateTime::createFromFormat('Y-m-d', $rgd['rgd_delivery_schedule_day']),
                             'rgd_arrive_day' => DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']),
                         ]);
-                    }
-                    else{
+                    }else{
                         $rgd_no = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
                             'rgd_contents' => $rgd['rgd_contents'],
                             'rgd_address' => $rgd['rgd_address'],
@@ -173,7 +172,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_arrive_day' => DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']),
                         ]);
                     }
-                }
+
 
                 foreach ($validated['remove'] as $remove) {
                     ReceivingGoodsDelivery::where('rgd_no', $remove['rgd_no'])->delete();
