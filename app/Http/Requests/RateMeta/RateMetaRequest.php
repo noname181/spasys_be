@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\RateDataSendMeta;
+namespace App\Http\Requests\RateMeta;
 
 use App\Http\Requests\BaseFormRequest;
 
-class RateDataSendMetaRequest extends BaseFormRequest
+class RateMetaRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,43 +24,43 @@ class RateDataSendMetaRequest extends BaseFormRequest
     public function rules()
     {
         return [
-            'rdsm_biz_name' => [
+            'rm_biz_name' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'rdsm_owner_name' => [
+            'rm_owner_name' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'rdsm_biz_number' => [
+            'rm_biz_number' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'rdsm_biz_address' => [
+            'rm_biz_address' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'rdsm_biz_address_detail' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'rdsm_biz_email' => [
+            // 'rm_biz_address_detail' => [
+            //     'required',
+            //     'string',
+            //     'max:255',
+            // ],
+            'rm_biz_email' => [
                 'required',
                 'string',
                 'max:255',
                 'email',
             ],
-            'rdsm_name' => [
+            'rm_name' => [
                 'required',
                 'string',
                 'max:255',
             ],
-            'rdsm_hp' => [
+            'rm_hp' => [
                 'required',
                 'string',
                 'max:255',

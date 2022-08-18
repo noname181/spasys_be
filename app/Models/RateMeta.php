@@ -5,14 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class RateDataSendMeta extends Model
+class RateMeta extends Model
 {
     use HasFactory;
 
-    protected $table = "rate_data_send_meta";
+    protected $table = "rate_meta";
 
 
-    protected $primaryKey = 'rdsm_no';
+    protected $primaryKey = 'rm_no';
 
     public $timestamps = true;
     /**
@@ -21,16 +21,16 @@ class RateDataSendMeta extends Model
      * @var string[]
      */
     protected $fillable = [
-        'rdsm_no',
+        'rm_no',
         'mb_no',
-        'rdsm_biz_name',
-        'rdsm_owner_name',
-        'rdsm_biz_number',
-        'rdsm_biz_email',
-        'rdsm_biz_address',
-        'rdsm_biz_address_detail',
-        'rdsm_name',
-        'rdsm_hp'
+        'rm_biz_name',
+        'rm_owner_name',
+        'rm_biz_number',
+        'rm_biz_email',
+        'rm_biz_address',
+        'rm_biz_address_detail',
+        'rm_name',
+        'rm_hp'
     ];
 
     protected $casts = [

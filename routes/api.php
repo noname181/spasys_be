@@ -216,9 +216,9 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::prefix('rate_data_send_meta')->name('rate_data_send_meta.')->group(function () {
-        Route::post('/', \App\Http\Controllers\RateDataSendMeta\RateDataSendMetaController::class)->name('registe_rdsm');
-        Route::get('/{rdsm_no}', [App\Http\Controllers\RateDataSendMeta\RateDataSendMetaController::class, 'getRDSM'])->name('get_rdsm');
-        Route::patch('/{rdsm}', [\App\Http\Controllers\RateDataSendMeta\RateDataSendMetaController::class, 'updateRDSM']);
+        Route::post('/', \App\Http\Controllers\RateMeta\RateMetaController::class)->name('registe_rdsm');
+        Route::get('/{rm_no}', [App\Http\Controllers\RateMeta\RateMetaController::class, 'getRDSM'])->name('get_rdsm');
+        Route::patch('/{rm}', [\App\Http\Controllers\RateMeta\RateMetaController::class, 'updateRDSM']);
     });
 
     Route::prefix('rate_data')->name('rate_data.')->group(function () {
