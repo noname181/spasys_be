@@ -118,6 +118,9 @@ class ReportController extends Controller
                         ]);
                         $index =  0;
                         $rp_file_no[] = $report_no;
+
+                        $path = join('/', ['files', 'report', $report_no]);
+
                     }
 
 
@@ -148,7 +151,19 @@ class ReportController extends Controller
                     $i++;
                 }
 
-                Report::where('rp_parent_no', $rp_parent_no)->whereNotIn('rp_no', $rp_file_no)->delete();
+                $delete_reports = Report::where('rp_parent_no', $rp_parent_no)->whereNotIn('rp_no', $rp_file_no)->get();
+
+                foreach($delete_reports as $delete_report){
+                    $path = join('/', ['files', 'report', $delete_report->rp_no]);
+                    $file = File::where('file_table', 'report')->where('file_table_key', $delete_report->rp_no)->first();
+                    Storage::disk('public')->delete($path . '/' . $file->file_name);
+                    $file->delete();
+                    $delete_report->delete();
+                }
+
+                $rp_parent_new = Report::where('rp_parent_no', $rp_parent_no)->first()->rp_no;
+
+                Report::where('rp_parent_no', $rp_parent_no)->update(['rp_parent_no' => $rp_parent_new]);
 
                 // $report = Report::where('rp_no', $request->rp_no)->update([
                 //     'item_no' => $request->item_no,
@@ -197,7 +212,9 @@ class ReportController extends Controller
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'reports' => $rp_file_no,
+                'reports' => $rp_parent_new,
+                '$rp_parent_no' => $rp_parent_no,
+                'delete_reports' => $delete_reports
             ]);
         } catch (\Exception $e) {
             DB::rollback();
