@@ -40,6 +40,7 @@ class ReportController extends Controller
                     ]);
                     if ($i == 0) {
                         $parent_no = $report_no;
+                        Report::where('rp_no', $report_no)->update(['rp_parent_no'=> $report_no]);
                     }
                     $reports[] = $report_no;
                     $filename = 'file' . (string) $i;
@@ -68,14 +69,15 @@ class ReportController extends Controller
                     $i++;
                 }
             } else {
-
+                $rp_file_no = [];
                 foreach ($request->rp_content as $rp_content) {
+                    $rp_parent_no = Report::where('rp_no', $request->rp_no)->first()->rp_parent_no;
                     $report = Report::where('rp_no', $request->rp_file_no[$i])->update([
                         'item_no' => $request->item_no,
                         'rp_cate' => $request->rp_cate,
                         'rp_content' => $request->rp_content[$i],
                     ]);
-
+                    $rp_file_no[] = $request->rp_file_no[$i];
                     $files = [];
                     $path = join('/', ['files', 'report', $request->rp_file_no[$i]]);
 
@@ -88,8 +90,9 @@ class ReportController extends Controller
                         }
                     }
 
-
+                   
                     if($request->rp_file_no[$i] != 'undefined'){
+
                         $files = File::where('file_table', 'report')->where('file_table_key', $request->rp_file_no[$i])->get();
                         $path = join('/', ['files', 'report', $request->rp_file_no[$i]]);
 
@@ -105,16 +108,16 @@ class ReportController extends Controller
                         $file_position = File::where('file_table', 'report')->where('file_table_key', $request->rp_file_no[$i])->orderBy('file_position', 'DESC')->first();
                         $index = $file_position ? $file_position->file_position : 0;
                     }else {
-
+                        
                         $report_no = Report::insertGetId([
                             'mb_no' => Auth::user()->mb_no,
                             'item_no' => $request->item_no,
                             'rp_cate' => $request->rp_cate,
-                            'rp_content' => $rp_content[$i],
-                            'rp_parent_no' => $request->rp_no,
+                            'rp_content' => $rp_content,
+                            'rp_parent_no' => $rp_parent_no,
                         ]);
                         $index =  0;
-
+                        $rp_file_no[] = $report_no;
                     }
 
 
@@ -144,6 +147,8 @@ class ReportController extends Controller
 
                     $i++;
                 }
+
+                Report::where('rp_parent_no', $rp_parent_no)->whereNotIn('rp_no', $rp_file_no)->delete();
 
                 // $report = Report::where('rp_no', $request->rp_no)->update([
                 //     'item_no' => $request->item_no,
@@ -192,7 +197,7 @@ class ReportController extends Controller
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'reports' => $reports,
+                'reports' => $rp_file_no,
             ]);
         } catch (\Exception $e) {
             DB::rollback();
@@ -204,7 +209,8 @@ class ReportController extends Controller
 
     public function getReport($rp_no)
     {
-        $report = Report::with('files')->where('rp_no', $rp_no)->orWhere('rp_parent_no', $rp_no)->get();
+        $rp_parent_no = Report::where('rp_no', $rp_no)->first()->rp_parent_no;
+        $report = Report::with('files')->where('rp_parent_no', $rp_parent_no)->get();
 
         return response()->json(['report' => $report]);
 
