@@ -212,9 +212,7 @@ class ReportController extends Controller
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'reports' => $rp_parent_new,
-                '$rp_parent_no' => $rp_parent_no,
-                'delete_reports' => $delete_reports
+                'rp_no' => isset($rp_parent_new) ? $rp_parent_new : $report_no,
             ]);
         } catch (\Exception $e) {
             DB::rollback();
@@ -239,7 +237,7 @@ class ReportController extends Controller
             $validated = $request->validated();
 
             // If per_page is null set default data = 15
-            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 5;
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $reports = Report::with(['files', 'reports_child_mobi'])->whereRaw('rp_no = rp_parent_no');
@@ -282,7 +280,7 @@ class ReportController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 5;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $reports = Report::with(['files', 'reports_child']);
+            $reports = Report::with(['files', 'reports_child'])->orderBy('rp_parent_no', 'DESC');
 
             if (isset($validated['from_date'])) {
                 $reports->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
