@@ -267,12 +267,10 @@ class ItemController extends Controller
                                         }
                                     }
                                 }
-                                Log::error(count($v));
                                 if (count($v) >= 1) {
                                     $validator = Validator::make($d, $validate);
                                     if ($validator->fails()) {
                                         $errors[$sheet->getTitle()][] = $validator->errors();
-                                        Log::error($validator->errors());
                                     } else {
                                         $item_channels[] = array_merge($v, ['item_no' => $item_no]);
                                     }
