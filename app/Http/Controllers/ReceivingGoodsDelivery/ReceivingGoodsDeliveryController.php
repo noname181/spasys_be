@@ -123,6 +123,24 @@ class ReceivingGoodsDeliveryController extends Controller
         }
     }
 
+    public function getReceivingGoodsDelivery($is_no){
+        
+        try {
+         
+            // If per_page is null set default data = 15
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+            $rgd = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->where('is_no', $is_no)->get();
+
+            return response()->json($rgd);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
     public function create_import_schedule(ReceivingGoodsDeliveryCreateRequest $request)
     {
         $validated = $request->validated();
