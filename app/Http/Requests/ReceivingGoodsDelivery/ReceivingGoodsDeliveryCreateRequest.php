@@ -27,7 +27,13 @@ class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
             'wr_contents' => [
                 '',
             ],
+            'remove' => [
+                '',
+            ],
             'location.*.rgd_no' => [
+                '',
+            ],
+            'location.*.is_no' => [
                 '',
             ],
             'location.*.rgd_contents' => [
