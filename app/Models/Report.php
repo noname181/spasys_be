@@ -42,4 +42,8 @@ class Report extends Model
         return $this->HasMany(Report::class, 'rp_parent_no','rp_no')->with('files');
     }
 
+    public function reports_child_mobi(){
+        return $this->HasMany(Report::class, 'rp_parent_no','rp_no')->whereRaw('rp_no != rp_parent_no')->with('files');
+    }
+
 }

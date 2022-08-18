@@ -90,7 +90,7 @@ class ReportController extends Controller
                         }
                     }
 
-                   
+
                     if($request->rp_file_no[$i] != 'undefined'){
 
                         $files = File::where('file_table', 'report')->where('file_table_key', $request->rp_file_no[$i])->get();
@@ -108,7 +108,7 @@ class ReportController extends Controller
                         $file_position = File::where('file_table', 'report')->where('file_table_key', $request->rp_file_no[$i])->orderBy('file_position', 'DESC')->first();
                         $index = $file_position ? $file_position->file_position : 0;
                     }else {
-                        
+
                         $report_no = Report::insertGetId([
                             'mb_no' => Auth::user()->mb_no,
                             'item_no' => $request->item_no,
@@ -216,6 +216,46 @@ class ReportController extends Controller
 
     }
 
+    public function getReportsMobi(ReportSearchRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+
+            // If per_page is null set default data = 15
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 5;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+            $reports = Report::with(['files', 'reports_child_mobi'])->whereRaw('rp_no = rp_parent_no');
+
+            if (isset($validated['from_date'])) {
+                $reports->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            }
+
+            if (isset($validated['to_date'])) {
+                $reports->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            }
+
+            if (isset($validated['rp_cate'])) {
+                $reports->where(function($query) use ($validated) {
+                    $query->where('rp_cate', 'like', '%' . $validated['rp_cate'] . '%')->where('rp_parent_no', NULL);
+                });
+            }
+
+            $reports = $reports->paginate($per_page, ['*'], 'page', $page);
+
+            $data = new Collection();
+
+
+
+            return response()->json($reports);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+
+        }
+    }
+
     public function getReports(ReportSearchRequest $request)
     {
         try {
@@ -245,7 +285,7 @@ class ReportController extends Controller
 
             $data = new Collection();
 
-            
+
 
             return response()->json($reports);
         } catch (\Exception $e) {
