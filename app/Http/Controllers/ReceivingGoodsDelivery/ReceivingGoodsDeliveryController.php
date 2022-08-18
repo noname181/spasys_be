@@ -176,7 +176,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_arrive_day' => DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']),
                         ]);
                     }
-
+                }
 
                 foreach ($validated['remove'] as $remove) {
                     ReceivingGoodsDelivery::where('rgd_no', $remove['rgd_no'])->delete();
