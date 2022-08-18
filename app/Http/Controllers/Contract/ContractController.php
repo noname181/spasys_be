@@ -7,6 +7,8 @@ use App\Http\Requests\Contract\ContractRegisterController\ContractRegisterReques
 use App\Http\Requests\Contract\ContractUpdateController\ContractUpdateRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Contract;
+use App\Models\Company;
+use App\Models\Service;
 use App\Utils\Messages;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Auth;
@@ -50,9 +52,9 @@ class ContractController extends Controller
                 'c_calculate_deadline_yn' => $validated['c_calculate_deadline_yn'],
                 'c_integrated_calculate_yn' => $validated['c_integrated_calculate_yn'],
                 'c_calculate_method' => $validated['c_calculate_method'],
-                'c_card_number' => $validated['c_card_number'],
+                // 'c_card_number' => $validated['c_card_number'],
                 'c_deposit_day' => $validated['c_deposit_day'],
-                'c_account_number' => $validated['c_account_number'],
+                // 'c_account_number' => $validated['c_account_number'],
                 'c_deposit_price' => $validated['c_deposit_price'],
                 'c_deposit_date' => DateTime::createFromFormat('Y-m-d', $validated['c_deposit_date']),
                 'c_file_insulance' => $inl,
@@ -64,7 +66,7 @@ class ContractController extends Controller
                 'c_deposit_return_reg_date' => DateTime::createFromFormat('Y-m-d', $validated['c_deposit_return_reg_date']),
                 'c_deposit_return_expiry_date' => DateTime::createFromFormat('Y-m-d', $validated['c_deposit_return_expiry_date']),
             ]);
-
+            $company = Company::where('co_no', $co_no)->update(['co_service' => $validated['co_service']]);
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -73,6 +75,7 @@ class ContractController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -80,13 +83,19 @@ class ContractController extends Controller
     public function getContract($co_no)
     {
         try {
-            $contract = Contract::where(['mb_no' => Auth::user()->mb_no, 'co_no' => $co_no])->first();
+            $co_service = Company::where('co_no', $co_no)->first()->co_service;
+            $contract = Contract::where(['co_no' => $co_no])->first();
+               
+            $services = Service::where('service_use_yn', 'y')->where('service_no', '!=', 1)->get();
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'contract' => $contract
+                'contract' => $contract,
+                'services' => $services,
+                'co_service' => $co_service
             ]);
         } catch (\Exception $e) {
             Log::error($e);
+            return  $e;
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -148,8 +157,10 @@ class ContractController extends Controller
 
             $update = array_merge($update, $files);
 
-            $contract = Contract::where(['mb_no' => Auth::user()->mb_no, 'co_no' => $co_no, 'c_no' => $contract->c_no])
+            $contract = Contract::where(['co_no' => $co_no, 'c_no' => $contract->c_no])
                 ->update($update);
+
+            $company = Company::where('co_no', $co_no)->update(['co_service' => $validated['co_service']]);
 
             DB::commit();
             return response()->json([

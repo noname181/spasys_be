@@ -64,6 +64,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/', \App\Http\Controllers\Service\ServiceController::class)->name('registe_update_services');
         Route::get('/', [App\Http\Controllers\Service\ServiceController::class, 'getServices'])->name('get_services');
         Route::delete('/{service}', [App\Http\Controllers\Service\ServiceController::class, 'deleteService'])->name('delete_services');
+        Route::get('/active', [App\Http\Controllers\Service\ServiceController::class, 'getActiveServices'])->name('get_active_services');
     });
 
     Route::prefix('push')->name('push.')->group(function () {
@@ -109,6 +110,15 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/warehousing', [\App\Http\Controllers\Warehousing\WarehousingController::class,'__invoke']);
     Route::post('/get_warehousing', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousing']);
+
+    Route::get('/warehousing_request', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class,'__invoke']);
+    Route::post('/get_warehousing_request', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class,'getWarehousingRequest']);
+    Route::post('/create', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class,'createWarehousingRequest']);
+
+    Route::get('/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'__invoke']);
+    Route::post('/get_rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'getReceivingGoodsDelivery']);
+    Route::post('warehousing/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_warehousing'])->name('rgd_warehousing');;
+    Route::post('import_schedule/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_import_schedule'])->name('rgd_import_schedule');
 
     Route::prefix('adjustment_group')->name('adjustment_group.')->group(function () {
         Route::post('/create_or_update/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create'])->name('register_adjustment_group');
@@ -196,6 +206,7 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::prefix('item')->name('item.')->group(function () {
+        Route::get('/get_item', [App\Http\Controllers\Item\ItemController::class, 'getItems'])->name('get_item');
         Route::get('/', [App\Http\Controllers\Item\ItemController::class, 'searchItems'])->name('search');
         Route::post('/', \App\Http\Controllers\Item\ItemController::class)->name('create_or_update');
         Route::get('/{item}', [App\Http\Controllers\Item\ItemController::class, 'getItemById'])->name('get_item_by_id');

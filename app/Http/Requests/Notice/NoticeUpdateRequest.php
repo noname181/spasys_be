@@ -37,6 +37,10 @@ class NoticeUpdateRequest extends BaseFormRequest
                 'required',
                 'string',
             ],
+            'notice_target' => [
+                'required',
+                'string',
+            ],
             'files' => [
                 'array',
             ],

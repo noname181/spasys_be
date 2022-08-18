@@ -28,6 +28,10 @@ class ContractUpdateRequest extends BaseFormRequest
                 'required',
                 'int',
             ],
+            'co_service' => [
+                'required',
+                'string',
+            ],
             'c_start_date' => [
                 'required',
                 'date_format:Y-m-d'
@@ -78,7 +82,7 @@ class ContractUpdateRequest extends BaseFormRequest
             ],
             'c_deposit_day' => [
                 'required',
-                'integer'
+                'string'
             ],
             'c_account_number' => [
                 'required',

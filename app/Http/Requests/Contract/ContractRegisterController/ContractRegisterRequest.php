@@ -28,6 +28,10 @@ class ContractRegisterRequest extends BaseFormRequest
                 'required',
                 'int',
             ],
+            'co_service' => [
+                'required',
+                'string',
+            ],
             'c_start_date' => [
                 'required',
                 'date_format:Y-m-d'
@@ -71,20 +75,20 @@ class ContractRegisterRequest extends BaseFormRequest
                 'string',
                 'max:255'
             ],
-            'c_card_number' => [
-                'required',
-                'string',
-                'max:255'
-            ],
+            // 'c_card_number' => [
+            //     'required',
+            //     'string',
+            //     'max:255'
+            // ],
             'c_deposit_day' => [
                 'required',
-                'integer'
+                'string'
             ],
-            'c_account_number' => [
-                'required',
-                'string',
-                'max:255'
-            ],
+            // 'c_account_number' => [
+            //     'required',
+            //     'string',
+            //     'max:255'
+            // ],
             'c_deposit_price' => [
                 'required',
                 'integer'

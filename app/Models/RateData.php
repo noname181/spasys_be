@@ -22,7 +22,7 @@ class RateData extends Model
      */
     protected $fillable = [
         'rd_no',
-        'mb_no',
+        'rm_no',
         'rd_cate_meta1',
         'rd_cate_meta2',
         'rd_cate1',

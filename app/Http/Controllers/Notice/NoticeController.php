@@ -162,6 +162,7 @@ class NoticeController extends Controller
                 ->update([
                     'notice_title' => $validated['notice_title'],
                     'notice_content' => $validated['notice_content'],
+                    'notice_target' => $validated['notice_target'],
             ]);
 
             //FILE PART
