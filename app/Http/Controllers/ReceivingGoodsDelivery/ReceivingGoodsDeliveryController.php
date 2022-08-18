@@ -64,26 +64,29 @@ class ReceivingGoodsDeliveryController extends Controller
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
 
             
-            $rgd_no = ReceivingGoodsDelivery::insertGetId([
-                'mb_no' => $member->mb_no,
-                'w_no' => $warehousing->w_no,
-                'rgd_contents' => $validated['rgd_contents'],
-                'rgd_address' => $validated['rgd_address'],
-                'rgd_address_detail' => $validated['rgd_address_detail'],
-                'rgd_receiver' => $validated['rgd_receiver'],
-                'rgd_hp' => $validated['rgd_hp'],
-                'rgd_memo' => $validated['rgd_memo'],
-                'rgd_status1' => $validated['rgd_status1'],
-                'rgd_status2' => $validated['rgd_status2'],
-                'rgd_status3' => $validated['rgd_status3'],
-                'rgd_delivery_company' => $validated['rgd_delivery_company'],
-                'rgd_tracking_code' => $validated['rgd_tracking_code'],
-                'rgd_delivery_man' => $validated['rgd_delivery_man'],
-                'rgd_delivery_man_hp' => $validated['rgd_delivery_man_hp'],
-                'rgd_delivery_schedule_day' => DateTime::createFromFormat('Y-m-d', $validated['rgd_delivery_schedule_day']),
-                'rgd_arrive_day' => DateTime::createFromFormat('Y-m-d', $validated['rgd_arrive_day']),
-            ]);
-
+            foreach ($validated['items'] as $rgd) {
+                if (!$rgd['rgd_no']) {
+                    $rgd_no = ReceivingGoodsDelivery::insertGetId([
+                        'mb_no' => $member->mb_no,
+                        'w_no' => $warehousing->w_no,
+                        'rgd_contents' => $validated['rgd_contents'],
+                        'rgd_address' => $validated['rgd_address'],
+                        'rgd_address_detail' => $validated['rgd_address_detail'],
+                        'rgd_receiver' => $validated['rgd_receiver'],
+                        'rgd_hp' => $validated['rgd_hp'],
+                        'rgd_memo' => $validated['rgd_memo'],
+                        'rgd_status1' => $validated['rgd_status1'],
+                        'rgd_status2' => $validated['rgd_status2'],
+                        'rgd_status3' => $validated['rgd_status3'],
+                        'rgd_delivery_company' => $validated['rgd_delivery_company'],
+                        'rgd_tracking_code' => $validated['rgd_tracking_code'],
+                        'rgd_delivery_man' => $validated['rgd_delivery_man'],
+                        'rgd_delivery_man_hp' => $validated['rgd_delivery_man_hp'],
+                        'rgd_delivery_schedule_day' => DateTime::createFromFormat('Y-m-d', $validated['rgd_delivery_schedule_day']),
+                        'rgd_arrive_day' => DateTime::createFromFormat('Y-m-d', $validated['rgd_arrive_day']),
+                    ]);
+                }
+            }
             Warehousing::insert([
                 'mb_no' => $member->mb_no,
                 'w_schedule_number' => 'w_schedule_number',

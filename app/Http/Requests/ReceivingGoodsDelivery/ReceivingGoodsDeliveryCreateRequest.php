@@ -27,6 +27,86 @@ class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
             'wr_contents' => [
                 '',
             ],
+
+
+
+            'items.rgd_no' => [
+                '',
+            ],
+            'items.rgd_contents' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'items.rgd_address' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'items.rgd_address_detail' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'items.rgd_receiver' => [
+                'required',
+                'string',
+                'max:255',
+            ],            
+            'items.rgd_hp' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'items.rgd_memo' => [
+                'required',
+                'string',
+            ],
+            'items.rgd_status1' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'items.rgd_status2' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'items.rgd_status3' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'items.rgd_delivery_company' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'items.rgd_tracking_code' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'items.rgd_delivery_man' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'items.rgd_delivery_man_hp' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'items.rgd_delivery_schedule_day' => [
+                'required',
+                'date_format:Y-m-d'
+            ],
+            'items.rgd_arrive_day' => [
+                'required',
+                'date_format:Y-m-d'
+            ],
+
+
             'location.*.rgd_no' => [
                 '',
             ],
