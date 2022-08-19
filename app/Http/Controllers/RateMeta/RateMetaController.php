@@ -4,11 +4,11 @@ namespace App\Http\Controllers\RateMeta;
 
 use App\Models\Member;
 use App\Utils\Messages;
-use Illuminate\Http\Request;
 use App\Models\RateMeta;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\RateMeta\RateMetaSearchRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\RateMeta\RateMetaRequest;
 
@@ -44,7 +44,7 @@ class RateMetaController extends Controller
         }
     }
 
-    public function getRDSM($rm_no)
+    public function getrm($rm_no)
     {
         try {
             $rate_data_send_meta = RateMeta::select([
@@ -65,7 +65,7 @@ class RateMetaController extends Controller
         }
     }
 
-    public function updateRDSM(RateMetaRequest $request, RateMeta $rm)
+    public function updaterm(RateMetaRequest $request, RateMeta $rm)
     {
         $validated = $request->validated();
         try {
@@ -88,6 +88,38 @@ class RateMetaController extends Controller
         } catch (\Exception $e) {
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0002], 500);
+        }
+    }
+
+    public function search(RateMetaSearchRequest $request)
+    {
+        $validated = $request->validated();
+        try {
+            // If per_page is null set default data = 15
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+            $rm = RateMeta::whereRaw('1 = 1');
+            if(isset($validated['from_date'])) {
+                $rm->where('created_at', '>=' , date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            }
+            if(isset($validated['to_date'])) {
+                $rm->where('created_at', '<=' , date('Y-m-d 23:59:59', strtotime($validated['to_date'])));
+            }
+            if(isset($validated['rm_biz_name'])) {
+                $rm->where('rm_biz_name', 'like', '%'.$validated['rm_biz_name'].'%');
+            }
+            if(isset($validated['rm_biz_number'])) {
+                $rm->where('rm_biz_number','like', '%'.$validated['rm_biz_number'].'%');
+            }
+            if(isset($validated['rm_owner_name'])) {
+                $rm->where('rm_owner_name','like', '%'.$validated['rm_owner_name'].'%');
+            }
+            $rm = $rm->paginate($per_page, ['*'], 'page', $page);
+            return response()->json($rm);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
 }

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Item;
+namespace App\Http\Requests\RateMeta;
 
 use App\Http\Requests\BaseFormRequest;
 
-class ItemSearchRequest extends BaseFormRequest
+class RateMetaSearchRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,16 +25,27 @@ class ItemSearchRequest extends BaseFormRequest
     {
         return [
             'from_date' => [
-                'string',
-                'date_format:Y-m-d'
+                'nullable',
+                'date'
             ],
             'to_date' => [
-                'string',
-                'date_format:Y-m-d'
-            ],
-            'search_string' => [
-                'string',
                 'nullable',
+                'date'
+            ],
+            'rm_biz_name' => [
+                'nullable',
+                'string',
+                'max:255'
+            ],
+            'rm_biz_number' => [
+                'nullable',
+                'string',
+                'max:255'
+            ],
+            'rm_owner_name' => [
+                'nullable',
+                'string',
+                'max:255'
             ],
             'per_page' => [
                 'nullable',
@@ -43,27 +54,6 @@ class ItemSearchRequest extends BaseFormRequest
             'page' => [
                 'nullable',
                 'int',
-            ],
-            'co_name_shop' => [
-                '',
-            ],
-            'co_name_agency' => [
-                '',
-            ],
-            'item_name' => [
-                '',
-            ],
-            'item_channel_code' => [
-                '',
-            ],
-            'item_bar_code' => [
-                '',
-            ],
-            'item_upc_code' => [
-                '',
-            ],
-            'item_channel_name' => [
-                '',
             ],
         ];
     }
