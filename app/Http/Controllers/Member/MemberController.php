@@ -43,20 +43,20 @@ class MemberController extends Controller
                 $validated['mb_type'] = Member::SPASYS;
                 $validated['mb_parent'] = Member::ADMIN;
             }else if ($roleNoOfUserLogin == Member::ROLE_SPASYS_ADMIN) {
-                $validated['mb_type'] = Member::AGENCY;
+                $validated['mb_type'] = Member::SHOP;
                 $validated['mb_parent'] = Member::SPASYS;
                 if($validated['role_no'] == "관리자"){
-                    $validated['role_no'] = Member::ROLE_AGENCY_MANAGER;
+                    $validated['role_no'] = Member::ROLE_SHOP_MANAGER;
                 }else {
-                    $validated['role_no'] = Member::ROLE_AGENCY_OPERATOR;
+                    $validated['role_no'] = Member::ROLE_SHOP_OPERATOR;
                 }
-            }else if ($roleNoOfUserLogin == Member::ROLE_AGENCY_MANAGER) {
-                $validated['mb_type'] = Member::SHOP;
-                $validated['mb_parent'] = Member::AGENCY;
+            }else if ($roleNoOfUserLogin == Member::ROLE_SHOP_MANAGER) {
+                $validated['mb_type'] = Member::SHIPPER;
+                $validated['mb_parent'] = Member::SHOP;
                 if($validated['role_no'] == "관리자"){
-                    $validated['role_no'] = Member::ROLE_AGENCY_MANAGER;
+                    $validated['role_no'] = Member::ROLE_SHOP_MANAGER;
                 }else {
-                    $validated['role_no'] = Member::ROLE_AGENCY_OPERATOR;
+                    $validated['role_no'] = Member::ROLE_SHOP_OPERATOR;
                 }
             }else {
                 $validated['role_no'] = 0;
@@ -136,9 +136,9 @@ class MemberController extends Controller
         try {
             $member = Member::with('company')->where('mb_no', $mb_no)->first();
             $services = Service::where('service_use_yn', 'y')->get();
-            if($member->role_no == Member::ROLE_SPASYS_MANAGER || $member->role_no == Member::ROLE_AGENCY_MANAGER){
+            if($member->role_no == Member::ROLE_SPASYS_MANAGER || $member->role_no == Member::ROLE_SHOP_MANAGER){
                 $member->role_no = '관리자';
-            }else if($member->role_no == Member::ROLE_SPASYS_OPERATOR || $member->role_no == Member::ROLE_AGENCY_OPERATOR){
+            }else if($member->role_no == Member::ROLE_SPASYS_OPERATOR || $member->role_no == Member::ROLE_SHOP_OPERATOR){
                 $member->role_no = '운영자';
             }else if($member->role_no == Member::ROLE_SPASYS_WORKER){
                 $member->role_no = '작업자';
@@ -255,12 +255,12 @@ class MemberController extends Controller
             $validated['mb_type'] = Member::SPASYS;
             $validated['mb_parent'] = Member::ADMIN;
         }else if ($roleNoOfUserLogin == Member::ROLE_SPASYS_ADMIN) {
-            $validated['mb_type'] = Member::AGENCY;
+            $validated['mb_type'] = Member::SHOP;
             $validated['mb_parent'] = Member::SPASYS;
             if($validated['role_no'] == "관리자"){
-                $validated['role_no'] = Member::ROLE_AGENCY_MANAGER;
+                $validated['role_no'] = Member::ROLE_SHOP_MANAGER;
             }else {
-                $validated['role_no'] = Member::ROLE_AGENCY_OPERATOR;
+                $validated['role_no'] = Member::ROLE_SHOP_OPERATOR;
             }
         }else {
             $validated['role_no'] = 1;
@@ -268,9 +268,9 @@ class MemberController extends Controller
 
         $member->save();
 
-        if($member->role_no == Member::ROLE_SPASYS_MANAGER || $member->role_no == Member::ROLE_AGENCY_MANAGER){
+        if($member->role_no == Member::ROLE_SPASYS_MANAGER || $member->role_no == Member::ROLE_SHOP_MANAGER){
             $member->role_no = '관리자';
-        }else if($member->role_no == Member::ROLE_SPASYS_OPERATOR || $member->role_no == Member::ROLE_AGENCY_OPERATOR){
+        }else if($member->role_no == Member::ROLE_SPASYS_OPERATOR || $member->role_no == Member::ROLE_SHOP_OPERATOR){
             $member->role_no = '운영자';
         }else if($member->role_no == Member::ROLE_SPASYS_WORKER){
             $member->role_no = '작업자';

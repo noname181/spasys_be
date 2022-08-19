@@ -18,15 +18,15 @@ class Member extends Authenticatable
     const ROLE_SPASYS_MANAGER = 3;
     const ROLE_SPASYS_OPERATOR = 4;
     const ROLE_SPASYS_WORKER = 5;
-    const ROLE_AGENCY_MANAGER = 6;
-    const ROLE_AGENCY_OPERATOR = 7;
-    const ROLE_SHOP_MANAGER = 8;
-    const ROLE_SHOP_OPERATOR = 9;
+    const ROLE_SHOP_MANAGER = 6;
+    const ROLE_SHOP_OPERATOR = 7;
+    const ROLE_SHIPPER_MANAGER = 8;
+    const ROLE_SHIPPER_OPERATOR = 9;
 
     const ADMIN = 'admin';
     const SPASYS = 'spasys';
-    const AGENCY = 'agency';
     const SHOP = 'shop';
+    const SHIPPER = 'shipper';
 
     protected $table = "member";
 

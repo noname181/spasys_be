@@ -29,7 +29,7 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('member')->name('member.')->group(function () {
 
-        Route::middleware('role:spasys_manager,spasys_admin,agency_manager')->group(function () {
+        Route::middleware('role:spasys_manager,spasys_admin,shop_manager')->group(function () {
             Route::post('/register', \App\Http\Controllers\Member\MemberController::class)->name('register');
             Route::patch('/update_by_id', [\App\Http\Controllers\Member\MemberController::class, 'updateProfileById'])->name('update_profile_by_id');
             Route::delete('/delete_member/{mb_no}',[\App\Http\Controllers\Member\MemberController::class, 'deleteMember'])->name('delete_member');
@@ -52,7 +52,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // Manger Role
-    Route::middleware('role:spasys_manager,spasys_admin,agency_manager')->group(function () {
+    Route::middleware('role:spasys_manager,spasys_admin,shop_manager')->group(function () {
         Route::post('/register_company', \App\Http\Controllers\Company\CompanyController::class)->name('register_company');
     });
     Route::post('/get_companies', [App\Http\Controllers\Company\CompanyController::class, 'getcompanies'])->name('get_companies');

@@ -30,9 +30,9 @@ class CompanyController extends Controller
             DB::beginTransaction();
 
             if(Auth::user()->mb_type == 'spasys'){
-                $co_type = 'agency';
-            }else if(Auth::user()->mb_type == 'agency'){
                 $co_type = 'shop';
+            }else if(Auth::user()->mb_type == 'shop'){
+                $co_type = 'shipper';
             }else {
                 $co_type = 'spasys';
             }
