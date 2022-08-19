@@ -38,6 +38,7 @@ class CompanyController extends Controller
             }
             $co_no = Company::insertGetId([
                 'mb_no' => Auth::user()->mb_no,
+                'co_parent_no' => Auth::user()->co_no,
                 'co_name' => $validated['co_name'],
                 'co_address' => $validated['co_address'],
                 'co_address_detail' => $validated['co_address_detail'],
@@ -49,13 +50,6 @@ class CompanyController extends Controller
                 'co_email' => $validated['co_email'],
                 'co_etc' => $validated['co_etc'],
                 'co_type' => $co_type,
-                'c_payment_cycle' => $validated['c_payment_cycle'],
-                'c_calculate_method1' => $validated['c_calculate_method1'],
-                'c_calculate_method2' => $validated['c_calculate_method2'],
-                'c_calculate_method3' => $validated['c_calculate_method3'],
-                'c_calculate_method4' => $validated['c_calculate_method4'],
-                'c_transaction_yn' => $validated['c_transaction_yn'],
-                'co_close_yn' => $validated['co_close_yn'],
             ]);
 
             $company = Company::where('co_no', $co_no)->first();
