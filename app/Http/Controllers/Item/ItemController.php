@@ -142,7 +142,7 @@ class ItemController extends Controller
     {
         $validated = $request->validated();
         try {
-            $items = Item::where('item_service_name', '유통가공')->get();
+            $items = Item::with('item_channels')->where('item_service_name', '유통가공')->get();
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'items' => $items,
