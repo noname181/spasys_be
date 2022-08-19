@@ -7,6 +7,7 @@ use App\Models\Warehousing;
 use App\Models\Member;
 use App\Models\WarehousingRequest;
 use App\Models\ReceivingGoodsDelivery;
+use App\Models\WarehousingItem;
 use App\Utils\Messages;
 use App\Utils\CommonFunc;
 use Illuminate\Http\Request;
@@ -20,6 +21,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Filesystem\Filesystem;
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryRequest;
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryCreateRequest;
+use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryCreateMobileRequest;
 
 class ReceivingGoodsDeliveryController extends Controller
 {
@@ -57,17 +59,40 @@ class ReceivingGoodsDeliveryController extends Controller
 
         try {
             //DB::beginTransaction();
-            $warehousing = Warehousing::where('w_no', $validated['w_no'])->first();
-            $warehousing_item = WarehousingItem::where('wi_no', $validated['wi_no'])->first();
-            $warehousing_request = WarehousingRequest::where('wr_no', $validated['wr_no'])->first();
-            $item = Item::where('item_no', $validated['item_no'])->first();
+            // $warehousing = Warehousing::where('w_no', $validated['w_no'])->first();
+            // $warehousing_item = WarehousingItem::where('wi_no', $validated['wi_no'])->first();
+            // $warehousing_request = WarehousingRequest::where('wr_no', $validated['wr_no'])->first();
+
+            //$item = Item::where('item_no', $validated['item_no'])->first();
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
 
             foreach ($validated['location'] as $rgd) {
-                if (!$rgd['rgd_no']) {
+
+                if (!isset($rgd['rgd_no'])) {
+
                     $rgd_no = ReceivingGoodsDelivery::insertGetId([
                         'mb_no' => $member->mb_no,
-                        'w_no' => $warehousing->w_no,
+                        'w_no' => $rgd['w_no'],
+                        'service_korean_name' => '유통 가공',
+                        'rgd_contents' => $rgd['rgd_contents'],
+                        'rgd_address' => $rgd['rgd_address'],
+                        'rgd_address_detail' => $rgd['rgd_address_detail'],
+                        'rgd_receiver' => $rgd['rgd_receiver'],
+                        'rgd_hp' => $rgd['rgd_hp'],
+                        'rgd_memo' => $rgd['rgd_memo'],
+                        'rgd_status1' => $rgd['rgd_status1'],
+                        'rgd_status2' => $rgd['rgd_status2'],
+                        'rgd_status3' => $rgd['rgd_status3'],
+                        'rgd_delivery_company' => $rgd['rgd_delivery_company'],
+                        'rgd_tracking_code' => $rgd['rgd_tracking_code'],
+                        'rgd_delivery_man' => $rgd['rgd_delivery_man'],
+                        'rgd_delivery_man_hp' => $rgd['rgd_delivery_man_hp'],
+                        'rgd_delivery_schedule_day' => DateTime::createFromFormat('Y-m-d', $rgd['rgd_delivery_schedule_day']),
+                        'rgd_arrive_day' => DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']),
+                    ]);
+                }else{
+                    
+                    $rgd_no = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
                         'rgd_contents' => $rgd['rgd_contents'],
                         'rgd_address' => $rgd['rgd_address'],
                         'rgd_address_detail' => $rgd['rgd_address_detail'],
@@ -87,38 +112,43 @@ class ReceivingGoodsDeliveryController extends Controller
                 }
             }
 
-            Warehousing::insert([
+            //T part
+            Warehousing::where('w_no', $validated['w_no'])->update([
                 'mb_no' => $member->mb_no,
-                'w_schedule_number' => 'w_schedule_number',
-                'w_schedule_day' => 'w_schedule_day',
-                'connection_number' => 'connection_number',
+                'w_schedule_number' => $validated['w_schedule_number'],
+                'w_schedule_day' => $validated['w_schedule_day'],
+                
             ]);
 
-            WarehousingRequest::insert([
-                'mb_no' => $member->mb_no,
-                'wr_contents' => 'wr_contents',
-            ]);
+            if($validated['wr_contents']){
+                WarehousingRequest::insert([
+                    'mb_no' => $member->mb_no,
+                    'wr_contents' => $validated['wr_contents'],
+                ]);
+            }
             
             $warehousing_items = [];
-            foreach ($validated['warehousing_items'] as $warehousing_item) {
+            foreach ($validated['items'] as $warehousing_item) {
                 if (isset($warehousing_item['wi_number'])) {
                     $warehousing_items[] = [
-                        'item_no' => $item_no,
-                        'w_no' => $warehousing->w_no,
+                        'item_no' => $warehousing_item['item_no'],
+                        'w_no' => $validated['w_no'],
                         'wi_number' => $warehousing_item['wi_number'],
                     ];
                 }
             }
+
             WarehousingItem::insert($warehousing_items);
 
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'notice_no' => $notice_no
+                'rgd_no' => $rgd_no
             ], 201);
         } catch (\Throwable $e) {
             DB::rollback();
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -132,6 +162,25 @@ class ReceivingGoodsDeliveryController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $rgd = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->where('is_no', $is_no)->get();
+
+            return response()->json($rgd);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function getReceivingGoodsDeliveryWarehousing($w_no)
+    {
+         
+        try {
+         
+            // If per_page is null set default data = 15
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+            $rgd = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->where('w_no', $w_no)->get();
 
             return response()->json($rgd);
         } catch (\Exception $e) {
@@ -176,6 +225,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_arrive_day' => DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']),
                         ]);
                     }else{
+                        
                         $rgd_no = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
                             'rgd_contents' => $rgd['rgd_contents'],
                             'rgd_address' => $rgd['rgd_address'],
@@ -192,6 +242,70 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_delivery_man_hp' => $rgd['rgd_delivery_man_hp'],
                             'rgd_delivery_schedule_day' => DateTime::createFromFormat('Y-m-d', $rgd['rgd_delivery_schedule_day']),
                             'rgd_arrive_day' => DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']),
+                        ]);
+                    }
+                }
+
+                foreach ($validated['remove'] as $remove) {
+                    ReceivingGoodsDelivery::where('rgd_no', $remove['rgd_no'])->delete();
+                }
+
+                if($validated['wr_contents']){
+                    WarehousingRequest::insert([
+                        'mb_no' => $member->mb_no,
+                        'wr_contents' => $validated['wr_contents'],
+                    ]);
+                }
+                
+           
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'rgd_no' => $rgd_no
+            ], 201);
+        } catch (\Throwable $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0001], 500);
+        }
+    }
+
+
+    public function create_import_schedule_mobile(ReceivingGoodsDeliveryCreateMobileRequest $request)
+    {
+        $validated = $request->validated();
+
+        try {
+            //DB::beginTransaction();
+
+            $member = Member::where('mb_id', Auth::user()->mb_id)->first(); 
+
+           
+                foreach ($validated['location'] as $rgd) {
+
+                    if (!isset($rgd['rgd_no'])) {
+
+                        $rgd_no = ReceivingGoodsDelivery::insertGetId([
+                            'mb_no' => $member->mb_no,
+                            'is_no' => $rgd['is_no'],
+                            'service_korean_name' => '보세화물',
+                            'rgd_contents' => $rgd['rgd_contents'],
+                            'rgd_address' => $rgd['rgd_address'],
+                            'rgd_address_detail' => $rgd['rgd_address_detail'],
+                            'rgd_receiver' => $rgd['rgd_receiver'],
+                            'rgd_hp' => $rgd['rgd_hp'],
+                            'rgd_memo' => $rgd['rgd_memo'],
+                        ]);
+                    }else{
+                        
+                        $rgd_no = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
+                            'rgd_contents' => $rgd['rgd_contents'],
+                            'rgd_address' => $rgd['rgd_address'],
+                            'rgd_address_detail' => $rgd['rgd_address_detail'],
+                            'rgd_receiver' => $rgd['rgd_receiver'],
+                            'rgd_hp' => $rgd['rgd_hp'],
+                            'rgd_memo' => $rgd['rgd_memo'],
                         ]);
                     }
                 }

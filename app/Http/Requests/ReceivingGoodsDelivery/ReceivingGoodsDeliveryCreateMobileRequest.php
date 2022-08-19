@@ -4,7 +4,7 @@ namespace App\Http\Requests\ReceivingGoodsDelivery;
 
 use App\Http\Requests\BaseFormRequest;
 
-class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
+class ReceivingGoodsDeliveryCreateMobileRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,34 +24,16 @@ class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
     public function rules()
     {
         return [
-            'w_no' => [
-                '',
-            ],
             'wr_contents' => [
                 '',
             ],
-            'w_schedule_number' =>[
-                'string',   
-            ],
-            'w_schedule_day' => [
-                ''
-            ],
             'remove' => [
-                '',
-            ],
-            'items.*.item_no' => [
-                '',
-            ],
-            'items.*.wi_number' => [
                 '',
             ],
             'location.*.rgd_no' => [
                 '',
             ],
             'location.*.is_no' => [
-                '',
-            ],
-            'location.*.w_no' => [
                 '',
             ],
             'location.*.rgd_contents' => [
@@ -82,47 +64,6 @@ class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
             'location.*.rgd_memo' => [
                 'required',
                 'string',
-            ],
-            'location.*.rgd_status1' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'location.*.rgd_status2' => [
-               ''
-            ],
-            'location.*.rgd_status3' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'location.*.rgd_delivery_company' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'location.*.rgd_tracking_code' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'location.*.rgd_delivery_man' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'location.*.rgd_delivery_man_hp' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'location.*.rgd_delivery_schedule_day' => [
-                'required',
-                'date_format:Y-m-d'
-            ],
-            'location.*.rgd_arrive_day' => [
-                'required',
-                'date_format:Y-m-d'
             ],
         ];
     }
