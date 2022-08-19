@@ -191,7 +191,7 @@ class ItemController extends Controller
                 $item->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
             }
             if (isset($validated['co_name_shop'])) {
-                $item->whereHas('company',function($query) use ($validated) {
+                $item->whereHas('company.co_parent',function($query) use ($validated) {              
                     $query->where(DB::raw('lower(co_name)'), 'like','%'. strtolower($validated['co_name_shop']) .'%');
                 });
             }
@@ -220,6 +220,7 @@ class ItemController extends Controller
                     $query->where(DB::raw('lower(item_upc_code)'), 'like','%'. strtolower($validated['item_upc_code']) .'%');
                 });
             }
+            
             $item = $item->paginate($per_page, ['*'], 'page', $page);
             //return DB::getQueryLog();
             return response()->json($item);
