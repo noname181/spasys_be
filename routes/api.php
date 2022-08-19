@@ -56,7 +56,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/register_company', \App\Http\Controllers\Company\CompanyController::class)->name('register_company');
     });
     Route::post('/get_companies', [App\Http\Controllers\Company\CompanyController::class, 'getcompanies'])->name('get_companies');
-    
+
     Route::get('/get_company/{co_no}', [App\Http\Controllers\Company\CompanyController::class, 'getCompany'])->name('get_company');
     Route::patch('/update_company/{company}', [App\Http\Controllers\Company\CompanyController::class, 'updateCompany'])->name('update_company');
     Route::post('/register_contract', \App\Http\Controllers\Contract\ContractController::class)->name('register_contract');
@@ -223,6 +223,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/', \App\Http\Controllers\RateMeta\RateMetaController::class)->name('registe_rdsm');
         Route::get('/{rm_no}', [App\Http\Controllers\RateMeta\RateMetaController::class, 'getRDSM'])->name('get_rdsm');
         Route::patch('/{rm}', [\App\Http\Controllers\RateMeta\RateMetaController::class, 'updateRDSM']);
+        Route::get('/', [App\Http\Controllers\RateMeta\RateMetaController::class, 'search'])->name('search');
     });
 
     Route::prefix('rate_data')->name('rate_data.')->group(function () {
