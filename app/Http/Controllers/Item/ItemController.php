@@ -128,7 +128,8 @@ class ItemController extends Controller
             }
             DB::commit();
             return response()->json([
-                'message' => Messages::MSG_0007
+                'message' => Messages::MSG_0007,
+                '$validated' => $validated['co_no']
             ]);
         } catch (\Exception $e) {
             DB::rollback();
@@ -161,10 +162,27 @@ class ItemController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $item = Item::with('file')->paginate($per_page, ['*'], 'page', $page);
+            $item = Item::with(['file', 'company'])->paginate($per_page, ['*'], 'page', $page);
             return response()->json($item);
         } catch (\Exception $e) {
             Log::error($e);
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function paginateItems(ItemSearchRequest $request)
+    {
+        $validated = $request->validated();
+        try {
+            // If per_page is null set default data = 15
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+            $item = Item::with(['file', 'company'])->paginate($per_page, ['*'], 'page', $page);
+            return response()->json($item);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }

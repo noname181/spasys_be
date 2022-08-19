@@ -59,4 +59,9 @@ class Item extends Model
         return $this->hasMany(ItemChannel::class, 'item_no', 'item_no');
     }
 
+    public function company()
+    {
+        return $this->HasOne(Company::class, 'co_no', 'co_no');
+    }
+
 }

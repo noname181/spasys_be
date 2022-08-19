@@ -209,6 +209,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('item')->name('item.')->group(function () {
         Route::get('/get_item', [App\Http\Controllers\Item\ItemController::class, 'getItems'])->name('get_item');
         Route::get('/', [App\Http\Controllers\Item\ItemController::class, 'searchItems'])->name('search');
+        Route::post('/paginate', [App\Http\Controllers\Item\ItemController::class, 'paginateItems'])->name('paginate');
         Route::post('/', \App\Http\Controllers\Item\ItemController::class)->name('create_or_update');
         Route::get('/{item}', [App\Http\Controllers\Item\ItemController::class, 'getItemById'])->name('get_item_by_id');
         Route::delete('/item_channel/{item_channel}', [App\Http\Controllers\Item\ItemController::class, 'deleteItemChannel'])->name('delete_item_channel');
