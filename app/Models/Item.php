@@ -22,6 +22,8 @@ class Item extends Model
      */
     protected $fillable = [
         'item_no',
+        'mb_no',
+        'co_no',
         'item_brand',
         'item_name',
         'item_option1',
@@ -39,7 +41,6 @@ class Item extends Model
         'item_cate1',
         'item_cate2',
         'item_cate3',
-        'mb_no',
         'item_regtime',
         'item_table',
         'item_key'
@@ -62,7 +63,7 @@ class Item extends Model
 
     public function company()
     {
-        return $this->HasOne(Company::class, 'co_no', 'co_no');
+        return $this->HasOne(Company::class, 'co_no', 'co_no')->with('co_parent');
     }
 
 }

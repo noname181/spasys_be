@@ -47,4 +47,9 @@ class Company extends Model
         return $this->hasOne(Contract::class, 'co_no', 'co_no');
     }
 
+    public function co_parent()
+    {
+        return $this->belongsTo(Company::class, 'co_parent_no', 'co_no');
+    }
+
 }

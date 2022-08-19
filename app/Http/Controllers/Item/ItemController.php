@@ -55,16 +55,19 @@ class ItemController extends Controller
                 ]);
 
                 $item_channels = [];
-                foreach ($validated['item_channels'] as $item_channel) {
-                    if (isset($item_channel['item_channel_code']) && isset($item_channel['item_channel_name'])) {
-                        $item_channels[] = [
-                            'item_no' => $item_no,
-                            'item_channel_code' => $item_channel['item_channel_code'],
-                            'item_channel_name' => $item_channel['item_channel_name']
-                        ];
+                if(isset($validated['item_channels'])) {
+                    foreach ($validated['item_channels'] as $item_channel) {
+                        if (isset($item_channel['item_channel_code']) && isset($item_channel['item_channel_name'])) {
+                            $item_channels[] = [
+                                'item_no' => $item_no,
+                                'item_channel_code' => $item_channel['item_channel_code'],
+                                'item_channel_name' => $item_channel['item_channel_name']
+                            ];
+                        }
                     }
+                    ItemChannel::insert($item_channels);
                 }
-                ItemChannel::insert($item_channels);
+               
             } else {
                 // Update data
                 $item = Item::with('file')->where('item_no', $item_no)->first();
@@ -95,7 +98,7 @@ class ItemController extends Controller
                 ];
                 $item->update($update);
 
-                if(!empty($validated['item_channels'])) 
+                if(isset($validated['item_channels'])) 
                     foreach ($validated['item_channels'] as $item_channel) {
                         ItemChannel::updateOrCreate(
                             [
@@ -134,7 +137,7 @@ class ItemController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-           
+            return $e;
             return response()->json(['message' => Messages::MSG_0019], 500);
         }
     }
