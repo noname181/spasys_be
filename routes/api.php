@@ -120,8 +120,11 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'__invoke']);
     Route::get('/get_rgd/{is_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'getReceivingGoodsDelivery']);
+    Route::get('/get_rgd_warehousing/{w_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'getReceivingGoodsDeliveryWarehousing']);
     Route::post('warehousing/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_warehousing'])->name('rgd_warehousing');;
     Route::post('import_schedule/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_import_schedule'])->name('rgd_import_schedule');
+
+    Route::post('import_schedule/rgd_mobile', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_import_schedule_mobile'])->name('rgd_import_schedule_mobile');
 
     Route::prefix('adjustment_group')->name('adjustment_group.')->group(function () {
         Route::post('/create_or_update/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create'])->name('register_adjustment_group');
