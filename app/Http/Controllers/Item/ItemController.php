@@ -177,11 +177,51 @@ class ItemController extends Controller
     {
         $validated = $request->validated();
         try {
+            DB::enableQueryLog();
             // If per_page is null set default data = 15
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $item = Item::with(['file', 'company'])->paginate($per_page, ['*'], 'page', $page);
+            $item = Item::with(['file', 'company']);
+            if (isset($validated['from_date'])) {
+                $item->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            }
+
+            if (isset($validated['to_date'])) {
+                $item->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            }
+            if (isset($validated['co_name_shop'])) {
+                $item->whereHas('company',function($query) use ($validated) {
+                    $query->where(DB::raw('lower(co_name)'), 'like','%'. strtolower($validated['co_name_shop']) .'%');
+                });
+            }
+            if (isset($validated['co_name_agency'])) {
+                $item->whereHas('company',function($query) use ($validated) {
+                    $query->where(DB::raw('lower(co_name)'), 'like','%'. strtolower($validated['co_name_agency']) .'%', 'and' , 'co_type' , '=' , 'shipper');
+                });
+            }
+            if (isset($validated['item_name'])) {
+                $item->where(function($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_name)'), 'like','%'. strtolower($validated['item_name']) .'%');
+                });
+            }
+            // if (isset($validated['item_channel_code'])) {
+            //     $item->whereHas('item_channel',function($query) use ($validated) {
+            //         $query->where(DB::raw('lower(item_channel_code)'), 'like','%'. strtolower($validated['item_channel_code']) .'%');
+            //     });
+            // }
+            if (isset($validated['item_bar_code'])) {
+                $item->where(function($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_bar_code)'), 'like','%'. strtolower($validated['item_bar_code']) .'%');
+                });
+            }
+            if (isset($validated['item_upc_code'])) {
+                $item->where(function($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_upc_code)'), 'like','%'. strtolower($validated['item_upc_code']) .'%');
+                });
+            }
+            $item = $item->paginate($per_page, ['*'], 'page', $page);
+            //return DB::getQueryLog();
             return response()->json($item);
         } catch (\Exception $e) {
             Log::error($e);
