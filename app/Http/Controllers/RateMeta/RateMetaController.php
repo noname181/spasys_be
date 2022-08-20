@@ -91,7 +91,7 @@ class RateMetaController extends Controller
         }
     }
 
-    public function search(RateMetaSearchRequest $request)
+    public function getRateData(RateMetaSearchRequest $request)
     {
         $validated = $request->validated();
         try {
