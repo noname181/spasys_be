@@ -65,6 +65,47 @@ class ReceivingGoodsDeliveryCreateMobileRequest extends BaseFormRequest
                 'required',
                 'string',
             ],
+            'location.*.rgd_status1' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'location.*.rgd_status2' => [
+               ''
+            ],
+            'location.*.rgd_status3' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'location.*.rgd_delivery_company' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'location.*.rgd_tracking_code' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'location.*.rgd_delivery_man' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'location.*.rgd_delivery_man_hp' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'location.*.rgd_delivery_schedule_day' => [
+                'required',
+                'date_format:Y-m-d'
+            ],
+            'location.*.rgd_arrive_day' => [
+                'required',
+                'date_format:Y-m-d'
+            ],
         ];
     }
 

@@ -296,6 +296,15 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_receiver' => $rgd['rgd_receiver'],
                             'rgd_hp' => $rgd['rgd_hp'],
                             'rgd_memo' => $rgd['rgd_memo'],
+                            'rgd_status1' => $rgd['rgd_status1'],
+                            'rgd_status2' => $rgd['rgd_status2'],
+                            'rgd_status3' => $rgd['rgd_status3'],
+                            'rgd_delivery_company' => $rgd['rgd_delivery_company'],
+                            'rgd_tracking_code' => $rgd['rgd_tracking_code'],
+                            'rgd_delivery_man' => $rgd['rgd_delivery_man'],
+                            'rgd_delivery_man_hp' => $rgd['rgd_delivery_man_hp'],
+                            'rgd_delivery_schedule_day' => DateTime::createFromFormat('Y-m-d', $rgd['rgd_delivery_schedule_day']),
+                            'rgd_arrive_day' => DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']),
                         ]);
                     }else{
                         
@@ -306,6 +315,15 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_receiver' => $rgd['rgd_receiver'],
                             'rgd_hp' => $rgd['rgd_hp'],
                             'rgd_memo' => $rgd['rgd_memo'],
+                            'rgd_status1' => $rgd['rgd_status1'],
+                            'rgd_status2' => $rgd['rgd_status2'],
+                            'rgd_status3' => $rgd['rgd_status3'],
+                            'rgd_delivery_company' => $rgd['rgd_delivery_company'],
+                            'rgd_tracking_code' => $rgd['rgd_tracking_code'],
+                            'rgd_delivery_man' => $rgd['rgd_delivery_man'],
+                            'rgd_delivery_man_hp' => $rgd['rgd_delivery_man_hp'],
+                            'rgd_delivery_schedule_day' => DateTime::createFromFormat('Y-m-d', $rgd['rgd_delivery_schedule_day']),
+                            'rgd_arrive_day' => DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']),
                         ]);
                     }
                 }
