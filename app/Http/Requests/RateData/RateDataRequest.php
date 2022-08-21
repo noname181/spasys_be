@@ -32,8 +32,12 @@ class RateDataRequest extends BaseFormRequest
                 'nullable'
             ],
             'rate_data.*.rm_no' => [
-                'required',
                 'int',
+                'nullable'
+            ],
+            'rate_data.*.co_no' => [
+                'int',
+                'nullable'
             ],
             'rate_data.*.rd_cate_meta1' => [
                 'required',
@@ -67,6 +71,10 @@ class RateDataRequest extends BaseFormRequest
             ],
             'rate_data.*.rd_data2' => [
                 'required',
+                'string',
+                'max:255',
+            ],
+            'rate_data.*.rd_data3' => [
                 'string',
                 'max:255',
             ],
