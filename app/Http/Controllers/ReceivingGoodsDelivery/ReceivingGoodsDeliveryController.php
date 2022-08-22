@@ -19,9 +19,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Filesystem\Filesystem;
+use App\Models\File;
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryRequest;
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryCreateRequest;
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryCreateMobileRequest;
+use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryFileRequest;
 
 class ReceivingGoodsDeliveryController extends Controller
 {
@@ -350,6 +352,64 @@ class ReceivingGoodsDeliveryController extends Controller
             Log::error($e);
             return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
+        }
+    }
+
+    public function update_rgd_file(ReceivingGoodsDeliveryFileRequest $request){
+        $validated = $request->validated();
+        try{
+            $path = join('/', ['files', 'import_schedule', $validated['is_no']]);
+            //return $validated['is_no'];
+            if($request->remove_files){
+                foreach($request->remove_files as $key => $file_no) {
+                    $file = File::where('file_no', $file_no)->get()->first();
+                    $url = Storage::disk('public')->delete($path. '/' . $file->file_name);
+                    $file->delete();
+                }
+            }
+            
+            $files = [];
+            foreach ($validated['files'] as $key => $file) {
+                $url = Storage::disk('public')->put($path, $file);
+                $files[] = [
+                    'file_table' => 'import_schedule',
+                    'file_table_key' => $validated['is_no'],
+                    'file_name' => basename($url),
+                    'file_name_old' => $file->getClientOriginalName(),
+                    'file_size' => $file->getSize(),
+                    'file_extension' => $file->extension(),
+                    'file_position' => $key,
+                    'file_url' => $url
+                ];
+            }
+
+            File::insert($files);
+
+            DB::commit();
+            return response()->json(['message' => Messages::MSG_0007], 201);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0001], 500);
+        }
+    }
+
+    public function get_rgd_file(Request $request){
+        try {
+            //$validated = $request->validated();
+
+            // If per_page is null set default data = 15
+            //$per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            //$page = isset($validated['page']) ? $validated['page'] : 1;
+            $file = File::where('file_table_key', '=', $request->is_no)->
+            where('file_table', '=', 'import_schedule')->get();
+            return response()->json($file);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
 
