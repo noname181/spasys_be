@@ -77,6 +77,7 @@ class RateDataRequest extends BaseFormRequest
             'rate_data.*.rd_data3' => [
                 'string',
                 'max:255',
+                'nullable'
             ],
         ];
     }

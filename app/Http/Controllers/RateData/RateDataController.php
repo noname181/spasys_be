@@ -57,6 +57,7 @@ class RateDataController extends Controller
 
     public function getRateData($rm_no)
     {
+        $co_no = Auth::user()->co_no;
         try {
             $rate_data = RateData::select([
                 'rd_no',
@@ -69,7 +70,9 @@ class RateDataController extends Controller
                 'rd_data1',
                 'rd_data2',
             ])->where('rm_no', $rm_no)->get();
-            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data], 200);
+            $my_rate_data1 = RateData::where('co_no', $co_no)->where('rd_cate_meta1', '보세화물')->get();
+            $my_rate_data2 = RateData::where('co_no', $co_no)->where('rd_cate_meta1', '수입풀필먼트')->get();
+            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data, 'my_rate_data1' => $my_rate_data1, 'my_rate_data2' => $my_rate_data2], 200);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
