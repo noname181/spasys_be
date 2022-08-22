@@ -157,6 +157,37 @@ class ItemController extends Controller
         }
     }
 
+    public function postItems(ItemSearchRequest $request)
+    {
+       
+        $validated = $request->validated();
+       // return  $validated;
+        try {
+
+            if(isset($validated['items'])){
+                $item_no =  array_column($validated['items'], 'item_no');
+            }
+
+            $items = Item::with('item_channels');
+            
+            if (isset($item_no)) {
+                $items->whereIn('item_no', $item_no);
+            }
+
+            $items->where('item_service_name', '유통가공');
+            
+            $items = $items->get();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'items' => $items,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
     public function searchItems(ItemSearchRequest $request)
     {
         $validated = $request->validated();

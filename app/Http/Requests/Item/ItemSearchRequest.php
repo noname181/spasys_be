@@ -24,6 +24,9 @@ class ItemSearchRequest extends BaseFormRequest
     public function rules()
     {
         return [
+            'items' => [
+                '',
+            ],
             'from_date' => [
                 'string',
                 'date_format:Y-m-d'
