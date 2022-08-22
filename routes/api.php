@@ -238,6 +238,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/', \App\Http\Controllers\RateData\RateDataController::class)->name('registe_rate_data');
         Route::get('/{rm_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateData'])->name('get_rate_data');
         Route::get('/by_co_no/{co_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByCono'])->name('get_rate_data_by_co_no');
+        Route::get('/importfulfillment/{rm_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByImportFulfillment'])->name('get_rate_data_by_importfulfillment');
+        Route::post('/importfulfillment', [App\Http\Controllers\RateData\RateDataController::class, 'createOrUpdateImportFulfillment'])->name('update_or_create_importfulfillment');
     });
 
     Route::prefix('alarm')->name('alarm.')->group(function () {
