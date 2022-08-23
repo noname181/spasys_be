@@ -200,7 +200,7 @@ class CompanyController extends Controller
             DB::beginTransaction();
 
             $comp = Company::where('co_no', $company->co_no)
-                ->where('mb_no', Auth::user()->mb_no)
+                // ->where('mb_no', Auth::user()->mb_no)
                 ->update([
                     'co_name' => $validated['co_name'],
                     'co_address' => $validated['co_address'],
