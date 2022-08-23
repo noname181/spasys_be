@@ -69,6 +69,6 @@ class Item extends Model
 
     public function warehousing_item()
     {
-        return $this->HasOne(WarehousingItem::class, 'item_no', 'item_no');
+        return $this->belongsTo(WarehousingItem::class, 'item_no', 'item_no');
     }
 }
