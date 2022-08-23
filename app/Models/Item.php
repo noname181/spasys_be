@@ -44,7 +44,9 @@ class Item extends Model
         'item_cate3',
         'item_regtime',
         'item_table',
-        'item_key'
+        'item_key',
+        'item_origin',
+        'item_manufacturer'
     ];
 
     protected $casts = [

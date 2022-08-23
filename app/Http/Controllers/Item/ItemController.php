@@ -52,6 +52,8 @@ class ItemController extends Controller
                     'item_cate2' => $validated['item_cate2'],
                     'item_cate3' => $validated['item_cate3'],
                     'item_url' => $validated['item_url'],
+                    'item_origin' => $validated['item_origin'],
+                    'item_manufacturer' => $validated['item_manufacturer'],
                 ]);
 
                 $item_channels = [];
@@ -95,6 +97,8 @@ class ItemController extends Controller
                     'item_cate2' => $validated['item_cate2'],
                     'item_cate3' => $validated['item_cate3'],
                     'item_url' => $validated['item_url'],
+                    'item_origin' => $validated['item_origin'],
+                    'item_manufacturer' => $validated['item_manufacturer'],
                 ];
                 $item->update($update);
 
