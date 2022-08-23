@@ -55,7 +55,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:spasys_manager,spasys_admin,shop_manager')->group(function () {
         Route::post('/register_company', \App\Http\Controllers\Company\CompanyController::class)->name('register_company');
     });
-    Route::post('/get_companies', [App\Http\Controllers\Company\CompanyController::class, 'getcompanies'])->name('get_companies');
+    Route::post('/get_companies', [App\Http\Controllers\Company\CompanyController::class, 'getCompanies'])->name('get_companies');
 
     Route::get('/get_company/{co_no}', [App\Http\Controllers\Company\CompanyController::class, 'getCompany'])->name('get_company');
     Route::patch('/update_company/{company}', [App\Http\Controllers\Company\CompanyController::class, 'updateCompany'])->name('update_company');

@@ -61,11 +61,11 @@ class InvokeRequest extends BaseFormRequest
                 'max:255'
             ],
             // FIXME no found
-            // 'co_close_yn' => [
-            //     'required',
-            //     'string',
-            //     'max:1'
-            // ],
+            'co_close_yn' => [
+                'required',
+                'string',
+                'max:1'
+            ],
             'co_homepage' => [
                 'required',
                 'string',

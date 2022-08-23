@@ -50,6 +50,7 @@ class CompanyController extends Controller
                 'co_email' => $validated['co_email'],
                 'co_etc' => $validated['co_etc'],
                 'co_type' => $co_type,
+                'co_close_yn' => $validated['co_close_yn'],
             ]);
 
             $company = Company::where('co_no', $co_no)->first();
@@ -85,7 +86,7 @@ class CompanyController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $companies = Company::with('contract')->where('co_type', '!=', 'spasys')->orderBy('co_no', 'DESC');
+            $companies = Company::with(['contract', 'co_parent'])->where('co_type', '!=', 'spasys')->orderBy('co_no', 'DESC');
 
             if (isset($validated['from_date'])) {
                 $companies->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
@@ -154,6 +155,7 @@ class CompanyController extends Controller
                 'company.co_country',
                 'company.co_service',
                 'company.co_license',
+                'company.co_close_yn',
                 'company.co_owner',
                 'company.co_homepage',
                 'company.co_email',
@@ -210,6 +212,7 @@ class CompanyController extends Controller
                     'co_homepage' => $validated['co_homepage'],
                     'co_email' => $validated['co_email'],
                     'co_etc' => $validated['co_etc'],
+                    'co_close_yn' => $validated['co_close_yn'],
                 ]);
 
 
