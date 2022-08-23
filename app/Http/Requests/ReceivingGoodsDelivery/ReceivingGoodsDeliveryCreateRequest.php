@@ -34,13 +34,13 @@ class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
                 '',   
             ],
             'w_schedule_number' =>[
-                'string',   
+                '',   
             ],
             'w_schedule_day' => [
                 ''
             ],
             'remove' => [
-                '',
+                'array',
             ],
             'items.*.item_no' => [
                 '',
@@ -49,6 +49,9 @@ class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
                 '',
             ],
             'items.*.warehousing_item.wi_number' => [
+                '',
+            ],
+            'items.*.warehousing_item.wi_no' => [
                 '',
             ],
             'location.*.rgd_no' => [
@@ -109,18 +112,18 @@ class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
                 'max:255',
             ],
             'location.*.rgd_tracking_code' => [
-                'required',
-                'string',
+                '',
+                '',
                 'max:255',
             ],
             'location.*.rgd_delivery_man' => [
-                'required',
-                'string',
+                '',
+                '',
                 'max:255',
             ],
             'location.*.rgd_delivery_man_hp' => [
-                'required',
-                'string',
+                '',
+                '',
                 'max:255',
             ],
             'location.*.rgd_delivery_schedule_day' => [

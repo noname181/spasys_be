@@ -45,6 +45,21 @@ class WarehousingController extends Controller
         }
     }
 
+    public function getWarehousingById($w_no)
+    {
+       
+        $warehousing = Warehousing::find($w_no);
+        if (!empty($warehousing)) {
+            return response()->json(
+                ['message' => Messages::MSG_0007,
+                 'data' => $warehousing
+                ], 200);
+        } else {
+            return response()->json(['message' => CommonFunc::renderMessage(Messages::MSG_0016, ['Warehousing'])], 400);
+        }
+    }
+
+    
     /**
      * Get Warehousing
      * @param  WarehousingSearchRequest $request

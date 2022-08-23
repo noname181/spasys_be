@@ -15,7 +15,7 @@ class WarehousingItem extends Model
 
     protected $primaryKey = 'wi_no';
 
-    public $timestamps = true;
+    public $timestamps = false;
 
     /**
      * The attributes that are mass assignable.
@@ -27,13 +27,13 @@ class WarehousingItem extends Model
         'item_no',
         'w_no',
         'wi_number',
-        'created_at',
-        'updated_at',
+        'wi_created_at',
+        'wi_updated_at',
     ];
 
     protected $casts = [
-        'created_at' => "date:Y.m.d H:i",
-        'updated_at' => "date:Y.m.d H:i",
+        'wi_created_at' => "date:Y.m.d H:i",
+        'wi_updated_at' => "date:Y.m.d H:i",
     ];
 
     public function w_no()

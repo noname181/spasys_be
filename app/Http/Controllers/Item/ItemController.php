@@ -171,21 +171,27 @@ class ItemController extends Controller
         $validated = $request->validated();
        // return  $validated;
         try {
-
+            DB::enableQueryLog();
             if(isset($validated['items'])){
                 $item_no =  array_column($validated['items'], 'item_no');
             }
 
-            $items = Item::with('item_channels')->with('warehousing_item');
+            $items = Item::with(['item_channels','warehousing_item']);
             
             if (isset($item_no)) {
                 $items->whereIn('item_no', $item_no);
             }
 
-            if (isset($validated['w_no']) && !$validated['items']) {
+            if (isset($validated['w_no']) && !isset($validated['items'])) {
+                //$items->with('warehousing_item')->whereHas('warehousing_item.w_no', '=', $validated['w_no']);
                 $items->whereHas('warehousing_item.w_no',function($query) use ($validated) {              
-                    $query->where(DB::raw('w_no'), '=',$validated['w_no']);
-                });
+                    $query->where('w_no', '=', $validated['w_no']);
+                });     
+                  
+            }
+
+            if (!isset($validated['w_no']) && !isset($validated['items'])) {
+                $items->where('1','=','2');
             }
 
             $items->where('item_service_name', '유통가공');
@@ -194,6 +200,7 @@ class ItemController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'items' => $items,
+                'sql' => DB::getQueryLog()
             ]);
         } catch (\Exception $e) {
             Log::error($e);
