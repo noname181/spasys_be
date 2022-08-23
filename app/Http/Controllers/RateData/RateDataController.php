@@ -72,7 +72,8 @@ class RateDataController extends Controller
             ])->where('rm_no', $rm_no)->get();
             $my_rate_data1 = RateData::where('co_no', $co_no)->where('rd_cate_meta1', '보세화물')->get();
             $my_rate_data2 = RateData::where('co_no', $co_no)->where('rd_cate_meta1', '수입풀필먼트')->get();
-            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data, 'my_rate_data1' => $my_rate_data1, 'my_rate_data2' => $my_rate_data2], 200);
+            $my_rate_data3 = RateData::where('co_no', $co_no)->where('rd_cate_meta1', '유통가공')->get();
+            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data, 'my_rate_data1' => $my_rate_data1, 'my_rate_data2' => $my_rate_data2, 'my_rate_data3' => $my_rate_data3], 200);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
