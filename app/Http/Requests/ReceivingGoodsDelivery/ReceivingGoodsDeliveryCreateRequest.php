@@ -33,6 +33,9 @@ class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
             'w_schedule_amount' =>[
                 '',   
             ],
+            'w_amount' =>[
+                '',   
+            ],
             'w_schedule_number' =>[
                 '',   
             ],
@@ -49,6 +52,9 @@ class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
                 '',
             ],
             'items.*.warehousing_item.wi_number' => [
+                '',
+            ],
+            'items.*.warehousing_item.wi_number_received' => [
                 '',
             ],
             'items.*.warehousing_item.wi_no' => [

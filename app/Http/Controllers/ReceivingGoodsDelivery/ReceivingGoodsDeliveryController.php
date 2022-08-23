@@ -71,9 +71,9 @@ class ReceivingGoodsDeliveryController extends Controller
             if(isset($validated['w_no'])){
                 Warehousing::where('w_no', $validated['w_no'])->update([
                     'mb_no' => $member->mb_no,
-                    'w_schedule_number' => $validated['w_schedule_number'],
+                    'w_schedule_amount' => $validated['w_schedule_amount'],
                     'w_schedule_day' => $validated['w_schedule_day'],
-                    
+                    'w_amount' => $validated['w_amount'],
                 ]);
             }else{
                 $w_no_data = Warehousing::insertGetId([
@@ -81,6 +81,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     // 'co_no' => $validated['co_no'],
                     'w_schedule_day' => DateTime::createFromFormat('Y-m-d', $validated['w_schedule_day']),
                     'w_schedule_amount' => $validated['w_schedule_amount'],
+                    'w_amount' => $validated['w_amount'],
                 ]);
             }
             
@@ -163,6 +164,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             'item_no' => $warehousing_item['item_no'],
                             'w_no' => $w_no,
                             'wi_number' => $warehousing_item['warehousing_item']['wi_number'],
+                            'wi_number_received' => $warehousing_item['warehousing_item']['wi_number_received'],
                         ]);
                     }
                     else{
@@ -170,6 +172,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             'item_no' => $warehousing_item['item_no'],
                             'w_no' => $w_no,
                             'wi_number' => $warehousing_item['warehousing_item']['wi_number'],
+                            'wi_number_received' => $warehousing_item['warehousing_item']['wi_number_received'],
                         ]);
 
                     }
