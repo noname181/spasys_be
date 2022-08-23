@@ -355,6 +355,22 @@ class ReceivingGoodsDeliveryController extends Controller
         }
     }
 
+    // Project model:
+
+    public static function boot()
+    {
+        parent::boot();
+        self::creating(function(Project $project) {
+            $projectCount = Project::where('code', 'LIKE', '%-'. date('Y'))->count();
+            $projectCount++;
+            $project->code = 'SIPRO-'. str_pad($projectCount, 5, '0', STR_PAD_LEFT) .'-'.date('Y');
+            return true;
+        });
+
+    }
+
+
+
     public function update_rgd_file(ReceivingGoodsDeliveryFileRequest $request){
         $validated = $request->validated();
         try{

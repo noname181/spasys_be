@@ -30,6 +30,9 @@ class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
             'wr_contents' => [
                 '',
             ],
+            'w_schedule_amount' =>[
+                '',   
+            ],
             'w_schedule_number' =>[
                 'string',   
             ],
