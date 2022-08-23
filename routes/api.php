@@ -223,6 +223,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [App\Http\Controllers\Item\ItemController::class, 'searchItems'])->name('search');
         Route::post('/paginate', [App\Http\Controllers\Item\ItemController::class, 'paginateItems'])->name('paginate');
         Route::post('/', \App\Http\Controllers\Item\ItemController::class)->name('create_or_update');
+        Route::post('/update_file', [\App\Http\Controllers\Item\ItemController::class, 'updateFile'])->name('update_file');
         Route::get('/{item}', [App\Http\Controllers\Item\ItemController::class, 'getItemById'])->name('get_item_by_id');
         Route::delete('/item_channel/{item_channel}', [App\Http\Controllers\Item\ItemController::class, 'deleteItemChannel'])->name('delete_item_channel');
         Route::post('/import_excel', [App\Http\Controllers\Item\ItemController::class, 'importItems'])->name('import_items');
