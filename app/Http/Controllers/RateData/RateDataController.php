@@ -282,4 +282,28 @@ class RateDataController extends Controller
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
+
+    
+    public function getSpasysRateData3()
+    {
+        $co_no = Auth::user()->co_no;
+        try {
+            $rate_data = RateData::select([
+                'rd_no',
+                'rd_cate_meta1',
+                'rd_cate_meta2',
+                'rd_cate1',
+                'rd_cate2',
+                'rd_cate3',
+                'rd_data1',
+                'rd_data2',
+                'rd_data3',
+            ])->where('co_no', $co_no)->where('rd_cate_meta1', '유통가공')->get();
+            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
 }
