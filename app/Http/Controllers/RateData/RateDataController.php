@@ -249,6 +249,7 @@ class RateDataController extends Controller
                 'rd_cate3',
                 'rd_data1',
                 'rd_data2',
+                'rd_data3',
             ])->where('co_no', $co_no)->get();
             return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data], 200);
         } catch (\Exception $e) {
@@ -271,6 +272,7 @@ class RateDataController extends Controller
                 'rd_cate3',
                 'rd_data1',
                 'rd_data2',
+                'rd_data3',
             ])->where('co_no', $co_no)->where('rd_cate_meta1', '수입풀필먼트')->get();
             return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data], 200);
         } catch (\Exception $e) {
