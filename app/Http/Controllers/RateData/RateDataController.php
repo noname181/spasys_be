@@ -114,7 +114,8 @@ class RateDataController extends Controller
                         'rd_no' => isset($val['rd_no']) ? $val['rd_no'] : null,
                     ],
                     [
-                        'rm_no' => $val['rm_no'],
+                        'rm_no' => isset($val['rm_no']) ? $val['rm_no'] : null,
+                        'co_no' => isset($val['co_no']) ? $val['co_no'] : null,
                         'rd_cate_meta1' => $val['rd_cate_meta1'],
                         'rd_cate_meta2' => '',
                         'rd_cate1' => $val['rd_cate1'],
@@ -138,7 +139,7 @@ class RateDataController extends Controller
         }
     }
 
-    public function getRateDataByImportFulfillment($rm_no)
+    public function getRateDataByImportFulfillmentByRmno($rm_no)
     {
         try {
             $rate_data = RateData::select([
@@ -156,7 +157,29 @@ class RateDataController extends Controller
                 ->get();
             return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data], 200);
         } catch (\Exception $e) {
-            DB::rollback();
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+    public function getRateDataByImportFulfillmentByCono($co_no)
+    {
+        try {
+            $rate_data = RateData::select([
+                'rd_no',
+                'rm_no',
+                'rd_cate_meta1',
+                'rd_cate1',
+                'rd_cate2',
+                'rd_data1',
+                'rd_data2',
+                'rd_data3',
+            ])
+                ->where('rd_cate_meta1', '수입풀필먼트')
+                ->where('co_no', $co_no)
+                ->get();
+            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data], 200);
+        } catch (\Exception $e) {
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
@@ -283,7 +306,7 @@ class RateDataController extends Controller
         }
     }
 
-    
+
     public function getSpasysRateData3()
     {
         $co_no = Auth::user()->co_no;
