@@ -11,6 +11,7 @@ use App\Http\Requests\RateData\RateDataRequest;
 use App\Http\Requests\RateData\RateDataImportFulfillmentRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Models\RateMeta;
 class RateDataController extends Controller
 {
     /**
@@ -23,6 +24,15 @@ class RateDataController extends Controller
         $validated = $request->validated();
         // try {
         DB::beginTransaction();
+        $co_no = $validated['rate_data'][0]['co_no'];
+
+        if(!empty($co_no)){
+            $rm_no = RateMeta::insertGetId([
+                'co_no' => $co_no,
+                'mb_no' => Auth::user()->mb_no
+            ]);
+        }
+
         foreach ($validated['rate_data'] as $val) {
             Log::error($val);
             $rdsm_no = RateData::updateOrCreate(
@@ -31,7 +41,7 @@ class RateDataController extends Controller
                     'co_no' => isset($val['co_no']) ? $val['co_no'] : null,
                 ],
                 [
-                    'rm_no' => isset($val['rm_no']) ? $val['rm_no'] : null,
+                    'rm_no' => isset($val['rm_no']) ? $val['rm_no'] : (isset($rm_no) ? $rm_no :  null),
                     'rd_cate_meta1' => $val['rd_cate_meta1'],
                     'rd_cate_meta2' => $val['rd_cate_meta2'],
                     'rd_cate1' => $val['rd_cate1'],
@@ -43,6 +53,8 @@ class RateDataController extends Controller
                 ],
             );
         }
+
+
 
         DB::commit();
         return response()->json([

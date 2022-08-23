@@ -236,6 +236,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/{rm_no}', [App\Http\Controllers\RateMeta\RateMetaController::class, 'getrm'])->name('get_rm');
         Route::patch('/{rm}', [\App\Http\Controllers\RateMeta\RateMetaController::class, 'updaterm']);
         Route::post('/all', [App\Http\Controllers\RateMeta\RateMetaController::class, 'getRateData'])->name('get_rate_data');
+        Route::post('/all_company', [App\Http\Controllers\RateMeta\RateMetaController::class, 'getRateDataCompany'])->name('get_rate_data_company');
     });
 
     Route::prefix('rate_data')->name('rate_data.')->group(function () {
