@@ -118,6 +118,13 @@ class ItemController extends Controller
                 $path = join('/', ['files', 'item', $item_no]);
                 $url = Storage::disk('public')->put($path, $validated['file']);
 
+                $file = File::where('file_table', 'item')->where('file_table_key', $item_no)->first();
+
+                if(!empty($file)){
+                    Storage::disk('public')->delete($file->file_url);
+                    $file->delete();  
+                }
+
                 File::insert([
                     'file_table' => 'item',
                     'file_table_key' => $item_no,
@@ -128,6 +135,7 @@ class ItemController extends Controller
                     'file_position' => 0,
                     'file_url' => $url
                 ]);
+               
             }
             DB::commit();
             return response()->json([
@@ -409,4 +417,25 @@ class ItemController extends Controller
             return response()->json(['message' => Messages::MSG_0004], 500);
         }
     }
+
+    public function updateFile(Request $request){
+        $path = join('/', ['files', 'item', $request->item_no]);
+        $url = Storage::disk('public')->put($path, $request->file);
+
+        File::insert([
+            'file_table' => 'item',
+            'file_table_key' => $request->item_no,
+            'file_name_old' => $request->file->getClientOriginalName(),
+            'file_name' => basename($url),
+            'file_size' => $request->file->getSize(),
+            'file_extension' => $request->file->extension(),
+            'file_position' => 0,
+            'file_url' => $url
+        ]);
+
+        return response()->json([
+            'message' => Messages::MSG_0007,
+        ]);
+    }
+
 }
