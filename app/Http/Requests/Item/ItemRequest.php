@@ -35,7 +35,7 @@ class ItemRequest extends BaseFormRequest
                 'max:255',
             ],
             'co_no' => [
-                'required',
+                'nullable',
                 'int',
             ],
             'item_name' => [
@@ -126,6 +126,16 @@ class ItemRequest extends BaseFormRequest
                 'nullable',
                 'max:5000',
                 'mimes:jpg,jpeg,png,pdf',
+            ],
+            'item_origin' => [
+                'string',
+                'nullable',
+                'max:255',
+            ],
+            'item_manufacturer' => [
+                'string',
+                'nullable',
+                'max:255',
             ],
         ];
     }

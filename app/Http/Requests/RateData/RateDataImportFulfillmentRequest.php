@@ -29,7 +29,13 @@ class RateDataImportFulfillmentRequest extends BaseFormRequest
             ],
             'rate_data.*.rm_no' => [
                 'int',
-                'nullable'
+                'nullable',
+                'exists:rate_meta,rm_no'
+            ],
+            'rate_data.*.co_no' => [
+                'int',
+                'nullable',
+                'exists:company,co_no'
             ],
             'rate_data.*.rd_no' => [
                 'int',
