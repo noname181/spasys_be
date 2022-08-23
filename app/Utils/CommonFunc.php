@@ -25,4 +25,12 @@ class CommonFunc
             return false;
         }
     }
+
+
+    function generate_w_schedule_number($data,$type)
+    {
+        $string = 'SPA';
+        $string = $string.'_'.date('Ymd').$data.'_'.$type;
+        return $string;
+    }
 }

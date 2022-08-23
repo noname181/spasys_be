@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\ItemChannel;
+use App\Models\WarehousingItem;
 
 class Item extends Model
 {
@@ -66,4 +67,8 @@ class Item extends Model
         return $this->HasOne(Company::class, 'co_no', 'co_no')->with('co_parent');
     }
 
+    public function warehousing_item()
+    {
+        return $this->HasOne(WarehousingItem::class, 'item_no', 'item_no');
+    }
 }

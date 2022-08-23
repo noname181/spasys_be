@@ -48,6 +48,9 @@ class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
             'items.*.wi_number' => [
                 '',
             ],
+            'items.*.warehousing_item.wi_number' => [
+                '',
+            ],
             'location.*.rgd_no' => [
                 '',
             ],
@@ -57,6 +60,7 @@ class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
             'location.*.w_no' => [
                 '',
             ],
+           
             'location.*.rgd_contents' => [
                 'required',
                 'string',
