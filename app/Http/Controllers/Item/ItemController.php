@@ -176,10 +176,16 @@ class ItemController extends Controller
                 $item_no =  array_column($validated['items'], 'item_no');
             }
 
-            $items = Item::with('item_channels');
+            $items = Item::with('item_channels')->with('warehousing_item');
             
             if (isset($item_no)) {
                 $items->whereIn('item_no', $item_no);
+            }
+
+            if (isset($validated['w_no']) && !$validated['items']) {
+                $items->whereHas('warehousing_item.w_no',function($query) use ($validated) {              
+                    $query->where(DB::raw('w_no'), '=',$validated['w_no']);
+                });
             }
 
             $items->where('item_service_name', '유통가공');
