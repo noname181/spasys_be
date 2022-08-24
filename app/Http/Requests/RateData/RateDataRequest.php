@@ -27,6 +27,14 @@ class RateDataRequest extends BaseFormRequest
             'rate_data' => [
                 'array',
             ],
+            'rm_no' => [
+                'int',
+                'nullable'
+            ],
+            'co_no' => [
+                'int',
+                'nullable'
+            ],
             'rate_data.*.rd_no' => [
                 'int',
                 'nullable'
