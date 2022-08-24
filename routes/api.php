@@ -254,10 +254,10 @@ Route::middleware('auth')->group(function () {
         });
         Route::post('/', \App\Http\Controllers\RateData\RateDataController::class)->name('registe_rate_data');
         Route::get('/{rm_no}/{rmd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateData'])->name('get_rate_data');
-        Route::get('/by_co_no/{co_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByCono'])->name('get_rate_data_by_co_no');
+        Route::get('/by_co_no/{co_no}/{rmd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByCono'])->name('get_rate_data_by_co_no');
         Route::get('/by_rm_no/{rm_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByRmno'])->name('get_rate_data_by_rm_no');
-        Route::get('/importfulfillment/by_rm_no/{rm_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByImportFulfillmentByRmno'])->name('get_rate_data_by_importfulfillment_rmno');
-        Route::get('/importfulfillment/by_co_no/{co_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByImportFulfillmentByCono'])->name('get_rate_data_by_importfulfillment_cono');
+        Route::get('/importfulfillment/by_rm_no/{rm_no}/{rmd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByImportFulfillmentByRmno'])->name('get_rate_data_by_importfulfillment_rmno');
+        Route::get('/importfulfillment/by_co_no/{co_no}/{rmd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByImportFulfillmentByCono'])->name('get_rate_data_by_importfulfillment_cono');
         Route::post('/importfulfillment', [App\Http\Controllers\RateData\RateDataController::class, 'createOrUpdateImportFulfillment'])->name('update_or_create_importfulfillment');
     });
 

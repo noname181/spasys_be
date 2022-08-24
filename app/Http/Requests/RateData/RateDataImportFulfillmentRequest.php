@@ -27,6 +27,14 @@ class RateDataImportFulfillmentRequest extends BaseFormRequest
             'rate_data' => [
                 'array',
             ],
+            'newRmd_no' => [
+                'int',
+                'nullable',
+            ],
+            'rm_no' => [
+                'int',
+                'nullable',
+            ],
             'rate_data.*.rm_no' => [
                 'int',
                 'nullable',
