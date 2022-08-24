@@ -24,6 +24,7 @@ class RateData extends Model
         'rd_no',
         'rm_no',
         'co_no',
+        'rd_co_no',
         'rmd_no',
         'rd_cate_meta1',
         'rd_cate_meta2',
