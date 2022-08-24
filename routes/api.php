@@ -242,6 +242,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/all_company', [App\Http\Controllers\RateMeta\RateMetaController::class, 'getRateDataCompany'])->name('get_rate_data_company');
     });
 
+    Route::prefix('rate_meta_data')->name('rate_data_send_meta.')->group(function () {
+        Route::post('/all', [App\Http\Controllers\RateMetaData\RateMetaDataController::class, 'getAll'])->name('get_all');
+    });
+
     Route::prefix('rate_data')->name('rate_data.')->group(function () {
         Route::middleware('role:spasys_manager,spasys_admin,spasys_operator,shop_manager,shop_operator')->group(function () {
             Route::post('/spasys', [\App\Http\Controllers\RateData\RateDataController::class, 'spasysRegisterRateData'])->name('spasys_registe_rate_data');
@@ -251,10 +255,11 @@ Route::middleware('auth')->group(function () {
             Route::get('/spasys3', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData3'])->name('get_spasys_rate_data3');
         });
         Route::post('/', \App\Http\Controllers\RateData\RateDataController::class)->name('registe_rate_data');
-        Route::get('/{rm_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateData'])->name('get_rate_data');
-        Route::get('/by_co_no/{co_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByCono'])->name('get_rate_data_by_co_no');
-        Route::get('/importfulfillment/by_rm_no/{rm_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByImportFulfillmentByRmno'])->name('get_rate_data_by_importfulfillment_rmno');
-        Route::get('/importfulfillment/by_co_no/{co_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByImportFulfillmentByCono'])->name('get_rate_data_by_importfulfillment_cono');
+        Route::get('/{rm_no}/{rmd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateData'])->name('get_rate_data');
+        Route::get('/by_co_no/{co_no}/{rmd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByCono'])->name('get_rate_data_by_co_no');
+        Route::get('/by_rm_no/{rm_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByRmno'])->name('get_rate_data_by_rm_no');
+        Route::get('/importfulfillment/by_rm_no/{rm_no}/{rmd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByImportFulfillmentByRmno'])->name('get_rate_data_by_importfulfillment_rmno');
+        Route::get('/importfulfillment/by_co_no/{co_no}/{rmd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByImportFulfillmentByCono'])->name('get_rate_data_by_importfulfillment_cono');
         Route::post('/importfulfillment', [App\Http\Controllers\RateData\RateDataController::class, 'createOrUpdateImportFulfillment'])->name('update_or_create_importfulfillment');
     });
 

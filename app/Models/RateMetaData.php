@@ -5,14 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class RateData extends Model
+class RateMetaData extends Model
 {
     use HasFactory;
 
-    protected $table = "rate_data";
+    protected $table = "rate_meta_data";
 
 
-    protected $primaryKey = 'rd_no';
+    protected $primaryKey = 'rmd_no';
 
     public $timestamps = true;
     /**
@@ -21,23 +21,18 @@ class RateData extends Model
      * @var string[]
      */
     protected $fillable = [
-        'rd_no',
-        'rm_no',
-        'co_no',
         'rmd_no',
-        'rd_cate_meta1',
-        'rd_cate_meta2',
-        'rd_cate1',
-        'rd_cate2',
-        'rd_cate3',
-        'rd_data1',
-        'rd_data2',
-        'rd_data3'
+        'mb_no',
+        'rm_no',
     ];
 
     protected $casts = [
         'created_at' => "date:Y.m.d",
         'updated_at' => "date:Y.m.d",
     ];
+
+    public function rate_meta() {
+        return $this->hasOne(RateMeta::class, 'rm_no', 'rm_no');
+    }
 
 }
