@@ -27,10 +27,16 @@ class CommonFunc
     }
 
 
-    function generate_w_schedule_number($data,$type)
+    function generate_w_schedule_number($data, $type)
     {
         $string = 'SPA';
         $string = $string.'_'.date('Ymd').$data.'_'.$type;
+        return $string;
+    }
+
+    function generate_rmd_number($id, $index)
+    {
+        $string = date('Ymd').$id.'_'.$index;
         return $string;
     }
 }

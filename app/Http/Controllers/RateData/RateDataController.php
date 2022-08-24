@@ -13,6 +13,7 @@ use App\Http\Requests\RateData\RateDataRequest;
 use App\Http\Requests\RateData\RateDataImportFulfillmentRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Utils\CommonFunc;
 
 class RateDataController extends Controller
 {
@@ -30,26 +31,28 @@ class RateDataController extends Controller
             if(isset($validated['co_no'])){
                 $rm_no = RateMeta::insertGetId([
                     'co_no' => $validated['co_no'],
-                    'mb_no' => Auth::user()->mb_no
+                    'mb_no' => Auth::user()->mb_no,
                 ]);
             }
-            if(empty($validated['newRmd_no'])){ 
+            if(empty($validated['newRmd_no'])){
+                $index = RateMetaData::where('rm_no', $validated['rm_no'])->get()->count() + 1;
                 $rmd_no = RateMetaData::insertGetId(
                     [
-                        'mb_no' => Auth::user()->mb_no,  
-                        'rm_no' => $validated['rm_no']  
+                        'mb_no' => Auth::user()->mb_no,
+                        'rm_no' => $validated['rm_no'],
+                        'rmd_number' => CommonFunc::generate_rmd_number($validated['rm_no'], $index)
                     ]
                 );
             }
 
             foreach ($validated['rate_data'] as $val) {
                 Log::error($val);
-                $rd_no = RateData::updateOrCreate(  
+                $rd_no = RateData::updateOrCreate(
                     [
-                        'rd_no' => isset($rmd_no) ? null : (isset($val['rd_no']) ? $val['rd_no'] : null),
+                        'rd_no' => isset($rmd_no) ? null : (isset($val['rd_no']) ? ($val['rd_no'] != $validated['newRmd_no'] ? null : $val['rd_no'] ) : null),
                         'rmd_no' => isset($rmd_no) ? $rmd_no : $validated['newRmd_no'],
                         'rm_no' => isset($validated['rm_no']) ? $validated['rm_no'] :  $rm_no,
-                    ], 
+                    ],
                     [
                         'co_no' => isset($validated['co_no']) ? $validated['co_no'] : null,
                         'rd_cate_meta1' => $val['rd_cate_meta1'],
@@ -60,7 +63,7 @@ class RateDataController extends Controller
                         'rd_data1' => $val['rd_data1'],
                         'rd_data2' => $val['rd_data2'],
                         'rd_data3' => isset($val['rd_data3']) ? $val['rd_data3'] : '',
-                        
+
                     ],
                 );
             }
@@ -81,11 +84,13 @@ class RateDataController extends Controller
     {
         $co_no = Auth::user()->co_no;
         try {
-            $rate_data = RateData::where('rm_no', $rm_no)->where('rmd_no', $rmd_no)->where('rd_cate_meta1', '보세화물')->get();
-            $my_rate_data1 = RateData::where('co_no', $co_no)->where('rd_cate_meta1', '보세화물')->get();
-            $my_rate_data2 = RateData::where('co_no', $co_no)->where('rd_cate_meta1', '수입풀필먼트')->get();
-            $my_rate_data3 = RateData::where(['co_no' => $co_no, 'rd_cate_meta1' => '유통가공'])->get();
-            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data, 'my_rate_data1' => $my_rate_data1, 'my_rate_data2' => $my_rate_data2, 'my_rate_data3' => $my_rate_data3], 200);
+            $rate_data1 = RateData::where('rm_no', $rm_no)->where('rmd_no', $rmd_no)->where('rd_cate_meta1', '보세화물')->get();
+            $rate_data2 = RateData::where('rm_no', $rm_no)->where('rmd_no', $rmd_no)->where('rd_cate_meta1', '수입풀필먼트')->get();
+            $rate_data3 = RateData::where('rm_no', $rm_no)->where('rmd_no', $rmd_no)->where('rd_cate_meta1', '유통가공')->get();
+            $co_rate_data1 = RateData::where('co_no', $co_no)->where('rd_cate_meta1', '보세화물')->get();
+            $co_rate_data2 = RateData::where('co_no', $co_no)->where('rd_cate_meta1', '수입풀필먼트')->get();
+            $co_rate_data3 = RateData::where(['co_no' => $co_no, 'rd_cate_meta1' => '유통가공'])->get();
+            return response()->json(['message' => Messages::MSG_0007, 'rate_data1' => $rate_data1, 'rate_data2' => $rate_data2, 'rate_data3' => $rate_data3, 'co_rate_data1' => $co_rate_data1, 'co_rate_data2' => $co_rate_data2, 'co_rate_data3' => $co_rate_data3], 200);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
@@ -145,11 +150,11 @@ class RateDataController extends Controller
                     'mb_no' => Auth::user()->mb_no
                 ]);
             }
-            if(empty($validated['newRmd_no'])){ 
+            if(empty($validated['newRmd_no'])){
                 $rmd_no = RateMetaData::insertGetId(
                     [
-                        'mb_no' => Auth::user()->mb_no,  
-                        'rm_no' => $validated['rm_no']  
+                        'mb_no' => Auth::user()->mb_no,
+                        'rm_no' => $validated['rm_no']
                     ]
                 );
             }
@@ -157,10 +162,10 @@ class RateDataController extends Controller
             foreach ($validated['rate_data'] as $val) {
                 RateData::updateOrCreate(
                     [
-                        'rd_no' => isset($rmd_no) ? null : (isset($val['rd_no']) ? $val['rd_no'] : null),
+                        'rd_no' => isset($rmd_no) ? null : (isset($val['rd_no']) ? ($val['rd_no'] != $validated['newRmd_no'] ? null : $val['rd_no'] ) : null),
                         'rmd_no' => isset($rmd_no) ? $rmd_no : $validated['newRmd_no'],
                         'rm_no' => isset($validated['rm_no']) ? $validated['rm_no'] :  $rm_no,
-                    ], 
+                    ],
                     [
                         'co_no' => isset($validated['co_no']) ? $validated['co_no'] : null,
                         'rd_cate_meta1' => $val['rd_cate_meta1'],
@@ -188,18 +193,19 @@ class RateDataController extends Controller
         }
     }
 
-    public function getRateDataByImportFulfillmentByRmno($rm_no)
+    public function getRateDataByImportFulfillmentByRmno($rm_no, $rmd_no)
     {
         $co_no = Auth::user()->co_no;
         try {
             $rate_data = RateData::where('rm_no', $rm_no)
+                ->where('rmd_no', $rmd_no)
                 ->where('rd_cate_meta1', '수입풀필먼트')
                 ->get();
             $co_rate_data = RateData::where('co_no', $co_no)
                 ->where('rd_cate_meta1', '수입풀필먼트')
                 ->get();
             return response()->json([
-                'message' => Messages::MSG_0007, 
+                'message' => Messages::MSG_0007,
                 'rate_data' => $rate_data,
                 'co_rate_data' => $co_rate_data
             ], 200);
