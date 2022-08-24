@@ -223,7 +223,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'w_schedule_amount' => $validated['w_schedule_amount'],
                     'w_schedule_day' => $validated['w_schedule_day'],
                     'w_amount' => $validated['w_amount'],
-                    'w_type' => 'RW',
+                    'w_type' => 'EW',
                     'w_category_name' => '유통 가공'
                 ]);
             }else{
@@ -233,7 +233,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'w_schedule_day' => DateTime::createFromFormat('Y-m-d', $validated['w_schedule_day']),
                     'w_schedule_amount' => $validated['w_schedule_amount'],
                     'w_amount' => $validated['w_amount'],
-                    'w_type' => 'RW',
+                    'w_type' => 'EW',
                     'w_category_name' => '유통 가공'
                 ]);
             }
