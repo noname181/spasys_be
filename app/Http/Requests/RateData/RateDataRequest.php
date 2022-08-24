@@ -45,9 +45,9 @@ class RateDataRequest extends BaseFormRequest
                 'max:255',
             ],
             'rate_data.*.rd_cate_meta2' => [
-                'required',
                 'string',
                 'max:255',
+                'nullable'
             ],
             'rate_data.*.rd_cate1' => [
                 'required',
@@ -60,7 +60,7 @@ class RateDataRequest extends BaseFormRequest
                 'max:255',
             ],
             'rate_data.*.rd_cate3' => [
-                'required',
+                'nullable',
                 'string',
                 'max:255',
             ],
