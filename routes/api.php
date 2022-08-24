@@ -222,6 +222,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('item')->name('item.')->group(function () {
         Route::get('/get_item', [App\Http\Controllers\Item\ItemController::class, 'getItems'])->name('get_item');
         Route::post('/post_item', [App\Http\Controllers\Item\ItemController::class, 'postItems'])->name('post_item');
+        Route::post('/post_item_chk', [App\Http\Controllers\Item\ItemController::class, 'postItemschk'])->name('post_item_chk');
         Route::get('/', [App\Http\Controllers\Item\ItemController::class, 'searchItems'])->name('search');
         Route::post('/paginate', [App\Http\Controllers\Item\ItemController::class, 'paginateItems'])->name('paginate');
         Route::post('/', \App\Http\Controllers\Item\ItemController::class)->name('create_or_update');

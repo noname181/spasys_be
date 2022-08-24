@@ -180,14 +180,14 @@ class ItemController extends Controller
                 $item_no =  array_column($validated['items'], 'item_no');
             }
 
-            $items = Item::with(['item_channels','warehousing_item']);
+            $items = Item::with('item_channels');
             
             if (isset($item_no)) {
                 $items->whereIn('item_no', $item_no);
             }
 
             if (isset($validated['w_no']) && !isset($validated['items'])) {
-                //$items->with('warehousing_item')->whereHas('warehousing_item.w_no', '=', $validated['w_no']);
+                $items->with('warehousing_item');
                 $items->whereHas('warehousing_item.w_no',function($query) use ($validated) {              
                     $query->where('w_no', '=', $validated['w_no']);
                 });     

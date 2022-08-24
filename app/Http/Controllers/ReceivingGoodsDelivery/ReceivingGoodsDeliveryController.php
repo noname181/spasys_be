@@ -154,8 +154,9 @@ class ReceivingGoodsDeliveryController extends Controller
             }
             
             $warehousing_items = [];
+            
             foreach ($validated['items'] as $warehousing_item) {
-               
+                $wi_number_received = isset($warehousing_item['warehousing_item']['wi_number_received']) ? $warehousing_item['warehousing_item']['wi_number_received'] : null;
                 if (isset($warehousing_item['warehousing_item']['wi_number'])) {
                    
                     if(isset($warehousing_item['warehousing_item']['wi_no'])){
@@ -164,7 +165,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             'item_no' => $warehousing_item['item_no'],
                             'w_no' => $w_no,
                             'wi_number' => $warehousing_item['warehousing_item']['wi_number'],
-                            'wi_number_received' => $warehousing_item['warehousing_item']['wi_number_received'],
+                            'wi_number_received' => $wi_number_received,
                         ]);
                     }
                     else{
@@ -172,7 +173,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             'item_no' => $warehousing_item['item_no'],
                             'w_no' => $w_no,
                             'wi_number' => $warehousing_item['warehousing_item']['wi_number'],
-                            'wi_number_received' => $warehousing_item['warehousing_item']['wi_number_received'],
+                            'wi_number_received' =>  $wi_number_received,
                         ]);
 
                     }
