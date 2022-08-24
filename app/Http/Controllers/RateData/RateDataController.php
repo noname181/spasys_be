@@ -59,7 +59,6 @@ class RateDataController extends Controller
                     ],
                 );
             }
-
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -80,7 +79,7 @@ class RateDataController extends Controller
             $rate_data = RateData::where('rm_no', $rm_no)->where('rmd_no', $rmd_no)->get();
             $my_rate_data1 = RateData::where('co_no', $co_no)->where('rd_cate_meta1', '보세화물')->get();
             $my_rate_data2 = RateData::where('co_no', $co_no)->where('rd_cate_meta1', '수입풀필먼트')->get();
-            $my_rate_data3 = RateData::where('co_no', $co_no)->where('rd_cate_meta1', '유통가공')->get();
+            $my_rate_data3 = RateData::where(['co_no' => $co_no, 'rd_cate_meta1' => '유통가공'])->get();
             return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data, 'my_rate_data1' => $my_rate_data1, 'my_rate_data2' => $my_rate_data2, 'my_rate_data3' => $my_rate_data3], 200);
         } catch (\Exception $e) {
             DB::rollback();
@@ -103,7 +102,25 @@ class RateDataController extends Controller
                 'rd_data1',
                 'rd_data2',
             ])->where('co_no', $co_no)->get();
-            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data], 200);
+            $my_rate_data1 = RateData::where('co_no', $co_no)->where('rd_cate_meta1', '보세화물')->get();
+            $my_rate_data2 = RateData::where('co_no', $co_no)->where('rd_cate_meta1', '수입풀필먼트')->get();
+            $my_rate_data3 = RateData::where(['co_no' => $co_no, 'rd_cate_meta1' => '유통가공'])->get();
+            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data, 'my_rate_data1' => $my_rate_data1, 'my_rate_data2' => $my_rate_data2, 'my_rate_data3' => $my_rate_data3], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+
+    public function getRateDataByRmno($rm_no)
+    {
+        try {
+            $my_rate_data1 = RateData::where(['rm_no' => $rm_no, 'rd_cate_meta1' => '보세화물'])->get();
+            $my_rate_data2 = RateData::where(['rm_no' => $rm_no, 'rd_cate_meta1' => '수입풀필먼트'])->get();
+            $my_rate_data3 = RateData::where(['rm_no' => $rm_no, 'rd_cate_meta1' => '유통가공'])->get();
+            return response()->json(['message' => Messages::MSG_0007, 'my_rate_data1' => $my_rate_data1, 'my_rate_data2' => $my_rate_data2, 'my_rate_data3' => $my_rate_data3], 200);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
