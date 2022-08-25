@@ -63,6 +63,6 @@ class Warehousing extends Model
 
     public function receving_goods_delivery()
     {
-        return $this->hasOne(ReceivingGoodsDelivery::class, 'w_no', 'w_no');
+        return $this->hasMany(ReceivingGoodsDelivery::class, 'w_no', 'w_no');
     }
 }

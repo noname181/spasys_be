@@ -24,6 +24,9 @@ class ItemSearchRequest extends BaseFormRequest
     public function rules()
     {
         return [
+            'type' => [
+                '',
+            ],
             'items' => [
                 '',
             ],

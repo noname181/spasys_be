@@ -160,7 +160,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 WarehousingItem::where('item_no', $remove['item_no'])->where('w_no', $w_no)->delete();
             }
 
-            WarehousingItem::where('w_no', $w_no)->delete();
+            WarehousingItem::where('w_no', $w_no)->where('wi_type','=','입고')->delete();
             
             $warehousing_items = [];
             
@@ -309,7 +309,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 WarehousingItem::where('item_no', $remove['item_no'])->where('w_no', $w_no)->delete();
             }
 
-            WarehousingItem::where('w_no', $w_no)->delete();
+            WarehousingItem::where('w_no', $w_no)->where('wi_type','=','출고')->delete();
             
             $warehousing_items = [];
             
