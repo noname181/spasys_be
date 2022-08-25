@@ -52,7 +52,7 @@ class RateDataController extends Controller
                 Log::error($val);
                 $rd_no = RateData::updateOrCreate(
                     [
-                        'rd_no' => isset($rmd_no) ? null : (isset($val['rd_no']) ? ($val['rd_no'] != $validated['newRmd_no'] ? null : $val['rd_no']) : null),
+                        'rd_no' => (isset($rmd_no) || empty($val['rmd_no']) || ($val['rmd_no'] != $validated['newRmd_no']))? null : $val['rd_no'],
                         'rmd_no' => isset($rmd_no) ? $rmd_no : $validated['newRmd_no'],
                         'rm_no' => isset($validated['rm_no']) ? $validated['rm_no'] : null,
                         'rd_co_no' => isset($validated['co_no']) ? $validated['co_no'] : null,
@@ -176,7 +176,7 @@ class RateDataController extends Controller
             foreach ($validated['rate_data'] as $val) {
                 RateData::updateOrCreate(
                     [
-                        'rd_no' => isset($rmd_no) ? null : (isset($val['rd_no']) ? ($val['rd_no'] != $validated['newRmd_no'] ? null : $val['rd_no']) : null),
+                        'rd_no' => isset($rmd_no) ? null : (isset($val['rd_no']) ?  $val['rd_no'] : null),
                         'rmd_no' => isset($rmd_no) ? $rmd_no : $validated['newRmd_no'],
                         'rm_no' => isset($validated['rm_no']) ? $validated['rm_no'] : $rm_no,
                     ],
