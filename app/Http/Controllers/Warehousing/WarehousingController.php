@@ -107,6 +107,21 @@ class WarehousingController extends Controller
             if (isset($validated['h_bl'])) {
                 $warehousing->where('h_bl', 'like', '%' . $validated['h_bl'] . '%');
             }
+            if (isset($validated['rgd_status1'])) {
+                $warehousing->whereHas('receving_goods_delivery',function($query) use ($validated) {              
+                    $query->where('rgd_status1', '=', $validated['rgd_status1']);
+                });
+            }
+            if (isset($validated['rgd_status2'])) {
+                $warehousing->whereHas('receving_goods_delivery',function($query) use ($validated) {              
+                    $query->where('rgd_status2', '=', $validated['rgd_status2']);
+                });
+            }
+            if (isset($validated['rgd_status3'])) {
+                $warehousing->whereHas('receving_goods_delivery',function($query) use ($validated) {              
+                    $query->where('rgd_status3', '=', $validated['rgd_status3']);
+                });
+            }
 
             // if (isset($validated['warehousing_status1']) || isset($validated['warehousing_status2'])) {
             //     $warehousing->where(function($query) use ($validated) {
