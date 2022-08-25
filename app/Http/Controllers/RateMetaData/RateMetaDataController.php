@@ -28,7 +28,7 @@ class RateMetaDataController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $rmd = RateMetaData::with(['rate_meta', 'member:mb_no,co_no'])->whereNotNull('rm_no');
+            $rmd = RateMetaData::with(['rate_meta', 'member:mb_no,co_no'])->whereNotNull('rm_no')->orderBy('rmd_no', 'DESC');
             if(isset($validated['from_date'])) {
                 $rm->where('created_at', '>=' , date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
@@ -60,7 +60,7 @@ class RateMetaDataController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $rmd = RateMetaData::with(['rate_meta', 'member:mb_no,co_no'])->whereNotNull('co_no');
+            $rmd = RateMetaData::with(['rate_meta', 'member:mb_no,co_no'])->whereNotNull('co_no')->orderBy('rmd_no', 'DESC');
             if(isset($validated['from_date'])) {
                 $rm->where('created_at', '>=' , date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }

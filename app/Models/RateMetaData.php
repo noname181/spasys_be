@@ -36,7 +36,7 @@ class RateMetaData extends Model
     }
 
     public function member() {
-        return $this->hasOne(Member::class, 'mb_no', 'mb_no')->with('company:co_no,co_name');
+        return $this->hasOne(Member::class, 'mb_no', 'mb_no')->with('company:co_no,co_name,co_service');
     }
 
 }
