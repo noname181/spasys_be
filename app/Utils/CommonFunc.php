@@ -34,7 +34,7 @@ class CommonFunc
         return $string;
     }
 
-    function generate_rmd_number($id, $index)
+    static function generate_rmd_number($id, $index)
     {
         $string = date('Ymd').$id.'_'.$index;
         return $string;
