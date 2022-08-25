@@ -27,6 +27,8 @@ class WarehousingItem extends Model
         'item_no',
         'w_no',
         'wi_number',
+        'wi_number_received',
+        'wi_type',
         'wi_created_at',
         'wi_updated_at',
     ];

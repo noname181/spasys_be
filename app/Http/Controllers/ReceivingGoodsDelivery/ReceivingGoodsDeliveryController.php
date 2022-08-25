@@ -183,6 +183,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             'w_no' => $w_no,
                             'wi_number' => $warehousing_item['warehousing_item']['wi_number'],
                             'wi_number_received' =>  $wi_number_received,
+                            'wi_type' => '입고'
                         ]);
 
                     //}
@@ -331,6 +332,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             'w_no' => $w_no,
                             'wi_number' => $warehousing_item['warehousing_item']['wi_number'],
                             'wi_number_received' =>  $wi_number_received,
+                            'wi_type' => '출고'
                         ]);
 
                     //}
