@@ -84,8 +84,11 @@ class WarehousingController extends Controller
             }
 
             if (isset($validated['mb_name'])) {
-                $warehousing->where(function($query) use ($validated) {
-                    $query->where(DB::raw('lower(mb_name)'), 'like', '%' . strtolower($validated['mb_name']) . '%');
+                // $warehousing->where(function($query) use ($validated) {
+                //     $query->where(DB::raw('lower(mb_name)'), 'like', '%' . strtolower($validated['mb_name']) . '%');
+                // });
+                $warehousing->whereHas('mb_no',function($query) use ($validated) {
+                    $query->where(DB::raw('lower(mb_name)'), 'like','%'. strtolower($validated['mb_name']) .'%');
                 });
             }
 
