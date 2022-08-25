@@ -6,16 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\RateData\RateDataImportFulfillmentRequest;
 use App\Http\Requests\RateData\RateDataRequest;
 use App\Http\Requests\RateData\RateDataSendMailRequest;
+use App\Models\File;
 use App\Models\RateData;
 use App\Models\RateMeta;
 use App\Models\RateMetaData;
 use App\Utils\CommonFunc;
 use App\Utils\Messages;
-use App\Models\File;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class RateDataController extends Controller
@@ -40,7 +40,7 @@ class RateDataController extends Controller
                         'rmd_number' => CommonFunc::generate_rmd_number($validated['rm_no'], $index),
                     ]
                 );
-            }else if(empty($validated['newRmd_no']) && isset($validated['co_no'])){
+            } else if (empty($validated['newRmd_no']) && isset($validated['co_no'])) {
                 $index = RateMetaData::where('co_no', $validated['co_no'])->get()->count() + 1;
                 $rmd_no = RateMetaData::insertGetId(
                     [
@@ -55,7 +55,7 @@ class RateDataController extends Controller
                 Log::error($val);
                 $rd_no = RateData::updateOrCreate(
                     [
-                        'rd_no' => (isset($rmd_no) || empty($val['rmd_no']) || ($val['rmd_no'] != $validated['newRmd_no']))? null : $val['rd_no'],
+                        'rd_no' => (isset($rmd_no) || empty($val['rmd_no']) || ($val['rmd_no'] != $validated['newRmd_no'])) ? null : $val['rd_no'],
                         'rmd_no' => isset($rmd_no) ? $rmd_no : $validated['newRmd_no'],
                         'rm_no' => isset($validated['rm_no']) ? $validated['rm_no'] : null,
                         'rd_co_no' => isset($validated['co_no']) ? $validated['co_no'] : null,
@@ -179,7 +179,7 @@ class RateDataController extends Controller
             foreach ($validated['rate_data'] as $val) {
                 RateData::updateOrCreate(
                     [
-                        'rd_no' => isset($rmd_no) ? null : (isset($val['rd_no']) ?  $val['rd_no'] : null),
+                        'rd_no' => isset($rmd_no) ? null : (isset($val['rd_no']) ? $val['rd_no'] : null),
                         'rmd_no' => isset($rmd_no) ? $rmd_no : $validated['newRmd_no'],
                         'rm_no' => isset($validated['rm_no']) ? $validated['rm_no'] : $rm_no,
                     ],
@@ -259,61 +259,25 @@ class RateDataController extends Controller
     {
         $validated = $request->validated();
         $co_no = Auth::user()->co_no;
-        // try {
-        DB::beginTransaction();
-        foreach ($validated['rate_data'] as $val) {
-            Log::error($val);
-            $rdsm_no = RateData::updateOrCreate(
-                [
-                    'co_no' => isset($co_no) ? $co_no : null,
-                    'rd_no' => isset($val['rd_no']) ? $val['rd_no'] : null,
-                ],
-                [
-                    'rm_no' => isset($val['rm_no']) ? $val['rm_no'] : null,
-                    'rd_cate_meta1' => $val['rd_cate_meta1'],
-                    'rd_cate_meta2' => $val['rd_cate_meta2'],
-                    'rd_cate1' => $val['rd_cate1'],
-                    'rd_cate2' => $val['rd_cate2'],
-                    'rd_cate3' => $val['rd_cate3'],
-                    'rd_data1' => $val['rd_data1'],
-                    'rd_data2' => $val['rd_data2'],
-                    'rd_data3' => isset($val['rd_data3']) ? $val['rd_data3'] : '',
-                ],
-            );
-        }
-
-        DB::commit();
-        return response()->json([
-            'message' => Messages::MSG_0007,
-        ], 201);
-        // } catch (\Exception $e) {
-        //     DB::rollback();
-        //     Log::error($e);
-        //     return response()->json(['message' => Messages::MSG_0001], 500);
-        // }
-    }
-
-    public function spasysRegisterRateData2(RateDataImportFulfillmentRequest $request)
-    {
-        $validated = $request->validated();
-        $co_no = Auth::user()->co_no;
         try {
             DB::beginTransaction();
             foreach ($validated['rate_data'] as $val) {
-                RateData::updateOrCreate(
+                Log::error($val);
+                $rdsm_no = RateData::updateOrCreate(
                     [
-                        'rd_no' => isset($val['rd_no']) ? $val['rd_no'] : null,
                         'co_no' => isset($co_no) ? $co_no : null,
+                        'rd_no' => isset($val['rd_no']) ? $val['rd_no'] : null,
                     ],
                     [
+                        'rm_no' => isset($val['rm_no']) ? $val['rm_no'] : null,
                         'rd_cate_meta1' => $val['rd_cate_meta1'],
-                        'rd_cate_meta2' => '',
+                        'rd_cate_meta2' => $val['rd_cate_meta2'],
                         'rd_cate1' => $val['rd_cate1'],
                         'rd_cate2' => $val['rd_cate2'],
-                        'rd_cate3' => '',
+                        'rd_cate3' => $val['rd_cate3'],
                         'rd_data1' => $val['rd_data1'],
                         'rd_data2' => $val['rd_data2'],
-                        'rd_data3' => $val['rd_data3'],
+                        'rd_data3' => isset($val['rd_data3']) ? $val['rd_data3'] : '',
                     ],
                 );
             }
@@ -325,7 +289,6 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -404,12 +367,12 @@ class RateDataController extends Controller
         $validated = $request->validated();
         try {
             $content = [
-                'content' => $validated['content']
+                'content' => $validated['content'],
             ];
 
             $files = [];
             $urls = [];
-            foreach ($validated['files'] as $file){
+            foreach ($validated['files'] as $file) {
                 $path = join('/', ['files', 'mails']);
                 $url = Storage::disk('public')->put($path, $file);
                 $urls[] = public_path('/storage/' . $url);
@@ -421,21 +384,21 @@ class RateDataController extends Controller
                     'file_size' => $file->getSize(),
                     'file_extension' => $file->extension(),
                     'file_position' => 0,
-                    'file_url' => $url
+                    'file_url' => $url,
                 ];
             }
             File::insert($files);
 
-            Mail::send('emails.rate_data', $content, function($message) use ($validated, $urls) {
+            Mail::send('emails.rate_data', $content, function ($message) use ($validated, $urls) {
                 $message->to($validated["recipient_mail"])
-                        ->subject($validated["subject"])
-                        ->from(env('MAIL_FROM_ADDRESS'),  $validated['sender_name']);
+                    ->subject($validated["subject"])
+                    ->from(env('MAIL_FROM_ADDRESS'), $validated['sender_name']);
 
-                if(!empty($validated['cc'])) {
+                if (!empty($validated['cc'])) {
                     $message->cc($validated['cc']);
                 }
 
-                foreach ($urls as $file){
+                foreach ($urls as $file) {
                     Log::error($file);
                     $message->attach($file);
                 }
