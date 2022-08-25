@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Item;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Item\ItemRequest;
 use App\Http\Requests\Item\ItemSearchRequest;
+use App\Models\Warehousing;
 use App\Models\Item;
 use App\Models\File;
 use App\Models\ItemChannel;
@@ -176,6 +177,10 @@ class ItemController extends Controller
        // return  $validated;
         try {
             DB::enableQueryLog();
+
+            
+            
+            //return $warehousing;
             if(isset($validated['items'])){
                 $item_no =  array_column($validated['items'], 'item_no');
             }
@@ -187,9 +192,16 @@ class ItemController extends Controller
             }
 
             if (isset($validated['w_no']) && !isset($validated['items'])) {
+                $warehousing = Warehousing::find($validated['w_no']);
+
                 $items->with('warehousing_item');
-                $items->whereHas('warehousing_item.w_no',function($query) use ($validated) {              
-                    $query->where('w_no', '=', $validated['w_no']);
+
+                $items->whereHas('warehousing_item.w_no',function($query) use ($validated) {
+                    if($validated['type'] == 'IW'){        
+                        $query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고');
+                    }else{
+                        $query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '출고');
+                    }
                 });     
                   
             }
