@@ -101,6 +101,15 @@ class WarehousingController extends Controller
             if (isset($validated['w_schedule_number'])) {
                 $warehousing->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
             }
+            if (isset($validated['logistic_manage_number'])) {
+                $warehousing->where('logistic_manage_number', 'like', '%' . $validated['logistic_manage_number'] . '%');
+            }
+            if (isset($validated['m_bl'])) {
+                $warehousing->where('m_bl', 'like', '%' . $validated['m_bl'] . '%');
+            }
+            if (isset($validated['h_bl'])) {
+                $warehousing->where('h_bl', 'like', '%' . $validated['h_bl'] . '%');
+            }
 
             // if (isset($validated['warehousing_status1']) || isset($validated['warehousing_status2'])) {
             //     $warehousing->where(function($query) use ($validated) {
