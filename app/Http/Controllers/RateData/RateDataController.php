@@ -5,15 +5,18 @@ namespace App\Http\Controllers\RateData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RateData\RateDataImportFulfillmentRequest;
 use App\Http\Requests\RateData\RateDataRequest;
+use App\Http\Requests\RateData\RateDataSendMailRequest;
 use App\Models\RateData;
 use App\Models\RateMeta;
 use App\Models\RateMetaData;
 use App\Utils\CommonFunc;
 use App\Utils\Messages;
-use Illuminate\Http\Request;
+use App\Models\File;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class RateDataController extends Controller
 {
@@ -393,6 +396,55 @@ class RateDataController extends Controller
             DB::rollback();
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+    public function sendMail(RateDataSendMailRequest $request)
+    {
+        $validated = $request->validated();
+        try {
+            $content = [
+                'content' => $validated['content']
+            ];
+
+            $files = [];
+            $urls = [];
+            foreach ($validated['files'] as $file){
+                $path = join('/', ['files', 'mails']);
+                $url = Storage::disk('public')->put($path, $file);
+                $urls[] = public_path('/storage/' . $url);
+                $files[] = [
+                    'file_table' => 'mail',
+                    'file_table_key' => 0,
+                    'file_name' => basename($url),
+                    'file_name_old' => $file->getClientOriginalName(),
+                    'file_size' => $file->getSize(),
+                    'file_extension' => $file->extension(),
+                    'file_position' => 0,
+                    'file_url' => $url
+                ];
+            }
+            File::insert($files);
+
+            Mail::send('emails.rate_data', $content, function($message) use ($validated, $urls) {
+                $message->to($validated["recipient_mail"])
+                        ->subject($validated["subject"])
+                        ->from(env('MAIL_FROM_ADDRESS'),  $validated['sender_name']);
+
+                if(!empty($validated['cc'])) {
+                    $message->cc($validated['cc']);
+                }
+
+                foreach ($urls as $file){
+                    Log::error($file);
+                    $message->attach($file);
+                }
+            });
+
+            return response()->json(['message' => Messages::MSG_0007], 200);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0019], 500);
         }
     }
 }
