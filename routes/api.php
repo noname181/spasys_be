@@ -264,6 +264,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/importfulfillment/by_rm_no/{rm_no}/{rmd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByImportFulfillmentByRmno'])->name('get_rate_data_by_importfulfillment_rmno');
         Route::get('/importfulfillment/by_co_no/{co_no}/{rmd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByImportFulfillmentByCono'])->name('get_rate_data_by_importfulfillment_cono');
         Route::post('/importfulfillment', [App\Http\Controllers\RateData\RateDataController::class, 'createOrUpdateImportFulfillment'])->name('update_or_create_importfulfillment');
+        Route::post('/send_mail', [App\Http\Controllers\RateData\RateDataController::class, 'sendMail'])->name('send_mail');
     });
 
     Route::prefix('alarm')->name('alarm.')->group(function () {
