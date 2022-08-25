@@ -207,7 +207,7 @@ class ItemController extends Controller
             }
 
             if (!isset($validated['w_no']) && !isset($validated['items'])) {
-                $items->where('1','=','2');
+                $items->where(DB::raw('1'),'=','2');
             }
 
             $items->where('item_service_name', '유통가공');
