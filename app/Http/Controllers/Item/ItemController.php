@@ -200,7 +200,7 @@ class ItemController extends Controller
                     if($validated['type'] == 'IW'){        
                         $query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고');
                     }else{
-                        $query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '출고');
+                        $query->where('w_no', '=', $validated['w_no']);
                     }
                 });     
                   
