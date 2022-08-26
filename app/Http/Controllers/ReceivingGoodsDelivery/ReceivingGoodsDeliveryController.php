@@ -314,6 +314,27 @@ class ReceivingGoodsDeliveryController extends Controller
             $warehousing_items = [];
             
             foreach ($validated['items'] as $warehousing_item) {
+                if(!isset($warehousing_item['item_no'])){
+                    {
+                        $item_no_new = Item::insertGetId([
+                            'mb_no' => Auth::user()->mb_no,
+                          
+                            'item_brand' => $warehousing_item['item_brand'],
+                          
+                            'item_name' => $warehousing_item['item_name'],
+                            'item_option1' => $warehousing_item['item_option1'],
+                            'item_option2' => $warehousing_item['item_option2'],
+                            
+                            'item_price3' => $warehousing_item['item_price3'],
+                            'item_price4' => $warehousing_item['item_price4'],
+                           
+                        ]);
+        
+
+                    }
+                }
+                $item_no = $warehousing_item['item_no'] ? $warehousing_item['item_no'] : $item_no_new;
+
                 $wi_number_received = isset($warehousing_item['warehousing_item']['wi_number_received']) ? $warehousing_item['warehousing_item']['wi_number_received'] : null;
                 if (isset($warehousing_item['warehousing_item']['wi_number'])) {
                    
