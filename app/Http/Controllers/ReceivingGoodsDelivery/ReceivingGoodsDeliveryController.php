@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Filesystem\Filesystem;
 use App\Models\File;
+use App\Models\Item;
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryRequest;
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryCreateRequest;
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryCreateMobileRequest;
@@ -163,8 +164,31 @@ class ReceivingGoodsDeliveryController extends Controller
             WarehousingItem::where('w_no', $w_no)->where('wi_type','=','입고')->delete();
             
             $warehousing_items = [];
+
+            
             
             foreach ($validated['items'] as $warehousing_item) {
+                if(!isset($warehousing_item['item_no'])){
+                    {
+                        $item_no_new = Item::insertGetId([
+                            'mb_no' => Auth::user()->mb_no,
+                          
+                            'item_brand' => $warehousing_item['item_brand'],
+                            'item_service_name' => '유통가공',
+                            'item_name' => $warehousing_item['item_name'],
+                            'item_option1' => $warehousing_item['item_option1'],
+                            'item_option2' => $warehousing_item['item_option2'],
+                            
+                            'item_price3' => $warehousing_item['item_price3'],
+                            'item_price4' => $warehousing_item['item_price4'],
+                           
+                        ]);
+        
+
+                    }
+                }
+                $item_no = $warehousing_item['item_no'] ? $warehousing_item['item_no'] : $item_no_new;
+
                 $wi_number_received = isset($warehousing_item['warehousing_item']['wi_number_received']) ? $warehousing_item['warehousing_item']['wi_number_received'] : null;
                 if (isset($warehousing_item['warehousing_item']['wi_number'])) {
                    
@@ -179,7 +203,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     // }
                     // else{
                         WarehousingItem::insert([
-                            'item_no' => $warehousing_item['item_no'],
+                            'item_no' => $item_no,
                             'w_no' => $w_no,
                             'wi_number' => $warehousing_item['warehousing_item']['wi_number'],
                             'wi_number_received' =>  $wi_number_received,
@@ -320,7 +344,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             'mb_no' => Auth::user()->mb_no,
                           
                             'item_brand' => $warehousing_item['item_brand'],
-                          
+                            'item_service_name' => '유통가공',
                             'item_name' => $warehousing_item['item_name'],
                             'item_option1' => $warehousing_item['item_option1'],
                             'item_option2' => $warehousing_item['item_option2'],
@@ -349,7 +373,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     // }
                     // else{
                         WarehousingItem::insert([
-                            'item_no' => $warehousing_item['item_no'],
+                            'item_no' => $item_no,
                             'w_no' => $w_no,
                             'wi_number' => $warehousing_item['warehousing_item']['wi_number'],
                             'wi_number_received' =>  $wi_number_received,

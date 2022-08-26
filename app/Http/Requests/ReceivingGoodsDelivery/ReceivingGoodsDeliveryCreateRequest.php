@@ -51,6 +51,24 @@ class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
             'items.*.wi_number' => [
                 '',
             ],
+            'items.*.item_brand' => [
+                '',
+            ],
+            'items.*.item_name' => [
+                '',
+            ],
+            'items.*.item_option1' => [
+                '',
+            ],
+            'items.*.item_option2' => [
+                '',
+            ],
+            'items.*.item_price3' => [
+                '',
+            ],
+            'items.*.item_price4' => [
+                '',
+            ],
             'items.*.warehousing_item.wi_number' => [
                 '',
             ],
