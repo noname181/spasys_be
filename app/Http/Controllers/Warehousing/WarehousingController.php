@@ -151,7 +151,8 @@ class WarehousingController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $warehousing = ReceivingGoodsDelivery::with('w_no');
+            $warehousing = ReceivingGoodsDelivery::with('w_no') -> with(['mb_no']);
+            // $warehousing = Warehousing::with('mb_no')->with(['co_no','warehousing_item','receving_goods_delivery'])->orderBy('w_no', 'DESC');
 
             // if (isset($validated['from_date'])) {
             //     $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
