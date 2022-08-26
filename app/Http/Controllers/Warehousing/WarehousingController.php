@@ -6,6 +6,7 @@ use DateTime;
 use App\Models\File;
 use App\Models\Member;
 use App\Models\Warehousing;
+use App\Models\ReceivingGoodsDelivery;
 use App\Utils\Messages;
 use App\Utils\CommonFunc;
 use Illuminate\Http\Request;
@@ -55,7 +56,7 @@ class WarehousingController extends Controller
                  'data' => $warehousing
                 ], 200);
         } else {
-            return response()->json(['message' => CommonFunc::renderMessage(Messages::MSG_0016, ['Warehousing'])], 400);
+            return response()->json(['message' => Messages::MSG_0018], 400);
         }
     }
 
@@ -150,42 +151,42 @@ class WarehousingController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $warehousing = Warehousing::with('mb_no')->with(['co_no','warehousing_item','receving_goods_delivery'])->orderBy('w_no', 'DESC');
+            $warehousing = ReceivingGoodsDelivery::with('w_no');
 
-            if (isset($validated['from_date'])) {
-                $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
-            }
+            // if (isset($validated['from_date'])) {
+            //     $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            // }
 
-            if (isset($validated['to_date'])) {
-                $warehousing->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
-            }
+            // if (isset($validated['to_date'])) {
+            //     $warehousing->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            // }
 
-            if (isset($validated['mb_name'])) {
-                $warehousing->whereHas('mb_no',function($query) use ($validated) {
-                    $query->where(DB::raw('lower(mb_name)'), 'like','%'. strtolower($validated['mb_name']) .'%');
-                });
-            }
+            // if (isset($validated['mb_name'])) {
+            //     $warehousing->whereHas('mb_no',function($query) use ($validated) {
+            //         $query->where(DB::raw('lower(mb_name)'), 'like','%'. strtolower($validated['mb_name']) .'%');
+            //     });
+            // }
 
-            if (isset($validated['co_name'])) {
-                $warehousing->whereHas('co_no', function($q) use($validated) {
-                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
-                });
-            }
+            // if (isset($validated['co_name'])) {
+            //     $warehousing->whereHas('co_no', function($q) use($validated) {
+            //         return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+            //     });
+            // }
 
-            if (isset($validated['w_schedule_number'])) {
-                $warehousing->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
-            }
-            if (isset($validated['logistic_manage_number'])) {
-                $warehousing->where('logistic_manage_number', 'like', '%' . $validated['logistic_manage_number'] . '%');
-            }
-            if (isset($validated['m_bl'])) {
-                $warehousing->where('m_bl', 'like', '%' . $validated['m_bl'] . '%');
-            }
-            if (isset($validated['h_bl'])) {
-                $warehousing->where('h_bl', 'like', '%' . $validated['h_bl'] . '%');
-            }
+            // if (isset($validated['w_schedule_number'])) {
+            //     $warehousing->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
+            // }
+            // if (isset($validated['logistic_manage_number'])) {
+            //     $warehousing->where('logistic_manage_number', 'like', '%' . $validated['logistic_manage_number'] . '%');
+            // }
+            // if (isset($validated['m_bl'])) {
+            //     $warehousing->where('m_bl', 'like', '%' . $validated['m_bl'] . '%');
+            // }
+            // if (isset($validated['h_bl'])) {
+            //     $warehousing->where('h_bl', 'like', '%' . $validated['h_bl'] . '%');
+            // }
 
-            $members = Member::where('mb_no', '!=', 0)->get();
+            // $members = Member::where('mb_no', '!=', 0)->get();
 
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
 
