@@ -78,15 +78,18 @@ class ServiceController extends Controller
     public function getServiceByCoNo($co_no)
     {
         try {
-            $co_service = Company::where('co_no', $co_no)->first()->co_service;
-            $co_service_array = explode(" ", $co_service);
-            $services = Service::whereIN("service_name", $co_service_array)->get();
+            $company = Company::where('co_no', $co_no)->first();
+            if($company->co_type == 'spasys'){
+                $services = Service::where('service_use_yn', 'y')->get();
+            }else {
+                $co_service_array = explode(" ", $company->co_service);
+                $services = Service::whereIN("service_name", $co_service_array)->get();
+            }
 
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'services' => $services,
-                '$co_service_array' => $co_service_array
             ]);
         } catch (\Exception $e) {
             DB::rollback();
