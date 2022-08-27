@@ -271,4 +271,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/{alarm}', [App\Http\Controllers\Alarm\AlarmController::class, 'getAlarmById'])->name('get_alarm_by_id');
         Route::get('/', [App\Http\Controllers\Alarm\AlarmController::class, 'searchAlarms'])->name('search');
     });
+
+
+    Route::prefix('orders')->name('orders.')->group(function () {
+        Route::get('/settlement_amount_trend', [App\Http\Controllers\Orders\OrdersController::class, 'settlementAmountTrend'])->name('settlement_amount_trend');
+    });
 });
