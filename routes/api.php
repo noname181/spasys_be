@@ -64,9 +64,17 @@ Route::middleware('auth')->group(function () {
     Route::post('/get_shop_companies', [\App\Http\Controllers\Company\CompanyController::class, 'getShopCompanies'])->name('get_shop_companies');
 
     Route::prefix('service')->name('service.')->group(function () {
-        Route::post('/', \App\Http\Controllers\Service\ServiceController::class)->name('registe_update_services');
+        //service route only for spasys admin
+        Route::middleware('role:spasys_admin')->group(function () {
+            Route::get('/all', [App\Http\Controllers\Service\ServiceController::class, 'getAllServices'])->name('get_all_services');
+            Route::post('/', \App\Http\Controllers\Service\ServiceController::class)->name('registe_update_services');
+            Route::delete('/{service}', [App\Http\Controllers\Service\ServiceController::class, 'deleteService'])->name('delete_services');
+        });
+
+        //get services by co_no
+        Route::get('/by_co_no/{co_no}', [App\Http\Controllers\Service\ServiceController::class, 'getServiceByCoNo'])->name('get_services_by_co_no');
+
         Route::get('/', [App\Http\Controllers\Service\ServiceController::class, 'getServices'])->name('get_services');
-        Route::delete('/{service}', [App\Http\Controllers\Service\ServiceController::class, 'deleteService'])->name('delete_services');
         Route::get('/active', [App\Http\Controllers\Service\ServiceController::class, 'getActiveServices'])->name('get_active_services');
     });
 

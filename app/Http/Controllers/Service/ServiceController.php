@@ -6,6 +6,7 @@ use App\Http\Requests\Service\ServiceRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Service;
 use App\Models\Menu;
+use App\Models\Company;
 use App\Utils\Messages;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -73,6 +74,43 @@ class ServiceController extends Controller
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
+
+    public function getServiceByCoNo($co_no)
+    {
+        try {
+            $co_service = Company::where('co_no', $co_no)->first()->co_service;
+            $co_service_array = explode(" ", $co_service);
+            $services = Service::whereIN("service_name", $co_service_array)->get();
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'services' => $services,
+                '$co_service_array' => $co_service_array
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+    public function getAllServices()
+    {
+        try {
+            $services = Service::where('service_no', '!=', 1)->get();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'services' => $services,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
 
     public function getActiveServices()
     {

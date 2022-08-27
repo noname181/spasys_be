@@ -135,7 +135,15 @@ class MemberController extends Controller
     {
         try {
             $member = Member::with('company')->where('mb_no', $mb_no)->first();
-            $services = Service::where('service_use_yn', 'y')->get();
+
+            if($member->company->co_type == 'spasys'){
+                $services = Service::where('service_use_yn', 'y')->get();
+            }else {
+                $co_service_array = explode(" ",  $member->company->co_service);
+                $services = Service::whereIN("service_name", $co_service_array)->get();
+            }
+
+            // $services = Service::where('service_use_yn', 'y')->get();
             if($member->role_no == Member::ROLE_SPASYS_MANAGER || $member->role_no == Member::ROLE_SHOP_MANAGER){
                 $member->role_no = '관리자';
             }else if($member->role_no == Member::ROLE_SPASYS_OPERATOR || $member->role_no == Member::ROLE_SHOP_OPERATOR){
