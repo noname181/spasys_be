@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Service;
 use App\Models\Menu;
 use App\Models\Company;
+use App\Models\Member;
 use App\Utils\Messages;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -83,6 +84,31 @@ class ServiceController extends Controller
                 $services = Service::where('service_use_yn', 'y')->get();
             }else {
                 $co_service_array = explode(" ", $company->co_service);
+                $services = Service::whereIN("service_name", $co_service_array)->get();
+            }
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'services' => $services,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+    public function getServiceByMember()
+    {
+        try {
+            $member = Member::with('company')->where('mb_no', Auth::user()->mb_no)->first();
+
+            if($member->company->co_type == 'spasys'){
+                $services = Service::where('service_use_yn', 'y')->where('service_no', '!=', 1)->get();
+            }else {
+                $co_service_array = explode(" ",  $member->company->co_service);
                 $services = Service::whereIN("service_name", $co_service_array)->get();
             }
 

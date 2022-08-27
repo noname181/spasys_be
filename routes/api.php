@@ -74,6 +74,9 @@ Route::middleware('auth')->group(function () {
         //get services by co_no
         Route::get('/by_co_no/{co_no}', [App\Http\Controllers\Service\ServiceController::class, 'getServiceByCoNo'])->name('get_services_by_co_no');
 
+        //get services by member company
+        Route::get('/by_member', [App\Http\Controllers\Service\ServiceController::class, 'getServiceByMember'])->name('get_services_by_member');
+
         Route::get('/', [App\Http\Controllers\Service\ServiceController::class, 'getServices'])->name('get_services');
         Route::get('/active', [App\Http\Controllers\Service\ServiceController::class, 'getActiveServices'])->name('get_active_services');
     });
