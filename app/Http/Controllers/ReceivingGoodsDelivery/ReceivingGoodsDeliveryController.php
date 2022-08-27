@@ -68,7 +68,8 @@ class ReceivingGoodsDeliveryController extends Controller
 
             //$item = Item::where('item_no', $validated['item_no'])->first();
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
-            
+            $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
+
             if(isset($validated['w_no'])){
                 Warehousing::where('w_no', $validated['w_no'])->update([
                     'mb_no' => $member->mb_no,
@@ -76,7 +77,8 @@ class ReceivingGoodsDeliveryController extends Controller
                     'w_schedule_day' => $validated['w_schedule_day'],
                     'w_amount' => $validated['w_amount'],
                     'w_type' => 'IW',
-                    'w_category_name' => '유통 가공'
+                    'w_category_name' => '유통 가공',
+                    'co_no' => $co_no
                 ]);
             }else{
                 $w_no_data = Warehousing::insertGetId([
@@ -86,7 +88,8 @@ class ReceivingGoodsDeliveryController extends Controller
                     'w_schedule_amount' => $validated['w_schedule_amount'],
                     'w_amount' => $validated['w_amount'],
                     'w_type' => 'IW',
-                    'w_category_name' => '유통 가공'
+                    'w_category_name' => '유통 가공',
+                    'co_no' => $co_no
                 ]);
             }
             

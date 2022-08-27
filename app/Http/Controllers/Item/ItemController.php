@@ -157,12 +157,15 @@ class ItemController extends Controller
 
     public function getItems(ItemSearchRequest $request)
     {
+       
         $validated = $request->validated();
         try {
-            $items = Item::with('item_channels')->where('item_service_name', '유통가공')->get();
+            $co_no = Auth::user()->co_no ? Auth::user()->co_no : '';
+            $items = Item::with('item_channels')->where('co_no',$co_no)->where('item_service_name', '유통가공')->get();
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'items' => $items,
+                'user' => Auth::user()
             ]);
         } catch (\Exception $e) {
             Log::error($e);
