@@ -154,29 +154,45 @@ class WarehousingController extends Controller
             $warehousing = ReceivingGoodsDelivery::with('w_no') -> with(['mb_no']);
             // $warehousing = Warehousing::with('mb_no')->with(['co_no','warehousing_item','receving_goods_delivery'])->orderBy('w_no', 'DESC');
 
-            // if (isset($validated['from_date'])) {
-            //     $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
-            // }
+            if (isset($validated['from_date'])) {
+                $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            }
 
-            // if (isset($validated['to_date'])) {
-            //     $warehousing->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
-            // }
+            if (isset($validated['to_date'])) {
+                $warehousing->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            }
 
-            // if (isset($validated['mb_name'])) {
-            //     $warehousing->whereHas('mb_no',function($query) use ($validated) {
-            //         $query->where(DB::raw('lower(mb_name)'), 'like','%'. strtolower($validated['mb_name']) .'%');
-            //     });
-            // }
+            if (isset($validated['mb_name'])) {
+                $warehousing->whereHas('mb_no',function($query) use ($validated) {
+                    $query->where(DB::raw('lower(mb_name)'), 'like','%'. strtolower($validated['mb_name']) .'%');
+                });
+            }
 
-            // if (isset($validated['co_name'])) {
-            //     $warehousing->whereHas('co_no', function($q) use($validated) {
-            //         return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
-            //     });
-            // }
+            if (isset($validated['co_name'])) {
+                $warehousing->whereHas('w_no.co_no', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                });
+            }
 
-            // if (isset($validated['w_schedule_number'])) {
-            //     $warehousing->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
-            // }
+            if (isset($validated['w_schedule_number'])) {
+                $warehousing->whereHas('w_no', function($q) use($validated) {
+                return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
+            });
+            }
+            if (isset($validated['rgd_status1'])) {
+                $warehousing->where('rgd_status1', '=', $validated['rgd_status1']);
+            }
+            if (isset($validated['rgd_status2'])) {
+                    $warehousing->where('rgd_status2', '=', $validated['rgd_status2']);
+            }
+            if (isset($validated['rgd_status3'])) {
+                    $warehousing->where('rgd_status3', '=', $validated['rgd_status3']);
+            }
+            if (isset($validated['item_brand'])) {
+                $warehousing->whereHas('w_no.warehousing_item', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(item_brand)'), 'like', '%' . strtolower($validated['item_brand']) . '%');
+                });
+            }
             // if (isset($validated['logistic_manage_number'])) {
             //     $warehousing->where('logistic_manage_number', 'like', '%' . $validated['logistic_manage_number'] . '%');
             // }
