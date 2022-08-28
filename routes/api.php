@@ -285,6 +285,7 @@ Route::middleware('auth')->group(function () {
 
 
     Route::prefix('orders')->name('orders.')->group(function () {
+        Route::get('/settlement_amount_trend_by_month', [App\Http\Controllers\Orders\OrdersController::class, 'settlementAmountTrendByMonth'])->name('settlement_amount_trend_by_month');
         Route::get('/settlement_amount_trend', [App\Http\Controllers\Orders\OrdersController::class, 'settlementAmountTrend'])->name('settlement_amount_trend');
     });
 });
