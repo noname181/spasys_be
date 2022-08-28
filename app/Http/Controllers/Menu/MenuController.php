@@ -96,6 +96,7 @@ class MenuController extends Controller
             DB::beginTransaction();
 
             $main_menu = Menu::first();
+            $sub_menu_level = 0;
             if(!$main_menu){
                 $main_menu_id = 101;
                 $main_menu_level = 1;
@@ -184,10 +185,11 @@ class MenuController extends Controller
     public function get_menu_main()
     {
         try {
-            $menu_main = Menu::select(['menu_no', 'menu_name', 'service_no_array'])->where('menu_depth', '상위')->get();
+            $menu_main = Menu::with('menu_childs')->select(['menu_no', 'menu_name', 'service_no_array'])->where('menu_depth', '상위')->get();
             return response()->json($menu_main);
         } catch (\Exception $e) {
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0002], 500);
         }
     }
