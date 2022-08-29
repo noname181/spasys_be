@@ -105,7 +105,10 @@ class ServiceController extends Controller
         try {
             $member = Member::with('company')->where('mb_no', Auth::user()->mb_no)->first();
 
-            if($member->company->co_type == 'spasys'){
+            if($member->mb_type == 'admin'){
+                $services = Service::where('service_use_yn', 'y')->where('service_no', '!=', 1)->get();
+            }
+            else if($member->company->co_type == 'spasys'){
                 $services = Service::where('service_use_yn', 'y')->where('service_no', '!=', 1)->get();
             }else {
                 $co_service_array = explode(" ",  $member->company->co_service);
