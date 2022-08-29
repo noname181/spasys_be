@@ -56,6 +56,18 @@ class WarehousingSearchRequest extends BaseFormRequest
                 'nullable',
                 'string',
             ],
+            'rgd_status1_1' => [
+                'nullable',
+                'string',
+            ],
+            'rgd_status1_2' => [
+                'nullable',
+                'string',
+            ],
+            'rgd_status1_3' => [
+                'nullable',
+                'string',
+            ],
             'rgd_status2' => [
                 'nullable',
                 'string',

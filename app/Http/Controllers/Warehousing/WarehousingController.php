@@ -193,6 +193,11 @@ class WarehousingController extends Controller
                     return $q->where(DB::raw('lower(item_brand)'), 'like', '%' . strtolower($validated['item_brand']) . '%');
                 });
             }
+            if (isset($validated['rgd_status1_1']) || isset($validated['rgd_status1_2']) || isset($validated['rgd_status1_3'])) {
+                $warehousing->where('rgd_status1', '=', $validated['rgd_status1_1']);
+                $warehousing->orWhere('rgd_status1', '=', $validated['rgd_status1_2']);
+                $warehousing->orWhere('rgd_status1', '=', $validated['rgd_status1_3']);
+            }
             if (isset($validated['rgd_status2_1']) || isset($validated['rgd_status2_2']) || isset($validated['rgd_status2_3'])) {
                 $warehousing->where('rgd_status2', '=', $validated['rgd_status2_1']);
                 $warehousing->orWhere('rgd_status2', '=', $validated['rgd_status2_2']);
