@@ -35,7 +35,7 @@ class ItemController extends Controller
             if (!isset($item_no)) {
                 $item_no = Item::insertGetId([
                     'mb_no' => Auth::user()->mb_no,
-                    'co_no' => $validated['co_no'],
+                    'co_no' => isset($validated['co_no']) ? $validated['co_no'] : Auth::user()->co_no,
                     'item_brand' => $validated['item_brand'],
                     'item_service_name' => $validated['item_service_name'],
                     'item_name' => $validated['item_name'],
@@ -145,7 +145,7 @@ class ItemController extends Controller
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
-                '$validated' => $validated['co_no']
+                '$validated' => isset($validated['co_no']) ? $validated['co_no'] : Auth::user()->co_no
             ]);
         } catch (\Exception $e) {
             DB::rollback();
@@ -160,12 +160,14 @@ class ItemController extends Controller
        
         $validated = $request->validated();
         try {
+            DB::enableQueryLog();
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : '';
             $items = Item::with('item_channels')->where('co_no',$co_no)->where('item_service_name', '유통가공')->get();
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'items' => $items,
-                'user' => Auth::user()
+                'user' => Auth::user(),
+                'sql' => DB::getQueryLog()
             ]);
         } catch (\Exception $e) {
             Log::error($e);
