@@ -162,7 +162,17 @@ class ItemController extends Controller
         try {
             DB::enableQueryLog();
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : '';
-            $items = Item::with('item_channels')->where('co_no',$co_no)->where('item_service_name', '유통가공')->get();
+            $items = Item::with(['item_channels','company'])->where('item_service_name', '유통가공');
+
+            if(Auth::user()->mb_type == "shop"){
+                $items->whereHas('company.co_parent',function($query) use ($co_no) {              
+                    $query->where(DB::raw('co_no'), '=', $co_no);
+                });
+            }else{
+                $items->where('co_no',$co_no);
+            }
+
+            $items = $items->get();
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'items' => $items,
@@ -171,6 +181,7 @@ class ItemController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
