@@ -149,6 +149,7 @@ class WarehousingController extends Controller
     public function getWarehousingExport(WarehousingSearchRequest $request)
     {
         try {
+            DB::enableQueryLog();
             $validated = $request->validated();
 
             // If per_page is null set default data = 15
@@ -205,11 +206,14 @@ class WarehousingController extends Controller
                 $warehousing->where('rgd_status1', '=', $validated['rgd_status1_1']);
                 $warehousing->orWhere('rgd_status1', '=', $validated['rgd_status1_2']);
                 $warehousing->orWhere('rgd_status1', '=', $validated['rgd_status1_3']);
-            }
+            // }
             if (isset($validated['rgd_status2_1']) || isset($validated['rgd_status2_2']) || isset($validated['rgd_status2_3'])) {
-                $warehousing->where('rgd_status2', '=', $validated['rgd_status2_1']);
-                $warehousing->orWhere('rgd_status2', '=', $validated['rgd_status2_2']);
-                $warehousing->orWhere('rgd_status2', '=', $validated['rgd_status2_3']);
+                $warehousing->where(function($q) use ($validated) {
+                    $q->Where('rgd_status2', '=', $validated['rgd_status2_1'] ? $validated['rgd_status2_1'] : "")
+                    ->orWhere('rgd_status2', '=', $validated['rgd_status2_2'] ? $validated['rgd_status2_2'] : "")
+                    ->orWhere('rgd_status2', '=', $validated['rgd_status2_3'] ? $validated['rgd_status2_3'] : "");
+                });
+            
             }
             // if (isset($validated['logistic_manage_number'])) {
             //     $warehousing->where('logistic_manage_number', 'like', '%' . $validated['logistic_manage_number'] . '%');
@@ -224,8 +228,10 @@ class WarehousingController extends Controller
             // $members = Member::where('mb_no', '!=', 0)->get();
 
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
+            //return DB::getQueryLog();
 
             return response()->json($warehousing);
+
         } catch (\Exception $e) {
             Log::error($e);
             return $e;
