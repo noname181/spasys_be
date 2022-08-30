@@ -203,9 +203,11 @@ class WarehousingController extends Controller
                 });
             }
             if (isset($validated['rgd_status1_1']) || isset($validated['rgd_status1_2']) || isset($validated['rgd_status1_3'])) {
-                $warehousing->where('rgd_status1', '=', $validated['rgd_status1_1']);
-                $warehousing->orWhere('rgd_status1', '=', $validated['rgd_status1_2']);
-                $warehousing->orWhere('rgd_status1', '=', $validated['rgd_status1_3']);
+                $warehousing->where(function($q) use ($validated) {
+                $q->Where('rgd_status1', '=', $validated['rgd_status1_1'] ? $validated['rgd_status1_1'] : "")
+                ->orWhere('rgd_status1', '=', $validated['rgd_status1_2'] ? $validated['rgd_status1_2'] : "")
+                ->orWhere('rgd_status1', '=', $validated['rgd_status1_3'] ? $validated['rgd_status1_3'] : "");
+                });
              }
             if (isset($validated['rgd_status2_1']) || isset($validated['rgd_status2_2']) || isset($validated['rgd_status2_3'])) {
                 $warehousing->where(function($q) use ($validated) {
@@ -214,6 +216,13 @@ class WarehousingController extends Controller
                     ->orWhere('rgd_status2', '=', $validated['rgd_status2_3'] ? $validated['rgd_status2_3'] : "");
                 });
             
+            }
+            if (isset($validated['rgd_status3_1']) || isset($validated['rgd_status3_2']) || isset($validated['rgd_status3_3'])) {
+                $warehousing->where(function($q) use ($validated) {
+                    $q->Where('rgd_status3', '=', $validated['rgd_status3_1'] ? $validated['rgd_status3_1'] : "")
+                    ->orWhere('rgd_status3', '=', $validated['rgd_status3_2'] ? $validated['rgd_status3_2'] : "")
+                    ->orWhere('rgd_status3', '=', $validated['rgd_status3_3'] ? $validated['rgd_status3_3'] : "");
+                });
             }
             // if (isset($validated['logistic_manage_number'])) {
             //     $warehousing->where('logistic_manage_number', 'like', '%' . $validated['logistic_manage_number'] . '%');
