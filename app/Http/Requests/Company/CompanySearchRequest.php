@@ -32,6 +32,9 @@ class CompanySearchRequest extends BaseFormRequest
                 'string',
                 'date_format:Y-m-d'
             ],
+            'co_no' => [
+                '',
+            ],
             'co_name' => [
                 'string',
                 'nullable',

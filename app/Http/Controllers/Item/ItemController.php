@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Item\ItemRequest;
 use App\Http\Requests\Item\ItemSearchRequest;
 use App\Models\Warehousing;
+use App\Models\WarehousingItem;
 use App\Models\Item;
 use App\Models\File;
 use App\Models\ItemChannel;
@@ -70,7 +71,7 @@ class ItemController extends Controller
                     }
                     ItemChannel::insert($item_channels);
                 }
-               
+
             } else {
                 // Update data
                 $item = Item::with('file')->where('item_no', $item_no)->first();
@@ -103,7 +104,7 @@ class ItemController extends Controller
                 ];
                 $item->update($update);
 
-                if(isset($validated['item_channels'])) 
+                if(isset($validated['item_channels']))
                     foreach ($validated['item_channels'] as $item_channel) {
                         ItemChannel::updateOrCreate(
                             [
@@ -127,7 +128,7 @@ class ItemController extends Controller
 
                 if(!empty($file)){
                     Storage::disk('public')->delete($file->file_url);
-                    $file->delete();  
+                    $file->delete();
                 }
 
                 File::insert([
@@ -140,7 +141,7 @@ class ItemController extends Controller
                     'file_position' => 0,
                     'file_url' => $url
                 ]);
-               
+
             }
             DB::commit();
             return response()->json([
@@ -157,7 +158,7 @@ class ItemController extends Controller
 
     public function getItems(ItemSearchRequest $request)
     {
-       
+
         $validated = $request->validated();
         try {
             DB::enableQueryLog();
@@ -165,7 +166,7 @@ class ItemController extends Controller
             $items = Item::with(['item_channels','company'])->where('item_service_name', '유통가공');
 
             if(Auth::user()->mb_type == "shop"){
-                $items->whereHas('company.co_parent',function($query) use ($co_no) {              
+                $items->whereHas('company.co_parent',function($query) use ($co_no) {
                     $query->where(DB::raw('co_no'), '=', $co_no);
                 });
             }else{
@@ -188,21 +189,21 @@ class ItemController extends Controller
 
     public function postItems(ItemSearchRequest $request)
     {
-       
+
         $validated = $request->validated();
        // return  $validated;
         try {
             DB::enableQueryLog();
 
-            
-            
+
+
             //return $warehousing;
             if(isset($validated['items'])){
                 $item_no =  array_column($validated['items'], 'item_no');
             }
 
             $items = Item::with('item_channels');
-            
+
             if (isset($item_no)) {
                 $items->whereIn('item_no', $item_no);
             }
@@ -213,13 +214,13 @@ class ItemController extends Controller
                 $items->with('warehousing_item');
 
                 $items->whereHas('warehousing_item.w_no',function($query) use ($validated) {
-                    if($validated['type'] == 'IW'){        
+                    if($validated['type'] == 'IW'){
                         $query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고');
                     }else{
                         $query->where('w_no', '=', $validated['w_no']);
                     }
-                });     
-                  
+                });
+
             }
 
             if (!isset($validated['w_no']) && !isset($validated['items'])) {
@@ -227,8 +228,85 @@ class ItemController extends Controller
             }
 
             $items->where('item_service_name', '유통가공');
-            
+
             $items = $items->get();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'items' => $items,
+                'sql' => DB::getQueryLog()
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function postItemsPopup(ItemSearchRequest $request)
+    {
+
+        $validated = $request->validated();
+        try {
+            DB::enableQueryLog();
+            $co_no = Auth::user()->co_no ? Auth::user()->co_no : '';
+            $items = Item::with(['item_channels','company'])->where('item_service_name', '유통가공');
+
+            if(isset($validated['co_no'])){
+                $items->where('co_no',$validated['co_no']);
+            }
+
+            if(Auth::user()->mb_type == "shop"){
+                $items->whereHas('company.co_parent',function($query) use ($co_no) {
+                    $query->where(DB::raw('co_no'), '=', $co_no);
+                });
+            }else{
+                $items->where('co_no',$co_no);
+            }
+
+            $items = $items->get();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'items' => $items,
+                'user' => Auth::user(),
+                'sql' => DB::getQueryLog()
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function importItemsList(ItemSearchRequest $request)
+    {
+
+        $validated = $request->validated();
+       // return  $validated;
+        try {
+            //return $warehousing;
+            if(isset($validated['items'])){
+                $item_no =  array_column($validated['items'], 'item_no');
+            }
+
+
+
+            if (isset($validated['w_no'])) {
+                if (isset($item_no)) {
+                    $warehousing_items = WarehousingItem::where('w_no', $validated['w_no'])->whereIn('item_no', $item_no)->get();
+                }else {
+                    $warehousing_items = WarehousingItem::where('w_no', $validated['w_no'])->get();
+                }
+
+                $items = [];
+                foreach($warehousing_items as $warehousing_item){
+                    $item = Item::with(['item_channels', 'company'])->where('item_no', $warehousing_item->item_no)->first();
+                    $item->warehousing_item = $warehousing_item;
+                    $items[] = $item;
+                }
+
+            }
+
+
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'items' => $items,
@@ -275,7 +353,7 @@ class ItemController extends Controller
                 $item->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
             }
             if (isset($validated['co_name_shop'])) {
-                $item->whereHas('company.co_parent',function($query) use ($validated) {              
+                $item->whereHas('company.co_parent',function($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like','%'. strtolower($validated['co_name_shop']) .'%');
                 });
             }

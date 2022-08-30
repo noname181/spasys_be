@@ -239,12 +239,19 @@ class CompanyController extends Controller
     public function  getAgencyCompanies (CompanySearchRequest $request){
         try {
             $validated = $request->validated();
-
+            //DB::enableQueryLog();
             // If per_page is null set default data = 15
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
+            $co_no = Auth::user()->co_no ? Auth::user()->co_no : '';
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $companies = Company::with('contract')->where('mb_no', Auth::user()->mb_no)->orderBy('co_no', 'DESC');
+            $companies = Company::with(['contract','co_parent'])->where('mb_no', Auth::user()->mb_no)->orderBy('co_no', 'DESC');
+
+            if(Auth::user()->mb_type == "shop"){
+                $companies->whereHas('co_parent',function($query) use ($co_no) {
+                    $query->where('co_no', '=',  $co_no);
+                });
+            }
 
             if (isset($validated['from_date'])) {
                 $companies->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
@@ -265,9 +272,9 @@ class CompanyController extends Controller
                     $query->where(DB::raw('lower(co_service)'), 'like', '%' . strtolower($validated['co_service']) . '%');
                 });
             }
-
+            
             $companies = $companies->paginate($per_page, ['*'], 'page', $page);
-
+            //return DB::getQueryLog();
             return response()->json($companies);
         } catch (\Exception $e) {
             Log::error($e);

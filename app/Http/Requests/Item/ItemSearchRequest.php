@@ -33,6 +33,9 @@ class ItemSearchRequest extends BaseFormRequest
             'w_no' => [
                 '',
             ],
+            'co_no' => [
+                '',
+            ],
             'from_date' => [
                 'string',
                 'date_format:Y-m-d'
