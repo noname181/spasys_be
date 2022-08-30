@@ -242,6 +242,41 @@ class ItemController extends Controller
         }
     }
 
+    public function postItemsPopup(ItemSearchRequest $request)
+    {
+
+        $validated = $request->validated();
+        try {
+            DB::enableQueryLog();
+            $co_no = Auth::user()->co_no ? Auth::user()->co_no : '';
+            $items = Item::with(['item_channels','company'])->where('item_service_name', '유통가공');
+
+            if(isset($validated['co_no'])){
+                $items->where('co_no',$validated['co_no']);
+            }
+
+            if(Auth::user()->mb_type == "shop"){
+                $items->whereHas('company.co_parent',function($query) use ($co_no) {
+                    $query->where(DB::raw('co_no'), '=', $co_no);
+                });
+            }else{
+                $items->where('co_no',$co_no);
+            }
+
+            $items = $items->get();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'items' => $items,
+                'user' => Auth::user(),
+                'sql' => DB::getQueryLog()
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
     public function importItemsList(ItemSearchRequest $request)
     {
 
