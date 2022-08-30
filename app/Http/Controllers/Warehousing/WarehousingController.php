@@ -50,10 +50,12 @@ class WarehousingController extends Controller
     {
        
         $warehousing = Warehousing::find($w_no);
+        $warehousings = Warehousing::where('w_import_no',$w_no)->get();
         if (!empty($warehousing)) {
             return response()->json(
                 ['message' => Messages::MSG_0007,
-                 'data' => $warehousing
+                 'data' => $warehousing,
+                 'datas' => $warehousings
                 ], 200);
         } else {
             return response()->json(['message' => Messages::MSG_0018], 400);

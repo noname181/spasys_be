@@ -124,6 +124,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/warehousing', [\App\Http\Controllers\Warehousing\WarehousingController::class,'__invoke']);
     Route::get('/get_warehousing/{w_no}', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingById']);
+ 
     Route::post('/get_warehousing', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousing']);
     Route::post('/get_warehousing_export', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingExport']);
 
@@ -289,4 +290,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/settlement_amount_trend_by_month', [App\Http\Controllers\Orders\OrdersController::class, 'settlementAmountTrendByMonth'])->name('settlement_amount_trend_by_month');
         Route::get('/settlement_amount_trend', [App\Http\Controllers\Orders\OrdersController::class, 'settlementAmountTrend'])->name('settlement_amount_trend');
     });
+
+    Route::post('get_export_data', [\App\Http\Controllers\Export\ExportController::class,'get_export_data'])->name('get_export_data');
 });
