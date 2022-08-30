@@ -369,7 +369,7 @@ class ItemController extends Controller
             }
             if (isset($validated['item_cargo_bar_code'])) {
                 $item->where(function($query) use ($validated) {
-                    $query->where('item_cargo_bar_code', '=', $validated['item_cargo_bar_code']);
+                    $query->where(DB::raw('lower(item_cargo_bar_code)'), 'like','%'. strtolower($validated['item_cargo_bar_code']) .'%');
                 });
             }
             if (isset($validated['item_channel_code'])) {

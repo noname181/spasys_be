@@ -77,6 +77,9 @@ class ItemSearchRequest extends BaseFormRequest
             'item_channel_name' => [
                 '',
             ],
+            'item_cargo_bar_code' => [
+                '',
+            ],
         ];
     }
 

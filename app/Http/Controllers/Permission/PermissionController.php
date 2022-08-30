@@ -35,7 +35,7 @@ class PermissionController extends Controller
         try {
             $validated = $request->validated();
         
-            $roles = Role::where('role_no', '!=', 1)->where('role_no', '!=', 2)->get();
+            $roles = Role::get();
             $services = Service::where('service_no', '!=', 1)->where('service_use_yn', 'y')->get();
             $permission = Permission::where('role_no', isset($validated['role_no']) ? $validated['role_no'] : $roles[0]->role_no)
             ->where('service_no', isset($validated['service_no']) ? $validated['service_no'] : $services[0]->service_no);

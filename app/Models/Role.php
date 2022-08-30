@@ -38,4 +38,9 @@ class Role extends Model
         return $this->hasMany(Member::class, 'role_no', 'role_no');
     }
 
+    public function permission()
+    {
+        return $this->hasMany(Permission::class, 'role_no', 'role_no');
+    }
+
 }
