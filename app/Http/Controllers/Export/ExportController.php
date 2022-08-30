@@ -32,11 +32,27 @@ class ExportController extends Controller
         //fetchWarehousing
         $warehousing = Warehousing::find($validated['w_no']);
         $warehousings = Warehousing::where('w_import_no',$validated['w_no'])->get();
+        
+
+        
+        if(isset($validated['page']) && $validated['page'] == 'Page146_1'){
+            $w_no = array();
+            foreach($warehousings as $o) {
+                $w_no[] = $o->w_no;
+            }
+           
+        }
 
         //fetchReceivingGoodsDeliveryRequests
         $rgd = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->whereHas('w_no', function($q) use ($validated) {
             return $q->where('w_no', $validated['w_no']);
         })->get();
+        
+        if(isset($validated['page']) && $validated['page'] == 'Page146_1'){
+            $rgd = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->whereHas('w_no', function($q) use ($w_no) {
+                return $q->whereIn('w_no', $w_no);
+            })->get();
+        }
 
         //fetchWarehousingRequests
         // If per_page is null set default data = 15
@@ -54,6 +70,7 @@ class ExportController extends Controller
             $item_no =  array_column($validated['items'], 'item_no');
         }
 
+        
 
         //fetchItems
         if (isset($validated['w_no'])) {

@@ -204,16 +204,16 @@ class ItemController extends Controller
 
             $items = Item::with('item_channels');
 
-            if (isset($item_no)) {
+            if (isset($validated['items'])) {
                 $items->whereIn('item_no', $item_no);
             }
 
             if (isset($validated['w_no']) && !isset($validated['items'])) {
                 $warehousing = Warehousing::find($validated['w_no']);
 
-                $items->with('warehousing_item');
+                $items->with(['warehousing_item' => fn($query) => $query->where('w_no', '=', $validated['w_no'])]);
 
-                $items->whereHas('warehousing_item.w_no',function($query) use ($validated) {
+                $items->whereHas('warehousing_item',function($query) use ($validated) {
                     if($validated['type'] == 'IW'){
                         $query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고');
                     }else{

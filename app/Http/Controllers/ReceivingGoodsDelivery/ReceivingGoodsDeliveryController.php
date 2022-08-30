@@ -77,7 +77,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'w_schedule_day' => $validated['w_schedule_day'],
                     'w_amount' => $validated['w_amount'],
                     'w_type' => 'IW',
-                    'w_category_name' => '유통 가공',
+                    'w_category_name' => $request->w_category_name,
                     'co_no' => $co_no
                 ]);
             }else{
@@ -88,7 +88,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'w_schedule_amount' => $validated['w_schedule_amount'],
                     'w_amount' => $validated['w_amount'],
                     'w_type' => 'IW',
-                    'w_category_name' => '유통 가공',
+                    'w_category_name' => $request->w_category_name,
                     'co_no' => $co_no
                 ]);
             }
@@ -111,7 +111,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     $rgd_no = ReceivingGoodsDelivery::insertGetId([
                         'mb_no' => $member->mb_no,
                         'w_no' => $w_no,
-                        'service_korean_name' => '유통 가공',
+                        'service_korean_name' => $request->w_category_name,
                         'rgd_contents' => $rgd['rgd_contents'],
                         'rgd_address' => $rgd['rgd_address'],
                         'rgd_address_detail' => $rgd['rgd_address_detail'],
@@ -235,9 +235,10 @@ class ReceivingGoodsDeliveryController extends Controller
     public function create_warehousing_release(Request $request)
     {
         // $validated = $request->validated();
-
+        
         try {
             DB::beginTransaction();
+            $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
             // $warehousing = Warehousing::where('w_no', $validated['w_no'])->first();
             // $warehousing_item = WarehousingItem::where('wi_no', $validated['wi_no'])->first();
             // $warehousing_request = WarehousingRequest::where('wr_no', $validated['wr_no'])->first();
@@ -250,13 +251,14 @@ class ReceivingGoodsDeliveryController extends Controller
                     'mb_no' => $member->mb_no,
                     'w_schedule_amount' => $data['w_schedule_amount'],
                     'w_schedule_day' => $request->w_schedule_day,
-                    'w_import_no' => $request->w_import_no,
+                    'w_import_no' => $data['w_import_no'],
                     'w_amount' => $data['w_amount'],
                     'w_type' => 'EW',
                     'w_category_name' => $request->w_category_name,
+                    'co_no' => $co_no
                 ]);
                 Warehousing::where('w_no', $w_no)->update([
-                    'w_schedule_number' =>   CommonFunc::generate_w_schedule_number($w_no,'RW')
+                    'w_schedule_number' =>   CommonFunc::generate_w_schedule_number($w_no,'EW')
                 ]);
                 if($request->wr_contents){
                     WarehousingRequest::insert([

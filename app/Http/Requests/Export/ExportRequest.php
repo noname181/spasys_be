@@ -30,6 +30,9 @@ class ExportRequest extends BaseFormRequest
             ],
             'type' => [
                 '',
+            ],
+            'page' => [
+                '',
             ]
         ];
     }
