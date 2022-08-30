@@ -58,6 +58,11 @@ class Menu extends Model
         return $this->hasMany(Menu::class, 'menu_parent_no', 'menu_no');
     }
 
+    public function permission()
+    {
+        return $this->hasMany(Permission::class, 'menu_no', 'menu_no');
+    }
+
     public function getServiceNameArrayAttribute()
     {
         $service_no_array = $this->service_no_array;

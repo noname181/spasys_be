@@ -185,7 +185,22 @@ class MenuController extends Controller
     public function get_menu_main()
     {
         try {
-            $menu_main = Menu::with('menu_childs')->select(['menu_no', 'menu_name', 'service_no_array'])->where('menu_depth', '상위')->get();
+            $user = Auth::user();
+            $menu = Menu::whereHas('permission', function($q) use($user) {
+                $q->where('role_no', $user->role_no);
+            })->get();
+            $menu_main = Menu::with(['menu_childs' =>function($q) use($user) {
+                $q->whereHas('permission', function($q) use($user) {
+                    $q->where('role_no', $user->role_no);
+                });
+            }])->whereHas('menu_childs', function($q) use($user) {
+                $q->whereHas('permission', function($q) use($user) {
+                    $q->where('role_no', $user->role_no);
+                });
+            })->select(['menu_no', 'menu_name', 'service_no_array'])->where('menu_depth', '상위')->get();
+            
+            
+
             return response()->json($menu_main);
         } catch (\Exception $e) {
             Log::error($e);

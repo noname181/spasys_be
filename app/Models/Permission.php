@@ -30,4 +30,14 @@ class Permission extends Model
         'created_at' => "date:Y.m.d H:i",
         'updated_at' => "date:Y.m.d H:i",
     ];
+
+    public function menu()
+    {
+        return $this->belongsTo(Menu::class, 'menu_no', 'menu_no');
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'role_no', 'role_no');
+    }
 }
