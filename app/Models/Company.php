@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Requests\ImportSchedule\ImportScheduleRequest;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Contract;
@@ -51,6 +52,10 @@ class Company extends Model
     public function co_parent()
     {
         return $this->belongsTo(Company::class, 'co_parent_no', 'co_no');
+    }
+    public function import_schedule()
+    {
+        return $this->hasMany(ImportSchedule::class, 'co_license', 'co_license');
     }
 
 }

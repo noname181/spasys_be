@@ -65,4 +65,9 @@ class Warehousing extends Model
     {
         return $this->hasMany(ReceivingGoodsDelivery::class, 'w_no', 'w_no');
     }
+
+    public function import_schedule()
+    {
+        return $this->belongsTo(ImportSchedule::class, 'connection_number', 'logistic_manage_number');
+    }
 }

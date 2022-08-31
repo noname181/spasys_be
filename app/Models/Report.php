@@ -23,7 +23,7 @@ class Report extends Model
     protected $fillable = [
         'rp_no',
         'mb_no',
-        'item_no',
+        'w_no',
         'rp_number',
         'rp_cate',
         'rp_content',
@@ -45,5 +45,8 @@ class Report extends Model
     public function reports_child_mobi(){
         return $this->HasMany(Report::class, 'rp_parent_no','rp_no')->whereRaw('rp_no != rp_parent_no')->with('files');
     }
-
+    public function warehousing()
+    {
+        return $this->belongsTo(Warehousing::class, 'w_no', 'w_no')->with(['import_schedule','co_no']);
+    }
 }

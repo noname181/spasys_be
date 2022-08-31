@@ -33,7 +33,7 @@ class ReportController extends Controller
                 foreach ($request->rp_content as $rp_content) {
                     $report_no = Report::insertGetId([
                         'mb_no' => Auth::user()->mb_no,
-                        'item_no' => $request->item_no,
+                        'w_no' => $request->w_no,
                         'rp_cate' => $request->rp_cate,
                         'rp_content' => $rp_content,
                         'rp_parent_no' => empty($parent_no) ? null : $parent_no,
@@ -73,7 +73,7 @@ class ReportController extends Controller
                 foreach ($request->rp_content as $rp_content) {
                     $rp_parent_no = Report::where('rp_no', $request->rp_no)->first()->rp_parent_no;
                     $report = Report::where('rp_no', $request->rp_file_no[$i])->update([
-                        'item_no' => $request->item_no,
+                        'w_no' => $request->w_no,
                         'rp_cate' => $request->rp_cate,
                         'rp_content' => $request->rp_content[$i],
                     ]);
@@ -111,7 +111,7 @@ class ReportController extends Controller
 
                         $report_no = Report::insertGetId([
                             'mb_no' => Auth::user()->mb_no,
-                            'item_no' => $request->item_no,
+                            'w_no' => $request->w_no,
                             'rp_cate' => $request->rp_cate,
                             'rp_content' => $rp_content,
                             'rp_parent_no' => $rp_parent_no,
@@ -166,7 +166,7 @@ class ReportController extends Controller
                 Report::where('rp_parent_no', $rp_parent_no)->update(['rp_parent_no' => $rp_parent_new]);
 
                 // $report = Report::where('rp_no', $request->rp_no)->update([
-                //     'item_no' => $request->item_no,
+                //     'w_no' => $request->w_no,
                 //     'rp_cate' => $request->rp_cate,
                 //     'rp_content' => $request->rp_content[0],
                 // ]);
@@ -225,7 +225,7 @@ class ReportController extends Controller
     public function getReport($rp_no)
     {
         $rp_parent_no = Report::where('rp_no', $rp_no)->first()->rp_parent_no;
-        $report = Report::with('files')->where('rp_parent_no', $rp_parent_no)->get();
+        $report = Report::with('files','warehousing')->where('rp_parent_no', $rp_parent_no)->get();
 
         return response()->json(['report' => $report]);
 
@@ -280,7 +280,7 @@ class ReportController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 5;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $reports = Report::with(['files', 'reports_child'])->orderBy('rp_parent_no', 'DESC');
+            $reports = Report::with(['files', 'reports_child','warehousing'])->orderBy('rp_parent_no', 'DESC');
 
             if (isset($validated['from_date'])) {
                 $reports->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
