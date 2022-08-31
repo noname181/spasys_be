@@ -40,7 +40,6 @@ class ExportController extends Controller
             foreach($warehousings as $o) {
                 $w_no[] = $o->w_no;
             }
-           
         }
 
         //fetchReceivingGoodsDeliveryRequests
@@ -59,6 +58,7 @@ class ExportController extends Controller
         $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
         // If page is null set default data = 1
         $page = isset($validated['page']) ? $validated['page'] : 1;
+
         $warehousing_request = WarehousingRequest::with('mb_no')->orderBy('wr_no', 'DESC');
 
         $members = Member::where('mb_no', '!=', 0)->get();
@@ -76,7 +76,9 @@ class ExportController extends Controller
         if (isset($validated['w_no'])) {
             if (isset($item_no)) {
                 $warehousing_items = WarehousingItem::where('w_no', $validated['w_no'])->whereIn('item_no', $item_no)->get();
-            }else {
+            }else if(isset($w_no)){
+                $warehousing_items = WarehousingItem::whereIn('w_no', $w_no)->get();
+            }else{
                 $warehousing_items = WarehousingItem::where('w_no', $validated['w_no'])->get();
             }
 
