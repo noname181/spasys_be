@@ -66,7 +66,7 @@ class Member extends Authenticatable
 
     public function company()
     {
-        return $this->belongsTo(Company::class, 'co_no', 'co_no');
+        return $this->belongsTo(Company::class, 'co_no', 'co_no')->with('co_parent');
     }
 
     public function role()

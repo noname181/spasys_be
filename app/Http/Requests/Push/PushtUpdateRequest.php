@@ -26,7 +26,7 @@ class PushtUpdateRequest extends BaseFormRequest
         return [
             'menu_no' => [
                 'required',
-                'int',
+                'string',
             ],
             'push_title' => [
                 'required',
