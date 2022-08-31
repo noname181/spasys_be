@@ -29,13 +29,18 @@ class ExportController extends Controller
         
         $validated = $request->validated();
         try{
+
+        DB::enableQueryLog();
         //fetchWarehousing
         $warehousing = Warehousing::find($validated['w_no']);
+
+
+        $type = $warehousing->w_type;
         $warehousings = Warehousing::where('w_import_no',$validated['w_no'])->get();
         
 
         
-        if(isset($validated['page']) && $validated['page'] == 'Page146_1'){
+        if(isset($validated['page_type']) && $validated['page_type'] == 'Page146_1' && $type=='IW'){
             $w_no = array();
             foreach($warehousings as $o) {
                 $w_no[] = $o->w_no;
@@ -47,7 +52,7 @@ class ExportController extends Controller
             return $q->where('w_no', $validated['w_no']);
         })->get();
         
-        if(isset($validated['page']) && $validated['page'] == 'Page146_1'){
+        if(isset($validated['page_type']) && $validated['page_type'] == 'Page146_1' && $type=='IW'){
             $rgd = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->whereHas('w_no', function($q) use ($w_no) {
                 return $q->whereIn('w_no', $w_no);
             })->get();
@@ -76,7 +81,7 @@ class ExportController extends Controller
         if (isset($validated['w_no'])) {
             if (isset($item_no)) {
                 $warehousing_items = WarehousingItem::where('w_no', $validated['w_no'])->whereIn('item_no', $item_no)->get();
-            }else if(isset($w_no)){
+            }else if(isset($w_no) && $type=='IW'){
                 $warehousing_items = WarehousingItem::whereIn('w_no', $w_no)->get();
             }else{
                 $warehousing_items = WarehousingItem::where('w_no', $validated['w_no'])->get();
@@ -96,7 +101,8 @@ class ExportController extends Controller
                                      'warehousings' => $warehousings,
                                      'rgd' => $rgd,
                                      'warehousing_request' => $warehousing_request,
-                                     'items' => $items
+                                     'items' => $items,
+                                     'sql' => DB::getQueryLog()
                                     ],
                                     
 
