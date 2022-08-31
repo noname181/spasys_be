@@ -26,7 +26,7 @@ class PushRequest extends BaseFormRequest
         return [
             'menu_no' => [
                 'nullable',
-                'int',
+                'string',
             ],
             'push_title' => [
                 'nullable',

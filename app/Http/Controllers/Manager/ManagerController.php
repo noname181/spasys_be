@@ -23,7 +23,7 @@ class ManagerController extends Controller
      * @param  ManagerCreateRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function create(ManagerMobileCreateRequest $request)
+    public function create(ManagerCreateRequest $request)
     {
 
         try {
@@ -189,7 +189,7 @@ class ManagerController extends Controller
      */
     public function delete(Request $request)
     {
-      
+
         try {
             Manager::where('m_no', $request->m_no)->delete();
             return response()->json(['message' => Messages::MSG_0007], 200);
@@ -198,7 +198,7 @@ class ManagerController extends Controller
             return $e;
             return response()->json(['message' => Messages::MSG_0003], 500);
         }
-        
+
     }
 
 
