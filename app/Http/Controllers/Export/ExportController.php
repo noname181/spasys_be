@@ -40,7 +40,7 @@ class ExportController extends Controller
         
 
         
-        if(isset($validated['page_type']) && $validated['page_type'] == 'Page146_1' && $type=='IW'){
+        if(isset($validated['page_type']) && $validated['page_type'] == 'Page146_1' || $type=='IW'){
             $w_no = array();
             foreach($warehousings as $o) {
                 $w_no[] = $o->w_no;
@@ -52,7 +52,7 @@ class ExportController extends Controller
             return $q->where('w_no', $validated['w_no']);
         })->get();
         
-        if(isset($validated['page_type']) && $validated['page_type'] == 'Page146_1' && $type=='IW'){
+        if(isset($validated['page_type']) && $validated['page_type'] == 'Page146_1' || $type=='IW'){
             $rgd = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->whereHas('w_no', function($q) use ($w_no) {
                 return $q->whereIn('w_no', $w_no);
             })->get();
@@ -99,6 +99,7 @@ class ExportController extends Controller
             return response()->json(['message' => Messages::MSG_0007,
                                      'warehousing' => $warehousing,
                                      'warehousings' => $warehousings,
+                                     'warehousing_items' => $warehousing_items,
                                      'rgd' => $rgd,
                                      'warehousing_request' => $warehousing_request,
                                      'items' => $items,
