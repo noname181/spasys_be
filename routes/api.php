@@ -220,8 +220,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/create_popup/{ci_no}', [App\Http\Controllers\CustomsInfo\CustomsInfoController::class, 'create_with_popup'])->name('register_customs_info_popup');
         Route::patch('/update_customs_info', [\App\Http\Controllers\CustomsInfo\CustomsInfoController::class, 'updateCI']);
     });
-
-    Route::prefix('permission')->name('permission.')->group(function () {
+    Route::middleware('role:spasys_admin,spasys_manager')->prefix('permission')->name('permission.')->group(function () {
         Route::post('/', [\App\Http\Controllers\Permission\PermissionController::class, 'getMenu'])->name('get_menu');
         Route::post('/save', [\App\Http\Controllers\Permission\PermissionController::class, 'savePermission'])->name('save_permission');
     });
