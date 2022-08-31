@@ -295,6 +295,36 @@ class ReportController extends Controller
                     $query->where('rp_cate', 'like', '%' . $validated['rp_cate'] . '%')->where('rp_parent_no', NULL);
                 });
             }
+            if (isset($validated['co_parent_name'])) {
+                $reports->whereHas('warehousing.co_no.co_parent',function($query) use ($validated) {              
+                    $query->where(DB::raw('lower(co_name)'), 'like','%'. strtolower($validated['co_parent_name']) .'%');
+                });
+            }
+            if (isset($validated['co_name'])) {
+                $reports->whereHas('warehousing.co_no', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                });
+            }
+            if (isset($validated['w_schedule_number'])) {
+                $reports->whereHas('warehousing', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(w_schedule_number)'), 'like', '%' . strtolower($validated['w_schedule_number']) . '%');
+                });
+            }
+            if (isset($validated['logistic_manage_number'])) {
+                $reports->whereHas('warehousing.import_schedule', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(logistic_manage_number)'), 'like', '%' . strtolower($validated['logistic_manage_number']) . '%');
+                });
+            }
+            if (isset($validated['m_bl'])) {
+                $reports->whereHas('warehousing.import_schedule', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(m_bl)'), 'like', '%' . strtolower($validated['m_bl']) . '%');
+                });
+            }
+            if (isset($validated['h_bl'])) {
+                $reports->whereHas('warehousing.import_schedule', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(h_bl)'), 'like', '%' . strtolower($validated['h_bl']) . '%');
+                });
+            }
 
             $reports = $reports->paginate($per_page, ['*'], 'page', $page);
 

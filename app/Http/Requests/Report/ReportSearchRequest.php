@@ -56,6 +56,34 @@ class ReportSearchRequest extends BaseFormRequest
                 'nullable',
                 'int',
             ],
+            'per_page' => [
+                'nullable',
+                'int',
+            ],
+            'co_name' => [
+                'nullable',
+                'string',
+            ],
+            'co_parent_name' => [
+                'nullable',
+                'string',
+            ],
+            'w_schedule_number' => [
+                'nullable',
+                'string',
+            ],
+            'logistic_manage_number' => [
+                'nullable',
+                'string',
+            ],
+            'm_bl' => [
+                'nullable',
+                'string',
+            ],
+            'h_bl' => [
+                'nullable',
+                'string',
+            ],
         ];
     }
 
