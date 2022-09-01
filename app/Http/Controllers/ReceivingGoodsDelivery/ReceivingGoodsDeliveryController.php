@@ -61,7 +61,7 @@ class ReceivingGoodsDeliveryController extends Controller
         $validated = $request->validated();
 
         try {
-            //DB::beginTransaction();
+            DB::beginTransaction();
             // $warehousing = Warehousing::where('w_no', $validated['w_no'])->first();
             // $warehousing_item = WarehousingItem::where('wi_no', $validated['wi_no'])->first();
             // $warehousing_request = WarehousingRequest::where('wr_no', $validated['wr_no'])->first();
@@ -202,6 +202,8 @@ class ReceivingGoodsDeliveryController extends Controller
                     //         'w_no' => $w_no,
                     //         'wi_number' => $warehousing_item['warehousing_item']['wi_number'],
                     //         'wi_number_received' => $wi_number_received,
+                    //         'wi_number_left' =>  $wi_number_received ? $wi_number_received : $warehousing_item['warehousing_item']['wi_number'],
+                    //         'wi_type' => '입고'
                     //     ]);
                     // }
                     // else{
@@ -210,6 +212,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             'w_no' => $w_no,
                             'wi_number' => $warehousing_item['warehousing_item']['wi_number'],
                             'wi_number_received' =>  $wi_number_received,
+                            'wi_number_left' =>  $wi_number_received > 0 ? $wi_number_received : $warehousing_item['warehousing_item']['wi_number'],
                             'wi_type' => '입고'
                         ]);
 
@@ -305,7 +308,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
             }else{
                 foreach($request->data as $data){
-                    $request->w_no = Warehousing::insertGetId([
+                    $w_no = Warehousing::insertGetId([
                         'mb_no' => $member->mb_no,
                         'w_schedule_amount' => $data['w_schedule_amount'],
                         'w_schedule_day' => $request->w_schedule_day,
@@ -315,7 +318,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         'w_category_name' => $request->w_category_name,
                         'co_no' => $co_no
                     ]);
-                    Warehousing::where('w_no', $request->w_no)->update([
+                    Warehousing::where('w_no', $w_no)->update([
                         'w_schedule_number' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EW')
                     ]);
                     if($request->wr_contents){
@@ -328,10 +331,17 @@ class ReceivingGoodsDeliveryController extends Controller
                     foreach ($data['items'] as $item) {
                         WarehousingItem::insert([
                             'item_no' => $item['item_no'],
-                            'w_no' => $request->w_no,
+                            'w_no' => $w_no,
                             'wi_number' => $item['schedule_wi_number'],
-                            'wi_number_received' =>  $item['warehousing_item']['wi_number'],
                             'wi_type' => '출고'
+                        ]);
+
+                        WarehousingItem::where([
+                            'item_no' => $item['item_no'],
+                            'w_no' => $request->w_no,
+                            'wi_type' => '입고'
+                        ])->update([
+                            'wi_number_left' => $item['warehousing_item']['wi_number_left'] - $item['schedule_wi_number']
                         ]);
                     }
 
