@@ -114,6 +114,15 @@ class WarehousingSearchRequest extends BaseFormRequest
                 'nullable',
                 'string',
             ],
+            'm_bl' => [
+                '',
+            ],
+            'h_bl' => [
+                '',
+            ],
+            'logistic_manage_number' => [
+                '',
+            ],
         ];
     }
 
