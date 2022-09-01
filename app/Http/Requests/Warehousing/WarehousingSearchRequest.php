@@ -104,6 +104,10 @@ class WarehousingSearchRequest extends BaseFormRequest
                 'nullable',
                 'string',
             ],
+            'w_type' => [
+                'nullable',
+                'string',
+            ],
         ];
     }
 
