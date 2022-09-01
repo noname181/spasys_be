@@ -48,6 +48,12 @@ class WarehousingSearchRequest extends BaseFormRequest
                 'nullable',
                 'string',
             ],
+            'w_schedule_number_iw' => [
+                '',
+            ],
+            'w_schedule_number_ew' => [
+                '',
+            ],
             'per_page' => [
                 'nullable',
                 'int',

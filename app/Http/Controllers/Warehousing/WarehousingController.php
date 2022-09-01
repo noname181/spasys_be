@@ -105,6 +105,12 @@ class WarehousingController extends Controller
             if (isset($validated['w_schedule_number'])) {
                 $warehousing->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
             }
+            if (isset($validated['w_schedule_number_ew'])) {
+                $warehousing->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number_ew'] . '%' , 'and' , 'w_type' , '=' , 'EW');
+            }
+            if (isset($validated['w_schedule_number_iw'])) {
+                $warehousing->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number_iw'] . '%' , 'and' , 'w_type' , '=' , 'IW');
+            }
             if (isset($validated['logistic_manage_number'])) {
                 $warehousing->where('logistic_manage_number', 'like', '%' . $validated['logistic_manage_number'] . '%');
             }
@@ -190,6 +196,7 @@ class WarehousingController extends Controller
                     return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
                 });
             }
+            
             if (isset($validated['w_type'])) {
                 $warehousing->whereHas('w_no', function($q) use($validated) {
                     return $q->where('w_type', 'like', '%' . $validated['w_type'] . '%');
