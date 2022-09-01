@@ -245,9 +245,9 @@ class ReceivingGoodsDeliveryController extends Controller
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
 
-             
+
             if($request->page_type == 'Page146_1'){
-               
+
                 foreach($request->data as $data){
                     Warehousing::where('w_no', $request->w_no)->update([
                         'mb_no' => $member->mb_no,
@@ -269,7 +269,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             'wr_type' => 'EW',
                         ]);
                     }
-                    
+
                     WarehousingItem::where('w_no', $request->w_no)->where('wi_type','=','출고')->delete();
 
                     foreach ($data['items'] as $item) {
@@ -336,12 +336,18 @@ class ReceivingGoodsDeliveryController extends Controller
                             'wi_type' => '출고'
                         ]);
 
+                        $warehousing = WarehousingItem::where([
+                            'item_no' => $item['item_no'],
+                            'w_no' => $request->w_no,
+                            'wi_type' => '입고'
+                        ])->first();
+
                         WarehousingItem::where([
                             'item_no' => $item['item_no'],
                             'w_no' => $request->w_no,
                             'wi_type' => '입고'
                         ])->update([
-                            'wi_number_left' => $item['warehousing_item']['wi_number_left'] - $item['schedule_wi_number']
+                            'wi_number_left' => $warehousing->wi_number_left - $item['schedule_wi_number']
                         ]);
                     }
 
