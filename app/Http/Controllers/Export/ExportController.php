@@ -82,11 +82,11 @@ class ExportController extends Controller
         //fetchItems
         if (isset($validated['w_no'])) {
             if (isset($item_no)) {
-                $warehousing_items = WarehousingItem::where('w_no', $validated['w_no'])->whereIn('item_no', $item_no)->get();
+                $warehousing_items = WarehousingItem::where('w_no', $validated['w_no'])->whereIn('item_no', $item_no)->where('wi_type', '=', '입고_spasys')->get();
             }else if(isset($w_no) && $type=='IW'){
-                $warehousing_items = WarehousingItem::whereIn('w_no', $w_no)->get();
+                $warehousing_items = WarehousingItem::whereIn('w_no', $w_no)->where('wi_type', '=', '입고_spasys')->get();
             }else{
-                $warehousing_items = WarehousingItem::where('w_no', $validated['w_no'])->get();
+                $warehousing_items = WarehousingItem::where('w_no', $validated['w_no'])->where('wi_type', '=', '입고_spasys')->get();
             }
 
             $items = [];

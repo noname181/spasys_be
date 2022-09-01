@@ -164,7 +164,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 WarehousingItem::where('item_no', $remove['item_no'])->where('w_no', $w_no)->delete();
             }
 
-            WarehousingItem::where('w_no', $w_no)->where('wi_type','=','입고')->delete();
+            //WarehousingItem::where('w_no', $w_no)->where('wi_type','=','입고_shipper')->delete();
 
             $warehousing_items = [];
 
@@ -192,32 +192,57 @@ class ReceivingGoodsDeliveryController extends Controller
                 }
                 $item_no = $warehousing_item['item_no'] ? $warehousing_item['item_no'] : $item_no_new;
 
-                $wi_number_received = isset($warehousing_item['warehousing_item']['wi_number_received']) ? $warehousing_item['warehousing_item']['wi_number_received'] : null;
+                //$wi_number_received = isset($warehousing_item['warehousing_item']['wi_number_received']) ? $warehousing_item['warehousing_item']['wi_number_received'] : null;
                 if (isset($warehousing_item['warehousing_item']['wi_number'])) {
 
-                    // if(isset($warehousing_item['warehousing_item']['wi_no'])){
+                    if(isset($warehousing_item['warehousing_item']['wi_no'])){
 
-                    //     $warehousing_items = WarehousingItem::where('wi_no', $warehousing_item['warehousing_item']['wi_no'])->update([
-                    //         'item_no' => $warehousing_item['item_no'],
-                    //         'w_no' => $w_no,
-                    //         'wi_number' => $warehousing_item['warehousing_item']['wi_number'],
-                    //         'wi_number_received' => $wi_number_received,
-                    //         'wi_number_left' =>  $wi_number_received ? $wi_number_received : $warehousing_item['warehousing_item']['wi_number'],
-                    //         'wi_type' => '입고'
-                    //     ]);
-                    // }
-                    // else{
+                        $warehousing_items = WarehousingItem::where('wi_no', $warehousing_item['warehousing_item']['wi_no'])->update([
+                            'item_no' => $warehousing_item['item_no'],
+                            'w_no' => $w_no,
+                            'wi_number' => $warehousing_item['warehousing_item']['wi_number'],
+                            // 'wi_number_received' => $wi_number_received,
+                            // 'wi_number_left' =>  $wi_number_received ? $wi_number_received : $warehousing_item['warehousing_item']['wi_number'],
+                            'wi_type' => '입고_shipper'
+                        ]);
+                    }
+                    else{
                         WarehousingItem::insert([
                             'item_no' => $item_no,
                             'w_no' => $w_no,
-                            'wi_number' => $warehousing_item['warehousing_item']['wi_number'],
-                            'wi_number_received' =>  $wi_number_received,
-                            'wi_number_left' =>  $wi_number_received > 0 ? $wi_number_received : $warehousing_item['warehousing_item']['wi_number'],
-                            'wi_type' => '입고'
+                            'wi_number' => $$warehousing_item['warehousing_item']['wi_number'],
+                            // 'wi_number_received' =>  $wi_number_received,
+                            // 'wi_number_left' =>  $wi_number_received > 0 ? $wi_number_received : $warehousing_item['warehousing_item']['wi_number'],
+                            'wi_type' => '입고_shipper'
                         ]);
 
-                    //}
+                    }
+
+                    
               }
+
+              if (isset($warehousing_item['warehousing_item2']['wi_number'])) {
+                if(isset($warehousing_item['warehousing_item2']['wi_no'])){
+
+                    $warehousing_items = WarehousingItem::where('wi_no', $warehousing_item['warehousing_item2']['wi_no'])->update([
+                        'item_no' => $warehousing_item['item_no'],
+                        'w_no' => $w_no,
+                        'wi_number' => $warehousing_item['warehousing_item2']['wi_number'],
+                        // 'wi_number_received' => $wi_number_received,
+                        // 'wi_number_left' =>  $wi_number_received ? $wi_number_received : $warehousing_item['warehousing_item']['wi_number'],
+                        'wi_type' => '입고_spasys'
+                    ]);
+                }else{
+                    WarehousingItem::insert([
+                        'item_no' => $item_no,
+                        'w_no' => $w_no,
+                        'wi_number' => $warehousing_item['warehousing_item2']['wi_number'],
+                        // 'wi_number_received' =>  $wi_number_received,
+                        // 'wi_number_left' =>  $wi_number_received > 0 ? $wi_number_received : $warehousing_item['warehousing_item']['wi_number'],
+                        'wi_type' => '입고_spasys'
+                    ]);
+                }
+            }
             }
 
 

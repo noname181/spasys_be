@@ -73,4 +73,10 @@ class Item extends Model
     {
         return $this->belongsTo(WarehousingItem::class, 'item_no', 'item_no');
     }
+
+    public function warehousing_item2()
+    {
+        return $this->belongsTo(WarehousingItem::class, 'item_no', 'item_no');
+    }
+    
 }
