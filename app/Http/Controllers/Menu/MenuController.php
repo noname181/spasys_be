@@ -39,7 +39,7 @@ class MenuController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $menu = Menu::with('service')->orderBy('menu_id', 'ASC');
+            $menu = Menu::with('service')->orderBy('main_menu_level', 'ASC')->orderBy('sub_menu_level', 'ASC');
 
 
 
@@ -198,8 +198,8 @@ class MenuController extends Controller
                     $q->where('role_no', $user->role_no);
                 });
             })->select(['menu_no', 'menu_name', 'service_no_array'])->where('menu_depth', '상위')->get();
-            
-            
+
+
 
             return response()->json($menu_main);
         } catch (\Exception $e) {

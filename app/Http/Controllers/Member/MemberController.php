@@ -2,25 +2,23 @@
 
 namespace App\Http\Controllers\Member;
 
-use App\Models\Member;
-use App\Models\Service;
-use App\Models\Company;
-use App\Utils\Messages;
 use App\Http\Controllers\Controller;
-
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-
+use App\Http\Requests\Member\MemberRegisterController\CreateAccountRequest;
+use App\Http\Requests\Member\MemberRegisterController\InvokeRequest;
 use App\Http\Requests\Member\MemberSearchRequest;
 use App\Http\Requests\Member\MemberSpasysSearchRequest;
 use App\Http\Requests\Member\MemberSpasysUpdateRequest;
-use App\Http\Requests\Member\MemberUpdate\MemberUpdateRequest;
 use App\Http\Requests\Member\MemberUpdate\MemberUpdateByIdRequest;
-use App\Http\Requests\Member\MemberRegisterController\InvokeRequest;
-use App\Http\Requests\Member\MemberRegisterController\CreateAccountRequest;
+use App\Http\Requests\Member\MemberUpdate\MemberUpdateRequest;
+use App\Models\Company;
+use App\Models\Member;
+use App\Models\Service;
+use App\Utils\Messages;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class MemberController extends Controller
 {
@@ -42,26 +40,25 @@ class MemberController extends Controller
             if ($roleNoOfUserLogin == Member::ROLE_ADMIN) {
                 $validated['mb_type'] = Member::SPASYS;
                 $validated['mb_parent'] = Member::ADMIN;
-            }else if ($roleNoOfUserLogin == Member::ROLE_SPASYS_ADMIN) {
+            } else if ($roleNoOfUserLogin == Member::ROLE_SPASYS_ADMIN) {
                 $validated['mb_type'] = Member::SHOP;
                 $validated['mb_parent'] = Member::SPASYS;
-                if($validated['role_no'] == "관리자"){
+                if ($validated['role_no'] == "관리자") {
                     $validated['role_no'] = Member::ROLE_SHOP_MANAGER;
-                }else {
+                } else {
                     $validated['role_no'] = Member::ROLE_SHOP_OPERATOR;
                 }
-            }else if ($roleNoOfUserLogin == Member::ROLE_SHOP_MANAGER) {
+            } else if ($roleNoOfUserLogin == Member::ROLE_SHOP_MANAGER) {
                 $validated['mb_type'] = Member::SHIPPER;
                 $validated['mb_parent'] = Member::SHOP;
-                if($validated['role_no'] == "관리자"){
+                if ($validated['role_no'] == "관리자") {
                     $validated['role_no'] = Member::ROLE_SHOP_MANAGER;
-                }else {
+                } else {
                     $validated['role_no'] = Member::ROLE_SHOP_OPERATOR;
                 }
-            }else {
+            } else {
                 $validated['role_no'] = 0;
             }
-
 
             $validated['mb_token'] = '';
             $validated['mb_pw'] = Hash::make($validated['mb_pw']);
@@ -91,15 +88,15 @@ class MemberController extends Controller
 
             if (is_null($member)) {
                 return response()->json([
-                    'message' => Messages::MSG_0020
+                    'message' => Messages::MSG_0020,
                 ], 404);
             }
             $length = strlen($member->mb_id);
-            $start = floor($length/4);
-            $end = floor($length/2) + $start;
+            $start = floor($length / 4);
+            $end = floor($length / 2) + $start;
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'mb_id' => substr_replace($member->mb_id, str_repeat('*', $end - $start + 1), $start , $end - $start + 1),
+                'mb_id' => substr_replace($member->mb_id, str_repeat('*', $end - $start + 1), $start, $end - $start + 1),
             ]);
         } catch (\Exception $e) {
             Log::error($e);
@@ -120,7 +117,7 @@ class MemberController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'profile' => $member,
-                'services' => $services
+                'services' => $services,
             ]);
         } catch (\Exception $e) {
             Log::error($e);
@@ -136,25 +133,25 @@ class MemberController extends Controller
         try {
             $member = Member::with('company')->where('mb_no', $mb_no)->first();
 
-            if($member->company->co_type == 'spasys'){
+            if ($member->company->co_type == 'spasys') {
                 $services = Service::where('service_use_yn', 'y')->get();
-            }else {
-                $co_service_array = explode(" ",  $member->company->co_service);
+            } else {
+                $co_service_array = explode(" ", $member->company->co_service);
                 $services = Service::whereIN("service_name", $co_service_array)->get();
             }
 
             // $services = Service::where('service_use_yn', 'y')->get();
-            if($member->role_no == Member::ROLE_SPASYS_MANAGER || $member->role_no == Member::ROLE_SHOP_MANAGER){
+            if ($member->role_no == Member::ROLE_SPASYS_MANAGER || $member->role_no == Member::ROLE_SHOP_MANAGER) {
                 $member->role_no = '관리자';
-            }else if($member->role_no == Member::ROLE_SPASYS_OPERATOR || $member->role_no == Member::ROLE_SHOP_OPERATOR){
+            } else if ($member->role_no == Member::ROLE_SPASYS_OPERATOR || $member->role_no == Member::ROLE_SHOP_OPERATOR) {
                 $member->role_no = '운영자';
-            }else if($member->role_no == Member::ROLE_SPASYS_WORKER){
+            } else if ($member->role_no == Member::ROLE_SPASYS_WORKER) {
                 $member->role_no = '작업자';
             }
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'member' => $member,
-                'services' => $services
+                'services' => $services,
             ]);
         } catch (\Exception $e) {
             Log::error($e);
@@ -169,12 +166,46 @@ class MemberController extends Controller
     {
         try {
             $validated = $request->validated();
-
             // If per_page is null set default data = 15
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $members = Member::with('company')->orderBy('mb_no', 'DESC');
+
+            $user = Member::where('mb_no', Auth::user()->mb_no)->with('company')->first();
+
+            if ($user->mb_type == 'spasys') {
+                $members = Member::with('company')->whereHas('company', function($q) use($user){
+                    $q->where('co_no', $user->company->co_no);
+                })
+                ->orWhereHas('company', function($q) use($user){
+                    $q->whereHas('co_parent', function($q) use($user){
+                        $q->where('co_no', $user->company->co_no);
+                    });
+                })
+                ->orWhereHas('company', function($q) use($user){
+                    $q->whereHas('co_parent', function($q) use($user){
+                        $q->whereHas('co_parent', function($q) use($user){
+                            $q->where('co_no', $user->company->co_no);
+                        });
+                    });
+                })
+                ->orderBy('mb_no', 'DESC');
+            }else if($user->mb_type == 'shop'){
+                $members = Member::with('company')->whereHas('company', function($q) use($user){
+                    $q->where('co_no', $user->company->co_no);
+                })
+                ->orWhereHas('company', function($q) use($user){
+                    $q->whereHas('co_parent', function($q) use($user){
+                        $q->where('co_no', $user->company->co_no);
+                    });
+                });
+            }else if($user->mb_type == 'shipper'){
+                $members = Member::with('company')->whereHas('company', function($q) use($user){
+                    $q->where('co_no', $user->company->co_no);
+                });
+            }
+
+
 
             if (isset($validated['from_date'])) {
                 $members->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
@@ -185,19 +216,19 @@ class MemberController extends Controller
             }
 
             if (isset($validated['co_name'])) {
-                $members->whereHas('company', function($q) use($validated) {
+                $members->whereHas('company', function ($q) use ($validated) {
                     return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
                 });
             }
 
             if (isset($validated['mb_name'])) {
-                $members->where(function($query) use ($validated) {
+                $members->where(function ($query) use ($validated) {
                     $query->where(DB::raw('lower(mb_name)'), 'like', '%' . strtolower($validated['mb_name']) . '%');
                 });
             }
 
             if (isset($validated['mb_id'])) {
-                $members->where(function($query) use ($validated) {
+                $members->where(function ($query) use ($validated) {
                     $query->where(DB::raw('lower(mb_id)'), 'like', '%' . strtolower($validated['mb_id']) . '%');
                 });
             }
@@ -211,7 +242,6 @@ class MemberController extends Controller
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
-
 
     /**
      * Update Profiles
@@ -241,7 +271,6 @@ class MemberController extends Controller
         }
     }
 
-
     /**
      * Update Profiles By Id
      */
@@ -262,32 +291,32 @@ class MemberController extends Controller
         if ($roleNoOfUserLogin == Member::ROLE_ADMIN) {
             $validated['mb_type'] = Member::SPASYS;
             $validated['mb_parent'] = Member::ADMIN;
-        }else if ($roleNoOfUserLogin == Member::ROLE_SPASYS_ADMIN) {
+        } else if ($roleNoOfUserLogin == Member::ROLE_SPASYS_ADMIN) {
             $validated['mb_type'] = Member::SHOP;
             $validated['mb_parent'] = Member::SPASYS;
-            if($validated['role_no'] == "관리자"){
+            if ($validated['role_no'] == "관리자") {
                 $validated['role_no'] = Member::ROLE_SHOP_MANAGER;
-            }else {
+            } else {
                 $validated['role_no'] = Member::ROLE_SHOP_OPERATOR;
             }
-        }else {
+        } else {
             $validated['role_no'] = 1;
         }
 
         $member->save();
 
-        if($member->role_no == Member::ROLE_SPASYS_MANAGER || $member->role_no == Member::ROLE_SHOP_MANAGER){
+        if ($member->role_no == Member::ROLE_SPASYS_MANAGER || $member->role_no == Member::ROLE_SHOP_MANAGER) {
             $member->role_no = '관리자';
-        }else if($member->role_no == Member::ROLE_SPASYS_OPERATOR || $member->role_no == Member::ROLE_SHOP_OPERATOR){
+        } else if ($member->role_no == Member::ROLE_SPASYS_OPERATOR || $member->role_no == Member::ROLE_SHOP_OPERATOR) {
             $member->role_no = '운영자';
-        }else if($member->role_no == Member::ROLE_SPASYS_WORKER){
+        } else if ($member->role_no == Member::ROLE_SPASYS_WORKER) {
             $member->role_no = '작업자';
         }
 
         return response()->json([
             'message' => Messages::MSG_0007,
             'profile' => $member,
-            'services' => $services
+            'services' => $services,
         ]);
     }
 
@@ -314,7 +343,7 @@ class MemberController extends Controller
                 'mb_no' => Auth::user()->mb_no,
                 'co_type' => Member::SPASYS,
                 'co_name' => $validated['mb_name'],
-                'co_etc' => $validated['mb_note']
+                'co_etc' => $validated['mb_note'],
             ]);
 
             $validated['co_no'] = $com_no;
@@ -324,7 +353,7 @@ class MemberController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'mb_no' => $mb_no,
-                'co_no' => $com_no
+                'co_no' => $com_no,
             ]);
         } catch (\Exception $e) {
             Log::error($e);
@@ -332,7 +361,7 @@ class MemberController extends Controller
         }
     }
 
-        /**
+    /**
      * Update Account
      */
     public function updateAccount(MemberSpasysUpdateRequest $request, Member $memeber)
@@ -340,12 +369,12 @@ class MemberController extends Controller
         $validated = $request->validated();
         try {
             DB::beginTransaction();
-            if(isset($validated['mb_pw'])) {
+            if (isset($validated['mb_pw'])) {
                 // Logout when change pw
                 $memeber->mb_token = '';
-                $memeber->mb_pw =  Hash::make($validated['mb_pw']);
+                $memeber->mb_pw = Hash::make($validated['mb_pw']);
             }
-            if($validated['mb_id'] != $memeber->mb_id) {
+            if ($validated['mb_id'] != $memeber->mb_id) {
                 // Logout when change mb_id
                 $memeber->mb_token = '';
             }
@@ -356,7 +385,7 @@ class MemberController extends Controller
 
             Company::where('co_no', $memeber->co_no)->update([
                 'co_name' => $memeber->mb_name,
-                'co_etc' => $memeber->mb_note
+                'co_etc' => $memeber->mb_note,
             ]);
 
             DB::commit();
@@ -383,7 +412,7 @@ class MemberController extends Controller
             $member->delete();
             Company::where('co_no', $co_no)->delete();
             return response()->json([
-                'message' => Messages::MSG_0007
+                'message' => Messages::MSG_0007,
             ]);
         } catch (\Exception $e) {
             Log::error($e);
@@ -403,7 +432,7 @@ class MemberController extends Controller
             $member->delete();
 
             return response()->json([
-                'message' => Messages::MSG_0007
+                'message' => Messages::MSG_0007,
             ]);
         } catch (\Exception $e) {
             Log::error($e);
@@ -426,19 +455,17 @@ class MemberController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $spasys = Member::with('company')->where('role_no', 2)->orderBy('mb_no', 'DESC');
 
-
             if (isset($validated['mb_name'])) {
-                $spasys->where(function($query) use ($validated) {
+                $spasys->where(function ($query) use ($validated) {
                     $query->where(DB::raw('lower(mb_name)'), 'like', '%' . strtolower($validated['mb_name']) . '%');
                 });
             }
 
             if (isset($validated['mb_id'])) {
-                $spasys->where(function($query) use ($validated) {
+                $spasys->where(function ($query) use ($validated) {
                     $query->where(DB::raw('lower(mb_id)'), 'like', '%' . strtolower($validated['mb_id']) . '%');
                 });
             }
-
 
             $spasys = $spasys->paginate($per_page, ['*'], 'page', $page);
 
@@ -459,7 +486,7 @@ class MemberController extends Controller
             $members = Member::all();
 
             return response()->json(["member" => $members]);
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0020], 500);
         }

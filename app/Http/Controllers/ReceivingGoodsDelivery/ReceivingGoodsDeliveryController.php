@@ -61,7 +61,7 @@ class ReceivingGoodsDeliveryController extends Controller
         $validated = $request->validated();
 
         try {
-            //DB::beginTransaction();
+            DB::beginTransaction();
             // $warehousing = Warehousing::where('w_no', $validated['w_no'])->first();
             // $warehousing_item = WarehousingItem::where('wi_no', $validated['wi_no'])->first();
             // $warehousing_request = WarehousingRequest::where('wr_no', $validated['wr_no'])->first();
@@ -202,6 +202,8 @@ class ReceivingGoodsDeliveryController extends Controller
                     //         'w_no' => $w_no,
                     //         'wi_number' => $warehousing_item['warehousing_item']['wi_number'],
                     //         'wi_number_received' => $wi_number_received,
+                    //         'wi_number_left' =>  $wi_number_received ? $wi_number_received : $warehousing_item['warehousing_item']['wi_number'],
+                    //         'wi_type' => '입고'
                     //     ]);
                     // }
                     // else{
@@ -210,6 +212,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             'w_no' => $w_no,
                             'wi_number' => $warehousing_item['warehousing_item']['wi_number'],
                             'wi_number_received' =>  $wi_number_received,
+                            'wi_number_left' =>  $wi_number_received > 0 ? $wi_number_received : $warehousing_item['warehousing_item']['wi_number'],
                             'wi_type' => '입고'
                         ]);
 

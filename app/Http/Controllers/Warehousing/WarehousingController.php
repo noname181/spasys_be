@@ -187,8 +187,13 @@ class WarehousingController extends Controller
 
             if (isset($validated['w_schedule_number'])) {
                 $warehousing->whereHas('w_no', function($q) use($validated) {
-                return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
-            });
+                    return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
+                });
+            }
+            if (isset($validated['w_type'])) {
+                $warehousing->whereHas('w_no', function($q) use($validated) {
+                    return $q->where('w_type', 'like', '%' . $validated['w_type'] . '%');
+                });
             }
             if (isset($validated['rgd_status1'])) {
                 $warehousing->where('rgd_status1', '=', $validated['rgd_status1']);
