@@ -272,13 +272,14 @@ class ReceivingGoodsDeliveryController extends Controller
 
 
             if($request->page_type == 'Page146_1'){
-
+                $warehousing_data = Warehousing::where('w_no', $request->w_no)->first();
+                
                 foreach($request->data as $data){
                     Warehousing::where('w_no', $request->w_no)->update([
                         'mb_no' => $member->mb_no,
                         'w_schedule_amount' => $data['w_schedule_amount'],
                         'w_schedule_day' => $request->w_schedule_day,
-                        'w_import_no' => $data['w_import_no'],
+                        'w_import_no' => $warehousing_data->w_import_no,
                         'w_amount' => $data['w_amount'],
                         'w_type' => 'EW',
                         'w_category_name' => $request->w_category_name,
@@ -295,16 +296,27 @@ class ReceivingGoodsDeliveryController extends Controller
                         ]);
                     }
 
-                    WarehousingItem::where('w_no', $request->w_no)->where('wi_type','=','출고')->delete();
+                    //WarehousingItem::where('w_no', $request->w_no)->where('wi_type','=','출고')->delete();
 
                     foreach ($data['items'] as $item) {
-                        WarehousingItem::insert([
-                            'item_no' => $item['item_no'],
-                            'w_no' => $request->w_no,
-                            'wi_number' => $item['schedule_wi_number'],
-                            'wi_number_received' =>  $item['warehousing_item']['wi_number_received'],
-                            'wi_type' => '출고'
-                        ]);
+                        if($item['warehousing_item']['wi_type'] == "출고_spasys"){
+                            WarehousingItem::where('wi_no', $item['warehousing_item']['wi_no'])->update([
+                                'item_no' => $item['item_no'],
+                                'w_no' => $request->w_no,
+                                'wi_number' => $item['schedule_wi_number'],
+                                'wi_number_received' =>  $item['warehousing_item']['wi_number_received'],
+                                'wi_type' => '출고_spasys'
+                            ]);
+
+                        }else{
+                            WarehousingItem::insert([
+                                'item_no' => $item['item_no'],
+                                'w_no' => $request->w_no,
+                                'wi_number' => $item['schedule_wi_number'],
+                                'wi_number_received' =>  $item['warehousing_item']['wi_number_received'],
+                                'wi_type' => '출고_spasys'
+                            ]);
+                        }
                     }
 
                     foreach ($data['location'] as $location) {
@@ -361,22 +373,22 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'item_no' => $item['item_no'],
                                 'w_no' => $w_no,
                                 'wi_number' => $item['schedule_wi_number'],
-                                'wi_type' => '출고'
+                                'wi_type' => '출고_shipper'
                             ]);
 
-                            $warehousing = WarehousingItem::where([
-                                'item_no' => $item['item_no'],
-                                'w_no' => $request->w_no,
-                                'wi_type' => '입고'
-                            ])->first();
+                            // $warehousing = WarehousingItem::where([
+                            //     'item_no' => $item['item_no'],
+                            //     'w_no' => $request->w_no,
+                            //     'wi_type' => '입고'
+                            // ])->first();
 
-                            WarehousingItem::where([
-                                'item_no' => $item['item_no'],
-                                'w_no' => $request->w_no,
-                                'wi_type' => '입고'
-                            ])->update([
-                                'wi_number_left' => $warehousing->wi_number_left - $item['schedule_wi_number']
-                            ]);
+                            // WarehousingItem::where([
+                            //     'item_no' => $item['item_no'],
+                            //     'w_no' => $request->w_no,
+                            //     'wi_type' => '입고'
+                            // ])->update([
+                            //     'wi_number_left' => $warehousing->wi_number_left - $item['schedule_wi_number']
+                            // ]);
                         }
 
                         foreach ($data['location'] as $location) {
@@ -426,30 +438,30 @@ class ReceivingGoodsDeliveryController extends Controller
                         }
                         foreach ($data['items'] as $item) {
 
-                            $warehousing = WarehousingItem::where([
-                                'item_no' => $item['item_no'],
-                                'w_no' => $request->w_no,
-                                'wi_type' => '출고'
-                            ])->first();
-                            //return $warehousing->wi_number;
-                            WarehousingItem::where([
-                                'item_no' => $item['item_no'],
-                                'w_no' => $warehousing_data->w_import_no,
-                                'wi_type' => '입고'
-                            ])->update([
-                                'wi_number_left' => $warehousing->wi_number - $item['schedule_wi_number'] 
-                            ]);
+                            // $warehousing = WarehousingItem::where([
+                            //     'item_no' => $item['item_no'],
+                            //     'w_no' => $request->w_no,
+                            //     'wi_type' => '출고'
+                            // ])->first();
+                            // return $warehousing->wi_number;
+                            // WarehousingItem::where([
+                            //     'item_no' => $item['item_no'],
+                            //     'w_no' => $warehousing_data->w_import_no,
+                            //     'wi_type' => '입고'
+                            // ])->update([
+                            //     'wi_number_left' => $warehousing->wi_number - $item['schedule_wi_number'] 
+                            // ]);
 
                             WarehousingItem::where('w_no', $request->w_no)->update([
                                 'item_no' => $item['item_no'],
                                 'w_no' => $request->w_no,
                                 'wi_number' => $item['schedule_wi_number'],
-                                'wi_type' => '출고'
+                                'wi_type' => '출고_shipper'
                             ]);
 
                           
                         }
-                        return $warehousing;
+                       
                         foreach ($data['location'] as $location) {
                             $rgd_no = ReceivingGoodsDelivery::where('w_no', $request->w_no)->update([
                                 'mb_no' => $member->mb_no,

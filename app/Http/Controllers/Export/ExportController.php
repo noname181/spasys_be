@@ -84,9 +84,23 @@ class ExportController extends Controller
             if (isset($item_no)) {
                 $warehousing_items = WarehousingItem::where('w_no', $validated['w_no'])->whereIn('item_no', $item_no)->where('wi_type', '=', '입고_spasys')->get();
             }else if(isset($w_no) && $type=='IW'){
+                //show for 130146 edit 입고
                 $warehousing_items = WarehousingItem::whereIn('w_no', $w_no)->where('wi_type', '=', '입고_spasys')->get();
-            }else{
+            }else if(isset($validated['w_no']) && $type=='IW'){
+                //show for 141 shipper edit 입고 to 출고
                 $warehousing_items = WarehousingItem::where('w_no', $validated['w_no'])->where('wi_type', '=', '입고_spasys')->get();
+            }else if(isset($validated['w_no']) && $type=='EW' && !isset($validated['page_type'])){
+                //show for 141 shipper edit 출고
+                $warehousing_items = WarehousingItem::where('w_no', $validated['w_no'])->where('wi_type', '=', '출고_shipper')->get();
+            }else{
+                $sql_count = WarehousingItem::where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '출고_spasys')->get();
+                $count = $sql_count->count();
+                //show for 130146
+                if($count != 0){
+                    $warehousing_items = WarehousingItem::where('w_no', $validated['w_no'])->where('wi_type', '=', '출고_spasys')->get();
+                }else{
+                    $warehousing_items = WarehousingItem::where('w_no', $validated['w_no'])->where('wi_type', '=', '출고_shipper')->get();
+                }
             }
 
             $items = [];

@@ -31,6 +31,9 @@ class ExportRequest extends BaseFormRequest
             'type' => [
                 '',
             ],
+            'items' => [
+                '',
+            ],
             'page_type' => [
                 '',
             ]
