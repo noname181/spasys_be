@@ -47,6 +47,6 @@ class Report extends Model
     }
     public function warehousing()
     {
-        return $this->belongsTo(Warehousing::class, 'w_no', 'w_no')->with(['import_schedule','co_no']);
+        return $this->belongsTo(Warehousing::class, 'w_no', 'w_no')->with(['import_schedule','co_no','warehousing_item','receving_goods_delivery']);
     }
 }
