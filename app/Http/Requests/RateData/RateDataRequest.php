@@ -31,6 +31,14 @@ class RateDataRequest extends BaseFormRequest
                 'int',
                 'nullable'
             ],
+            'w_no' => [
+                'int',
+                'nullable'
+            ],
+            'set_type' => [
+                'string',
+                'nullable'
+            ],
             'rd_co_no' => [
                 'int',
                 'nullable'
@@ -91,6 +99,31 @@ class RateDataRequest extends BaseFormRequest
                 'max:255',
             ],
             'rate_data.*.rd_data3' => [
+                'string',
+                'max:255',
+                'nullable'
+            ],
+            'rate_data.*.rd_data8' => [
+                'string',
+                'max:255',
+                'nullable'
+            ],
+            'rate_data.*.rd_data4' => [
+                'string',
+                'max:255',
+                'nullable'
+            ],
+            'rate_data.*.rd_data5' => [
+                'string',
+                'max:255',
+                'nullable'
+            ],
+            'rate_data.*.rd_data6' => [
+                'string',
+                'max:255',
+                'nullable'
+            ],
+            'rate_data.*.rd_data7' => [
                 'string',
                 'max:255',
                 'nullable'

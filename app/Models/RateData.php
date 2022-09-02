@@ -24,6 +24,7 @@ class RateData extends Model
         'rd_no',
         'rm_no',
         'co_no',
+        'w_no',
         'rd_co_no',
         'rmd_no',
         'rd_cate_meta1',
@@ -33,7 +34,12 @@ class RateData extends Model
         'rd_cate3',
         'rd_data1',
         'rd_data2',
-        'rd_data3'
+        'rd_data3',
+        'rd_data4',
+        'rd_data5',
+        'rd_data6',
+        'rd_data7',
+        'rd_data8',
     ];
 
     protected $casts = [
