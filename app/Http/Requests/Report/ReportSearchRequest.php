@@ -84,6 +84,15 @@ class ReportSearchRequest extends BaseFormRequest
                 'nullable',
                 'string',
             ],
+            'rgd_status1_1' => [
+                '',
+            ],
+            'rgd_status1_2' => [
+                '',
+            ],
+            'rgd_status1_3' => [
+                '',
+            ],
         ];
     }
 

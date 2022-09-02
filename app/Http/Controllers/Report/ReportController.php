@@ -240,7 +240,7 @@ class ReportController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $reports = Report::with(['files', 'reports_child_mobi'])->whereRaw('rp_no = rp_parent_no');
+            $reports = Report::with(['files', 'reports_child_mobi','warehousing'])->whereRaw('rp_no = rp_parent_no');
 
             if (isset($validated['from_date'])) {
                 $reports->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
@@ -255,7 +255,43 @@ class ReportController extends Controller
                     $query->where('rp_cate', 'like', '%' . $validated['rp_cate'] . '%')->where('rp_parent_no', NULL);
                 });
             }
-
+            if (isset($validated['co_parent_name'])) {
+                $reports->whereHas('warehousing.co_no.co_parent',function($query) use ($validated) {              
+                    $query->where(DB::raw('lower(co_name)'), 'like','%'. strtolower($validated['co_parent_name']) .'%');
+                });
+            }
+            if (isset($validated['co_name'])) {
+                $reports->whereHas('warehousing.co_no', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                });
+            }
+            if (isset($validated['w_schedule_number'])) {
+                $reports->whereHas('warehousing', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(w_schedule_number)'), 'like', '%' . strtolower($validated['w_schedule_number']) . '%');
+                });
+            }
+            if (isset($validated['logistic_manage_number'])) {
+                $reports->whereHas('warehousing', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(logistic_manage_number)'), 'like', '%' . strtolower($validated['logistic_manage_number']) . '%');
+                });
+            }
+            if (isset($validated['m_bl'])) {
+                $reports->whereHas('warehousing', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(m_bl)'), 'like', '%' . strtolower($validated['m_bl']) . '%');
+                });
+            }
+            if (isset($validated['h_bl'])) {
+                $reports->whereHas('warehousing', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(h_bl)'), 'like', '%' . strtolower($validated['h_bl']) . '%');
+                });
+            }
+            if (isset($validated['rgd_status1_1']) || isset($validated['rgd_status1_2']) || isset($validated['rgd_status1_3'])) {
+                $reports->whereHas('warehousing.receving_goods_delivery', function($q) use($validated) {
+                $q->Where('rgd_status1', '=', $validated['rgd_status1_1'] ? $validated['rgd_status1_1'] : "")
+                ->orWhere('rgd_status1', '=', $validated['rgd_status1_2'] ? $validated['rgd_status1_2'] : "")
+                ->orWhere('rgd_status1', '=', $validated['rgd_status1_3'] ? $validated['rgd_status1_3'] : "");
+                });
+            }
             $reports = $reports->paginate($per_page, ['*'], 'page', $page);
 
             $data = new Collection();
