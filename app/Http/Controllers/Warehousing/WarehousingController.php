@@ -308,8 +308,23 @@ class WarehousingController extends Controller
             if (isset($validated['rgd_status3'])) {
                     $warehousing->where('rgd_status3', '=', $validated['rgd_status3']);
             }
-
-
+            if (isset($validated['m_bl'])) {
+                $warehousing->whereHas('w_no', function($q) use($validated) {
+                    return $q->where('m_bl', 'like', '%' . $validated['m_bl'] . '%');
+                });
+            }
+            if (isset($validated['h_bl'])) {
+                $warehousing->whereHas('w_no', function($q) use($validated) {
+                    return $q->where('h_bl', 'like', '%' . $validated['h_bl'] . '%');
+                });
+            }
+            if (isset($validated['rgd_status1_1']) || isset($validated['rgd_status1_2']) || isset($validated['rgd_status1_3'])) {
+                $warehousing->where(function($q) use ($validated) {
+                $q->Where('rgd_status1', '=', $validated['rgd_status1_1'] ? $validated['rgd_status1_1'] : "")
+                ->orWhere('rgd_status1', '=', $validated['rgd_status1_2'] ? $validated['rgd_status1_2'] : "")
+                ->orWhere('rgd_status1', '=', $validated['rgd_status1_3'] ? $validated['rgd_status1_3'] : "");
+                });
+            }
 
 
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
@@ -424,7 +439,21 @@ class WarehousingController extends Controller
                     $warehousing->where('rgd_status3', '=', $validated['rgd_status3']);
             }
 
-
+            if (isset($validated['rgd_status1_1']) || isset($validated['rgd_status1_2']) || isset($validated['rgd_status1_3'])) {
+                $warehousing->where(function($q) use ($validated) {
+                $q->Where('rgd_status1', '=', $validated['rgd_status1_1'] ? $validated['rgd_status1_1'] : "")
+                ->orWhere('rgd_status1', '=', $validated['rgd_status1_2'] ? $validated['rgd_status1_2'] : "")
+                ->orWhere('rgd_status1', '=', $validated['rgd_status1_3'] ? $validated['rgd_status1_3'] : "");
+                });
+             }
+            if (isset($validated['rgd_status2_1']) || isset($validated['rgd_status2_2']) || isset($validated['rgd_status2_3'])) {
+                $warehousing->where(function($q) use ($validated) {
+                    $q->Where('rgd_status2', '=', $validated['rgd_status2_1'] ? $validated['rgd_status2_1'] : "")
+                    ->orWhere('rgd_status2', '=', $validated['rgd_status2_2'] ? $validated['rgd_status2_2'] : "")
+                    ->orWhere('rgd_status2', '=', $validated['rgd_status2_3'] ? $validated['rgd_status2_3'] : "");
+                });
+            
+            }
 
 
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
@@ -490,11 +519,32 @@ class WarehousingController extends Controller
                     $warehousing->where('rgd_status3', '=', $validated['rgd_status3']);
             }
             if (isset($validated['item_brand'])) {
-                $warehousing->whereHas('w_no.warehousing_item', function($q) use($validated) {
+                $warehousing->whereHas('w_no.warehousing_item.item_no', function($q) use($validated) {
                     return $q->where(DB::raw('lower(item_brand)'), 'like', '%' . strtolower($validated['item_brand']) . '%');
                 });
             }
-
+            if (isset($validated['item_bar_code'])) {
+                $warehousing->whereHas('w_no.warehousing_item.item_no', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(item_bar_code)'), 'like', '%' . strtolower($validated['item_bar_code']) . '%');
+                });
+            }
+            if (isset($validated['item_cargo_bar_code'])) {
+                $warehousing->whereHas('w_no.warehousing_item.item_no', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(item_cargo_bar_code)'), 'like', '%' . strtolower($validated['item_cargo_bar_code']) . '%');
+                });
+            }
+            if (isset($validated['item_upc_code'])) {
+                $warehousing->whereHas('w_no.warehousing_item.item_no', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(item_upc_code)'), 'like', '%' . strtolower($validated['item_upc_code']) . '%');
+                });
+            }
+            if (isset($validated['rgd_status3_1']) || isset($validated['rgd_status3_2']) || isset($validated['rgd_status3_3'])) {
+                $warehousing->where(function($q) use ($validated) {
+                    $q->Where('rgd_status3', '=', $validated['rgd_status3_1'] ? $validated['rgd_status3_1'] : "")
+                    ->orWhere('rgd_status3', '=', $validated['rgd_status3_2'] ? $validated['rgd_status3_2'] : "")
+                    ->orWhere('rgd_status3', '=', $validated['rgd_status3_3'] ? $validated['rgd_status3_3'] : "");
+                });
+            }
 
 
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
