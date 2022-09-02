@@ -123,6 +123,18 @@ class WarehousingSearchRequest extends BaseFormRequest
             'logistic_manage_number' => [
                 '',
             ],
+            'item_bar_code' => [
+                '',
+            ],
+            'item_brand' => [
+                '',
+            ],
+            'item_cargo_bar_code' => [
+                '',
+            ],
+            'item_upc_code' => [
+                '',
+            ],
         ];
     }
 
