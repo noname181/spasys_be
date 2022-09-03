@@ -133,9 +133,9 @@ class NoticeController extends Controller
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function getNoticeById(Request $request)
+    public function getNoticeById($notice_no)
     {
-        $notice = Notice::find($request);
+        $notice = Notice::find($notice_no);
         if (!empty($notice)) {
             return response()->json(
                 ['message' => Messages::MSG_0007,
