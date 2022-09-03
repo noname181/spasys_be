@@ -252,6 +252,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/{item}', [App\Http\Controllers\Item\ItemController::class, 'getItemById'])->name('get_item_by_id');
         Route::delete('/item_channel/{item_channel}', [App\Http\Controllers\Item\ItemController::class, 'deleteItemChannel'])->name('delete_item_channel');
         Route::post('/import_excel', [App\Http\Controllers\Item\ItemController::class, 'importItems'])->name('import_items');
+        Route::post('/api_item', [App\Http\Controllers\Item\ItemController::class, 'apiItems'])->name('api_item');
     });
 
     Route::prefix('rate_data_send_meta')->name('rate_data_send_meta.')->group(function () {

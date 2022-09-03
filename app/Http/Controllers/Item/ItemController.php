@@ -8,6 +8,8 @@ use App\Http\Requests\Item\ItemSearchRequest;
 use App\Models\Warehousing;
 use App\Models\WarehousingItem;
 use App\Models\Item;
+use App\Models\ItemInfo;
+use App\Models\Company;
 use App\Models\File;
 use App\Models\ItemChannel;
 use App\Utils\Messages;
@@ -156,6 +158,7 @@ class ItemController extends Controller
         }
     }
 
+
     public function getItems(ItemSearchRequest $request)
     {
 
@@ -266,7 +269,7 @@ class ItemController extends Controller
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : '';
             $items = Item::with(['item_channels','company'])->where('item_service_name', '유통가공');
 
-            if(isset($validated['co_no'])){
+            if(isset($validated['co_no']) && Auth::user()->mb_type == "shop"){
                 $items->where('co_no',$validated['co_no']);
             }
 
@@ -274,8 +277,18 @@ class ItemController extends Controller
                 $items->whereHas('company.co_parent',function($query) use ($co_no) {
                     $query->where(DB::raw('co_no'), '=', $co_no);
                 });
+            }elseif(Auth::user()->mb_type == "shipper"){
+                $items->where('co_no',$validated['co_no']);
             }else{
-                $items->where('co_no',$co_no);
+                $co_child = Company::where('co_parent_no', $co_no)->get();
+                $co_no = array();
+                foreach($co_child as $o) {
+                    $co_no[] = $o->co_no;
+                }
+               
+                $items->whereHas('company.co_parent',function($query) use ($co_no) {
+                    $query->whereIn(DB::raw('co_no'), $co_no);
+                });
             }
 
             $items = $items->get();
@@ -576,4 +589,69 @@ class ItemController extends Controller
         ]);
     }
 
+    public function apiItems(Request $request)
+    {
+        //return $request;
+        //$validated = $request->validated();
+        try {
+            DB::beginTransaction();
+            foreach ($request->data as $i_item => $item) {
+                $item_no = Item::insertGetId([
+                    'mb_no' => Auth::user()->mb_no,
+                    'co_no' => isset($item['co_no']) ? $item['co_no'] : Auth::user()->co_no,
+                    'item_name' => $item['name'],
+                    'item_brand' => $item['brand'],
+                    'item_origin' => $item['origin'],
+                    'item_weight' => $item['weight'],
+                    'item_price1' => $item['org_price'],
+                    'item_price2' => $item['shop_price'],
+                    'item_price3' => $item['supply_price'],
+                    'item_url' => $item['img_500'],
+                    'item_option1' => $item['options'],
+                    'item_bar_code' => $item['barcode'],
+                    'item_service_name' => '수입풀필먼트',
+                ]);
+
+                $item_info_no = ItemInfo::insertGetId([
+                    'item_no' => $item_no,
+
+                    'supply_code' => $item['supply_code'],
+                    'trans_fee' => $item['trans_fee'],
+                    'img_desc1' => $item['img_desc1'],
+                    'img_desc2' => $item['img_desc2'],
+                    'img_desc3' => $item['img_desc3'],
+                    'img_desc4' => $item['img_desc4'],
+                    'img_desc5' => $item['img_desc5'],
+                    'product_desc' => $item['product_desc'],
+                    'product_desc2' => $item['product_desc2'],
+                    'location' => $item['location'],
+                    'memo' => $item['memo'],
+                    'category' => $item['category'],
+                    'maker' => $item['maker'],
+                    'md' => $item['md'],
+                    'manager1' => $item['manager1'],
+                    'manager2' => $item['manager2'],
+                    'supply_options' => $item['supply_options'],
+                    'enable_sale' => $item['enable_sale'],
+                    'use_temp_soldout' => $item['use_temp_soldout'],
+                    'stock_alarm1' => $item['stock_alarm1'],
+                    'stock_alarm2' => $item['stock_alarm2'],
+                    'extra_price' => $item['extra_price'],
+                    'extra_shop_price' => $item['extra_shop_price'],
+
+                ]);
+               
+            }
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0019], 500);
+        }
+    }
 }
