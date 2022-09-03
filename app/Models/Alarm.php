@@ -4,6 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Item;
+use App\Models\WarehousingItem;
+use App\Models\Member;
+
 
 class Alarm extends Model
 {
@@ -33,4 +37,16 @@ class Alarm extends Model
         'alarm_content',
         'mb_no'
     ];
+    public function item()
+    {
+        return $this->hasOne(Item::class, 'item_no', 'item_no')->with(['company']);
+    }
+    public function warehousing_item()
+    {
+        return $this->belongsTo(WarehousingItem::class, 'item_no', 'item_no')->with(['w_no']);;
+    }
+    public function member()
+    {
+        return $this->hasOne(Member::class, 'mb_no', 'mb_no');;
+    }
 }
