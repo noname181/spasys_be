@@ -88,6 +88,8 @@ class RateDataController extends Controller
 
     public function register_set_data(RateDataRequest $request) {
         $validated = $request->validated();
+
+
         try {
             DB::beginTransaction();
 
@@ -131,7 +133,7 @@ class RateDataController extends Controller
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'rmd_no' => isset($rmd_no) ? $rmd_no : null,
+                'rmd_no' => isset($rmd) ? $rmd->rmd_no : null,
             ], 201);
         } catch (\Exception $e) {
             DB::rollback();

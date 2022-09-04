@@ -24,6 +24,8 @@ class RateMetaData extends Model
         'rmd_no',
         'mb_no',
         'rm_no',
+        'set_type',
+        'w_no'
     ];
 
     protected $casts = [
