@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Export;
+namespace App\Http\Requests\Import;
 
 use App\Http\Requests\BaseFormRequest;
 
-class ExportRequest extends BaseFormRequest
+class ImportRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,10 +24,6 @@ class ExportRequest extends BaseFormRequest
     public static function rules()
     {
         return [
-            'w_no' => [
-                '',
-                
-            ],
             'w_no' => [
                 '',
                 
