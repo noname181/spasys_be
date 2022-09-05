@@ -39,6 +39,14 @@ class CompanySearchRequest extends BaseFormRequest
                 'string',
                 'nullable',
             ],
+            'co_name_shop' => [
+                'string',
+                'nullable',
+            ],
+            'co_name_shipper' => [
+                'string',
+                'nullable',
+            ],
             'co_service' => [
                 'string',
                 'nullable',
