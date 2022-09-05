@@ -73,7 +73,7 @@ class WarehousingController extends Controller
      * Get Warehousing
      * @param  WarehousingSearchRequest $request
      */
-    public function getWarehousing(WarehousingSearchRequest $request)
+    public function getWarehousing(WarehousingSearchRequest $request) // page 710
     {
         try {
             $validated = $request->validated();
@@ -82,7 +82,7 @@ class WarehousingController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $warehousing = Warehousing::with('mb_no')->with(['co_no','warehousing_item','receving_goods_delivery'])->orderBy('w_no', 'DESC');
+            $warehousing = Warehousing::with('mb_no')->with(['co_no','warehousing_item','receving_goods_delivery','w_import_parent'])->orderBy('w_no', 'DESC');
 
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
@@ -111,11 +111,12 @@ class WarehousingController extends Controller
             if (isset($validated['w_schedule_number'])) {
                 $warehousing->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
             }
+            if (isset($validated['w_schedule_number_iw'])) {
+                $warehousing->whereHas('w_import_parent', function($q) use($validated) {
+                    return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number_iw'] . '%' , 'and' , 'w_type' , '=' , 'IW') ;});
+            }
             if (isset($validated['w_schedule_number_ew'])) {
                 $warehousing->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number_ew'] . '%' , 'and' , 'w_type' , '=' , 'EW');
-            }
-            if (isset($validated['w_schedule_number_iw'])) {
-                $warehousing->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number_iw'] . '%' , 'and' , 'w_type' , '=' , 'IW');
             }
             if (isset($validated['logistic_manage_number'])) {
                 $warehousing->where('logistic_manage_number', 'like', '%' . $validated['logistic_manage_number'] . '%');
