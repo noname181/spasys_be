@@ -41,6 +41,7 @@ class ItemInfo extends Model
         'supply_options',
         'enable_sale',
         'use_temp_soldout',
+        'stock',
         'stock_alarm1',
         'stock_alarm2',
         'extra_price',

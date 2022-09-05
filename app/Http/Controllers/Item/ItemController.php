@@ -654,4 +654,28 @@ class ItemController extends Controller
             return response()->json(['message' => Messages::MSG_0019], 500);
         }
     }
+    public function apiupdateStockItems(Request $request)
+    {
+        //return $request;
+        //$validated = $request->validated();
+        try {
+            DB::beginTransaction();
+            foreach ($request->data as $i_item => $item) {
+                $item_info_no = ItemInfo::where('item_no',$item['product_id'])
+                ->update([
+                    'stock' => $item['stock']
+                ]);
+            }
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0019], 500);
+        }
+    }
 }
