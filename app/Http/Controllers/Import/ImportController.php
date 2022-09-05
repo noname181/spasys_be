@@ -114,7 +114,7 @@ class ImportController extends Controller
 
         $items->where('item_service_name', '유통가공');
 
-        $items = $items->get()->toArray();
+        $items = $items->get();
             return response()->json(['message' => Messages::MSG_0007,
                                     'data' => $warehousing,
                                     'datas' => $warehousings,
