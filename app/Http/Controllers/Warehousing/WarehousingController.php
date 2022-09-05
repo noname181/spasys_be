@@ -379,7 +379,12 @@ class WarehousingController extends Controller
 
             if (isset($validated['w_schedule_number_iw'])) {
                 $warehousing->whereHas('w_no', function($q) use($validated) {
-                    return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
+                    return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number_iw'] . '%');
+                });
+            }
+            if (isset($validated['w_schedule_number_ew'])) {
+                $warehousing->whereHas('w_no.w_import_parent', function($q) use($validated) {
+                    return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number_ew'] . '%');
                 });
             }
 
