@@ -70,4 +70,8 @@ class Warehousing extends Model
     {
         return $this->belongsTo(ImportSchedule::class, 'connection_number', 'logistic_manage_number');
     }
+    public function w_import_parent()
+    {
+        return $this->belongsTo(Warehousing::class, 'w_import_no', 'w_no');
+    }
 }

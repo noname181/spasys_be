@@ -58,6 +58,6 @@ class ReceivingGoodsDelivery extends Model
 
     public function w_no()
     {
-        return $this->hasOne(Warehousing::class, 'w_no', 'w_no')->with(['co_no', 'warehousing_item']);
+        return $this->hasOne(Warehousing::class, 'w_no', 'w_no')->with(['co_no', 'warehousing_item','w_import_parent']);
     }
 }
