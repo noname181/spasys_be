@@ -378,10 +378,11 @@ class RateDataController extends Controller
 
     public function getSpasysRateData()
     {
-        $co_no = Auth::user()->co_no;
+        $user = Auth::user();
         try {
             $rate_data = RateData::select([
                 'rd_no',
+                'rd_co_no',
                 'rd_cate_meta1',
                 'rd_cate_meta2',
                 'rd_cate1',
@@ -390,8 +391,21 @@ class RateDataController extends Controller
                 'rd_data1',
                 'rd_data2',
                 'rd_data3',
-            ])->where('co_no', $co_no)->get();
-            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data], 200);
+            ])->where('rd_cate_meta1', '보세화물');
+
+            if($user->mb_type == 'spasys'){
+                $rate_data = $rate_data->where('co_no', $user->co_no);
+            }else if($user->mb_type == 'shop'){
+                $rmd = RateMetaData::where('co_no', $user->co_no)->latest('created_at')->first();
+                $rate_data = $rate_data->where('rd_co_no', $user->co_no);
+                if(!empty($rmd)){
+                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+                }
+            }
+
+            $rate_data = $rate_data->get();
+
+            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data, 'mb_type' => $user->mb_type], 200);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
@@ -401,10 +415,11 @@ class RateDataController extends Controller
 
     public function getSpasysRateData2()
     {
-        $co_no = Auth::user()->co_no;
+        $user = Auth::user();
         try {
             $rate_data = RateData::select([
                 'rd_no',
+                'rd_co_no',
                 'rd_cate_meta1',
                 'rd_cate_meta2',
                 'rd_cate1',
@@ -413,7 +428,20 @@ class RateDataController extends Controller
                 'rd_data1',
                 'rd_data2',
                 'rd_data3',
-            ])->where('co_no', $co_no)->where('rd_cate_meta1', '수입풀필먼트')->get();
+            ])->where('rd_cate_meta1', '수입풀필먼트');
+
+            if($user->mb_type == 'spasys'){
+                $rate_data = $rate_data->where('co_no', $user->co_no);
+            }else if($user->mb_type == 'shop'){
+                $rmd = RateMetaData::where('co_no', $user->co_no)->latest('created_at')->first();
+                $rate_data = $rate_data->where('rd_co_no', $user->co_no);
+                if(!empty($rmd)){
+                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+                }
+            }
+
+            $rate_data = $rate_data->get();
+
             return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data], 200);
         } catch (\Exception $e) {
             DB::rollback();
@@ -424,10 +452,11 @@ class RateDataController extends Controller
 
     public function getSpasysRateData3()
     {
-        $co_no = Auth::user()->co_no;
+        $user = Auth::user();
         try {
             $rate_data = RateData::select([
                 'rd_no',
+                'rd_co_no',
                 'rd_cate_meta1',
                 'rd_cate_meta2',
                 'rd_cate1',
@@ -436,7 +465,20 @@ class RateDataController extends Controller
                 'rd_data1',
                 'rd_data2',
                 'rd_data3',
-            ])->where('co_no', $co_no)->where('rd_cate_meta1', '유통가공')->get();
+            ])->where('rd_cate_meta1', '유통가공');
+
+            if($user->mb_type == 'spasys'){
+                $rate_data = $rate_data->where('co_no', $user->co_no);
+            }else if($user->mb_type == 'shop'){
+                $rmd = RateMetaData::where('co_no', $user->co_no)->latest('created_at')->first();
+                $rate_data = $rate_data->where('rd_co_no', $user->co_no);
+                if(!empty($rmd)){
+                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+                }
+            }
+
+            $rate_data = $rate_data->get();
+
             return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data], 200);
         } catch (\Exception $e) {
             DB::rollback();

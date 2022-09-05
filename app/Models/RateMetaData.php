@@ -25,7 +25,8 @@ class RateMetaData extends Model
         'mb_no',
         'rm_no',
         'set_type',
-        'w_no'
+        'w_no',
+        'co_no'
     ];
 
     protected $casts = [
@@ -35,6 +36,10 @@ class RateMetaData extends Model
 
     public function rate_meta() {
         return $this->hasOne(RateMeta::class, 'rm_no', 'rm_no');
+    }
+
+    public function company() {
+        return $this->hasOne(Company::class, 'co_no', 'co_no')->with(['contract', 'co_parent']);
     }
 
     public function member() {
