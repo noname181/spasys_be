@@ -382,9 +382,19 @@ class WarehousingController extends Controller
                     return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
                 });
             }
+
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             //return DB::getQueryLog();
-
+            $warehousing->setCollection(
+                $warehousing->getCollection()->map(function ($item){
+                    // if(!empty($item->w_no)){
+                    //     $item->w_amount_left = $item->w_no->w_amount - $item->w_no->w_schedule_amount;
+                    // }
+                    $warehousing = Warehousing::where('w_no', $item->w_no)->first();
+                    $item->w_amount_left = $warehousing->w_amount - $warehousing->w_schedule_amount;
+                    return $item;
+                })
+            );
             return response()->json($warehousing);
 
         } catch (\Exception $e) {
