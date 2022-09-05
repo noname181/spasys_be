@@ -33,20 +33,28 @@ class ImportController extends Controller
 
         DB::enableQueryLog();
         //fetchWarehousing
-        $warehousing = Warehousing::find($validated['w_no']);
-        $warehousings = Warehousing::where('w_import_no',$validated['w_no'])->get();
-        if(isset($warehousing->w_import_no) && $warehousing->w_import_no){
-            $warehousing_import = Warehousing::where('w_no',$warehousing->w_import_no)->first();
+
+        if(isset($validated['w_no'])){
+            $warehousing = Warehousing::find($validated['w_no']);
+            $warehousings = Warehousing::where('w_import_no',$validated['w_no'])->get();
+
+            if(isset($warehousing->w_import_no) && $warehousing->w_import_no){
+                $warehousing_import = Warehousing::where('w_no',$warehousing->w_import_no)->first();
+            }else{
+                $warehousing_import = '';
+            }
+
+            //fetchReceivingGoodsDeliveryRequests
+        
+            $rgd = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->whereHas('w_no', function($q) use ($validated) {
+                return $q->where('w_no', $validated['w_no']);
+            })->get();
         }else{
-            $warehousing_import = '';
+            $warehousing = [];
+            $warehousings = [];
+            $rgd= [];
+            $warehousing_import = [];
         }
-
-        //fetchReceivingGoodsDeliveryRequests
-    
-        $rgd = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->whereHas('w_no', function($q) use ($validated) {
-            return $q->where('w_no', $validated['w_no']);
-        })->get();
-
 
         //fetchWarehousingRequests
        // If per_page is null set default data = 15
