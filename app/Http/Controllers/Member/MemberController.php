@@ -111,13 +111,11 @@ class MemberController extends Controller
     public function getProfile()
     {
         try {
-            $member = Member::where('mb_no', Auth::user()->mb_no)->first();
-            $services = Service::select(['service_no', 'service_name'])->where('service_use_yn', 'y')->get();
+            $member = Member::with('company')->where('mb_no', Auth::user()->mb_no)->first();
 
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'profile' => $member,
-                'services' => $services,
             ]);
         } catch (\Exception $e) {
             Log::error($e);
@@ -258,12 +256,9 @@ class MemberController extends Controller
             $member['mb_service_no_array'] = $validated['mb_service_no_array'];
             $member->save();
 
-            $services = Service::select(['service_no', 'service_name'])->where('service_use_yn', 'y')->get();
-
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'profile' => $member,
-                'services' => $services,
             ]);
         } catch (\Exception $e) {
             Log::error($e);
