@@ -79,4 +79,9 @@ class Warehousing extends Model
     {
         return $this->hasOne(WarehousingRequest::class, 'w_no', 'w_no');
     }
+
+    public function rate_data_general()
+    {
+        return $this->hasOne(RateDataGeneral::class, 'w_no', 'w_no');
+    }
 }

@@ -8,6 +8,7 @@ use App\Http\Requests\RateData\RateDataImportFulfillmentRequest;
 use App\Http\Requests\RateData\RateDataRequest;
 use App\Http\Requests\RateData\RateDataSendMailRequest;
 use App\Models\File;
+use App\Models\ReceivingGoodsDelivery;
 use App\Models\RateData;
 use App\Models\RateDataGeneral;
 use App\Models\RateMeta;
@@ -548,6 +549,7 @@ class RateDataController extends Controller
                 [
                     'w_no' => $request->w_no,
                     'mb_no' => Auth::user()->mb_no,
+                    'rdg_set_type' => $request->rdg_set_type,
                     'rdg_supply_price1' => $request->storageData['supply_price'],
                     'rdg_supply_price2' => $request->workData['supply_price'],
                     'rdg_supply_price3' => $request->total['supply_price'],
@@ -562,6 +564,28 @@ class RateDataController extends Controller
                     'rdg_etc3' => $request->total['etc'],
                 ]
             );
+
+            ReceivingGoodsDelivery::where('w_no', $request->w_no)->update([
+                'rgd_status4' => '예상경비청구서'
+            ]);
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'rdg' => $rdg
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+    public function get_rate_data_general($w_no) {
+        try {
+            DB::beginTransaction();
+            $rdg = RateDataGeneral::where('w_no', $w_no)->first();
 
             DB::commit();
             return response()->json([

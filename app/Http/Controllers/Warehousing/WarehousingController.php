@@ -48,7 +48,7 @@ class WarehousingController extends Controller
 
     public function getWarehousingById($w_no)
     {
-       
+
         $warehousing = Warehousing::with(['co_no', 'warehousing_request'])->find($w_no);
         $warehousings = Warehousing::where('w_import_no',$w_no)->get();
         if(isset($warehousing->w_import_no) && $warehousing->w_import_no){
@@ -68,7 +68,7 @@ class WarehousingController extends Controller
         }
     }
 
-    
+
     /**
      * Get Warehousing
      * @param  WarehousingSearchRequest $request
@@ -98,7 +98,7 @@ class WarehousingController extends Controller
                 });
             }
             if (isset($validated['co_parent_name'])) {
-                $warehousing->whereHas('co_no.co_parent',function($query) use ($validated) {              
+                $warehousing->whereHas('co_no.co_parent',function($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like','%'. strtolower($validated['co_parent_name']) .'%');
                 });
             }
@@ -128,17 +128,17 @@ class WarehousingController extends Controller
                 $warehousing->where('h_bl', 'like', '%' . $validated['h_bl'] . '%');
             }
             if (isset($validated['rgd_status1'])) {
-                $warehousing->whereHas('receving_goods_delivery',function($query) use ($validated) {              
+                $warehousing->whereHas('receving_goods_delivery',function($query) use ($validated) {
                     $query->where('rgd_status1', '=', $validated['rgd_status1']);
                 });
             }
             if (isset($validated['rgd_status2'])) {
-                $warehousing->whereHas('receving_goods_delivery',function($query) use ($validated) {              
+                $warehousing->whereHas('receving_goods_delivery',function($query) use ($validated) {
                     $query->where('rgd_status2', '=', $validated['rgd_status2']);
                 });
             }
             if (isset($validated['rgd_status3'])) {
-                $warehousing->whereHas('receving_goods_delivery',function($query) use ($validated) {              
+                $warehousing->whereHas('receving_goods_delivery',function($query) use ($validated) {
                     $query->where('rgd_status3', '=', $validated['rgd_status3']);
                 });
             }
@@ -188,7 +188,7 @@ class WarehousingController extends Controller
                 });
             }
             if (isset($validated['co_parent_name'])) {
-                $warehousing->whereHas('w_no.co_no.co_parent',function($query) use ($validated) {              
+                $warehousing->whereHas('w_no.co_no.co_parent',function($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like','%'. strtolower($validated['co_parent_name']) .'%');
                 });
             }
@@ -203,7 +203,7 @@ class WarehousingController extends Controller
                     return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
                 });
             }
-            
+
             if (isset($validated['w_type'])) {
                 $warehousing->whereHas('w_no', function($q) use($validated) {
                     return $q->where('w_type', 'like', '%' . $validated['w_type'] . '%');
@@ -236,7 +236,7 @@ class WarehousingController extends Controller
                     ->orWhere('rgd_status2', '=', $validated['rgd_status2_2'] ? $validated['rgd_status2_2'] : "")
                     ->orWhere('rgd_status2', '=', $validated['rgd_status2_3'] ? $validated['rgd_status2_3'] : "");
                 });
-            
+
             }
             if (isset($validated['rgd_status3_1']) || isset($validated['rgd_status3_2']) || isset($validated['rgd_status3_3'])) {
                 $warehousing->where(function($q) use ($validated) {
@@ -291,7 +291,7 @@ class WarehousingController extends Controller
             }
 
             if (isset($validated['co_parent_name'])) {
-                $warehousing->whereHas('w_no.co_no.co_parent',function($query) use ($validated) {              
+                $warehousing->whereHas('w_no.co_no.co_parent',function($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like','%'. strtolower($validated['co_parent_name']) .'%');
                 });
             }
@@ -368,7 +368,7 @@ class WarehousingController extends Controller
             }
 
             if (isset($validated['co_parent_name'])) {
-                $warehousing->whereHas('w_no.co_no.co_parent',function($query) use ($validated) {              
+                $warehousing->whereHas('w_no.co_no.co_parent',function($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like','%'. strtolower($validated['co_parent_name']) .'%');
                 });
             }
@@ -432,7 +432,7 @@ class WarehousingController extends Controller
             }
 
             if (isset($validated['co_parent_name'])) {
-                $warehousing->whereHas('w_no.co_no.co_parent',function($query) use ($validated) {              
+                $warehousing->whereHas('w_no.co_no.co_parent',function($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like','%'. strtolower($validated['co_parent_name']) .'%');
                 });
             }
@@ -474,7 +474,7 @@ class WarehousingController extends Controller
                     ->orWhere('rgd_status2', '=', $validated['rgd_status2_2'] ? $validated['rgd_status2_2'] : "")
                     ->orWhere('rgd_status2', '=', $validated['rgd_status2_3'] ? $validated['rgd_status2_3'] : "");
                 });
-            
+
             }
 
 
@@ -500,7 +500,9 @@ class WarehousingController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $warehousing = ReceivingGoodsDelivery::with('w_no') -> with(['mb_no'])->whereHas('w_no',function($query) {
-                $query->where('w_type', '=', 'EW')->where('rgd_status1' , '=' , '입고')->where('rgd_status2' , '=' , '작업완료');
+                $query->where('w_type', '=', 'EW')->where('rgd_status1' , '=' , '입고')->where('rgd_status2' , '=' , '작업완료')->where(function($q){
+                    $q->where('rgd_status4', '!=', '예상경비청구서')->orWhereNull('rgd_status4');
+                });
             });
 
             if (isset($validated['from_date'])) {
@@ -512,7 +514,7 @@ class WarehousingController extends Controller
             }
 
             if (isset($validated['co_parent_name'])) {
-                $warehousing->whereHas('w_no.co_no.co_parent',function($query) use ($validated) {              
+                $warehousing->whereHas('w_no.co_no.co_parent',function($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like','%'. strtolower($validated['co_parent_name']) .'%');
                 });
             }
@@ -580,69 +582,95 @@ class WarehousingController extends Controller
             //return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function getWarehousingExportStatus4(WarehousingSearchRequest $request) //page 144 show EW,rgd_status1 and rgd_status2 = complete
     {
-        //
+        try {
+            DB::enableQueryLog();
+            $validated = $request->validated();
+
+            // If per_page is null set default data = 15
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+            $warehousing = ReceivingGoodsDelivery::with('w_no') -> with(['mb_no'])->whereHas('w_no',function($query) {
+                $query->where('w_type', '=', 'EW')->where('rgd_status1' , '=' , '입고')->where('rgd_status2' , '=' , '작업완료')->where('rgd_status4', '=', '예상경비청구서');
+            });
+            if (isset($validated['from_date'])) {
+                $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            }
+
+            if (isset($validated['to_date'])) {
+                $warehousing->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            }
+
+            if (isset($validated['co_parent_name'])) {
+                $warehousing->whereHas('w_no.co_no.co_parent',function($query) use ($validated) {
+                    $query->where(DB::raw('lower(co_name)'), 'like','%'. strtolower($validated['co_parent_name']) .'%');
+                });
+            }
+            if (isset($validated['co_name'])) {
+                $warehousing->whereHas('w_no.co_no', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                });
+            }
+            if (isset($validated['w_type'])) {
+                $warehousing->whereHas('w_no', function($q) use($validated) {
+                    return $q->where('w_type', 'like', '%' . $validated['w_type'] . '%');
+                });
+            }
+            if (isset($validated['w_schedule_number'])) {
+                $warehousing->whereHas('w_no', function($q) use($validated) {
+                    return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
+                });
+            }
+            if (isset($validated['rgd_status1'])) {
+                $warehousing->where('rgd_status1', '=', $validated['rgd_status1']);
+            }
+            if (isset($validated['rgd_status2'])) {
+                    $warehousing->where('rgd_status2', '=', $validated['rgd_status2']);
+            }
+            if (isset($validated['rgd_status3'])) {
+                    $warehousing->where('rgd_status3', '=', $validated['rgd_status3']);
+            }
+            if (isset($validated['item_brand'])) {
+                $warehousing->whereHas('w_no.warehousing_item.item_no', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(item_brand)'), 'like', '%' . strtolower($validated['item_brand']) . '%');
+                });
+            }
+            if (isset($validated['item_bar_code'])) {
+                $warehousing->whereHas('w_no.warehousing_item.item_no', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(item_bar_code)'), 'like', '%' . strtolower($validated['item_bar_code']) . '%');
+                });
+            }
+            if (isset($validated['item_cargo_bar_code'])) {
+                $warehousing->whereHas('w_no.warehousing_item.item_no', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(item_cargo_bar_code)'), 'like', '%' . strtolower($validated['item_cargo_bar_code']) . '%');
+                });
+            }
+            if (isset($validated['item_upc_code'])) {
+                $warehousing->whereHas('w_no.warehousing_item.item_no', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(item_upc_code)'), 'like', '%' . strtolower($validated['item_upc_code']) . '%');
+                });
+            }
+            if (isset($validated['rgd_status3_1']) || isset($validated['rgd_status3_2']) || isset($validated['rgd_status3_3'])) {
+                $warehousing->where(function($q) use ($validated) {
+                    $q->Where('rgd_status3', '=', $validated['rgd_status3_1'] ? $validated['rgd_status3_1'] : "")
+                    ->orWhere('rgd_status3', '=', $validated['rgd_status3_2'] ? $validated['rgd_status3_2'] : "")
+                    ->orWhere('rgd_status3', '=', $validated['rgd_status3_3'] ? $validated['rgd_status3_3'] : "");
+                });
+            }
+
+
+            $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
+            //return DB::getQueryLog();
+
+            return response()->json($warehousing);
+
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            //return response()->json(['message' => Messages::MSG_0018], 500);
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Warehousing  $warehousing
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Warehousing $warehousing)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Warehousing  $warehousing
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Warehousing $warehousing)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Warehousing  $warehousing
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Warehousing $warehousing)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Warehousing  $warehousing
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Warehousing $warehousing)
-    {
-        //
-    }
 }
