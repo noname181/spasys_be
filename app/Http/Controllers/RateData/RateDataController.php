@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\RateData;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Http\Requests\RateData\RateDataImportFulfillmentRequest;
 use App\Http\Requests\RateData\RateDataRequest;
 use App\Http\Requests\RateData\RateDataSendMailRequest;
 use App\Models\File;
 use App\Models\RateData;
+use App\Models\RateDataGeneral;
 use App\Models\RateMeta;
 use App\Models\RateMetaData;
 use App\Utils\CommonFunc;
@@ -533,6 +535,44 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0019], 500);
+        }
+    }
+
+    public function registe_rate_data_general(Request $request) {
+        try {
+            DB::beginTransaction();
+            $rdg = RateDataGeneral::updateOrCreate(
+                [
+                    'rdg_no' => $request->rdg_no,
+                ],
+                [
+                    'w_no' => $request->w_no,
+                    'mb_no' => Auth::user()->mb_no,
+                    'rdg_supply_price1' => $request->storageData['supply_price'],
+                    'rdg_supply_price2' => $request->workData['supply_price'],
+                    'rdg_supply_price3' => $request->total['supply_price'],
+                    'rdg_vat1' => $request->storageData['taxes'],
+                    'rdg_vat2' => $request->workData['taxes'],
+                    'rdg_vat3' => $request->total['taxes'],
+                    'rdg_sum1' => $request->storageData['sum'],
+                    'rdg_sum2' => $request->workData['sum'],
+                    'rdg_sum3' => $request->total['sum'],
+                    'rdg_etc1' => $request->storageData['etc'],
+                    'rdg_etc2' => $request->workData['etc'],
+                    'rdg_etc3' => $request->total['etc'],
+                ]
+            );
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'rdg' => $rdg
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
 }
