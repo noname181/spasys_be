@@ -25,6 +25,7 @@ class RateDataGeneral extends Model
         'w_no',
         'mb_no',
         'rdg_set_type',
+        'rdg_bill_type',
         'rdg_supply_price1',
         'rdg_supply_price2',
         'rdg_supply_price3',

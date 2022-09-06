@@ -593,7 +593,9 @@ class WarehousingController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $warehousing = ReceivingGoodsDelivery::with('w_no') -> with(['mb_no'])->whereHas('w_no',function($query) {
-                $query->where('w_type', '=', 'EW')->where('rgd_status1' , '=' , '입고')->where('rgd_status2' , '=' , '작업완료')->where('rgd_status4', '=', '예상경비청구서');
+                $query->where('w_type', '=', 'EW')->where('rgd_status1' , '=' , '입고')->where('rgd_status2' , '=' , '작업완료')->where(function($q){
+                    $q->where('rgd_status4', '=', '예상경비청구서')->orWhere('rgd_status4', '=', '확정청구서');
+                });
             });
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
