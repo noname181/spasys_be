@@ -23,6 +23,7 @@ class WarehousingRequest extends Model
      */
     protected $fillable = [
         'wr_no',
+        'w_no',
         'mb_no',
         'wr_type',
         'wr_contents',

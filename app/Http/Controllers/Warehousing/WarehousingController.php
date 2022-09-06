@@ -49,7 +49,7 @@ class WarehousingController extends Controller
     public function getWarehousingById($w_no)
     {
        
-        $warehousing = Warehousing::find($w_no);
+        $warehousing = Warehousing::with(['co_no', 'warehousing_request'])->find($w_no);
         $warehousings = Warehousing::where('w_import_no',$w_no)->get();
         if(isset($warehousing->w_import_no) && $warehousing->w_import_no){
             $warehousing_import = Warehousing::where('w_no',$warehousing->w_import_no)->first();
