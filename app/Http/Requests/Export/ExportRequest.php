@@ -28,10 +28,6 @@ class ExportRequest extends BaseFormRequest
                 '',
                 
             ],
-            'w_no' => [
-                '',
-                
-            ],
             'type' => [
                 '',
             ],

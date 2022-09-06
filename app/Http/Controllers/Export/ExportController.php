@@ -32,9 +32,9 @@ class ExportController extends Controller
 
         DB::enableQueryLog();
         //fetchWarehousing
-        $warehousing = Warehousing::find($validated['w_no']);
+        $warehousing = Warehousing::where('w_no', $validated['w_no'])->first();
 
-
+           
         $type = $warehousing->w_type;
         $warehousings = Warehousing::where('w_import_no',$validated['w_no'])->get();
         
