@@ -45,6 +45,7 @@ class ImportSchedule extends Model
     protected $casts = [
         'created_at' => "date:Y.m.d H:i",
         'updated_at' => "date:Y.m.d H:i",
+        'is_date' => "date:Y.m.d H:i",
     ];
 
     public function co_no()
