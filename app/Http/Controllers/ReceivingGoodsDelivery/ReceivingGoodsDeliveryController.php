@@ -353,7 +353,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             'w_schedule_amount' => $data['w_schedule_amount'],
                             'w_schedule_day' => $request->w_schedule_day,
                             'w_import_no' => $data['w_import_no'],
-                            'w_amount' => $data['w_amount'],
+                            //'w_amount' => $data['w_amount'],
                             'w_type' => 'EW',
                             'w_category_name' => $request->w_category_name,
                             'co_no' => $co_no
