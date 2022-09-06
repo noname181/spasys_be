@@ -30,8 +30,8 @@ class Report extends Model
     ];
 
     protected $casts = [
-        'created_at' => "date:Y.m.d",
-        'updated_at' => "date:Y.m.d",
+        'created_at' => "date:Y.m.d H:i",
+        'updated_at' => "date:Y.m.d H:i",
     ];
 
     public function files(){
