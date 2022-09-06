@@ -30,8 +30,11 @@ class Member extends Authenticatable
 
     protected $table = "member";
 
-
     protected $primaryKey = 'mb_no';
+
+    protected $attributes = ['mb_services'];
+
+    protected $appends = ['mb_services'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -63,6 +66,22 @@ class Member extends Authenticatable
         'created_at' => "date:Y.m.d H:i",
         'updated_at' => "date:Y.m.d H:i",
     ];
+
+    public function getMbServicesAttribute()
+    {
+        $service_no_array = $this->company->co_service;
+        $service_no_array = explode(" ", $service_no_array);
+        $service_array = [];
+
+        foreach($service_no_array as $service_name){
+            $service = Service::where('service_name', $service_name)->first();
+            if($service){
+                $service_array[] = $service;
+            }
+        }
+
+        return $service_array;
+    }
 
     public function company()
     {
