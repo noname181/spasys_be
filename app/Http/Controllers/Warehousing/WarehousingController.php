@@ -501,7 +501,10 @@ class WarehousingController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $warehousing = ReceivingGoodsDelivery::with('w_no') -> with(['mb_no'])->whereHas('w_no',function($query) {
                 $query->where('w_type', '=', 'EW')->where('rgd_status1' , '=' , '입고')->where('rgd_status2' , '=' , '작업완료')->where(function($q){
-                    $q->where('rgd_status4', '!=', '예상경비청구서')->orWhereNull('rgd_status4');
+                    $q->where(function($query) {
+                        $query->where('rgd_status4', '!=', '예상경비청구서')->where('rgd_status4', '!=', '확정청구서');
+                    })
+                    ->orWhereNull('rgd_status4');
                 });
             });
 
@@ -672,6 +675,31 @@ class WarehousingController extends Controller
             Log::error($e);
             return $e;
             //return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function getWarehousingByRgd($rgd_no)
+    {
+
+        $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
+        $w_no = $rgd->w_no;
+
+        $warehousing = Warehousing::with(['co_no', 'warehousing_request'])->find($w_no);
+
+        if(isset($warehousing->w_import_no) && $warehousing->w_import_no){
+            $warehousing_import = Warehousing::where('w_no',$warehousing->w_import_no)->first();
+        }else{
+            $warehousing_import = '';
+        }
+        if (!empty($warehousing)) {
+            return response()->json(
+                ['message' => Messages::MSG_0007,
+                 'data' => $warehousing,
+
+                 'warehousing_import' => $warehousing_import
+                ], 200);
+        } else {
+            return response()->json(['message' => Messages::MSG_0018], 400);
         }
     }
 

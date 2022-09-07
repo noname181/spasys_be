@@ -23,6 +23,10 @@ class RateDataGeneral extends Model
     protected $fillable = [
         'rdg_no ',
         'w_no',
+        'rgd_no',
+        'rgd_no_expectation',
+        'rgd_no_final',
+        'rgd_no_additional',
         'mb_no',
         'rdg_set_type',
         'rdg_bill_type',

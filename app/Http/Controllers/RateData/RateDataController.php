@@ -91,8 +91,6 @@ class RateDataController extends Controller
 
     public function register_set_data(RateDataRequest $request) {
         $validated = $request->validated();
-
-
         try {
             DB::beginTransaction();
 
@@ -114,7 +112,7 @@ class RateDataController extends Controller
                 Log::error($val);
                 $rd_no = RateData::updateOrCreate(
                     [
-                        'rd_no' => !empty($is_new) ? null : (isset($val['rd_no']) ? $val['rd_no'] : null),
+                        'rd_no' => !isset($is_new->rmd_no) ? null : (isset($val['rd_no']) ? $val['rd_no'] : null),
                         'rmd_no' => isset($rmd) ? $rmd->rmd_no : null,
                         'w_no' => isset($validated['w_no']) ? $validated['w_no'] : null,
                     ],
@@ -148,22 +146,87 @@ class RateDataController extends Controller
         }
     }
 
-    public function get_rmd_no($w_no, $set_type){
+    public function register_set_data_final(RateDataRequest $request) {
+        $validated = $request->validated();
+        try {
+            DB::beginTransaction();
+
+            $rgd = ReceivingGoodsDelivery::where('rgd_no', $validated['w_no'])->first();
+            $w_no = $rgd->w_no;
+
+            if (isset($w_no)) {
+                $is_new = RateMetaData::where(['w_no' => $w_no,
+                'set_type' => $validated['set_type']])->get();
+                $rmd = RateMetaData::updateOrCreate(
+                    [
+                        'w_no' => $w_no,
+                        'set_type' => $validated['set_type'],
+                    ],
+                    [
+                        'mb_no' => Auth::user()->mb_no,
+                    ]
+                );
+            }
+
+            foreach ($validated['rate_data'] as $val) {
+                Log::error($val);
+                $rd_no = RateData::updateOrCreate(
+                    [
+                        'rd_no' => isset($is_new->rmd_no) ? (isset($val['rd_no']) ? $val['rd_no'] : null) : null,
+                        'rmd_no' => isset($rmd) ? $rmd->rmd_no : null,
+                        'w_no' => isset($validated['w_no']) ? $validated['w_no'] : null,
+                    ],
+                    [
+                        'rd_cate_meta1' => $val['rd_cate_meta1'],
+                        'rd_cate_meta2' => $val['rd_cate_meta2'],
+                        'rd_cate1' => isset($val['rd_cate1']) ? $val['rd_cate1'] : '',
+                        'rd_cate2' => isset($val['rd_cate2']) ? $val['rd_cate2'] : '',
+                        'rd_cate3' => isset($val['rd_cate3']) ? $val['rd_cate3'] : '',
+                        'rd_data1' => isset($val['rd_data1']) ? $val['rd_data1'] : '',
+                        'rd_data2' => isset($val['rd_data2']) ? $val['rd_data2'] : '',
+                        'rd_data3' => isset($val['rd_data3']) ? $val['rd_data3'] : '',
+                        'rd_data4' => isset($val['rd_data4']) ? $val['rd_data4'] : '',
+                        'rd_data5' => isset($val['rd_data5']) ? $val['rd_data5'] : '',
+                        'rd_data6' => isset($val['rd_data6']) ? $val['rd_data6'] : '',
+                        'rd_data7' => isset($val['rd_data7']) ? $val['rd_data7'] : '',
+                        'rd_data8' => isset($val['rd_data8']) ? $val['rd_data8'] : '',
+                    ],
+                );
+            }
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'rmd_no' => isset($rmd) ? $rmd->rmd_no : null,
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0001], 500);
+        }
+    }
+
+
+    public function get_rmd_no($data_no, $set_type){
         $rmd = RateMetaData::where(
             [
-                'w_no' => $w_no,
+                'w_no' => $data_no,
                 'set_type' => $set_type
             ]
         )->first();
 
-        if(empty($rmd) && $set_type == 'work_final'){
+        if(!isset($rmd->rmd_no) && $set_type == 'work_final'){
+            $rgd = ReceivingGoodsDelivery::where('rgd_no', $data_no)->first();
+            $w_no = $rgd->w_no;
             $rmd = RateMetaData::where(
                 [
                     'w_no' => $w_no,
                     'set_type' => 'work'
                 ]
             )->first();
-        }else if(empty($rmd) && $set_type == 'storage_final'){
+        }else if(!isset($rmd->rmd_no) && $set_type == 'storage_final'){
+            $rgd = ReceivingGoodsDelivery::where('rgd_no', $data_no)->first();
+            $w_no = $rgd->w_no;
             $rmd = RateMetaData::where(
                 [
                     'w_no' => $w_no,
@@ -419,7 +482,7 @@ class RateDataController extends Controller
             }else if($user->mb_type == 'shop'){
                 $rmd = RateMetaData::where('co_no', $user->co_no)->latest('created_at')->first();
                 $rate_data = $rate_data->where('rd_co_no', $user->co_no);
-                if(!empty($rmd)){
+                if(isset($rmd->rmd_no)){
                     $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
                 }
             }
@@ -456,7 +519,7 @@ class RateDataController extends Controller
             }else if($user->mb_type == 'shop'){
                 $rmd = RateMetaData::where('co_no', $user->co_no)->latest('created_at')->first();
                 $rate_data = $rate_data->where('rd_co_no', $user->co_no);
-                if(!empty($rmd)){
+                if(isset($rmd->rmd_no)){
                     $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
                 }
             }
@@ -493,7 +556,7 @@ class RateDataController extends Controller
             }else if($user->mb_type == 'shop'){
                 $rmd = RateMetaData::where('co_no', $user->co_no)->latest('created_at')->first();
                 $rate_data = $rate_data->where('rd_co_no', $user->co_no);
-                if(!empty($rmd)){
+                if(isset($rmd->rmd_no)){
                     $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
                 }
             }
@@ -560,6 +623,8 @@ class RateDataController extends Controller
     public function registe_rate_data_general(Request $request) {
         try {
             DB::beginTransaction();
+            $rgd = ReceivingGoodsDelivery::where('w_no', $request->w_no)->first();
+
             $rdg = RateDataGeneral::updateOrCreate(
                 [
                     'rdg_no' => $request->rdg_no,
@@ -567,6 +632,7 @@ class RateDataController extends Controller
                 ],
                 [
                     'w_no' => $request->w_no,
+                    'rgd_no' => isset($rgd->rgd_no) ? $rgd->rgd_no : null ,
                     'rdg_bill_type' => 'expectation',
                     'mb_no' => Auth::user()->mb_no,
                     'rdg_set_type' => $request->rdg_set_type,
@@ -603,9 +669,13 @@ class RateDataController extends Controller
         }
     }
 
-    public function get_rate_data_general($w_no) {
+    public function get_rate_data_general($rgd_no) {
         try {
             DB::beginTransaction();
+            $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
+
+            $w_no = $rgd->w_no;
+
             $rdg = RateDataGeneral::where('w_no', $w_no)->where('rdg_bill_type', 'expectation')->first();
 
             DB::commit();
@@ -624,7 +694,35 @@ class RateDataController extends Controller
     public function get_rate_data_general_final($w_no) {
         try {
             DB::beginTransaction();
-            $rdg = RateDataGeneral::where('w_no', $w_no)->where('rdg_bill_type', 'final')->first();
+            $rdg = RateDataGeneral::where('rgd_no_expectation', $w_no)->where('rdg_bill_type', 'final')->first();
+
+            if(!isset($rdg->rdg_no)){
+                $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'expectation')->first();
+            }
+
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'rdg' => $rdg
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+    public function get_rate_data_general_final2($w_no) {
+        try {
+            DB::beginTransaction();
+            $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'final')->first();
+
+            if(!isset($rdg->rdg_no)){
+                $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'expectation')->first();
+            }
+
 
             DB::commit();
             return response()->json([
@@ -643,14 +741,19 @@ class RateDataController extends Controller
         try {
             DB::beginTransaction();
             $is_new = RateDataGeneral::where('rdg_no',  $request->rdg_no)->where('rdg_bill_type', 'final')->first();
+
+            $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->w_no)->first();
+            $w_no = $rgd->w_no;
+
             $rdg = RateDataGeneral::updateOrCreate(
                 [
-                    'rdg_no' => !empty($is_new) ? null :  $request->rdg_no,
+                    'rdg_no' => isset($is_new->rdg_no) ? $request->rdg_no : null,
                     'rdg_bill_type' => 'final'
                 ],
                 [
-                    'w_no' => $request->w_no,
+                    'w_no' => $w_no,
                     'rdg_bill_type' => 'final',
+                    'rgd_no_expectation' => $request->w_no,
                     'mb_no' => Auth::user()->mb_no,
                     'rdg_set_type' => $request->rdg_set_type,
                     'rdg_supply_price1' => $request->storageData['supply_price'],
@@ -668,12 +771,78 @@ class RateDataController extends Controller
                 ]
             );
 
-            $expectation_rgd = ReceivingGoodsDelivery::where('w_no', $request->w_no)->where('rgd_bill_type', 'expectation')->first();
+            $expectation_rgd = ReceivingGoodsDelivery::where('w_no', $w_no)->where('rgd_bill_type', 'expectation')->first();
+
+            if(!isset($is_new->rdg_no)){
+                $final_rgd = $expectation_rgd->replicate();
+                $final_rgd->rgd_bill_type = 'final'; // the new project_id
+                $final_rgd->rgd_status4 = '확정청구서';
+                $final_rgd->save();
+
+                RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
+                    'rgd_no' => $final_rgd->rgd_no
+                ]);
+    
+            }
+           
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'rdg' => $rdg,
+                // 'final_rgd' => $final_rgd
+            ], 201);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+    public function registe_rate_data_general_additional(Request $request) {
+        try {
+            DB::beginTransaction();
+            $is_new = RateDataGeneral::where('rdg_no',  $request->rdg_no)->where('rdg_bill_type', 'additional')->first();
+
+            $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->w_no)->first();
+            $w_no = $rgd->w_no;
+
+            $rdg = RateDataGeneral::updateOrCreate(
+                [
+                    'rdg_no' => !isset($is_new->rdg_no) ? null :  $request->rdg_no,
+                    'rdg_bill_type' => 'additional'
+                ],
+                [
+                    'w_no' => $w_no,
+                    'rdg_bill_type' => 'additional',
+                    'mb_no' => Auth::user()->mb_no,
+                    'rdg_set_type' => $request->rdg_set_type,
+                    'rdg_supply_price1' => $request->storageData['supply_price'],
+                    'rdg_supply_price2' => $request->workData['supply_price'],
+                    'rdg_supply_price3' => $request->total['supply_price'],
+                    'rdg_vat1' => $request->storageData['taxes'],
+                    'rdg_vat2' => $request->workData['taxes'],
+                    'rdg_vat3' => $request->total['taxes'],
+                    'rdg_sum1' => $request->storageData['sum'],
+                    'rdg_sum2' => $request->workData['sum'],
+                    'rdg_sum3' => $request->total['sum'],
+                    'rdg_etc1' => $request->storageData['etc'],
+                    'rdg_etc2' => $request->workData['etc'],
+                    'rdg_etc3' => $request->total['etc'],
+                ]
+            );
+
+            $expectation_rgd = ReceivingGoodsDelivery::where('w_no', $w_no)->where('rgd_bill_type', 'final')->first();
 
             $final_rgd = $expectation_rgd->replicate();
-            $final_rgd->rgd_bill_type = 'final'; // the new project_id
+            $final_rgd->rgd_bill_type = 'additional'; // the new project_id
             $final_rgd->rgd_status4 = '확정청구서';
             $final_rgd->save();
+
+            RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
+                'rgd_no' => $final_rgd->rgd_no
+            ]);
 
             DB::commit();
             return response()->json([
@@ -682,6 +851,25 @@ class RateDataController extends Controller
                 'final_rgd' => $final_rgd
             ], 201);
 
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+    public function get_rate_data_general_additional($w_no) {
+        try {
+            DB::beginTransaction();
+            $rdg = RateDataGeneral::where('w_no', $w_no)->where('rdg_bill_type', 'additional')->first();
+
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'rdg' => $rdg
+            ], 201);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
