@@ -27,6 +27,9 @@ class ItemSearchRequest extends BaseFormRequest
             'type' => [
                 '',
             ],
+            'keyword' => [
+                '',
+            ],
             'items' => [
                 '',
             ],
