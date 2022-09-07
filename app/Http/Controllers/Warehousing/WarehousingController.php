@@ -84,6 +84,10 @@ class WarehousingController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $warehousing = Warehousing::with('mb_no')->with(['co_no','warehousing_item','receving_goods_delivery','w_import_parent'])->orderBy('w_no', 'DESC');
 
+            if (isset($validated['page_type']) && $validated['page_type'] == "page130") {
+                $warehousing->where('w_type', '=', 'IW');
+            }
+
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }

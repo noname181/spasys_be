@@ -24,6 +24,9 @@ class WarehousingSearchRequest extends BaseFormRequest
     public function rules()
     {
         return [
+            'page_type' => [
+                ''
+            ],
             'from_date' => [
                 'string',
                 'date_format:Y-m-d',
