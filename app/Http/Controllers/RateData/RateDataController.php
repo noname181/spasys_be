@@ -114,7 +114,7 @@ class RateDataController extends Controller
                 Log::error($val);
                 $rd_no = RateData::updateOrCreate(
                     [
-                        'rd_no' => !empty($is_new) ? null : isset($val['rd_no']) ? $val['rd_no'] : null,
+                        'rd_no' => !empty($is_new) ? null : (isset($val['rd_no']) ? $val['rd_no'] : null),
                         'rmd_no' => isset($rmd) ? $rmd->rmd_no : null,
                         'w_no' => isset($validated['w_no']) ? $validated['w_no'] : null,
                     ],

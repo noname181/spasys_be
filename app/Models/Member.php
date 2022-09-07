@@ -67,9 +67,22 @@ class Member extends Authenticatable
         'updated_at' => "date:Y.m.d H:i",
     ];
 
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'co_no', 'co_no')->with('co_parent');
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'role_no', 'role_no');
+    }
+
     public function getMbServicesAttribute()
     {
-        $service_no_array = $this->company->co_service;
+        $service_no_array = "";
+        if(!empty($this->company)){
+            $service_no_array = $this->company->co_service;
+        }
         $service_no_array = explode(" ", $service_no_array);
         $service_array = [];
 
@@ -81,15 +94,5 @@ class Member extends Authenticatable
         }
 
         return $service_array;
-    }
-
-    public function company()
-    {
-        return $this->belongsTo(Company::class, 'co_no', 'co_no')->with('co_parent');
-    }
-
-    public function role()
-    {
-        return $this->belongsTo(Role::class, 'role_no', 'role_no');
     }
 }
