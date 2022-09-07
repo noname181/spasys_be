@@ -273,6 +273,20 @@ class ItemController extends Controller
                 $items->where('co_no',$validated['co_no']);
             }
 
+           
+
+            if (isset($validated['keyword']) ) {
+                if($validated['type'] == 'item_brand' || $validated['type'] == 'item_name'){
+                    $items->where(function($query) use ($validated) {
+                        $query->where(strtolower($validated['type']), 'like','%'. strtolower($validated['keyword']) .'%');
+                    });
+                }else{
+                    $items->whereHas('item_channels',function($query) use ($validated) {
+                        $query->where(strtolower($validated['type']), 'like','%'. strtolower($validated['keyword']) .'%');
+                    });
+                }
+            }
+
             if(Auth::user()->mb_type == "shop"){
                 $items->whereHas('company.co_parent',function($query) use ($co_no) {
                     $query->where(DB::raw('co_no'), '=', $co_no);
