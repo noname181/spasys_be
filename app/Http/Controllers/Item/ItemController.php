@@ -148,6 +148,7 @@ class ItemController extends Controller
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
+                'item_no' => $item_no ? $item_no : ($item ? $item->item_no : null),
                 '$validated' => isset($validated['co_no']) ? $validated['co_no'] : Auth::user()->co_no
             ]);
         } catch (\Exception $e) {
