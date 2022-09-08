@@ -218,7 +218,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                     }
 
-                    
+
               }
 
               if (isset($warehousing_item['warehousing_item2']['wi_number'])) {
@@ -273,7 +273,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
             if($request->page_type == 'Page146_1'){
                 $warehousing_data = Warehousing::where('w_no', $request->w_no)->first();
-                
+
                 foreach($request->data as $data){
                     Warehousing::where('w_no', $request->w_no)->update([
                         'mb_no' => $member->mb_no,
@@ -345,7 +345,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
             }else{
                 $warehousing_data = Warehousing::where('w_no', $request->w_no)->first();
-                
+
                 if($warehousing_data->w_type == 'IW'){
                     foreach($request->data as $data){
                         $w_no = Warehousing::insertGetId([
@@ -450,7 +450,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             //     'w_no' => $warehousing_data->w_import_no,
                             //     'wi_type' => '입고'
                             // ])->update([
-                            //     'wi_number_left' => $warehousing->wi_number - $item['schedule_wi_number'] 
+                            //     'wi_number_left' => $warehousing->wi_number - $item['schedule_wi_number']
                             // ]);
 
                             WarehousingItem::where('w_no', $request->w_no)->where('item_no', $item['item_no'])->update([
@@ -460,9 +460,9 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'wi_type' => '출고_shipper'
                             ]);
 
-                          
+
                         }
-                       
+
                         foreach ($data['location'] as $location) {
                             $rgd_no = ReceivingGoodsDelivery::where('w_no', $request->w_no)->update([
                                 'mb_no' => $member->mb_no,
@@ -973,59 +973,18 @@ class ReceivingGoodsDeliveryController extends Controller
         }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
+    public function update_status4(Request $request){
+        try {
+            ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                'rgd_status5' => 'confirmed'
+            ]);
+            return response()->json([
+                'message' => 'Success'
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\ReceivingGoodsDelivery  $receivingGoodsDelivery
-     * @return \Illuminate\Http\Response
-     */
-    public function show(ReceivingGoodsDelivery $receivingGoodsDelivery)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\ReceivingGoodsDelivery  $receivingGoodsDelivery
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(ReceivingGoodsDelivery $receivingGoodsDelivery)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\ReceivingGoodsDelivery  $receivingGoodsDelivery
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, ReceivingGoodsDelivery $receivingGoodsDelivery)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\ReceivingGoodsDelivery  $receivingGoodsDelivery
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(ReceivingGoodsDelivery $receivingGoodsDelivery)
-    {
-        //
-    }
 }

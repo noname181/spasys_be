@@ -94,12 +94,15 @@ class RateDataController extends Controller
         try {
             DB::beginTransaction();
 
-            if (isset($validated['w_no'])) {
-                $is_new = RateMetaData::where(['w_no' => $validated['w_no'],
-                'set_type' => $validated['set_type']])->get();
+            $rgd = ReceivingGoodsDelivery::where('rgd_no', $validated['rgd_no'])->first();
+            $w_no = $rgd->w_no;
+
+            if (isset($w_no)) {
+                $is_new = RateMetaData::where(['w_no' => $w_no,
+                'set_type' => $validated['set_type']])->first();
                 $rmd = RateMetaData::updateOrCreate(
                     [
-                        'w_no' => $validated['w_no'],
+                        'w_no' => $w_no,
                         'set_type' => $validated['set_type'],
                     ],
                     [
@@ -112,9 +115,9 @@ class RateDataController extends Controller
                 Log::error($val);
                 $rd_no = RateData::updateOrCreate(
                     [
-                        'rd_no' => !isset($is_new->rmd_no) ? null : (isset($val['rd_no']) ? $val['rd_no'] : null),
+                        'rd_no' => isset($is_new->rmd_no) ? (isset($val['rd_no']) ? $val['rd_no'] : null) : null,
                         'rmd_no' => isset($rmd) ? $rmd->rmd_no : null,
-                        'w_no' => isset($validated['w_no']) ? $validated['w_no'] : null,
+                        'w_no' => isset($w_no) ? $w_no : null,
                     ],
                     [
                         'rd_cate_meta1' => $val['rd_cate_meta1'],
@@ -137,6 +140,7 @@ class RateDataController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'rmd_no' => isset($rmd) ? $rmd->rmd_no : null,
+                'w_no' => isset($w_no) ? $w_no : null,
             ], 201);
         } catch (\Exception $e) {
             DB::rollback();
@@ -151,12 +155,12 @@ class RateDataController extends Controller
         try {
             DB::beginTransaction();
 
-            $rgd = ReceivingGoodsDelivery::where('rgd_no', $validated['w_no'])->first();
+            $rgd = ReceivingGoodsDelivery::where('rgd_no', $validated['rgd_no'])->first();
             $w_no = $rgd->w_no;
 
             if (isset($w_no)) {
                 $is_new = RateMetaData::where(['w_no' => $w_no,
-                'set_type' => $validated['set_type']])->get();
+                'set_type' => $validated['set_type']])->first();
                 $rmd = RateMetaData::updateOrCreate(
                     [
                         'w_no' => $w_no,
@@ -221,7 +225,7 @@ class RateDataController extends Controller
             $rmd = RateMetaData::where(
                 [
                     'w_no' => $w_no,
-                    'set_type' => 'work'
+                    'set_type' => 'work_final'
                 ]
             )->first();
         }else if(!isset($rmd->rmd_no) && $set_type == 'storage_final'){
@@ -230,7 +234,25 @@ class RateDataController extends Controller
             $rmd = RateMetaData::where(
                 [
                     'w_no' => $w_no,
-                    'set_type' => 'storage'
+                    'set_type' => 'storage_final'
+                ]
+            )->first();
+        } if(!isset($rmd->rmd_no) && $set_type == 'work_additional'){
+            $rgd = ReceivingGoodsDelivery::where('rgd_no', $data_no)->first();
+            $w_no = $rgd->w_no;
+            $rmd = RateMetaData::where(
+                [
+                    'w_no' => $w_no,
+                    'set_type' => 'work_additional'
+                ]
+            )->first();
+        }else if(!isset($rmd->rmd_no) && $set_type == 'storage_additional'){
+            $rgd = ReceivingGoodsDelivery::where('rgd_no', $data_no)->first();
+            $w_no = $rgd->w_no;
+            $rmd = RateMetaData::where(
+                [
+                    'w_no' => $w_no,
+                    'set_type' => 'storage_additional'
                 ]
             )->first();
         }
@@ -623,7 +645,7 @@ class RateDataController extends Controller
     public function registe_rate_data_general(Request $request) {
         try {
             DB::beginTransaction();
-            $rgd = ReceivingGoodsDelivery::where('w_no', $request->w_no)->first();
+            $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
 
             $rdg = RateDataGeneral::updateOrCreate(
                 [
@@ -631,7 +653,7 @@ class RateDataController extends Controller
                     'rdg_bill_type' => 'expectation'
                 ],
                 [
-                    'w_no' => $request->w_no,
+                    'w_no' => $rgd->w_no,
                     'rgd_no' => isset($rgd->rgd_no) ? $rgd->rgd_no : null ,
                     'rdg_bill_type' => 'expectation',
                     'mb_no' => Auth::user()->mb_no,
@@ -651,7 +673,7 @@ class RateDataController extends Controller
                 ]
             );
 
-            ReceivingGoodsDelivery::where('w_no', $request->w_no)->update([
+            ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                 'rgd_status4' => '예상경비청구서',
                 'rgd_bill_type' => 'expectation'
             ]);
@@ -694,7 +716,11 @@ class RateDataController extends Controller
     public function get_rate_data_general_final($w_no) {
         try {
             DB::beginTransaction();
-            $rdg = RateDataGeneral::where('rgd_no_expectation', $w_no)->where('rdg_bill_type', 'final')->first();
+            $rdg = RateDataGeneral::where('rgd_no_final', $w_no)->where('rdg_bill_type', 'additional')->first();
+
+            if(!isset($rdg->rdg_no)){
+                $rdg = RateDataGeneral::where('rgd_no_expectation', $w_no)->where('rdg_bill_type', 'final')->first();
+            }
 
             if(!isset($rdg->rdg_no)){
                 $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'expectation')->first();
@@ -742,7 +768,7 @@ class RateDataController extends Controller
             DB::beginTransaction();
             $is_new = RateDataGeneral::where('rdg_no',  $request->rdg_no)->where('rdg_bill_type', 'final')->first();
 
-            $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->w_no)->first();
+            $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
             $w_no = $rgd->w_no;
 
             $rdg = RateDataGeneral::updateOrCreate(
@@ -753,7 +779,7 @@ class RateDataController extends Controller
                 [
                     'w_no' => $w_no,
                     'rdg_bill_type' => 'final',
-                    'rgd_no_expectation' => $request->w_no,
+                    'rgd_no_expectation' => $request->rgd_no,
                     'mb_no' => Auth::user()->mb_no,
                     'rdg_set_type' => $request->rdg_set_type,
                     'rdg_supply_price1' => $request->storageData['supply_price'],
@@ -782,9 +808,9 @@ class RateDataController extends Controller
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
                     'rgd_no' => $final_rgd->rgd_no
                 ]);
-    
+
             }
-           
+
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -805,7 +831,7 @@ class RateDataController extends Controller
             DB::beginTransaction();
             $is_new = RateDataGeneral::where('rdg_no',  $request->rdg_no)->where('rdg_bill_type', 'additional')->first();
 
-            $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->w_no)->first();
+            $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
             $w_no = $rgd->w_no;
 
             $rdg = RateDataGeneral::updateOrCreate(
@@ -816,6 +842,7 @@ class RateDataController extends Controller
                 [
                     'w_no' => $w_no,
                     'rdg_bill_type' => 'additional',
+                    'rgd_no_final' => $request->rgd_no,
                     'mb_no' => Auth::user()->mb_no,
                     'rdg_set_type' => $request->rdg_set_type,
                     'rdg_supply_price1' => $request->storageData['supply_price'],

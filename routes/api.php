@@ -142,6 +142,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/create', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class,'createWarehousingRequest']);
 
     Route::get('receiving_goods_delivery/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'__invoke']);
+    Route::post('receiving_goods_delivery/update_status4', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_status4']);
     Route::get('receiving_goods_delivery/get_rgd/{is_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'getReceivingGoodsDelivery']);
     Route::get('receiving_goods_delivery/get_rgd_warehousing/{w_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'getReceivingGoodsDeliveryWarehousing']);
     //130
@@ -291,7 +292,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/', \App\Http\Controllers\RateData\RateDataController::class)->name('registe_rate_data');
         Route::post('/set_data',[\App\Http\Controllers\RateData\RateDataController::class, 'register_set_data'])->name('registe_set_data');
         Route::post('/set_data_final',[\App\Http\Controllers\RateData\RateDataController::class, 'register_set_data_final'])->name('registe_set_data_final');
-        Route::post('/set_data_additional',[\App\Http\Controllers\RateData\RateDataController::class, 'register_set_data_additional'])->name('registe_set_data_additional');
+        Route::post('/set_data_additional',[\App\Http\Controllers\RateData\RateDataController::class, 'register_set_data_final'])->name('registe_set_data_additional');
         Route::get('/get_set_data/{rmd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_set_data'])->name('get_set_data');
         Route::get('/get_rmd_no/{w_no}/{set_type}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_rmd_no'])->name('get_rmd_no');
 

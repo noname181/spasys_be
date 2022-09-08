@@ -58,6 +58,10 @@ class ReceivingGoodsDelivery extends Model
 
     public function w_no()
     {
-        return $this->hasOne(Warehousing::class, 'w_no', 'w_no')->with(['co_no', 'warehousing_item','w_import_parent', 'rate_data_general']);
+        return $this->hasOne(Warehousing::class, 'w_no', 'w_no')->with(['co_no', 'warehousing_item','w_import_parent']);
+    }
+
+    public function rate_data_general(){
+        return $this->hasOne(RateDataGeneral::class, 'rgd_no', 'rgd_no');
     }
 }

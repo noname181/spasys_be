@@ -35,6 +35,10 @@ class RateDataRequest extends BaseFormRequest
                 'int',
                 'nullable'
             ],
+            'rgd_no' => [
+                'int',
+                'nullable'
+            ],
             'set_type' => [
                 'string',
                 'nullable'
