@@ -673,7 +673,10 @@ class WarehousingController extends Controller
                         ->orWhere('rgd_status3', '=', $validated['rgd_status3_3'] ? $validated['rgd_status3_3'] : "");
                 });
             }
+            if (isset($validated['service_korean_name'])) {
+                $warehousing->where('service_korean_name', '=', $validated['service_korean_name']);
 
+            }
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             //return DB::getQueryLog();
 

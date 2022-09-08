@@ -138,6 +138,12 @@ class WarehousingSearchRequest extends BaseFormRequest
             'item_upc_code' => [
                 '',
             ],
+            'service_korean_name' => [
+                '',
+            ],
+            'settlement_cycle' => [
+                '',
+            ],
         ];
     }
 
