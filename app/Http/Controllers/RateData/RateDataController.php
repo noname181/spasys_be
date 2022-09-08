@@ -806,7 +806,7 @@ class RateDataController extends Controller
                 [
                     'w_no' => $w_no,
                     'rdg_bill_type' => 'final',
-                    'rgd_no_expectation' => $request->rgd_no,
+                    'rgd_no_expectation' => $request->type  == 'edit' ? $is_new->rgd_no_expectation : $request->rgd_no,
                     'mb_no' => Auth::user()->mb_no,
                     'rdg_set_type' => $request->rdg_set_type,
                     'rdg_supply_price1' => $request->storageData['supply_price'],
@@ -889,14 +889,17 @@ class RateDataController extends Controller
 
             $expectation_rgd = ReceivingGoodsDelivery::where('w_no', $w_no)->where('rgd_bill_type', 'final')->first();
 
-            $final_rgd = $expectation_rgd->replicate();
-            $final_rgd->rgd_bill_type = 'additional'; // the new project_id
-            $final_rgd->rgd_status4 = '확정청구서';
-            $final_rgd->save();
+            if(!isset($is_new->rdg_no)){
+                $final_rgd = $expectation_rgd->replicate();
+                $final_rgd->rgd_bill_type = 'additional'; // the new project_id
+                $final_rgd->rgd_status4 = '확정청구서';
+                $final_rgd->save();
 
-            RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
-                'rgd_no' => $final_rgd->rgd_no
-            ]);
+                RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
+                    'rgd_no' => $final_rgd->rgd_no
+                ]);
+
+            }
 
             DB::commit();
             return response()->json([
@@ -916,8 +919,11 @@ class RateDataController extends Controller
     public function get_rate_data_general_additional($w_no) {
         try {
             DB::beginTransaction();
-            $rdg = RateDataGeneral::where('w_no', $w_no)->where('rdg_bill_type', 'additional')->first();
+            $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'final')->first();
 
+            if(!isset($rdg->rdg_no)){
+                $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'final')->first();
+            }
 
             DB::commit();
             return response()->json([
@@ -931,4 +937,48 @@ class RateDataController extends Controller
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
+    public function get_rate_data_general_additional2($w_no) {
+        try {
+            DB::beginTransaction();
+            $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'additional')->first();
+
+            if(!isset($rdg->rdg_no)){
+                $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'final')->first();
+            }
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'rdg' => $rdg
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+    public function get_rate_data_general_additional3($w_no) {
+        try {
+            DB::beginTransaction();
+            $rdg = RateDataGeneral::where('rgd_no_final', $w_no)->where('rdg_bill_type', 'additional')->first();
+
+            if(!isset($rdg->rdg_no)){
+                $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'final')->first();
+            }
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'rdg' => $rdg
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
 }

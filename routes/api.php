@@ -288,6 +288,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/general_final/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_final'])->name('get_rate_data_general_final');
         Route::get('/general_final2/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_final2'])->name('get_rate_data_general_final2');
         Route::get('/general_additional/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_additional'])->name('get_rate_data_general_additional');
+        Route::get('/general_additional2/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_additional2'])->name('get_rate_data_general_additional2');
+        Route::get('/general_additional3/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_additional3'])->name('get_rate_data_general_additional3');
 
         Route::post('/', \App\Http\Controllers\RateData\RateDataController::class)->name('registe_rate_data');
         Route::post('/set_data',[\App\Http\Controllers\RateData\RateDataController::class, 'register_set_data'])->name('registe_set_data');
