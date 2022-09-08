@@ -148,6 +148,7 @@ class ItemController extends Controller
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
+                'item_no' => $item_no ? $item_no : ($item ? $item->item_no : null),
                 '$validated' => isset($validated['co_no']) ? $validated['co_no'] : Auth::user()->co_no
             ]);
         } catch (\Exception $e) {
@@ -386,7 +387,20 @@ class ItemController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $item = Item::with(['file', 'company','item_channels']);
+            $user = Auth::user();
+            if($user->mb_type == 'shop'){
+                $item = Item::with(['file', 'company','item_channels'])->whereHas('company.co_parent',function($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                });
+            }else if ($user->mb_type == 'shipper'){
+                $item = Item::with(['file', 'company','item_channels'])->whereHas('company',function($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                });
+            }else if($user->mb_type == 'spasys'){
+                $item = Item::with(['file', 'company','item_channels'])->whereHas('company.co_parent.co_parent',function($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                });
+            }
             if (isset($validated['from_date'])) {
                 $item->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
