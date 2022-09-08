@@ -139,13 +139,7 @@ class MemberController extends Controller
             }
 
             // $services = Service::where('service_use_yn', 'y')->get();
-            if ($member->role_no == Member::ROLE_SPASYS_MANAGER || $member->role_no == Member::ROLE_SHOP_MANAGER) {
-                $member->role_no = '관리자';
-            } else if ($member->role_no == Member::ROLE_SPASYS_OPERATOR || $member->role_no == Member::ROLE_SHOP_OPERATOR) {
-                $member->role_no = '운영자';
-            } else if ($member->role_no == Member::ROLE_SPASYS_WORKER) {
-                $member->role_no = '작업자';
-            }
+
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'member' => $member,
@@ -281,6 +275,7 @@ class MemberController extends Controller
         $member['mb_push_yn'] = $validated['mb_push_yn'];
         $member['mb_service_no_array'] = $validated['mb_service_no_array'];
         $member['co_no'] = $validated['co_no'];
+        $member['role_no'] = $validated['role_no'];
 
         $roleNoOfUserLogin = Auth::user()->role_no;
         if ($roleNoOfUserLogin == Member::ROLE_ADMIN) {
@@ -289,13 +284,6 @@ class MemberController extends Controller
         } else if ($roleNoOfUserLogin == Member::ROLE_SPASYS_ADMIN) {
             $validated['mb_type'] = Member::SHOP;
             $validated['mb_parent'] = Member::SPASYS;
-            if ($validated['role_no'] == "관리자") {
-                $validated['role_no'] = Member::ROLE_SHOP_MANAGER;
-            } else {
-                $validated['role_no'] = Member::ROLE_SHOP_OPERATOR;
-            }
-        } else {
-            $validated['role_no'] = 1;
         }
 
         $member->save();
