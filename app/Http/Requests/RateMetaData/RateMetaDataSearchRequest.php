@@ -47,6 +47,11 @@ class RateMetaDataSearchRequest extends BaseFormRequest
                 'string',
                 'max:255'
             ],
+            'co_name' => [
+                'nullable',
+                'string',
+                'max:255'
+            ],
             'per_page' => [
                 'nullable',
                 'int',

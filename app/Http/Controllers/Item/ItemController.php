@@ -292,7 +292,7 @@ class ItemController extends Controller
                     $query->where(DB::raw('co_no'), '=', $co_no);
                 });
             }elseif(Auth::user()->mb_type == "shipper"){
-                $items->where('co_no',$validated['co_no']);
+                $items->where('co_no',$co_no);
             }else{
                 $co_child = Company::where('co_parent_no', $co_no)->get();
                 $co_no = array();
