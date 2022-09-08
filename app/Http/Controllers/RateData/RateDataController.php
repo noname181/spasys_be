@@ -211,50 +211,77 @@ class RateDataController extends Controller
     }
 
 
-    public function get_rmd_no($data_no, $set_type){
+    public function get_rmd_no($rgd_no, $set_type){
+        $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
+        $w_no = $rgd->w_no;
+
         $rmd = RateMetaData::where(
             [
-                'w_no' => $data_no,
+                'w_no' => $w_no,
                 'set_type' => $set_type
             ]
         )->first();
 
         if(!isset($rmd->rmd_no) && $set_type == 'work_final'){
-            $rgd = ReceivingGoodsDelivery::where('rgd_no', $data_no)->first();
-            $w_no = $rgd->w_no;
             $rmd = RateMetaData::where(
                 [
                     'w_no' => $w_no,
                     'set_type' => 'work_final'
                 ]
             )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'w_no' => $w_no,
+                        'set_type' => 'work'
+                    ]
+                )->first();
+            }
         }else if(!isset($rmd->rmd_no) && $set_type == 'storage_final'){
-            $rgd = ReceivingGoodsDelivery::where('rgd_no', $data_no)->first();
-            $w_no = $rgd->w_no;
             $rmd = RateMetaData::where(
                 [
                     'w_no' => $w_no,
                     'set_type' => 'storage_final'
                 ]
             )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'w_no' => $w_no,
+                        'set_type' => 'storage'
+                    ]
+                )->first();
+            }
         } if(!isset($rmd->rmd_no) && $set_type == 'work_additional'){
-            $rgd = ReceivingGoodsDelivery::where('rgd_no', $data_no)->first();
-            $w_no = $rgd->w_no;
             $rmd = RateMetaData::where(
                 [
                     'w_no' => $w_no,
                     'set_type' => 'work_additional'
                 ]
             )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'w_no' => $w_no,
+                        'set_type' => 'work_final'
+                    ]
+                )->first();
+            }
         }else if(!isset($rmd->rmd_no) && $set_type == 'storage_additional'){
-            $rgd = ReceivingGoodsDelivery::where('rgd_no', $data_no)->first();
-            $w_no = $rgd->w_no;
             $rmd = RateMetaData::where(
                 [
                     'w_no' => $w_no,
                     'set_type' => 'storage_additional'
                 ]
             )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'w_no' => $w_no,
+                        'set_type' => 'storage_final'
+                    ]
+                )->first();
+            }
         }
 
         return response()->json([
