@@ -111,7 +111,7 @@ class MemberController extends Controller
     public function getProfile()
     {
         try {
-            $member = Member::with('company')->where('mb_no', Auth::user()->mb_no)->first();
+            $member = Member::with(['company', 'role'])->where('mb_no', Auth::user()->mb_no)->first();
 
             return response()->json([
                 'message' => Messages::MSG_0007,
