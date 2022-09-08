@@ -61,6 +61,7 @@ class RateMetaDataController extends Controller
             return response()->json($rmd);
         } catch (\Exception $e) {
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
