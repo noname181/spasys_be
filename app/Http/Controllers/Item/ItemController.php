@@ -773,14 +773,16 @@ class ItemController extends Controller
                     ]);
                 }
             }else if ($user->mb_type == 'shop'){
-                $get_co_no_shop = Company::with(['co_parent'])->where('co_no',$user->co_no)->get();
-                $co_no = array();
-                foreach($get_co_no_shop as $co_no_shop){
-                    $co_no[] = $co_no_shop->co_no;
+                $get_shipper_company = Company::with(['co_parent'])->whereHas('co_parent', function($q) use($user) {
+                    $q->where('co_no', $user->co_no);
+                })->get();
+                $co_no_shipper = array();
+                foreach($get_shipper_company as $shipper_company){
+
                     foreach ($request->data as $i_item => $item) {
                         $item_no = Item::insertGetId([
                             'mb_no' => Auth::user()->mb_no,
-                            'co_no' => $co_no,
+                            'co_no' => $shipper_company->co_no,
                             'item_name' => $item['name'],
                             'item_brand' => $item['brand'],
                             'item_origin' => $item['origin'],
