@@ -251,6 +251,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/post_item_chk', [App\Http\Controllers\Item\ItemController::class, 'postItemschk'])->name('post_item_chk');
         Route::get('/', [App\Http\Controllers\Item\ItemController::class, 'searchItems'])->name('search');
         Route::post('/paginate', [App\Http\Controllers\Item\ItemController::class, 'paginateItems'])->name('paginate');
+        Route::post('/paginateapi', [App\Http\Controllers\Item\ItemController::class, 'paginateItemsApi'])->name('paginateapi');
         Route::post('/', \App\Http\Controllers\Item\ItemController::class)->name('create_or_update');
         Route::post('/update_file', [\App\Http\Controllers\Item\ItemController::class, 'updateFile'])->name('update_file');
         Route::get('/{item}', [App\Http\Controllers\Item\ItemController::class, 'getItemById'])->name('get_item_by_id');
