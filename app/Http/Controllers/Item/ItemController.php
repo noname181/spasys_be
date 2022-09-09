@@ -215,7 +215,9 @@ class ItemController extends Controller
             if (isset($validated['w_no']) && !isset($validated['items'])) {
                 $warehousing = Warehousing::find($validated['w_no']);
 
-                $items->with(['warehousing_item' => fn($query) => $query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고_shipper')]);
+                $items->with(['warehousing_item' => function ($query) use($validated){
+                    $query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고_shipper');
+                }]);
 
                 $items->whereHas('warehousing_item',function($query) use ($validated) {
                     if($validated['type'] == 'IW'){
@@ -229,7 +231,9 @@ class ItemController extends Controller
                 $count = $sql_count->count();
 
                 if($count != 0){
-                    $items->with(['warehousing_item2' => fn($query) => $query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고_spasys')]);
+                    $items->with(['warehousing_item2' => function ($query) use($validated) { 
+                        $query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고_spasys');
+                    }]);
 
                     $items->whereHas('warehousing_item2',function($query) use ($validated) {
                         if($validated['type'] == 'IW'){
