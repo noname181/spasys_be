@@ -493,6 +493,7 @@ class ItemController extends Controller
     public function importItems(Request $request)
     {
         try {
+            DB::beginTransaction();
             $f = Storage::disk('public')->put('files/tmp', $request['file']);
 
             $path = storage_path('app/public') . '/' . $f;
@@ -504,14 +505,21 @@ class ItemController extends Controller
             $datas = $sheet->toArray(null, true, true, true);
             $results[$sheet->getTitle()] = [];
             $errors[$sheet->getTitle()] = [];
+            
+         
+            $number_add = 0;
             foreach ($datas as $key => $d) {
                 if($key == 1) {
                     continue;
                 }
+                
                 $validator = Validator::make($d, ExcelRequest::rules());
                 if ($validator->fails()) {
+                   
                     $errors[$sheet->getTitle()][] = $validator->errors();
+                   
                 } else {
+                    $number_add =  $number_add + 1;
                     $item_no = Item::insertGetId([
                         'mb_no' => Auth::user()->mb_no,
                         'co_no' => $d['A'],
@@ -542,6 +550,9 @@ class ItemController extends Controller
                     foreach ($d as $k => $val) {
                         if ($k === 'S') {
                             $flgCheck = true;
+                        }
+                        if ($k === 'U') {
+                            $flgCheck = false;
                         }
                         if ($flgCheck) {
                             if ($i === 0) {
@@ -577,9 +588,12 @@ class ItemController extends Controller
                                 if (count($v) >= 1) {
                                     $validator = Validator::make($d, $validate);
                                     if ($validator->fails()) {
+                                        DB::rollback();
+                                        $number_add =   $number_add - 1;
                                         $errors[$sheet->getTitle()][] = $validator->errors();
                                     } else {
                                         $item_channels[] = array_merge($v, ['item_no' => $item_no]);
+                                   
                                     }
                                 }
                                 $item_channel = [];
@@ -591,11 +605,16 @@ class ItemController extends Controller
             }
 
             Storage::disk('public')->delete($f);
+            DB::commit();
+
+
             return response()->json([
                 'message' => Messages::MSG_0007,
+                'number'=>$number_add,
                 'errors' => $errors
             ]);
         } catch (\Exception $e) {
+           
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0004], 500);
         }
