@@ -37,7 +37,7 @@ class MemberUpdateByIdRequest extends BaseFormRequest
             ],
             'role_no' => [
                 'required',
-                'string',
+                'integer',
             ],
             'mb_email' => [
                 'required',
