@@ -215,7 +215,9 @@ class ItemController extends Controller
             if (isset($validated['w_no']) && !isset($validated['items'])) {
                 $warehousing = Warehousing::find($validated['w_no']);
 
-                $items->with(['warehousing_item' => fn($query) => $query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고_shipper')]);
+                $items->with(['warehousing_item' => function ($query) use($validated){
+                    $query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고_shipper');
+                }]);
 
                 $items->whereHas('warehousing_item',function($query) use ($validated) {
                     if($validated['type'] == 'IW'){
@@ -229,7 +231,9 @@ class ItemController extends Controller
                 $count = $sql_count->count();
 
                 if($count != 0){
-                    $items->with(['warehousing_item2' => fn($query) => $query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고_spasys')]);
+                    $items->with(['warehousing_item2' => function ($query) use($validated) { 
+                        $query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고_spasys');
+                    }]);
 
                     $items->whereHas('warehousing_item2',function($query) use ($validated) {
                         if($validated['type'] == 'IW'){
@@ -389,15 +393,94 @@ class ItemController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
             if($user->mb_type == 'shop'){
-                $item = Item::with(['file', 'company','item_channels'])->whereHas('company.co_parent',function($q) use ($user){
+                $item = Item::with(['file', 'company','item_channels'])->where('item_service_name', '=', '유통가공')->whereHas('company.co_parent',function($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 });
             }else if ($user->mb_type == 'shipper'){
-                $item = Item::with(['file', 'company','item_channels'])->whereHas('company',function($q) use ($user){
+                $item = Item::with(['file', 'company','item_channels'])->where('item_service_name', '=', '유통가공')->whereHas('company',function($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 });
             }else if($user->mb_type == 'spasys'){
-                $item = Item::with(['file', 'company','item_channels'])->whereHas('company.co_parent.co_parent',function($q) use ($user){
+                $item = Item::with(['file', 'company','item_channels'])->where('item_service_name', '=', '유통가공')->whereHas('company.co_parent.co_parent',function($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                });
+            }
+            if (isset($validated['from_date'])) {
+                $item->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            }
+
+            if (isset($validated['to_date'])) {
+                $item->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            }
+            if (isset($validated['co_name_shop'])) {
+                $item->whereHas('company.co_parent',function($query) use ($validated) {
+                    $query->where(DB::raw('lower(co_name)'), 'like','%'. strtolower($validated['co_name_shop']) .'%');
+                });
+            }
+            if (isset($validated['co_name_agency'])) {
+                $item->whereHas('company',function($query) use ($validated) {
+                    $query->where(DB::raw('lower(co_name)'), 'like','%'. strtolower($validated['co_name_agency']) .'%', 'and' , 'co_type' , '=' , 'shipper');
+                });
+            }
+            if (isset($validated['item_name'])) {
+                $item->where(function($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_name)'), 'like','%'. strtolower($validated['item_name']) .'%');
+                });
+            }
+            if (isset($validated['item_cargo_bar_code'])) {
+                $item->where(function($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_cargo_bar_code)'), 'like','%'. strtolower($validated['item_cargo_bar_code']) .'%');
+                });
+            }
+            if (isset($validated['item_channel_code'])) {
+                $item->whereHas('item_channels',function($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_channel_name)'), 'like','%'. strtolower($validated['item_channel_name']) .'%');
+                });
+            }
+            if (isset($validated['item_bar_code'])) {
+                $item->where(function($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_bar_code)'), 'like','%'. strtolower($validated['item_bar_code']) .'%');
+                });
+            }
+            if (isset($validated['item_upc_code'])) {
+                $item->where(function($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_upc_code)'), 'like','%'. strtolower($validated['item_upc_code']) .'%');
+                });
+            }
+            if (isset($validated['item_channel_name'])) {
+                $item->whereHas('item_channels',function($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_channel_name)'), 'like','%'. strtolower($validated['item_channel_name']) .'%');
+                });
+            }
+            $item = $item->paginate($per_page, ['*'], 'page', $page);
+            //return DB::getQueryLog();
+            return response()->json($item);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+    public function paginateItemsApi(ItemSearchRequest $request)
+    {
+        $validated = $request->validated();
+        try {
+            DB::enableQueryLog();
+            // If per_page is null set default data = 15
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+            $user = Auth::user();
+            if($user->mb_type == 'shop'){
+                $item = Item::with(['file', 'company','item_channels'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('company.co_parent',function($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                });
+            }else if ($user->mb_type == 'shipper'){
+                $item = Item::with(['file', 'company','item_channels'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('company',function($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                });
+            }else if($user->mb_type == 'spasys'){
+                $item = Item::with(['file', 'company','item_channels'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('company.co_parent.co_parent',function($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 });
             }
@@ -489,6 +572,7 @@ class ItemController extends Controller
     public function importItems(Request $request)
     {
         try {
+            DB::beginTransaction();
             $f = Storage::disk('public')->put('files/tmp', $request['file']);
 
             $path = storage_path('app/public') . '/' . $f;
@@ -500,14 +584,21 @@ class ItemController extends Controller
             $datas = $sheet->toArray(null, true, true, true);
             $results[$sheet->getTitle()] = [];
             $errors[$sheet->getTitle()] = [];
+            
+         
+            $number_add = 0;
             foreach ($datas as $key => $d) {
                 if($key == 1) {
                     continue;
                 }
+                
                 $validator = Validator::make($d, ExcelRequest::rules());
                 if ($validator->fails()) {
+                   
                     $errors[$sheet->getTitle()][] = $validator->errors();
+                   
                 } else {
+                    $number_add =  $number_add + 1;
                     $item_no = Item::insertGetId([
                         'mb_no' => Auth::user()->mb_no,
                         'co_no' => $d['A'],
@@ -538,6 +629,9 @@ class ItemController extends Controller
                     foreach ($d as $k => $val) {
                         if ($k === 'S') {
                             $flgCheck = true;
+                        }
+                        if ($k === 'U') {
+                            $flgCheck = false;
                         }
                         if ($flgCheck) {
                             if ($i === 0) {
@@ -573,9 +667,12 @@ class ItemController extends Controller
                                 if (count($v) >= 1) {
                                     $validator = Validator::make($d, $validate);
                                     if ($validator->fails()) {
+                                        DB::rollback();
+                                        $number_add =   $number_add - 1;
                                         $errors[$sheet->getTitle()][] = $validator->errors();
                                     } else {
                                         $item_channels[] = array_merge($v, ['item_no' => $item_no]);
+                                   
                                     }
                                 }
                                 $item_channel = [];
@@ -587,11 +684,16 @@ class ItemController extends Controller
             }
 
             Storage::disk('public')->delete($f);
+            DB::commit();
+
+
             return response()->json([
                 'message' => Messages::MSG_0007,
+                'number'=>$number_add,
                 'errors' => $errors
             ]);
         } catch (\Exception $e) {
+           
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0004], 500);
         }
@@ -623,53 +725,162 @@ class ItemController extends Controller
         //$validated = $request->validated();
         try {
             DB::beginTransaction();
-            foreach ($request->data as $i_item => $item) {
-                $item_no = Item::insertGetId([
-                    'mb_no' => Auth::user()->mb_no,
-                    'co_no' => isset($item['co_no']) ? $item['co_no'] : Auth::user()->co_no,
-                    'item_name' => $item['name'],
-                    'item_brand' => $item['brand'],
-                    'item_origin' => $item['origin'],
-                    'item_weight' => $item['weight'],
-                    'item_price1' => $item['org_price'],
-                    'item_price2' => $item['shop_price'],
-                    'item_price3' => $item['supply_price'],
-                    'item_url' => $item['img_500'],
-                    'item_option1' => $item['options'],
-                    'item_bar_code' => $item['barcode'],
-                    'item_service_name' => '수입풀필먼트',
-                ]);
+            $user = Auth::user();
+            if($user->mb_type == 'shipper'){
+                foreach ($request->data as $i_item => $item) {
+                    $item_no = Item::insertGetId([
+                        'mb_no' => Auth::user()->mb_no,
+                        'co_no' => isset($item['co_no']) ? $item['co_no'] : Auth::user()->co_no,
+                        'item_name' => $item['name'],
+                        'item_brand' => $item['brand'],
+                        'item_origin' => $item['origin'],
+                        'item_weight' => $item['weight'],
+                        'item_price1' => $item['org_price'],
+                        'item_price2' => $item['shop_price'],
+                        'item_price3' => $item['supply_price'],
+                        'item_url' => $item['img_500'],
+                        'item_option1' => $item['options'],
+                        'item_bar_code' => $item['barcode'],
+                        'item_service_name' => '수입풀필먼트',
+                    ]);
+    
+                    $item_info_no = ItemInfo::insertGetId([
+                        'item_no' => $item_no,
+    
+                        'supply_code' => $item['supply_code'],
+                        'trans_fee' => $item['trans_fee'],
+                        'img_desc1' => $item['img_desc1'],
+                        'img_desc2' => $item['img_desc2'],
+                        'img_desc3' => $item['img_desc3'],
+                        'img_desc4' => $item['img_desc4'],
+                        'img_desc5' => $item['img_desc5'],
+                        'product_desc' => $item['product_desc'],
+                        'product_desc2' => $item['product_desc2'],
+                        'location' => $item['location'],
+                        'memo' => $item['memo'],
+                        'category' => $item['category'],
+                        'maker' => $item['maker'],
+                        'md' => $item['md'],
+                        'manager1' => $item['manager1'],
+                        'manager2' => $item['manager2'],
+                        'supply_options' => $item['supply_options'],
+                        'enable_sale' => $item['enable_sale'],
+                        'use_temp_soldout' => $item['use_temp_soldout'],
+                        'stock_alarm1' => $item['stock_alarm1'],
+                        'stock_alarm2' => $item['stock_alarm2'],
+                        'extra_price' => $item['extra_price'],
+                        'extra_shop_price' => $item['extra_shop_price'],
+                    ]);
+                }
+            }else if ($user->mb_type == 'shop'){
+                $get_shipper_company = Company::with(['co_parent'])->whereHas('co_parent', function($q) use($user) {
+                    $q->where('co_no', $user->co_no);
+                })->get();
+                $co_no_shipper = array();
+                foreach($get_shipper_company as $shipper_company){
 
-                $item_info_no = ItemInfo::insertGetId([
-                    'item_no' => $item_no,
-
-                    'supply_code' => $item['supply_code'],
-                    'trans_fee' => $item['trans_fee'],
-                    'img_desc1' => $item['img_desc1'],
-                    'img_desc2' => $item['img_desc2'],
-                    'img_desc3' => $item['img_desc3'],
-                    'img_desc4' => $item['img_desc4'],
-                    'img_desc5' => $item['img_desc5'],
-                    'product_desc' => $item['product_desc'],
-                    'product_desc2' => $item['product_desc2'],
-                    'location' => $item['location'],
-                    'memo' => $item['memo'],
-                    'category' => $item['category'],
-                    'maker' => $item['maker'],
-                    'md' => $item['md'],
-                    'manager1' => $item['manager1'],
-                    'manager2' => $item['manager2'],
-                    'supply_options' => $item['supply_options'],
-                    'enable_sale' => $item['enable_sale'],
-                    'use_temp_soldout' => $item['use_temp_soldout'],
-                    'stock_alarm1' => $item['stock_alarm1'],
-                    'stock_alarm2' => $item['stock_alarm2'],
-                    'extra_price' => $item['extra_price'],
-                    'extra_shop_price' => $item['extra_shop_price'],
-
-                ]);
+                    foreach ($request->data as $i_item => $item) {
+                        $item_no = Item::insertGetId([
+                            'mb_no' => Auth::user()->mb_no,
+                            'co_no' => $shipper_company->co_no,
+                            'item_name' => $item['name'],
+                            'item_brand' => $item['brand'],
+                            'item_origin' => $item['origin'],
+                            'item_weight' => $item['weight'],
+                            'item_price1' => $item['org_price'],
+                            'item_price2' => $item['shop_price'],
+                            'item_price3' => $item['supply_price'],
+                            'item_url' => $item['img_500'],
+                            'item_option1' => $item['options'],
+                            'item_bar_code' => $item['barcode'],
+                            'item_service_name' => '수입풀필먼트',
+                        ]);
+        
+                        $item_info_no = ItemInfo::insertGetId([
+                            'item_no' => $item_no,
+        
+                            'supply_code' => $item['supply_code'],
+                            'trans_fee' => $item['trans_fee'],
+                            'img_desc1' => $item['img_desc1'],
+                            'img_desc2' => $item['img_desc2'],
+                            'img_desc3' => $item['img_desc3'],
+                            'img_desc4' => $item['img_desc4'],
+                            'img_desc5' => $item['img_desc5'],
+                            'product_desc' => $item['product_desc'],
+                            'product_desc2' => $item['product_desc2'],
+                            'location' => $item['location'],
+                            'memo' => $item['memo'],
+                            'category' => $item['category'],
+                            'maker' => $item['maker'],
+                            'md' => $item['md'],
+                            'manager1' => $item['manager1'],
+                            'manager2' => $item['manager2'],
+                            'supply_options' => $item['supply_options'],
+                            'enable_sale' => $item['enable_sale'],
+                            'use_temp_soldout' => $item['use_temp_soldout'],
+                            'stock_alarm1' => $item['stock_alarm1'],
+                            'stock_alarm2' => $item['stock_alarm2'],
+                            'extra_price' => $item['extra_price'],
+                            'extra_shop_price' => $item['extra_shop_price'],
+                        ]);
+                    }
+                }
                
+            }else if ($user->mb_type == 'spasys'){
+                $get_shop_company = Company::with(['co_parent'])->whereHas('co_parent.co_parent', function($q) use($user) {
+                    $q->where('co_no', $user->co_no);
+                })->get();
+                $co_no_shop = array();
+                foreach($get_shop_company as $shop_company){
+
+                    foreach ($request->data as $i_item => $item) {
+                        $item_no = Item::insertGetId([
+                            'mb_no' => Auth::user()->mb_no,
+                            'co_no' => $shop_company->co_no,
+                            'item_name' => $item['name'],
+                            'item_brand' => $item['brand'],
+                            'item_origin' => $item['origin'],
+                            'item_weight' => $item['weight'],
+                            'item_price1' => $item['org_price'],
+                            'item_price2' => $item['shop_price'],
+                            'item_price3' => $item['supply_price'],
+                            'item_url' => $item['img_500'],
+                            'item_option1' => $item['options'],
+                            'item_bar_code' => $item['barcode'],
+                            'item_service_name' => '수입풀필먼트',
+                        ]);
+        
+                        $item_info_no = ItemInfo::insertGetId([
+                            'item_no' => $item_no,
+        
+                            'supply_code' => $item['supply_code'],
+                            'trans_fee' => $item['trans_fee'],
+                            'img_desc1' => $item['img_desc1'],
+                            'img_desc2' => $item['img_desc2'],
+                            'img_desc3' => $item['img_desc3'],
+                            'img_desc4' => $item['img_desc4'],
+                            'img_desc5' => $item['img_desc5'],
+                            'product_desc' => $item['product_desc'],
+                            'product_desc2' => $item['product_desc2'],
+                            'location' => $item['location'],
+                            'memo' => $item['memo'],
+                            'category' => $item['category'],
+                            'maker' => $item['maker'],
+                            'md' => $item['md'],
+                            'manager1' => $item['manager1'],
+                            'manager2' => $item['manager2'],
+                            'supply_options' => $item['supply_options'],
+                            'enable_sale' => $item['enable_sale'],
+                            'use_temp_soldout' => $item['use_temp_soldout'],
+                            'stock_alarm1' => $item['stock_alarm1'],
+                            'stock_alarm2' => $item['stock_alarm2'],
+                            'extra_price' => $item['extra_price'],
+                            'extra_shop_price' => $item['extra_shop_price'],
+                        ]);
+                    }
+                }
             }
+            
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
