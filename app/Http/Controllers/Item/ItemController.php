@@ -827,7 +827,58 @@ class ItemController extends Controller
                 }
                
             }else if ($user->mb_type == 'spasys'){
+                $get_shop_company = Company::with(['co_parent'])->whereHas('co_parent.co_parent', function($q) use($user) {
+                    $q->where('co_no', $user->co_no);
+                })->get();
+                $co_no_shop = array();
+                foreach($get_shop_company as $shop_company){
 
+                    foreach ($request->data as $i_item => $item) {
+                        $item_no = Item::insertGetId([
+                            'mb_no' => Auth::user()->mb_no,
+                            'co_no' => $shop_company->co_no,
+                            'item_name' => $item['name'],
+                            'item_brand' => $item['brand'],
+                            'item_origin' => $item['origin'],
+                            'item_weight' => $item['weight'],
+                            'item_price1' => $item['org_price'],
+                            'item_price2' => $item['shop_price'],
+                            'item_price3' => $item['supply_price'],
+                            'item_url' => $item['img_500'],
+                            'item_option1' => $item['options'],
+                            'item_bar_code' => $item['barcode'],
+                            'item_service_name' => '수입풀필먼트',
+                        ]);
+        
+                        $item_info_no = ItemInfo::insertGetId([
+                            'item_no' => $item_no,
+        
+                            'supply_code' => $item['supply_code'],
+                            'trans_fee' => $item['trans_fee'],
+                            'img_desc1' => $item['img_desc1'],
+                            'img_desc2' => $item['img_desc2'],
+                            'img_desc3' => $item['img_desc3'],
+                            'img_desc4' => $item['img_desc4'],
+                            'img_desc5' => $item['img_desc5'],
+                            'product_desc' => $item['product_desc'],
+                            'product_desc2' => $item['product_desc2'],
+                            'location' => $item['location'],
+                            'memo' => $item['memo'],
+                            'category' => $item['category'],
+                            'maker' => $item['maker'],
+                            'md' => $item['md'],
+                            'manager1' => $item['manager1'],
+                            'manager2' => $item['manager2'],
+                            'supply_options' => $item['supply_options'],
+                            'enable_sale' => $item['enable_sale'],
+                            'use_temp_soldout' => $item['use_temp_soldout'],
+                            'stock_alarm1' => $item['stock_alarm1'],
+                            'stock_alarm2' => $item['stock_alarm2'],
+                            'extra_price' => $item['extra_price'],
+                            'extra_shop_price' => $item['extra_shop_price'],
+                        ]);
+                    }
+                }
             }
             
             DB::commit();
