@@ -264,6 +264,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/api_update_stock_items', [App\Http\Controllers\Item\ItemController::class, 'apiupdateStockItems'])->name('api_update_stock_items');
 
     });
+    Route::prefix('scheduleshipment')->name('scheduleshipment.')->group(function () {
+        Route::post('/paginate', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'paginateScheduleShipments'])->name('paginate');
+    });
+
 
     Route::prefix('rate_data_send_meta')->name('rate_data_send_meta.')->group(function () {
         Route::post('/', \App\Http\Controllers\RateMeta\RateMetaController::class)->name('registe_rdsm');

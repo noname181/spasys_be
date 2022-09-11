@@ -480,7 +480,7 @@ class ItemController extends Controller
                     $q->where('co_no', $user->co_no);
                 })->orderBy('item_no', 'DESC');
             }else if($user->mb_type == 'spasys'){
-                $item = Item::with(['file', 'company','item_channels'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('company.co_parent.co_parent',function($q) use ($user){
+                $item = Item::with(['file', 'company','item_channels','item_info'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('company.co_parent.co_parent',function($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->orderBy('item_no', 'DESC');
             }
