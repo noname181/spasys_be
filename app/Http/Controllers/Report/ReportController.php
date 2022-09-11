@@ -240,7 +240,7 @@ class ReportController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $reports = Report::with(['files', 'reports_child_mobi','warehousing'])->whereRaw('rp_no = rp_parent_no');
+            $reports = Report::with(['files', 'reports_child_mobi','warehousing'])->whereRaw('rp_no = rp_parent_no')->orderBy('rp_parent_no', 'DESC');
 
             if (isset($validated['from_date'])) {
                 $reports->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));

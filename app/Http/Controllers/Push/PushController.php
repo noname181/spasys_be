@@ -24,7 +24,7 @@ class PushController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $pushs = Push::paginate($per_page, ['*'], 'page', $page);
+            $pushs = Push::orderBy('push_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
             return response()->json($pushs);
         } catch (\Exception $e) {
             Log::error($e);

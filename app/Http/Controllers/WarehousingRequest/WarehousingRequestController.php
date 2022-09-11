@@ -62,6 +62,33 @@ class WarehousingRequestController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $warehousing_request = WarehousingRequest::with('mb_no')->orderBy('wr_no', 'DESC');
 
+            $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no']);
+
+            $members = Member::where('mb_no', '!=', 0)->get();
+
+            $warehousing_request = $warehousing_request->paginate($per_page, ['*'], 'page', $page);
+
+            return response()->json($warehousing_request);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            //return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function paginateWarehousingRequest(WarehousingRequestRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+
+            // If per_page is null set default data = 15
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+            $warehousing_request = WarehousingRequest::with('mb_no')->orderBy('wr_no', 'DESC');
+
+            $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no']);
+
             $members = Member::where('mb_no', '!=', 0)->get();
 
             $warehousing_request = $warehousing_request->paginate($per_page, ['*'], 'page', $page);
