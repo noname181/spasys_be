@@ -81,8 +81,6 @@ class ContractUpdateRequest extends BaseFormRequest
                 'max:255'
             ],
             'c_deposit_day' => [
-                'nullable',
-                'string'
             ],
             'c_account_number' => [
                 'required',

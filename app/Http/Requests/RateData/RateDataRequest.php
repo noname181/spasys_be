@@ -94,42 +94,26 @@ class RateDataRequest extends BaseFormRequest
             ],
             'rate_data.*.rd_data1' => [
                 'required',
-                'string',
-                'max:255',
             ],
             'rate_data.*.rd_data2' => [
                 'required',
-                'string',
-                'max:255',
             ],
             'rate_data.*.rd_data3' => [
-                'string',
-                'max:255',
                 'nullable'
             ],
             'rate_data.*.rd_data8' => [
-                'string',
-                'max:255',
                 'nullable'
             ],
             'rate_data.*.rd_data4' => [
-                'string',
-                'max:255',
                 'nullable'
             ],
             'rate_data.*.rd_data5' => [
-                'string',
-                'max:255',
                 'nullable'
             ],
             'rate_data.*.rd_data6' => [
-                'string',
-                'max:255',
                 'nullable'
             ],
             'rate_data.*.rd_data7' => [
-                'string',
-                'max:255',
                 'nullable'
             ],
         ];

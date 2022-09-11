@@ -85,7 +85,7 @@ class ContractController extends Controller
         try {
             $co_service = Company::where('co_no', $co_no)->first()->co_service;
             $contract = Contract::where(['co_no' => $co_no])->first();
-               
+
             $services = Service::where('service_use_yn', 'y')->where('service_no', '!=', 1)->get();
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -145,7 +145,7 @@ class ContractController extends Controller
                 'c_integrated_calculate_yn' => $validated['c_integrated_calculate_yn'],
                 'c_calculate_method' => $validated['c_calculate_method'],
                 'c_card_number' => $validated['c_card_number'],
-                'c_deposit_day' => $validated['c_deposit_day'],
+                'c_deposit_day' => $validated['c_deposit_day'] ? $validated['c_deposit_day'] : "",
                 'c_account_number' => $validated['c_account_number'],
                 'c_deposit_price' => $validated['c_deposit_price'],
                 'c_deposit_date' =>  DateTime::createFromFormat('Y-m-d', $validated['c_deposit_date']),

@@ -81,8 +81,6 @@ class ContractRegisterRequest extends BaseFormRequest
             //     'max:255'
             // ],
             'c_deposit_day' => [
-                'required',
-                'string'
             ],
             // 'c_account_number' => [
             //     'required',
