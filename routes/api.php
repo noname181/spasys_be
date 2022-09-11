@@ -133,7 +133,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/get_warehousing_import_status1', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingImportStatus1']); //page 134
 
     Route::post('/get_warehousing_status1', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingStatus1']); //page 140
-    Route::post('/get_warehousing_export_status12', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingExportStatus12']); //page 144, Page259
+    Route::post('/get_warehousing_export_status12', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingExportStatus12']); //page 144
+
+    Route::post('/get_warehousing_export_status_complete', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingExportStatusComplete']); //Page259
     Route::post('/get_warehousing_export_status4', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingExportStatus4']); //page 263
 
 
@@ -282,17 +284,25 @@ Route::middleware('auth')->group(function () {
             Route::get('/spasys2', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData2'])->name('get_spasys_rate_data2');
             Route::get('/spasys3', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData3'])->name('get_spasys_rate_data3');
         });
+
+        //SET GENERAL DATA
         Route::post('/general', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general'])->name('registe_rate_data_general');
         Route::post('/general_final', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_final'])->name('registe_rate_data_general_final');
         Route::post('/general_additional', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_additional'])->name('registe_rate_data_general_additional');
         Route::post('/general_additional2', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_additional2'])->name('registe_rate_data_general_additional2');
-        Route::get('/general/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general'])->name('get_rate_data_general');
+
+        //GET BILL GENERAL DATA
+        //GET EXPECTATION BILL DATA
+        Route::get('/general/{rgd_no}/{bill_type}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general'])->name('get_rate_data_general');
+        //GET FINAL BILL DATA
         Route::get('/general_final/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_final'])->name('get_rate_data_general_final');
         Route::get('/general_final2/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_final2'])->name('get_rate_data_general_final2');
+        //GET ADDITIONAL BILL DATA
         Route::get('/general_additional/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_additional'])->name('get_rate_data_general_additional');
         Route::get('/general_additional2/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_additional2'])->name('get_rate_data_general_additional2');
         Route::get('/general_additional3/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_additional3'])->name('get_rate_data_general_additional3');
 
+        //SET RATE DATA
         Route::post('/', \App\Http\Controllers\RateData\RateDataController::class)->name('registe_rate_data');
         Route::post('/set_data',[\App\Http\Controllers\RateData\RateDataController::class, 'register_set_data'])->name('registe_set_data');
         Route::post('/set_data_final',[\App\Http\Controllers\RateData\RateDataController::class, 'register_set_data_final'])->name('registe_set_data_final');
