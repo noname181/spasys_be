@@ -155,8 +155,10 @@ class ReceivingGoodsDeliveryController extends Controller
 
             if($validated['wr_contents']){
                 WarehousingRequest::insert([
+                    'w_no' => $w_no,
                     'mb_no' => $member->mb_no,
                     'wr_contents' => $validated['wr_contents'],
+                    'wr_type' => 'IW',
                 ]);
             }
 
@@ -363,6 +365,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         ]);
                         if($request->wr_contents){
                             WarehousingRequest::insert([
+                                'w_no' => $w_no,
                                 'mb_no' => $member->mb_no,
                                 'wr_contents' => $request->wr_contents,
                                 'wr_type' => 'EW',
@@ -503,6 +506,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                         if($request->wr_contents){
                             WarehousingRequest::insert([
+                                'w_no' => $w_no,
                                 'mb_no' => $member->mb_no,
                                 'wr_contents' => $request->wr_contents,
                                 'wr_type' => 'EW',
@@ -814,6 +818,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                 if($validated['wr_contents']){
                     WarehousingRequest::insert([
+                        
                         'mb_no' => $member->mb_no,
                         'wr_contents' => $validated['wr_contents'],
                     ]);
