@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\ItemChannel;
 use App\Models\WarehousingItem;
 use App\Models\ItemInfo;
+use App\Models\Item;
 
 
 class ScheduleShipment extends Model
@@ -68,7 +69,13 @@ class ScheduleShipment extends Model
     protected $casts = [
 
     ];
-
-
+    public function item()
+    {
+        return $this->hasOne(Item::class, 'item_no', 'item_no');
+    }
+    public function item_channels()
+    {
+        return $this->hasMany(ItemChannel::class, 'item_no', 'item_no');
+    }
     
 }
