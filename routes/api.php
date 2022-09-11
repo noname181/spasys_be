@@ -150,6 +150,7 @@ Route::middleware('auth')->group(function () {
     Route::get('receiving_goods_delivery/get_rgd_warehousing/{w_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'getReceivingGoodsDeliveryWarehousing']);
     //130
     Route::post('receiving_goods_delivery/warehousing/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_warehousing'])->name('rgd_warehousing');
+    Route::post('receiving_goods_delivery/warehousing/update_rdc_cancel', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_rdc_cancel'])->name('update_rdc_cancel');
     //141
     Route::post('receiving_goods_delivery/warehousing_release/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_warehousing_release'])->name('rgd_warehousing_release');
     Route::post('receiving_goods_delivery/import_schedule/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_import_schedule'])->name('rgd_import_schedule');
