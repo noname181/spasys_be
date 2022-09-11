@@ -271,6 +271,11 @@ class ItemController extends Controller
         $validated = $request->validated();
         try {
             DB::enableQueryLog();
+
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+            
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : '';
             $items = Item::with(['item_channels','company'])->where('item_service_name', '유통가공');
 
@@ -310,7 +315,7 @@ class ItemController extends Controller
                 });
             }
 
-            $items = $items->get();
+            $items = $items->paginate($per_page, ['*'], 'page', $page);
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'items' => $items,
@@ -323,6 +328,7 @@ class ItemController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
+    
 
     public function importItemsList(ItemSearchRequest $request)
     {

@@ -717,6 +717,23 @@ class ReceivingGoodsDeliveryController extends Controller
         }
     }
 
+    public function update_rdc_cancel(Request $request)
+    {
+        
+        try {
+           
+            Warehousing::where('w_no', $request->w_no)->update([
+                'w_cancel_yn' => 'y'
+            ]);
+
+            return response()->json(['message' => Messages::MSG_0007]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
     public function getReceivingGoodsDelivery($is_no){
 
         try {
