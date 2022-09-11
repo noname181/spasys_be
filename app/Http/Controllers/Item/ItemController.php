@@ -167,7 +167,7 @@ class ItemController extends Controller
         try {
             DB::enableQueryLog();
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : '';
-            $items = Item::with(['item_channels','company'])->where('item_service_name', '유통가공');
+            $items = Item::with(['item_channels','company'])->where('item_service_name', '유통가공')->orderBy('item_no', 'DESC');
 
             if(Auth::user()->mb_type == "shop"){
                 $items->whereHas('company.co_parent',function($query) use ($co_no) {
@@ -206,7 +206,7 @@ class ItemController extends Controller
                 $item_no =  array_column($validated['items'], 'item_no');
             }
 
-            $items = Item::with('item_channels');
+            $items = Item::with('item_channels')->orderBy('item_no', 'DESC');
 
             if (isset($validated['items'])) {
                 $items->whereIn('item_no', $item_no);
@@ -272,7 +272,7 @@ class ItemController extends Controller
         try {
             DB::enableQueryLog();
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : '';
-            $items = Item::with(['item_channels','company'])->where('item_service_name', '유통가공');
+            $items = Item::with(['item_channels','company'])->where('item_service_name', '유통가공')->orderBy('item_no', 'DESC');
 
             if(isset($validated['co_no']) && Auth::user()->mb_type == "shop"){
                 $items->where('co_no',$validated['co_no']);
@@ -374,7 +374,7 @@ class ItemController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $item = Item::with(['file', 'company'])->paginate($per_page, ['*'], 'page', $page);
+            $item = Item::with(['file', 'company'])->orderBy('item_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
             return response()->json($item);
         } catch (\Exception $e) {
             Log::error($e);
