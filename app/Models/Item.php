@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\ItemChannel;
 use App\Models\WarehousingItem;
+use App\Models\ItemInfo;
+
 
 class Item extends Model
 {
@@ -77,6 +79,10 @@ class Item extends Model
     public function warehousing_item2()
     {
         return $this->belongsTo(WarehousingItem::class, 'item_no', 'item_no');
+    }
+    public function item_info()
+    {
+        return $this->belongsTo(ItemInfo::class, 'item_no', 'item_no');
     }
     
 }
