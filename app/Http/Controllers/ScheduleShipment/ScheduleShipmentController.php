@@ -8,7 +8,7 @@ use App\Http\Requests\ScheduleShipment\ScheduleShipmentSearchRequest;
 use App\Models\Warehousing;
 use App\Models\WarehousingItem;
 use App\Models\ScheduleShipment;
-use App\Models\ItemInfo;
+use App\Models\ScheduleShipmentInfo;
 use App\Models\Company;
 use App\Models\File;
 use App\Models\ItemChannel;
@@ -37,7 +37,7 @@ class ScheduleShipmentController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $schedule_shipment = ScheduleShipment::with('item','item_channels')->orderBy('ss_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
+            $schedule_shipment = ScheduleShipment::with('schedule_shipment_info')->orderBy('ss_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
 
             return response()->json($schedule_shipment);
         } catch (\Exception $e) {
@@ -89,8 +89,35 @@ class ScheduleShipmentController extends Controller
                         'sub_domain' => $schedule['sub_domain'],
                         'sub_domain_seq' => $schedule['sub_domain_seq'],
                     ]);
-                
-            }
+                    foreach ($schedule['order_products'] as $ss_info => $schedule_info) {
+                        $ss_info_no = ScheduleShipmentInfo::insertGetId([
+                            'ss_no' => $ss_no,
+                            'barcode' => $schedule_info['barcode'],
+                            'brand' => $schedule_info['brand'],
+                            'cancel_date' => $schedule_info['cancel_date'],
+                            'change_date' => $schedule_info['change_date'],
+                            'enable_sale' => $schedule_info['enable_sale'],
+                            'extra_money' => $schedule_info['extra_money'],
+                            'is_gift' => $schedule_info['is_gift'],
+                            'link_id' => $schedule_info['link_id'],
+                            'name' => $schedule_info['name'],
+                            'new_link_id' => $schedule_info['new_link_id'],
+                            'options' => $schedule_info['options'],
+                            'order_cs' => $schedule_info['order_cs'],
+                            'prd_amount' => $schedule_info['prd_amount'],
+                            'prd_seq' => $schedule_info['prd_seq'],
+                            'prd_supply_price' => $schedule_info['prd_supply_price'],
+                            'product_id' => $schedule_info['product_id'],
+                            'qty' => $schedule_info['qty'],
+                            'shop_price' => $schedule_info['shop_price'],
+                            'supply_code' => $schedule_info['supply_code'],
+                            'supply_name' => $schedule_info['supply_name'],
+                            'supply_options' => $schedule_info['supply_options'],
+  
+                        ]);
+                    }
+
+                }
             
             DB::commit();
             return response()->json([

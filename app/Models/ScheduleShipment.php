@@ -8,6 +8,7 @@ use App\Models\ItemChannel;
 use App\Models\WarehousingItem;
 use App\Models\ItemInfo;
 use App\Models\Item;
+use App\Models\ScheduleShipmentInfo;
 
 
 class ScheduleShipment extends Model
@@ -76,6 +77,10 @@ class ScheduleShipment extends Model
     public function item_channels()
     {
         return $this->hasMany(ItemChannel::class, 'item_no', 'item_no');
+    }
+    public function schedule_shipment_info()
+    {
+        return $this->belongsTo(ScheduleShipmentInfo::class, 'ss_no', 'ss_no');
     }
     
 }
