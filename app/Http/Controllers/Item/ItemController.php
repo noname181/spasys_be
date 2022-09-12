@@ -933,4 +933,37 @@ class ItemController extends Controller
             return response()->json(['message' => Messages::MSG_0019], 500);
         }
     }
+    public function caculateItem(ItemSearchRequest $request)
+    {
+        $validated = $request->validated();
+        try {
+            DB::enableQueryLog();
+
+            $user = Auth::user();
+            if($user->mb_type == 'shop'){
+                $item = Item::with(['file', 'company','item_channels','warehousing_item'])->where('item_service_name', '=', '유통가공')->whereHas('company.co_parent',function($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->orderBy('item_no', 'DESC');
+            }else if ($user->mb_type == 'shipper'){
+                $item = Item::with(['file', 'company','item_channels','warehousing_item'])->where('item_service_name', '=', '유통가공')->whereHas('company',function($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->orderBy('item_no', 'DESC');
+            }else if($user->mb_type == 'spasys'){
+                $item = Item::select(DB::raw('SUM(warehousing_item.wi_number) as total'))
+                ->with(['company'])
+                ->leftJoin('warehousing_item', 'item.item_no', '=', 'warehousing_item.item_no')
+                ->where('item.item_service_name','=','유통가공')
+                ->get();
+
+            }
+            //return DB::getQueryLog();
+
+
+            return response()->json($item);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
 }
