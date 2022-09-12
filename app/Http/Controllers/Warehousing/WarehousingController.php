@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class WarehousingController extends Controller
 {
@@ -690,23 +691,46 @@ class WarehousingController extends Controller
         }
     }
 
-    public function getWarehousingByRgd($rgd_no)
+    public function getWarehousingByRgd($rgd_no, $type)
     {
         try {
-            $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
-            $w_no = $rgd->w_no;
+            if($type == 'monthly'){
+                $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
 
-            $warehousing = Warehousing::with(['co_no', 'warehousing_request'])->find($w_no);
+                $updated_at = Carbon::createFromFormat('Y.m.d H:i:s',  $rgd->updated_at->format('Y.m.d H:i:s'));
+
+                $start_date = $updated_at->startOfMonth()->toDateString();
+                $end_date = $updated_at->endOfMonth()->toDateString();
+
+                $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general'])->where('updated_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
+                ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
+                ->where('rgd_status1', '=', '출고')
+                ->where('rgd_status2', '=', '작업완료')
+                ->where(function($q){
+                    $q->where('rgd_status4', '=', '예상경비청구서')->orWhereNull('rgd_status4');
+                })
+                ->get();
+
+                $time = str_replace('-', '.', $start_date) . ' - ' . str_replace('-', '.', $end_date);
+
+            }else {
+                $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
+                $w_no = $rgd->w_no;
+
+                $warehousing = Warehousing::with(['co_no', 'warehousing_request'])->find($w_no);
+
+            }
 
 
             return response()->json(
                 ['message' => Messages::MSG_0007,
-                    'data' => $warehousing,
+                    'data' => isset($warehousing) ? $warehousing : $rgds,
+                    'time' => isset($time) ? $time : '',
                 ], 200);
 
         } catch (\Exception $e) {
             Log::error($e);
-            //return $e;
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
 
