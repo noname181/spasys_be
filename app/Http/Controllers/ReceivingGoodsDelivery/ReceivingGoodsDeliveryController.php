@@ -273,7 +273,7 @@ class ReceivingGoodsDeliveryController extends Controller
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
 
 
-            if($request->page_type == 'Page146_1'){
+            if($request->page_type == 'Page130146'){
                 $warehousing_data = Warehousing::where('w_no', $request->w_no)->first();
 
                 foreach($request->data as $data){
@@ -298,15 +298,21 @@ class ReceivingGoodsDeliveryController extends Controller
                         ]);
                     }
 
+                    foreach ($data['remove_items'] as $remove) {
+                        WarehousingItem::where('item_no', $remove['item_no'])->where('w_no', $request->w_no)->delete();
+                    }
+                    
                     //WarehousingItem::where('w_no', $request->w_no)->where('wi_type','=','출고')->delete();
 
                     foreach ($data['items'] as $item) {
-                        if($item['warehousing_item']['wi_type'] == "출고_spasys"){
+                      
+
+                        if(isset($item['warehousing_item']['wi_type']) && $item['warehousing_item']['wi_type'] == "출고_spasys"){
                             WarehousingItem::where('wi_no', $item['warehousing_item']['wi_no'])->update([
                                 'item_no' => $item['item_no'],
                                 'w_no' => $request->w_no,
                                 'wi_number' => $item['schedule_wi_number'],
-                                'wi_number_received' =>  $item['warehousing_item']['wi_number_received'],
+                               //'wi_number_received' =>  $item['warehousing_item']['wi_number_received'],
                                 'wi_type' => '출고_spasys'
                             ]);
 
@@ -315,7 +321,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'item_no' => $item['item_no'],
                                 'w_no' => $request->w_no,
                                 'wi_number' => $item['schedule_wi_number'],
-                                'wi_number_received' =>  $item['warehousing_item']['wi_number_received'],
+                                //'wi_number_received' =>  $item['warehousing_item']['wi_number_received'],
                                 'wi_type' => '출고_spasys'
                             ]);
                         }
