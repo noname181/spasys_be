@@ -327,9 +327,8 @@ class ReportController extends Controller
             }
 
             if (isset($validated['rp_cate'])) {
-                $reports->where(function($query) use ($validated) {
-                    $query->where('rp_cate', 'like', '%' . $validated['rp_cate'] . '%')->where('rp_parent_no', NULL);
-                });
+                    $reports->where('rp_cate', '=', $validated['rp_cate']);
+              
             }
             if (isset($validated['co_parent_name'])) {
                 $reports->whereHas('warehousing.co_no.co_parent',function($query) use ($validated) {              
