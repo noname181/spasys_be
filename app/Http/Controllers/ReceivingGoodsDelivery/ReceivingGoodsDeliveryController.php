@@ -732,7 +732,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 'w_cancel_yn' => 'y'
             ]);
 
-            return response()->json(['message' => Messages::MSG_0007]);
+            return response()->json(['message' => 'ok']);
         } catch (\Exception $e) {
             Log::error($e);
             return $e;
