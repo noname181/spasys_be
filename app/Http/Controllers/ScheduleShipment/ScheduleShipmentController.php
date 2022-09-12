@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use App\Utils\CommonFunc;
 
 class ScheduleShipmentController extends Controller
 {
@@ -66,6 +67,11 @@ class ScheduleShipmentController extends Controller
                         'qty' => $schedule['qty'],
                         'order_name' => $schedule['order_name'],
                         'order_mobile' => $schedule['order_mobile'],
+                        'order_tel' => $schedule['order_tel'],
+                        'recv_name' => $schedule['recv_name'],
+                        'recv_mobile' => $schedule['recv_mobile'],
+                        'recv_tel' => $schedule['recv_tel'],
+                        'recv_address' => $schedule['recv_address'],
                         'recv_zip' => $schedule['recv_zip'],
                         'memo' => $schedule['memo'],
                         'status' => $schedule['status'],
@@ -129,6 +135,18 @@ class ScheduleShipmentController extends Controller
             Log::error($e);
             return $e;
             return response()->json(['message' => Messages::MSG_0019], 500);
+        }
+    }
+    public function getScheduleShipmentById($ss_no)
+    {
+        $schedule_shipment = ScheduleShipment::find($ss_no);
+        if (!empty($schedule_shipment)) {
+            return response()->json(
+                ['message' => Messages::MSG_0007,
+                 'data' => $schedule_shipment
+                ], 200);
+        } else {
+            return response()->json(['message' => CommonFunc::renderMessage(Messages::MSG_0016, ['ScheduleShipment'])], 400);
         }
     }
 

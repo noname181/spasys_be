@@ -95,6 +95,31 @@ class ScheduleShipmentRequest extends BaseFormRequest
                 'nullable',
                 'max:1000',
             ],
+            'order_tel' => [
+                'string',
+                'nullable',
+                'max:255',
+            ],
+            'recv_name' => [
+                'string',
+                'nullable',
+                'max:255',
+            ],
+            'recv_mobile' => [
+                'string',
+                'nullable',
+                'max:255',
+            ],
+            'recv_tel' => [
+                'string',
+                'nullable',
+                'max:255',
+            ],
+            'recv_address' => [
+                'string',
+                'nullable',
+                'max:1000',
+            ],
             'recv_zip' => [
                 'string',
                 'nullable',

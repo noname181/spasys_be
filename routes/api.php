@@ -268,6 +268,8 @@ Route::middleware('auth')->group(function () {
     Route::prefix('scheduleshipment')->name('scheduleshipment.')->group(function () {
         Route::post('/paginate', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'paginateScheduleShipments'])->name('paginate');
         Route::post('/api_schedule_shipments', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'apiScheduleShipments'])->name('api_schedule_shipments');
+        Route::get('/{scheduleshipment}', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'getScheduleShipmentById'])->name('get_schedule_shipment_by_id');
+
     });
 
 
