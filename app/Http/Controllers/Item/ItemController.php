@@ -399,15 +399,15 @@ class ItemController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
             if($user->mb_type == 'shop'){
-                $item = Item::with(['file', 'company','item_channels'])->where('item_service_name', '=', '유통가공')->whereHas('company.co_parent',function($q) use ($user){
+                $item = Item::with(['file', 'company','item_channels','warehousing_item'])->where('item_service_name', '=', '유통가공')->whereHas('company.co_parent',function($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->orderBy('item_no', 'DESC');
             }else if ($user->mb_type == 'shipper'){
-                $item = Item::with(['file', 'company','item_channels'])->where('item_service_name', '=', '유통가공')->whereHas('company',function($q) use ($user){
+                $item = Item::with(['file', 'company','item_channels','warehousing_item'])->where('item_service_name', '=', '유통가공')->whereHas('company',function($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->orderBy('item_no', 'DESC');
             }else if($user->mb_type == 'spasys'){
-                $item = Item::with(['file', 'company','item_channels'])->where('item_service_name', '=', '유통가공')->whereHas('company.co_parent.co_parent',function($q) use ($user){
+                $item = Item::with(['file', 'company','item_channels','warehousing_item'])->where('item_service_name', '=', '유통가공')->whereHas('company.co_parent.co_parent',function($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->orderBy('item_no', 'DESC');
             }
@@ -460,6 +460,17 @@ class ItemController extends Controller
             }
             $item = $item->paginate($per_page, ['*'], 'page', $page);
             //return DB::getQueryLog();
+            
+            $item->setCollection(
+                $item->getCollection()->map(function ($q){
+                    // if(!empty($item->w_no)){
+                    //     $item->w_amount_left = $item->w_no->w_amount - $item->w_no->w_schedule_amount;
+                    // }
+                    $item = Item::with(['warehousing_item'])->where('item_no', $q->item_no)->first();
+                    $q->total_price = $item->item_price2 * $item->warehousing_item->wi_number;
+                    return $q;
+                })
+            );
             return response()->json($item);
         } catch (\Exception $e) {
             Log::error($e);
