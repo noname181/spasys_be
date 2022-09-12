@@ -606,7 +606,8 @@ class WarehousingController extends Controller
                 ->where('rgd_status2', '=', '작업완료')
                 ->where(function ($q) {
                     $q->where('rgd_status4', '=', '예상경비청구서')
-                    ->orWhere('rgd_status4', '=', '확정청구서');
+                    ->orWhere('rgd_status4', '=', '확정청구서')
+                    ->orWhere('rgd_status4', '=', '추가청구서');
                 });
             })->orderBy('rgd_no', 'DESC');
             if (isset($validated['from_date'])) {

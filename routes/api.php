@@ -145,7 +145,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/create', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class,'createWarehousingRequest']);
 
     Route::get('receiving_goods_delivery/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'__invoke']);
-    Route::post('receiving_goods_delivery/update_status4', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_status4']);
+    Route::post('receiving_goods_delivery/update_status5', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_status5']);
     Route::get('receiving_goods_delivery/get_rgd/{is_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'getReceivingGoodsDelivery']);
     Route::get('receiving_goods_delivery/get_rgd_warehousing/{w_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'getReceivingGoodsDeliveryWarehousing']);
     //130
@@ -312,8 +312,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/general_final2/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_final2'])->name('get_rate_data_general_final2');
         Route::get('/general_monthly_final2/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_monthly_final2'])->name('get_rate_data_general_monthly_final2');
 
-        
+
         //GET ADDITIONAL BILL DATA
+        Route::get('/general_monthly_additional/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_monthly_additional'])->name('get_rate_data_general_monthly_additional');
         Route::get('/general_additional/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_additional'])->name('get_rate_data_general_additional');
         Route::get('/general_additional2/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_additional2'])->name('get_rate_data_general_additional2');
         Route::get('/general_additional3/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_additional3'])->name('get_rate_data_general_additional3');

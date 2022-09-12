@@ -301,11 +301,11 @@ class ReceivingGoodsDeliveryController extends Controller
                     foreach ($data['remove_items'] as $remove) {
                         WarehousingItem::where('item_no', $remove['item_no'])->where('w_no', $request->w_no)->delete();
                     }
-                    
+
                     //WarehousingItem::where('w_no', $request->w_no)->where('wi_type','=','출고')->delete();
 
                     foreach ($data['items'] as $item) {
-                      
+
 
                         if(isset($item['warehousing_item']['wi_type']) && $item['warehousing_item']['wi_type'] == "출고_spasys"){
                             WarehousingItem::where('wi_no', $item['warehousing_item']['wi_no'])->update([
@@ -725,9 +725,9 @@ class ReceivingGoodsDeliveryController extends Controller
 
     public function update_rdc_cancel(Request $request)
     {
-        
+
         try {
-           
+
             Warehousing::where('w_no', $request->w_no)->update([
                 'w_cancel_yn' => 'y'
             ]);
@@ -841,7 +841,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                 if($validated['wr_contents']){
                     WarehousingRequest::insert([
-                        
+
                         'mb_no' => $member->mb_no,
                         'wr_contents' => $validated['wr_contents'],
                     ]);
@@ -1001,11 +1001,21 @@ class ReceivingGoodsDeliveryController extends Controller
         }
     }
 
-    public function update_status4(Request $request){
+    public function update_status5(Request $request){
         try {
-            ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-                'rgd_status5' => 'confirmed'
-            ]);
+            if($request->bill_type == 'case'){
+                ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                    'rgd_status5' => 'confirmed'
+                ]);
+            }else if ($request->bill_type == 'monthly'){
+                foreach($request->rgds as $rgd){
+                    ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
+                        'rgd_status5' => 'confirmed'
+                    ]);
+                }
+
+            }
+
             return response()->json([
                 'message' => 'Success'
             ]);
