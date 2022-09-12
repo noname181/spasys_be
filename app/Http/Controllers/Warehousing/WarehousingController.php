@@ -282,7 +282,7 @@ class WarehousingController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) {
-                $query->where('w_type', '=', 'IW');
+                $query->where('w_type', '=', 'IW')->where('rgd_status1','!=','입고');
             })->orderBy('rgd_no', 'DESC');
 
             if (isset($validated['from_date'])) {
