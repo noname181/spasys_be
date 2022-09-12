@@ -292,6 +292,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/spasys3', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData3'])->name('get_spasys_rate_data3');
         });
 
+        Route::get('/monthly_bill_list/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'monthly_bill_list'])->name('monthly_bill_list');
+
         //SET GENERAL DATA
         Route::post('/general', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general'])->name('registe_rate_data_general');
         Route::post('/general_final', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_final'])->name('registe_rate_data_general_final');

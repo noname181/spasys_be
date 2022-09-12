@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class RateDataController extends Controller
 {
@@ -280,6 +281,36 @@ class RateDataController extends Controller
                     [
                         'w_no' => $w_no,
                         'set_type' => 'storage_final'
+                    ]
+                )->first();
+            }
+        }else  if(!isset($rmd->rmd_no) && $set_type == 'work_monthly_final'){
+            $rmd = RateMetaData::where(
+                [
+                    'w_no' => $w_no,
+                    'set_type' => 'work_monthly_final'
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'w_no' => $w_no,
+                        'set_type' => 'work_monthly'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'storage_monthly_final'){
+            $rmd = RateMetaData::where(
+                [
+                    'w_no' => $w_no,
+                    'set_type' => 'storage_monthly_final'
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'w_no' => $w_no,
+                        'set_type' => 'storage_monthly'
                     ]
                 )->first();
             }
@@ -754,6 +785,10 @@ class RateDataController extends Controller
                 $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'expectation')->first();
             }
 
+            if(!isset($rdg->rdg_no)){
+                $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'expectation_monthly')->first();
+            }
+
 
             DB::commit();
             return response()->json([
@@ -1025,6 +1060,61 @@ class RateDataController extends Controller
             if(!isset($rdg->rdg_no)){
                 $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'final')->first();
             }
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'rdg' => $rdg
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+    public function monthly_bill_list($rgd_no) {
+        try {
+            DB::beginTransaction();
+            $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
+
+            $updated_at = Carbon::createFromFormat('Y.m.d H:i:s',  $rgd->updated_at->format('Y.m.d H:i:s'));
+
+            $start_date = $updated_at->startOfMonth()->toDateString();
+            $end_date = $updated_at->endOfMonth()->toDateString();
+
+            $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general'])->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
+            ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
+            ->where('rgd_status1', '=', '출고')
+            ->where('rgd_status2', '=', '작업완료')
+            ->where(function($q) {
+                $rgd_bill_type =  DB::raw('rgd_bill_type');
+
+                if($rgd_bill_type == 'expectation_monthly_final'){
+                    $q->where('rgd_bill_type', 'expectation_monthly_final');
+                }else {
+                    $q->where('rgd_bill_type', 'expectation_monthly');
+                }
+            })
+            ->get();
+
+            return response()->json([
+                'rgds' => $rgds,
+            ], 201);
+
+            // if (isset($validated['from_date'])) {
+            //     $notices->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            // }
+
+            // if (isset($validated['to_date'])) {
+            //     $notices->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            // }
+
+
+            // if(!isset($rdg->rdg_no)){
+            //     $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'final')->first();
+            // }
 
             DB::commit();
             return response()->json([
