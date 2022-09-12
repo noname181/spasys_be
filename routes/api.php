@@ -292,11 +292,12 @@ Route::middleware('auth')->group(function () {
             Route::get('/spasys3', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData3'])->name('get_spasys_rate_data3');
         });
 
-        Route::get('/monthly_bill_list/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'monthly_bill_list'])->name('monthly_bill_list');
+        Route::get('/monthly_bill_list/{rgd_no}/{bill_type}', [\App\Http\Controllers\RateData\RateDataController::class, 'monthly_bill_list'])->name('monthly_bill_list');
 
         //SET GENERAL DATA
         Route::post('/general', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general'])->name('registe_rate_data_general');
         Route::post('/general_final', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_final'])->name('registe_rate_data_general_final');
+        Route::post('/general_monthly_final', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_monthly_final'])->name('registe_rate_data_general_monthly_final');
         Route::post('/general_additional', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_additional'])->name('registe_rate_data_general_additional');
         Route::post('/general_additional2', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_additional2'])->name('registe_rate_data_general_additional2');
 
@@ -305,7 +306,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/general/{rgd_no}/{bill_type}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general'])->name('get_rate_data_general');
         //GET FINAL BILL DATA
         Route::get('/general_final/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_final'])->name('get_rate_data_general_final');
+        Route::get('/general_monthly_final/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_monthly_final'])->name('get_rate_data_general_monthly_final');
         Route::get('/general_final2/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_final2'])->name('get_rate_data_general_final2');
+        Route::get('/general_monthly_final2/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_monthly_final2'])->name('get_rate_data_general_monthly_final2');
+
+        
         //GET ADDITIONAL BILL DATA
         Route::get('/general_additional/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_additional'])->name('get_rate_data_general_additional');
         Route::get('/general_additional2/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_additional2'])->name('get_rate_data_general_additional2');

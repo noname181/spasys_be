@@ -824,7 +824,7 @@ class RateDataController extends Controller
     public function registe_rate_data_general_final(Request $request) {
         try {
             DB::beginTransaction();
-            $is_new = RateDataGeneral::where('rdg_no',  $request->rdg_no)->where('rdg_bill_type', 'final')->first();
+            $is_new = RateDataGeneral::where('rdg_no',  $request->rdg_no)->where('rdg_bill_type', $request->bill_type)->first();
 
             $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
             $w_no = $rgd->w_no;
@@ -832,11 +832,11 @@ class RateDataController extends Controller
             $rdg = RateDataGeneral::updateOrCreate(
                 [
                     'rdg_no' => isset($is_new->rdg_no) ? $request->rdg_no : null,
-                    'rdg_bill_type' => 'final'
+                    'rdg_bill_type' => $request->bill_type
                 ],
                 [
                     'w_no' => $w_no,
-                    'rdg_bill_type' => 'final',
+                    'rdg_bill_type' => $request->bill_type,
                     'rgd_no_expectation' => $request->type  == 'edit' ? $is_new->rgd_no_expectation : $request->rgd_no,
                     'mb_no' => Auth::user()->mb_no,
                     'rdg_set_type' => $request->rdg_set_type,
@@ -855,11 +855,11 @@ class RateDataController extends Controller
                 ]
             );
 
-            $expectation_rgd = ReceivingGoodsDelivery::where('w_no', $w_no)->where('rgd_bill_type', 'expectation')->first();
+            $expectation_rgd = ReceivingGoodsDelivery::where('w_no', $w_no)->where('rgd_bill_type', $request->previous_bill_type)->first();
 
             if(!isset($is_new->rdg_no)){
                 $final_rgd = $expectation_rgd->replicate();
-                $final_rgd->rgd_bill_type = 'final'; // the new project_id
+                $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
                 $final_rgd->rgd_status4 = '확정청구서';
                 $final_rgd->save();
 
@@ -1074,7 +1074,7 @@ class RateDataController extends Controller
         }
     }
 
-    public function monthly_bill_list($rgd_no) {
+    public function monthly_bill_list($rgd_no, $bill_type) {
         try {
             DB::beginTransaction();
             $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
@@ -1088,15 +1088,7 @@ class RateDataController extends Controller
             ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
             ->where('rgd_status1', '=', '출고')
             ->where('rgd_status2', '=', '작업완료')
-            ->where(function($q) {
-                $rgd_bill_type =  DB::raw('rgd_bill_type');
-
-                if($rgd_bill_type == 'expectation_monthly_final'){
-                    $q->where('rgd_bill_type', 'expectation_monthly_final');
-                }else {
-                    $q->where('rgd_bill_type', 'expectation_monthly');
-                }
-            })
+            ->where('rgd_bill_type', $bill_type)
             ->get();
 
             return response()->json([
@@ -1129,4 +1121,133 @@ class RateDataController extends Controller
         }
     }
 
+
+    public function registe_rate_data_general_monthly_final(Request $request) {
+        try {
+            DB::beginTransaction();
+
+            foreach($request->rgds as $rgd){
+                $rdg = RateDataGeneral::where('w_no',$rgd['w_no']['w_no'])->where('rdg_bill_type', 'final_monthly')->first();
+                if(!$rdg){
+                    $rdg = RateDataGeneral::where('w_no', $rgd['w_no']['w_no'])->where('rdg_bill_type', 'expectation_monthly')->first();
+
+                    $final_rdg = $rdg->replicate();
+                    $final_rdg->rdg_bill_type = $request->bill_type; // the new project_id
+                    $final_rdg->save();
+                }
+
+                $expectation_rgd = ReceivingGoodsDelivery::where('w_no', $rgd['w_no']['w_no'])->where('rgd_bill_type', 'expectation_monthly')->first();
+                $final_rgd = ReceivingGoodsDelivery::where('w_no', $rgd['w_no']['w_no'])->where('rgd_bill_type', 'final_monthly')->first();
+
+                if(!isset($is_new->rdg_no) && !$final_rgd){
+                    $final_rgd = $expectation_rgd->replicate();
+                    $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
+                    $final_rgd->rgd_status4 = '확정청구서';
+                    $final_rgd->save();
+
+                    RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
+                        'rgd_no' => $final_rgd->rgd_no
+                    ]);
+
+                }else {
+                    RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
+                        'rgd_no' => $final_rgd->rgd_no
+                    ]);
+                }
+            }
+
+            // $is_new = RateDataGeneral::where('rdg_no',  $request->rdg_no)->where('rdg_bill_type', $request->bill_type)->first();
+
+            // $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+            // $w_no = $rgd->w_no;
+
+            // $rdg = RateDataGeneral::updateOrCreate(
+            //     [
+            //         'rdg_no' => isset($is_new->rdg_no) ? $request->rdg_no : null,
+            //         'rdg_bill_type' => $request->bill_type
+            //     ],
+            //     [
+            //         'w_no' => $w_no,
+            //         'rdg_bill_type' => $request->bill_type,
+            //         'rgd_no_expectation' => $request->rgd_no,
+            //         'mb_no' => Auth::user()->mb_no,
+            //         // 'rdg_set_type' => $request->rdg_set_type,
+            //         'rdg_supply_price3' => $request->supply_price,      
+            //         'rdg_vat3' => $request->vat,           
+            //         'rdg_sum3' => $request->sum,
+            //     ]
+            // );
+
+            // $expectation_rgd = ReceivingGoodsDelivery::where('w_no', $w_no)->where('rgd_bill_type', 'expectation_monthly')->first();
+           
+            // if(!isset($is_new->rdg_no)){
+            //     $final_rgd = $expectation_rgd->replicate();
+            //     $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
+            //     $final_rgd->rgd_status4 = '확정청구서';
+            //     $final_rgd->save();
+
+            //     RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
+            //         'rgd_no' => $final_rgd->rgd_no
+            //     ]);
+
+            // }
+
+            DB::commit();
+
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'rdg' => $rdg,
+                // 'final_rgd' => $final_rgd
+            ], 201);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+    public function get_rate_data_general_monthly_final($w_no) {
+        try {
+            DB::beginTransaction();
+            $rdg = RateDataGeneral::where('rgd_no_expectation', $w_no)->where('rdg_bill_type', 'final_monthly')->first();
+
+            if(!isset($rdg->rdg_no)){
+                $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'expectation_monthly')->first();
+            }
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'rdg' => $rdg
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+    public function get_rate_data_general_monthly_final2($w_no) {
+        try {
+            DB::beginTransaction();
+            $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'final_monthly')->first();
+
+            if(!isset($rdg->rdg_no)){
+                $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'expectation_monthly')->first();
+            }
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'rdg' => $rdg
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
 }
