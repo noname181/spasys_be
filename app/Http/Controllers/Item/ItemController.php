@@ -463,9 +463,6 @@ class ItemController extends Controller
             
             $item->setCollection(
                 $item->getCollection()->map(function ($q){
-                    // if(!empty($item->w_no)){
-                    //     $item->w_amount_left = $item->w_no->w_amount - $item->w_no->w_schedule_amount;
-                    // }
                     $item = Item::with(['warehousing_item'])->where('item_no', $q->item_no)->first();
                     $q->total_price = $item->item_price2 * $item->warehousing_item->wi_number;
                     return $q;
