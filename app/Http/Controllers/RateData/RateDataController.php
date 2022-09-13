@@ -829,7 +829,7 @@ class RateDataController extends Controller
         try {
             DB::beginTransaction();
             //Check is there already RateDataGeneral with rdg_no yet
-            $is_new = RateDataGeneral::where('rdg_no',  $request->rdg_no)->where('rdg_bill_type', $request->bill_type)->first();
+            $is_exist = RateDataGeneral::where('rdg_no',  $request->rdg_no)->where('rdg_bill_type', $request->bill_type)->first();
 
             //Get RecevingGoodsDelivery base on rgd_no
             $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
@@ -837,13 +837,14 @@ class RateDataController extends Controller
 
             $rdg = RateDataGeneral::updateOrCreate(
                 [
-                    'rdg_no' => isset($is_new->rdg_no) ? $request->rdg_no : null,
+                    'rdg_no' => isset($is_exist->rdg_no) ? $request->rdg_no : null,
                     'rdg_bill_type' => $request->bill_type
                 ],
                 [
                     'w_no' => $w_no,
                     'rdg_bill_type' => $request->bill_type,
-                    'rgd_no_expectation' => $request->type  == 'edit' ? $is_new->rgd_no_expectation : $request->rgd_no,
+                    'rgd_no_expectation' => $request->type  == 'edit_final' ? $is_exist->rgd_no_expectation : (str_contains($request->bill_type, 'final') ? $request->rgd_no : null),
+                    'rgd_no_final' => $request->type  == 'edit_additional' ? $is_exist->rgd_no_final : (str_contains($request->bill_type, 'additional') ? $request->rgd_no : null),
                     'mb_no' => Auth::user()->mb_no,
                     'rdg_set_type' => $request->rdg_set_type,
                     'rdg_supply_price1' => $request->storageData['supply_price'],
@@ -861,10 +862,10 @@ class RateDataController extends Controller
                 ]
             );
 
-            $expectation_rgd = ReceivingGoodsDelivery::where('w_no', $w_no)->where('rgd_bill_type', $request->previous_bill_type)->first();
+            $previous_rgd = ReceivingGoodsDelivery::where('w_no', $w_no)->where('rgd_bill_type', '=' , $request->previous_bill_type)->first();
 
-            if(!isset($is_new->rdg_no)){
-                $final_rgd = $expectation_rgd->replicate();
+            if(!isset($is_exist->rdg_no) && isset($request->previous_bill_type)){
+                $final_rgd = $previous_rgd->replicate();
                 $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
                 $final_rgd->rgd_status4 = $request->status;
                 $final_rgd->save();
@@ -872,7 +873,17 @@ class RateDataController extends Controller
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
                     'rgd_no' => $final_rgd->rgd_no
                 ]);
+            }else {
+                RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
+                    'rgd_no' =>  $is_exist ?  $is_exist->rgd_no : $rgd->rgd_no
+                ]);
+            }
 
+            if($request->bill_type == 'expectation' || $request->bill_type == 'expectation_monthly'){
+                ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                    'rgd_status4' => $request->status,
+                    'rgd_bill_type' => $request->bill_type
+                ]);
             }
 
             DB::commit();
@@ -1263,7 +1274,11 @@ class RateDataController extends Controller
     public function get_rate_data_general_monthly_additional($w_no) {
         try {
             DB::beginTransaction();
-            $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'additional_monthly')->first();
+            $rdg = RateDataGeneral::where('rgd_no_final', $w_no)->where('rdg_bill_type', 'additional_monthly')->first();
+
+            if(!isset($rdg->rdg_no)){
+                $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'final_monthly')->first();
+            }
 
             DB::commit();
             return response()->json([
