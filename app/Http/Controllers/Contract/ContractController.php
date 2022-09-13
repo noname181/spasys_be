@@ -160,7 +160,10 @@ class ContractController extends Controller
             $contract = Contract::where(['co_no' => $co_no, 'c_no' => $contract->c_no])
                 ->update($update);
 
-            $company = Company::where('co_no', $co_no)->update(['co_service' => $validated['co_service']]);
+            $company = Company::where('co_no', $co_no)->update([
+                'co_service' => $validated['co_service'],
+                'co_settlement_cycle' => $validated['c_payment_cycle'],
+            ]);
 
             DB::commit();
             return response()->json([
@@ -170,6 +173,7 @@ class ContractController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
