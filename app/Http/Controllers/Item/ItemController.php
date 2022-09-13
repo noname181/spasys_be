@@ -458,9 +458,28 @@ class ItemController extends Controller
                     $query->where(DB::raw('lower(item_channel_name)'), 'like','%'. strtolower($validated['item_channel_name']) .'%');
                 });
             }
+
+            $item2 = $item->get();
+            $count_check = 0; 
+            $item3 = collect($item2)->map(function ($q){
+                $item4 = Item::with(['warehousing_item'])->where('item_no', $q->item_no)->first();
+                return [ 'total_amount' => $item4['warehousing_item']['wi_number']];
+            })->sum('total_amount');
+            $item5 = collect($item2)->map(function ($q){
+                $item6 = Item::with(['warehousing_item'])->where('item_no', $q->item_no)->first();
+                return [ 'total_price' => $item6->item_price2 * $item6['warehousing_item']['wi_number']];
+            })->sum('total_price');
+
+
             $item = $item->paginate($per_page, ['*'], 'page', $page);
-            //return DB::getQueryLog();
             
+           
+            $custom = collect(['sum1' => $item3,'sum2'=>$item5]);
+
+            //
+
+       
+            //return DB::getQueryLog();
             $item->setCollection(
                 $item->getCollection()->map(function ($q){
                     $item = Item::with(['warehousing_item'])->where('item_no', $q->item_no)->first();
@@ -470,7 +489,10 @@ class ItemController extends Controller
                     return $q;
                 })
             );
-            return response()->json($item);
+            
+            $data = $custom->merge($item);
+
+            return response()->json($data);
         } catch (\Exception $e) {
             Log::error($e);
             return $e;
