@@ -470,11 +470,15 @@ class ItemController extends Controller
             $count_check = 0; 
             $item3 = collect($item2)->map(function ($q){
                 $item4 = Item::with(['warehousing_item'])->where('item_no', $q->item_no)->first();
+                if(isset($item4['warehousing_item']['wi_number'])){
                 return [ 'total_amount' => $item4['warehousing_item']['wi_number']];
+                }
             })->sum('total_amount');
             $item5 = collect($item2)->map(function ($q){
                 $item6 = Item::with(['warehousing_item'])->where('item_no', $q->item_no)->first();
+                if(isset($item6['warehousing_item']['wi_number'])){
                 return [ 'total_price' => $item6->item_price2 * $item6['warehousing_item']['wi_number']];
+                }
             })->sum('total_price');
 
 
