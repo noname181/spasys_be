@@ -72,13 +72,13 @@ class ReceivingGoodsDeliveryController extends Controller
 
             if(isset($validated['w_no'])){
                 Warehousing::where('w_no', $validated['w_no'])->update([
-                    'mb_no' => $member->mb_no,
+                    //'mb_no' => $member->mb_no,
                     'w_schedule_amount' => $validated['w_schedule_amount'],
                     'w_schedule_day' => $validated['w_schedule_day'],
                     'w_amount' => $validated['w_amount'],
                     'w_type' => 'IW',
                     'w_category_name' => $request->w_category_name,
-                    'co_no' => $co_no
+                    //'co_no' => $co_no
                 ]);
             }else{
                 $w_no_data = Warehousing::insertGetId([
@@ -278,14 +278,14 @@ class ReceivingGoodsDeliveryController extends Controller
 
                 foreach($request->data as $data){
                     Warehousing::where('w_no', $request->w_no)->update([
-                        'mb_no' => $member->mb_no,
+                        //'mb_no' => $member->mb_no,
                         'w_schedule_amount' => $data['w_schedule_amount'],
                         'w_schedule_day' => $request->w_schedule_day,
                         'w_import_no' => $warehousing_data->w_import_no,
                         'w_amount' => $data['w_amount'],
                         'w_type' => 'EW',
                         'w_category_name' => $request->w_category_name,
-                        'co_no' => $co_no
+                        //'co_no' => $co_no
                     ]);
                     Warehousing::where('w_no', $request->w_no)->update([
                         'w_schedule_number' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EW')
@@ -427,14 +427,14 @@ class ReceivingGoodsDeliveryController extends Controller
                     foreach($request->data as $data){
                     if($data['w_no'] != ""){
                         $w_no = Warehousing::where('w_no', $request->w_no)->update([
-                            'mb_no' => $member->mb_no,
+                            //'mb_no' => $member->mb_no,
                             'w_schedule_amount' => $data['w_schedule_amount'],
                             'w_schedule_day' => $request->w_schedule_day,
                             'w_import_no' => $warehousing_data->w_import_no,
                             'w_amount' => $data['w_amount'],
                             'w_type' => 'EW',
                             'w_category_name' => $request->w_category_name,
-                            'co_no' => $co_no
+                            //'co_no' => $co_no
                         ]);
                         Warehousing::where('w_no', $w_no)->update([
                             'w_schedule_number' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EW')
