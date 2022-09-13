@@ -483,19 +483,19 @@ class WarehousingController extends Controller
             $user = Auth::user();
             if($user->mb_type == 'shop'){
                 $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
-                    $query->where('rgd_status1', '=', '입고')->whereHas('co_no.co_parent',function($q) use ($user){
+                    $query->where('rgd_status1', '=', '입고')->whereNull('w_children_yn')->whereHas('co_no.co_parent',function($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     });
                 })->orderBy('rgd_no', 'DESC');
             }else if($user->mb_type == 'shipper'){
                 $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
-                    $query->where('rgd_status1', '=', '입고')->whereHas('co_no',function($q) use ($user){
+                    $query->where('rgd_status1', '=', '입고')->whereNull('w_children_yn')->whereHas('co_no',function($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     });
                 })->orderBy('rgd_no', 'DESC');
             }else if($user->mb_type == 'spasys'){
                 $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
-                    $query->where('rgd_status1', '=', '입고')->whereHas('co_no.co_parent.co_parent',function($q) use ($user){
+                    $query->where('rgd_status1', '=', '입고')->whereNull('w_children_yn')->whereHas('co_no.co_parent.co_parent',function($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     });
                 })->orderBy('rgd_no', 'DESC');
