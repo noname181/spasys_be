@@ -283,6 +283,11 @@ class ItemController extends Controller
                 $items->where('co_no',$validated['co_no']);
             }
 
+            if(isset($validated['w_no'])){
+                $warehousing = Warehousing::where('w_no',$validated['w_no'])->first();
+                $items->where('co_no',$warehousing->co_no);
+            }
+
            
 
             if (isset($validated['keyword']) ) {
@@ -314,6 +319,8 @@ class ItemController extends Controller
                     $query->whereIn(DB::raw('co_no'), $co_no);
                 });
             }
+
+            
 
             $items = $items->paginate($per_page, ['*'], 'page', $page);
             return response()->json([
