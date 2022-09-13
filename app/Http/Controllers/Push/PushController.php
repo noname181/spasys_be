@@ -50,7 +50,7 @@ class PushController extends Controller
         try {
             $push = Push::insertGetId([
                 'mb_no' => Auth::user()->mb_no,
-                'menu_no' => $validated['menu_no'],
+                'push_category' => $validated['push_category'],
                 'push_title' => $validated['push_title'],
                 'push_content' => $validated['push_content'],
                 'push_time' => $validated['push_time'],
@@ -78,7 +78,7 @@ class PushController extends Controller
         $validated = $request->validated();
         try {
             $update = [
-                'menu_no' => $validated['menu_no'],
+                'push_category' => $validated['push_category'],
                 'push_title' => $validated['push_title'],
                 'push_content' => $validated['push_content'],
                 'push_time' => $validated['push_time'],
