@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class WarehousingController extends Controller
 {
@@ -81,7 +82,26 @@ class WarehousingController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $warehousing = Warehousing::with('mb_no')->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->orderBy('w_no', 'DESC');
+            $user = Auth::user();
+            if($user->mb_type == 'shop'){
+                $warehousing = Warehousing::with('mb_no')
+                ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])
+                ->whereHas('co_no.co_parent',function ($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->orderBy('w_no', 'DESC');
+            }else if($user->mb_type == 'shipper'){
+                $warehousing = Warehousing::with('mb_no')
+                ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])
+                ->whereHas('co_no',function ($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->orderBy('w_no', 'DESC');
+            }else if($user->mb_type == 'spasys'){
+                $warehousing = Warehousing::with('mb_no')
+                ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])
+                ->whereHas('co_no.co_parent.co_parent',function ($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->orderBy('w_no', 'DESC');
+            }
 
             if (isset($validated['page_type']) && $validated['page_type'] == "page130") {
                 $warehousing->where('w_type', '=', 'IW');
@@ -282,9 +302,27 @@ class WarehousingController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) {
-                $query->where('w_type', '=', 'IW')->where('rgd_status1','!=','입고');
-            })->orderBy('rgd_no', 'DESC');
+            $user = Auth::user();
+            if($user->mb_type == 'shop'){
+                $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                    $query->where('w_type', '=', 'IW')->where('rgd_status1','!=','입고')->whereHas('co_no.co_parent',function($q) use ($user){
+                        $q->where('co_no', $user->co_no);
+                    });
+                })->orderBy('rgd_no', 'DESC');
+            }else if ($user->mb_type == 'shipper'){
+                $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                    $query->where('w_type', '=', 'IW')->where('rgd_status1','!=','입고')->whereHas('co_no',function($q) use ($user){
+                        $q->where('co_no', $user->co_no);
+                    });
+                })->orderBy('rgd_no', 'DESC');
+            }else if ($user->mb_type == 'spasys'){
+                $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                    $query->where('w_type', '=', 'IW')->where('rgd_status1','!=','입고')->whereHas('co_no.co_parent.co_parent',function($q) use ($user){
+                        $q->where('co_no', $user->co_no);
+                    });
+                })->orderBy('rgd_no', 'DESC');
+            }
+
 
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
@@ -359,9 +397,27 @@ class WarehousingController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) {
-                $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고');
-            })->orderBy('rgd_no', 'DESC');
+            $user = Auth::user();
+            if($user->mb_type =='shop'){
+                $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                    $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->whereHas('co_no.co_parent',function($q) use ($user){
+                        $q->where('co_no', $user->co_no);
+                    });
+                })->orderBy('rgd_no', 'DESC');
+            }else if($user->mb_type == 'shipper' ){
+                $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                    $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->whereHas('co_no',function($q) use ($user){
+                        $q->where('co_no', $user->co_no);
+                    });
+                })->orderBy('rgd_no', 'DESC');
+            }else if($user->mb_type == 'spasys'){
+                $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                    $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->whereHas('co_no.co_parent.co_parent',function($q) use ($user){
+                        $q->where('co_no', $user->co_no);
+                    });
+                })->orderBy('rgd_no', 'DESC');
+            }
+            
 
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
@@ -424,9 +480,27 @@ class WarehousingController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) {
-                $query->where('rgd_status1', '=', '입고');
-            })->orderBy('rgd_no', 'DESC');
+            $user = Auth::user();
+            if($user->mb_type == 'shop'){
+                $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                    $query->where('rgd_status1', '=', '입고')->whereHas('co_no.co_parent',function($q) use ($user){
+                        $q->where('co_no', $user->co_no);
+                    });
+                })->orderBy('rgd_no', 'DESC');
+            }else if($user->mb_type == 'shipper'){
+                $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                    $query->where('rgd_status1', '=', '입고')->whereHas('co_no',function($q) use ($user){
+                        $q->where('co_no', $user->co_no);
+                    });
+                })->orderBy('rgd_no', 'DESC');
+            }else if($user->mb_type == 'spasys'){
+                $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                    $query->where('rgd_status1', '=', '입고')->whereHas('co_no.co_parent.co_parent',function($q) use ($user){
+                        $q->where('co_no', $user->co_no);
+                    });
+                })->orderBy('rgd_no', 'DESC');
+            }
+
 
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
@@ -504,14 +578,51 @@ class WarehousingController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) {
-                $query->where('w_type', '=', 'EW')->where('rgd_status1', '=', '출고')->where('rgd_status2', '=', '작업완료')->where(function ($q) {
-                    $q->where(function ($query) {
-                        $query->where('rgd_status4', '!=', '예상경비청구서')->where('rgd_status4', '!=', '확정청구서');
-                    })
-                        ->orWhereNull('rgd_status4');
-                });
-            })->orderBy('rgd_no', 'DESC');
+            $user = Auth::user();
+            if($user->mb_type == 'shop'){
+                $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                    $query->where('w_type', '=', 'EW')
+                    ->where('rgd_status1', '=', '출고')
+                    ->where('rgd_status2', '=', '작업완료')
+                    ->where(function ($q) {
+                        $q->where(function ($query) {
+                            $query->where('rgd_status4', '!=', '예상경비청구서')->where('rgd_status4', '!=', '확정청구서');
+                        })
+                            ->orWhereNull('rgd_status4');
+                    })->whereHas('co_no.co_parent', function ($q2) use ($user){
+                        $q2->where('co_no', $user->co_no);
+                    });
+                })->orderBy('rgd_no', 'DESC');
+            }else if ($user->mb_type == 'shipper'){
+                $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                    $query->where('w_type', '=', 'EW')
+                    ->where('rgd_status1', '=', '출고')
+                    ->where('rgd_status2', '=', '작업완료')
+                    ->where(function ($q) {
+                        $q->where(function ($query) {
+                            $query->where('rgd_status4', '!=', '예상경비청구서')->where('rgd_status4', '!=', '확정청구서');
+                        })
+                            ->orWhereNull('rgd_status4');
+                    })->whereHas('co_no', function ($q2) use ($user){
+                        $q2->where('co_no', $user->co_no);
+                    });
+                })->orderBy('rgd_no', 'DESC');
+            }else if($user->mb_type == 'spasys'){
+                $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                    $query->where('w_type', '=', 'EW')
+                    ->where('rgd_status1', '=', '출고')
+                    ->where('rgd_status2', '=', '작업완료')
+                    ->where(function ($q) {
+                        $q->where(function ($query) {
+                            $query->where('rgd_status4', '!=', '예상경비청구서')->where('rgd_status4', '!=', '확정청구서');
+                        })
+                            ->orWhereNull('rgd_status4');
+                    })->whereHas('co_no.co_parent.co_parent', function ($q2) use ($user){
+                        $q2->where('co_no', $user->co_no);
+                    });
+                })->orderBy('rgd_no', 'DESC');
+            }
+            
 
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
