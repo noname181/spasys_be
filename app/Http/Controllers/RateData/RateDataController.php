@@ -10,6 +10,7 @@ use App\Http\Requests\RateData\RateDataSendMailRequest;
 use App\Models\File;
 use App\Models\ReceivingGoodsDelivery;
 use App\Models\RateData;
+use App\Models\Warehousing;
 use App\Models\RateDataGeneral;
 use App\Models\RateMeta;
 use App\Models\RateMetaData;
@@ -757,12 +758,15 @@ class RateDataController extends Controller
 
             $w_no = $rgd->w_no;
 
+            $warehousing = Warehousing::with(['co_no'])->where('w_no', $w_no)->first();
+
             $rdg = RateDataGeneral::where('w_no', $w_no)->where('rdg_bill_type', $bill_type)->first();
 
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'rdg' => $rdg
+                'rdg' => $rdg,
+                'warehousing' => $warehousing
             ], 201);
         } catch (\Exception $e) {
             DB::rollback();
@@ -824,8 +828,10 @@ class RateDataController extends Controller
     public function registe_rate_data_general_final(Request $request) {
         try {
             DB::beginTransaction();
+            //Check is there already RateDataGeneral with rdg_no yet
             $is_new = RateDataGeneral::where('rdg_no',  $request->rdg_no)->where('rdg_bill_type', $request->bill_type)->first();
 
+            //Get RecevingGoodsDelivery base on rgd_no
             $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
             $w_no = $rgd->w_no;
 

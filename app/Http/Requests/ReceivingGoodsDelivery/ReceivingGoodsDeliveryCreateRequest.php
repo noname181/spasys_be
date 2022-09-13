@@ -27,6 +27,9 @@ class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
             'w_no' => [
                 '',
             ],
+            'w_no_select' => [
+                '',
+            ],
             'page_type' => [
                 '',
             ],

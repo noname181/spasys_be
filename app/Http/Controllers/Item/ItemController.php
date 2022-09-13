@@ -283,6 +283,11 @@ class ItemController extends Controller
                 $items->where('co_no',$validated['co_no']);
             }
 
+            if(isset($validated['w_no'])){
+                $warehousing = Warehousing::where('w_no',$validated['w_no'])->first();
+                $items->where('co_no',$warehousing->co_no);
+            }
+
            
 
             if (isset($validated['keyword']) ) {
@@ -314,6 +319,8 @@ class ItemController extends Controller
                     $query->whereIn(DB::raw('co_no'), $co_no);
                 });
             }
+
+            
 
             $items = $items->paginate($per_page, ['*'], 'page', $page);
             return response()->json([
@@ -463,11 +470,15 @@ class ItemController extends Controller
             $count_check = 0; 
             $item3 = collect($item2)->map(function ($q){
                 $item4 = Item::with(['warehousing_item'])->where('item_no', $q->item_no)->first();
+                if(isset($item4['warehousing_item']['wi_number'])){
                 return [ 'total_amount' => $item4['warehousing_item']['wi_number']];
+                }
             })->sum('total_amount');
             $item5 = collect($item2)->map(function ($q){
                 $item6 = Item::with(['warehousing_item'])->where('item_no', $q->item_no)->first();
+                if(isset($item6['warehousing_item']['wi_number'])){
                 return [ 'total_price' => $item6->item_price2 * $item6['warehousing_item']['wi_number']];
+                }
             })->sum('total_price');
 
 
