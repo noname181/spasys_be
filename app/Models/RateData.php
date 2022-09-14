@@ -46,5 +46,9 @@ class RateData extends Model
         'created_at' => "date:Y.m.d",
         'updated_at' => "date:Y.m.d",
     ];
-
+    
+    public function w_import_parent()
+    {
+        return $this->belongsTo(Warehousing::class, 'w_import_no', 'w_no');
+    }
 }
