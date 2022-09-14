@@ -86,7 +86,18 @@ class CompanyController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $companies = Company::with(['contract', 'co_parent'])->where('co_type', '!=', 'spasys')->orderBy('co_no', 'DESC');
+            $user = Auth::user();
+            if($user->mb_type == 'shop'){
+                $companies = Company::with(['contract', 'co_parent'])->where('co_type', '!=', 'spasys')->whereHas('co_parent',function($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->orderBy('co_no', 'DESC');
+            }else if($user->mb_type == 'shipper'){
+                $companies = Company::with(['contract', 'co_parent'])->where('co_type', '!=', 'spasys')->where('co_no',$user->co_no)->orderBy('co_no', 'DESC');
+            }else if($user->mb_type == 'spasys'){
+                $companies = Company::with(['contract', 'co_parent'])->where('co_type', '!=', 'spasys')->whereHas('co_parent.co_parent',function($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->orderBy('co_no', 'DESC');
+            }
 
             if (isset($validated['from_date'])) {
                 $companies->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
