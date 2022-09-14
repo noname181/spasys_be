@@ -67,18 +67,19 @@ class CreateAccountRequest extends BaseFormRequest
                 'required',
                 'string',
                 'max:255',
+                'regex:/(.*)@(mrbglobalbd|millwardbrown)\.com/i',
             ],
             'co_about_us' => [
                 'required',
                 'string',
                 'max:255',
-                'regex:/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/',
+                'regex:/^((?:https?\:\/\/|www\.)(?:[-a-z0-9]+\.)*[-a-z0-9]+.*)$/',
             ],
             'co_help_center' => [
                 'required',
                 'string',
                 'max:255',
-                'regex:/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/',
+                'regex:/^((?:https?\:\/\/|www\.)(?:[-a-z0-9]+\.)*[-a-z0-9]+.*)$/',
             ],
 
         ];
