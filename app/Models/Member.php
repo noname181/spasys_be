@@ -59,7 +59,9 @@ class Member extends Authenticatable
         'mb_email',
         'mb_pw',
         'mb_language',
-        'mb_hp'
+        'mb_hp',
+        'mb_tel',
+        'mb_note'
     ];
 
     protected $casts = [
