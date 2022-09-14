@@ -97,7 +97,7 @@ class WarehousingController extends Controller
                 })->orderBy('w_no', 'DESC');
             }else if($user->mb_type == 'spasys'){
                 $warehousing = Warehousing::with('mb_no')
-                ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])
+                ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent','warehousing_child'])
                 ->whereHas('co_no.co_parent.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->orderBy('w_no', 'DESC');
