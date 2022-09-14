@@ -84,6 +84,7 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('push')->name('push.')->group(function () {
         Route::get('/', \App\Http\Controllers\Push\PushController::class)->name('get_pushs');
+        Route::post('/getpush', [App\Http\Controllers\Push\PushController::class, 'searchPush'])->name('getPush');
         Route::get('/{push}', [App\Http\Controllers\Push\PushController::class, 'getPushDetail'])->name('get_push_detail');
         Route::post('/create', [App\Http\Controllers\Push\PushController::class, 'createPush'])->name('create');
         Route::patch('/update/{push}', [App\Http\Controllers\Push\PushController::class, 'updatePush'])->name('update');

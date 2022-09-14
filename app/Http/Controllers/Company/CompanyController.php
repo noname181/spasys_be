@@ -29,11 +29,11 @@ class CompanyController extends Controller
         try {
             DB::beginTransaction();
 
-            if(Auth::user()->mb_type == 'spasys'){
+            if (Auth::user()->mb_type == 'spasys') {
                 $co_type = 'shop';
-            }else if(Auth::user()->mb_type == 'shop'){
+            } else if (Auth::user()->mb_type == 'shop') {
                 $co_type = 'shipper';
-            }else {
+            } else {
                 $co_type = 'spasys';
             }
             $co_no = Company::insertGetId([
@@ -81,23 +81,38 @@ class CompanyController extends Controller
         try {
             DB::enableQueryLog();
             $validated = $request->validated();
+            $user = Auth::user();
 
             // If per_page is null set default data = 15
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $user = Auth::user();
-            if($user->mb_type == 'shop'){
-                $companies = Company::with(['contract', 'co_parent'])->where('co_type', '!=', 'spasys')->whereHas('co_parent',function($q) use ($user){
-                    $q->where('co_no', $user->co_no);
-                })->orderBy('co_no', 'DESC');
-            }else if($user->mb_type == 'shipper'){
-                $companies = Company::with(['contract', 'co_parent'])->where('co_type', '!=', 'spasys')->where('co_no',$user->co_no)->orderBy('co_no', 'DESC');
-            }else if($user->mb_type == 'spasys'){
-                $companies = Company::with(['contract', 'co_parent'])->where('co_type', '!=', 'spasys')->whereHas('co_parent.co_parent',function($q) use ($user){
-                    $q->where('co_no', $user->co_no);
-                })->orderBy('co_no', 'DESC');
-            }
+            $companies = Company::with(['contract', 'co_parent'])
+                ->where(function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no)
+                        ->orWhereHas('co_parent', function ($q) use ($user) {
+                            $q->where('co_no', $user->co_no)
+                                ->orWhereHas('co_parent', function ($q) use ($user) {
+                                    $q->where('co_no', $user->co_no);
+                                });
+                        });
+                })
+
+                ->where('co_type', '!=', 'spasys')
+                ->orderBy('co_no', 'DESC');
+
+            // $user = Auth::user();
+            // if($user->mb_type == 'shop'){
+            //     $companies = Company::with(['contract', 'co_parent'])->where('co_type', '!=', 'spasys')->whereHas('co_parent',function($q) use ($user){
+            //         $q->where('co_no', $user->co_no);
+            //     })->orderBy('co_no', 'DESC');
+            // }else if($user->mb_type == 'shipper'){
+            //     $companies = Company::with(['contract', 'co_parent'])->where('co_type', '!=', 'spasys')->where('co_no',$user->co_no)->orderBy('co_no', 'DESC');
+            // }else if($user->mb_type == 'spasys'){
+            //     $companies = Company::with(['contract', 'co_parent'])->where('co_type', '!=', 'spasys')->whereHas('co_parent.co_parent',function($q) use ($user){
+            //         $q->where('co_no', $user->co_no);
+            //     })->orderBy('co_no', 'DESC');
+            // }
 
             if (isset($validated['from_date'])) {
                 $companies->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
@@ -108,23 +123,23 @@ class CompanyController extends Controller
             }
 
             if (isset($validated['co_name'])) {
-                $companies->where(function($query) use ($validated) {
+                $companies->where(function ($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
                 });
             }
 
             if (isset($validated['co_service'])) {
-                $companies->where(function($query) use ($validated) {
+                $companies->where(function ($query) use ($validated) {
                     $query->where(DB::raw('lower(co_service)'), 'like', '%' . strtolower($validated['co_service']) . '%');
                 });
             }
             if (isset($validated['c_payment_cycle'])) {
-                $companies->whereHas('contract',function($query) use ($validated) {
+                $companies->whereHas('contract', function ($query) use ($validated) {
                     $query->where('c_payment_cycle', '=', $validated['c_payment_cycle']);
                 });
             }
             if (isset($validated['c_calculate_method1']) || isset($validated['c_calculate_method2']) || isset($validated['c_calculate_method3']) || isset($validated['c_calculate_method4'])) {
-                $companies->whereHas('contract',function($query) use ($validated) {
+                $companies->whereHas('contract', function ($query) use ($validated) {
                     $query->where('c_calculate_method', '=', $validated['c_calculate_method1']);
                     $query->orwhere('c_calculate_method', '=', $validated['c_calculate_method2']);
                     $query->orwhere('c_calculate_method', '=', $validated['c_calculate_method3']);
@@ -132,12 +147,12 @@ class CompanyController extends Controller
                 });
             }
             if (isset($validated['c_transaction_yn'])) {
-                $companies->whereHas('contract',function($query) use ($validated) {
+                $companies->whereHas('contract', function ($query) use ($validated) {
                     $query->where('c_transaction_yn', '=', $validated['c_transaction_yn']);
                 });
             }
             if (isset($validated['co_close_yn'])) {
-                $companies->where(function($query) use ($validated) {
+                $companies->where(function ($query) use ($validated) {
                     $query->orwhere('co_close_yn', '=', $validated['co_close_yn']);
                 });
             }
@@ -173,7 +188,7 @@ class CompanyController extends Controller
                 'company.co_etc',
                 // 'co_address.ca_address as co_address',
                 // 'co_address.ca_address_detail as co_address_detail',
-            // ])->join('co_address', 'co_address.co_no', 'company.co_no')
+                // ])->join('co_address', 'co_address.co_no', 'company.co_no')
             ])->where('company.co_no', $co_no)
                 // ->where('co_address.co_no', $co_no)
                 ->first();
@@ -247,7 +262,8 @@ class CompanyController extends Controller
         }
     }
 
-    public function  getShopCompanies (CompanySearchRequest $request){
+    public function  getShopCompanies(CompanySearchRequest $request)
+    {
         try {
             $validated = $request->validated();
             //DB::enableQueryLog();
@@ -256,10 +272,10 @@ class CompanyController extends Controller
             // If page is null set default data = 1
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : '';
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $companies = Company::with(['contract','co_parent'])->where('co_type', 'shop')->orderBy('co_no', 'DESC');
+            $companies = Company::with(['contract', 'co_parent'])->where('co_type', 'shop')->orderBy('co_no', 'DESC');
 
 
-            $companies->whereHas('co_parent', function($query) use ($co_no) {
+            $companies->whereHas('co_parent', function ($query) use ($co_no) {
                 $query->where('co_no', '=',  $co_no);
             });
 
@@ -273,14 +289,14 @@ class CompanyController extends Controller
             }
 
             if (isset($validated['co_name'])) {
-                $companies->where(function($query) use ($validated) {
+                $companies->where(function ($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
                 });
             }
 
 
             if (isset($validated['co_service'])) {
-                $companies->where(function($query) use ($validated) {
+                $companies->where(function ($query) use ($validated) {
                     $query->where(DB::raw('lower(co_service)'), 'like', '%' . strtolower($validated['co_service']) . '%');
                 });
             }
@@ -295,7 +311,8 @@ class CompanyController extends Controller
         }
     }
 
-    public function  getShipperCompanies (CompanySearchRequest $request){
+    public function  getShipperCompanies(CompanySearchRequest $request)
+    {
         try {
             $validated = $request->validated();
 
@@ -316,13 +333,13 @@ class CompanyController extends Controller
             }
 
             if (isset($validated['co_name_shop'])) {
-                $companies->where(function($query) use ($validated) {
+                $companies->where(function ($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name_shop']) . '%');
                 });
             }
 
             if (isset($validated['co_service'])) {
-                $companies->where(function($query) use ($validated) {
+                $companies->where(function ($query) use ($validated) {
                     $query->where(DB::raw('lower(co_service)'), 'like', '%' . strtolower($validated['co_service']) . '%');
                 });
             }
@@ -337,7 +354,8 @@ class CompanyController extends Controller
         }
     }
 
-    public function  getItemCompanies (CompanySearchRequest $request){
+    public function  getItemCompanies(CompanySearchRequest $request)
+    {
         try {
             $validated = $request->validated();
 
@@ -346,10 +364,10 @@ class CompanyController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
-            if($user->mb_type == 'shop')
+            if ($user->mb_type == 'shop')
                 $companies = Company::with('contract')->where('co_type', 'shipper')->where('co_parent_no', $user->co_no)->orderBy('co_no', 'DESC');
-            else if($user->mb_type == 'spasys')
-                $companies = Company::with('contract')->where('co_type', 'shipper')->whereHas('co_parent', function($q) use ($user) {
+            else if ($user->mb_type == 'spasys')
+                $companies = Company::with('contract')->where('co_type', 'shipper')->whereHas('co_parent', function ($q) use ($user) {
                     $q->where('co_parent_no', $user->co_no);
                 })->orderBy('co_no', 'DESC');
 
@@ -362,13 +380,13 @@ class CompanyController extends Controller
             }
 
             if (isset($validated['co_name_shop'])) {
-                $companies->where(function($query) use ($validated) {
+                $companies->where(function ($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name_shop']) . '%');
                 });
             }
 
             if (isset($validated['co_service'])) {
-                $companies->where(function($query) use ($validated) {
+                $companies->where(function ($query) use ($validated) {
                     $query->where(DB::raw('lower(co_service)'), 'like', '%' . strtolower($validated['co_service']) . '%');
                 });
             }

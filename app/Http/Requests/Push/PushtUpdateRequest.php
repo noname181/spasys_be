@@ -24,7 +24,7 @@ class PushtUpdateRequest extends BaseFormRequest
     public function rules()
     {
         return [
-            'menu_no' => [
+            'push_category' => [
                 'required',
                 'string',
             ],
