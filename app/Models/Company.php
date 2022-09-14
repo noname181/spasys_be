@@ -36,7 +36,11 @@ class Company extends Model
         'co_close_yn',
         'co_homepage',
         'co_email',
-        'co_etc'
+        'co_etc',
+        'co_operating_time',
+        'co_lunch_break',
+        'co_about_us',
+        'co_help_center',
     ];
 
     protected $casts = [

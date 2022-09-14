@@ -48,6 +48,39 @@ class CreateAccountRequest extends BaseFormRequest
                 'string',
                 'max:255',
             ],
+            'mb_tel' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'co_operating_time' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'co_lunch_break' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'co_email' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'co_about_us' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/',
+            ],
+            'co_help_center' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/',
+            ],
+
         ];
     }
 

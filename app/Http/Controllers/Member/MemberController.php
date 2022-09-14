@@ -293,6 +293,7 @@ class MemberController extends Controller
     {
         try {
             $validated = $request->validated();
+
             $roleNoOfUserLogin = Auth::user()->role_no;
             if ($roleNoOfUserLogin == Member::ROLE_ADMIN) {
                 $validated['mb_type'] = Member::SPASYS;
@@ -310,11 +311,28 @@ class MemberController extends Controller
                 'co_type' => Member::SPASYS,
                 'co_name' => $validated['mb_name'],
                 'co_etc' => $validated['mb_note'],
+                'co_operating_time' => $validated['co_operating_time'],
+                'co_lunch_break' => $validated['co_lunch_break'],
+                'co_email' => $validated['co_email'],
+                'co_about_us' => $validated['co_about_us'],
+                'co_help_center' => $validated['co_help_center'],
             ]);
 
             $validated['co_no'] = $com_no;
 
-            $mb_no = Member::insertGetId($validated);
+            $mb_no = Member::insertGetId([
+                'mb_name' => $validated['mb_name'],
+                'mb_pw' => $validated['mb_pw'],
+                'mb_tel' => $validated['mb_tel'],
+                'mb_id' => $validated['mb_id'],
+                'mb_note' => $validated['mb_note'],
+                'mb_type' => $validated['mb_type'],
+                'mb_parent' => $validated['mb_parent'],
+                'role_no' => $validated['role_no'],
+                'mb_language' => $validated['mb_language'],
+                'mb_token' => $validated['mb_token'],
+            ]);
+
 
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -323,6 +341,7 @@ class MemberController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
