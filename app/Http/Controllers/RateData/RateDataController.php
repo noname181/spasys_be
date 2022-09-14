@@ -1093,14 +1093,19 @@ class RateDataController extends Controller
     public function monthly_bill_list($rgd_no, $bill_type) {
         try {
             DB::beginTransaction();
-            $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
+            $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd_no)->first();
+            $co_no = $rgd->warehousing->co_no;
 
             $updated_at = Carbon::createFromFormat('Y.m.d H:i:s',  $rgd->updated_at->format('Y.m.d H:i:s'));
 
             $start_date = $updated_at->startOfMonth()->toDateString();
             $end_date = $updated_at->endOfMonth()->toDateString();
 
-            $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general'])->where('updated_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
+            $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general'])
+            ->whereHas('w_no', function($q) use($co_no){
+                $q->where('co_no', $co_no);
+            })
+            ->where('updated_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
             ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
             ->where('rgd_status1', '=', '출고')
             ->where('rgd_status2', '=', '작업완료')

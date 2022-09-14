@@ -277,24 +277,7 @@ class MemberController extends Controller
         $member['co_no'] = $validated['co_no'];
         $member['role_no'] = $validated['role_no'];
 
-        $roleNoOfUserLogin = Auth::user()->role_no;
-        if ($roleNoOfUserLogin == Member::ROLE_ADMIN) {
-            $validated['mb_type'] = Member::SPASYS;
-            $validated['mb_parent'] = Member::ADMIN;
-        } else if ($roleNoOfUserLogin == Member::ROLE_SPASYS_ADMIN) {
-            $validated['mb_type'] = Member::SHOP;
-            $validated['mb_parent'] = Member::SPASYS;
-        }
-
         $member->save();
-
-        if ($member->role_no == Member::ROLE_SPASYS_MANAGER || $member->role_no == Member::ROLE_SHOP_MANAGER) {
-            $member->role_no = '관리자';
-        } else if ($member->role_no == Member::ROLE_SPASYS_OPERATOR || $member->role_no == Member::ROLE_SHOP_OPERATOR) {
-            $member->role_no = '운영자';
-        } else if ($member->role_no == Member::ROLE_SPASYS_WORKER) {
-            $member->role_no = '작업자';
-        }
 
         return response()->json([
             'message' => Messages::MSG_0007,

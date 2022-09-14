@@ -95,14 +95,27 @@ class ReceivingGoodsDeliveryController extends Controller
 
             $w_no = isset($validated['w_no']) ? $validated['w_no'] : $w_no_data;
 
+            
+
             if(!isset($validate['w_schedule_number'])){
                 $w_schedule_number = (new CommonFunc)->generate_w_schedule_number($w_no,'IW');
+                if(isset($validated['page_type']) && $validated['page_type'] == 'Page130146'){
+                    $w_schedule_number2 = (new CommonFunc)->generate_w_schedule_number($w_no,'IWC');
+                }
             }
 
 
             Warehousing::where('w_no', $w_no)->update([
                 'w_schedule_number' =>  $w_schedule_number
             ]);
+
+            if(isset($validated['page_type']) && $validated['page_type'] == 'Page130146'){
+                Warehousing::where('w_no', $w_no)->update([
+                    'w_schedule_number2' =>  $w_schedule_number2,
+
+                ]);
+            }
+
 
             foreach ($validated['location'] as $rgd) {
 
@@ -174,7 +187,7 @@ class ReceivingGoodsDeliveryController extends Controller
             if(isset($validated['w_no'])){
                 foreach ($validated['items'] as $warehousing_item) {
                     if(isset($validated['page_type']) && $validated['page_type'] == 'Page130146'){
-                        $checkexit1 = WarehousingItem::where('item_no', $warehousing_item['item_no'])->where('w_no', $validated['w_no'])->where('wi_type', '입고_shipper')->first();
+                        $checkexit1 = WarehousingItem::where('item_no', $warehousing_item['item_no'])->where('w_no', $validated['w_no'])->where('wi_type', '입고_spasys')->first();
                         if(!isset($checkexit1->wi_no)){
                             WarehousingItem::insert([
                                 'item_no' => $warehousing_item['item_no'],
@@ -338,9 +351,17 @@ class ReceivingGoodsDeliveryController extends Controller
                         'w_category_name' => $request->w_category_name,
                         //'co_no' => $co_no
                     ]);
+
                     Warehousing::where('w_no', $request->w_no)->update([
                         'w_schedule_number' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EW')
                     ]);
+
+                    if(isset($request->page_type) && $request->page_type == 'Page130146'){
+                        Warehousing::where('w_no', $request->w_no)->update([
+                            'w_schedule_number2' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EWC')
+                        ]);
+                    }
+
                     if($request->wr_contents){
                         WarehousingRequest::where('w_no', $request->w_no)->update([
                             'mb_no' => $member->mb_no,
@@ -415,11 +436,23 @@ class ReceivingGoodsDeliveryController extends Controller
                             //'w_amount' => $data['w_amount'],
                             'w_type' => 'EW',
                             'w_category_name' => $request->w_category_name,
-                            'co_no' => $co_no
+                            'co_no' => $warehousing_data->co_no
                         ]);
+
+                        Warehousing::where('w_no', $data['w_import_no'])->update([
+                            'w_children_yn' => "y"
+                        ]);
+
                         Warehousing::where('w_no', $w_no)->update([
                             'w_schedule_number' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EW')
                         ]);
+
+                        if(isset($request->page_type) && $request->page_type == 'Page130146'){
+                            Warehousing::where('w_no', $request->w_no)->update([
+                                'w_schedule_number2' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EWC')
+                            ]);
+                        }
+
                         if($request->wr_contents){
                             WarehousingRequest::insert([
                                 'w_no' => $w_no,
@@ -487,9 +520,17 @@ class ReceivingGoodsDeliveryController extends Controller
                             'w_category_name' => $request->w_category_name,
                             //'co_no' => $co_no
                         ]);
+                        Warehousing::where('w_no', $warehousing_data->w_import_no)->update([
+                            'w_children_yn' => "y"
+                        ]);
                         Warehousing::where('w_no', $w_no)->update([
                             'w_schedule_number' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EW')
                         ]);
+                        if(isset($request->page_type) && $request->page_type == 'Page130146'){
+                            Warehousing::where('w_no', $request->w_no)->update([
+                                'w_schedule_number2' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EWC')
+                            ]);
+                        }
                         if($request->wr_contents){
                             WarehousingRequest::where('w_no', $request->w_no)->update([
                                 'mb_no' => $member->mb_no,
@@ -560,6 +601,12 @@ class ReceivingGoodsDeliveryController extends Controller
                         Warehousing::where('w_no', $w_no)->update([
                             'w_schedule_number' =>   CommonFunc::generate_w_schedule_number($w_no,'EW')
                         ]);
+
+                        if(isset($request->page_type) && $request->page_type == 'Page130146'){
+                            Warehousing::where('w_no', $request->w_no)->update([
+                                'w_schedule_number2' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EWC')
+                            ]);
+                        }
 
                         if($request->wr_contents){
                             WarehousingRequest::insert([
