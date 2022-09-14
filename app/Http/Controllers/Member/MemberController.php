@@ -243,6 +243,7 @@ class MemberController extends Controller
     {
         try {
             $validated = $request->validated();
+            
             $member = Member::where('mb_no', Auth::user()->mb_no)->first();
             $member['mb_email'] = $validated['mb_email'];
             $member['mb_tel'] = $validated['mb_tel'];
@@ -368,11 +369,16 @@ class MemberController extends Controller
             $memeber->mb_name = $validated['mb_name'];
             $memeber->mb_id = $validated['mb_id'];
             $memeber->mb_note = $validated['mb_note'];
+            $memeber->mb_tel = $validated['mb_tel'];
+            $memeber->mb_id = $validated['mb_id'];
             $memeber->save();
 
             Company::where('co_no', $memeber->co_no)->update([
-                'co_name' => $memeber->mb_name,
-                'co_etc' => $memeber->mb_note,
+                'co_operating_time' => $validated['mb_name'],
+                'co_lunch_break' => $validated['co_lunch_break'],
+                'co_email' => $validated['co_email'],
+                'co_about_us' => $validated['co_about_us'],
+                'co_help_center' => $validated['co_help_center'],
             ]);
 
             DB::commit();
