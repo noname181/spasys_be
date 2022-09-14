@@ -32,6 +32,26 @@ class ContractUpdateRequest extends BaseFormRequest
                 'required',
                 'string',
             ],
+            'service_no' => [
+                'required',
+                'array',
+            ],
+            'c_payment_cycle' => [
+                'required',
+                'array',
+            ],
+            'c_money_type' => [
+                'required',
+                'array',
+            ],
+            'c_system' => [
+                'required',
+                'array',
+            ],
+            'c_payment_group' => [
+                'required',
+                'array',
+            ],
             'c_start_date' => [
                 'required',
                 'date_format:Y-m-d'
@@ -45,21 +65,7 @@ class ContractUpdateRequest extends BaseFormRequest
                 'string',
                 'max:1'
             ],
-            'c_payment_cycle' => [
-                'required',
-                'string',
-                'max:255'
-            ],
-            'c_money_type' => [
-                'required',
-                'string',
-                'max:255'
-            ],
-            'c_payment_group' => [
-                'required',
-                'string',
-                'max:255'
-            ],
+
             'c_calculate_deadline_yn' => [
                 'required',
                 'string',

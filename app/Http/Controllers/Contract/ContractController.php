@@ -8,6 +8,7 @@ use App\Http\Requests\Contract\ContractUpdateController\ContractUpdateRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Contract;
 use App\Models\Company;
+use App\Models\CompanySettlement;
 use App\Models\Service;
 use App\Utils\Messages;
 use Illuminate\Http\Client\Request;
@@ -46,9 +47,6 @@ class ContractController extends Controller
                 'c_start_date' => DateTime::createFromFormat('Y-m-d', $validated['c_start_date']),
                 'c_end_date' => DateTime::createFromFormat('Y-m-d', $validated['c_end_date']),
                 'c_transaction_yn' => $validated['c_transaction_yn'],
-                'c_payment_cycle' => $validated['c_payment_cycle'],
-                'c_money_type' => $validated['c_money_type'],
-                'c_payment_group' => $validated['c_payment_group'],
                 'c_calculate_deadline_yn' => $validated['c_calculate_deadline_yn'],
                 'c_integrated_calculate_yn' => $validated['c_integrated_calculate_yn'],
                 'c_calculate_method' => $validated['c_calculate_method'],
@@ -67,6 +65,25 @@ class ContractController extends Controller
                 'c_deposit_return_expiry_date' => DateTime::createFromFormat('Y-m-d', $validated['c_deposit_return_expiry_date']),
             ]);
             $company = Company::where('co_no', $co_no)->update(['co_service' => $validated['co_service']]);
+
+            $i = 0;
+            foreach($validated['service_no'] as $co_settlement){
+
+                CompanySettlement::updateOrCreate(
+                    [
+                        'co_no' => $co_no,
+                        'service_no' => $validated['service_no'][$i],
+                    ],
+                    [
+                        'cs_payment_cycle' => $validated['c_payment_cycle'][$i],
+                        'cs_money_type' => $validated['c_money_type'][$i],
+                        'cs_payment_group' => $validated['c_payment_group'][$i],
+                        'cs_system' => $validated['c_system'][$i],
+                    ]
+                );
+                $i++;
+            }
+
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -85,13 +102,17 @@ class ContractController extends Controller
         try {
             $co_service = Company::where('co_no', $co_no)->first()->co_service;
             $contract = Contract::where(['co_no' => $co_no])->first();
+            $company_settlement = CompanySettleMent::where(['co_no' => $co_no])
+            ->leftJoin('service', 'service.service_no', '=', 'company_settlement.service_no')
+            ->get();
 
             $services = Service::where('service_use_yn', 'y')->where('service_no', '!=', 1)->get();
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'contract' => $contract,
                 'services' => $services,
-                'co_service' => $co_service
+                'co_service' => $co_service,
+                'company_settlement' => $company_settlement
             ]);
         } catch (\Exception $e) {
             Log::error($e);
@@ -138,9 +159,7 @@ class ContractController extends Controller
                 'c_start_date' => DateTime::createFromFormat('Y-m-d', $validated['c_start_date']),
                 'c_end_date' => DateTime::createFromFormat('Y-m-d', $validated['c_end_date']),
                 'c_transaction_yn' => $validated['c_transaction_yn'],
-                'c_payment_cycle' => $validated['c_payment_cycle'],
-                'c_money_type' => $validated['c_money_type'],
-                'c_payment_group' => $validated['c_payment_group'],
+
                 'c_calculate_deadline_yn' => $validated['c_calculate_deadline_yn'],
                 'c_integrated_calculate_yn' => $validated['c_integrated_calculate_yn'],
                 'c_calculate_method' => $validated['c_calculate_method'],
@@ -164,6 +183,23 @@ class ContractController extends Controller
                 'co_service' => $validated['co_service'],
                 'co_settlement_cycle' => $validated['c_payment_cycle'],
             ]);
+            $i = 0;
+            foreach($validated['service_no'] as $service_no){
+
+                CompanySettlement::updateOrCreate(
+                    [
+                        'co_no' => $co_no,
+                        'service_no' => $validated['service_no'][$i],
+                    ],
+                    [
+                        'cs_payment_cycle' => $validated['c_payment_cycle'][$i],
+                        'cs_money_type' => $validated['c_money_type'][$i],
+                        'cs_payment_group' => $validated['c_payment_group'][$i],
+                        'cs_system' => $validated['c_system'][$i],
+                    ]
+                );
+                $i++;
+            }
 
             DB::commit();
             return response()->json([
