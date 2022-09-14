@@ -41,6 +41,7 @@ class CompanyController extends Controller
                 'co_parent_no' => Auth::user()->co_no,
                 'co_name' => $validated['co_name'],
                 'co_address' => $validated['co_address'],
+                'co_zipcode' => $validated['co_zipcode'],
                 'co_address_detail' => $validated['co_address_detail'],
                 'co_country' => $validated['co_country'],
                 'co_service' => $validated['co_service'],
@@ -230,6 +231,7 @@ class CompanyController extends Controller
                 ->update([
                     'co_name' => $validated['co_name'],
                     'co_address' => $validated['co_address'],
+                    'co_zipcode' => $validated['co_zipcode'],
                     'co_address_detail' => $validated['co_address_detail'],
                     'co_country' => $validated['co_country'],
                     'co_service' => $validated['co_service'],

@@ -27,6 +27,7 @@ class Company extends Model
         'mb_no',
         'co_name',
         'co_address',
+        'co_zipcode',
         'co_address_detail',
         'co_post_number',
         'co_country',
