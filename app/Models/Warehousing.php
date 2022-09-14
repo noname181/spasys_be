@@ -75,6 +75,11 @@ class Warehousing extends Model
         return $this->belongsTo(Warehousing::class, 'w_import_no', 'w_no');
     }
 
+    public function warehousing_child()
+    {
+        return $this->hasMany(Warehousing::class, 'w_import_no');
+    }
+
     public function warehousing_request()
     {
         return $this->hasOne(WarehousingRequest::class, 'w_no', 'w_no');
