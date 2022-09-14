@@ -61,4 +61,9 @@ class Qna extends Model
     {
         return $this->hasMany(Qna::class, 'answer_for', 'qna_no');
     }
+    public function member()
+    {
+        return $this->belongsTo(Member::class, 'mb_no', 'mb_no')->with('company');
+    }
+
 }

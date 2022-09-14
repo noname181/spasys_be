@@ -35,7 +35,7 @@ class QnaController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $qna = Qna::with('mb_no_target')->with('mb_no')->with('files')->paginate($per_page, ['*'], 'page', $page);
+            $qna = Qna::with('mb_no_target')->with('mb_no')->with('member')->with('files')->paginate($per_page, ['*'], 'page', $page);
 
             return response()->json($qna);
         } catch (\Exception $e) {
@@ -260,7 +260,10 @@ class QnaController extends Controller
                     $query->select(['mb_name','mb_no']);
                 }]);
 
-            }])->orderBy('qna_no', 'DESC')->where('depth_level', '=', '0');
+            }])->with(['member' => function($query){
+
+            }])
+            ->orderBy('qna_no', 'DESC')->where('depth_level', '=', '0');
 
             if (isset($validated['from_date'])) {
                 $qna->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
