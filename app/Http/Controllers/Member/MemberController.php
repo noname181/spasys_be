@@ -147,6 +147,7 @@ class MemberController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -321,6 +322,7 @@ class MemberController extends Controller
             $validated['co_no'] = $com_no;
 
             $mb_no = Member::insertGetId([
+                'co_no' =>  $validated['co_no'],
                 'mb_name' => $validated['mb_name'],
                 'mb_pw' => $validated['mb_pw'],
                 'mb_tel' => $validated['mb_tel'],
