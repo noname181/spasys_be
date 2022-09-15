@@ -471,21 +471,21 @@ class ItemController extends Controller
             $item3 = collect($item2)->map(function ($q){
                 $item4 = Item::with(['warehousing_item'])->where('item_no', $q->item_no)->first();
                 if(isset($item4['warehousing_item']['wi_number'])){
-                return [ 'total_amount' => $item4['warehousing_item']['wi_number']];
+                return [ 'total_amount' => $item4['warehousing_item']['wi_number'] ,  'total_price' => $item4->item_price2 * $item4['warehousing_item']['wi_number']];
                 }
-            })->sum('total_amount');
-            $item5 = collect($item2)->map(function ($q){
-                $item6 = Item::with(['warehousing_item'])->where('item_no', $q->item_no)->first();
-                if(isset($item6['warehousing_item']['wi_number'])){
-                return [ 'total_price' => $item6->item_price2 * $item6['warehousing_item']['wi_number']];
-                }
-            })->sum('total_price');
+            });
+            $item5 = $item3->sum('total_amount');
+            $item6 = $item3->sum('total_price');
+
+
+
+           
 
 
             $item = $item->paginate($per_page, ['*'], 'page', $page);
             
            
-            $custom = collect(['sum1' => $item3,'sum2'=>$item5]);
+            $custom = collect(['sum1' => $item5,'sum2'=>$item6]);
 
             //
 
@@ -521,11 +521,11 @@ class ItemController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
             if($user->mb_type == 'shop'){
-                $item = Item::with(['file', 'company','item_channels'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('company.co_parent',function($q) use ($user){
+                $item = Item::with(['file', 'company','item_channels','item_info'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('company.co_parent',function($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->orderBy('item_no', 'DESC');
             }else if ($user->mb_type == 'shipper'){
-                $item = Item::with(['file', 'company','item_channels'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('company',function($q) use ($user){
+                $item = Item::with(['file', 'company','item_channels','item_info'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('company',function($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->orderBy('item_no', 'DESC');
             }else if($user->mb_type == 'spasys'){
@@ -580,9 +580,40 @@ class ItemController extends Controller
                     $query->where(DB::raw('lower(item_channel_name)'), 'like','%'. strtolower($validated['item_channel_name']) .'%');
                 });
             }
+            $item2 = $item->get();
+            $count_check = 0;
+            $item3 = collect($item2)->map(function ($q){
+                $item4 = Item::with(['item_info'])->where('item_no', $q->item_no)->first();
+                if(isset($item4['item_info']['stock'])){
+                return [ 'total_amount' => $item4['item_info']['stock']];
+                }
+            })->sum('total_amount');
+            $item5 = collect($item2)->map(function ($q){
+                $item6 = Item::with(['item_info'])->where('item_no', $q->item_no)->first();
+                if(isset($item6['item_info']['stock'])){
+                return [ 'total_price' => $item6->item_price2 * $item6['item_info']['stock']];
+                }
+            })->sum('total_price');
+
+
             $item = $item->paginate($per_page, ['*'], 'page', $page);
+
+            $custom = collect(['sum1' => $item3,'sum2'=>$item5]);
+
             //return DB::getQueryLog();
-            return response()->json($item);
+            $item->setCollection(
+                $item->getCollection()->map(function ($q){
+                    $item = Item::with(['item_info'])->where('item_no', $q->item_no)->first();
+                    if(isset($item['item_info']['stock'])){
+                        $q->total_price_row = $item->item_price2 * $item['item_info']['stock'];
+                    }
+                    return $q;
+                })
+            );
+
+            $data = $custom->merge($item);
+
+            return response()->json($data);
         } catch (\Exception $e) {
             Log::error($e);
             return $e;
