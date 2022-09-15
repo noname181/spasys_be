@@ -41,6 +41,7 @@ class Company extends Model
         'co_operating_time',
         'co_lunch_break',
         'co_about_us',
+        'co_policy',
         'co_help_center',
     ];
 
