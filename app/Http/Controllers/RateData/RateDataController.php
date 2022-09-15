@@ -326,7 +326,23 @@ class RateDataController extends Controller
     {
         try {
             $rate_data = RateData::where('rmd_no', $rmd_no)->where('rd_cate_meta1', '유통가공')->get();
-            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data], 200);
+            $w_no = $rate_data[0]->w_no;
+            $warehousing = Warehousing::with(['co_no', 'w_import_parent'])->where('w_no', $w_no)->first();
+            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data,'warehousing'=>$warehousing], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+    public function get_set_data2($bill_type,$rmd_no)
+    {
+        try {
+            $rate_data = RateData::where('rmd_no', $rmd_no)->where('rd_cate_meta1', '유통가공')->get();
+            $w_no = $rate_data[0]->w_no;
+            $warehousing = Warehousing::with(['co_no', 'w_import_parent'])->where('w_no', $w_no)->first();
+            $rdg = RateDataGeneral::where('w_no', $w_no)->where('rdg_bill_type', $bill_type)->first();
+            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data,'rdg'=>$rdg,'warehousing'=>$warehousing], 200);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
@@ -766,7 +782,8 @@ class RateDataController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'rdg' => $rdg,
-                'warehousing' => $warehousing
+                'warehousing' => $warehousing,
+                'rgd' => $rgd,
             ], 201);
         } catch (\Exception $e) {
             DB::rollback();
@@ -1147,7 +1164,7 @@ class RateDataController extends Controller
         try {
             DB::beginTransaction();
 
-            foreach($request->rgds as $rgd){
+            foreach($request->rgds as $key=>$rgd){
                 $is_exist = RateDataGeneral::where('w_no',$rgd['w_no']['w_no'])->where('rdg_bill_type', 'final_monthly')->first();
                 if(!$is_exist){
                     $is_exist = RateDataGeneral::where('w_no', $rgd['w_no']['w_no'])->where('rdg_bill_type', 'expectation_monthly')->first();

@@ -302,7 +302,6 @@ class MemberController extends Controller
 
             $validated['mb_token'] = '';
             $validated['mb_pw'] = Hash::make($validated['mb_pw']);
-
             $com_no = Company::insertGetId([
                 'mb_no' => Auth::user()->mb_no,
                 'co_type' => Member::SPASYS,
@@ -312,6 +311,7 @@ class MemberController extends Controller
                 'co_lunch_break' => $validated['co_lunch_break'],
                 'co_email' => $validated['co_email'],
                 'co_about_us' => $validated['co_about_us'],
+                 'co_policy' => $validated['co_policy'],
                 'co_help_center' => $validated['co_help_center'],
             ]);
 
@@ -374,6 +374,7 @@ class MemberController extends Controller
                 'co_email' => $validated['co_email'],
                 'co_about_us' => $validated['co_about_us'],
                 'co_help_center' => $validated['co_help_center'],
+                'co_policy' => $validated['co_policy'],
             ]);
 
             DB::commit();
