@@ -33,8 +33,6 @@ class InvokeRequest extends BaseFormRequest
                 'unique:member,mb_id'
             ],
             'co_no' => [
-                'required',
-                'integer',
             ],
             // FIXME hard set role_no = 1
             // 'role_no' => [

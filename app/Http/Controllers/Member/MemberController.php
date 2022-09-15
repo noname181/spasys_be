@@ -37,31 +37,24 @@ class MemberController extends Controller
 
             $validated['mb_language'] = 'ko';
 
-            if ($roleNoOfUserLogin == Member::ROLE_ADMIN) {
+            if ($roleNoOfUserLogin == Member::ROLE_ADMIN || ($roleNoOfUserLogin == Member::ROLE_SPASYS_ADMIN && empty($validated['co_no']))) {
                 $validated['mb_type'] = Member::SPASYS;
                 $validated['mb_parent'] = Member::ADMIN;
             } else if ($roleNoOfUserLogin == Member::ROLE_SPASYS_ADMIN) {
                 $validated['mb_type'] = Member::SHOP;
                 $validated['mb_parent'] = Member::SPASYS;
-                if ($validated['role_no'] == "관리자") {
-                    $validated['role_no'] = Member::ROLE_SHOP_MANAGER;
-                } else {
-                    $validated['role_no'] = Member::ROLE_SHOP_OPERATOR;
-                }
+
             } else if ($roleNoOfUserLogin == Member::ROLE_SHOP_MANAGER) {
                 $validated['mb_type'] = Member::SHIPPER;
                 $validated['mb_parent'] = Member::SHOP;
-                if ($validated['role_no'] == "관리자") {
-                    $validated['role_no'] = Member::ROLE_SHOP_MANAGER;
-                } else {
-                    $validated['role_no'] = Member::ROLE_SHOP_OPERATOR;
-                }
-            } else {
-                $validated['role_no'] = 0;
             }
 
             $validated['mb_token'] = '';
             $validated['mb_pw'] = Hash::make($validated['mb_pw']);
+
+            if(empty($validated['co_no'])){
+                $validated['co_no'] = Auth::user()->co_no;
+            }
 
             $mb_no = Member::insertGetId($validated);
 
@@ -71,6 +64,7 @@ class MemberController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -132,7 +126,7 @@ class MemberController extends Controller
             $member = Member::with('company')->where('mb_no', $mb_no)->first();
 
             if ($member->company->co_type == 'spasys') {
-                $services = Service::where('service_use_yn', 'y')->get();
+                $services = Service::where('service_use_yn', 'y')->where('service_no', '!=', 1)->get();
             } else {
                 $co_service_array = explode(" ", $member->company->co_service);
                 $services = Service::whereIN("service_name", $co_service_array)->get();
@@ -243,7 +237,7 @@ class MemberController extends Controller
     {
         try {
             $validated = $request->validated();
-            
+
             $member = Member::where('mb_no', Auth::user()->mb_no)->first();
             $member['mb_email'] = $validated['mb_email'];
             $member['mb_tel'] = $validated['mb_tel'];
@@ -275,6 +269,7 @@ class MemberController extends Controller
         $member['mb_tel'] = $validated['mb_tel'];
         $member['mb_hp'] = $validated['mb_hp'];
         $member['mb_push_yn'] = $validated['mb_push_yn'];
+        $member['mb_use_yn'] = $validated['mb_use_yn'];
         $member['mb_service_no_array'] = $validated['mb_service_no_array'];
         $member['co_no'] = $validated['co_no'];
         $member['role_no'] = $validated['role_no'];

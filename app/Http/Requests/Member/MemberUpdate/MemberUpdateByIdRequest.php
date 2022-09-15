@@ -66,6 +66,11 @@ class MemberUpdateByIdRequest extends BaseFormRequest
                 'string',
                 'max:1'
             ],
+            'mb_use_yn' => [
+                'required',
+                'string',
+                'max:1'
+            ],
             'mb_service_no_array' => [
                 'required',
                 'string'

@@ -81,7 +81,7 @@ class ServiceController extends Controller
         try {
             $company = Company::where('co_no', $co_no)->first();
             if($company->co_type == 'spasys'){
-                $services = Service::where('service_use_yn', 'y')->get();
+                $services = Service::where('service_use_yn', 'y')->where('service_no', '!=', 1)->get();
             }else {
                 $co_service_array = explode(" ", $company->co_service);
                 $services = Service::whereIN("service_name", $co_service_array)->get();
@@ -147,7 +147,7 @@ class ServiceController extends Controller
     public function getActiveServices()
     {
         try {
-            $services = Service::where('service_use_yn', 'y')->get();
+            $services = Service::where('service_use_yn', 'y')->where('service_no', '!=', 1)->get();
 
             return response()->json([
                 'message' => Messages::MSG_0007,
