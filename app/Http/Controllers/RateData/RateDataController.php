@@ -1162,7 +1162,7 @@ class RateDataController extends Controller
         try {
             DB::beginTransaction();
 
-            foreach($request->rgds as $rgd){
+            foreach($request->rgds as $key=>$rgd){
                 $is_exist = RateDataGeneral::where('w_no',$rgd['w_no']['w_no'])->where('rdg_bill_type', 'final_monthly')->first();
                 if(!$is_exist){
                     $is_exist = RateDataGeneral::where('w_no', $rgd['w_no']['w_no'])->where('rdg_bill_type', 'expectation_monthly')->first();
