@@ -328,6 +328,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/set_data_final',[\App\Http\Controllers\RateData\RateDataController::class, 'register_set_data_final'])->name('registe_set_data_final');
         Route::post('/set_data_additional',[\App\Http\Controllers\RateData\RateDataController::class, 'register_set_data_final'])->name('registe_set_data_additional');
         Route::get('/get_set_data/{rmd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_set_data'])->name('get_set_data');
+        Route::get('/get_set_data2/{bill_type}/{rmd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_set_data2'])->name('get_set_data2');
         Route::get('/get_rmd_no/{w_no}/{set_type}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_rmd_no'])->name('get_rmd_no');
 
         Route::get('/{rm_no}/{rmd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateData'])->name('get_rate_data');
