@@ -8,6 +8,8 @@ use App\Http\Requests\Warehousing\WarehousingSearchRequest;
 use App\Models\Member;
 use App\Models\ReceivingGoodsDelivery;
 use App\Models\Warehousing;
+use App\Models\RateData;
+use App\Models\RateDataGeneral;
 use App\Utils\Messages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
@@ -832,10 +834,13 @@ class WarehousingController extends Controller
 
             }
 
+            $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
 
             return response()->json(
                 ['message' => Messages::MSG_0007,
                     'data' => isset($warehousing) ? $warehousing : $rgds,
+                    'rgd'  => $rgd,
+                    'rdg'  => $rdg,
                     'time' => isset($time) ? $time : '',
                 ], 200);
 
