@@ -64,7 +64,27 @@ class AlarmController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $alarm = Alarm::with('item','warehousing_item','member')->orderBy('alarm_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
+            $alarm = Alarm::with('item','warehousing_item','member')->orderBy('alarm_no', 'DESC');
+
+            if (isset($validated['from_date'])) {
+                $alarm->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            }
+
+            if (isset($validated['to_date'])) {
+                $alarm->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            }
+            if (isset($validated['co_parent_name'])) {
+                $alarm->whereHas('member.company.co_parent', function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                });
+            }
+            if (isset($validated['co_name'])) {
+                $alarm->whereHas('member.company', function ($q) use ($validated) {
+                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                });
+            }
+            $alarm = $alarm->paginate($per_page, ['*'], 'page', $page);
+
             return response()->json($alarm);
         } catch (\Exception $e) {
             Log::error($e);
