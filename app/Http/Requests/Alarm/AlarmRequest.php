@@ -25,7 +25,7 @@ class AlarmRequest extends BaseFormRequest
     {
         return [
             // FIXME hard set
-            // 'item_no' => [
+            // 'w_no' => [
             //     'required',
             //     'integer',
             // ],
