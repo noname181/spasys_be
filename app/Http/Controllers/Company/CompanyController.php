@@ -178,6 +178,7 @@ class CompanyController extends Controller
                 'company.mb_no',
                 'company.co_name',
                 'company.co_address',
+                'company.co_zipcode',
                 'company.co_address_detail',
                 'company.co_country',
                 'company.co_service',

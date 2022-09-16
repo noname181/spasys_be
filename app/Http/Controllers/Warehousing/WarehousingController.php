@@ -8,6 +8,8 @@ use App\Http\Requests\Warehousing\WarehousingSearchRequest;
 use App\Models\Member;
 use App\Models\ReceivingGoodsDelivery;
 use App\Models\Warehousing;
+use App\Models\RateData;
+use App\Models\RateDataGeneral;
 use App\Utils\Messages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
@@ -832,10 +834,13 @@ class WarehousingController extends Controller
 
             }
 
+            $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
 
             return response()->json(
                 ['message' => Messages::MSG_0007,
                     'data' => isset($warehousing) ? $warehousing : $rgds,
+                    'rgd'  => $rgd,
+                    'rdg'  => $rdg,
                     'time' => isset($time) ? $time : '',
                 ], 200);
 
@@ -860,12 +865,22 @@ class WarehousingController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->with(['rate_data_general'])->whereHas('w_no', function ($query) {
-                $query->where('w_type', '=', 'EW')->where('rgd_status1', '=', '출고')->where('rgd_status2', '=', '작업완료')->where(function ($q) {
+            $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])
+            ->where('rgd_status1', '=', '출고')
+            ->where('rgd_status2', '=', '작업완료')
+            ->whereHas('w_no', function ($query) {
+                $query->where('w_type', '=', 'EW')->where(function ($q) {
                     $q->where(function ($query) {
-                        $query->where('rgd_status4', '!=', '예상경비청구서')->where('rgd_status4', '!=', '확정청구서');
+                        $query->where('rgd_status4', '!=', '예상경비청구서')
+                        ->where('rgd_status4', '!=', '확정청구서');
                     })
                         ->orWhereNull('rgd_status4');
+                })
+                ->where('w_category_name', '=', '유통가공');
+            })
+            ->whereHas('mb_no', function ($q) {
+                $q->whereHas('company', function ($q) {
+                    $q->where('co_type', 'spasys');
                 });
             });
 
@@ -933,7 +948,7 @@ class WarehousingController extends Controller
                         ->orWhere('rgd_status3', '=', $validated['rgd_status3_3'] ? $validated['rgd_status3_3'] : "");
                 });
             }
-
+            $warehousing->orderBy('updated_at', 'DESC');
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             //return DB::getQueryLog();
 
