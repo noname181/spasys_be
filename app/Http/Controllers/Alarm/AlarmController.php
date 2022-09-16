@@ -27,7 +27,7 @@ class AlarmController extends Controller
             if (!isset($alarm_no)) {
                 $alarm_no = Alarm::insertGetId([
                     'mb_no' => Auth::user()->mb_no,
-                    'w_no' => 1, // FIXME hard set
+                    'w_no' => $validated['w_no'], // FIXME hard set
                     'alarm_content' => $validated['alarm_content']
                 ]);
             } else {
@@ -39,7 +39,7 @@ class AlarmController extends Controller
 
                 $update = [
                     'mb_no' => Auth::user()->mb_no,
-                    'w_no' => 1,
+                    'w_no' => $validated['w_no'],
                     'alarm_content' => $validated['alarm_content']
                 ];
                 $alarm->update($update);
