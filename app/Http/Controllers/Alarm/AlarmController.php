@@ -93,13 +93,9 @@ class AlarmController extends Controller
     }
 
 
-    public function getAlarmById(Alarm $alarm)
+    public function getAlarmById($alarm_no)
     {
-        try {
-            return response()->json($alarm);
-        } catch (\Exception $e) {
-            Log::error($e);
-            return response()->json(['message' => Messages::MSG_0018], 500);
-        }
+        $alarm = Alarm::with('warehousing')->where('alarm_no', $alarm_no )->first();
+        return response()->json(['alarm' => $alarm]);
     }
 }
