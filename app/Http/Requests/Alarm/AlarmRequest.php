@@ -24,11 +24,10 @@ class AlarmRequest extends BaseFormRequest
     public function rules()
     {
         return [
-            // FIXME hard set
-            // 'item_no' => [
-            //     'required',
-            //     'integer',
-            // ],
+            'w_no' => [
+                'required',
+                'integer',
+            ],
             'alarm_content' => [
                 'required',
                 'string',

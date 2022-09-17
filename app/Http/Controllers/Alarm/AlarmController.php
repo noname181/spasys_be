@@ -27,7 +27,7 @@ class AlarmController extends Controller
             if (!isset($alarm_no)) {
                 $alarm_no = Alarm::insertGetId([
                     'mb_no' => Auth::user()->mb_no,
-                    'item_no' => 1, // FIXME hard set
+                    'w_no' => $validated['w_no'], // FIXME hard set
                     'alarm_content' => $validated['alarm_content']
                 ]);
             } else {
@@ -39,7 +39,7 @@ class AlarmController extends Controller
 
                 $update = [
                     'mb_no' => Auth::user()->mb_no,
-                    'item_no' => 1,
+                    'w_no' => $validated['w_no'],
                     'alarm_content' => $validated['alarm_content']
                 ];
                 $alarm->update($update);
@@ -64,7 +64,7 @@ class AlarmController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $alarm = Alarm::with('item','warehousing_item','member')->orderBy('alarm_no', 'DESC');
+            $alarm = Alarm::with('warehousing','member')->orderBy('alarm_no', 'DESC');
 
             if (isset($validated['from_date'])) {
                 $alarm->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));

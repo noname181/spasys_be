@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Item;
+use App\Models\Warehousing;
 use App\Models\WarehousingItem;
 use App\Models\Member;
 
@@ -33,17 +34,16 @@ class Alarm extends Model
     protected $fillable = [
         'alarm_no',
         'mb_no',
-        'item_no',
+        'w_no',
         'alarm_content',
-        'mb_no'
     ];
-    public function item()
+    // public function item()
+    // {
+    //     return $this->hasOne(Item::class, 'item_no', 'item_no')->with(['company']);
+    // }
+    public function warehousing()
     {
-        return $this->hasOne(Item::class, 'item_no', 'item_no')->with(['company']);
-    }
-    public function warehousing_item()
-    {
-        return $this->belongsTo(WarehousingItem::class, 'item_no', 'item_no')->with(['w_no']);;
+        return $this->belongsTo(Warehousing::class, 'w_no', 'w_no')->with(['warehousing_item']);;
     }
     public function member()
     {
