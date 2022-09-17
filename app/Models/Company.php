@@ -64,4 +64,8 @@ class Company extends Model
         return $this->hasMany(ImportSchedule::class, 'co_license', 'co_license');
     }
 
+    public function company_settlement()
+    {
+        return $this->hasMany(CompanySettlement::class, 'co_no', 'co_no');
+    }
 }
