@@ -830,7 +830,7 @@ class WarehousingController extends Controller
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
                 $w_no = $rgd->w_no;
 
-                $warehousing = Warehousing::with(['co_no', 'warehousing_request'])->find($w_no);
+                $warehousing = Warehousing::with(['co_no', 'warehousing_request', 'w_import_parent'])->find($w_no);
 
             }
 
