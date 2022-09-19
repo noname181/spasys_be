@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\ReceivingGoodsDelivery;
+namespace App\Http\Controllers\EWHP;
 
 use DateTime;
 use App\Models\Warehousing;
@@ -26,7 +26,7 @@ use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryCreateRequest
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryCreateMobileRequest;
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryFileRequest;
 
-class ReceivingGoodsDeliveryController extends Controller
+class EWHPController extends Controller
 {
     /**
      * Fetch data
