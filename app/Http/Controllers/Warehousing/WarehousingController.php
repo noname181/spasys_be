@@ -807,6 +807,8 @@ class WarehousingController extends Controller
     public function getWarehousingByRgd($rgd_no, $type)
     {
         try {
+            $check_cofirm = 0;
+            $check_paid = 0;
             if($type == 'monthly'){
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
 
@@ -829,19 +831,22 @@ class WarehousingController extends Controller
             }else {
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
                 $w_no = $rgd->w_no;
-
+                $check_cofirm = ReceivingGoodsDelivery::where('rgd_status5', 'confirmed')->where('rgd_bill_type','final')->where('w_no',$w_no)->get()->count();
+                $check_paid = ReceivingGoodsDelivery::where('rgd_status5', 'paid')->where('rgd_bill_type','additional')->where('w_no',$w_no)->get()->count();
                 $warehousing = Warehousing::with(['co_no', 'warehousing_request', 'w_import_parent'])->find($w_no);
 
             }
-
+            
             $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
-
+   
             return response()->json(
                 ['message' => Messages::MSG_0007,
                     'data' => isset($warehousing) ? $warehousing : $rgds,
                     'rgd'  => $rgd,
+                    'check_cofirm'=>$check_cofirm,
                     'rdg'  => $rdg,
                     'time' => isset($time) ? $time : '',
+                    'check_paid'=>$check_paid
                 ], 200);
 
         } catch (\Exception $e) {
