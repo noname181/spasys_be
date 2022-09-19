@@ -37,9 +37,7 @@ class EWHPController extends Controller
     {
         try {
 
-            return response()->json([
-                'msg' => 'ok'
-            ]);
+            return $request;
         } catch (\Exception $e) {
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0018], 500);
@@ -50,9 +48,7 @@ class EWHPController extends Controller
     {
         try {
 
-            return response()->json([
-                'msg' => 'ok'
-            ]);
+            return $request;
         } catch (\Exception $e) {
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0018], 500);
@@ -63,9 +59,7 @@ class EWHPController extends Controller
     {
         try {
 
-            return response()->json([
-                'msg' => 'ok'
-            ]);
+            return $request;
         } catch (\Exception $e) {
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0018], 500);
