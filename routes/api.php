@@ -63,6 +63,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/get_shop_companies', [\App\Http\Controllers\Company\CompanyController::class, 'getShopCompanies'])->name('get_shop_companies');
     Route::post('/get_shipper_companies', [\App\Http\Controllers\Company\CompanyController::class, 'getShipperCompanies'])->name('get_shipper_companies');
     Route::post('/get_item_companies', [\App\Http\Controllers\Company\CompanyController::class, 'getItemCompanies'])->name('get_item_companies');
+    Route::get('/customer_center_information', [\App\Http\Controllers\Company\CompanyController::class, 'getCustomerCenterInformation'])->name('get_CustomerCenterInformation');
+    Route::get('/get_company_policy/{co_no}', [App\Http\Controllers\Company\CompanyController::class, 'getCompanyPolicy'])->name('get_company_policy');
 
     Route::prefix('service')->name('service.')->group(function () {
         //service route only for spasys admin
