@@ -85,7 +85,7 @@ class ScheduleShipmentController extends Controller
                         'amount' => $schedule['amount'],
                         'extra_money' => $schedule['extra_money'],
                         'trans_corp' => $schedule['trans_corp'],
-                        'trans_no' => $schedule['trans_no'],
+                        'trans_no' => isset($schedule['trans_no']) ? '출고' : '출고예정',
                         'trans_who' => $schedule['trans_who'],
                         'prepay_price' => $schedule['prepay_price'],
                         'gift' => $schedule['gift'],
