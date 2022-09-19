@@ -57,6 +57,7 @@ class ScheduleShipmentController extends Controller
                     $ss_no = ScheduleShipment::insertGetId([
                         'seq' => $schedule['seq'],
                         'pack' => $schedule['pack'],
+                        'shop_code' => $schedule['shop_code'],
                         'shop_name' => $schedule['shop_name'],
                         'order_id' => $schedule['order_id'],
                         'order_id_seq' => $schedule['order_id_seq'],
@@ -147,6 +148,18 @@ class ScheduleShipmentController extends Controller
                 ], 200);
         } else {
             return response()->json(['message' => CommonFunc::renderMessage(Messages::MSG_0016, ['ScheduleShipment'])], 400);
+        }
+    }
+    public function deleteScheduleShipmentInfo(ScheduleShipmentInfo $scheduleShipmentInfo)
+    {
+        try {
+            $scheduleShipmentInfo->delete();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0006], 500);
         }
     }
 
