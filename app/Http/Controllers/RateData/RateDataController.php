@@ -659,6 +659,42 @@ class RateDataController extends Controller
         }
     }
 
+    public function getSpasysRateData4()
+    {
+        $user = Auth::user();
+        try {
+            $rate_data = RateData::where('rd_cate_meta1', '수입풀필먼트');
+
+            if($user->mb_type == 'spasys'){
+                $rate_data = $rate_data->where('co_no', $user->co_no);
+            }else if($user->mb_type == 'shop'){
+                $rmd = RateMetaData::where('co_no', $user->co_no)->latest('created_at')->first();
+                $rate_data = $rate_data->where('rd_co_no', $user->co_no);
+                if(isset($rmd->rmd_no)){
+                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+                }
+            }
+
+            $rate_data = $rate_data->get();
+            $rate_data1 = [];
+            for($i = 1;$i <= 15; $i++ ){
+                $rate_data1[] = $rate_data[$i];
+            }
+
+            $rate_data2 = [];
+            for($i = 11;$i <= 13; $i++ ){
+                $rate_data2[] = $rate_data[$i];
+            }
+
+            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data,'rate_data2' => $rate_data2], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+
     public function sendMail(RateDataSendMailRequest $request)
     {
         $validated = $request->validated();
