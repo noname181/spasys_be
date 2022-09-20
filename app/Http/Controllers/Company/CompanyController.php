@@ -403,4 +403,44 @@ class CompanyController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
+    public function getCustomerCenterInformation(){
+        try{
+            $co_no = Auth::user()->co_no;
+            $company = Company::where('co_no', $co_no)->first();
+            $company->co_parent;
+            $co_type = Auth::user()->mb_type ;
+            if($co_type == 'shipper'){
+               $infomation = $company->co_parent->co_parent;
+            }
+            if($co_type == 'shop'){
+                $infomation = $company->co_parent;
+             }
+             if($co_type == 'spasys'){
+                $infomation = $company;
+             }
+           return response()->json($infomation);
+        }catch(\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+    public function getCompanyPolicy($co_no)
+    {
+        try {
+            $companypolicy = Company::select([
+                'company.co_policy',
+            ])->where('company.co_no', $co_no)->first();
+
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'companypolicy' => $companypolicy,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
 }

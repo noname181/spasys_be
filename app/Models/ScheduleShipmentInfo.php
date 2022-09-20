@@ -42,6 +42,7 @@ class ScheduleShipmentInfo extends Model
         'supply_code',
         'supply_name',
         'supply_options',
+        'co_no',
     ];
 
     protected $casts = [

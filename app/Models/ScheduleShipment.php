@@ -29,7 +29,7 @@ class ScheduleShipment extends Model
         'ss_no',
         'item_no',
         'co_no',
-        'shop_no',
+        'shop_code',
         'seq',
         'pack',
         'shop_name',

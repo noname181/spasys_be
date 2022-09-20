@@ -116,7 +116,7 @@ class QnaController extends Controller
         $validated = $request->validated();
 
         try {
-            //DB::beginTransaction();
+            DB::beginTransaction();
             // FIXME hard set mb_no = 1
             $depth_level = Qna::where('qna_no' ,'=' ,$validated['qna_no'])->first()['depth_level'];
             $answer_for = Qna::where('qna_no' ,'=' ,$validated['qna_no'])->first()['answer_for'];

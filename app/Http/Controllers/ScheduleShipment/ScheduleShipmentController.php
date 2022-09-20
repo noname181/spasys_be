@@ -57,6 +57,7 @@ class ScheduleShipmentController extends Controller
                     $ss_no = ScheduleShipment::insertGetId([
                         'seq' => $schedule['seq'],
                         'pack' => $schedule['pack'],
+                        'shop_code' => $schedule['shop_code'],
                         'shop_name' => $schedule['shop_name'],
                         'order_id' => $schedule['order_id'],
                         'order_id_seq' => $schedule['order_id_seq'],
@@ -85,7 +86,7 @@ class ScheduleShipmentController extends Controller
                         'amount' => $schedule['amount'],
                         'extra_money' => $schedule['extra_money'],
                         'trans_corp' => $schedule['trans_corp'],
-                        'trans_no' => $schedule['trans_no'],
+                        'trans_no' => isset($schedule['trans_no']) ? '출고' : '출고예정',
                         'trans_who' => $schedule['trans_who'],
                         'prepay_price' => $schedule['prepay_price'],
                         'gift' => $schedule['gift'],
@@ -148,6 +149,71 @@ class ScheduleShipmentController extends Controller
         } else {
             return response()->json(['message' => CommonFunc::renderMessage(Messages::MSG_0016, ['ScheduleShipment'])], 400);
         }
+    }
+    public function deleteScheduleShipmentInfo(ScheduleShipmentInfo $scheduleShipmentInfo)
+    {
+        try {
+            $scheduleShipmentInfo->delete();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0006], 500);
+        }
+    }
+    public function CreateOrUpdateByCoPu(ScheduleShipmentRequest $request)
+    {
+        $validated = $request->validated();
+        try {
+            DB::beginTransaction();
+            //$ssi_no = $request->get('ssi_no');
+
+                if(isset($validated['co_no']))
+
+                    foreach ($validated['schedule_shipment_info'] as $ssi) {
+                        $co_no = $request->get('co_no');
+                        ScheduleShipmentInfo::updateOrCreate(
+                            [
+                                'ssi_no' => $ssi['ssi_no'] ?: null,
+                            ],
+                            [
+                                'co_no' => $co_no,
+                                'supply_code' => $ssi['supply_code'],
+                                'supply_name' => $ssi['supply_name']
+                            ]
+                        );
+                    }
+            
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'co_no' => $co_no ? $co_no : ($ssi ? $ssi->co_no : null),
+                '$validated' => isset($validated['co_no']) ? $validated['co_no'] : ''
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0019], 500);
+        }
+    }
+    public function getScheduleShipmentInfoByCono($request)
+    {
+        try {
+            $schedule_shipment_info = ScheduleShipmentInfo::where('co_no','=',$request)->get();
+            
+                return response()->json(
+                    ['message' => Messages::MSG_0007,
+                    'data' => $schedule_shipment_info
+                    ], 200);
+           
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0006], 500);
+        }
+        
     }
 
 

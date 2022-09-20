@@ -63,6 +63,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/get_shop_companies', [\App\Http\Controllers\Company\CompanyController::class, 'getShopCompanies'])->name('get_shop_companies');
     Route::post('/get_shipper_companies', [\App\Http\Controllers\Company\CompanyController::class, 'getShipperCompanies'])->name('get_shipper_companies');
     Route::post('/get_item_companies', [\App\Http\Controllers\Company\CompanyController::class, 'getItemCompanies'])->name('get_item_companies');
+    Route::get('/customer_center_information', [\App\Http\Controllers\Company\CompanyController::class, 'getCustomerCenterInformation'])->name('get_CustomerCenterInformation');
+    Route::get('/get_company_policy/{co_no}', [App\Http\Controllers\Company\CompanyController::class, 'getCompanyPolicy'])->name('get_company_policy');
 
     Route::prefix('service')->name('service.')->group(function () {
         //service route only for spasys admin
@@ -272,6 +274,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/paginate', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'paginateScheduleShipments'])->name('paginate');
         Route::post('/api_schedule_shipments', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'apiScheduleShipments'])->name('api_schedule_shipments');
         Route::get('/{scheduleshipment}', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'getScheduleShipmentById'])->name('get_schedule_shipment_by_id');
+        Route::delete('/schedule_shipment_info/{schedule_shipment_info}', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'deleteScheduleShipmentInfo'])->name('delete_schedule_shipment_info');
+        Route::post('/create_or_update', [\App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'CreateOrUpdateByCoPu'])->name('create_or_update');
+        Route::get('/get_schedule_shipment_info_by_co_no/{co_no}', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'getScheduleShipmentInfoByCono'])->name('get_schedule_shipment_info_by_co_no');
+
 
     });
 
