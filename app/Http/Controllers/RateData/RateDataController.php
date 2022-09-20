@@ -325,7 +325,10 @@ class RateDataController extends Controller
     public function get_set_data($rmd_no)
     {
         try {
-            $rate_data = RateData::where('rmd_no', $rmd_no)->where('rd_cate_meta1', '유통가공')->get();
+            $rate_data = RateData::where('rmd_no', $rmd_no)->where(function($q) {
+                $q->where('rd_cate_meta1', '유통가공')
+                ->orWhere('rd_cate_meta1', '수입풀필먼트');
+            })->get();
             $w_no = $rate_data[0]->w_no;
             $warehousing = Warehousing::with(['co_no', 'w_import_parent'])->where('w_no', $w_no)->first();
             return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data,'warehousing'=>$warehousing], 200);
