@@ -19,12 +19,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Filesystem\Filesystem;
+
 use App\Models\File;
 use App\Models\Item;
-use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryRequest;
-use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryCreateRequest;
-use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryCreateMobileRequest;
-use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryFileRequest;
+
+use App\Http\Requests\EWHP\EWHPRequest;
 
 class EWHPController extends Controller
 {
@@ -44,14 +43,15 @@ class EWHPController extends Controller
         }
     }
 
-    public function import(Request $request)
+    public function import(EWHPRequest $request)
     {
+        $validated = $request->validated();
         try {
             
             DB::beginTransaction();
            
             $count = 0;
-            foreach ($request->import as $key => $value) {
+            foreach ($validated['import'] as $key => $value) {
                 $import = Import::insertGetId([
                     "ti_status" => $value['status'],
                     "ti_logistic_manage_number" => $value['logistic_manage_number'],
@@ -82,19 +82,17 @@ class EWHPController extends Controller
             return response()->json(['message' => 'ok', 'count' => $count]);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
-            return response()->json(['message' => Messages::MSG_0018], 500);
+            return response()->json(['message' => "no"], 500);
         }
     }
 
-    public function export(Request $request)
+    public function export(EWHPRequest $request)
     {
-        try {
-            
+        $validated = $request->validated();
+        try {     
             DB::beginTransaction();
-           
             $count = 0;
-            foreach ($request->export as $key => $value) {
+            foreach ($validated['export'] as $key => $value) {
                 $export = Export::insertGetId([
                     "te_status" => $value['status'],
                     "te_logistic_manage_number" => $value['logistic_manage_number'],
@@ -129,17 +127,17 @@ class EWHPController extends Controller
         } catch (\Exception $e) {
             Log::error($e);
             return $e;
-            return response()->json(['message' => Messages::MSG_0018], 500);
+            return response()->json(['message' => "no"], 500);
         }
     }
 
-    public function import_expected(Request $request)
+    public function import_expected(EWHPRequest $request)
     {
+        $validated = $request->validated();
         try {
             DB::beginTransaction();
-            $request = $request->all();
             $count = 0;
-            foreach ($request as $key => $value) {
+            foreach ($validated['import_expected'] as $key => $value) {
                 $import_expected = ImportExpected::insertGetId([
                     'tie_status' => $value['status'],
                     'tie_logistic_manage_number' => $value['logistic_manage_number'],
@@ -167,14 +165,16 @@ class EWHPController extends Controller
         }
     }
 
-    public function export_confirm(Request $request)
+
+    public function export_confirm(EWHPRequest $request)
     {
+        $validated = $request->validated();
         try {
             
             DB::beginTransaction();
            
             $count = 0;
-            foreach ($request->export_confirm as $key => $value) {
+            foreach ($validated['export_confirm'] as $key => $value) {
                 $export_confirm = ExportConfirm::insertGetId([
                     "tec_status" => $value['status'],
                     "tec_logistic_manage_number" => $value['logistic_manage_number'],
