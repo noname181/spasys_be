@@ -170,20 +170,38 @@ class ScheduleShipmentController extends Controller
             //$ssi_no = $request->get('ssi_no');
 
                 if(isset($validated['co_no']))
-
-                    foreach ($validated['schedule_shipment_info'] as $ssi) {
-                        $co_no = $request->get('co_no');
-                        ScheduleShipmentInfo::updateOrCreate(
-                            [
-                                'ssi_no' => $ssi['ssi_no'] ?: null,
-                            ],
-                            [
-                                'co_no' => $co_no,
-                                'supply_code' => $ssi['supply_code'],
-                                'supply_name' => $ssi['supply_name']
-                            ]
-                        );
+                    if($validated['schedule_shipment_info']){
+                        foreach ($validated['schedule_shipment_info'] as $ssi) {
+                            $co_no = $request->get('co_no');
+                            ScheduleShipmentInfo::updateOrCreate(
+                                [
+                                    'ssi_no' => $ssi['ssi_no'] ?: null,
+                                ],
+                                [
+                                    'co_no' => $co_no,
+                                    'supply_code' => $ssi['supply_code'],
+                                    'supply_name' => $ssi['supply_name']
+                                ]
+                            );
+                        }
                     }
+                    if($validated['schedule_shipment']){
+                        foreach ($validated['schedule_shipment'] as $ss) {
+                            $co_no = $request->get('co_no');
+                            ScheduleShipment::updateOrCreate(
+                                [
+                                    'ss_no' => $ss['ss_no'] ?: null,
+                                ],
+                                [
+                                    'co_no' => $co_no,
+                                    'shop_code' => $ss['supply_code'],
+                                    'shop_name' => $ss['supply_name']
+                                ]
+                            );
+                        }
+                    }
+
+                    
             
             DB::commit();
             return response()->json([
@@ -202,10 +220,12 @@ class ScheduleShipmentController extends Controller
     {
         try {
             $schedule_shipment_info = ScheduleShipmentInfo::where('co_no','=',$request)->get();
-            
+            $schedule_shipment = ScheduleShipment::where('co_no','=',$request)->get();
+
                 return response()->json(
                     ['message' => Messages::MSG_0007,
-                    'data' => $schedule_shipment_info
+                    'data' => $schedule_shipment_info,
+                    'data2' => $schedule_shipment
                     ], 200);
            
         } catch (\Exception $e) {
@@ -215,6 +235,7 @@ class ScheduleShipmentController extends Controller
         }
         
     }
+
 
 
 

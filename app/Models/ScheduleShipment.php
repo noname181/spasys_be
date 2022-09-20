@@ -69,7 +69,9 @@ class ScheduleShipment extends Model
         'deal_no',
         'sub_domain',
         'sub_domain_seq',
-        'order_products'
+        'order_products',
+        'shop_code',
+        'shop_name'
     ];
 
     protected $casts = [
