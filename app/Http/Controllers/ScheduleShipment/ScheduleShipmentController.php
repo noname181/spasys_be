@@ -162,6 +162,74 @@ class ScheduleShipmentController extends Controller
             return response()->json(['message' => Messages::MSG_0006], 500);
         }
     }
+    public function CreateOrUpdateByCoPu(ScheduleShipmentRequest $request)
+    {
+        $validated = $request->validated();
+        try {
+            DB::beginTransaction();
+            $co_no = $request->get('co_no');
+            if (isset($validated['co_no'])) {
+                $schedule_shipment_info = [];
+                if(isset($validated['schedule_shipment_info'])) {
+                    foreach ($validated['schedule_shipment_info'] as $ssi) {
+                        if (isset($ssi['supply_name']) && isset($ssi['supply_code'])) {
+                            $schedule_shipment_info[] = [
+                                'co_no' => $co_no,
+                                'supply_code' => $ssi['supply_code'],
+                                'supply_name' => $ssi['supply_name']
+                            ];
+                        }
+                    }
+                    ScheduleShipmentInfo::insert($schedule_shipment_info);
+                }
+
+            } else {
+
+
+                if(isset($validated['co_no']))
+                    foreach ($validated['schedule_shipment_info'] as $ssi) {
+                        ScheduleShipmentInfo::updateOrCreate(
+                            [
+                                'ssi_no' => $ssi['ssi_no'] ?: null,
+                            ],
+                            [
+                                'co_no' => $co_no,
+                                'supply_code' => $ssi['supply_code'],
+                                'supply_name' => $ssi['supply_name']
+                            ]
+                        );
+                    }
+            }
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'co_no' => $co_no ? $co_no : ($ssi ? $ssi->co_no : null),
+                '$validated' => isset($validated['co_no']) ? $validated['co_no'] : ''
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0019], 500);
+        }
+    }
+    public function getScheduleShipmentInfoByCono($request)
+    {
+        try {
+            $schedule_shipment_info = ScheduleShipmentInfo::where('co_no','=',$request)->get();
+            
+                return response()->json(
+                    ['message' => Messages::MSG_0007,
+                    'data' => $schedule_shipment_info
+                    ], 200);
+           
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0006], 500);
+        }
+        
+    }
 
 
 
