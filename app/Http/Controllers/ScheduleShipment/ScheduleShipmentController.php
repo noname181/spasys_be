@@ -167,27 +167,12 @@ class ScheduleShipmentController extends Controller
         $validated = $request->validated();
         try {
             DB::beginTransaction();
-            $co_no = $request->get('co_no');
-            if (isset($validated['co_no'])) {
-                $schedule_shipment_info = [];
-                if(isset($validated['schedule_shipment_info'])) {
-                    foreach ($validated['schedule_shipment_info'] as $ssi) {
-                        if (isset($ssi['supply_name']) && isset($ssi['supply_code'])) {
-                            $schedule_shipment_info[] = [
-                                'co_no' => $co_no,
-                                'supply_code' => $ssi['supply_code'],
-                                'supply_name' => $ssi['supply_name']
-                            ];
-                        }
-                    }
-                    ScheduleShipmentInfo::insert($schedule_shipment_info);
-                }
-
-            } else {
-
+            //$ssi_no = $request->get('ssi_no');
 
                 if(isset($validated['co_no']))
+
                     foreach ($validated['schedule_shipment_info'] as $ssi) {
+                        $co_no = $request->get('co_no');
                         ScheduleShipmentInfo::updateOrCreate(
                             [
                                 'ssi_no' => $ssi['ssi_no'] ?: null,
@@ -199,7 +184,7 @@ class ScheduleShipmentController extends Controller
                             ]
                         );
                     }
-            }
+            
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,

@@ -220,6 +220,10 @@ class ScheduleShipmentRequest extends BaseFormRequest
                 'integer',
                 'nullable',
             ],
+            'ssi_no' => [
+                'int',
+                'nullable',
+            ],
             'schedule_shipment_info' => [
                 'array',
                 'nullable'
