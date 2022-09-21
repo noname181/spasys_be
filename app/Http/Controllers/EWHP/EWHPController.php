@@ -152,7 +152,7 @@ class EWHPController extends Controller
                     'tie_h_bl' => $value['h_bl'],
                     'tie_is_name_eng' => $value['is_name_eng'],
                 ]);      
-                if($import >= 1){
+                if($import_expected >= 1){
                     $count++;
                 }          
             }

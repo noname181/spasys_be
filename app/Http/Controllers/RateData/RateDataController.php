@@ -681,12 +681,7 @@ class RateDataController extends Controller
                 $rate_data1[] = $rate_data[$i];
             }
 
-            $rate_data2 = [];
-            for($i = 11;$i <= 13; $i++ ){
-                $rate_data2[] = $rate_data[$i];
-            }
-
-            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data,'rate_data2' => $rate_data2], 200);
+            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data], 200);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
