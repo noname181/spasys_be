@@ -238,6 +238,20 @@ class ScheduleShipmentRequest extends BaseFormRequest
                 'nullable',
                 'max:255',
             ],
+            'schedule_shipment' => [
+                'array',
+                'nullable'
+            ],
+            'schedule_shipment.*.shop_code' => [
+                'string',
+                'nullable',
+                'max:255',
+            ],
+            'schedule_shipment.*.shop_name' => [
+                'string',
+                'nullable',
+                'max:255',
+            ],
         ];
     }
 
