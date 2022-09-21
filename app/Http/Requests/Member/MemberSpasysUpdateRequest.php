@@ -63,27 +63,30 @@ class MemberSpasysUpdateRequest extends BaseFormRequest
                 'max:255',
             ],
             'co_email' => [
-                'required',
-                'string',
-                'max:255',
-                'regex:/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$/',
+                ''
+                //'required',
+                //'string',
+               // 'max:255',
+                //'regex:/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$/',
                 
             ],
             'co_about_us' => [
-                'required',
-                'string',
-                'max:255',
-                'regex:/^((?:https?\:\/\/|www\.)(?:[-a-z0-9]+\.)*[-a-z0-9]+.*)$/',
+                ''
+                //'required',
+                //'string',
+                //'max:255',
+                //'regex:/^((?:https?\:\/\/|www\.)(?:[-a-z0-9]+\.)*[-a-z0-9]+.*)$/',
             ],
             'co_policy' => [
                 'nullable',
                 'string'
             ],
             'co_help_center' => [
-                'required',
-                'string',
-                'max:255',
-                'regex:/^((?:https?\:\/\/|www\.)(?:[-a-z0-9]+\.)*[-a-z0-9]+.*)$/',
+                ''
+                //'required',
+                //'string',
+                //'max:255',
+                //'regex:/^((?:https?\:\/\/|www\.)(?:[-a-z0-9]+\.)*[-a-z0-9]+.*)$/',
             ],
 
         ];
