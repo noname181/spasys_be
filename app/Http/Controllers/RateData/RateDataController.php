@@ -681,12 +681,7 @@ class RateDataController extends Controller
                 $rate_data1[] = $rate_data[$i];
             }
 
-            $rate_data2 = [];
-            for($i = 11;$i <= 13; $i++ ){
-                $rate_data2[] = $rate_data[$i];
-            }
-
-            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data,'rate_data2' => $rate_data2], 200);
+            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data], 200);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
@@ -1333,6 +1328,94 @@ class RateDataController extends Controller
                 'message' => Messages::MSG_0007,
                 'rdg' => $rdg
             ], 201);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+    public function registe_rate_data_general_final_service2(Request $request) {
+        try {
+            DB::beginTransaction();
+            //Check is there already RateDataGeneral with rdg_no yet
+            $is_exist = RateDataGeneral::where('rdg_no',  $request->rdg_no)->where('rdg_bill_type', $request->bill_type)->first();
+
+            //Get RecevingGoodsDelivery base on rgd_no
+            $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+            $w_no = $rgd->w_no;
+
+            $rdg = RateDataGeneral::updateOrCreate(
+                [
+                    'rdg_no' => isset($is_exist->rdg_no) ? $request->rdg_no : null,
+                    'rdg_bill_type' => $request->bill_type
+                ],
+                [
+                    'w_no' => $w_no,
+                    'rdg_bill_type' => $request->bill_type,
+                    'rgd_no_expectation' => $request->type  == 'edit_final' ? $is_exist->rgd_no_expectation : (str_contains($request->bill_type, 'final') ? $request->rgd_no : null),
+                    'rgd_no_final' => $request->type  == 'edit_additional' ? $is_exist->rgd_no_final : (str_contains($request->bill_type, 'additional') ? $request->rgd_no : null),
+                    'mb_no' => Auth::user()->mb_no,
+                    'rdg_set_type' => $request->rdg_set_type,
+                    'rdg_supply_price1' => $request->fulfill1['supply_price'],
+                    'rdg_supply_price2' => $request->fulfill2['supply_price'],
+                    'rdg_supply_price3' => $request->fulfill3['supply_price'],
+                    'rdg_supply_price4' => $request->fulfill4['supply_price'],
+                    'rdg_supply_price5' => $request->fulfill5['supply_price'],
+                    'rdg_supply_price6' => $request->total['supply_price'],
+                    'rdg_vat1' => $request->fulfill1['taxes'],
+                    'rdg_vat2' => $request->fulfill2['taxes'],
+                    'rdg_vat3' => $request->fulfill3['taxes'],
+                    'rdg_vat4' => $request->fulfill4['taxes'],
+                    'rdg_vat5' => $request->fulfill5['taxes'],
+                    'rdg_vat6' => $request->total['taxes'],
+                    'rdg_sum1' => $request->fulfill1['sum'],
+                    'rdg_sum2' => $request->fulfill2['sum'],
+                    'rdg_sum3' => $request->fulfill3['sum'],
+                    'rdg_sum4' => $request->fulfill4['sum'],
+                    'rdg_sum5' => $request->fulfill5['sum'],
+                    'rdg_sum6' => $request->total['sum'],
+                    'rdg_etc1' => $request->fulfill1['etc'],
+                    'rdg_etc2' => $request->fulfill2['etc'],
+                    'rdg_etc3' => $request->fulfill3['etc'],
+                    'rdg_etc4' => $request->fulfill4['etc'],
+                    'rdg_etc5' => $request->fulfill5['etc'],
+                    'rdg_etc6' => $request->total['etc'],
+                ]
+            );
+
+            $previous_rgd = ReceivingGoodsDelivery::where('w_no', $w_no)->where('rgd_bill_type', '=' , $request->previous_bill_type)->first();
+
+            if(!isset($is_exist->rdg_no) && isset($request->previous_bill_type)){
+                $final_rgd = $previous_rgd->replicate();
+                $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
+                $final_rgd->rgd_status4 = $request->status;
+                $final_rgd->save();
+
+                RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
+                    'rgd_no' => $final_rgd->rgd_no
+                ]);
+            }else {
+                RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
+                    'rgd_no' =>  $is_exist ?  $is_exist->rgd_no : $rgd->rgd_no
+                ]);
+            }
+
+            if($request->bill_type == 'expectation' || $request->bill_type == 'expectation_monthly'){
+                ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                    'rgd_status4' => $request->status,
+                    'rgd_bill_type' => $request->bill_type
+                ]);
+            }
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'rdg' => $rdg,
+                // 'final_rgd' => $final_rgd
+            ], 201);
+
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
