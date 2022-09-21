@@ -255,7 +255,7 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
-        } if(!isset($rmd->rmd_no) && $set_type == 'work_additional'){
+        }else if(!isset($rmd->rmd_no) && $set_type == 'work_additional'){
             $rmd = RateMetaData::where(
                 [
                     'w_no' => $w_no,
@@ -312,6 +312,21 @@ class RateDataController extends Controller
                     [
                         'w_no' => $w_no,
                         'set_type' => 'storage_monthly'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'storage_final'){
+            $rmd = RateMetaData::where(
+                [
+                    'w_no' => $w_no,
+                    'set_type' => 'storage_final'
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'w_no' => $w_no,
+                        'set_type' => 'storage'
                     ]
                 )->first();
             }
@@ -1422,5 +1437,31 @@ class RateDataController extends Controller
             return $e;
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
+    }
+
+    public function get_rmd_no_fulfill($rgd_no, $type, $pretype){
+        $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
+        $w_no = $rgd->w_no;
+
+
+        $rmd = RateMetaData::where(
+            [
+                'w_no' => $w_no,
+                'set_type' => $type
+            ]
+        )->first();
+        if(empty($rmd)){
+            $rmd = RateMetaData::where(
+                [
+                    'w_no' => $w_no,
+                    'set_type' => $pretype
+                ]
+            )->first();
+        }
+
+
+        return response()->json([
+            'rmd_no' => $rmd ?  $rmd->rmd_no : null,
+        ], 200);
     }
 }
