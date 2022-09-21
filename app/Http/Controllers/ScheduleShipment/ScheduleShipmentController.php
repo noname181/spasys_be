@@ -162,6 +162,18 @@ class ScheduleShipmentController extends Controller
             return response()->json(['message' => Messages::MSG_0006], 500);
         }
     }
+    public function deleteScheduleShipment(ScheduleShipment $scheduleShipment)
+    {
+        try {
+            $scheduleShipment->delete();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0006], 500);
+        }
+    }
     public function CreateOrUpdateByCoPu(ScheduleShipmentRequest $request)
     {
         $validated = $request->validated();
@@ -169,7 +181,7 @@ class ScheduleShipmentController extends Controller
             DB::beginTransaction();
             //$ssi_no = $request->get('ssi_no');
 
-                if(isset($validated['co_no']))
+                if(isset($validated['co_no'])){
                     if($validated['schedule_shipment_info']){
                         foreach ($validated['schedule_shipment_info'] as $ssi) {
                             $co_no = $request->get('co_no');
@@ -201,6 +213,8 @@ class ScheduleShipmentController extends Controller
                         }
                     }
 
+                }
+                    
                     
             
             DB::commit();
