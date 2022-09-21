@@ -51,7 +51,7 @@ class EWHPController extends Controller
             DB::beginTransaction();
            
             $count = 0;
-            foreach ($validated['import'] as $key => $value) {
+            foreach ($validated['import'] as $value) {
                 $import = Import::insertGetId([
                     "ti_status" => $value['status'],
                     "ti_logistic_manage_number" => $value['logistic_manage_number'],
@@ -126,7 +126,6 @@ class EWHPController extends Controller
             return response()->json(['message' => 'ok', 'count' => $count]);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
             return response()->json(['message' => "no"], 500);
         }
     }
@@ -153,7 +152,7 @@ class EWHPController extends Controller
                     'tie_h_bl' => $value['h_bl'],
                     'tie_is_name_eng' => $value['is_name_eng'],
                 ]);      
-                if($import >= 1){
+                if($import_expected >= 1){
                     $count++;
                 }          
             }
@@ -161,7 +160,7 @@ class EWHPController extends Controller
             return response()->json(['message' => 'ok', 'count' => $count]);
         } catch (\Exception $e) {
             Log::error($e);
-            return response()->json(['message' => Messages::MSG_0018], 500);
+            return response()->json(['message' => "no"], 500);
         }
     }
 
@@ -192,8 +191,7 @@ class EWHPController extends Controller
             return response()->json(['message' => 'ok', 'count' => $count]);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
-            return response()->json(['message' => Messages::MSG_0018], 500);
+            return response()->json(['message' => "no"], 500);
         }
     }
 

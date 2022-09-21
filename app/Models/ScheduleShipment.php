@@ -71,7 +71,8 @@ class ScheduleShipment extends Model
         'sub_domain_seq',
         'order_products',
         'shop_code',
-        'shop_name'
+        'shop_name',
+        
     ];
 
     protected $casts = [

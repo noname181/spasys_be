@@ -162,6 +162,18 @@ class ScheduleShipmentController extends Controller
             return response()->json(['message' => Messages::MSG_0006], 500);
         }
     }
+    public function deleteScheduleShipment(ScheduleShipment $scheduleShipment)
+    {
+        try {
+            $scheduleShipment->delete();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0006], 500);
+        }
+    }
     public function CreateOrUpdateByCoPu(ScheduleShipmentRequest $request)
     {
         $validated = $request->validated();
@@ -169,8 +181,8 @@ class ScheduleShipmentController extends Controller
             DB::beginTransaction();
             //$ssi_no = $request->get('ssi_no');
 
-                if(isset($validated['co_no']))
-                    if($validated['schedule_shipment_info']){
+                if(isset($validated['co_no'])){
+                    if(isset($validated['schedule_shipment_info'])){
                         foreach ($validated['schedule_shipment_info'] as $ssi) {
                             $co_no = $request->get('co_no');
                             ScheduleShipmentInfo::updateOrCreate(
@@ -179,28 +191,30 @@ class ScheduleShipmentController extends Controller
                                 ],
                                 [
                                     'co_no' => $co_no,
-                                    'supply_code' => $ssi['supply_code'],
-                                    'supply_name' => $ssi['supply_name']
+                                    'supply_code' => ($ssi['supply_code'] && $ssi['supply_code'] !='null') ? $ssi['supply_code']  : null,
+                                    'supply_name' => ($ssi['supply_name'] && $ssi['supply_name'] !='null') ? $ssi['supply_name']  : null,
                                 ]
                             );
                         }
                     }
-                    if($validated['schedule_shipment']){
+                    if(isset($validated['schedule_shipment'])){
                         foreach ($validated['schedule_shipment'] as $ss) {
                             $co_no = $request->get('co_no');
                             ScheduleShipment::updateOrCreate(
                                 [
-                                    'ss_no' => $ss['ss_no'] ?: null,
+                                    'ss_no' => ($ss['ss_no'] &&  $ss['ss_no'] != 'undefined') ?  $ss['ss_no'] : null,
                                 ],
                                 [
                                     'co_no' => $co_no,
-                                    'shop_code' => $ss['supply_code'],
-                                    'shop_name' => $ss['supply_name']
+                                    'shop_code' => ($ss['shop_code'] && $ss['shop_code'] !='null') ? $ss['shop_code']: null,
+                                    'shop_name' => ($ss['shop_name'] && $ss['shop_name'] !='null') ? $ss['shop_name']: null,
                                 ]
                             );
                         }
                     }
 
+                }
+                    
                     
             
             DB::commit();
