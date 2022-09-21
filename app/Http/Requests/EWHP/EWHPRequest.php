@@ -28,83 +28,83 @@ class EWHPRequest extends BaseFormRequest
                 'array',
                 'nullable'
             ],
-            "import.*.ti_status" => [
+            "import.*.status" => [
                 'nullable',
                 'max:255',
             ],
-            "import.*.ti_logistic_manage_number" => [
+            "import.*.logistic_manage_number" => [
                 'nullable',
                 'max:255',
             ],
-            "import.*.ti_carry_in_number" => [
+            "import.*.carry_in_number" => [
                 'nullable',
                 'max:255',
             ],
-            "import.*.ti_register_id" => [
+            "import.*.register_id" => [
                 'nullable',
                 'max:255',
             ],
-            "import.*.ti_i_date" => [
+            "import.*.i_date" => [
                 'nullable',
                 'max:255',
             ],
-            "import.*.ti_i_time" => [
+            "import.*.i_time" => [
                 'nullable',
                 'max:255',
             ],
-            "import.*.ti_i_report_type" => [
+            "import.*.i_report_type" => [
                 'nullable',
                 'max:255',
             ],
-            "import.*.ti_i_division_type" => [
+            "import.*.i_division_type" => [
                 'nullable',
                 'max:255',
             ],
-            "import.*.ti_i_confirm_number" => [
+            "import.*.i_confirm_number" => [
                 'nullable',
                 'max:255',
             ],
-            "import.*.ti_i_order" => [
+            "import.*.i_order" => [
                 'nullable',
                 'max:255',
             ],
-            "import.*.ti_i_type" => [
+            "import.*.i_type" => [
                 'nullable',
                 'max:255',
             ],
-            "import.*.ti_m_bl" => [
+            "import.*.m_bl" => [
                 'nullable',
                 'max:255',
             ],
-            "import.*.ti_h_bl" => [
+            "import.*.h_bl" => [
                 'nullable',
                 'max:255',
             ],
-            "import.*.ti_i_report_number" => [
+            "import.*.i_report_number" => [
                 'nullable',
                 'max:255',
             ],
-            "import.*.ti_i_packing_type" => [
+            "import.*.i_packing_type" => [
                 'nullable',
                 'max:255',
             ],
-            "import.*.ti_i_number" => [
+            "import.*.i_number" => [
                 'nullable',
                 'max:255',
             ],
-            "import.*.ti_i_weight" => [
+            "import.*.i_weight" => [
                 'nullable',
                 'max:255',
             ],
-            "import.*.ti_i_weight_unit" => [
+            "import.*.i_weight_unit" => [
                 'nullable',
                 'max:255',
             ],
-            "import.*.ti_co_license" => [
+            "import.*.co_license" => [
                 'nullable',
                 'max:255',
             ],
-            "import.*.ti_logistic_type" => [
+            "import.*.logistic_type" => [
                 'nullable',
                 'max:255',
             ],
@@ -113,95 +113,95 @@ class EWHPRequest extends BaseFormRequest
                 'array',
                 'nullable'
             ],
-            "export.*.te_status" => [
+            "export.*.status" => [
                 'nullable',
                 'max:255',
             ],
-            "export.*.te_logistic_manage_number" => [
+            "export.*.logistic_manage_number" => [
                 'nullable',
                 'max:255',
             ],
-            "export.*.te_e_confirm_number" => [
+            "export.*.e_confirm_number" => [
                 'nullable',
                 'max:255',
             ],
-            "export.*.te_e_confirm_type" => [
+            "export.*.e_confirm_type" => [
                 'nullable',
                 'max:255',
             ],
-            "export.*.te_e_confirm_date" => [
+            "export.*.e_confirm_date" => [
                 'nullable',
                 'max:255',
             ],
-            "export.*.te_carry_in_number" => [
+            "export.*.carry_in_number" => [
                 'nullable',
                 'max:255',
             ],
-            "export.*.te_carry_out_number" => [
+            "export.*.carry_out_number" => [
                 'nullable',
                 'max:255',
             ],
-            "export.*.te_register_id" => [
+            "export.*.register_id" => [
                 'nullable',
                 'max:255',
             ],
-            "export.*.te_e_date" => [
+            "export.*.e_date" => [
                 'nullable',
                 'max:255',
             ],
-            "export.*.te_e_time" => [
+            "export.*.e_time" => [
                 'nullable',
                 'max:255',
             ],
-            "export.*.te_e_order" => [
+            "export.*.e_order" => [
                 'nullable',
                 'max:255',
             ],
-            "export.*.te_m_bl" => [
+            "export.*.m_bl" => [
                 'nullable',
                 'max:255',
             ],
-            "export.*.te_h_bl" => [
+            "export.*.h_bl" => [
                 'nullable',
                 'max:255',
             ],
-            "export.*.te_e_division_type" => [
+            "export.*.e_division_type" => [
                 'nullable',
                 'max:255',
             ],
-            "export.*.te_e_packing_type" => [
+            "export.*.e_packing_type" => [
                 'nullable',
                 'max:255',
             ],
-            "export.*.te_e_number" => [
+            "export.*.e_number" => [
                 'nullable',
                 'max:255',
             ],
-            "export.*.te_e_weight" => [
+            "export.*.e_weight" => [
                 'nullable',
                 'max:255',
             ],
-            "export.*.te_e_weight_unit" => [
+            "export.*.e_weight_unit" => [
                 'nullable',
                 'max:255',
             ],
-            "export.*.te_e_type" => [
+            "export.*.e_type" => [
                 'nullable',
                 'max:255',
             ],
-            "export.*.te_e_do_number" => [
+            "export.*.e_do_number" => [
                 'nullable',
                 'max:255',
             ],
-            "export.*.te_e_price" => [
+            "export.*.e_price" => [
                 'nullable',
                 'max:255',
             ],
-            "export.*.te_co_license" => [
+            "export.*.co_license" => [
                 'nullable',
                 'max:255',
             ],
-            "export.*.te_logistic_type" => [
+            "export.*.logistic_type" => [
                 'nullable',
                 'max:255',
             ],
@@ -211,55 +211,55 @@ class EWHPRequest extends BaseFormRequest
                 'nullable'
             ],
 
-            'import_expected.*.tie_status' => [
+            'import_expected.*.status' => [
                 'nullable',
                 'max:255',
             ],
-            'import_expected.*.tie_logistic_manage_number' => [
+            'import_expected.*.logistic_manage_number' => [
                 'nullable',
                 'max:255',
             ],
-            'import_expected.*.tie_register_id' => [
+            'import_expected.*.register_id' => [
                 'nullable',
                 'max:255',
             ],
-            'import_expected.*.tie_is_date' => [
+            'import_expected.*.is_date' => [
                 'nullable',
                 'max:255',
             ],
-            'import_expected.*.tie_is_ship' => [
+            'import_expected.*.is_ship' => [
                 'nullable',
                 'max:255',
             ],
-            'import_expected.*.tie_co_license' => [
+            'import_expected.*.co_license' => [
                 'nullable',
                 'max:255',
             ],
-            'import_expected.*.tie_is_cargo_eng' => [
+            'import_expected.*.is_cargo_eng' => [
                 'nullable',
                 'max:255',
             ],
-            'import_expected.*.tie_is_number' => [
+            'import_expected.*.is_number' => [
                 'nullable',
                 'max:255',
             ],
-            'import_expected.*.tie_is_weight' => [
+            'import_expected.*.is_weight' => [
                 'nullable',
                 'max:255',
             ],
-            'import_expected.*.tie_is_weight_unit' => [
+            'import_expected.*.is_weight_unit' => [
                 'nullable',
                 'max:255',
             ],
-            'import_expected.*.tie_m_bl' => [
+            'import_expected.*.m_bl' => [
                 'nullable',
                 'max:255',
             ],
-            'import_expected.*.tie_h_bl' => [
+            'import_expected.*.h_bl' => [
                 'nullable',
                 'max:255',
             ],
-            'import_expected.*.tie_is_name_eng' => [
+            'import_expected.*.is_name_eng' => [
                 'nullable',
                 'max:255',
             ],
@@ -269,31 +269,31 @@ class EWHPRequest extends BaseFormRequest
                 'nullable'
             ],
 
-            "export_confirm.*.tec_status" => [
+            "export_confirm.*.status" => [
                 'nullable',
                 'max:255',
             ],
-            "export_confirm.*.tec_logistic_manage_number" => [
+            "export_confirm.*.logistic_manage_number" => [
                 'nullable',
                 'max:255',
             ],
-            "export_confirm.*.tec_ec_confirm_number" => [
+            "export_confirm.*.ec_confirm_number" => [
                 'nullable',
                 'max:255',
             ],
-            "export_confirm.*.tec_ec_type" => [
+            "export_confirm.*.ec_type" => [
                 'nullable',
                 'max:255',
             ],
-            "export_confirm.*.tec_ec_date" => [
+            "export_confirm.*.ec_date" => [
                 'nullable',
                 'max:255',
             ],
-            "export_confirm.*.tec_register_id" => [
+            "export_confirm.*.register_id" => [
                 'nullable',
                 'max:255',
             ],
-            "export_confirm.*.tec_ec_number" => [
+            "export_confirm.*.ec_number" => [
                 'nullable',
                 'max:255',
             ],
