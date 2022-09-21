@@ -70,7 +70,6 @@ class ScheduleShipment extends Model
         'sub_domain',
         'sub_domain_seq',
         'order_products',
-        'shop_code',
         'shop_name',
         
     ];

@@ -9,6 +9,7 @@ use App\Http\Requests\Menu\MenuUpdateRequest;
 use App\Models\Member;
 use App\Models\Menu;
 use App\Models\Service;
+use App\Models\Company;
 
 use App\Utils\Messages;
 use App\Utils\CommonFunc;
@@ -200,8 +201,30 @@ class MenuController extends Controller
             })->select(['menu_no', 'menu_name', 'service_no_array'])->where('menu_depth', '상위')->get();
 
 
+            // getCustomerCenterInformation
+            $co_no = Auth::user()->co_no;
+            $company = Company::where('co_no', $co_no)->first();
+            if($user->mb_type != 'admin'){
+                $company->co_parent;
+            }
+            $co_type = Auth::user()->mb_type ;
+            if($co_type == 'shipper'){
+               $information = $company->co_parent->co_parent;
+            }
+            if($co_type == 'shop'){
+                $information = $company->co_parent;
+             }
+             if($co_type == 'spasys'){
+                $information = $company;
+             }
+             if($user->mb_type == 'admin'){
+                $information = '';
+             }
 
-            return response()->json($menu_main);
+            return response()->json([
+                'menu_main' => $menu_main,
+                'information' => $information
+            ]);
         } catch (\Exception $e) {
             Log::error($e);
             return $e;
