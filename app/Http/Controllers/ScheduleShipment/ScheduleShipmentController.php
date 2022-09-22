@@ -57,7 +57,7 @@ class ScheduleShipmentController extends Controller
                     $ss_no = ScheduleShipment::insertGetId([
                         'seq' => $schedule['seq'],
                         'pack' => $schedule['pack'],
-                        'shop_code' => $schedule['shop_code'],
+                        'shop_code' => $schedule['shop_id'],
                         'shop_name' => $schedule['shop_name'],
                         'order_id' => $schedule['order_id'],
                         'order_id_seq' => $schedule['order_id_seq'],
