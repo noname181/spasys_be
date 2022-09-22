@@ -55,7 +55,7 @@ class Menu extends Model
 
     public function menu_childs()
     {
-        return $this->hasMany(Menu::class, 'menu_parent_no', 'menu_no');
+        return $this->hasMany(Menu::class, 'menu_parent_no', 'menu_no')->where('menu_use_yn', 'y');
     }
 
     public function permission()
