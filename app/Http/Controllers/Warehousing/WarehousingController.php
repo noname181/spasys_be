@@ -719,6 +719,10 @@ class WarehousingController extends Controller
                 ->where('rgd_status1', '=', '출고')
                 ->where('rgd_status2', '=', '작업완료')
                 ->where(function ($q) {
+                    $q->where('rgd_status5','!=','cancel')
+                    ->orWhereNull('rgd_status5');
+                })
+                ->where(function ($q) {
                     $q->where('rgd_status4', '=', '예상경비청구서')
                     ->orWhere('rgd_status4', '=', '확정청구서')
                     ->orWhere('rgd_status4', '=', '추가청구서');
@@ -794,7 +798,7 @@ class WarehousingController extends Controller
             }
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             //return DB::getQueryLog();
-
+           // return DB::getQueryLog();
             return response()->json($warehousing);
 
         } catch (\Exception $e) {
