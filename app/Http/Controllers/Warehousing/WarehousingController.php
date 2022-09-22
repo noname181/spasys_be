@@ -8,6 +8,8 @@ use App\Http\Requests\Warehousing\WarehousingSearchRequest;
 use App\Models\Member;
 use App\Models\ReceivingGoodsDelivery;
 use App\Models\Warehousing;
+use App\Models\CompanySettlement;
+use App\Models\Service;
 use App\Models\RateData;
 use App\Models\RateDataGeneral;
 use App\Utils\Messages;
@@ -961,13 +963,19 @@ class WarehousingController extends Controller
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             //return DB::getQueryLog();
             $warehousing->setCollection(
-                $warehousing->getCollection()->map(function ($q){
-                    $warehousing = ReceivingGoodsDelivery::with(['w_no'])->whereHas('w_no.co_no.company_settlement')->first();
-                    // if(isset($item['warehousing_item']['wi_number'])){
-                    //     $q->total_price_row = $item->item_price2 * $item['warehousing_item']['wi_number'];
-                    // }
-                    $q->cs_payment_cycle = $warehousing['w_no'];
-                    return $q;
+                $warehousing->getCollection()->map(function ($item){
+                    $service_name = $item->service_korean_name;
+                    $w_no = $item->w_no;
+                    $co_no = Warehousing::where('w_no', $w_no)->first()->co_no;
+                    $service_no = Service::where('service_name', $service_name)->first()->service_no;
+
+                    $company_settlement = CompanySettlement::where([
+                        'co_no' => $co_no,
+                        'service_no' => $service_no
+                    ])->first();
+                    $item->settlement_cycle = $company_settlement ? $company_settlement->cs_payment_cycle : "";
+
+                    return $item;
                 })
             );
 
