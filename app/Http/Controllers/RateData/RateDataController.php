@@ -10,6 +10,7 @@ use App\Http\Requests\RateData\RateDataSendMailRequest;
 use App\Models\File;
 use App\Models\ReceivingGoodsDelivery;
 use App\Models\RateData;
+use App\Models\AdjustmentGroup;
 use App\Models\Warehousing;
 use App\Models\RateDataGeneral;
 use App\Models\RateMeta;
@@ -814,12 +815,18 @@ class RateDataController extends Controller
 
             $rdg = RateDataGeneral::where('w_no', $w_no)->where('rdg_bill_type', $bill_type)->first();
 
+            $get_w_no = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first()->w_no;
+            $get_co_no = Warehousing::where('w_no',$get_w_no)->first()->co_no;
+
+            $ag_name = AdjustmentGroup::where('co_no',$get_co_no)->get();
+
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'rdg' => $rdg,
                 'warehousing' => $warehousing,
-                'rgd' => $rgd,
+                'ag_name' =>  $ag_name,
+                'co_no' => $get_co_no,
             ], 201);
         } catch (\Exception $e) {
             DB::rollback();
