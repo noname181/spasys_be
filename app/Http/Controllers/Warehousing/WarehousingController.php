@@ -2,12 +2,18 @@
 
 namespace App\Http\Controllers\Warehousing;
 
+use DateTime;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Warehousing\WarehousingRequest;
 use App\Http\Requests\Warehousing\WarehousingSearchRequest;
+use App\Http\Requests\Warehousing\WarehousingDataValidate;
+use App\Http\Requests\Warehousing\WarehousingItemValidate;
 use App\Models\Member;
 use App\Models\ReceivingGoodsDelivery;
 use App\Models\Warehousing;
+use App\Models\WarehousingItem;
+use App\Models\CompanySettlement;
+use App\Models\Service;
 use App\Models\RateData;
 use App\Models\RateDataGeneral;
 use App\Utils\Messages;
@@ -17,6 +23,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use Illuminate\Support\Facades\Validator;
 
 class WarehousingController extends Controller
 {
@@ -293,6 +302,129 @@ class WarehousingController extends Controller
             //return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
+
+    public function warehousingImport(Request $request){
+        try{
+            DB::beginTransaction();
+            $f = Storage::disk('public')->put('files/tmp', $request['file']);
+
+            $path = storage_path('app/public') . '/' . $f;
+            $reader = IOFactory::createReaderForFile($path);
+            $reader->setReadDataOnly(true);
+            $spreadsheet = $reader->load($path);
+
+            $sheet = $spreadsheet->getSheet(0);
+            $warehousing_data = $sheet->toArray(null, true, true, true);
+
+            $sheet2 = $spreadsheet->getSheet(1);
+            $warehousing_item_data = $sheet2->toArray(null, true, true, true);
+
+            $amount_total = array_sum(array_column($warehousing_item_data,'D'));
+            
+            $member = Member::where('mb_id', Auth::user()->mb_id)->first();
+            $results[$sheet->getTitle()] = [];
+            $errors[$sheet->getTitle()] = [];
+            $key_schedule = Warehousing::latest()->orderBy('w_no', 'DESC')->first();
+            $check_key = 1;
+            
+            $rows_warehousing_add = 0;
+            $rows_number_item_add = 0;
+            $check_error = false;
+            foreach($warehousing_data as $key=> $warehouse){
+                if($key <= 2){
+                    continue;
+                }
+                $validator = Validator::make($warehouse, WarehousingDataValidate::rules());
+                if ($validator->fails()) {
+                    $errors[$sheet->getTitle()][] = $validator->errors();
+                    $check_error = true;
+                } else {
+                    $w_schedule_day = date('Y-m-d', strtotime($warehouse['B']));
+                    $schedule_number = 'SPA_'.date('Ymd').((int)$key_schedule->w_no + $check_key).'_IW';
+                    $rows_warehousing_add = $rows_warehousing_add + 1;
+                    $warehousing_id = Warehousing::insertGetId([
+                        'mb_no' => Auth::user()->mb_no,
+                        'w_schedule_number' => $schedule_number,
+                        'w_type' => 'IW',
+                        'w_category_name' => '유통가공',
+                        'mb_no' => $member->mb_no,
+                        'co_no' => $warehouse['I'],
+                        'w_schedule_day' => $w_schedule_day,
+                        'w_schedule_amount' => $amount_total,
+                        'w_cancel_yn' => 'n'
+                    ]);
+                    if($warehousing_id){
+                        ReceivingGoodsDelivery::insert([
+                            'mb_no' => $member->mb_no,
+                            'w_no' => $warehousing_id,
+                            'service_korean_name' => '유통가공',
+                            'rgd_contents' => $warehouse['C'],
+                            'rgd_address' => $warehouse['D'],
+                            'rgd_address_detail' => $warehouse['E'],
+                            'rgd_receiver' => $warehouse['F'],
+                            'rgd_hp' => $warehouse['G'],
+                            'rgd_memo' => $warehouse['H'],
+                            'rgd_status1' => '입고예정',
+                            'rgd_status2' => '작업대기',
+                            'rgd_status3' => '배송준비',
+                            'rgd_delivery_company' => '택배',
+                            'rgd_delivery_schedule_day' => date('Y-m-d'),
+                            'rgd_arrive_day' => date('Y-m-d'),
+                        ]);
+                        foreach($warehousing_item_data as $key => $warehouse_item){
+                            if($key <= 2){
+                                continue;
+                            }
+                            
+                            $validator_item = Validator::make($warehouse_item, WarehousingItemValidate::rules());
+                            if ($validator_item->fails()) {
+                                $errors[$sheet->getTitle()][] = $validator_item->errors();
+                                $check_error = true;
+                            } else {
+                                if($warehouse['A'] === $warehouse_item['A']){
+                                    $rows_number_item_add = $rows_number_item_add + 1;
+                                    $item_no = WarehousingItem::insert([
+                                        'item_no' => $warehouse_item['B'],
+                                        'w_no' => $warehousing_id,
+                                        'wi_number' => $warehouse_item['C'],
+                                        'wi_type' => '입고_shipper'
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+                }
+                $check_key++;
+            }
+            if($check_error == true){
+                DB::rollback();
+                return response()->json([
+                    'message' => Messages::MSG_0007,
+                    'status' => 2,
+                    'errors' => $errors,
+                    'rows_warehousing_add' => $rows_warehousing_add,
+                    'rows_number_item_add' => $rows_number_item_add
+                ], 201);
+            }else{
+                DB::commit();
+                return response()->json([
+                    'message' => Messages::MSG_0007,
+                    'errors' => $errors,
+                    'status' => 1,
+                    'rows_warehousing_add' => $rows_warehousing_add,
+                    'rows_number_item_add' => $rows_number_item_add
+                ], 201);
+            }
+            
+        } catch (\Throwable $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0001], 500);
+        }
+    }
+
+
     public function getWarehousingImport(WarehousingSearchRequest $request) //page 129 show IW
 
     {
@@ -496,8 +628,19 @@ class WarehousingController extends Controller
                     });
                 })->orderBy('rgd_no', 'DESC');
             }else if($user->mb_type == 'spasys'){
-                $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing2 = Warehousing::where('w_type','=','EW')->whereNull('w_children_yn')->whereHas('co_no.co_parent.co_parent',function($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->get();
+                $w_import_no = collect($warehousing2)->map(function ($q){
+                   
+                    return $q -> w_import_no;
+                    
+                });
+
+                $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereNotIn('w_no', $w_import_no)->whereHas('w_no', function ($query) use ($user) {
                     $query->where('rgd_status1', '=', '입고')->whereNull('w_children_yn')->whereHas('co_no.co_parent.co_parent',function($q) use ($user){
+                        $q->where('co_no', $user->co_no);
+                    })->orwhere('rgd_status1', '=', '입고예정')->whereNotNull('w_import_no')->whereNull('w_children_yn')->whereHas('co_no.co_parent.co_parent',function($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     });
                 })->orderBy('rgd_no', 'DESC');
@@ -719,6 +862,10 @@ class WarehousingController extends Controller
                 ->where('rgd_status1', '=', '출고')
                 ->where('rgd_status2', '=', '작업완료')
                 ->where(function ($q) {
+                    $q->where('rgd_status5','!=','cancel')
+                    ->orWhereNull('rgd_status5');
+                })
+                ->where(function ($q) {
                     $q->where('rgd_status4', '=', '예상경비청구서')
                     ->orWhere('rgd_status4', '=', '확정청구서')
                     ->orWhere('rgd_status4', '=', '추가청구서');
@@ -794,7 +941,7 @@ class WarehousingController extends Controller
             }
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             //return DB::getQueryLog();
-
+           // return DB::getQueryLog();
             return response()->json($warehousing);
 
         } catch (\Exception $e) {
@@ -877,7 +1024,7 @@ class WarehousingController extends Controller
                 $query->where('w_type', '=', 'EW')->where(function ($q) {
                     $q->where(function ($query) {
                         $query->where('rgd_status4', '!=', '예상경비청구서')
-                        ->where('rgd_status4', '!=', '확정청구서');
+                        ->where('rgd_status4', '!=', '확정청구서')->where('rgd_status4', '!=', '추가청구서');
                     })
                         ->orWhereNull('rgd_status4');
                 })
@@ -956,6 +1103,22 @@ class WarehousingController extends Controller
             $warehousing->orderBy('updated_at', 'DESC');
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             //return DB::getQueryLog();
+            $warehousing->setCollection(
+                $warehousing->getCollection()->map(function ($item){
+                    $service_name = $item->service_korean_name;
+                    $w_no = $item->w_no;
+                    $co_no = Warehousing::where('w_no', $w_no)->first()->co_no;
+                    $service_no = Service::where('service_name', $service_name)->first()->service_no;
+
+                    $company_settlement = CompanySettlement::where([
+                        'co_no' => $co_no,
+                        'service_no' => $service_no
+                    ])->first();
+                    $item->settlement_cycle = $company_settlement ? $company_settlement->cs_payment_cycle : "";
+
+                    return $item;
+                })
+            );
 
             return response()->json($warehousing);
 
