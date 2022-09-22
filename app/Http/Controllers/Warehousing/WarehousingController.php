@@ -956,6 +956,16 @@ class WarehousingController extends Controller
             $warehousing->orderBy('updated_at', 'DESC');
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             //return DB::getQueryLog();
+            $warehousing->setCollection(
+                $warehousing->getCollection()->map(function ($q){
+                    $warehousing = ReceivingGoodsDelivery::with(['w_no'])->whereHas('w_no.co_no.company_settlement')->first();
+                    // if(isset($item['warehousing_item']['wi_number'])){
+                    //     $q->total_price_row = $item->item_price2 * $item['warehousing_item']['wi_number'];
+                    // }
+                    $q->cs_payment_cycle = $warehousing['w_no'];
+                    return $q;
+                })
+            );
 
             return response()->json($warehousing);
 
