@@ -12,6 +12,8 @@ use App\Models\Member;
 use App\Models\ReceivingGoodsDelivery;
 use App\Models\Warehousing;
 use App\Models\WarehousingItem;
+use App\Models\CompanySettlement;
+use App\Models\Service;
 use App\Models\RateData;
 use App\Models\RateDataGeneral;
 use App\Utils\Messages;
@@ -626,8 +628,19 @@ class WarehousingController extends Controller
                     });
                 })->orderBy('rgd_no', 'DESC');
             }else if($user->mb_type == 'spasys'){
-                $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing2 = Warehousing::where('w_type','=','EW')->whereNull('w_children_yn')->whereHas('co_no.co_parent.co_parent',function($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->get();
+                $w_import_no = collect($warehousing2)->map(function ($q){
+                   
+                    return $q -> w_import_no;
+                    
+                });
+
+                $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereNotIn('w_no', $w_import_no)->whereHas('w_no', function ($query) use ($user) {
                     $query->where('rgd_status1', '=', '입고')->whereNull('w_children_yn')->whereHas('co_no.co_parent.co_parent',function($q) use ($user){
+                        $q->where('co_no', $user->co_no);
+                    })->orwhere('rgd_status1', '=', '입고예정')->whereNotNull('w_import_no')->whereNull('w_children_yn')->whereHas('co_no.co_parent.co_parent',function($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     });
                 })->orderBy('rgd_no', 'DESC');
@@ -849,6 +862,10 @@ class WarehousingController extends Controller
                 ->where('rgd_status1', '=', '출고')
                 ->where('rgd_status2', '=', '작업완료')
                 ->where(function ($q) {
+                    $q->where('rgd_status5','!=','cancel')
+                    ->orWhereNull('rgd_status5');
+                })
+                ->where(function ($q) {
                     $q->where('rgd_status4', '=', '예상경비청구서')
                     ->orWhere('rgd_status4', '=', '확정청구서')
                     ->orWhere('rgd_status4', '=', '추가청구서');
@@ -924,7 +941,7 @@ class WarehousingController extends Controller
             }
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             //return DB::getQueryLog();
-
+           // return DB::getQueryLog();
             return response()->json($warehousing);
 
         } catch (\Exception $e) {
@@ -1007,7 +1024,7 @@ class WarehousingController extends Controller
                 $query->where('w_type', '=', 'EW')->where(function ($q) {
                     $q->where(function ($query) {
                         $query->where('rgd_status4', '!=', '예상경비청구서')
-                        ->where('rgd_status4', '!=', '확정청구서');
+                        ->where('rgd_status4', '!=', '확정청구서')->where('rgd_status4', '!=', '추가청구서');
                     })
                         ->orWhereNull('rgd_status4');
                 })
@@ -1086,6 +1103,22 @@ class WarehousingController extends Controller
             $warehousing->orderBy('updated_at', 'DESC');
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             //return DB::getQueryLog();
+            $warehousing->setCollection(
+                $warehousing->getCollection()->map(function ($item){
+                    $service_name = $item->service_korean_name;
+                    $w_no = $item->w_no;
+                    $co_no = Warehousing::where('w_no', $w_no)->first()->co_no;
+                    $service_no = Service::where('service_name', $service_name)->first()->service_no;
+
+                    $company_settlement = CompanySettlement::where([
+                        'co_no' => $co_no,
+                        'service_no' => $service_no
+                    ])->first();
+                    $item->settlement_cycle = $company_settlement ? $company_settlement->cs_payment_cycle : "";
+
+                    return $item;
+                })
+            );
 
             return response()->json($warehousing);
 
