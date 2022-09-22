@@ -496,8 +496,19 @@ class WarehousingController extends Controller
                     });
                 })->orderBy('rgd_no', 'DESC');
             }else if($user->mb_type == 'spasys'){
-                $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing2 = Warehousing::where('w_type','=','EW')->whereNull('w_children_yn')->whereHas('co_no.co_parent.co_parent',function($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->get();
+                $w_import_no = collect($warehousing2)->map(function ($q){
+                   
+                    return $q -> w_import_no;
+                    
+                });
+
+                $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereNotIn('w_no', $w_import_no)->whereHas('w_no', function ($query) use ($user) {
                     $query->where('rgd_status1', '=', '입고')->whereNull('w_children_yn')->whereHas('co_no.co_parent.co_parent',function($q) use ($user){
+                        $q->where('co_no', $user->co_no);
+                    })->orwhere('rgd_status1', '=', '입고예정')->whereNotNull('w_import_no')->whereNull('w_children_yn')->whereHas('co_no.co_parent.co_parent',function($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     });
                 })->orderBy('rgd_no', 'DESC');
@@ -881,7 +892,7 @@ class WarehousingController extends Controller
                 $query->where('w_type', '=', 'EW')->where(function ($q) {
                     $q->where(function ($query) {
                         $query->where('rgd_status4', '!=', '예상경비청구서')
-                        ->where('rgd_status4', '!=', '확정청구서');
+                        ->where('rgd_status4', '!=', '확정청구서')->where('rgd_status4', '!=', '추가청구서');
                     })
                         ->orWhereNull('rgd_status4');
                 })
