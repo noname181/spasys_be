@@ -127,9 +127,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/get_import_schedule', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'getImportSchedule']);
 
     Route::get('/warehousing', [\App\Http\Controllers\Warehousing\WarehousingController::class,'__invoke']);
+    Route::post('/warehousing_import', [\App\Http\Controllers\Warehousing\WarehousingController::class,'warehousingImport']);
+    
     Route::get('/get_warehousing/{w_no}', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingById']);
     Route::get('/get_warehousing_from_rgd/{rgd_no}/{type}', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingByRgd']);
-
+    
     Route::post('/get_warehousing', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousing']);
     Route::post('/get_warehousing_export', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingExport']);
     Route::post('/get_warehousing_import', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingImport']); //page 129
@@ -280,8 +282,6 @@ Route::middleware('auth')->group(function () {
         Route::delete('/schedule_shipment/{schedule_shipment}', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'deleteScheduleShipment'])->name('delete_schedule_shipment');
         Route::post('/create_or_update', [\App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'CreateOrUpdateByCoPu'])->name('create_or_update');
         Route::get('/get_schedule_shipment_info_by_co_no/{co_no}', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'getScheduleShipmentInfoByCono'])->name('get_schedule_shipment_info_by_co_no');
-
-
     });
 
 
