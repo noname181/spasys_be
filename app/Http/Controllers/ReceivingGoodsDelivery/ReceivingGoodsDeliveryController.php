@@ -847,7 +847,21 @@ class ReceivingGoodsDeliveryController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
+    public function update_ReceivingGoodsDelivery_cancel($rgd_no){
+            
+        try {
 
+            $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->update([
+                'rgd_status5' => 'cancel'
+            ]);
+
+            return response()->json(['message' => 'ok']);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
     public function getReceivingGoodsDelivery($is_no){
 
         try {
