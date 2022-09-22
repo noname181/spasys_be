@@ -658,7 +658,7 @@ class ItemController extends Controller
             $path = storage_path('app/public') . '/' . $f;
             $reader = IOFactory::createReaderForFile($path);
             $reader->setReadDataOnly(true);
-            $spreadsheet = $reader->load($path);
+            $spreadsheet = $reader->load($path); 
 
             $sheet = $spreadsheet->getSheet(0);
             $datas = $sheet->toArray(null, true, true, true);
@@ -674,9 +674,7 @@ class ItemController extends Controller
                 
                 $validator = Validator::make($d, ExcelRequest::rules());
                 if ($validator->fails()) {
-                   
                     $errors[$sheet->getTitle()][] = $validator->errors();
-                   
                 } else {
                     $number_add =  $number_add + 1;
                     $item_no = Item::insertGetId([

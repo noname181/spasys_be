@@ -127,9 +127,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/get_import_schedule', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'getImportSchedule']);
 
     Route::get('/warehousing', [\App\Http\Controllers\Warehousing\WarehousingController::class,'__invoke']);
+    Route::post('/warehousing_import', [\App\Http\Controllers\Warehousing\WarehousingController::class,'warehousingImport']);
+    
     Route::get('/get_warehousing/{w_no}', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingById']);
     Route::get('/get_warehousing_from_rgd/{rgd_no}/{type}', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingByRgd']);
-
+    
     Route::post('/get_warehousing', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousing']);
     Route::post('/get_warehousing_export', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingExport']);
     Route::post('/get_warehousing_import', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingImport']); //page 129
@@ -281,8 +283,6 @@ Route::middleware('auth')->group(function () {
         Route::delete('/schedule_shipment/{schedule_shipment}', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'deleteScheduleShipment'])->name('delete_schedule_shipment');
         Route::post('/create_or_update', [\App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'CreateOrUpdateByCoPu'])->name('create_or_update');
         Route::get('/get_schedule_shipment_info_by_co_no/{co_no}', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'getScheduleShipmentInfoByCono'])->name('get_schedule_shipment_info_by_co_no');
-
-
     });
 
 
@@ -302,6 +302,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('rate_data')->name('rate_data.')->group(function () {
         Route::middleware('role:spasys_manager,spasys_admin,spasys_operator,shop_manager,shop_operator')->group(function () {
             Route::post('/spasys', [\App\Http\Controllers\RateData\RateDataController::class, 'spasysRegisterRateData'])->name('spasys_registe_rate_data');
+            Route::post('/spasys2', [\App\Http\Controllers\RateData\RateDataController::class, 'spasysRegisterRateData2'])->name('spasys_registe_rate_data2');
             Route::get('/spasys', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData'])->name('get_spasys_rate_data');
             Route::get('/spasys2', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData2'])->name('get_spasys_rate_data2');
             Route::get('/spasys3', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData3'])->name('get_spasys_rate_data3');
