@@ -95,17 +95,45 @@ class WarehousingController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
             if($user->mb_type == 'shop'){
+                $warehousing2 = Warehousing::join(DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
+                'm.w_no', '=', 'warehousing.w_no')->where('warehousing.w_type','=','EW')->whereHas('co_no.co_parent',function ($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->get();
+                $w_import_no = collect($warehousing2)->map(function ($q){
+                    
+                    return $q -> w_import_no;   
+
+                });
+                $w_no_in = collect($warehousing2)->map(function ($q){
+                    
+                    return $q -> w_no;   
+
+                });
                 $warehousing = Warehousing::with('mb_no')
-                ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])
+                ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->whereNotIn('w_no',$w_import_no)->where('w_type','IW')
                 ->whereHas('co_no.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
-                })->orderBy('w_no', 'DESC');
+                })->orWhereIn('w_no',$w_no_in)->orderBy('w_no', 'DESC');
             }else if($user->mb_type == 'shipper'){
+                $warehousing2 = Warehousing::join(DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
+                'm.w_no', '=', 'warehousing.w_no')->where('warehousing.w_type','=','EW')->whereHas('co_no',function ($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->get();
+                $w_import_no = collect($warehousing2)->map(function ($q){
+                    
+                    return $q -> w_import_no;   
+
+                });
+                $w_no_in = collect($warehousing2)->map(function ($q){
+                    
+                    return $q -> w_no;   
+
+                });
                 $warehousing = Warehousing::with('mb_no')
-                ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])
+                ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->whereNotIn('w_no',$w_import_no)->where('w_type','IW')
                 ->whereHas('co_no',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
-                })->orderBy('w_no', 'DESC');
+                })->orWhereIn('w_no',$w_no_in)->orderBy('w_no', 'DESC');
             }else if($user->mb_type == 'spasys'){
                 
                 $warehousing2 = Warehousing::join(DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
@@ -633,14 +661,34 @@ class WarehousingController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
             if($user->mb_type == 'shop'){
-                $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing2 = Warehousing::where('w_type','=','EW')->whereNull('w_children_yn')->whereHas('co_no.co_parent',function($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->get();
+                $w_import_no = collect($warehousing2)->map(function ($q){
+
+                    return $q -> w_import_no;
+
+                });
+                $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereNotIn('w_no', $w_import_no)->whereHas('w_no', function ($query) use ($user) {
                     $query->where('rgd_status1', '=', '입고')->whereNull('w_children_yn')->whereHas('co_no.co_parent',function($q) use ($user){
+                        $q->where('co_no', $user->co_no);
+                    })->orwhere('rgd_status1', '=', '입고예정')->whereNotNull('w_import_no')->whereNull('w_children_yn')->whereHas('co_no.co_parent',function($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     });
                 })->orderBy('rgd_no', 'DESC');
             }else if($user->mb_type == 'shipper'){
-                $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing2 = Warehousing::where('w_type','=','EW')->whereNull('w_children_yn')->whereHas('co_no',function($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->get();
+                $w_import_no = collect($warehousing2)->map(function ($q){
+
+                    return $q -> w_import_no;
+
+                });
+                $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereNotIn('w_no', $w_import_no)->whereHas('w_no', function ($query) use ($user) {
                     $query->where('rgd_status1', '=', '입고')->whereNull('w_children_yn')->whereHas('co_no',function($q) use ($user){
+                        $q->where('co_no', $user->co_no);
+                    })->orwhere('rgd_status1', '=', '입고예정')->whereNotNull('w_import_no')->whereNull('w_children_yn')->whereHas('co_no',function($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     });
                 })->orderBy('rgd_no', 'DESC');
