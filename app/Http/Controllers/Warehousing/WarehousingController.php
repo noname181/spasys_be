@@ -320,13 +320,13 @@ class WarehousingController extends Controller
             $warehousing_item_data = $sheet2->toArray(null, true, true, true);
 
             $amount_total = array_sum(array_column($warehousing_item_data,'D'));
-            
+
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
             $results[$sheet->getTitle()] = [];
             $errors[$sheet->getTitle()] = [];
             $key_schedule = Warehousing::latest()->orderBy('w_no', 'DESC')->first();
             $check_key = 1;
-            
+
             $rows_warehousing_add = 0;
             $rows_number_item_add = 0;
             $check_error = false;
@@ -375,7 +375,7 @@ class WarehousingController extends Controller
                             if($key <= 2){
                                 continue;
                             }
-                            
+
                             $validator_item = Validator::make($warehouse_item, WarehousingItemValidate::rules());
                             if ($validator_item->fails()) {
                                 $errors[$sheet->getTitle()][] = $validator_item->errors();
@@ -415,7 +415,7 @@ class WarehousingController extends Controller
                     'rows_number_item_add' => $rows_number_item_add
                 ], 201);
             }
-            
+
         } catch (\Throwable $e) {
             DB::rollback();
             Log::error($e);
@@ -632,9 +632,9 @@ class WarehousingController extends Controller
                     $q->where('co_no', $user->co_no);
                 })->get();
                 $w_import_no = collect($warehousing2)->map(function ($q){
-                   
+
                     return $q -> w_import_no;
-                    
+
                 });
 
                 $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereNotIn('w_no', $w_import_no)->whereHas('w_no', function ($query) use ($user) {
@@ -940,6 +940,22 @@ class WarehousingController extends Controller
 
             }
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
+            $warehousing->setCollection(
+                $warehousing->getCollection()->map(function ($item){
+                    $service_name = $item->service_korean_name;
+                    $w_no = $item->w_no;
+                    $co_no = Warehousing::where('w_no', $w_no)->first()->co_no;
+                    $service_no = Service::where('service_name', $service_name)->first()->service_no;
+
+                    $company_settlement = CompanySettlement::where([
+                        'co_no' => $co_no,
+                        'service_no' => $service_no
+                    ])->first();
+                    $item->settlement_cycle = $company_settlement ? $company_settlement->cs_payment_cycle : "";
+
+                    return $item;
+                })
+            );
             //return DB::getQueryLog();
            // return DB::getQueryLog();
             return response()->json($warehousing);
