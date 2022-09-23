@@ -100,13 +100,13 @@ class WarehousingController extends Controller
                     $q->where('co_no', $user->co_no);
                 })->get();
                 $w_import_no = collect($warehousing2)->map(function ($q){
-                    
-                    return $q -> w_import_no;   
+
+                    return $q -> w_import_no;
 
                 });
                 $w_no_in = collect($warehousing2)->map(function ($q){
-                    
-                    return $q -> w_no;   
+
+                    return $q -> w_no;
 
                 });
                 $warehousing = Warehousing::with('mb_no')
@@ -120,13 +120,13 @@ class WarehousingController extends Controller
                     $q->where('co_no', $user->co_no);
                 })->get();
                 $w_import_no = collect($warehousing2)->map(function ($q){
-                    
-                    return $q -> w_import_no;   
+
+                    return $q -> w_import_no;
 
                 });
                 $w_no_in = collect($warehousing2)->map(function ($q){
-                    
-                    return $q -> w_no;   
+
+                    return $q -> w_no;
 
                 });
                 $warehousing = Warehousing::with('mb_no')
@@ -135,19 +135,19 @@ class WarehousingController extends Controller
                     $q->where('co_no', $user->co_no);
                 })->orWhereIn('w_no',$w_no_in)->orderBy('w_no', 'DESC');
             }else if($user->mb_type == 'spasys'){
-                
+
                 $warehousing2 = Warehousing::join(DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
                 'm.w_no', '=', 'warehousing.w_no')->where('warehousing.w_type','=','EW')->whereHas('co_no.co_parent.co_parent',function($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->get();
                 $w_import_no = collect($warehousing2)->map(function ($q){
-                    
-                    return $q -> w_import_no;   
+
+                    return $q -> w_import_no;
 
                 });
                 $w_no_in = collect($warehousing2)->map(function ($q){
-                    
-                    return $q -> w_no;   
+
+                    return $q -> w_no;
 
                 });
 
@@ -935,7 +935,7 @@ class WarehousingController extends Controller
                     ->orWhere('rgd_status4', '=', '확정청구서')
                     ->orWhere('rgd_status4', '=', '추가청구서');
                 });
-            })->orderBy('rgd_no', 'DESC');
+            })->orderBy('updated_at', 'DESC');
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }

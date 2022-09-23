@@ -50,6 +50,11 @@ class Warehousing extends Model
         return $this->hasOne(Member::class, 'mb_no', 'mb_no');
     }
 
+    public function member()
+    {
+        return $this->hasOne(Member::class, 'mb_no', 'mb_no')->select(['mb_no', 'mb_name']);
+    }
+
     public function co_no()
     {
         return $this->belongsTo(Company::class, 'co_no', 'co_no')->with(['contract', 'co_parent', 'company_settlement']);

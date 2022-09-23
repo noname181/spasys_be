@@ -26,6 +26,7 @@ class RateMetaData extends Model
         'rm_no',
         'set_type',
         'w_no',
+        'rgd_no',
         'co_no'
     ];
 

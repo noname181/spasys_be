@@ -105,6 +105,7 @@ class RateDataController extends Controller
                 'set_type' => $validated['set_type']])->first();
                 $rmd = RateMetaData::updateOrCreate(
                     [
+                        'rgd_no' => $validated['rgd_no'],
                         'w_no' => $w_no,
                         'set_type' => $validated['set_type'],
                     ],
@@ -120,9 +121,9 @@ class RateDataController extends Controller
                     [
                         'rd_no' => isset($is_new->rmd_no) ? (isset($val['rd_no']) ? $val['rd_no'] : null) : null,
                         'rmd_no' => isset($rmd) ? $rmd->rmd_no : null,
-                        'w_no' => isset($w_no) ? $w_no : null,
                     ],
                     [
+                        'w_no' => isset($w_no) ? $w_no : null,
                         'rd_cate_meta1' => $val['rd_cate_meta1'],
                         'rd_cate_meta2' => $val['rd_cate_meta2'],
                         'rd_cate1' => isset($val['rd_cate1']) ? $val['rd_cate1'] : '',
@@ -153,68 +154,6 @@ class RateDataController extends Controller
         }
     }
 
-    public function register_set_data_final(RateDataRequest $request) {
-        $validated = $request->validated();
-        try {
-            DB::beginTransaction();
-
-            $rgd = ReceivingGoodsDelivery::where('rgd_no', $validated['rgd_no'])->first();
-            $w_no = $rgd->w_no;
-
-            if (isset($w_no)) {
-                $is_new = RateMetaData::where(['w_no' => $w_no,
-                'set_type' => $validated['set_type']])->first();
-                $rmd = RateMetaData::updateOrCreate(
-                    [
-                        'w_no' => $w_no,
-                        'set_type' => $validated['set_type'],
-                    ],
-                    [
-                        'mb_no' => Auth::user()->mb_no,
-                    ]
-                );
-            }
-
-            foreach ($validated['rate_data'] as $val) {
-                Log::error($val);
-                $rd_no = RateData::updateOrCreate(
-                    [
-                        'rd_no' => isset($is_new->rmd_no) ? (isset($val['rd_no']) ? $val['rd_no'] : null) : null,
-                        'rmd_no' => isset($rmd) ? $rmd->rmd_no : null,
-
-                    ],
-                    [
-                        'w_no' => isset($w_no) ? $w_no : null,
-                        'rd_cate_meta1' => $val['rd_cate_meta1'],
-                        'rd_cate_meta2' => $val['rd_cate_meta2'],
-                        'rd_cate1' => isset($val['rd_cate1']) ? $val['rd_cate1'] : '',
-                        'rd_cate2' => isset($val['rd_cate2']) ? $val['rd_cate2'] : '',
-                        'rd_cate3' => isset($val['rd_cate3']) ? $val['rd_cate3'] : '',
-                        'rd_data1' => isset($val['rd_data1']) ? $val['rd_data1'] : '',
-                        'rd_data2' => isset($val['rd_data2']) ? $val['rd_data2'] : '',
-                        'rd_data3' => isset($val['rd_data3']) ? $val['rd_data3'] : '',
-                        'rd_data4' => isset($val['rd_data4']) ? $val['rd_data4'] : '',
-                        'rd_data5' => isset($val['rd_data5']) ? $val['rd_data5'] : '',
-                        'rd_data6' => isset($val['rd_data6']) ? $val['rd_data6'] : '',
-                        'rd_data7' => isset($val['rd_data7']) ? $val['rd_data7'] : '',
-                        'rd_data8' => isset($val['rd_data8']) ? $val['rd_data8'] : '',
-                    ],
-                );
-            }
-            DB::commit();
-            return response()->json([
-                'message' => Messages::MSG_0007,
-                'rmd_no' => isset($rmd) ? $rmd->rmd_no : null,
-            ], 201);
-        } catch (\Exception $e) {
-            DB::rollback();
-            Log::error($e);
-            return $e;
-            return response()->json(['message' => Messages::MSG_0001], 500);
-        }
-    }
-
-
     public function get_rmd_no($rgd_no, $set_type){
         $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
         $w_no = $rgd->w_no;
@@ -222,6 +161,7 @@ class RateDataController extends Controller
         $rmd = RateMetaData::where(
             [
                 'w_no' => $w_no,
+                'rgd_no' => $rgd_no,
                 'set_type' => $set_type
             ]
         )->first();
@@ -230,6 +170,7 @@ class RateDataController extends Controller
             $rmd = RateMetaData::where(
                 [
                     'w_no' => $w_no,
+                    'rgd_no' => $rgd_no,
                     'set_type' => 'work_final'
                 ]
             )->first();
@@ -237,6 +178,7 @@ class RateDataController extends Controller
                 $rmd = RateMetaData::where(
                     [
                         'w_no' => $w_no,
+                        'rgd_no' => $rgd_no,
                         'set_type' => 'work'
                     ]
                 )->first();
@@ -245,6 +187,7 @@ class RateDataController extends Controller
             $rmd = RateMetaData::where(
                 [
                     'w_no' => $w_no,
+                    'rgd_no' => $rgd_no,
                     'set_type' => 'storage_final'
                 ]
             )->first();
@@ -252,6 +195,7 @@ class RateDataController extends Controller
                 $rmd = RateMetaData::where(
                     [
                         'w_no' => $w_no,
+                        'rgd_no' => $rgd_no,
                         'set_type' => 'storage'
                     ]
                 )->first();
@@ -260,6 +204,7 @@ class RateDataController extends Controller
             $rmd = RateMetaData::where(
                 [
                     'w_no' => $w_no,
+                    'rgd_no' => $rgd_no,
                     'set_type' => 'work_additional'
                 ]
             )->first();
@@ -267,6 +212,7 @@ class RateDataController extends Controller
                 $rmd = RateMetaData::where(
                     [
                         'w_no' => $w_no,
+                        'rgd_no' => $rgd_no,
                         'set_type' => 'work_final'
                     ]
                 )->first();
@@ -275,6 +221,7 @@ class RateDataController extends Controller
             $rmd = RateMetaData::where(
                 [
                     'w_no' => $w_no,
+                    'rgd_no' => $rgd_no,
                     'set_type' => 'storage_additional'
                 ]
             )->first();
@@ -282,6 +229,7 @@ class RateDataController extends Controller
                 $rmd = RateMetaData::where(
                     [
                         'w_no' => $w_no,
+                        'rgd_no' => $rgd_no,
                         'set_type' => 'storage_final'
                     ]
                 )->first();
@@ -290,6 +238,7 @@ class RateDataController extends Controller
             $rmd = RateMetaData::where(
                 [
                     'w_no' => $w_no,
+                    'rgd_no' => $rgd_no,
                     'set_type' => 'work_monthly_final'
                 ]
             )->first();
@@ -297,6 +246,7 @@ class RateDataController extends Controller
                 $rmd = RateMetaData::where(
                     [
                         'w_no' => $w_no,
+                        'rgd_no' => $rgd_no,
                         'set_type' => 'work_monthly'
                     ]
                 )->first();
@@ -305,6 +255,7 @@ class RateDataController extends Controller
             $rmd = RateMetaData::where(
                 [
                     'w_no' => $w_no,
+                    'rgd_no' => $rgd_no,
                     'set_type' => 'storage_monthly_final'
                 ]
             )->first();
@@ -312,6 +263,7 @@ class RateDataController extends Controller
                 $rmd = RateMetaData::where(
                     [
                         'w_no' => $w_no,
+                        'rgd_no' => $rgd_no,
                         'set_type' => 'storage_monthly'
                     ]
                 )->first();
@@ -320,6 +272,7 @@ class RateDataController extends Controller
             $rmd = RateMetaData::where(
                 [
                     'w_no' => $w_no,
+                    'rgd_no' => $rgd_no,
                     'set_type' => 'storage_final'
                 ]
             )->first();
@@ -327,6 +280,7 @@ class RateDataController extends Controller
                 $rmd = RateMetaData::where(
                     [
                         'w_no' => $w_no,
+                        'rgd_no' => $rgd_no,
                         'set_type' => 'storage'
                     ]
                 )->first();
@@ -354,7 +308,7 @@ class RateDataController extends Controller
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
-    public function get_set_data2($bill_type,$rmd_no)
+    public function get_set_data_mobile($bill_type,$rmd_no)
     {
         try {
             $rate_data = RateData::where('rmd_no', $rmd_no)->where('rd_cate_meta1', '유통가공')->get();
@@ -445,119 +399,6 @@ class RateDataController extends Controller
         }
     }
 
-    public function getRateDataByRmno($rm_no)
-    {
-        try {
-            $my_rate_data1 = RateData::where(['rm_no' => $rm_no, 'rd_cate_meta1' => '보세화물'])->get();
-            $my_rate_data2 = RateData::where(['rm_no' => $rm_no, 'rd_cate_meta1' => '수입풀필먼트'])->get();
-            $my_rate_data3 = RateData::where(['rm_no' => $rm_no, 'rd_cate_meta1' => '유통가공'])->get();
-            return response()->json(['message' => Messages::MSG_0007, 'my_rate_data1' => $my_rate_data1, 'my_rate_data2' => $my_rate_data2, 'my_rate_data3' => $my_rate_data3], 200);
-        } catch (\Exception $e) {
-            DB::rollback();
-            Log::error($e);
-            return response()->json(['message' => Messages::MSG_0020], 500);
-        }
-    }
-
-    public function createOrUpdateImportFulfillment(RateDataImportFulfillmentRequest $request)
-    {
-        $validated = $request->validated();
-        try {
-            DB::beginTransaction();
-
-            if (isset($validated['co_no'])) {
-                $rm_no = RateMeta::insertGetId([
-                    'co_no' => $validated['co_no'],
-                    'mb_no' => Auth::user()->mb_no,
-                ]);
-            }
-            if (empty($validated['newRmd_no'])) {
-                $rmd_no = RateMetaData::insertGetId(
-                    [
-                        'mb_no' => Auth::user()->mb_no,
-                        'rm_no' => $validated['rm_no'],
-                    ]
-                );
-            }
-
-            foreach ($validated['rate_data'] as $val) {
-                RateData::updateOrCreate(
-                    [
-                        'rd_no' => isset($rmd_no) ? null : (isset($val['rd_no']) ? $val['rd_no'] : null),
-                        'rmd_no' => isset($rmd_no) ? $rmd_no : $validated['newRmd_no'],
-                        'rm_no' => isset($validated['rm_no']) ? $validated['rm_no'] : $rm_no,
-                    ],
-                    [
-                        'co_no' => isset($validated['co_no']) ? $validated['co_no'] : null,
-                        'rd_cate_meta1' => $val['rd_cate_meta1'],
-                        'rd_cate_meta2' => '',
-                        'rd_cate1' => $val['rd_cate1'],
-                        'rd_cate2' => $val['rd_cate2'],
-                        'rd_cate3' => '',
-                        'rd_data1' => $val['rd_data1'],
-                        'rd_data2' => $val['rd_data2'],
-                        'rd_data3' => $val['rd_data3'],
-                    ],
-                );
-            }
-
-            DB::commit();
-            return response()->json([
-                'message' => Messages::MSG_0007,
-                'rmd_no' => isset($rmd_no) ? $rmd_no : $validated['newRmd_no'],
-            ], 201);
-        } catch (\Exception $e) {
-            DB::rollback();
-            Log::error($e);
-            return $e;
-            return response()->json(['message' => Messages::MSG_0001], 500);
-        }
-    }
-
-    public function getRateDataByImportFulfillmentByRmno($rm_no, $rmd_no)
-    {
-        $co_no = Auth::user()->co_no;
-        try {
-            $rate_data = RateData::where('rm_no', $rm_no)
-                ->where('rmd_no', $rmd_no)
-                ->where('rd_cate_meta1', '수입풀필먼트')
-                ->get();
-            $co_rate_data = RateData::where('co_no', $co_no)
-                ->where('rd_cate_meta1', '수입풀필먼트')
-                ->get();
-            return response()->json([
-                'message' => Messages::MSG_0007,
-                'rate_data' => $rate_data,
-                'co_rate_data' => $co_rate_data,
-            ], 200);
-        } catch (\Exception $e) {
-            Log::error($e);
-            return response()->json(['message' => Messages::MSG_0020], 500);
-        }
-    }
-
-    public function getRateDataByImportFulfillmentByCono($co_no)
-    {
-        try {
-            $rate_data = RateData::select([
-                'rd_no',
-                'rm_no',
-                'rd_cate_meta1',
-                'rd_cate1',
-                'rd_cate2',
-                'rd_data1',
-                'rd_data2',
-                'rd_data3',
-            ])
-                ->where('rd_cate_meta1', '수입풀필먼트')
-                ->where('co_no', $co_no)
-                ->get();
-            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data], 200);
-        } catch (\Exception $e) {
-            Log::error($e);
-            return response()->json(['message' => Messages::MSG_0020], 500);
-        }
-    }
 
     public function spasysRegisterRateData(RateDataRequest $request)
     {
@@ -616,7 +457,7 @@ class RateDataController extends Controller
                     'set_type' => 'estimated_costs'
                 ]);
             }
-    
+
             foreach ($validated['rate_data'] as $val) {
                 RateData::updateOrCreate(
                     [
@@ -907,14 +748,14 @@ class RateDataController extends Controller
 
             $w_no = $rgd->w_no;
 
-            $warehousing = Warehousing::with(['co_no', 'w_import_parent'])->where('w_no', $w_no)->first();
+            $warehousing = Warehousing::with(['co_no', 'w_import_parent', 'member'])->where('w_no', $w_no)->first();
 
-            $rdg = RateDataGeneral::where('w_no', $w_no)->where('rdg_bill_type', $bill_type)->first();
+            $rdg = RateDataGeneral::where('w_no', $w_no)->where('rgd_no', $rgd_no)->where('rdg_bill_type', $bill_type)->first();
 
-            $get_w_no = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first()->w_no;
-            $get_co_no = Warehousing::where('w_no',$get_w_no)->first()->co_no;
 
-            $ag_name = AdjustmentGroup::where('co_no',$get_co_no)->get();
+            $co_no = $warehousing->co_no;
+
+            $ag_name = AdjustmentGroup::where('co_no',$co_no)->get();
 
             DB::commit();
             return response()->json([
@@ -922,7 +763,7 @@ class RateDataController extends Controller
                 'rdg' => $rdg,
                 'warehousing' => $warehousing,
                 'ag_name' =>  $ag_name,
-                'co_no' => $get_co_no,
+                'co_no' => $co_no,
             ], 201);
         } catch (\Exception $e) {
             DB::rollback();
@@ -1038,7 +879,8 @@ class RateDataController extends Controller
             if($request->bill_type == 'expectation' || $request->bill_type == 'expectation_monthly'){
                 ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_status4' => $request->status,
-                    'rgd_bill_type' => $request->bill_type
+                    'rgd_bill_type' => $request->bill_type,
+                    'rgd_settlement_number' => $request->settlement_number ? $request->settlement_number : null,
                 ]);
             }
 
@@ -1550,6 +1392,7 @@ class RateDataController extends Controller
         $rmd = RateMetaData::where(
             [
                 'w_no' => $w_no,
+                'rgd_no' => $rgd_no,
                 'set_type' => $type
             ]
         )->first();
@@ -1557,6 +1400,7 @@ class RateDataController extends Controller
             $rmd = RateMetaData::where(
                 [
                     'w_no' => $w_no,
+                    'rgd_no' => $rgd_no,
                     'set_type' => $pretype
                 ]
             )->first();
