@@ -765,21 +765,21 @@ class RateDataController extends Controller
         }
     }
 
-    public function get_rate_data_general_final($w_no) {
+    public function get_rate_data_general_final($rgd_no) {
         try {
             DB::beginTransaction();
-            $rdg = RateDataGeneral::where('rgd_no_final', $w_no)->where('rdg_bill_type', 'additional')->first();
+            $rdg = RateDataGeneral::where('rgd_no_final', $rgd_no)->where('rdg_bill_type', 'additional')->first();
 
             if(!isset($rdg->rdg_no)){
-                $rdg = RateDataGeneral::where('rgd_no_expectation', $w_no)->where('rdg_bill_type', 'final')->first();
+                $rdg = RateDataGeneral::where('rgd_no_expectation', $rgd_no)->where('rdg_bill_type', 'final')->first();
             }
 
             if(!isset($rdg->rdg_no)){
-                $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'expectation')->first();
+                $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'expectation')->first();
             }
 
             if(!isset($rdg->rdg_no)){
-                $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'expectation_monthly')->first();
+                $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'expectation_monthly')->first();
             }
 
 
@@ -796,10 +796,10 @@ class RateDataController extends Controller
         }
     }
 
-    public function get_rate_data_general_final2($w_no) {
+    public function get_rate_data_general_final2($rgd_no) {
         try {
             DB::beginTransaction();
-            $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'final')->first();
+            $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'final')->first();
 
             DB::commit();
             return response()->json([
@@ -1015,13 +1015,13 @@ class RateDataController extends Controller
         }
     }
 
-    public function get_rate_data_general_additional($w_no) {
+    public function get_rate_data_general_additional($rgd_no) {
         try {
             DB::beginTransaction();
-            $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'final')->first();
+            $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'final')->first();
 
             if(!isset($rdg->rdg_no)){
-                $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'final')->first();
+                $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'final')->first();
             }
 
             DB::commit();
@@ -1036,13 +1036,13 @@ class RateDataController extends Controller
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
-    public function get_rate_data_general_additional2($w_no) {
+    public function get_rate_data_general_additional2($rgd_no) {
         try {
             DB::beginTransaction();
-            $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'additional')->first();
+            $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'additional')->first();
 
             if(!isset($rdg->rdg_no)){
-                $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'final')->first();
+                $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'final')->first();
             }
 
             DB::commit();
@@ -1058,13 +1058,13 @@ class RateDataController extends Controller
         }
     }
 
-    public function get_rate_data_general_additional3($w_no) {
+    public function get_rate_data_general_additional3($rgd_no) {
         try {
             DB::beginTransaction();
-            $rdg = RateDataGeneral::where('rgd_no_final', $w_no)->where('rdg_bill_type', 'additional')->first();
+            $rdg = RateDataGeneral::where('rgd_no_final', $rgd_no)->where('rdg_bill_type', 'additional')->first();
 
             if(!isset($rdg->rdg_no)){
-                $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'final')->first();
+                $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'final')->first();
             }
 
             DB::commit();
@@ -1223,13 +1223,13 @@ class RateDataController extends Controller
         }
     }
 
-    public function get_rate_data_general_monthly_final($w_no) {
+    public function get_rate_data_general_monthly_final($rgd_no) {
         try {
             DB::beginTransaction();
-            $rdg = RateDataGeneral::where('rgd_no_expectation', $w_no)->where('rdg_bill_type', 'final_monthly')->first();
+            $rdg = RateDataGeneral::where('rgd_no_expectation', $rgd_no)->where('rdg_bill_type', 'final_monthly')->first();
 
             if(!isset($rdg->rdg_no)){
-                $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'expectation_monthly')->first();
+                $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'expectation_monthly')->first();
             }
 
             DB::commit();
@@ -1244,13 +1244,13 @@ class RateDataController extends Controller
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
-    public function get_rate_data_general_monthly_final2($w_no) {
+    public function get_rate_data_general_monthly_final2($rgd_no) {
         try {
             DB::beginTransaction();
-            $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'final_monthly')->first();
+            $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'final_monthly')->first();
 
             if(!isset($rdg->rdg_no)){
-                $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'expectation_monthly')->first();
+                $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'expectation_monthly')->first();
             }
 
             DB::commit();
@@ -1266,13 +1266,13 @@ class RateDataController extends Controller
         }
     }
 
-    public function get_rate_data_general_monthly_additional($w_no) {
+    public function get_rate_data_general_monthly_additional($rgd_no) {
         try {
             DB::beginTransaction();
-            $rdg = RateDataGeneral::where('rgd_no_final', $w_no)->where('rdg_bill_type', 'additional_monthly')->first();
+            $rdg = RateDataGeneral::where('rgd_no_final', $rgd_no)->where('rdg_bill_type', 'additional_monthly')->first();
 
             if(!isset($rdg->rdg_no)){
-                $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'final_monthly')->first();
+                $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'final_monthly')->first();
             }
 
             DB::commit();
