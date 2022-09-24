@@ -332,13 +332,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/general_monthly_final2/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_monthly_final2'])->name('get_rate_data_general_monthly_final2');
 
 
-        //GET ADDITIONAL BILL DATA
+        //GET GENERAL BILL FOR CREATE ADDITIONAL MONTHLY BILL PAGE 270
         Route::get('/general_monthly_additional/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_monthly_additional'])->name('get_rate_data_general_monthly_additional');
         //GET GENERAL BILL FOR EDIT ADDITIONAL BILL PAGE
         Route::get('/general_additional2/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_additional2'])->name('get_rate_data_general_additional2');
-        //GET GENERAL BILL FOR CREATE ADDITIONAL BILL PAGE 268
+        //GET GENERAL BILL FOR CREATE ADDITIONAL CASE BILL PAGE 268
         Route::get('/general_additional/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_additional'])->name('get_rate_data_general_additional');
-        //GET GENERAL BILL FOR CREATE ADDITIONAL BILL PAGE 268 POPUP
+        //GET GENERAL BILL FOR CREATE ADDITIONAL CASE BILL PAGE 268 POPUP
         Route::get('/general_additional3/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_additional3'])->name('get_rate_data_general_additional3');
 
 
