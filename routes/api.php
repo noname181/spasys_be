@@ -128,10 +128,10 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/warehousing', [\App\Http\Controllers\Warehousing\WarehousingController::class,'__invoke']);
     Route::post('/warehousing_import', [\App\Http\Controllers\Warehousing\WarehousingController::class,'warehousingImport']);
-    
+
     Route::get('/get_warehousing/{w_no}', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingById']);
     Route::get('/get_warehousing_from_rgd/{rgd_no}/{type}', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingByRgd']);
-    
+
     Route::post('/get_warehousing', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousing']);
     Route::post('/get_warehousing_export', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingExport']);
     Route::post('/get_warehousing_import', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingImport']); //page 129
@@ -339,22 +339,20 @@ Route::middleware('auth')->group(function () {
         Route::get('/general_additional2/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_additional2'])->name('get_rate_data_general_additional2');
         Route::get('/general_additional3/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_additional3'])->name('get_rate_data_general_additional3');
 
-        //SET RATE DATA
+
         Route::post('/', \App\Http\Controllers\RateData\RateDataController::class)->name('registe_rate_data');
+        //REGISTER RATE DATA
         Route::post('/set_data',[\App\Http\Controllers\RateData\RateDataController::class, 'register_set_data'])->name('registe_set_data');
-        Route::post('/set_data_final',[\App\Http\Controllers\RateData\RateDataController::class, 'register_set_data_final'])->name('registe_set_data_final');
-        Route::post('/set_data_additional',[\App\Http\Controllers\RateData\RateDataController::class, 'register_set_data_final'])->name('registe_set_data_additional');
+        //GET RATE DATA
         Route::get('/get_set_data/{rmd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_set_data'])->name('get_set_data');
-        Route::get('/get_set_data2/{bill_type}/{rmd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_set_data2'])->name('get_set_data2');
-        Route::get('/get_rmd_no/{w_no}/{set_type}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_rmd_no'])->name('get_rmd_no');
+        Route::get('/get_set_data_mobile/{bill_type}/{rmd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_set_data_mobile'])->name('get_set_data2');
+        //GET RATE META DATA
+        Route::get('/get_rmd_no/{rgd_no}/{set_type}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_rmd_no'])->name('get_rmd_no');
         Route::get('/get_rmd_no_fulfill/{w_no}/{type}/{pretype}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_rmd_no_fulfill'])->name('get_rmd_no_fulfill');
 
         Route::get('/{rm_no}/{rmd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateData'])->name('get_rate_data');
         Route::get('/by_co_no/{rd_co_no}/{rmd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByCono'])->name('get_rate_data_by_co_no');
-        Route::get('/by_rm_no/{rm_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByRmno'])->name('get_rate_data_by_rm_no');
-        Route::get('/importfulfillment/by_rm_no/{rm_no}/{rmd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByImportFulfillmentByRmno'])->name('get_rate_data_by_importfulfillment_rmno');
-        Route::get('/importfulfillment/by_co_no/{co_no}/{rmd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByImportFulfillmentByCono'])->name('get_rate_data_by_importfulfillment_cono');
-        Route::post('/importfulfillment', [App\Http\Controllers\RateData\RateDataController::class, 'createOrUpdateImportFulfillment'])->name('update_or_create_importfulfillment');
+
         Route::post('/send_mail', [App\Http\Controllers\RateData\RateDataController::class, 'sendMail'])->name('send_mail');
     });
 

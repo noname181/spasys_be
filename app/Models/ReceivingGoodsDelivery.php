@@ -30,6 +30,8 @@ class ReceivingGoodsDelivery extends Model
         'rgd_address',
         'rgd_address_detail',
         'rgd_receiver',
+        'rgd_settlement_number',
+        'rgd_bill_type',
         'rgd_hp',
         'rgd_memo',
         'rgd_status1',
