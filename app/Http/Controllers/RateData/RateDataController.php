@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
+
 class RateDataController extends Controller
 {
     /**
@@ -449,7 +450,59 @@ class RateDataController extends Controller
             DB::beginTransaction();
 
             if (isset($request->rmd_no)) {
-                
+                foreach ($request->rate_data as $val) {
+                    RateData::where('rmd_no', $request->rmd_no)->update(
+                        [
+                            'rmd_no' => $rmd_no,
+                            'co_no' => $request->co_no,
+                            'rd_cate_meta1' => $val['rd_cate_meta1'],
+                            'rd_cate_meta2' => $val['rd_cate_meta2'],
+                            'rd_cate1' => $val['rd_cate1'],
+                            'rd_cate2' => $val['rd_cate2'],
+                            'rd_cate3' => '',
+                            'rd_data1' => $val['rd_data1'],
+                            'rd_data2' => $val['rd_data2'],
+                            'rd_data3' => $val['rd_data3'],
+                            'rd_data4' => isset($val['rd_data4']) ? $val['rd_data4'] : '',
+                            'rd_data5' => isset($val['rd_data5']) ? $val['rd_data5'] : '',
+                            'rd_data6' => isset($val['rd_data6']) ? $val['rd_data6'] : '',
+                            'rd_data7' => isset($val['rd_data7']) ? $val['rd_data7'] : '',
+                            'rd_data8' => isset($val['rd_data8']) ? $val['rd_data8'] : '',
+                        ]
+                    );
+                }
+
+                $rdg = RateDataGeneral::where('rmd_no', $request->rmd_no)->update(
+                    [
+                        'rmd_no' => $rmd_no,
+                        'mb_no' => Auth::user()->mb_no,
+                        'rdg_set_type' => 'estimated_costs',
+                        'rdg_supply_price1' => $request->total1['total1_3'],
+                        'rdg_supply_price2' => $request->total2['total2_3'],
+                        'rdg_supply_price3' => $request->total3['total3_3'],
+                        'rdg_supply_price4' => $request->total4['total4_3'],
+                        'rdg_supply_price5' => $request->total5['total5_3'],
+                        'rdg_supply_price6' => $request->total['totalall3'],
+                        'rdg_vat1' => $request->total1['total1_4'],
+                        'rdg_vat2' => $request->total2['total2_4'],
+                        'rdg_vat3' => $request->total3['total3_4'],
+                        'rdg_vat4' => $request->total4['total4_4'],
+                        'rdg_vat5' => $request->total5['total5_4'],
+                        'rdg_vat6' => $request->total['totalall4'],
+                        'rdg_sum1' => $request->total1['total1_5'],
+                        'rdg_sum2' => $request->total2['total2_5'],
+                        'rdg_sum3' => $request->total3['total3_5'],
+                        'rdg_sum4' => $request->total4['total4_5'],
+                        'rdg_sum5' => $request->total5['total5_5'],
+                        'rdg_sum6' => $request->total['totalall5'],
+                        'rdg_etc1' => isset($request->total1['total1_6']) ? $val['rd_data4'] : '',
+                        'rdg_etc2' => isset($request->total2['total2_6']) ? $val['rd_data4'] : '',
+                        'rdg_etc3' => isset($request->total3['total3_6']) ? $val['rd_data4'] : '',
+                        'rdg_etc4' => isset($request->total4['total4_6']) ? $val['rd_data4'] : '',
+                        'rdg_etc5' => isset($request->total5['total5_6']) ? $val['rd_data4'] : '',
+                        'rdg_etc6' => isset($request->total['totalall6']) ? $val['rd_data4'] : '',
+                    ]
+                );
             }else{
                 if (isset($request->co_no)) {
                     $rmd_no = RateMetaData::insertGetId([
@@ -513,7 +566,7 @@ class RateDataController extends Controller
                     ]
                 );
             }
-            
+
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -604,27 +657,29 @@ class RateDataController extends Controller
         }
     }
 
-    public function getSpasysRateData4()
+    public function getSpasysRateData4(Request $request)
     {
+       
         $user = Auth::user();
         try {
-            $rate_data = RateData::where('rd_cate_meta1', '수입풀필먼트');
-
-            if($user->mb_type == 'spasys'){
-                $rate_data = $rate_data->where('co_no', $user->co_no);
-            }else if($user->mb_type == 'shop'){
-                $rmd = RateMetaData::where('co_no', $user->co_no)->latest('created_at')->first();
-                $rate_data = $rate_data->where('rd_co_no', $user->co_no);
-                if(isset($rmd->rmd_no)){
-                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+            if(isset($request->rmd_no)){
+                $rate_data = RateData::where('rd_cate_meta1', '수입풀필먼트')->where('rmd_no',$request->rmd_no);
+            }else{
+                $rate_data = RateData::where('rd_cate_meta1', '수입풀필먼트');
+                if($user->mb_type == 'spasys'){
+                    $rate_data = $rate_data->where('co_no', $user->co_no);
+                }else if($user->mb_type == 'shop'){
+                    $rmd = RateMetaData::where('co_no', $user->co_no)->latest('created_at')->first();
+                    $rate_data = $rate_data->where('rd_co_no', $user->co_no);
+                    if(isset($rmd->rmd_no)){
+                        $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+                    }
                 }
+    
             }
-
+            
+            
             $rate_data = $rate_data->get();
-            $rate_data1 = [];
-            for($i = 1;$i <= 15; $i++ ){
-                $rate_data1[] = $rate_data[$i];
-            }
 
             return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data], 200);
         } catch (\Exception $e) {
