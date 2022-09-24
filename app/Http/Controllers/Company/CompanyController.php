@@ -157,6 +157,11 @@ class CompanyController extends Controller
                     $query->orwhere('co_close_yn', '=', $validated['co_close_yn']);
                 });
             }
+            if (isset($validated['c_calculate_deadline_yn'])) {
+                $companies->whereHas('contract', function ($query) use ($validated) {
+                    $query->where('c_calculate_deadline_yn', '=', $validated['c_calculate_deadline_yn']);
+                });
+            }
 
             $companies = $companies->paginate($per_page, ['*'], 'page', $page);
 

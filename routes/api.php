@@ -308,36 +308,38 @@ Route::middleware('auth')->group(function () {
             Route::get('/spasys', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData'])->name('get_spasys_rate_data');
             Route::get('/spasys2', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData2'])->name('get_spasys_rate_data2');
             Route::get('/spasys3', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData3'])->name('get_spasys_rate_data3');
-            Route::get('/spasys4', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData4'])->name('get_spasys_rate_data4');
+            Route::post('/spasys4', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData4'])->name('get_spasys_rate_data4');
         });
 
         Route::get('/monthly_bill_list/{rgd_no}/{bill_type}', [\App\Http\Controllers\RateData\RateDataController::class, 'monthly_bill_list'])->name('monthly_bill_list');
 
-        //SET GENERAL DATA 유통가공
+        //REGISTER GENERAL DATA 유통가공
         Route::post('/general', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general'])->name('registe_rate_data_general');
         Route::post('/general_final', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_final'])->name('registe_rate_data_general_final');
         Route::post('/general_monthly_final', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_monthly_final'])->name('registe_rate_data_general_monthly_final');
         Route::post('/general_additional', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_additional'])->name('registe_rate_data_general_additional');
         Route::post('/general_additional2', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_additional2'])->name('registe_rate_data_general_additional2');
 
-         //SET GENERAL DATA 수입풀필먼트
-         Route::post('/general_final_service2', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_final_service2'])->name('registe_rate_data_general_final_service2');
+        //REGISTER GENERAL DATA FOR 수입풀필먼트 SERVICE
+        Route::post('/general_final_service2', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_final_service2'])->name('registe_rate_data_general_final_service2');
 
-        //GET BILL GENERAL DATA
-        //GET EXPECTATION BILL DATA
+        //GET GENERAL DATA FOLLOW BILL TYPE
         Route::get('/general/{rgd_no}/{bill_type}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general'])->name('get_rate_data_general');
         //GET FINAL BILL DATA
-        Route::get('/general_final/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_final'])->name('get_rate_data_general_final');
-        Route::get('/general_monthly_final/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_monthly_final'])->name('get_rate_data_general_monthly_final');
-        Route::get('/general_final2/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_final2'])->name('get_rate_data_general_final2');
-        Route::get('/general_monthly_final2/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_monthly_final2'])->name('get_rate_data_general_monthly_final2');
+        Route::get('/general_final/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_final'])->name('get_rate_data_general_final');
+        Route::get('/general_final2/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_final2'])->name('get_rate_data_general_final2');
+        Route::get('/general_monthly_final/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_monthly_final'])->name('get_rate_data_general_monthly_final');
+        Route::get('/general_monthly_final2/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_monthly_final2'])->name('get_rate_data_general_monthly_final2');
 
 
-        //GET ADDITIONAL BILL DATA
-        Route::get('/general_monthly_additional/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_monthly_additional'])->name('get_rate_data_general_monthly_additional');
-        Route::get('/general_additional/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_additional'])->name('get_rate_data_general_additional');
-        Route::get('/general_additional2/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_additional2'])->name('get_rate_data_general_additional2');
-        Route::get('/general_additional3/{w_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_additional3'])->name('get_rate_data_general_additional3');
+        //GET GENERAL BILL FOR CREATE ADDITIONAL MONTHLY BILL PAGE 270
+        Route::get('/general_monthly_additional/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_monthly_additional'])->name('get_rate_data_general_monthly_additional');
+        //GET GENERAL BILL FOR EDIT ADDITIONAL BILL PAGE
+        Route::get('/general_additional2/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_additional2'])->name('get_rate_data_general_additional2');
+        //GET GENERAL BILL FOR CREATE ADDITIONAL CASE BILL PAGE 268
+        Route::get('/general_additional/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_additional'])->name('get_rate_data_general_additional');
+        //GET GENERAL BILL FOR CREATE ADDITIONAL CASE BILL PAGE 268 POPUP
+        Route::get('/general_additional3/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_additional3'])->name('get_rate_data_general_additional3');
 
 
         Route::post('/', \App\Http\Controllers\RateData\RateDataController::class)->name('registe_rate_data');
@@ -348,7 +350,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/get_set_data_mobile/{bill_type}/{rmd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_set_data_mobile'])->name('get_set_data2');
         //GET RATE META DATA
         Route::get('/get_rmd_no/{rgd_no}/{set_type}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_rmd_no'])->name('get_rmd_no');
-        Route::get('/get_rmd_no_fulfill/{w_no}/{type}/{pretype}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_rmd_no_fulfill'])->name('get_rmd_no_fulfill');
+        Route::get('/get_rmd_no_fulfill/{rgd_no}/{type}/{pretype}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_rmd_no_fulfill'])->name('get_rmd_no_fulfill');
 
         Route::get('/{rm_no}/{rmd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateData'])->name('get_rate_data');
         Route::get('/by_co_no/{rd_co_no}/{rmd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByCono'])->name('get_rate_data_by_co_no');
@@ -370,5 +372,6 @@ Route::middleware('auth')->group(function () {
 
     Route::post('get_import_data', [\App\Http\Controllers\Import\ImportController::class,'get_import_data'])->name('get_import_data');
     Route::post('get_export_data', [\App\Http\Controllers\Export\ExportController::class,'get_export_data'])->name('get_export_data');
+    Route::post('/download_distribution_stocklist', [\App\Http\Controllers\Excel\ExportExcelController::class,'download_distribution_stocklist'])->name('download_distribution_stocklist');
 });
 
