@@ -295,8 +295,10 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::prefix('rate_meta_data')->name('rate_data_send_meta.')->group(function () {
+        Route::get('/get_RMD_data/{rmd_no}', [App\Http\Controllers\RateMetaData\RateMetaDataController::class, 'get_RMD_data'])->name('get_rmd_data');
         Route::post('/rm', [App\Http\Controllers\RateMetaData\RateMetaDataController::class, 'getAllRM'])->name('get_all_rm');
         Route::post('/co', [App\Http\Controllers\RateMetaData\RateMetaDataController::class, 'getAllCO'])->name('get_all_co');
+        Route::post('/get_precalculate_details', [App\Http\Controllers\RateMetaData\RateMetaDataController::class, 'getAllCOPrecalculateDetails'])->name('get_all_co_precalculate_details');
     });
 
     Route::prefix('rate_data')->name('rate_data.')->group(function () {
@@ -371,3 +373,4 @@ Route::middleware('auth')->group(function () {
     Route::post('get_import_data', [\App\Http\Controllers\Import\ImportController::class,'get_import_data'])->name('get_import_data');
     Route::post('get_export_data', [\App\Http\Controllers\Export\ExportController::class,'get_export_data'])->name('get_export_data');
 });
+

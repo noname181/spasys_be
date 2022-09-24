@@ -96,10 +96,13 @@ class RateDataController extends Controller
         $validated = $request->validated();
         try {
             DB::beginTransaction();
-
-            $rgd = ReceivingGoodsDelivery::where('rgd_no', $validated['rgd_no'])->first();
-            $w_no = $rgd->w_no;
-
+            if(isset($validated['rgd_no'])){
+                $rgd = ReceivingGoodsDelivery::where('rgd_no', $validated['rgd_no'])->first();
+                $w_no = $rgd->w_no;
+            }else{
+               
+                $w_no = null;
+            }
             if (isset($w_no)) {
                 $is_new = RateMetaData::where(['w_no' => $w_no,
                 'set_type' => $validated['set_type']])->first();
@@ -445,84 +448,72 @@ class RateDataController extends Controller
         try {
             DB::beginTransaction();
 
-            $rate_data = RateMeta::
-                where('rd_cate_meta1', '수입풀필먼트')
-                ->where('co_no', $co_no)
-                ->get();
+            if (isset($request->rmd_no)) {
+                
+            }else{
+                if (isset($request->co_no)) {
+                    $rmd_no = RateMetaData::insertGetId([
+                        'co_no' => $request->co_no,
+                        'mb_no' => Auth::user()->mb_no,
+                        'set_type' => 'estimated_costs'
+                    ]);
+                }
 
-            if (isset($request->co_no)) {
-                $rm_no = RateMeta::insertGetId([
-                    'co_no' => $request->co_no,
-                    'mb_no' => Auth::user()->mb_no,
-                    'set_type' => 'estimated_costs'
-                ]);
-            }
+                foreach ($request->rate_data as $val) {
+                    RateData::insertGetId(
+                        [
+                            'rmd_no' => $rmd_no,
+                            'co_no' => $request->co_no,
+                            'rd_cate_meta1' => $val['rd_cate_meta1'],
+                            'rd_cate_meta2' => $val['rd_cate_meta2'],
+                            'rd_cate1' => $val['rd_cate1'],
+                            'rd_cate2' => $val['rd_cate2'],
+                            'rd_cate3' => '',
+                            'rd_data1' => $val['rd_data1'],
+                            'rd_data2' => $val['rd_data2'],
+                            'rd_data3' => $val['rd_data3'],
+                            'rd_data4' => isset($val['rd_data4']) ? $val['rd_data4'] : '',
+                            'rd_data5' => isset($val['rd_data5']) ? $val['rd_data5'] : '',
+                            'rd_data6' => isset($val['rd_data6']) ? $val['rd_data6'] : '',
+                            'rd_data7' => isset($val['rd_data7']) ? $val['rd_data7'] : '',
+                            'rd_data8' => isset($val['rd_data8']) ? $val['rd_data8'] : '',
+                        ]
+                    );
+                }
 
-            foreach ($validated['rate_data'] as $val) {
-                RateData::updateOrCreate(
+                $rdg = RateDataGeneral::insertGetId(
                     [
-                        'rd_no' => isset($rmd_no) ? null : (isset($val['rd_no']) ? $val['rd_no'] : null),
-                        'rmd_no' => isset($rmd_no) ? $rmd_no : $validated['newRmd_no'],
-                        'rm_no' => isset($validated['rm_no']) ? $validated['rm_no'] : $rm_no,
-                    ],
-                    [
-                        'co_no' => isset($validated['co_no']) ? $validated['co_no'] : null,
-                        'rd_cate_meta1' => $val['rd_cate_meta1'],
-                        'rd_cate_meta2' => '',
-                        'rd_cate1' => $val['rd_cate1'],
-                        'rd_cate2' => $val['rd_cate2'],
-                        'rd_cate3' => '',
-                        'rd_data1' => $val['rd_data1'],
-                        'rd_data2' => $val['rd_data2'],
-                        'rd_data3' => $val['rd_data3'],
-                        'rd_data4' => isset($val['rd_data4']) ? $val['rd_data4'] : '',
-                        'rd_data5' => isset($val['rd_data5']) ? $val['rd_data5'] : '',
-                        'rd_data6' => isset($val['rd_data6']) ? $val['rd_data6'] : '',
-                        'rd_data7' => isset($val['rd_data7']) ? $val['rd_data7'] : '',
-                        'rd_data8' => isset($val['rd_data8']) ? $val['rd_data8'] : '',
-                    ],
+                        'rmd_no' => $rmd_no,
+                        'mb_no' => Auth::user()->mb_no,
+                        'rdg_set_type' => 'estimated_costs',
+                        'rdg_supply_price1' => $request->total1['total1_3'],
+                        'rdg_supply_price2' => $request->total2['total2_3'],
+                        'rdg_supply_price3' => $request->total3['total3_3'],
+                        'rdg_supply_price4' => $request->total4['total4_3'],
+                        'rdg_supply_price5' => $request->total5['total5_3'],
+                        'rdg_supply_price6' => $request->total['totalall3'],
+                        'rdg_vat1' => $request->total1['total1_4'],
+                        'rdg_vat2' => $request->total2['total2_4'],
+                        'rdg_vat3' => $request->total3['total3_4'],
+                        'rdg_vat4' => $request->total4['total4_4'],
+                        'rdg_vat5' => $request->total5['total5_4'],
+                        'rdg_vat6' => $request->total['totalall4'],
+                        'rdg_sum1' => $request->total1['total1_5'],
+                        'rdg_sum2' => $request->total2['total2_5'],
+                        'rdg_sum3' => $request->total3['total3_5'],
+                        'rdg_sum4' => $request->total4['total4_5'],
+                        'rdg_sum5' => $request->total5['total5_5'],
+                        'rdg_sum6' => $request->total['totalall5'],
+                        'rdg_etc1' => isset($request->total1['total1_6']) ? $val['rd_data4'] : '',
+                        'rdg_etc2' => isset($request->total2['total2_6']) ? $val['rd_data4'] : '',
+                        'rdg_etc3' => isset($request->total3['total3_6']) ? $val['rd_data4'] : '',
+                        'rdg_etc4' => isset($request->total4['total4_6']) ? $val['rd_data4'] : '',
+                        'rdg_etc5' => isset($request->total5['total5_6']) ? $val['rd_data4'] : '',
+                        'rdg_etc6' => isset($request->total['totalall6']) ? $val['rd_data4'] : '',
+                    ]
                 );
             }
-
-            $rdg = RateDataGeneral::updateOrCreate(
-                [
-                    'rdg_no' => isset($is_exist->rdg_no) ? $request->rdg_no : null,
-                    'rdg_bill_type' => $request->bill_type
-                ],
-                [
-                    'w_no' => $w_no,
-                    'rdg_bill_type' => $request->bill_type,
-                    'rgd_no_expectation' => $request->type  == 'edit_final' ? $is_exist->rgd_no_expectation : (str_contains($request->bill_type, 'final') ? $request->rgd_no : null),
-                    'rgd_no_final' => $request->type  == 'edit_additional' ? $is_exist->rgd_no_final : (str_contains($request->bill_type, 'additional') ? $request->rgd_no : null),
-                    'mb_no' => Auth::user()->mb_no,
-                    'rdg_set_type' => $request->rdg_set_type,
-                    'rdg_supply_price1' => $request->fulfill1['supply_price'],
-                    'rdg_supply_price2' => $request->fulfill2['supply_price'],
-                    'rdg_supply_price3' => $request->fulfill3['supply_price'],
-                    'rdg_supply_price4' => $request->fulfill4['supply_price'],
-                    'rdg_supply_price5' => $request->fulfill5['supply_price'],
-                    'rdg_supply_price6' => $request->total['supply_price'],
-                    'rdg_vat1' => $request->fulfill1['taxes'],
-                    'rdg_vat2' => $request->fulfill2['taxes'],
-                    'rdg_vat3' => $request->fulfill3['taxes'],
-                    'rdg_vat4' => $request->fulfill4['taxes'],
-                    'rdg_vat5' => $request->fulfill5['taxes'],
-                    'rdg_vat6' => $request->total['taxes'],
-                    'rdg_sum1' => $request->fulfill1['sum'],
-                    'rdg_sum2' => $request->fulfill2['sum'],
-                    'rdg_sum3' => $request->fulfill3['sum'],
-                    'rdg_sum4' => $request->fulfill4['sum'],
-                    'rdg_sum5' => $request->fulfill5['sum'],
-                    'rdg_sum6' => $request->total['sum'],
-                    'rdg_etc1' => $request->fulfill1['etc'],
-                    'rdg_etc2' => $request->fulfill2['etc'],
-                    'rdg_etc3' => $request->fulfill3['etc'],
-                    'rdg_etc4' => $request->fulfill4['etc'],
-                    'rdg_etc5' => $request->fulfill5['etc'],
-                    'rdg_etc6' => $request->total['etc'],
-                ]
-            );
-
+            
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -530,6 +521,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
