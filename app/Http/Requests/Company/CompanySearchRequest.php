@@ -80,6 +80,9 @@ class CompanySearchRequest extends BaseFormRequest
             'co_close_yn' => [
                 '',
             ],
+            'c_calculate_deadline_yn' => [
+                '',
+            ],
         ];
     }
 
