@@ -101,7 +101,7 @@ class RateDataController extends Controller
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $validated['rgd_no'])->first();
                 $w_no = $rgd->w_no;
             }else{
-               
+
                 $w_no = null;
             }
             if (isset($w_no)) {
@@ -587,12 +587,14 @@ class RateDataController extends Controller
 
             if($user->mb_type == 'spasys'){
                 $rate_data = $rate_data->where('co_no', $user->co_no);
-            }else if($user->mb_type == 'shop'){
+            }else if($user->mb_type == 'shop' || $user->mb_type == 'shipper'){
                 $rmd = RateMetaData::where('co_no', $user->co_no)->latest('created_at')->first();
                 $rate_data = $rate_data->where('rd_co_no', $user->co_no);
                 if(isset($rmd->rmd_no)){
                     $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
                 }
+            }else {
+                $rate_data = $rate_data->where('co_no', $user->co_no);
             }
 
             $rate_data = $rate_data->get();
@@ -613,12 +615,14 @@ class RateDataController extends Controller
 
             if($user->mb_type == 'spasys'){
                 $rate_data = $rate_data->where('co_no', $user->co_no);
-            }else if($user->mb_type == 'shop'){
+            }else if($user->mb_type == 'shop' || $user->mb_type == 'shipper'){
                 $rmd = RateMetaData::where('co_no', $user->co_no)->latest('created_at')->first();
                 $rate_data = $rate_data->where('rd_co_no', $user->co_no);
                 if(isset($rmd->rmd_no)){
                     $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
                 }
+            }else {
+                $rate_data = $rate_data->where('co_no', $user->co_no);
             }
 
             $rate_data = $rate_data->get();
@@ -639,12 +643,14 @@ class RateDataController extends Controller
 
             if($user->mb_type == 'spasys'){
                 $rate_data = $rate_data->where('co_no', $user->co_no);
-            }else if($user->mb_type == 'shop'){
+            }else if($user->mb_type == 'shop' || $user->mb_type == 'shipper'){
                 $rmd = RateMetaData::where('co_no', $user->co_no)->latest('created_at')->first();
                 $rate_data = $rate_data->where('rd_co_no', $user->co_no);
                 if(isset($rmd->rmd_no)){
                     $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
                 }
+            }else {
+                $rate_data = $rate_data->where('co_no', $user->co_no);
             }
 
             $rate_data = $rate_data->get();
@@ -659,7 +665,7 @@ class RateDataController extends Controller
 
     public function getSpasysRateData4(Request $request)
     {
-       
+
         $user = Auth::user();
         try {
 
@@ -677,7 +683,7 @@ class RateDataController extends Controller
                             $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
                         }
                     }
-        
+
                 }
             }else{
                 if(isset($request->rmd_no)){
@@ -693,10 +699,12 @@ class RateDataController extends Controller
                             $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
                         }
                     }
-        
+
                 }
+
             }
-            
+
+
             $rate_data = $rate_data->get();
 
             return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data], 200);
@@ -1136,9 +1144,9 @@ class RateDataController extends Controller
             DB::beginTransaction();
             $rdg = RateDataGeneral::where('rgd_no_final', $rgd_no)->where('rdg_bill_type', 'additional')->first();
 
-            if(!isset($rdg->rdg_no)){
-                $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'final')->first();
-            }
+            // if(!isset($rdg->rdg_no)){
+            //     $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'final')->first();
+            // }
 
             DB::commit();
             return response()->json([
