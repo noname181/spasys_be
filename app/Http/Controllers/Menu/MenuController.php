@@ -190,11 +190,7 @@ class MenuController extends Controller
             $menu = Menu::whereHas('permission', function($q) use($user) {
                 $q->where('role_no', $user->role_no);
             })->get();
-            $menu_main = Menu::with(['menu_childs' =>function($q) use($user) {
-                $q->whereHas('permission', function($q) use($user) {
-                    $q->where('role_no', $user->role_no);
-                });
-            }])->whereHas('menu_childs', function($q) use($user) {
+            $menu_main = Menu::with(['menu_childs'])->whereHas('menu_childs', function($q) use($user) {
                 $q->whereHas('permission', function($q) use($user) {
                     $q->where('role_no', $user->role_no);
                 });
@@ -223,7 +219,8 @@ class MenuController extends Controller
 
             return response()->json([
                 'menu_main' => $menu_main,
-                'information' => $information
+                'information' => $information,
+                '$user->role_no' => $user->role_no
             ]);
         } catch (\Exception $e) {
             Log::error($e);

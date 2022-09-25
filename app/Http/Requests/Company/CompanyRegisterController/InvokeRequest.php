@@ -50,7 +50,7 @@ class InvokeRequest extends BaseFormRequest
                 'string',
                 'max:255'
             ],
-            'co_service' => [
+            'co_major' => [
                 'required',
                 'string',
                 'max:255'

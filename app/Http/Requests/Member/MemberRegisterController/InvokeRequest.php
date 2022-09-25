@@ -78,7 +78,7 @@ class InvokeRequest extends BaseFormRequest
                 'string',
                 'max:255',
                 'regex:/[0-9]{3}-[0-9]{4}-[0-9]{4}$/',
-                'unique:member,mb_hp'
+                // 'unique:member,mb_hp'
             ],
             'mb_use_yn' => [
                 'required',
@@ -105,6 +105,14 @@ class InvokeRequest extends BaseFormRequest
     public function attributes()
     {
         return [
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'mb_email.unique' => '이미 존재하는 이메일주소입니다.',
+            'mb_id.unique' => '이미 존재하는 사용자 이름.',
         ];
     }
 }

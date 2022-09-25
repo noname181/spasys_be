@@ -37,6 +37,7 @@ class Company extends Model
         'co_owner',
         'co_close_yn',
         'co_homepage',
+        'co_major',
         'co_email',
         'co_etc',
         'co_operating_time',
