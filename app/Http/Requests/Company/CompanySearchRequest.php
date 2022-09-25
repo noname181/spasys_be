@@ -24,6 +24,9 @@ class CompanySearchRequest extends BaseFormRequest
     public function rules()
     {
         return [
+            'w_no' => [
+                ''
+            ],
             'from_date' => [
                 'string',
                 'date_format:Y-m-d'

@@ -6,6 +6,7 @@ use App\Http\Requests\ImportSchedule\ImportScheduleRequest;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Contract;
+use App\Models\Warehousing;
 use App\Models\ScheduleShipmentInfo;
 
 class Company extends Model
@@ -73,5 +74,11 @@ class Company extends Model
     public function schedule_shipment_info()
     {
         return $this->hasMany(ScheduleShipmentInfo::class, 'co_no', 'co_no');
+    }
+
+    public function warehousing()
+    {
+        return $this->hasOne(Warehousing::class, 'co_no', 'co_no');
+
     }
 }
