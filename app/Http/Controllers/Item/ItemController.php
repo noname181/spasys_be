@@ -400,7 +400,7 @@ class ItemController extends Controller
     {
         $validated = $request->validated();
         try {
-            DB::enableQueryLog();
+            
             // If per_page is null set default data = 15
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
@@ -468,22 +468,34 @@ class ItemController extends Controller
             }
 
             $item2 = $item->get();
-            $count_check = 0; 
+            
+            // $item3 = collect($item2)->map(function ($q){
+            //     $item4 = Item::with(['warehousing_item'])->where('item_no', $q->item_no)->first();
+            //     if(isset($item4['warehousing_item']['wi_number'])){
+            //     return [ 'total_amount' => $item4['warehousing_item']['wi_number'] ,  'total_price' => $item4->item_price2 * $item4['warehousing_item']['wi_number']];
+            //     }
+            // });
+            //  $item5 = $item3->sum('total_amount');
+            //  $item6 = $item3->sum('total_price');
+
+
+            $total_remain = 0;
+            $total_get = 0;
+            DB::enableQueryLog();
             $item3 = collect($item2)->map(function ($q){
-                $item4 = Item::with(['warehousing_item'])->where('item_no', $q->item_no)->first();
-                if(isset($item4['warehousing_item']['wi_number'])){
-                return [ 'total_amount' => $item4['warehousing_item']['wi_number'] ,  'total_price' => $item4->item_price2 * $item4['warehousing_item']['wi_number']];
-                }
+                $item4 = Item::where('item_no', $q->item_no)->first();
+                $total_get = WarehousingItem::where('item_no', $q->item_no)->where('wi_type','입고_spasys')->sum('wi_number');
+                $total_give = WarehousingItem::where('item_no', $q->item_no)->where('wi_type','출고_spasys')->sum('wi_number');
+                $total = $total_get - $total_give;
+                return [ 'total_amount' => $total ,  'total_price' => $item4->item_price2 * $total];
             });
+        
+            $item = $item->paginate($per_page, ['*'], 'page', $page);
+            
             $item5 = $item3->sum('total_amount');
             $item6 = $item3->sum('total_price');
-
-
-
-           
-
-
-            $item = $item->paginate($per_page, ['*'], 'page', $page);
+          
+            
             
            
             $custom = collect(['sum1' => $item5,'sum2'=>$item6]);
@@ -495,9 +507,13 @@ class ItemController extends Controller
             $item->setCollection(
                 $item->getCollection()->map(function ($q){
                     $item = Item::with(['warehousing_item'])->where('item_no', $q->item_no)->first();
-                    if(isset($item['warehousing_item']['wi_number'])){
-                        $q->total_price_row = $item->item_price2 * $item['warehousing_item']['wi_number'];
-                    }
+                    $total_get = WarehousingItem::where('item_no', $q->item_no)->where('wi_type','입고_spasys')->sum('wi_number');
+                    $total_give = WarehousingItem::where('item_no', $q->item_no)->where('wi_type','출고_spasys')->sum('wi_number');
+                    $total = $total_get - $total_give;
+                    //if(isset($item['warehousing_item']['wi_number'])){
+                    $q->total_price_row = $item->item_price2 * $total;
+                    $q->item_total_amount = $total;
+                    //}
                     return $q;
                 })
             );

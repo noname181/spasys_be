@@ -323,14 +323,19 @@ class CompanyController extends Controller
     {
         try {
             $validated = $request->validated();
-
+            
             // If per_page is null set default data = 15
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
-            $companies = Company::with('contract')->where('co_type', 'shipper')->where('co_parent_no', $user->co_no)->orderBy('co_no', 'DESC');
+            $companies = Company::with('contract')->with('warehousing')->where('co_type', 'shipper')->where('co_parent_no', $user->co_no)->orderBy('co_no', 'DESC');
 
+            // if (isset($validated['w_no'])) {
+            //     $companies->whereHas('warehousing', function ($query) use ($validated) {
+            //         $query->where('w_no', '=',  $validated['w_no']);
+            //     });
+            // }
 
             if (isset($validated['from_date'])) {
                 $companies->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
@@ -355,6 +360,36 @@ class CompanyController extends Controller
             $companies = $companies->paginate($per_page, ['*'], 'page', $page);
 
             return response()->json($companies);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function  getShipperCompanies2(CompanySearchRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+            
+         
+            $user = Auth::user();
+            $companies2 = "";
+            $companies = Company::with('contract')->with('warehousing')->where('co_type', 'shipper')->where('co_parent_no', $user->co_no)->orderBy('co_no', 'DESC');
+
+            if (isset($validated['w_no'])) {
+                $companies2 = Company::with('contract')->with('warehousing')->where('co_type', 'shipper')->where('co_parent_no', $user->co_no)->orderBy('co_no', 'DESC');
+                $companies2->whereHas('warehousing', function ($query) use ($validated) {
+                    $query->where('w_no', '=',  $validated['w_no']);
+                });
+                $companies2 = $companies2->first();
+            }
+
+       
+            
+            $companies = $companies->get();
+
+            return response()->json(['data' => $companies,'selected' => $companies2 ]);
         } catch (\Exception $e) {
             Log::error($e);
             return $e;

@@ -453,7 +453,7 @@ class RateDataController extends Controller
                 foreach ($request->rate_data as $val) {
                     RateData::where('rmd_no', $request->rmd_no)->update(
                         [
-                            'rmd_no' => $rmd_no,
+                            'rmd_no' => $request->rmd_no,
                             'co_no' => $request->co_no,
                             'rd_cate_meta1' => $val['rd_cate_meta1'],
                             'rd_cate_meta2' => $val['rd_cate_meta2'],
@@ -474,33 +474,33 @@ class RateDataController extends Controller
 
                 $rdg = RateDataGeneral::where('rmd_no', $request->rmd_no)->update(
                     [
-                        'rmd_no' => $rmd_no,
+                        'rmd_no' => $request->rmd_no,
                         'mb_no' => Auth::user()->mb_no,
                         'rdg_set_type' => 'estimated_costs',
                         'rdg_supply_price1' => $request->total1['total1_3'],
                         'rdg_supply_price2' => $request->total2['total2_3'],
-                        'rdg_supply_price3' => $request->total3['total3_3'],
-                        'rdg_supply_price4' => $request->total4['total4_3'],
-                        'rdg_supply_price5' => $request->total5['total5_3'],
-                        'rdg_supply_price6' => $request->total['totalall3'],
-                        'rdg_vat1' => $request->total1['total1_4'],
-                        'rdg_vat2' => $request->total2['total2_4'],
-                        'rdg_vat3' => $request->total3['total3_4'],
-                        'rdg_vat4' => $request->total4['total4_4'],
-                        'rdg_vat5' => $request->total5['total5_4'],
-                        'rdg_vat6' => $request->total['totalall4'],
-                        'rdg_sum1' => $request->total1['total1_5'],
-                        'rdg_sum2' => $request->total2['total2_5'],
-                        'rdg_sum3' => $request->total3['total3_5'],
-                        'rdg_sum4' => $request->total4['total4_5'],
-                        'rdg_sum5' => $request->total5['total5_5'],
-                        'rdg_sum6' => $request->total['totalall5'],
-                        'rdg_etc1' => isset($request->total1['total1_6']) ? $val['rd_data4'] : '',
-                        'rdg_etc2' => isset($request->total2['total2_6']) ? $val['rd_data4'] : '',
-                        'rdg_etc3' => isset($request->total3['total3_6']) ? $val['rd_data4'] : '',
-                        'rdg_etc4' => isset($request->total4['total4_6']) ? $val['rd_data4'] : '',
-                        'rdg_etc5' => isset($request->total5['total5_6']) ? $val['rd_data4'] : '',
-                        'rdg_etc6' => isset($request->total['totalall6']) ? $val['rd_data4'] : '',
+                        'rdg_supply_price3' => isset($request->total3['total3_3']) ? $request->total3['total3_3'] : '',
+                        'rdg_supply_price4' => isset($request->total4['total4_3']) ? $request->total4['total4_3'] : '',
+                        'rdg_supply_price5' => isset($request->total5['total5_3']) ? $request->total5['total5_3'] : '',
+                        'rdg_supply_price6' => isset($request->total['totalall3']) ? $request->total['totalall3'] : '',
+                        'rdg_vat1' => isset($request->total1['total1_4']) ? $request->total1['total1_4'] : '',
+                        'rdg_vat2' => isset($request->total2['total2_4']) ? $request->total2['total2_4'] : '',
+                        'rdg_vat3' => isset($request->total3['total3_4']) ? $request->total3['total3_4'] : '',
+                        'rdg_vat4' => isset($request->total4['total4_4']) ? $request->total4['total4_4'] : '',
+                        'rdg_vat5' => isset($request->total5['total5_4']) ? $request->total5['total5_4'] : '',
+                        'rdg_vat6' => isset($request->total['totalall4']) ? $request->total['totalall4'] : '',
+                        'rdg_sum1' => isset($request->total1['total1_5']) ? $request->total1['total1_5'] : '',
+                        'rdg_sum2' => isset($request->total2['total2_5']) ? $request->total2['total2_5'] : '',
+                        'rdg_sum3' => isset($request->total3['total3_5']) ? $request->total3['total3_5'] : '',
+                        'rdg_sum4' => isset($request->total4['total4_5']) ? $request->total4['total4_5'] : '',
+                        'rdg_sum5' => isset($request->total5['total5_5']) ? $request->total5['total5_5'] : '',
+                        'rdg_sum6' => isset($request->total['totalall5']) ? $request->total['totalall5'] : '',
+                        'rdg_etc1' => isset($request->total1['total1_6']) ? $request->total1['total1_6'] : '',
+                        'rdg_etc2' => isset($request->total2['total2_6']) ? $request->total2['total2_6'] : '',
+                        'rdg_etc3' => isset($request->total3['total3_6']) ? $request->total3['total3_6'] : '',
+                        'rdg_etc4' => isset($request->total4['total4_6']) ? $request->total4['total4_6'] : '',
+                        'rdg_etc5' => isset($request->total5['total5_6']) ? $request->total5['total5_6'] : '',
+                        'rdg_etc6' => isset($request->total['totalall6']) ? $request->total['totalall6'] : '',
                     ]
                 );
             }else{
@@ -541,28 +541,28 @@ class RateDataController extends Controller
                         'rdg_set_type' => 'estimated_costs',
                         'rdg_supply_price1' => $request->total1['total1_3'],
                         'rdg_supply_price2' => $request->total2['total2_3'],
-                        'rdg_supply_price3' => $request->total3['total3_3'],
-                        'rdg_supply_price4' => $request->total4['total4_3'],
-                        'rdg_supply_price5' => $request->total5['total5_3'],
-                        'rdg_supply_price6' => $request->total['totalall3'],
-                        'rdg_vat1' => $request->total1['total1_4'],
-                        'rdg_vat2' => $request->total2['total2_4'],
-                        'rdg_vat3' => $request->total3['total3_4'],
-                        'rdg_vat4' => $request->total4['total4_4'],
-                        'rdg_vat5' => $request->total5['total5_4'],
-                        'rdg_vat6' => $request->total['totalall4'],
-                        'rdg_sum1' => $request->total1['total1_5'],
-                        'rdg_sum2' => $request->total2['total2_5'],
-                        'rdg_sum3' => $request->total3['total3_5'],
-                        'rdg_sum4' => $request->total4['total4_5'],
-                        'rdg_sum5' => $request->total5['total5_5'],
-                        'rdg_sum6' => $request->total['totalall5'],
-                        'rdg_etc1' => isset($request->total1['total1_6']) ? $val['rd_data4'] : '',
-                        'rdg_etc2' => isset($request->total2['total2_6']) ? $val['rd_data4'] : '',
-                        'rdg_etc3' => isset($request->total3['total3_6']) ? $val['rd_data4'] : '',
-                        'rdg_etc4' => isset($request->total4['total4_6']) ? $val['rd_data4'] : '',
-                        'rdg_etc5' => isset($request->total5['total5_6']) ? $val['rd_data4'] : '',
-                        'rdg_etc6' => isset($request->total['totalall6']) ? $val['rd_data4'] : '',
+                        'rdg_supply_price3' => isset($request->total3['total3_3']) ? $request->total3['total3_3'] : '',
+                        'rdg_supply_price4' => isset($request->total4['total4_3']) ? $request->total4['total4_3'] : '',
+                        'rdg_supply_price5' => isset($request->total5['total5_3']) ? $request->total5['total5_3'] : '',
+                        'rdg_supply_price6' => isset($request->total['totalall3']) ? $request->total['totalall3'] : '',
+                        'rdg_vat1' => isset($request->total1['total1_4']) ? $request->total1['total1_4'] : '',
+                        'rdg_vat2' => isset($request->total2['total2_4']) ? $request->total2['total2_4'] : '',
+                        'rdg_vat3' => isset($request->total3['total3_4']) ? $request->total3['total3_4'] : '',
+                        'rdg_vat4' => isset($request->total4['total4_4']) ? $request->total4['total4_4'] : '',
+                        'rdg_vat5' => isset($request->total5['total5_4']) ? $request->total5['total5_4'] : '',
+                        'rdg_vat6' => isset($request->total['totalall4']) ? $request->total['totalall4'] : '',
+                        'rdg_sum1' => isset($request->total1['total1_5']) ? $request->total1['total1_5'] : '',
+                        'rdg_sum2' => isset($request->total2['total2_5']) ? $request->total2['total2_5'] : '',
+                        'rdg_sum3' => isset($request->total3['total3_5']) ? $request->total3['total3_5'] : '',
+                        'rdg_sum4' => isset($request->total4['total4_5']) ? $request->total4['total4_5'] : '',
+                        'rdg_sum5' => isset($request->total5['total5_5']) ? $request->total5['total5_5'] : '',
+                        'rdg_sum6' => isset($request->total['totalall5']) ? $request->total['totalall5'] : '',
+                        'rdg_etc1' => isset($request->total1['total1_6']) ? $request->total1['total1_6'] : '',
+                        'rdg_etc2' => isset($request->total2['total2_6']) ? $request->total2['total2_6'] : '',
+                        'rdg_etc3' => isset($request->total3['total3_6']) ? $request->total3['total3_6'] : '',
+                        'rdg_etc4' => isset($request->total4['total4_6']) ? $request->total4['total4_6'] : '',
+                        'rdg_etc5' => isset($request->total5['total5_6']) ? $request->total5['total5_6'] : '',
+                        'rdg_etc6' => isset($request->total['totalall6']) ? $request->total['totalall6'] : '',
                     ]
                 );
             }
@@ -662,22 +662,40 @@ class RateDataController extends Controller
        
         $user = Auth::user();
         try {
-            if(isset($request->rmd_no)){
-                $rate_data = RateData::where('rd_cate_meta1', '수입풀필먼트')->where('rmd_no',$request->rmd_no);
-            }else{
-                $rate_data = RateData::where('rd_cate_meta1', '수입풀필먼트');
-                if($user->mb_type == 'spasys'){
-                    $rate_data = $rate_data->where('co_no', $user->co_no);
-                }else if($user->mb_type == 'shop'){
-                    $rmd = RateMetaData::where('co_no', $user->co_no)->latest('created_at')->first();
-                    $rate_data = $rate_data->where('rd_co_no', $user->co_no);
-                    if(isset($rmd->rmd_no)){
-                        $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+
+            if(isset($request->rd_cate_meta1) && $request->rd_cate_meta1 == '수입풀필먼트'){
+                if(isset($request->rmd_no)){
+                    $rate_data = RateData::where('rd_cate_meta1', '수입풀필먼트')->where('rmd_no',$request->rmd_no);
+                }else{
+                    $rate_data = RateData::where('rd_cate_meta1', '수입풀필먼트');
+                    if($user->mb_type == 'spasys'){
+                        $rate_data = $rate_data->where('co_no', $user->co_no);
+                    }else if($user->mb_type == 'shop'){
+                        $rmd = RateMetaData::where('co_no', $user->co_no)->latest('created_at')->first();
+                        $rate_data = $rate_data->where('rd_co_no', $user->co_no);
+                        if(isset($rmd->rmd_no)){
+                            $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+                        }
                     }
+        
                 }
-    
+            }else{
+                if(isset($request->rmd_no)){
+                    $rate_data = RateData::where('rd_cate_meta1', '유통가공')->where('rmd_no',$request->rmd_no);
+                }else{
+                    $rate_data = RateData::where('rd_cate_meta1', '유통가공');
+                    if($user->mb_type == 'spasys'){
+                        $rate_data = $rate_data->where('co_no', $user->co_no);
+                    }else if($user->mb_type == 'shop'){
+                        $rmd = RateMetaData::where('co_no', $user->co_no)->latest('created_at')->first();
+                        $rate_data = $rate_data->where('rd_co_no', $user->co_no);
+                        if(isset($rmd->rmd_no)){
+                            $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+                        }
+                    }
+        
+                }
             }
-            
             
             $rate_data = $rate_data->get();
 
