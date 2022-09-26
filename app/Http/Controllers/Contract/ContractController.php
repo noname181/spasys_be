@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Contract;
 use App\Models\Company;
 use App\Models\CompanySettlement;
+use App\Models\CompanyPayment;
 use App\Models\Service;
 use App\Utils\Messages;
 use Illuminate\Http\Client\Request;
@@ -49,7 +50,6 @@ class ContractController extends Controller
                 'c_transaction_yn' => $validated['c_transaction_yn'],
                 'c_calculate_deadline_yn' => $validated['c_calculate_deadline_yn'],
                 'c_integrated_calculate_yn' => $validated['c_integrated_calculate_yn'],
-                'c_calculate_method' => $validated['c_calculate_method'],
                 // 'c_card_number' => $validated['c_card_number'],
                 'c_deposit_day' => $validated['c_deposit_day'],
                 // 'c_account_number' => $validated['c_account_number'],
@@ -84,6 +84,22 @@ class ContractController extends Controller
                 $i++;
             }
 
+            CompanyPayment::updateOrCreate(
+                [
+                    'co_no' => $co_no
+                ],
+                [
+                    'cp_method' => isset($validated['cp_method']) ? $validated['cp_method'] : null,
+                    'cp_virtual_account' => isset($validated['cp_virtual_account']) ? $validated['cp_virtual_account'] : null,
+                    'cp_bank' => isset($validated['cp_bank']) ? $validated['cp_bank'] : null,
+                    'cp_bank_number' => isset($validated['cp_bank_number']) ? $validated['cp_bank_number'] : null,
+                    'cp_bank_name' => isset($validated['cp_bank_name']) ? $validated['cp_bank_name'] : null,
+                    'cp_card_name' => isset($validated['cp_card_name']) ? $validated['cp_card_name'] : null,
+                    'cp_card_number' => isset($validated['cp_card_number']) ? $validated['cp_card_number'] : null,
+                    'cp_card_cvc' => isset($validated['cp_card_cvc']) ? $validated['cp_card_cvc'] : null,
+                ]
+            );
+
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -102,6 +118,7 @@ class ContractController extends Controller
         try {
             $co_service = Company::where('co_no', $co_no)->first()->co_service;
             $contract = Contract::where(['co_no' => $co_no])->first();
+            $co_payment = CompanyPayment::where(['co_no' => $co_no])->first();
             $company_settlement = CompanySettleMent::where(['co_no' => $co_no])
             ->leftJoin('service', 'service.service_no', '=', 'company_settlement.service_no')
             ->get();
@@ -112,6 +129,7 @@ class ContractController extends Controller
                 'contract' => $contract,
                 'services' => $services,
                 'co_service' => $co_service,
+                'co_payment' => $co_payment,
                 'company_settlement' => $company_settlement
             ]);
         } catch (\Exception $e) {
@@ -162,8 +180,7 @@ class ContractController extends Controller
 
                 'c_calculate_deadline_yn' => $validated['c_calculate_deadline_yn'],
                 'c_integrated_calculate_yn' => $validated['c_integrated_calculate_yn'],
-                'c_calculate_method' => $validated['c_calculate_method'],
-                'c_card_number' => $validated['c_card_number'],
+                // 'c_card_number' => $validated['c_card_number'],
                 'c_deposit_day' => $validated['c_deposit_day'] ? $validated['c_deposit_day'] : "",
                 'c_account_number' => $validated['c_account_number'],
                 'c_deposit_price' => $validated['c_deposit_price'],
@@ -200,6 +217,22 @@ class ContractController extends Controller
                 );
                 $i++;
             }
+
+            CompanyPayment::updateOrCreate(
+                [
+                    'co_no' => $co_no
+                ],
+                [
+                    'cp_method' => isset($validated['cp_method']) ? $validated['cp_method'] : null,
+                    'cp_virtual_account' => isset($validated['cp_virtual_account']) ? $validated['cp_virtual_account'] : null,
+                    'cp_bank' => isset($validated['cp_bank']) ? $validated['cp_bank'] : null,
+                    'cp_bank_number' => isset($validated['cp_bank_number']) ? $validated['cp_bank_number'] : null,
+                    'cp_bank_name' => isset($validated['cp_bank_name']) ? $validated['cp_bank_name'] : null,
+                    'cp_card_name' => isset($validated['cp_card_name']) ? $validated['cp_card_name'] : null,
+                    'cp_card_number' => isset($validated['cp_card_number']) ? $validated['cp_card_number'] : null,
+                    'cp_card_cvc' => isset($validated['cp_card_cvc']) ? $validated['cp_card_cvc'] : null,
+                ]
+            );
 
             DB::commit();
             return response()->json([

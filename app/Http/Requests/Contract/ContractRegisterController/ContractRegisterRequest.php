@@ -75,7 +75,7 @@ class ContractRegisterRequest extends BaseFormRequest
                 'string',
                 'max:1'
             ],
-            'c_calculate_method' => [
+            'cp_method' => [
                 'required',
                 'string',
                 'max:255'
@@ -86,6 +86,20 @@ class ContractRegisterRequest extends BaseFormRequest
             //     'max:255'
             // ],
             'c_deposit_day' => [
+            ],
+            'cp_virtual_account' => [
+            ],
+            'cp_bank' => [
+            ],
+            'cp_bank_number' => [
+            ],
+            'cp_bank_name' => [
+            ],
+            'cp_card_name' => [
+            ],
+            'cp_card_number' => [
+            ],
+            'cp_card_cvc' => [
             ],
             // 'c_account_number' => [
             //     'required',
