@@ -91,6 +91,8 @@ class ExportController extends Controller
                 $warehousing_items = WarehousingItem::where('w_no', $validated['w_no'])->where('wi_type', '=', '입고_spasys')->get();
             }else if(isset($validated['w_no']) && $type=='EW' && !isset($validated['page_type'])){
                 //show for 141 shipper edit 출고
+                
+
                 $warehousing_items = WarehousingItem::where('w_no', $validated['w_no'])->where('wi_type', '=', '출고_shipper')->get();
             }else{
                 $sql_count = WarehousingItem::where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '출고_spasys')->get();
@@ -104,18 +106,34 @@ class ExportController extends Controller
             }
 
             $items = [];
-            foreach($warehousing_items as $warehousing_item){
-                $item = Item::with(['item_channels', 'company'])->where('item_no', $warehousing_item->item_no)->first();
-                $item->warehousing_item = $warehousing_item;
+           
+            foreach($warehousing_items as $key =>  $warehousing_item){
+                $item = Item::with('item_channels')->where('item_no', $warehousing_item->item_no)->first();
+                if($type=='EW'){
+                    $warehousing_items_import = WarehousingItem::with('item_no')->whereHas('item_no',function($q) use ($warehousing){
+                        $q->where('w_no', $warehousing->w_import_no);
+                    })->where('item_no', $warehousing_item->item_no)->where('wi_type', '=', '입고_spasys')->get();
+                    $item->remain = $warehousing_items_import[0]->wi_number - $warehousing_item->wi_number;
+                    $item->warehousing_items_import = $warehousing_items_import;
+                    // $warehousing_item->wi_number = $warehousing_items_import[0]->wi_number - $warehousing_item->wi_number;
+                }else{
+                    $item->remain = $warehousing_items_import[0]->wi_number - $warehousing_item->wi_number;
+                }
+                
+                $item->warehousing_item = [$warehousing_item];
+               
                 $items[] = $item;
             }
 
         }
 
+
+
             return response()->json(['message' => Messages::MSG_0007,
                                      'warehousing' => $warehousing,
                                      'warehousings' => $warehousings,
                                      'warehousing_items' => $warehousing_items,
+                                    
                                      'rgd' => $rgd,
                                      'warehousing_request' => $warehousing_request,
                                      'items' => $items,
