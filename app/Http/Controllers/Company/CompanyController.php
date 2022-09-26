@@ -15,6 +15,8 @@ use App\Utils\Messages;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use App\Models\Service;
+use App\Models\CompanySettlement;
 
 class CompanyController extends Controller
 {
@@ -88,7 +90,7 @@ class CompanyController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $companies = Company::with(['contract', 'co_parent'])
+            $companies = Company::with(['contract', 'co_parent','company_settlement'])
                 ->where(function ($q) use ($user) {
                     $q->where('co_no', $user->co_no)
                         ->orWhereHas('co_parent', function ($q) use ($user) {
@@ -171,6 +173,23 @@ class CompanyController extends Controller
 
             $companies = $companies->paginate($per_page, ['*'], 'page', $page);
 
+            $companies->setCollection(
+                $companies->getCollection()->map(function ($item){
+                    $service_name = explode(" ",$item->co_service);
+                    $co_no = $item->co_no;
+             
+                        $service_no = Service::where('service_name', $service_name)->first();
+                    
+                    
+
+                    $company_settlement = CompanySettlement::where([
+                        'co_no' => $co_no,
+                        'service_no' => $service_no
+                    ])->first();
+                    $item->settlement_cycle = $company_settlement;
+                    return $item;
+                })
+            );
 
 
             return response()->json($companies);
