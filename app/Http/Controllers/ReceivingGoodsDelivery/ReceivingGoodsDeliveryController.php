@@ -89,7 +89,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'w_amount' => $validated['w_amount'],
                     'w_type' => 'IW',
                     'w_category_name' => $request->w_category_name,
-                    'co_no' => $validated['w_no_select'] ? $validated['w_no_select'] : $co_no,
+                    'co_no' => $validated['co_no'] ? $validated['co_no'] : $co_no,
                 ]);
             }
 
@@ -326,7 +326,9 @@ class ReceivingGoodsDeliveryController extends Controller
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'rgd_no' => $rgd_no
+                'rgd_no' => $rgd_no,
+                'w_schedule_number' =>  $w_schedule_number,
+                'w_schedule_number2' => isset($w_schedule_number2) ? $w_schedule_number2 : '',
             ], 201);
         } catch (\Throwable $e) {
             DB::rollback();

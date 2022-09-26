@@ -116,9 +116,10 @@ class ExportController extends Controller
                     $item->remain = $warehousing_items_import[0]->wi_number - $warehousing_item->wi_number;
                     $item->warehousing_items_import = $warehousing_items_import;
                     // $warehousing_item->wi_number = $warehousing_items_import[0]->wi_number - $warehousing_item->wi_number;
-                }else{
-                    $item->remain = $warehousing_items_import[0]->wi_number - $warehousing_item->wi_number;
                 }
+                // else{
+                //     $item->remain = $warehousing_items_import[0]->wi_number - $warehousing_item->wi_number;
+                // }
                 
                 $item->warehousing_item = [$warehousing_item];
                

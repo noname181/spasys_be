@@ -123,6 +123,12 @@ class CompanyController extends Controller
                 $companies->where('updated_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
             }
 
+            if (isset($validated['co_parent_name'])) {
+                $companies->whereHas('co_parent', function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(company.co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                });
+            }
+           
             if (isset($validated['co_name'])) {
                 $companies->where(function ($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
@@ -376,14 +382,27 @@ class CompanyController extends Controller
          
             $user = Auth::user();
             $companies2 = "";
-            $companies = Company::with('contract')->with('warehousing')->where('co_type', 'shipper')->where('co_parent_no', $user->co_no)->orderBy('co_no', 'DESC');
 
-            if (isset($validated['w_no'])) {
-                $companies2 = Company::with('contract')->with('warehousing')->where('co_type', 'shipper')->where('co_parent_no', $user->co_no)->orderBy('co_no', 'DESC');
-                $companies2->whereHas('warehousing', function ($query) use ($validated) {
-                    $query->where('w_no', '=',  $validated['w_no']);
-                });
-                $companies2 = $companies2->first();
+            if($validated['type'] == 'shop'){
+                $companies = Company::with('contract')->with('warehousing')->where('co_type', 'shipper')->where('co_parent_no', $user->co_no)->orderBy('co_no', 'DESC');
+
+                if (isset($validated['w_no'])) {
+                    $companies2 = Company::with('contract')->with('warehousing')->where('co_type', 'shipper')->where('co_parent_no', $user->co_no)->orderBy('co_no', 'DESC');
+                    $companies2->whereHas('warehousing', function ($query) use ($validated) {
+                        $query->where('w_no', '=',  $validated['w_no']);
+                    });
+                    $companies2 = $companies2->first();
+                }
+            }else{
+                $companies = Company::with('contract')->with('warehousing')->where('co_type', 'shipper')->orderBy('co_no', 'DESC');
+
+                if (isset($validated['w_no'])) {
+                    $companies2 = Company::with('contract')->with('warehousing')->where('co_type', 'shipper')->orderBy('co_no', 'DESC');
+                    $companies2->whereHas('warehousing', function ($query) use ($validated) {
+                        $query->where('w_no', '=',  $validated['w_no']);
+                    });
+                    $companies2 = $companies2->first();
+                }
             }
 
        
