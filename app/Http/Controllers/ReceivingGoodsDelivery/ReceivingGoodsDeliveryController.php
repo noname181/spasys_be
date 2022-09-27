@@ -375,12 +375,22 @@ class ReceivingGoodsDeliveryController extends Controller
                     }
 
                     if($request->wr_contents){
-                        WarehousingRequest::where('w_no', $request->w_no)->update([
-                            'mb_no' => $member->mb_no,
-                            'wr_contents' => $request->wr_contents,
-                            'wr_type' => 'EW',
-                        ]);
+                        // WarehousingRequest::where('w_no', $request->w_no)->update([
+                        //     'mb_no' => $member->mb_no,
+                        //     'wr_contents' => $request->wr_contents,
+                        //     'wr_type' => 'EW',
+                        // ]);
+
+                        if($request->wr_contents){
+                            WarehousingRequest::insert([
+                                'w_no' => $request->w_no,
+                                'mb_no' => $member->mb_no,
+                                'wr_contents' => $request->wr_contents,
+                                'wr_type' => 'EW',
+                            ]);
+                        }
                     }
+                    
 
                     foreach ($data['remove_items'] as $remove) {
                         WarehousingItem::where('item_no', $remove['item_no'])->where('w_no', $request->w_no)->delete();
@@ -544,12 +554,21 @@ class ReceivingGoodsDeliveryController extends Controller
                             ]);
                         }
                         if($request->wr_contents){
-                            WarehousingRequest::where('w_no', $request->w_no)->update([
-                                'mb_no' => $member->mb_no,
-                                'wr_contents' => $request->wr_contents,
-                                'wr_type' => 'EW',
-                            ]);
+                            // WarehousingRequest::where('w_no', $request->w_no)->update([
+                            //     'mb_no' => $member->mb_no,
+                            //     'wr_contents' => $request->wr_contents,
+                            //     'wr_type' => 'EW',
+                            // ]);
+                            if($request->wr_contents){
+                                WarehousingRequest::insert([
+                                    'w_no' => $request->w_no,
+                                    'mb_no' => $member->mb_no,
+                                    'wr_contents' => $request->wr_contents,
+                                    'wr_type' => 'EW',
+                                ]);
+                            }
                         }
+
                         foreach ($data['items'] as $item) {
 
                             // $warehousing = WarehousingItem::where([
