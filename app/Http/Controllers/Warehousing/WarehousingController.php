@@ -56,11 +56,16 @@ class WarehousingController extends Controller
     {
         try {
             $warehousing = Warehousing::with(['co_no', 'warehousing_request'])->find($w_no);
-            $warehousings = Warehousing::where('w_import_no', $w_no)->get();
+            //$warehousings = Warehousing::where('w_import_no', $w_no)->get();
             if (isset($warehousing->w_import_no) && $warehousing->w_import_no) {
                 $warehousing_import = Warehousing::where('w_no', $warehousing->w_import_no)->first();
             } else {
                 $warehousing_import = '';
+            }
+            if($warehousing->w_import_no){
+                $warehousings = Warehousing::where('w_import_no', $warehousing->w_import_no)->get();
+            }else{
+                $warehousings = [];
             }
             if (!empty($warehousing)) {
                 return response()->json(
