@@ -175,18 +175,26 @@ class CompanyController extends Controller
 
             $companies->setCollection(
                 $companies->getCollection()->map(function ($item){
-                    $service_name = explode(" ",$item->co_service);
+                    $service_names = explode(" ",$item->co_service);
                     $co_no = $item->co_no;
              
-                        $service_no = Service::where('service_name', $service_name)->first();
+                    $settlement_cycle = [];
                     
+                    foreach($service_names as $service_name){
+                        $service = Service::where('service_name', $service_name)->first();
+                        if(isset($service->service_no)){
+                            $company_settlement = CompanySettlement::where([
+                                'co_no' => $co_no,
+                                'service_no' => $service->service_no
+                            ])->first();
+                            if($company_settlement){
+                                $settlement_cycle[] = $company_settlement->cs_payment_cycle;
+                            }
+                        }
+                    }
+                    $settlement_cycle = implode("/", $settlement_cycle);
                     
-
-                    $company_settlement = CompanySettlement::where([
-                        'co_no' => $co_no,
-                        'service_no' => $service_no
-                    ])->first();
-                    $item->settlement_cycle = $company_settlement;
+                    $item->settlement_cycle = $settlement_cycle;
                     return $item;
                 })
             );
