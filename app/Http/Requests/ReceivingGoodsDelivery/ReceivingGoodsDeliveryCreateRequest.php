@@ -166,12 +166,10 @@ class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
                 'max:255',
             ],
             'location.*.rgd_delivery_schedule_day' => [
-                'required',
-                'date_format:Y-m-d'
+                'nullable'
             ],
             'location.*.rgd_arrive_day' => [
-                'required',
-                'date_format:Y-m-d'
+                'nullable'
             ],
         ];
     }
