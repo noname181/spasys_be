@@ -138,8 +138,8 @@ class ReceivingGoodsDeliveryController extends Controller
                         'rgd_tracking_code' => $rgd['rgd_tracking_code'],
                         'rgd_delivery_man' => $rgd['rgd_delivery_man'],
                         'rgd_delivery_man_hp' => $rgd['rgd_delivery_man_hp'],
-                        'rgd_delivery_schedule_day' => DateTime::createFromFormat('Y-m-d', $rgd['rgd_delivery_schedule_day']),
-                        'rgd_arrive_day' => DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']),
+                        'rgd_delivery_schedule_day' => $rgd['rgd_delivery_schedule_day'] ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_delivery_schedule_day']) : null,
+                        'rgd_arrive_day' => $rgd['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']) : null,
                     ]);
                 }else{
 
@@ -157,8 +157,8 @@ class ReceivingGoodsDeliveryController extends Controller
                         'rgd_tracking_code' => $rgd['rgd_tracking_code'],
                         'rgd_delivery_man' => $rgd['rgd_delivery_man'],
                         'rgd_delivery_man_hp' => $rgd['rgd_delivery_man_hp'],
-                        'rgd_delivery_schedule_day' => DateTime::createFromFormat('Y-m-d', $rgd['rgd_delivery_schedule_day']),
-                        'rgd_arrive_day' => DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']),
+                        'rgd_delivery_schedule_day' => $rgd['rgd_delivery_schedule_day'] ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_delivery_schedule_day']) : null,
+                        'rgd_arrive_day' => $rgd['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']) : null,
                     ]);
                 }
             }
@@ -375,12 +375,22 @@ class ReceivingGoodsDeliveryController extends Controller
                     }
 
                     if($request->wr_contents){
-                        WarehousingRequest::where('w_no', $request->w_no)->update([
-                            'mb_no' => $member->mb_no,
-                            'wr_contents' => $request->wr_contents,
-                            'wr_type' => 'EW',
-                        ]);
+                        // WarehousingRequest::where('w_no', $request->w_no)->update([
+                        //     'mb_no' => $member->mb_no,
+                        //     'wr_contents' => $request->wr_contents,
+                        //     'wr_type' => 'EW',
+                        // ]);
+
+                        if($request->wr_contents){
+                            WarehousingRequest::insert([
+                                'w_no' => $request->w_no,
+                                'mb_no' => $member->mb_no,
+                                'wr_contents' => $request->wr_contents,
+                                'wr_type' => 'EW',
+                            ]);
+                        }
                     }
+                    
 
                     foreach ($data['remove_items'] as $remove) {
                         WarehousingItem::where('item_no', $remove['item_no'])->where('w_no', $request->w_no)->delete();
@@ -429,8 +439,8 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_tracking_code' => $location['rgd_tracking_code'],
                             'rgd_delivery_man' => $location['rgd_delivery_man'],
                             'rgd_delivery_man_hp' => $location['rgd_delivery_man_hp'],
-                            'rgd_delivery_schedule_day' => DateTime::createFromFormat('Y-m-d', $location['rgd_delivery_schedule_day']),
-                            'rgd_arrive_day' => DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']),
+                            'rgd_delivery_schedule_day' => $location['rgd_delivery_schedule_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_delivery_schedule_day']) : null,
+                            'rgd_arrive_day' =>  $location['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']) : null,
                         ]);
                     }
                 }
@@ -514,8 +524,8 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'rgd_tracking_code' => $location['rgd_tracking_code'],
                                 'rgd_delivery_man' => $location['rgd_delivery_man'],
                                 'rgd_delivery_man_hp' => $location['rgd_delivery_man_hp'],
-                                'rgd_delivery_schedule_day' => DateTime::createFromFormat('Y-m-d', $location['rgd_delivery_schedule_day']),
-                                'rgd_arrive_day' => DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']),
+                                'rgd_delivery_schedule_day' => $location['rgd_delivery_schedule_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_delivery_schedule_day']) : null,
+                                'rgd_arrive_day' => $location['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']) : null,
                             ]);
                         }
                     }
@@ -544,12 +554,21 @@ class ReceivingGoodsDeliveryController extends Controller
                             ]);
                         }
                         if($request->wr_contents){
-                            WarehousingRequest::where('w_no', $request->w_no)->update([
-                                'mb_no' => $member->mb_no,
-                                'wr_contents' => $request->wr_contents,
-                                'wr_type' => 'EW',
-                            ]);
+                            // WarehousingRequest::where('w_no', $request->w_no)->update([
+                            //     'mb_no' => $member->mb_no,
+                            //     'wr_contents' => $request->wr_contents,
+                            //     'wr_type' => 'EW',
+                            // ]);
+                            if($request->wr_contents){
+                                WarehousingRequest::insert([
+                                    'w_no' => $request->w_no,
+                                    'mb_no' => $member->mb_no,
+                                    'wr_contents' => $request->wr_contents,
+                                    'wr_type' => 'EW',
+                                ]);
+                            }
                         }
+
                         foreach ($data['items'] as $item) {
 
                             // $warehousing = WarehousingItem::where([
@@ -594,8 +613,8 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'rgd_tracking_code' => $location['rgd_tracking_code'],
                                 'rgd_delivery_man' => $location['rgd_delivery_man'],
                                 'rgd_delivery_man_hp' => $location['rgd_delivery_man_hp'],
-                                'rgd_delivery_schedule_day' => DateTime::createFromFormat('Y-m-d', $location['rgd_delivery_schedule_day']),
-                                'rgd_arrive_day' => DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']),
+                                'rgd_delivery_schedule_day' => $location['rgd_delivery_schedule_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_delivery_schedule_day']) : null,
+                                'rgd_arrive_day' => $location['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']) : null,
                             ]);
                         }
                     }else{
@@ -669,8 +688,8 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'rgd_tracking_code' => $location['rgd_tracking_code'],
                                 'rgd_delivery_man' => $location['rgd_delivery_man'],
                                 'rgd_delivery_man_hp' => $location['rgd_delivery_man_hp'],
-                                'rgd_delivery_schedule_day' => DateTime::createFromFormat('Y-m-d', $location['rgd_delivery_schedule_day']),
-                                'rgd_arrive_day' => DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']),
+                                'rgd_delivery_schedule_day' => $location['rgd_delivery_schedule_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_delivery_schedule_day']) : null,
+                                'rgd_arrive_day' => $location['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']) : null,
                             ]);
                         }
                     }
@@ -934,8 +953,8 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_tracking_code' => $rgd['rgd_tracking_code'],
                             'rgd_delivery_man' => $rgd['rgd_delivery_man'],
                             'rgd_delivery_man_hp' => $rgd['rgd_delivery_man_hp'],
-                            'rgd_delivery_schedule_day' => DateTime::createFromFormat('Y-m-d', $rgd['rgd_delivery_schedule_day']),
-                            'rgd_arrive_day' => DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']),
+                            'rgd_delivery_schedule_day' => $rgd['rgd_delivery_schedule_day'] ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_delivery_schedule_day']) : null,
+                            'rgd_arrive_day' => $rgd['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']) : null,
                         ]);
                     }else{
 
@@ -953,8 +972,8 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_tracking_code' => $rgd['rgd_tracking_code'],
                             'rgd_delivery_man' => $rgd['rgd_delivery_man'],
                             'rgd_delivery_man_hp' => $rgd['rgd_delivery_man_hp'],
-                            'rgd_delivery_schedule_day' => DateTime::createFromFormat('Y-m-d', $rgd['rgd_delivery_schedule_day']),
-                            'rgd_arrive_day' => DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']),
+                            'rgd_delivery_schedule_day' => $rgd['rgd_delivery_schedule_day'] ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_delivery_schedule_day']) : null,
+                            'rgd_arrive_day' => $rgd['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']) : null,
                         ]);
                     }
                 }
@@ -1017,8 +1036,8 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_tracking_code' => $rgd['rgd_tracking_code'],
                             'rgd_delivery_man' => $rgd['rgd_delivery_man'],
                             'rgd_delivery_man_hp' => $rgd['rgd_delivery_man_hp'],
-                            'rgd_delivery_schedule_day' => DateTime::createFromFormat('Y-m-d', $rgd['rgd_delivery_schedule_day']),
-                            'rgd_arrive_day' => DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']),
+                            'rgd_delivery_schedule_day' => $rgd['rgd_delivery_schedule_day'] ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_delivery_schedule_day']) : null,
+                            'rgd_arrive_day' => $rgd['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']) : null,
                         ]);
                     }else{
 
@@ -1036,8 +1055,8 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_tracking_code' => $rgd['rgd_tracking_code'],
                             'rgd_delivery_man' => $rgd['rgd_delivery_man'],
                             'rgd_delivery_man_hp' => $rgd['rgd_delivery_man_hp'],
-                            'rgd_delivery_schedule_day' => DateTime::createFromFormat('Y-m-d', $rgd['rgd_delivery_schedule_day']),
-                            'rgd_arrive_day' => DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']),
+                            'rgd_delivery_schedule_day' => $rgd['rgd_delivery_schedule_day'] ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_delivery_schedule_day']) : null,
+                            'rgd_arrive_day' => $rgd['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']) : null,
                         ]);
                     }
                 }
