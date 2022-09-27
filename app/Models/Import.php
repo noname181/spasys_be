@@ -55,7 +55,9 @@ class Import extends Model
 
     public function export()
     {
-        return $this->hasMany(Export::class, 'mb_no', 'mb_no');
+        return $this->hasMany(Export::class, 'te_logistic_manage_number', 'tie_logistic_manage_number');
     }
+
+    
 
 }
