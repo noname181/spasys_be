@@ -55,13 +55,15 @@ class ImportScheduleController extends Controller
     public function getImportSchedule(ImportScheduleSearchRequest $request)
     {
         try {
+           
             $validated = $request->validated();
 
             // If per_page is null set default data = 15
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $import_schedule = ImportSchedule::with('co_no')->with('files')->orderBy('is_no', 'DESC');
+            $import_schedule = ImportSchedule::with('co_no')->with('files')->orderBy('tie_no', 'DESC');
+            
 
             if (isset($validated['from_date'])) {
                 $import_schedule->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
@@ -89,12 +91,6 @@ class ImportScheduleController extends Controller
                 $import_schedule->where('logistic_manage_number', 'like', '%' . $validated['logistic_manage_number'] . '%');
             }
 
-            // if (isset($validated['import_schedule_status1']) || isset($validated['import_schedule_status2'])) {
-            //     $import_schedule->where(function($query) use ($validated) {
-            //         $query->orwhere('import_schedule_status', '=', $validated['import_schedule_status1']);
-            //         $query->orWhere('import_schedule_status', '=', $validated['import_schedule_status2']);
-            //     });
-            // }
 
             $members = Member::where('mb_no', '!=', 0)->get();
 
@@ -104,7 +100,7 @@ class ImportScheduleController extends Controller
         } catch (\Exception $e) {
             Log::error($e);
             return $e;
-            //return response()->json(['message' => Messages::MSG_0018], 500);
+            return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
 
@@ -112,14 +108,15 @@ class ImportScheduleController extends Controller
     public function getImportAPI(ImportScheduleSearchRequest $request)
     {
         try {
+            DB::enableQueryLog();
             $validated = $request->validated();
 
             // If per_page is null set default data = 15
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $import_schedule = ImportExpected::with('co_no')->with('files')->orderBy('is_no', 'DESC');
-
+            $import_schedule = ImportExpected::with('import')->orderBy('tie_no', 'DESC');
+           
             if (isset($validated['from_date'])) {
                 $import_schedule->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }

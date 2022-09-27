@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-
+use App\Models\Import;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -44,5 +44,10 @@ class ImportExpected extends Model
         'updated_at' => "date:Y.m.d H:i",
         'tie_is_date' => "date:Y.m.d H:i",
     ];
+
+    public function import()
+    {
+        return $this->hasOne(Import::class,'ti_logistic_manage_number','tie_logistic_manage_number')->with('export');
+    }
 
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Export;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -51,5 +52,10 @@ class Import extends Model
         'updated_at' => "date:Y.m.d H:i",
         'ti_is_date' => "date:Y.m.d",
     ];
+
+    public function export()
+    {
+        return $this->hasMany(Export::class, 'mb_no', 'mb_no');
+    }
 
 }
