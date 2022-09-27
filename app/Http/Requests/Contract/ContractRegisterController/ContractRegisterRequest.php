@@ -107,36 +107,30 @@ class ContractRegisterRequest extends BaseFormRequest
             //     'max:255'
             // ],
             'c_deposit_price' => [
-                'required',
-                'integer'
+                ''
             ],
             'c_deposit_date' => [
                 'required',
                 'date'
             ],
             'c_file_insulance' => [
-                'required',
                 'max:2048',
                 'mimes:pdf,png,jpg,jpeg'
             ],
             'c_file_license' => [
-                'required',
                 'max:2048',
                 'mimes:pdf,png,jpg,jpeg'
             ],
             'c_file_contract' => [
-                'required',
                 'max:2048',
                 'mimes:pdf,png,jpg,jpeg'
             ],
             'c_file_bank_account' => [
-                'required',
                 'max:2048',
                 'mimes:pdf,png,jpg,jpeg'
             ],
             'c_deposit_return_price' => [
-                'required',
-                'integer'
+                ''
             ],
             'c_deposit_return_date' => [
                 'required',

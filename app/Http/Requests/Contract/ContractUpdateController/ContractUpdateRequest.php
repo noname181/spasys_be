@@ -103,8 +103,6 @@ class ContractUpdateRequest extends BaseFormRequest
                 'max:255'
             ],
             'c_deposit_price' => [
-                'required',
-                'integer'
             ],
             'c_deposit_date' => [
                 'required',
@@ -127,8 +125,7 @@ class ContractUpdateRequest extends BaseFormRequest
                 'mimes:pdf,png,jpg,jpeg'
             ],
             'c_deposit_return_price' => [
-                'required',
-                'integer'
+                ''
             ],
             'c_deposit_return_date' => [
                 'required',
