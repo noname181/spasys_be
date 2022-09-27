@@ -62,7 +62,7 @@ class ImportScheduleController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $import_schedule = ImportSchedule::with('co_no')->with('files')->orderBy('tie_no', 'DESC');
+            $import_schedule = ImportSchedule::with('co_no')->with('files')->orderBy('i_no', 'DESC');
             
 
             if (isset($validated['from_date'])) {
@@ -115,7 +115,7 @@ class ImportScheduleController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $import_schedule = ImportExpected::with('import')->orderBy('tie_no', 'DESC');
+            $import_schedule = ImportExpected::with(['import','company'])->orderBy('tie_no', 'DESC');
            
             if (isset($validated['from_date'])) {
                 $import_schedule->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
@@ -125,18 +125,24 @@ class ImportScheduleController extends Controller
                 $import_schedule->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
             }
 
+            if (isset($validated['co_parent_name'])) {
+                $companies->whereHas('company.co_parent', function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(company.co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                });
+            }
+
             if (isset($validated['co_name'])) {
-                $import_schedule->whereHas('co_no', function($q) use($validated) {
+                $import_schedule->whereHas('company', function($q) use($validated) {
                     return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
                 });
             }
 
             if (isset($validated['m_bl'])) {
-                $import_schedule->where('m_bl', 'like', '%' . $validated['m_bl'] . '%');
+                $import_schedule->where(DB::raw('tie_m_bl'), 'like', '%' . strtolower($validated['m_bl']) . '%');
             }
 
             if (isset($validated['h_bl'])) {
-                $import_schedule->where('h_bl', 'like', '%' . $validated['h_bl'] . '%');
+                $import_schedule->where(DB::raw('tie_h_bl'), 'like', '%' . strtolower($validated['h_bl']) . '%');
             }
 
             if (isset($validated['logistic_manage_number'])) {
@@ -150,7 +156,7 @@ class ImportScheduleController extends Controller
             //     });
             // }
 
-            $members = Member::where('mb_no', '!=', 0)->get();
+            //$members = Member::where('mb_no', '!=', 0)->get();
 
             $import_schedule = $import_schedule->paginate($per_page, ['*'], 'page', $page);
 
