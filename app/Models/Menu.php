@@ -55,7 +55,7 @@ class Menu extends Model
 
     public function menu_childs()
     {
-        return $this->hasMany(Menu::class, 'menu_parent_no', 'menu_no')->where('menu_use_yn', 'y')->orderBy('menu_order', 'ASC')->orderBy('menu_no', 'ASC');
+        return $this->hasMany(Menu::class, 'menu_parent_no', 'menu_no')->with('permission')->where('menu_use_yn', 'y')->orderBy('menu_order', 'ASC')->orderBy('menu_no', 'ASC');
     }
 
     public function permission()

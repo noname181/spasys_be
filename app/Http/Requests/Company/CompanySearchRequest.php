@@ -24,6 +24,9 @@ class CompanySearchRequest extends BaseFormRequest
     public function rules()
     {
         return [
+            'type' => [
+                ''
+            ],
             'w_no' => [
                 ''
             ],
@@ -37,6 +40,10 @@ class CompanySearchRequest extends BaseFormRequest
             ],
             'co_no' => [
                 '',
+            ],
+            'co_parent_name' => [
+                'string',
+                'nullable',
             ],
             'co_name' => [
                 'string',

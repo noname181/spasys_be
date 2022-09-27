@@ -374,5 +374,7 @@ Route::middleware('auth')->group(function () {
     Route::post('get_import_data', [\App\Http\Controllers\Import\ImportController::class,'get_import_data'])->name('get_import_data');
     Route::post('get_export_data', [\App\Http\Controllers\Export\ExportController::class,'get_export_data'])->name('get_export_data');
     Route::post('/download_distribution_stocklist', [\App\Http\Controllers\Excel\ExportExcelController::class,'download_distribution_stocklist'])->name('download_distribution_stocklist');
+    Route::post('/dowload_fulfillment_stock_list', [\App\Http\Controllers\Excel\ExportExcelController::class,'dowload_fulfillment_stock_list'])->name('dowload_fulfillment_stock_list');
+    Route::post('/download_bonded_cargo', [\App\Http\Controllers\Excel\ExportExcelController::class,'download_bonded_cargo'])->name('download_bonded_cargo');
 });
 
