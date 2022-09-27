@@ -146,7 +146,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/get_fulfillment_export_status_complete', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getFulfillmentExportStatusComplete']); //Page243
     Route::post('/get_warehousing_export_status4', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingExportStatus4']); //page 263
     Route::post('/get_fulfillment_export_status4', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getFulfillmentExportStatus4']); //page 252
-
+    Route::post('/get_tax_invoice_list', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getTaxInvoiceList']); //page tax_invoice_list
 
     Route::get('/warehousing_request', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class,'__invoke']);
     Route::post('/warehousing_request_paginate', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class,'paginateWarehousingRequest']);
