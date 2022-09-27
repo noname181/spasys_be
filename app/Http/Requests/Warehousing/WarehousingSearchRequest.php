@@ -144,6 +144,12 @@ class WarehousingSearchRequest extends BaseFormRequest
             'settlement_cycle' => [
                 '',
             ],
+            'settlement_cycle1' => [
+                '',
+            ],
+            'settlement_cycle2' => [
+                '',
+            ],
         ];
     }
 
