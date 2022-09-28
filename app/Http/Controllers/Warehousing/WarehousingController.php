@@ -1436,7 +1436,7 @@ class WarehousingController extends Controller
     }
 
 
-    public function getTaxInvoiceList(WarehousingSearchRequest $request) //page 144 show EW,rgd_status1 and rgd_status2 = complete
+    public function getTaxInvoiceList(WarehousingSearchRequest $request) //page277
 
     {
         try {

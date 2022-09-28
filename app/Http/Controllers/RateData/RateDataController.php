@@ -1217,8 +1217,17 @@ class RateDataController extends Controller
             ->where('rgd_bill_type', $bill_type)
             ->get();
 
+            $rdgs = [];
+            foreach($rgds as $rgd){
+                $rdg = RateDataGeneral::where('rgd_no_expectation', $rgd->rgd_no)
+                ->where('rdg_bill_type', 'final_monthly')->first();
+                $rdgs[] = $rdg;
+            }
+            
+
             return response()->json([
                 'rgds' => $rgds,
+                'rdgs' => $rdgs
             ], 201);
 
             // if (isset($validated['from_date'])) {
