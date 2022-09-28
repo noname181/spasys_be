@@ -364,11 +364,13 @@ class ReceivingGoodsDeliveryController extends Controller
                         //'co_no' => $co_no
                     ]);
 
+                    $w_schedule_number = CommonFunc::generate_w_schedule_number($request->w_no,'EW');
                     Warehousing::where('w_no', $request->w_no)->update([
                         'w_schedule_number' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EW')
                     ]);
 
                     if(isset($request->page_type) && $request->page_type == 'Page130146'){
+                        $w_schedule_number2 = CommonFunc::generate_w_schedule_number($request->w_no,'EWC');
                         Warehousing::where('w_no', $request->w_no)->update([
                             'w_schedule_number2' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EWC')
                         ]);
@@ -464,12 +466,13 @@ class ReceivingGoodsDeliveryController extends Controller
                         Warehousing::where('w_no', $data['w_import_no'])->update([
                             'w_children_yn' => "y"
                         ]);
-
+                        $w_schedule_number = CommonFunc::generate_w_schedule_number($request->w_no,'EW');
                         Warehousing::where('w_no', $w_no)->update([
                             'w_schedule_number' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EW')
                         ]);
 
                         if(isset($request->page_type) && $request->page_type == 'Page130146'){
+                            $w_schedule_number2 = CommonFunc::generate_w_schedule_number($request->w_no,'EWC');
                             Warehousing::where('w_no', $request->w_no)->update([
                                 'w_schedule_number2' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EWC')
                             ]);
@@ -545,10 +548,12 @@ class ReceivingGoodsDeliveryController extends Controller
                         Warehousing::where('w_no', $warehousing_data->w_import_no)->update([
                             'w_children_yn' => "y"
                         ]);
+                        $w_schedule_number = CommonFunc::generate_w_schedule_number($request->w_no,'EW');
                         Warehousing::where('w_no', $w_no)->update([
                             'w_schedule_number' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EW')
                         ]);
                         if(isset($request->page_type) && $request->page_type == 'Page130146'){
+                            $w_schedule_number2 = CommonFunc::generate_w_schedule_number($request->w_no,'EWC');
                             Warehousing::where('w_no', $request->w_no)->update([
                                 'w_schedule_number2' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EWC')
                             ]);
@@ -628,12 +633,13 @@ class ReceivingGoodsDeliveryController extends Controller
                             'w_category_name' => $request->w_category_name,
                             'co_no' => $co_no
                         ]);
-
+                        $w_schedule_number = CommonFunc::generate_w_schedule_number($w_no,'EW');
                         Warehousing::where('w_no', $w_no)->update([
                             'w_schedule_number' =>   CommonFunc::generate_w_schedule_number($w_no,'EW')
                         ]);
 
                         if(isset($request->page_type) && $request->page_type == 'Page130146'){
+                            $w_schedule_number2 = CommonFunc::generate_w_schedule_number($request->w_no,'EWC');
                             Warehousing::where('w_no', $request->w_no)->update([
                                 'w_schedule_number2' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EWC')
                             ]);
@@ -843,6 +849,8 @@ class ReceivingGoodsDeliveryController extends Controller
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
+                'w_schedule_number' =>  $w_schedule_number,
+                'w_schedule_number2' => isset($w_schedule_number2) ? $w_schedule_number2 : '',
             ], 201);
         } catch (\Throwable $e) {
             DB::rollback();
