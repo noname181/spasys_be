@@ -44,7 +44,7 @@ class MemberUpdateByIdRequest extends BaseFormRequest
                 'string',
                 'max:255',
                 'email',
-                'unique:member,mb_email,'.Auth::user()->mb_no.',mb_no'
+                'unique:member,mb_email,'.$this->mb_no.',mb_no'
             ],
             'mb_name' => [
                 'required',
