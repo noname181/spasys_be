@@ -1050,16 +1050,18 @@ class WarehousingController extends Controller
                 $start_date = $updated_at->startOfMonth()->toDateString();
                 $end_date = $updated_at->endOfMonth()->toDateString();
 
-                $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general'])->where('updated_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
+                $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general'])
+                ->where('updated_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
                 ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
                 ->where('rgd_status1', '=', '출고')
                 ->where('rgd_status2', '=', '작업완료')
+                ->where('rgd_bill_type', 'expectation_monthly')
                 ->where(function($q){
                     $q->where('rgd_status4', '=', '예상경비청구서')->orWhereNull('rgd_status4');
                 })
                 ->get();
                 $warehousing = Warehousing::with(['co_no', 'warehousing_request', 'w_import_parent'])->find($w_no);
-                $time = str_replace('-', '.', $start_date) . ' - ' . str_replace('-', '.', $end_date);
+                $time = str_replace('-', '.', $start_date) . ' ~ ' . str_replace('-', '.', $end_date);
 
             }else {
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
@@ -1074,7 +1076,7 @@ class WarehousingController extends Controller
 
             return response()->json(
                 ['message' => Messages::MSG_0007,
-                    'data' => isset($warehousing) ? $warehousing : $rgds,
+                    'data' => isset($rgds) ? $rgds : null,
                     'warehousing' => isset($warehousing) ? $warehousing : null,
                     'rgd'  => $rgd,
                     'check_cofirm'=>$check_cofirm,

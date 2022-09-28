@@ -272,6 +272,40 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
+        }else  if(!isset($rmd->rmd_no) && $set_type == 'work_monthly_additional'){
+            $rmd = RateMetaData::where(
+                [
+                    'w_no' => $w_no,
+                    'rgd_no' => $rgd_no,
+                    'set_type' => 'work_monthly_additional'
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'w_no' => $w_no,
+                        'rgd_no' => $rgd_no,
+                        'set_type' => 'work_monthly_final'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'storage_monthly_additional'){
+            $rmd = RateMetaData::where(
+                [
+                    'w_no' => $w_no,
+                    'rgd_no' => $rgd_no,
+                    'set_type' => 'storage_monthly_additional'
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'w_no' => $w_no,
+                        'rgd_no' => $rgd_no,
+                        'set_type' => 'storage_monthly_final'
+                    ]
+                )->first();
+            }
         }else if(!isset($rmd->rmd_no) && $set_type == 'storage_final'){
             $rmd = RateMetaData::where(
                 [
@@ -1237,11 +1271,13 @@ class RateDataController extends Controller
                     $final_rgd = $expectation_rgd->replicate();
                     $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
                     $final_rgd->rgd_status4 = '확정청구서';
+                    $final_rgd->rgd_settlement_number =  $request->settlement_number;
                     $final_rgd->save();
 
                     RateDataGeneral::where('rdg_no', $final_rdg->rdg_no)->update([
                         'rgd_no' => $final_rgd->rgd_no,
-                        'rgd_no_expectation' => $expectation_rgd->rgd_no
+                        'rgd_no_expectation' => $expectation_rgd->rgd_no,
+                        'rdg_set_type' => $request->rdg_set_type
                     ]);
 
                 }else {
@@ -1352,9 +1388,9 @@ class RateDataController extends Controller
             DB::beginTransaction();
             $rdg = RateDataGeneral::where('rgd_no_final', $rgd_no)->where('rdg_bill_type', 'additional_monthly')->first();
 
-            if(!isset($rdg->rdg_no)){
-                $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'final_monthly')->first();
-            }
+            // if(!isset($rdg->rdg_no)){
+            //     $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'final_monthly')->first();
+            // }
 
             DB::commit();
             return response()->json([
