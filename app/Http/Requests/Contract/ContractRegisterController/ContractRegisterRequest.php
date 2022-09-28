@@ -65,6 +65,11 @@ class ContractRegisterRequest extends BaseFormRequest
                 'string',
                 'max:1'
             ],
+            'co_close_yn' => [
+                'required',
+                'string',
+                'max:1'
+            ],
             'c_calculate_deadline_yn' => [
                 'required',
                 'string',

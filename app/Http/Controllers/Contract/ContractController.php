@@ -43,10 +43,10 @@ class ContractController extends Controller
             $c_file_bank_account_ = isset($validated['c_file_bank_account']) ? $validated['c_file_bank_account'] : '';
              
 
-            $inl = Storage::disk('public')->put($c_file_insulance, $c_file_insulance_);
-            $lic = Storage::disk('public')->put($c_file_license,  $c_file_license_);
-            $con = Storage::disk('public')->put($c_file_contract,   $c_file_contract_);
-            $bc = Storage::disk('public')->put($c_file_bank_account,  $c_file_bank_account_);
+            if(isset($validated['c_file_insulance'])) $inl = Storage::disk('public')->put($c_file_insulance, $c_file_insulance_) ;
+            if(isset($validated['c_file_license'])) $lic = Storage::disk('public')->put($c_file_license,  $c_file_license_);
+            if(isset($validated['c_file_contract'])) $con = Storage::disk('public')->put($c_file_contract,   $c_file_contract_);
+            if(isset($validated['c_file_bank_account'])) $bc = Storage::disk('public')->put($c_file_bank_account,  $c_file_bank_account_);
 
             $c_no = Contract::insertGetId([
                 'co_no' => $validated['co_no'],
@@ -57,20 +57,23 @@ class ContractController extends Controller
                 'c_calculate_deadline_yn' => $validated['c_calculate_deadline_yn'],
                 'c_integrated_calculate_yn' => $validated['c_integrated_calculate_yn'],
                 // 'c_card_number' => $validated['c_card_number'],
-                'c_deposit_day' => $validated['c_deposit_day'],
+                'c_deposit_day' => ($validated['c_deposit_day'] && $validated['c_deposit_day'] !='null') ? $validated['c_deposit_day']  : null,
                 // 'c_account_number' => $validated['c_account_number'],
                 'c_deposit_price' => ($validated['c_deposit_price'] && $validated['c_deposit_price'] !='null') ? $validated['c_deposit_price']  : null,
                 'c_deposit_date' => DateTime::createFromFormat('Y-m-d', $validated['c_deposit_date']),
-                'c_file_insulance' => $inl && $inl != '1' ? $inl : null,
-                'c_file_license' => $lic && $lic != '1' ? $lic : null,
-                'c_file_contract' => $con && $con != '1' ? $con : null,
-                'c_file_bank_account' => $bc && $bc != '1' ? $bc : null,
+                'c_file_insulance' => isset($inl) ? $inl : null,
+                'c_file_license' => isset($lic) ? $lic : null,
+                'c_file_contract' => isset($con) ? $con : null,
+                'c_file_bank_account' => isset($bc) ? $bc : null,
                 'c_deposit_return_price' => ($validated['c_deposit_return_price'] && $validated['c_deposit_return_price'] !='null') ? $validated['c_deposit_return_price']  : null,
                 'c_deposit_return_date' => DateTime::createFromFormat('Y-m-d', $validated['c_deposit_return_date']),
                 'c_deposit_return_reg_date' => DateTime::createFromFormat('Y-m-d', $validated['c_deposit_return_reg_date']),
                 'c_deposit_return_expiry_date' => DateTime::createFromFormat('Y-m-d', $validated['c_deposit_return_expiry_date']),
             ]);
-            $company = Company::where('co_no', $co_no)->update(['co_service' => $validated['co_service']]);
+            $company = Company::where('co_no', $co_no)->update([
+                'co_service' => $validated['co_service'],
+                'co_close_yn' => $validated['co_close_yn'],
+            ]);
 
             $i = 0;
             foreach($validated['service_no'] as $co_settlement){
@@ -122,7 +125,8 @@ class ContractController extends Controller
     public function getContract($co_no)
     {
         try {
-            $co_service = Company::where('co_no', $co_no)->first()->co_service;
+            $company = Company::where('co_no', $co_no)->first();
+            $co_service = $company->co_service;
             $contract = Contract::where(['co_no' => $co_no])->first();
             $co_payment = CompanyPayment::where(['co_no' => $co_no])->first();
             $company_settlement = CompanySettleMent::where(['co_no' => $co_no])
@@ -136,7 +140,8 @@ class ContractController extends Controller
                 'services' => $services,
                 'co_service' => $co_service,
                 'co_payment' => $co_payment,
-                'company_settlement' => $company_settlement
+                'company_settlement' => $company_settlement,
+                'company' => $company
             ]);
         } catch (\Exception $e) {
             Log::error($e);
@@ -204,7 +209,7 @@ class ContractController extends Controller
 
             $company = Company::where('co_no', $co_no)->update([
                 'co_service' => $validated['co_service'],
-                'co_settlement_cycle' => $validated['c_payment_cycle'],
+                'co_close_yn' => $validated['co_close_yn'],
             ]);
             $i = 0;
             foreach($validated['service_no'] as $service_no){
