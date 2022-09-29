@@ -26,6 +26,7 @@ use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryRequest;
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryCreateRequest;
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryCreateMobileRequest;
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryFileRequest;
+Use \Carbon\Carbon;
 
 class ReceivingGoodsDeliveryController extends Controller
 {
@@ -111,9 +112,10 @@ class ReceivingGoodsDeliveryController extends Controller
             ]);
 
             if(isset($validated['page_type']) && $validated['page_type'] == 'Page130146'){
+                $mytime = Carbon::now();
                 Warehousing::where('w_no', $w_no)->update([
                     'w_schedule_number2' =>  $w_schedule_number2,
-
+                    'w_completed_day' => $mytime->toDateTimeString()
                 ]);
             }
 
