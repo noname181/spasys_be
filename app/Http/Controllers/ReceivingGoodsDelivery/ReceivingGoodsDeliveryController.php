@@ -350,6 +350,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 'rgd_no' => $rgd_no,
                 'w_schedule_number' =>  $w_schedule_number,
                 'w_schedule_number2' => isset($w_schedule_number2) ? $w_schedule_number2 : '',
+                'w_no' => isset($w_no) ? $w_no :  $validated['w_no'],
             ], 201);
         } catch (\Throwable $e) {
             DB::rollback();
@@ -419,6 +420,23 @@ class ReceivingGoodsDeliveryController extends Controller
                     
                     if(isset($package)){
                         //foreach ($data['package'] as $package) {
+                        if(isset($package['p_no'])){
+                            Package::where('p_no',$package['p_no'])->update([
+                                'w_no' => $request->w_no,
+                                'note' => $package['note'],
+                                'order_number' => $package['order_number'],
+                                'pack_type' => $package['pack_type'],
+                                'quantity' => $package['quantity'],
+                                'reciever' => $package['reciever'],
+                                'reciever_address' => $package['reciever_address'],
+                                'reciever_contract' => $package['reciever_contract'],
+                                'reciever_detail_address' => $package['reciever_detail_address'],
+                                'sender' => $package['sender'],
+                                'sender_address' => $package['sender_address'],
+                                'sender_contract' => $package['sender_contract'],
+                                'sender_detail_address' => $package['sender_detail_address']
+                            ]);
+                        }else{
                             Package::insert([
                                 'w_no' => $request->w_no,
                                 'note' => $package['note'],
@@ -434,6 +452,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'sender_contract' => $package['sender_contract'],
                                 'sender_detail_address' => $package['sender_detail_address']
                             ]);
+                        }
                         //}
                     }
 
@@ -897,6 +916,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 'message' => Messages::MSG_0007,
                 'w_schedule_number' =>  $w_schedule_number,
                 'w_schedule_number2' => isset($w_schedule_number2) ? $w_schedule_number2 : '',
+                'w_no' => isset($w_no) ? $w_no :  $request->w_no,
             ], 201);
         } catch (\Throwable $e) {
             DB::rollback();
