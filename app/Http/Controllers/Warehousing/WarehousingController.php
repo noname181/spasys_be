@@ -1299,12 +1299,12 @@ class WarehousingController extends Controller
             ->whereHas('w_no', function ($query) {
                 $query->where('w_type', '=', 'EW')
                 ->where('w_category_name', '=', '수입풀필먼트');
-            })
-            ->whereHas('mb_no', function ($q) {
-                $q->whereHas('company', function ($q) {
-                    $q->where('co_type', 'spasys');
-                });
             });
+            // ->whereHas('mb_no', function ($q) {
+            //     $q->whereHas('company', function ($q) {
+            //         $q->where('co_type', 'spasys');
+            //     });
+            // });
 
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
@@ -1425,11 +1425,11 @@ class WarehousingController extends Controller
                 $query->where('w_type', '=', 'EW')
                 ->where('w_category_name', '=', '수입풀필먼트');
             })
-            ->whereHas('mb_no', function ($q) {
-                $q->whereHas('company', function ($q) {
-                    $q->where('co_type', 'spasys');
-                });
-            })
+            // ->whereHas('mb_no', function ($q) {
+            //     $q->whereHas('company', function ($q) {
+            //         $q->where('co_type', 'spasys');
+            //     });
+            // })
             ->orderBy('rgd_no', 'DESC');
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));

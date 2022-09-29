@@ -38,7 +38,7 @@ class RateDataController extends Controller
         try {
             DB::beginTransaction();
 
-            if (empty($validated['newRmd_no']) && isset($validated['rm_no'])) {
+            if (!isset($validated['rmd_no']) && isset($validated['rm_no'])) {
                 $index = RateMetaData::where('rm_no', $validated['rm_no'])->get()->count() + 1;
                 $rmd_no = RateMetaData::insertGetId(
                     [
@@ -47,7 +47,7 @@ class RateDataController extends Controller
                         'rmd_number' => CommonFunc::generate_rmd_number($validated['rm_no'], $index),
                     ]
                 );
-            } else if (empty($validated['newRmd_no']) && isset($validated['co_no'])) {
+            } else if (!isset($validated['rmd_no']) && isset($validated['co_no'])) {
                 $index = RateMetaData::where('co_no', $validated['co_no'])->get()->count() + 1;
                 $rmd_no = RateMetaData::insertGetId(
                     [
@@ -62,12 +62,13 @@ class RateDataController extends Controller
                 Log::error($val);
                 $rd_no = RateData::updateOrCreate(
                     [
-                        'rd_no' => (isset($rmd_no) || empty($val['rmd_no']) || ($val['rmd_no'] != $validated['newRmd_no'])) ? null : $val['rd_no'],
-                        'rmd_no' => isset($rmd_no) ? $rmd_no : $validated['newRmd_no'],
-                        'rm_no' => isset($validated['rm_no']) ? $validated['rm_no'] : null,
-                        'rd_co_no' => isset($validated['co_no']) ? $validated['co_no'] : null,
+                        'rd_no' => $val['rd_no'],
+                        'rmd_no' => isset($rmd_no) ? $rmd_no : $validated['rmd_no'],
+                        
                     ],
                     [
+                        'rm_no' => isset($validated['rm_no']) ? $validated['rm_no'] : null,
+                        'rd_co_no' => isset($validated['co_no']) ? $validated['co_no'] : null,
                         'rd_cate_meta1' => $val['rd_cate_meta1'],
                         'rd_cate_meta2' => $val['rd_cate_meta2'],
                         'rd_cate1' => $val['rd_cate1'],
@@ -83,7 +84,7 @@ class RateDataController extends Controller
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'rmd_no' => isset($rmd_no) ? $rmd_no : $validated['newRmd_no'],
+                'rmd_no' => isset($rmd_no) ? $rmd_no : $validated['rmd_no'],
             ], 201);
         } catch (\Exception $e) {
             DB::rollback();
