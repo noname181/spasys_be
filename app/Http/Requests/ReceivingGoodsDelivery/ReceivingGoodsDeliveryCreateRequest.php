@@ -171,6 +171,46 @@ class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
             'location.*.rgd_arrive_day' => [
                 'nullable'
             ],
+
+            'package' => [
+                'nullable'
+            ],
+            'package.*.note' => [
+                'nullable'
+            ],
+            'package.*.order_number' => [
+                'nullable'
+            ],
+            'package.*.pack_type' => [
+                'nullable'
+            ],
+            'package.*.quantity' => [
+                'nullable'
+            ],
+            'package.*.reciever' => [
+                'nullable'
+            ],
+            'package.*.reciever_address' => [
+                'nullable'
+            ],
+            'package.*.reciever_contract' => [
+                'nullable'
+            ],
+            'package.*.reciever_detail_address' => [
+                'nullable'
+            ],
+            'package.*.sender' => [
+                'nullable'
+            ],
+            'package.*.sender_address' => [
+                'nullable'
+            ],
+            'package.*.sender_contract' => [
+                'nullable'
+            ],
+            'package.*.sender_detail_address' => [
+                'nullable'
+            ],
         ];
     }
 

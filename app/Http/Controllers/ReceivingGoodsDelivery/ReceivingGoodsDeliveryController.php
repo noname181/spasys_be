@@ -8,6 +8,7 @@ use App\Models\Member;
 use App\Models\WarehousingRequest;
 use App\Models\ReceivingGoodsDelivery;
 use App\Models\WarehousingItem;
+use App\Models\Package;
 use App\Utils\Messages;
 use App\Utils\CommonFunc;
 use Illuminate\Http\Request;
@@ -25,6 +26,7 @@ use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryRequest;
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryCreateRequest;
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryCreateMobileRequest;
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryFileRequest;
+Use \Carbon\Carbon;
 
 class ReceivingGoodsDeliveryController extends Controller
 {
@@ -110,9 +112,10 @@ class ReceivingGoodsDeliveryController extends Controller
             ]);
 
             if(isset($validated['page_type']) && $validated['page_type'] == 'Page130146'){
+                $mytime = Carbon::now();
                 Warehousing::where('w_no', $w_no)->update([
                     'w_schedule_number2' =>  $w_schedule_number2,
-
+                    'w_completed_day' => $mytime->toDateTimeString()
                 ]);
             }
 
@@ -186,48 +189,66 @@ class ReceivingGoodsDeliveryController extends Controller
 
             if(isset($validated['w_no'])){
                 foreach ($validated['items'] as $warehousing_item) {
+
+                    if(!isset($warehousing_item['item_no'])){
+                        if(isset($warehousing_item['item_name'])){
+                            $item_no_new = Item::insertGetId([
+                                'mb_no' => Auth::user()->mb_no,
+                                'item_brand' => $warehousing_item['item_brand'],
+                                'item_service_name' => '유통가공',
+                                'item_name' => $warehousing_item['item_name'],
+                                'item_option1' => $warehousing_item['item_option1'],
+                                'item_option2' => $warehousing_item['item_option2'],
+                                'item_price3' => $warehousing_item['item_price3'],
+                                'item_price4' => $warehousing_item['item_price4'],
+                            ]);
+                        }
+                    }
+
+                    $item_no = $warehousing_item['item_no'] ? $warehousing_item['item_no'] : $item_no_new;
+
                     if(isset($validated['page_type']) && $validated['page_type'] == 'Page130146'){
-                        $checkexit1 = WarehousingItem::where('item_no', $warehousing_item['item_no'])->where('w_no', $validated['w_no'])->where('wi_type', '입고_spasys')->first();
+                        $checkexit1 = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_spasys')->first();
                         if(!isset($checkexit1->wi_no)){
                             WarehousingItem::insert([
-                                'item_no' => $warehousing_item['item_no'],
+                                'item_no' => $item_no,
                                 'w_no' => $w_no,
                                 'wi_number' => $warehousing_item['warehousing_item2'][0]['wi_number'],
                                 'wi_type' => '입고_spasys'
                             ]);
                         }else{
-                            $warehousing_items = WarehousingItem::where('item_no', $warehousing_item['item_no'])->where('w_no', $validated['w_no'])->where('wi_type', '입고_spasys')->update([
+                            $warehousing_items = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_spasys')->update([
                                 'wi_number' => $warehousing_item['warehousing_item2'][0]['wi_number'],
                             ]);
                         }
                         
-                        $checkexit2 = WarehousingItem::where('item_no', $warehousing_item['item_no'])->where('w_no', $validated['w_no'])->where('wi_type', '입고_shipper')->first();
+                        $checkexit2 = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_shipper')->first();
                         if(!isset($checkexit2->wi_no)){
                             WarehousingItem::insert([
-                                'item_no' => $warehousing_item['item_no'],
+                                'item_no' => $item_no,
                                 'w_no' => $w_no,
                                 'wi_number' => 0,
                                 'wi_type' => '입고_shipper'
                             ]);
                         }else{
-                            $warehousing_items = WarehousingItem::where('item_no', $warehousing_item['item_no'])->where('w_no', $validated['w_no'])->where('wi_type', '입고_shipper')->update([
+                            $warehousing_items = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_shipper')->update([
                                 'wi_number' => $warehousing_item['warehousing_item'][0]['wi_number'],
                             ]);
                         }
 
                     }else{
                         
-                        $checkexit3 = WarehousingItem::where('item_no', $warehousing_item['item_no'])->where('w_no', $validated['w_no'])->where('wi_type', '입고_shipper')->first();
+                        $checkexit3 = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_shipper')->first();
                         if(!isset($checkexit3->wi_no)){
                             WarehousingItem::insert([
-                                'item_no' => $warehousing_item['item_no'],
+                                'item_no' => $item_no,
                                 'w_no' => $w_no,
                                 'wi_number' => $warehousing_item['warehousing_item'][0]['wi_number'],
                                 'wi_type' => '입고_shipper'
                             ]);
                         }else{
                             if(isset($warehousing_item['warehousing_item'][0]['wi_number'])){
-                                $warehousing_items = WarehousingItem::where('item_no', $warehousing_item['item_no'])->where('w_no', $validated['w_no'])->where('wi_type', '입고_shipper')->update([
+                                $warehousing_items = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_shipper')->update([
                                     'wi_number' => $warehousing_item['warehousing_item'][0]['wi_number'],
                                 ]);
                             }
@@ -371,8 +392,10 @@ class ReceivingGoodsDeliveryController extends Controller
 
                     if(isset($request->page_type) && $request->page_type == 'Page130146'){
                         $w_schedule_number2 = CommonFunc::generate_w_schedule_number($request->w_no,'EWC');
+                       
                         Warehousing::where('w_no', $request->w_no)->update([
-                            'w_schedule_number2' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EWC')
+                            'w_schedule_number2' =>  CommonFunc::generate_w_schedule_number($request->w_no,'EWC'),
+                            'w_completed_day' => Carbon::now()->toDateTimeString()
                         ]);
                     }
 
@@ -392,7 +415,27 @@ class ReceivingGoodsDeliveryController extends Controller
                             ]);
                         }
                     }
+                    $package = $request->package;
                     
+                    if(isset($package)){
+                        //foreach ($data['package'] as $package) {
+                            Package::insert([
+                                'w_no' => $request->w_no,
+                                'note' => $package['note'],
+                                'order_number' => $package['order_number'],
+                                'pack_type' => $package['pack_type'],
+                                'quantity' => $package['quantity'],
+                                'reciever' => $package['reciever'],
+                                'reciever_address' => $package['reciever_address'],
+                                'reciever_contract' => $package['reciever_contract'],
+                                'reciever_detail_address' => $package['reciever_detail_address'],
+                                'sender' => $package['sender'],
+                                'sender_address' => $package['sender_address'],
+                                'sender_contract' => $package['sender_contract'],
+                                'sender_detail_address' => $package['sender_detail_address']
+                            ]);
+                        //}
+                    }
 
                     foreach ($data['remove_items'] as $remove) {
                         WarehousingItem::where('item_no', $remove['item_no'])->where('w_no', $request->w_no)->delete();
@@ -474,7 +517,8 @@ class ReceivingGoodsDeliveryController extends Controller
                         if(isset($request->page_type) && $request->page_type == 'Page130146'){
                             $w_schedule_number2 = CommonFunc::generate_w_schedule_number($request->w_no,'EWC');
                             Warehousing::where('w_no', $request->w_no)->update([
-                                'w_schedule_number2' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EWC')
+                                'w_schedule_number2' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EWC'),
+                                'w_completed_day' => Carbon::now()->toDateTimeString()
                             ]);
                         }
 
@@ -555,7 +599,8 @@ class ReceivingGoodsDeliveryController extends Controller
                         if(isset($request->page_type) && $request->page_type == 'Page130146'){
                             $w_schedule_number2 = CommonFunc::generate_w_schedule_number($request->w_no,'EWC');
                             Warehousing::where('w_no', $request->w_no)->update([
-                                'w_schedule_number2' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EWC')
+                                'w_schedule_number2' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EWC'),
+                                'w_completed_day' => Carbon::now()->toDateTimeString()
                             ]);
                         }
                         if($request->wr_contents){
@@ -641,7 +686,8 @@ class ReceivingGoodsDeliveryController extends Controller
                         if(isset($request->page_type) && $request->page_type == 'Page130146'){
                             $w_schedule_number2 = CommonFunc::generate_w_schedule_number($request->w_no,'EWC');
                             Warehousing::where('w_no', $request->w_no)->update([
-                                'w_schedule_number2' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EWC')
+                                'w_schedule_number2' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EWC'),
+                                'w_completed_day' => Carbon::now()->toDateTimeString()
                             ]);
                         }
 
