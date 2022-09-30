@@ -364,6 +364,15 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
+            if(empty($rmd) && !empty($rdg)){
+                $rmd = RateMetaData::where(
+                    [
+                        'w_no' => $w_no,
+                        'rgd_no' => $rdg->rgd_no_final,
+                        'set_type' => 'work_monthly_additional'
+                    ]
+                )->first();
+            }
         }else if(!isset($rmd->rmd_no) && $set_type == 'storage_monthly_additional'){
             $rmd = RateMetaData::where(
                 [
@@ -378,6 +387,15 @@ class RateDataController extends Controller
                         'w_no' => $w_no,
                         'rgd_no' => $rgd_no,
                         'set_type' => 'storage_monthly_final'
+                    ]
+                )->first();
+            }
+            if(empty($rmd) && !empty($rdg)){
+                $rmd = RateMetaData::where(
+                    [
+                        'w_no' => $w_no,
+                        'rgd_no' => $rdg->rgd_no_final,
+                        'set_type' => 'storage_monthly_additional'
                     ]
                 )->first();
             }
@@ -1052,6 +1070,12 @@ class RateDataController extends Controller
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
                     'rgd_no' => $final_rgd->rgd_no
                 ]);
+                if($request->bill_type == 'additional_monthly'){
+                    RateMetaData::where('rgd_no', $previous_rgd->rgd_no)->update([
+                        'rgd_no' => $final_rgd->rgd_no
+                    ]);
+                }
+
             }else {
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
                     'rgd_no' =>  $is_exist ?  $is_exist->rgd_no : $rgd->rgd_no
