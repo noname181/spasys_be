@@ -294,11 +294,11 @@ class ItemController extends Controller
             if (isset($validated['keyword']) ) {
                 if($validated['type'] == 'item_brand' || $validated['type'] == 'item_name'){
                     $items->where(function($query) use ($validated) {
-                        $query->where(strtolower($validated['type']), 'like','%'. strtolower($validated['keyword']) .'%');
+                        $query->where(DB::raw('lower('.$validated['type'].')'), 'like','%'. strtolower($validated['keyword']) .'%');
                     });
                 }else{
                     $items->whereHas('item_channels',function($query) use ($validated) {
-                        $query->where(strtolower($validated['type']), 'like','%'. strtolower($validated['keyword']) .'%');
+                        $query->where(DB::raw('lower('.$validated['type'].')'), 'like','%'. strtolower($validated['keyword']) .'%');
                     });
                 }
             }
