@@ -141,9 +141,7 @@ class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
                ''
             ],
             'location.*.rgd_status3' => [
-                'required',
-                'string',
-                'max:255',
+                ''
             ],
             'location.*.rgd_delivery_company' => [
                 'required',

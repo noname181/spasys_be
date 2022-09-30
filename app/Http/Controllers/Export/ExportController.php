@@ -113,7 +113,10 @@ class ExportController extends Controller
                     $warehousing_items_import = WarehousingItem::with('item_no')->whereHas('item_no',function($q) use ($warehousing){
                         $q->where('w_no', $warehousing->w_import_no);
                     })->where('item_no', $warehousing_item->item_no)->where('wi_type', '=', '입고_spasys')->get();
-                    $item->remain = $warehousing_items_import[0]->wi_number - $warehousing_item->wi_number;
+                    foreach($warehousing_items_import as $i => $value){
+                        $item->remain = $warehousing_items_import[$i]->wi_number - $warehousing_item->wi_number;
+                    }
+                   
                     $item->warehousing_items_import = $warehousing_items_import;
                     // $warehousing_item->wi_number = $warehousing_items_import[0]->wi_number - $warehousing_item->wi_number;
                 }
