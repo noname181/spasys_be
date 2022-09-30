@@ -364,6 +364,15 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
+            if(empty($rmd) && !empty($rdg)){
+                $rmd = RateMetaData::where(
+                    [
+                        'w_no' => $w_no,
+                        'rgd_no' => $rdg->rgd_no_final,
+                        'set_type' => 'work_monthly_additional'
+                    ]
+                )->first();
+            }
         }else if(!isset($rmd->rmd_no) && $set_type == 'storage_monthly_additional'){
             $rmd = RateMetaData::where(
                 [
@@ -378,6 +387,15 @@ class RateDataController extends Controller
                         'w_no' => $w_no,
                         'rgd_no' => $rgd_no,
                         'set_type' => 'storage_monthly_final'
+                    ]
+                )->first();
+            }
+            if(empty($rmd) && !empty($rdg)){
+                $rmd = RateMetaData::where(
+                    [
+                        'w_no' => $w_no,
+                        'rgd_no' => $rdg->rgd_no_final,
+                        'set_type' => 'storage_monthly_additional'
                     ]
                 )->first();
             }
@@ -1052,6 +1070,13 @@ class RateDataController extends Controller
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
                     'rgd_no' => $final_rgd->rgd_no
                 ]);
+                //FOR ADDITIONAL MONTHLY BILL, UPDATE ALL RATEMETADATA FOLLOW NEW RGD_NO
+                if($request->bill_type == 'additional_monthly'){
+                    RateMetaData::where('rgd_no', $previous_rgd->rgd_no)->update([
+                        'rgd_no' => $final_rgd->rgd_no
+                    ]);
+                }
+
             }else {
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
                     'rgd_no' =>  $is_exist ?  $is_exist->rgd_no : $rgd->rgd_no
@@ -1566,6 +1591,35 @@ class RateDataController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'rdg' => $rdg,
+                // 'final_rgd' => $final_rgd
+            ], 201);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+    public function registe_rate_data_general_final_service2_mobile(Request $request) {
+        try {
+            DB::beginTransaction();
+
+            $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+            $w_no = $rgd->w_no;
+            $rdg = RateDataGeneral::where('rgd_no',$request->rgd_no)
+            ->where('rdg_bill_type',$request->bill_type)
+            ->update([
+                    'rdg_set_type' => $request->ag_name,
+                ]);
+              //  return DB::getQueryLog();
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'rdg' => $rdg,
+                'sql' => DB::getQueryLog(),
+                'rgd_no' => $request->rdg_no,
+                'rdg_bill_type' => $request->bill_type
                 // 'final_rgd' => $final_rgd
             ], 201);
 

@@ -325,6 +325,7 @@ Route::middleware('auth')->group(function () {
 
         //REGISTER GENERAL DATA FOR 수입풀필먼트 SERVICE
         Route::post('/general_final_service2', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_final_service2'])->name('registe_rate_data_general_final_service2');
+        Route::post('/general_final_service2_mobile', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_final_service2_mobile'])->name('registe_rate_data_general_final_service2_mobile');
 
         //GET GENERAL DATA FOLLOW BILL TYPE
         Route::get('/general/{rgd_no}/{bill_type}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general'])->name('get_rate_data_general');
@@ -379,6 +380,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/dowload_fulfillment_stock_list', [\App\Http\Controllers\Excel\ExportExcelController::class,'dowload_fulfillment_stock_list'])->name('dowload_fulfillment_stock_list');
     Route::post('/download_bonded_cargo', [\App\Http\Controllers\Excel\ExportExcelController::class,'download_bonded_cargo'])->name('download_bonded_cargo');
     Route::post('get_package_data', [\App\Http\Controllers\Package\PackageController::class,'get_package_data'])->name('get_package_data');
+
+    Route::post('/import_excel_distribution', [\App\Http\Controllers\Warehousing\WarehousingController::class,'importExcelDistribution']);
 
 });
 
