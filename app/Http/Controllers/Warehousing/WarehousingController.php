@@ -100,14 +100,14 @@ class WarehousingController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
             if($user->mb_type == 'shop'){
-           
+
                 $warehousing = Warehousing::with('mb_no')
                 ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->where('w_type','IW')->whereNotNull('w_schedule_number2')->where('w_schedule_number2','!=','')
                 ->whereHas('co_no.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->orderBy('w_no', 'DESC');
             }else if($user->mb_type == 'shipper'){
-              
+
                 $warehousing = Warehousing::with('mb_no')
                 ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->where('w_type','IW')->whereNotNull('w_schedule_number2')->where('w_schedule_number2','!=','')
                 ->whereHas('co_no',function ($q) use ($user){
@@ -186,7 +186,7 @@ class WarehousingController extends Controller
                 });
             }
 
-         
+
 
             $members = Member::where('mb_no', '!=', 0)->get();
 
@@ -1026,7 +1026,7 @@ class WarehousingController extends Controller
             //return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
-   
+
     public function getWarehousingByRgd($rgd_no, $type)
     {
         try {
@@ -1085,7 +1085,7 @@ class WarehousingController extends Controller
     }
 
 
-    public function getWarehousingExportStatusComplete(WarehousingSearchRequest $request) //page 263
+    public function getWarehousingImportStatusComplete(WarehousingSearchRequest $request) //page 263
 
     {
         try {
@@ -1116,10 +1116,9 @@ class WarehousingController extends Controller
                     });
                 });
             }
-            $warehousing->where('rgd_status1', '=', '출고')
-            ->where('rgd_status2', '=', '작업완료')
+            $warehousing->where('rgd_status1', '=', '입고')
             ->whereHas('w_no', function ($query) {
-                $query->where('w_type', '=', 'EW')->where(function ($q) {
+                $query->where(function ($q) {
                     $q->where(function ($query) {
                         $query->where('rgd_status4', '!=', '예상경비청구서')
                         ->where('rgd_status4', '!=', '확정청구서')->where('rgd_status4', '!=', '추가청구서');
@@ -1221,7 +1220,7 @@ class WarehousingController extends Controller
             //return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
-    public function getWarehousingExportStatus4(WarehousingSearchRequest $request) //page 144 show EW,rgd_status1 and rgd_status2 = complete
+    public function getWarehousingImportStatus4(WarehousingSearchRequest $request) //page 144 show EW,rgd_status1 and rgd_status2 = complete
 
     {
         try {
@@ -1253,9 +1252,7 @@ class WarehousingController extends Controller
                 });
             }
             $warehousing->whereHas('w_no', function ($query) {
-                $query->where('w_type', '=', 'EW')
-                ->where('rgd_status1', '=', '출고')
-                ->where('rgd_status2', '=', '작업완료')
+                $query->where('rgd_status1', '=', '입고')
                 ->where(function ($q) {
                     $q->where('rgd_status5','!=','cancel')
                     ->orWhereNull('rgd_status5');
@@ -1489,7 +1486,7 @@ class WarehousingController extends Controller
         }
     }
 
-    public function getFulfillmentExportStatus4(WarehousingSearchRequest $request) 
+    public function getFulfillmentExportStatus4(WarehousingSearchRequest $request)
 
     {
         try {
@@ -1616,7 +1613,7 @@ class WarehousingController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
-    public function getFulfillmentExportStatus4ById($rgd_no) 
+    public function getFulfillmentExportStatus4ById($rgd_no)
 
     {
 
@@ -1633,7 +1630,7 @@ class WarehousingController extends Controller
             } else {
                 return response()->json([
                     'message' => CommonFunc::renderMessage(Messages::MSG_0016, ['Warehousing']),
-                   
+
                 ]);
             }
     }
@@ -1781,7 +1778,7 @@ class WarehousingController extends Controller
             if($key <= 2){
                 continue;
             }
-            
+
             $receivingGoodsDelivery = ReceivingGoodsDelivery::where('w_no', '=', $warehouse['A'])->first();
             $receivingGoodsDelivery->update(array(
                 'co_name' => isset($warehouse['B'])?$warehouse['B']:'',
