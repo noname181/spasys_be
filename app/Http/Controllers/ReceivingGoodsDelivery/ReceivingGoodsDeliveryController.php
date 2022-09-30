@@ -189,6 +189,7 @@ class ReceivingGoodsDeliveryController extends Controller
             $warehousing_items = [];
 
             if(isset($validated['item_new'])){
+                if(isset($validated['item_new']['item_name'])){
                 $item_no_new = Item::insertGetId([
                     'mb_no' => Auth::user()->mb_no,
                     'item_brand' => $validated['item_new']['item_brand'],
@@ -215,7 +216,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         'item_channel_name' => $validated['item_new']['item_channel_name']
                     ]
                 );
-
+            }
 
             }
 
