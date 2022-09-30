@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Item;
+use App\Utils\CommonFunc;
 
 class WarehousingController extends Controller
 {
@@ -1615,7 +1616,27 @@ class WarehousingController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
+    public function getFulfillmentExportStatus4ById($rgd_no) 
 
+    {
+
+            $warehousing = ReceivingGoodsDelivery::find($rgd_no);
+            $rate_data_general = RateDataGeneral::where('rgd_no', $rgd_no)->get();
+            $w_no =  Warehousing::where('w_no',  $warehousing->w_no)->get();
+            if (!empty($warehousing)) {
+                return response()->json(
+                    ['message' => Messages::MSG_0007,
+                     'data' => $warehousing,
+                     'rate_data_general' =>  $rate_data_general,
+                     'w_no' => $w_no,
+                    ], 200);
+            } else {
+                return response()->json([
+                    'message' => CommonFunc::renderMessage(Messages::MSG_0016, ['Warehousing']),
+                   
+                ]);
+            }
+    }
 
     public function getTaxInvoiceList(WarehousingSearchRequest $request) //page277
 
