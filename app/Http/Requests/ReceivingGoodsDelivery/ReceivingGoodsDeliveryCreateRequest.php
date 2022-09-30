@@ -211,6 +211,46 @@ class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
             'package.*.sender_detail_address' => [
                 'nullable'
             ],
+
+            'item_new' => [
+                'nullable'
+            ],
+            
+            'item_new.item_brand' => [
+                'nullable'
+            ],
+            
+            'item_new.item_name' => [
+                'nullable'
+            ],
+            
+            'item_new.item_option1' => [
+                'nullable'
+            ],
+            
+            'item_new.item_option2' => [
+                'nullable'
+            ],
+            
+            'item_new.item_channel_name' => [
+                'nullable'
+            ],
+            
+            'item_new.item_channel_code' => [
+                'nullable'
+            ],
+
+            'item_new.item_price3' => [
+                'nullable'
+            ],
+
+            'item_new.item_price4' => [
+                'nullable'
+            ],
+
+            'item_new.wi_number' => [
+                'nullable'
+            ],
         ];
     }
 

@@ -9,6 +9,7 @@ use App\Models\WarehousingRequest;
 use App\Models\ReceivingGoodsDelivery;
 use App\Models\WarehousingItem;
 use App\Models\Package;
+use App\Models\ItemChannel;
 use App\Utils\Messages;
 use App\Utils\CommonFunc;
 use Illuminate\Http\Request;
@@ -184,28 +185,44 @@ class ReceivingGoodsDeliveryController extends Controller
 
             //WarehousingItem::where('w_no', $w_no)->where('wi_type','=','입고_shipper')->delete();
 
+            
             $warehousing_items = [];
+
+            if(isset($validated['item_new'])){
+                $item_no_new = Item::insertGetId([
+                    'mb_no' => Auth::user()->mb_no,
+                    'item_brand' => $validated['item_new']['item_brand'],
+                    'item_service_name' => '유통가공',
+                    'co_no' => $validated['co_no'] ? $validated['co_no'] : $co_no,
+                    'item_name' => $validated['item_new']['item_name'],
+                    'item_option1' => $validated['item_new']['item_option1'],
+                    'item_option2' => $validated['item_new']['item_option2'],
+                    'item_price3' => $validated['item_new']['item_price3'],
+                    'item_price4' => $validated['item_new']['item_price4']
+                ]);
+
+                WarehousingItem::insert([
+                    'item_no' => $item_no_new,
+                    'w_no' => $w_no,
+                    'wi_number' => $validated['item_new']['wi_number'],
+                    'wi_type' => '입고_shipper'
+                ]);
+
+                ItemChannel::insert(
+                    [
+                        'item_no' => $item_no_new,
+                        'item_channel_code' => $validated['item_new']['item_channel_code'],
+                        'item_channel_name' => $validated['item_new']['item_channel_name']
+                    ]
+                );
+
+
+            }
 
 
             if(isset($validated['w_no'])){
                 foreach ($validated['items'] as $warehousing_item) {
-
-                    if(!isset($warehousing_item['item_no'])){
-                        if(isset($warehousing_item['item_name'])){
-                            $item_no_new = Item::insertGetId([
-                                'mb_no' => Auth::user()->mb_no,
-                                'item_brand' => $warehousing_item['item_brand'],
-                                'item_service_name' => '유통가공',
-                                'item_name' => $warehousing_item['item_name'],
-                                'item_option1' => $warehousing_item['item_option1'],
-                                'item_option2' => $warehousing_item['item_option2'],
-                                'item_price3' => $warehousing_item['item_price3'],
-                                'item_price4' => $warehousing_item['item_price4'],
-                            ]);
-                        }
-                    }
-
-                    $item_no = $warehousing_item['item_no'] ? $warehousing_item['item_no'] : $item_no_new;
+                    $item_no = $warehousing_item['item_no'] ? $warehousing_item['item_no'] : '';
 
                     if(isset($validated['page_type']) && $validated['page_type'] == 'Page130146'){
                         $checkexit1 = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_spasys')->first();
