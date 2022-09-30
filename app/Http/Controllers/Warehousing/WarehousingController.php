@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Item;
 
 class WarehousingController extends Controller
 {
@@ -1737,5 +1738,64 @@ class WarehousingController extends Controller
             //return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
+    }
+    public function importExcelDistribution(WarehousingSearchRequest $request){
+        DB::beginTransaction();
+        $f = Storage::disk('public')->put('files/tmp', $request['file']);
+
+        $path = storage_path('app/public') . '/' . $f;
+        $reader = IOFactory::createReaderForFile($path);
+        $reader->setReadDataOnly(true);
+        $spreadsheet = $reader->load($path);
+
+        $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
+        $member = Member::where('mb_id', Auth::user()->mb_id)->first();
+
+        $sheet = $spreadsheet->getSheet(0);
+        $warehousing_data = $sheet->toArray(null, true, true, true);
+        $sheet2 = $spreadsheet->getSheet(1);
+        $warehousing_item_data = $sheet2->toArray(null, true, true, true);
+
+        foreach($warehousing_data as $key=>$warehouse){
+            if($key <= 2){
+                continue;
+            }
+            
+            $receivingGoodsDelivery = ReceivingGoodsDelivery::where('w_no', '=', $warehouse['A'])->first();
+            $receivingGoodsDelivery->update(array(
+                'co_name' => isset($warehouse['B'])?$warehouse['B']:'',
+                'rgd_contents' => isset($warehouse['C'])?$warehouse['C']:'',
+                'rgd_address' => isset($warehouse['D'])?$warehouse['D']:'',
+                'rgd_address_detail' => isset($warehouse['E'])?$warehouse['E']:'',
+                'rgd_receiver' => isset($warehouse['F'])?$warehouse['F']:'',
+                'rgd_hp' => isset($warehouse['G'])?$warehouse['G']:'',
+                'rgd_memo' => isset($warehouse['H'])?$warehouse['H']:''
+            ));
+            $total_wi_number = array();
+            foreach($warehousing_item_data as $key2 => $warehousing_item){
+                if($key2 <= 2){
+                    continue;
+                }
+                if($warehouse['A'] == $warehousing_item['A']){
+                    $warehousingItem = WarehousingItem::where('item_no','=',$warehousing_item['B'])->where('w_no','=',$warehousing_item['A'])->first();
+                    if(!empty($warehousing_item['C'])){
+                        $total_wi_number[$warehousing_item['A']][] = $warehousing_item['C'];
+                        $warehousingItem->update(array(
+                            'w_no' => $warehousing_item['A'],
+                            'item_no' => $warehousing_item['B'],
+                            'wi_number' => $warehousing_item['C']
+                        ));
+                    }
+                    // Warehousing::update(
+                    //     'w_schedule_amount' => array_sum(array_column($total_wi_number,$warehousing_item['A']))
+                    // );
+                }
+            }
+        }
+        DB::commit();
+        return response()->json([
+            'message' => 'Upload dữ liệu thành công',
+            'status' => 1
+        ], 201);
     }
 }

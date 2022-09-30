@@ -381,5 +381,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/download_bonded_cargo', [\App\Http\Controllers\Excel\ExportExcelController::class,'download_bonded_cargo'])->name('download_bonded_cargo');
     Route::post('get_package_data', [\App\Http\Controllers\Package\PackageController::class,'get_package_data'])->name('get_package_data');
 
+    Route::post('/import_excel_distribution', [\App\Http\Controllers\Warehousing\WarehousingController::class,'importExcelDistribution']);
+
 });
 
