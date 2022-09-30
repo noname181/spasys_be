@@ -1070,6 +1070,7 @@ class RateDataController extends Controller
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
                     'rgd_no' => $final_rgd->rgd_no
                 ]);
+                //FOR ADDITIONAL MONTHLY BILL, UPDATE ALL RATEMETADATA FOLLOW NEW RGD_NO
                 if($request->bill_type == 'additional_monthly'){
                     RateMetaData::where('rgd_no', $previous_rgd->rgd_no)->update([
                         'rgd_no' => $final_rgd->rgd_no
