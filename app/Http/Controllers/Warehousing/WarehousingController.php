@@ -784,7 +784,7 @@ class WarehousingController extends Controller
 
                 });
                 $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereNotIn('w_no', $w_import_no)->whereHas('w_no', function ($query) use ($user) {
-                    $query->where('rgd_status1', '=', '입고')->whereNull('w_children_yn')->whereHas('co_no.co_parent',function($q) use ($user){
+                    $query->where('rgd_status1', '=', '입고')->where('rgd_status2', '=', '작업완료')->whereNull('w_children_yn')->whereHas('co_no.co_parent',function($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     })->orwhere('rgd_status1', '=', '출고예정')->whereNotNull('w_import_no')->whereNull('w_children_yn')->whereHas('co_no.co_parent',function($q) use ($user){
                         $q->where('co_no', $user->co_no);
@@ -800,7 +800,7 @@ class WarehousingController extends Controller
 
                 });
                 $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereNotIn('w_no', $w_import_no)->whereHas('w_no', function ($query) use ($user) {
-                    $query->where('rgd_status1', '=', '입고')->whereNull('w_children_yn')->whereHas('co_no',function($q) use ($user){
+                    $query->where('rgd_status1', '=', '입고')->where('rgd_status2', '=', '작업완료')->whereNull('w_children_yn')->whereHas('co_no',function($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     })->orwhere('rgd_status1', '=', '출고예정')->whereNotNull('w_import_no')->whereNull('w_children_yn')->whereHas('co_no',function($q) use ($user){
                         $q->where('co_no', $user->co_no);
@@ -817,7 +817,7 @@ class WarehousingController extends Controller
                 });
 
                 $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereNotIn('w_no', $w_import_no)->whereHas('w_no', function ($query) use ($user) {
-                    $query->where('rgd_status1', '=', '입고')->whereNull('w_children_yn')->whereHas('co_no.co_parent.co_parent',function($q) use ($user){
+                    $query->where('rgd_status1', '=', '입고')->where('rgd_status2', '=', '작업완료')->whereNull('w_children_yn')->whereHas('co_no.co_parent.co_parent',function($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     })->orwhere('rgd_status1', '=', '출고예정')->whereNotNull('w_import_no')->whereNull('w_children_yn')->whereHas('co_no.co_parent.co_parent',function($q) use ($user){
                         $q->where('co_no', $user->co_no);
