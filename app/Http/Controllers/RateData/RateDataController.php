@@ -1601,6 +1601,35 @@ class RateDataController extends Controller
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
+    public function registe_rate_data_general_final_service2_mobile(Request $request) {
+        try {
+            DB::beginTransaction();
+
+            $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+            $w_no = $rgd->w_no;
+            $rdg = RateDataGeneral::where('rgd_no',$request->rgd_no)
+            ->where('rdg_bill_type',$request->bill_type)
+            ->update([
+                    'rdg_set_type' => $request->ag_name,
+                ]);
+              //  return DB::getQueryLog();
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'rdg' => $rdg,
+                'sql' => DB::getQueryLog(),
+                'rgd_no' => $request->rdg_no,
+                'rdg_bill_type' => $request->bill_type
+                // 'final_rgd' => $final_rgd
+            ], 201);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
 
     public function get_rmd_no_fulfill($rgd_no, $type, $pretype){
         $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
