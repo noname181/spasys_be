@@ -1618,14 +1618,19 @@ class WarehousingController extends Controller
     {
 
             $warehousing = ReceivingGoodsDelivery::find($rgd_no);
-            $rate_data_general = RateDataGeneral::where('rgd_no', $rgd_no)->get();
-            $w_no =  Warehousing::where('w_no',  $warehousing->w_no)->get();
+            $rate_data_general = RateDataGeneral::where('rgd_no', $rgd_no)->first();
+            $w_no =  Warehousing::where('w_no',  $warehousing->w_no)->first();
+
+            $get_co_no = Member::where('mb_no',$warehousing->mb_no)->first()->co_no;
+            $get_service_no = Service::where('service_name', $warehousing->service_korean_name)->first()->service_no;
+            $settlement_cycle = CompanySettlement::where('service_no', $get_service_no)->where('co_no',$get_co_no)->first()->cs_payment_cycle;
             if (!empty($warehousing)) {
                 return response()->json(
                     ['message' => Messages::MSG_0007,
                      'data' => $warehousing,
                      'rate_data_general' =>  $rate_data_general,
                      'w_no' => $w_no,
+                     'settlement_cycle' => $settlement_cycle,
                     ], 200);
             } else {
                 return response()->json([
