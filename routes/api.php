@@ -156,6 +156,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/create', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class,'createWarehousingRequest']);
 
     Route::get('receiving_goods_delivery/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'__invoke']);
+    Route::get('/get_rgd_package/{co_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'get_rgd_package'])->name('get_rgd_package');
     Route::post('receiving_goods_delivery/update_status5', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_status5']);
     Route::get('receiving_goods_delivery/cancel_rgd/{rgd_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_ReceivingGoodsDelivery_cancel']);
     Route::get('receiving_goods_delivery/get_rgd/{is_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'getReceivingGoodsDelivery']);
@@ -383,6 +384,6 @@ Route::middleware('auth')->group(function () {
     Route::post('get_package_data', [\App\Http\Controllers\Package\PackageController::class,'get_package_data'])->name('get_package_data');
 
     Route::post('/import_excel_distribution', [\App\Http\Controllers\Warehousing\WarehousingController::class,'importExcelDistribution']);
-
+    Route::post('/update_rgd_status3', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'updateRgdState3'])->name('update_rgd_status3');
 });
 

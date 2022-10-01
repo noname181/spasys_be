@@ -1260,4 +1260,29 @@ class ReceivingGoodsDeliveryController extends Controller
         }
     }
 
+    public function get_rgd_package($w_no){
+        
+        try {
+            $package = Package::where('w_no', $w_no)->get();
+            return response()->json($package);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function updateRgdState3(Request $request){
+        try{    
+            ReceivingGoodsDelivery::where('w_no',$request['w_no'])->update([
+                'rgd_status3' => '배송완료'
+            ]);
+            return response()->json([
+                'status' => 1,
+                'message' => 'Success'
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
 }
