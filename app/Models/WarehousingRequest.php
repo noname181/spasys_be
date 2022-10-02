@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Member;
-
+use App\Models\Warehousing;
 class WarehousingRequest extends Model
 {
     use HasFactory;
@@ -39,5 +39,10 @@ class WarehousingRequest extends Model
     public function mb_no()
     {
         return $this->hasOne(Member::class, 'mb_no', 'mb_no');
+    }
+
+    public function warehousing()
+    {
+        return $this->belongsTo(Warehousing::class, 'w_no', 'w_no');
     }
 }
