@@ -5,6 +5,7 @@ namespace App\Http\Controllers\WarehousingRequest;
 use DateTime;
 use App\Models\Member;
 use App\Models\WarehousingRequest;
+use App\Models\Warehousing;
 use App\Utils\Messages;
 use App\Utils\CommonFunc;
 use Illuminate\Http\Request;
@@ -35,7 +36,7 @@ class WarehousingRequestController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $warehousing_request = WarehousingRequest::with('mb_no')->orderBy('wr_no', 'DESC');
-
+            
             $members = Member::where('mb_no', '!=', 0)->get();
 
             $warehousing_request = $warehousing_request->paginate($per_page, ['*'], 'page', $page);
@@ -60,9 +61,11 @@ class WarehousingRequestController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $warehousing_request = WarehousingRequest::with('mb_no')->orderBy('wr_no', 'DESC');
+            $warehousing = Warehousing::where('w_no', '=', $validated['w_no'])->first();
 
-            $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no']);
+            $warehousing_request = WarehousingRequest::with(['mb_no','warehousing'])->orderBy('wr_no', 'DESC');
+            
+            $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no'])->orwhere('w_no', '=', $warehousing->w_import_no);
 
             $members = Member::where('mb_no', '!=', 0)->get();
 
