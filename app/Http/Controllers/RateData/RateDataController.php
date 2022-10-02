@@ -1337,8 +1337,7 @@ class RateDataController extends Controller
             })
             ->where('updated_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
             ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
-            ->where('rgd_status1', '=', '출고')
-            ->where('rgd_status2', '=', '작업완료')
+            ->where('rgd_status1', '=', '입고')
             ->where('rgd_bill_type', $bill_type)
             ->get();
 
