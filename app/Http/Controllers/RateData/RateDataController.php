@@ -190,12 +190,21 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
-            if(empty($rmd) && !empty($rdg)){
+            else if(empty($rmd) && !empty($rdg)){
                 $rmd = RateMetaData::where(
                     [
                         'w_no' => $w_no,
                         'rgd_no' => $rdg->rgd_no_expectation,
                         'set_type' => 'work_final'
+                    ]
+                )->first();
+            }
+            else if(empty($rmd) && !empty($rdg)){
+                $rmd = RateMetaData::where(
+                    [
+                        'w_no' => $w_no,
+                        'rgd_no' => $rdg->rgd_no_expectation,
+                        'set_type' => 'work'
                     ]
                 )->first();
             }
@@ -216,12 +225,21 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
-            if(empty($rmd) && !empty($rdg)){
+            else if(empty($rmd) && !empty($rdg)){
                 $rmd = RateMetaData::where(
                     [
                         'w_no' => $w_no,
                         'rgd_no' => $rdg->rgd_no_expectation,
                         'set_type' => 'storage_final'
+                    ]
+                )->first();
+            }
+            else if(empty($rmd) && !empty($rdg)){
+                $rmd = RateMetaData::where(
+                    [
+                        'w_no' => $w_no,
+                        'rgd_no' => $rdg->rgd_no_expectation,
+                        'set_type' => 'storage'
                     ]
                 )->first();
             }
@@ -285,16 +303,16 @@ class RateDataController extends Controller
                     'set_type' => 'work_additional'
                 ]
             )->first();
-            if(empty($rmd)){
+
+            if(empty($rmd) && !empty($rdg)){
                 $rmd = RateMetaData::where(
                     [
                         'w_no' => $w_no,
-                        'rgd_no' => $rgd_no,
-                        'set_type' => 'work_final'
+                        'rgd_no' => $rdg->rgd_no_final,
+                        'set_type' => 'work_additional'
                     ]
                 )->first();
             }
-
         }else if(!isset($rmd->rmd_no) && $set_type == 'storage_additional2'){
             $rmd = RateMetaData::where(
                 [
@@ -303,12 +321,12 @@ class RateDataController extends Controller
                     'set_type' => 'storage_additional'
                 ]
             )->first();
-            if(empty($rmd)){
+            if(empty($rmd) && !empty($rdg)){
                 $rmd = RateMetaData::where(
                     [
                         'w_no' => $w_no,
-                        'rgd_no' => $rgd_no,
-                        'set_type' => 'storage_final'
+                        'rgd_no' => $rdg->rgd_no_final,
+                        'set_type' => 'storage_additional'
                     ]
                 )->first();
             }
@@ -1149,6 +1167,13 @@ class RateDataController extends Controller
                 $final_rgd->save();
 
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
+                    'rgd_no' => $final_rgd->rgd_no
+                ]);
+
+                RateMetaData::where('rgd_no', $request->rgd_no)->where(function($q){
+                    $e->where('set_type', 'storage_additional')
+                    ->orWhere('set_type', 'work_additional');
+                })->update([
                     'rgd_no' => $final_rgd->rgd_no
                 ]);
 
