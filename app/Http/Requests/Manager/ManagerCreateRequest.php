@@ -50,8 +50,8 @@ class ManagerCreateRequest extends BaseFormRequest
                 'max:255',
             ],            
             '*.m_hp' => [
-                'required',
                 'string',
+                'nullable',
                 'max:255',
                 'regex:/[0-9]{3}-[0-9]{4}-[0-9]{4}$/',
             ],
@@ -60,6 +60,7 @@ class ManagerCreateRequest extends BaseFormRequest
             ],
             '*.m_email' => [
                 'string',
+                'nullable',
                 'max:255',
                 'email',
             ],

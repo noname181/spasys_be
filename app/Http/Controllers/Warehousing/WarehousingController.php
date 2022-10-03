@@ -10,6 +10,7 @@ use App\Http\Requests\Warehousing\WarehousingDataValidate;
 use App\Http\Requests\Warehousing\WarehousingItemValidate;
 use App\Models\Member;
 use App\Models\ReceivingGoodsDelivery;
+use App\Models\AdjustmentGroup;
 use App\Models\Warehousing;
 use App\Models\WarehousingItem;
 use App\Models\CompanySettlement;
@@ -1051,6 +1052,7 @@ class WarehousingController extends Controller
                 })
                 ->get();
                 $warehousing = Warehousing::with(['co_no', 'warehousing_request', 'w_import_parent'])->find($w_no);
+                $adjustment_group = AdjustmentGroup::where('co_no','=',$warehousing->co_no)->first();
                 $time = str_replace('-', '.', $start_date) . ' ~ ' . str_replace('-', '.', $end_date);
 
             }else {
@@ -1059,7 +1061,7 @@ class WarehousingController extends Controller
                 $check_cofirm = ReceivingGoodsDelivery::where('rgd_status5', 'confirmed')->where('rgd_bill_type','final')->where('w_no',$w_no)->get()->count();
                 $check_paid = ReceivingGoodsDelivery::where('rgd_status5', 'paid')->where('rgd_bill_type','additional')->where('w_no',$w_no)->get()->count();
                 $warehousing = Warehousing::with(['co_no', 'warehousing_request', 'w_import_parent'])->find($w_no);
-
+                $adjustment_group = AdjustmentGroup::where('co_no','=',$warehousing->co_no)->first();
             }
 
             $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
@@ -1067,6 +1069,7 @@ class WarehousingController extends Controller
             return response()->json(
                 ['message' => Messages::MSG_0007,
                     'data' => isset($rgds) ? $rgds : $warehousing,
+                    'adjustment_group'=>$adjustment_group,
                     'warehousing' => isset($warehousing) ? $warehousing : null,
                     'rgd'  => $rgd,
                     'check_cofirm'=>$check_cofirm,
