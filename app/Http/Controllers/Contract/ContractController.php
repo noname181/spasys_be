@@ -72,7 +72,6 @@ class ContractController extends Controller
             ]);
             $company = Company::where('co_no', $co_no)->update([
                 'co_service' => $validated['co_service'],
-                'co_close_yn' => $validated['co_close_yn'],
             ]);
 
             $i = 0;
@@ -209,7 +208,6 @@ class ContractController extends Controller
 
             $company = Company::where('co_no', $co_no)->update([
                 'co_service' => $validated['co_service'],
-                'co_close_yn' => $validated['co_close_yn'],
             ]);
             $i = 0;
             foreach($validated['service_no'] as $service_no){
