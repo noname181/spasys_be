@@ -332,6 +332,7 @@ class RateDataController extends Controller
             }
 
         }else  if(!isset($rmd->rmd_no) && $set_type == 'work_monthly_final'){
+            
             $rmd = RateMetaData::where(
                 [
                     'w_no' => $w_no,
@@ -348,6 +349,26 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
+            if(empty($rmd) && !empty($rdg)){
+                $rmd = RateMetaData::where(
+                    [
+                        'w_no' => $w_no,
+                        'rgd_no' => $rdg->rgd_no_expectation,
+                        'set_type' => 'work_monthly_final'
+                    ]
+                )->first();
+            }
+            if(empty($rmd) && !empty($rdg)){
+                $rmd = RateMetaData::where(
+                    [
+                        'w_no' => $w_no,
+                        'rgd_no' => $rdg->rgd_no_expectation,
+                        'set_type' => 'work_monthly'
+                    ]
+                )->first();
+            }
+
+            
         }else if(!isset($rmd->rmd_no) && $set_type == 'storage_monthly_final'){
             $rmd = RateMetaData::where(
                 [
@@ -361,6 +382,24 @@ class RateDataController extends Controller
                     [
                         'w_no' => $w_no,
                         'rgd_no' => $rgd_no,
+                        'set_type' => 'storage_monthly'
+                    ]
+                )->first();
+            }
+            if(empty($rmd) && !empty($rdg)){
+                $rmd = RateMetaData::where(
+                    [
+                        'w_no' => $w_no,
+                        'rgd_no' => $rdg->rgd_no_expectation,
+                        'set_type' => 'storage_monthly_final'
+                    ]
+                )->first();
+            }
+            if(empty($rmd) && !empty($rdg)){
+                $rmd = RateMetaData::where(
+                    [
+                        'w_no' => $w_no,
+                        'rgd_no' => $rdg->rgd_no_expectation,
                         'set_type' => 'storage_monthly'
                     ]
                 )->first();
@@ -1411,6 +1450,12 @@ class RateDataController extends Controller
                         'rgd_no' => $final_rgd->rgd_no,
                         'rgd_no_expectation' => $expectation_rgd->rgd_no,
                         'rdg_set_type' => $request->rdg_set_type
+                    ]);
+                    RateMetaData::where('rgd_no', $request->rgd_no)->where(function($q){
+                        $e->where('set_type', 'storage_monthly_final')
+                        ->orWhere('set_type', 'work_monthly_final');
+                    })->update([
+                        'rgd_no' => $final_rgd->rgd_no
                     ]);
 
                 }else {
