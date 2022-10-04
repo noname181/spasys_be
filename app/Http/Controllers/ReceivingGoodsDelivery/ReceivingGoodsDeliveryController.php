@@ -1254,7 +1254,7 @@ class ReceivingGoodsDeliveryController extends Controller
             }else if ($request->bill_type == 'multiple'){
                 foreach($request->rgds as $rgd){
                     if($rgd['settlement_cycle'] == '건별' && $rgd['rgd_bill_type'] == 'final'){
-                        ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                        ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
                             'rgd_status5' => 'confirmed'
                         ]);
                     }else if($rgd['settlement_cycle'] == '월별' && $rgd['rgd_bill_type'] == 'final_monthly'){
