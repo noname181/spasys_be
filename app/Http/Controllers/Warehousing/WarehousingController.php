@@ -1053,6 +1053,8 @@ class WarehousingController extends Controller
                 ->get();
                 $warehousing = Warehousing::with(['co_no', 'warehousing_request', 'w_import_parent'])->find($w_no);
                 $adjustment_group = AdjustmentGroup::where('co_no','=',$warehousing->co_no)->first();
+                $adjustment_group2 = AdjustmentGroup::select(['ag_name'])->where('co_no','=',$warehousing->co_no)->get();
+              
                 $time = str_replace('-', '.', $start_date) . ' ~ ' . str_replace('-', '.', $end_date);
 
             }else {
@@ -1061,14 +1063,19 @@ class WarehousingController extends Controller
                 $check_cofirm = ReceivingGoodsDelivery::where('rgd_status5', 'confirmed')->where('rgd_bill_type','final')->where('w_no',$w_no)->get()->count();
                 $check_paid = ReceivingGoodsDelivery::where('rgd_status5', 'paid')->where('rgd_bill_type','additional')->where('w_no',$w_no)->get()->count();
                 $warehousing = Warehousing::with(['co_no', 'warehousing_request', 'w_import_parent'])->find($w_no);
+                $adjustment_group2 = AdjustmentGroup::select(['ag_name'])->where('co_no','=',$warehousing->co_no)->get();
                 $adjustment_group = AdjustmentGroup::where('co_no','=',$warehousing->co_no)->first();
             }
-
+            $adjustment_group_choose = '';
             $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
-
+            if($rdg){
+            $adjustment_group_choose = AdjustmentGroup::where('co_no','=',$warehousing->co_no)->where('ag_name','=',$rdg->rdg_set_type)->first();
+            }
             return response()->json(
                 ['message' => Messages::MSG_0007,
+                    'adjustment_group2'=>$adjustment_group2,
                     'data' => isset($rgds) ? $rgds : $warehousing,
+                    'adjustment_group_choose'=>$adjustment_group_choose,
                     'adjustment_group'=>$adjustment_group,
                     'warehousing' => isset($warehousing) ? $warehousing : null,
                     'rgd'  => $rgd,
@@ -1128,7 +1135,7 @@ class WarehousingController extends Controller
                     })
                         ->orWhereNull('rgd_status4');
                 })
-                ->where('w_category_name', '=', '유통가공');
+                ->where('w_category_name', '=', '유통가공')->where('w_type', '=', 'IW');
             });
 
             if (isset($validated['from_date'])) {
