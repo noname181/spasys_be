@@ -84,15 +84,16 @@ class ReceivingGoodsDeliveryController extends Controller
                     //'co_no' => $co_no
                 ]);
             }else{
+                //return $co_no;
                 $w_no_data = Warehousing::insertGetId([
                     'mb_no' => $member->mb_no,
                     // 'co_no' => $validated['co_no'],
-                    'w_schedule_day' => DateTime::createFromFormat('Y-m-d', $validated['w_schedule_day']),
+                    'w_schedule_day' => isset($validated['w_schedule_day']) ? DateTime::createFromFormat('Y-m-d', $validated['w_schedule_day']) : null,
                     'w_schedule_amount' => $validated['w_schedule_amount'],
                     'w_amount' => $validated['w_amount'],
                     'w_type' => 'IW',
                     'w_category_name' => $request->w_category_name,
-                    'co_no' => $validated['co_no'] ? $validated['co_no'] : $co_no,
+                    'co_no' => isset($validated['co_no']) ? $validated['co_no'] : $co_no,
                 ]);
             }
 
@@ -135,15 +136,15 @@ class ReceivingGoodsDeliveryController extends Controller
                         'rgd_receiver' => $rgd['rgd_receiver'],
                         'rgd_hp' => $rgd['rgd_hp'],
                         'rgd_memo' => $rgd['rgd_memo'],
-                        'rgd_status1' => $rgd['rgd_status1'],
-                        'rgd_status2' => $rgd['rgd_status2'],
-                        'rgd_status3' => $rgd['rgd_status3'],
-                        'rgd_delivery_company' => $rgd['rgd_delivery_company'],
-                        'rgd_tracking_code' => $rgd['rgd_tracking_code'],
-                        'rgd_delivery_man' => $rgd['rgd_delivery_man'],
-                        'rgd_delivery_man_hp' => $rgd['rgd_delivery_man_hp'],
-                        'rgd_delivery_schedule_day' => $rgd['rgd_delivery_schedule_day'] ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_delivery_schedule_day']) : null,
-                        'rgd_arrive_day' => $rgd['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']) : null,
+                        'rgd_status1' => isset($rgd['rgd_status1']) ? $rgd['rgd_status1'] : null,
+                        'rgd_status2' => isset($rgd['rgd_status2']) ? $rgd['rgd_status2'] : null,
+                        'rgd_status3' => isset($rgd['rgd_status3']) ? $rgd['rgd_status3'] : null,
+                        'rgd_delivery_company' => isset($rgd['rgd_delivery_company']) ? $rgd['rgd_delivery_company'] : null ,
+                        'rgd_tracking_code' => isset($rgd['rgd_tracking_code']) ? $rgd['rgd_tracking_code'] : null,
+                        'rgd_delivery_man' => isset($rgd['rgd_delivery_man']) ? $rgd['rgd_delivery_man'] : null,
+                        'rgd_delivery_man_hp' => isset($rgd['rgd_delivery_man_hp']) ? $rgd['rgd_delivery_man_hp'] : null,
+                        'rgd_delivery_schedule_day' => isset($rgd['rgd_delivery_schedule_day']) ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_delivery_schedule_day']) : null,
+                        'rgd_arrive_day' => isset($rgd['rgd_arrive_day']) ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']) : null,
                     ]);
                 }else{
 
@@ -278,7 +279,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     WarehousingItem::insert([
                         'item_no' => $warehousing_item['item_no'],
                         'w_no' => $w_no,
-                        'wi_number' => $warehousing_item['warehousing_item'][0]['wi_number'],
+                        'wi_number' => isset($warehousing_item['warehousing_item'][0]['wi_number']) ? $warehousing_item['warehousing_item'][0]['wi_number'] : null ,
                         'wi_type' => '입고_shipper'
                     ]);
                 }

@@ -133,9 +133,7 @@ class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
                 'string',
             ],
             'location.*.rgd_status1' => [
-                'required',
-                'string',
-                'max:255',
+                '',
             ],
             'location.*.rgd_status2' => [
                ''
@@ -144,9 +142,7 @@ class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
                 ''
             ],
             'location.*.rgd_delivery_company' => [
-                'required',
-                'string',
-                'max:255',
+                '',
             ],
             'location.*.rgd_tracking_code' => [
                 '',
