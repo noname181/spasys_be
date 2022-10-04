@@ -52,6 +52,9 @@ class CoAddressCreatePopupRequest extends BaseFormRequest
                 'string',
                 'max:255',
             ],
+            'ca_is_default' => [
+                'required',
+            ],
 
         ];
     }

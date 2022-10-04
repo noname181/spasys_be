@@ -56,6 +56,9 @@ class CoAddressUpdatePopupRequest extends BaseFormRequest
                 'integer',
 				'required',
             ],
+            'ca_is_default' => [
+               'required',
+            ],
         ];
     }
 

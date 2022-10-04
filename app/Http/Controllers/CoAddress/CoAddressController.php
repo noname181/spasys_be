@@ -71,6 +71,7 @@ class CoAddressController extends Controller
                         'ca_manager' => $value['ca_manager'],
                         'ca_address' => $value['ca_address'],
                         'ca_address_detail' => $value['ca_address_detail'],
+                        'ca_is_default' => $value['ca_is_default'] == true ? 'y' : 'n',
                     ]);
                     $id = $ca->first()->ca_no;
                 }else {
@@ -82,6 +83,7 @@ class CoAddressController extends Controller
                         'ca_manager' => $value['ca_manager'],
                         'ca_address' => $value['ca_address'],
                         'ca_address_detail' => $value['ca_address_detail'],
+                        'ca_is_default' => $value['ca_is_default'] == true ? 'y' : 'n',
                     ]);
                 }
                 $ids[] = $id;
@@ -207,7 +209,7 @@ class CoAddressController extends Controller
                 'ca_manager' => $validated['ca_manager'],
 				'ca_address' => $validated['ca_address'],
 				'ca_address_detail' => $validated['ca_address_detail'],
-
+                'ca_is_default'=>$validated['ca_is_default'] == true ? 'y' : 'n'
             ]);
             return response()->json(['message' => Messages::MSG_0007], 200);
         } catch (\Exception $e) {

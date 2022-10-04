@@ -55,6 +55,9 @@ class CoAddressCreateRequest extends BaseFormRequest
             '*.ca_no' => [
                 'integer',
             ],
+            '*.ca_is_default' => [
+                'required',
+            ],
         ];
     }
 
