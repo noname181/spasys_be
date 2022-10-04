@@ -1128,7 +1128,7 @@ class WarehousingController extends Controller
                     })
                         ->orWhereNull('rgd_status4');
                 })
-                ->where('w_category_name', '=', '유통가공');
+                ->where('w_category_name', '=', '유통가공')->where('w_type', '=', 'IW');
             });
 
             if (isset($validated['from_date'])) {
