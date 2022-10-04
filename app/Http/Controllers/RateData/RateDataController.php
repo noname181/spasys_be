@@ -190,7 +190,7 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
-            else if(empty($rmd) && !empty($rdg)){
+            if(empty($rmd) && !empty($rdg)){
                 $rmd = RateMetaData::where(
                     [
                         'w_no' => $w_no,
@@ -199,7 +199,7 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
-            else if(empty($rmd) && !empty($rdg)){
+            if(empty($rmd) && !empty($rdg)){
                 $rmd = RateMetaData::where(
                     [
                         'w_no' => $w_no,
@@ -225,7 +225,7 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
-            else if(empty($rmd) && !empty($rdg)){
+            if(empty($rmd) && !empty($rdg)){
                 $rmd = RateMetaData::where(
                     [
                         'w_no' => $w_no,
@@ -234,7 +234,7 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
-            else if(empty($rmd) && !empty($rdg)){
+            if(empty($rmd) && !empty($rdg)){
                 $rmd = RateMetaData::where(
                     [
                         'w_no' => $w_no,
