@@ -1364,7 +1364,7 @@ class RateDataController extends Controller
             DB::beginTransaction();
             $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd_no)->first();
             $co_no = $rgd->warehousing->co_no;
-
+            $adjustmentgroupall = AdjustmentGroup::where('co_no', $co_no)->get();
             $updated_at = Carbon::createFromFormat('Y.m.d H:i:s',  $rgd->updated_at->format('Y.m.d H:i:s'));
 
             $start_date = $updated_at->startOfMonth()->toDateString();
@@ -1386,11 +1386,27 @@ class RateDataController extends Controller
                 ->where('rdg_bill_type', 'final_monthly')->first();
                 $rdgs[] = $rdg;
             }
+           
+            $rdgs2 = [];
+            
+            foreach($rgds as $rgd2){
+                $rdg2 = RateDataGeneral::where('rgd_no', $rgd2->rgd_no)
+                ->where('rdg_bill_type', 'expectation_monthly')->first();
+                $rdgs2[] = $rdg2;
+            }
 
+            $adjustment_group_choose = [];
+              if($rdgs[0] != null){
+                  $adjustment_group_choose = AdjustmentGroup::where('co_no','=', $co_no )->where('ag_name','=',$rdgs[0]->rdg_set_type)->first();
+             }else if($rdgs2[0] != null){
+               $adjustment_group_choose = AdjustmentGroup::where('co_no','=', $co_no )->where('ag_name','=',$rdgs2[0]->rdg_set_type)->first();
+            }
 
             return response()->json([
                 'rgds' => $rgds,
-                'rdgs' => $rdgs
+                'rdgs' => $rdgs,
+                'adjustmentgroupall'=>$adjustmentgroupall,
+                'adjustment_group_choose'=>$adjustment_group_choose
             ], 201);
 
             // if (isset($validated['from_date'])) {
