@@ -644,8 +644,10 @@ class ItemController extends Controller
         try {
             $file = $item->file()->first();
             $item_channels = $item->item_channels()->get();
+            $company = $item->company()->get();
             $item['item_channels'] = $item_channels;
             $item['file'] = $file;
+            $item['company'] = $company;
             return response()->json($item);
         } catch (\Exception $e) {
             Log::error($e);
