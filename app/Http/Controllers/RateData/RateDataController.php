@@ -332,7 +332,7 @@ class RateDataController extends Controller
             }
 
         }else  if(!isset($rmd->rmd_no) && $set_type == 'work_monthly_final'){
-            
+
             $rmd = RateMetaData::where(
                 [
                     'w_no' => $w_no,
@@ -368,7 +368,7 @@ class RateDataController extends Controller
                 )->first();
             }
 
-            
+
         }else if(!isset($rmd->rmd_no) && $set_type == 'storage_monthly_final'){
             $rmd = RateMetaData::where(
                 [
@@ -1423,7 +1423,7 @@ class RateDataController extends Controller
     public function registe_rate_data_general_monthly_final(Request $request) {
         try {
             DB::beginTransaction();
-
+            $i = 0;
             foreach($request->rgds as $key=>$rgd){
                 $is_exist = RateDataGeneral::where('w_no',$rgd['w_no']['w_no'])->where('rdg_bill_type', 'final_monthly')->first();
                 if(!$is_exist){
@@ -1443,6 +1443,7 @@ class RateDataController extends Controller
                     $final_rgd = $expectation_rgd->replicate();
                     $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
                     $final_rgd->rgd_status4 = '확정청구서';
+                    $final_rgd->rgd_is_show = ($i == 0 ? 'y' : 'n');
                     $final_rgd->rgd_settlement_number =  $request->settlement_number;
                     $final_rgd->save();
 
@@ -1452,7 +1453,7 @@ class RateDataController extends Controller
                         'rdg_set_type' => $request->rdg_set_type
                     ]);
                     RateMetaData::where('rgd_no', $request->rgd_no)->where(function($q){
-                        $e->where('set_type', 'storage_monthly_final')
+                        $q->where('set_type', 'storage_monthly_final')
                         ->orWhere('set_type', 'work_monthly_final');
                     })->update([
                         'rgd_no' => $final_rgd->rgd_no
@@ -1464,6 +1465,7 @@ class RateDataController extends Controller
                         'rgd_no_expectation' => $expectation_rgd->rgd_no
                     ]);
                 }
+                $i++;
             }
 
             // $is_new = RateDataGeneral::where('rdg_no',  $request->rdg_no)->where('rdg_bill_type', $request->bill_type)->first();
