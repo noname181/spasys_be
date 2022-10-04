@@ -1210,7 +1210,7 @@ class RateDataController extends Controller
                 ]);
 
                 RateMetaData::where('rgd_no', $request->rgd_no)->where(function($q){
-                    $e->where('set_type', 'storage_additional')
+                    $q->where('set_type', 'storage_additional')
                     ->orWhere('set_type', 'work_additional');
                 })->update([
                     'rgd_no' => $final_rgd->rgd_no
