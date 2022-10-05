@@ -831,7 +831,7 @@ class ItemController extends Controller
     
                     $item_info_no = ItemInfo::insertGetId([
                         'item_no' => $item_no,
-    
+                        'product_id' => $item['product_id'],
                         'supply_code' => $item['supply_code'],
                         'trans_fee' => $item['trans_fee'],
                         'img_desc1' => $item['img_desc1'],
@@ -855,6 +855,22 @@ class ItemController extends Controller
                         'stock_alarm2' => $item['stock_alarm2'],
                         'extra_price' => $item['extra_price'],
                         'extra_shop_price' => $item['extra_shop_price'],
+
+                        'extra_column1' => $item['extra_column1'],
+                        'extra_column2' => $item['extra_column2'],
+                        'extra_column3' => $item['extra_column3'],
+                        'extra_column4' => $item['extra_column4'],
+                        'extra_column5' => $item['extra_column5'],
+                        'extra_column6' => $item['extra_column6'],
+                        'extra_column7' => $item['extra_column7'],
+                        'extra_column8' => $item['extra_column8'],
+                        'extra_column9' => $item['extra_column9'],
+                        'extra_column10' => $item['extra_column10'],
+                        'reg_date' => $item['reg_date'],
+                        'last_update_date' => $item['last_update_date'],
+                        'new_link_id' => $item['new_link_id'],
+                        'link_id' => $item['link_id'],
+
                     ]);
                 }
             }else if ($user->mb_type == 'shop'){
@@ -883,7 +899,7 @@ class ItemController extends Controller
         
                         $item_info_no = ItemInfo::insertGetId([
                             'item_no' => $item_no,
-        
+                            'product_id' => $item['product_id'],
                             'supply_code' => $item['supply_code'],
                             'trans_fee' => $item['trans_fee'],
                             'img_desc1' => $item['img_desc1'],
@@ -907,6 +923,21 @@ class ItemController extends Controller
                             'stock_alarm2' => $item['stock_alarm2'],
                             'extra_price' => $item['extra_price'],
                             'extra_shop_price' => $item['extra_shop_price'],
+
+                            'extra_column1' => $item['extra_column1'],
+                            'extra_column2' => $item['extra_column2'],
+                            'extra_column3' => $item['extra_column3'],
+                            'extra_column4' => $item['extra_column4'],
+                            'extra_column5' => $item['extra_column5'],
+                            'extra_column6' => $item['extra_column6'],
+                            'extra_column7' => $item['extra_column7'],
+                            'extra_column8' => $item['extra_column8'],
+                            'extra_column9' => $item['extra_column9'],
+                            'extra_column10' => $item['extra_column10'],
+                            'reg_date' => $item['reg_date'],
+                            'last_update_date' => $item['last_update_date'],
+                            'new_link_id' => $item['new_link_id'],
+                            'link_id' => $item['link_id'],
                         ]);
                     }
                 }
@@ -937,7 +968,7 @@ class ItemController extends Controller
         
                         $item_info_no = ItemInfo::insertGetId([
                             'item_no' => $item_no,
-        
+                            'product_id' => $item['product_id'],
                             'supply_code' => $item['supply_code'],
                             'trans_fee' => $item['trans_fee'],
                             'img_desc1' => $item['img_desc1'],
@@ -961,6 +992,21 @@ class ItemController extends Controller
                             'stock_alarm2' => $item['stock_alarm2'],
                             'extra_price' => $item['extra_price'],
                             'extra_shop_price' => $item['extra_shop_price'],
+
+                            'extra_column1' => $item['extra_column1'],
+                            'extra_column2' => $item['extra_column2'],
+                            'extra_column3' => $item['extra_column3'],
+                            'extra_column4' => $item['extra_column4'],
+                            'extra_column5' => $item['extra_column5'],
+                            'extra_column6' => $item['extra_column6'],
+                            'extra_column7' => $item['extra_column7'],
+                            'extra_column8' => $item['extra_column8'],
+                            'extra_column9' => $item['extra_column9'],
+                            'extra_column10' => $item['extra_column10'],
+                            'reg_date' => $item['reg_date'],
+                            'last_update_date' => $item['last_update_date'],
+                            'new_link_id' => $item['new_link_id'],
+                            'link_id' => $item['link_id'],
                         ]);
                     }
                 }
@@ -985,7 +1031,7 @@ class ItemController extends Controller
         try {
             DB::beginTransaction();
             foreach ($request->data as $i_item => $item) {
-                $item_info_no = ItemInfo::where('item_no',$item['product_id'])
+                $item_info_no = ItemInfo::where('product_id',$item['product_id'])
                 ->update([
                     'stock' => $item['stock']
                 ]);

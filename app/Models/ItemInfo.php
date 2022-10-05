@@ -46,6 +46,22 @@ class ItemInfo extends Model
         'stock_alarm2',
         'extra_price',
         'extra_shop_price',
+
+        'product_id',
+        'extra_column1',
+        'extra_column2',
+        'extra_column3',
+        'extra_column4',
+        'extra_column5',
+        'extra_column6',
+        'extra_column7',
+        'extra_column8',
+        'extra_column9',
+        'extra_column10',
+        'reg_date',
+        'last_update_date',
+        'new_link_id',
+        'link_id',
     ];
 
     protected $casts = [
