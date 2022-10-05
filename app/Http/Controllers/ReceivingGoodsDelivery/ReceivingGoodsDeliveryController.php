@@ -7,6 +7,7 @@ use App\Models\Warehousing;
 use App\Models\Member;
 use App\Models\WarehousingRequest;
 use App\Models\ReceivingGoodsDelivery;
+use App\Models\RateDataGeneral;
 use App\Models\WarehousingItem;
 use App\Models\Package;
 use App\Models\ItemChannel;
@@ -99,7 +100,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
             $w_no = isset($validated['w_no']) ? $validated['w_no'] : $w_no_data;
 
-            
+
 
             if(!isset($validate['w_schedule_number'])){
                 $w_schedule_number = (new CommonFunc)->generate_w_schedule_number($w_no,'IW');
@@ -186,7 +187,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
             //WarehousingItem::where('w_no', $w_no)->where('wi_type','=','입고_shipper')->delete();
 
-            
+
             $warehousing_items = [];
 
             if(isset($validated['item_new'])){
@@ -240,7 +241,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'wi_number' => $warehousing_item['warehousing_item2'][0]['wi_number'],
                             ]);
                         }
-                        
+
                         $checkexit2 = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_shipper')->first();
                         if(!isset($checkexit2->wi_no)){
                             WarehousingItem::insert([
@@ -256,7 +257,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         }
 
                     }else{
-                        
+
                         $checkexit3 = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_shipper')->first();
                         if(!isset($checkexit3->wi_no)){
                             WarehousingItem::insert([
@@ -412,7 +413,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                     if(isset($request->page_type) && $request->page_type == 'Page130146'){
                         $w_schedule_number2 = CommonFunc::generate_w_schedule_number($request->w_no,'EWC');
-                       
+
                         Warehousing::where('w_no', $request->w_no)->update([
                             'w_schedule_number2' =>  CommonFunc::generate_w_schedule_number($request->w_no,'EWC'),
                             'w_completed_day' => Carbon::now()->toDateTimeString()
@@ -436,7 +437,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         }
                     }
                     $package = $request->package;
-                    
+
                     if(isset($package)){
                         //foreach ($data['package'] as $package) {
                         if(isset($package['p_no'])){
@@ -962,7 +963,7 @@ class ReceivingGoodsDeliveryController extends Controller
         }
     }
     public function update_ReceivingGoodsDelivery_cancel($rgd_no){
-            
+
         try {
 
             $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->update([
@@ -1250,6 +1251,36 @@ class ReceivingGoodsDeliveryController extends Controller
                     ]);
                 }
 
+            }else if ($request->bill_type == 'multiple'){
+                foreach($request->rgds as $rgd){
+                    if($rgd['settlement_cycle'] == '건별' && $rgd['rgd_bill_type'] == 'final'){
+                        ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
+                            'rgd_status5' => 'confirmed'
+                        ]);
+                    }else if($rgd['settlement_cycle'] == '월별' && $rgd['rgd_bill_type'] == 'final_monthly'){
+                        $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd['rgd_no'])->first();
+                        $co_no = $rgd->warehousing->co_no;
+
+                        $updated_at = Carbon::createFromFormat('Y.m.d H:i:s',  $rgd->updated_at->format('Y.m.d H:i:s'));
+
+                        $start_date = $updated_at->startOfMonth()->toDateString();
+                        $end_date = $updated_at->endOfMonth()->toDateString();
+
+                        $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general'])
+                        ->whereHas('w_no', function($q) use($co_no){
+                            $q->where('co_no', $co_no);
+                        })
+                        ->where('updated_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
+                        ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
+                        ->where('rgd_status1', '=', '입고')
+                        ->where('rgd_bill_type', 'final_monthly')
+                        ->update([
+                            'rgd_status5' => 'confirmed'
+                        ]);
+
+                    }
+                }
+
             }
 
             return response()->json([
@@ -1257,12 +1288,13 @@ class ReceivingGoodsDeliveryController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
 
     public function get_rgd_package($w_no){
-        
+
         try {
             $package = Package::where('w_no', $w_no)->get();
             return response()->json($package);
@@ -1273,7 +1305,7 @@ class ReceivingGoodsDeliveryController extends Controller
     }
 
     public function updateRgdState3(Request $request){
-        try{    
+        try{
             ReceivingGoodsDelivery::where('w_no',$request['w_no'])->update([
                 'rgd_status3' => '배송완료'
             ]);

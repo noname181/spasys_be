@@ -519,9 +519,29 @@ class RateDataController extends Controller
             $rate_data1 = RateData::where('rm_no', $rm_no)->where('rmd_no', $rmd_no)->where('rd_cate_meta1', '보세화물')->get();
             $rate_data2 = RateData::where('rm_no', $rm_no)->where('rmd_no', $rmd_no)->where('rd_cate_meta1', '수입풀필먼트')->get();
             $rate_data3 = RateData::where('rm_no', $rm_no)->where('rmd_no', $rmd_no)->where('rd_cate_meta1', '유통가공')->get();
-            $co_rate_data1 = RateData::where('co_no', $co_no)->where('rd_cate_meta1', '보세화물')->get();
-            $co_rate_data2 = RateData::where('co_no', $co_no)->where('rd_cate_meta1', '수입풀필먼트')->get();
-            $co_rate_data3 = RateData::where(['co_no' => $co_no, 'rd_cate_meta1' => '유통가공'])->get();
+            $co_rate_data1 = RateData::where('rd_cate_meta1', '보세화물');
+            $co_rate_data2 = RateData::where('rd_cate_meta1', '수입풀필먼트');
+            $co_rate_data3 = RateData::where('rd_cate_meta1', '유통가공');
+
+            if(Auth::user()->mb_type == 'spasys'){
+                $co_rate_data1 = $co_rate_data1->where('co_no', $co_no);
+                $co_rate_data2 = $co_rate_data2->where('co_no', $co_no);
+                $co_rate_data3 = $co_rate_data3->where('co_no', $co_no);
+            }else if(Auth::user()->mb_type == 'shop'){
+                $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
+                $co_rate_data1 = $co_rate_data1->where('rd_co_no', $co_no);
+                $co_rate_data2 = $co_rate_data2->where('rd_co_no', $co_no);
+                $co_rate_data3 = $co_rate_data3->where('rd_co_no', $co_no);
+                if(isset($rmd->rmd_no)){
+                    $co_rate_data1 = $co_rate_data1->where('rmd_no', $rmd->rmd_no);
+                    $co_rate_data2 = $co_rate_data2->where('rmd_no', $rmd->rmd_no);
+                    $co_rate_data3 = $co_rate_data3->where('rmd_no', $rmd->rmd_no);
+                }
+            }
+            $co_rate_data1 = $co_rate_data1->get();
+            $co_rate_data2 = $co_rate_data2->get();
+            $co_rate_data3 = $co_rate_data3->get();
+
 
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -1364,7 +1384,7 @@ class RateDataController extends Controller
             DB::beginTransaction();
             $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd_no)->first();
             $co_no = $rgd->warehousing->co_no;
-
+            $adjustmentgroupall = AdjustmentGroup::where('co_no', $co_no)->get();
             $updated_at = Carbon::createFromFormat('Y.m.d H:i:s',  $rgd->updated_at->format('Y.m.d H:i:s'));
 
             $start_date = $updated_at->startOfMonth()->toDateString();
@@ -1386,11 +1406,27 @@ class RateDataController extends Controller
                 ->where('rdg_bill_type', 'final_monthly')->first();
                 $rdgs[] = $rdg;
             }
+           
+            $rdgs2 = [];
+            
+            foreach($rgds as $rgd2){
+                $rdg2 = RateDataGeneral::where('rgd_no', $rgd2->rgd_no)
+                ->where('rdg_bill_type', 'expectation_monthly')->first();
+                $rdgs2[] = $rdg2;
+            }
 
+            $adjustment_group_choose = [];
+              if($rdgs[0] != null){
+                  $adjustment_group_choose = AdjustmentGroup::where('co_no','=', $co_no )->where('ag_name','=',$rdgs[0]->rdg_set_type)->first();
+             }else if($rdgs2[0] != null){
+               $adjustment_group_choose = AdjustmentGroup::where('co_no','=', $co_no )->where('ag_name','=',$rdgs2[0]->rdg_set_type)->first();
+            }
 
             return response()->json([
                 'rgds' => $rgds,
-                'rdgs' => $rdgs
+                'rdgs' => $rdgs,
+                'adjustmentgroupall'=>$adjustmentgroupall,
+                'adjustment_group_choose'=>$adjustment_group_choose
             ], 201);
 
             // if (isset($validated['from_date'])) {
