@@ -973,11 +973,12 @@ class ItemController extends Controller
                                     'item_service_name' => '수입풀필먼트',
                                 ]
                             );
-             
+                           if($item_no->item_no){
                             $item_info_no = ItemInfo::updateOrCreate(
+                                
                                 [
-                                    
-                                    'item_no' => $item_no->item_no
+                                   
+                                    'item_no' =>$item_no->item_no,
                                 ],
                                 [
                                 'product_id' => $item['product_id'],
@@ -1020,6 +1021,8 @@ class ItemController extends Controller
                                 'new_link_id' => $item['new_link_id'],
                                 'link_id' => $item['link_id'],
                             ]);
+                           }
+                            
                         
 
                     }

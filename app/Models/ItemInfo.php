@@ -46,7 +46,7 @@ class ItemInfo extends Model
         'stock_alarm2',
         'extra_price',
         'extra_shop_price',
-
+        'item_no',
         'product_id',
         'extra_column1',
         'extra_column2',

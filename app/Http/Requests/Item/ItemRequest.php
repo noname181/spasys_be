@@ -140,6 +140,9 @@ class ItemRequest extends BaseFormRequest
             'product_id' => [
                 '',
             ],
+            'item_no' => [
+                '',
+            ],
         ];
     }
 
