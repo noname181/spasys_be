@@ -137,6 +137,9 @@ class ItemRequest extends BaseFormRequest
                 'nullable',
                 'max:255',
             ],
+            'product_id' => [
+                '',
+            ],
         ];
     }
 

@@ -48,7 +48,8 @@ class Item extends Model
         'item_table',
         'item_key',
         'item_origin',
-        'item_manufacturer'
+        'item_manufacturer',
+        'product_id'
     ];
 
     protected $casts = [
