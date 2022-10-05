@@ -1728,16 +1728,14 @@ class WarehousingController extends Controller
                     });
                 });
             }
-            $warehousing->where('rgd_status1', '=', '출고')
-            ->where('rgd_status2', '=', '작업완료')
+            $warehousing->where('rgd_status1', '=', '입고')
             ->where(function ($q) {
                 $q->where('rgd_status4', '=', '확정청구서')
                 ->orWhere('rgd_status4', '=', '추가청구서');
             })
             ->where('rgd_status5', '=', 'confirmed')
             ->whereHas('w_no', function ($query) {
-                $query->where('w_type', '=', 'EW')
-                ->where('w_category_name', '=', '유통가공');
+                $query->where('w_category_name', '=', '유통가공');
             })
             ->orderBy('updated_at', 'DESC');
             if (isset($validated['from_date'])) {
