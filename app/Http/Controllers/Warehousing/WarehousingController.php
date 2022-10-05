@@ -17,6 +17,7 @@ use App\Models\CompanySettlement;
 use App\Models\Service;
 use App\Models\RateData;
 use App\Models\RateDataGeneral;
+use App\Models\RateMetaData;
 use App\Utils\Messages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
@@ -1108,19 +1109,19 @@ class WarehousingController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
             if($user->mb_type =='shop'){
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general','rate_meta_data'])->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent',function($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     });
                 });
             }else if($user->mb_type == 'shipper' ){
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general','rate_meta_data'])->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no',function($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     });
                 });
             }else if($user->mb_type == 'spasys'){
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general','rate_meta_data'])->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent.co_parent',function($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     });
