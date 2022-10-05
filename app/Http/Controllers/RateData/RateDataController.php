@@ -519,9 +519,29 @@ class RateDataController extends Controller
             $rate_data1 = RateData::where('rm_no', $rm_no)->where('rmd_no', $rmd_no)->where('rd_cate_meta1', '보세화물')->get();
             $rate_data2 = RateData::where('rm_no', $rm_no)->where('rmd_no', $rmd_no)->where('rd_cate_meta1', '수입풀필먼트')->get();
             $rate_data3 = RateData::where('rm_no', $rm_no)->where('rmd_no', $rmd_no)->where('rd_cate_meta1', '유통가공')->get();
-            $co_rate_data1 = RateData::where('co_no', $co_no)->where('rd_cate_meta1', '보세화물')->get();
-            $co_rate_data2 = RateData::where('co_no', $co_no)->where('rd_cate_meta1', '수입풀필먼트')->get();
-            $co_rate_data3 = RateData::where(['co_no' => $co_no, 'rd_cate_meta1' => '유통가공'])->get();
+            $co_rate_data1 = RateData::where('rd_cate_meta1', '보세화물');
+            $co_rate_data2 = RateData::where('rd_cate_meta1', '수입풀필먼트');
+            $co_rate_data3 = RateData::where('rd_cate_meta1', '유통가공');
+
+            if(Auth::user()->mb_type == 'spasys'){
+                $co_rate_data1 = $co_rate_data1->where('co_no', $co_no);
+                $co_rate_data2 = $co_rate_data2->where('co_no', $co_no);
+                $co_rate_data3 = $co_rate_data3->where('co_no', $co_no);
+            }else if(Auth::user()->mb_type == 'shop'){
+                $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
+                $co_rate_data1 = $co_rate_data1->where('rd_co_no', $co_no);
+                $co_rate_data2 = $co_rate_data2->where('rd_co_no', $co_no);
+                $co_rate_data3 = $co_rate_data3->where('rd_co_no', $co_no);
+                if(isset($rmd->rmd_no)){
+                    $co_rate_data1 = $co_rate_data1->where('rmd_no', $rmd->rmd_no);
+                    $co_rate_data2 = $co_rate_data2->where('rmd_no', $rmd->rmd_no);
+                    $co_rate_data3 = $co_rate_data3->where('rmd_no', $rmd->rmd_no);
+                }
+            }
+            $co_rate_data1 = $co_rate_data1->get();
+            $co_rate_data2 = $co_rate_data2->get();
+            $co_rate_data3 = $co_rate_data3->get();
+
 
             return response()->json([
                 'message' => Messages::MSG_0007,
