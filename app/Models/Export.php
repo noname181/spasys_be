@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Models\Import;
 class Export extends Model
 {
     use HasFactory;
@@ -55,5 +55,11 @@ class Export extends Model
         'te_e_date' => "date:Y.m.d",
         'te_e_confirm_date' => "date:Y.m.d",
     ];
+
+    public function import()
+    {
+        return $this->hasOne(Import::class, 'ti_logistic_manage_number', 'te_logistic_manage_number');
+
+    }
 
 }
