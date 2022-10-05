@@ -269,6 +269,15 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
+            if(empty($rmd) && !empty($rdg)){
+                $rmd = RateMetaData::where(
+                    [
+                        'w_no' => $w_no,
+                        'rgd_no' => $rdg->rgd_no_expectation,
+                        'set_type' => 'work'
+                    ]
+                )->first();
+            }
         }else if(!isset($rmd->rmd_no) && $set_type == 'storage_additional'){
             $rmd = RateMetaData::where(
                 [
@@ -292,6 +301,15 @@ class RateDataController extends Controller
                         'w_no' => $w_no,
                         'rgd_no' => $rdg->rgd_no_expectation,
                         'set_type' => 'storage_final'
+                    ]
+                )->first();
+            }
+            if(empty($rmd) && !empty($rdg)){
+                $rmd = RateMetaData::where(
+                    [
+                        'w_no' => $w_no,
+                        'rgd_no' => $rdg->rgd_no_expectation,
+                        'set_type' => 'storage'
                     ]
                 )->first();
             }
@@ -1406,9 +1424,9 @@ class RateDataController extends Controller
                 ->where('rdg_bill_type', 'final_monthly')->first();
                 $rdgs[] = $rdg;
             }
-           
+
             $rdgs2 = [];
-            
+
             foreach($rgds as $rgd2){
                 $rdg2 = RateDataGeneral::where('rgd_no', $rgd2->rgd_no)
                 ->where('rdg_bill_type', 'expectation_monthly')->first();
