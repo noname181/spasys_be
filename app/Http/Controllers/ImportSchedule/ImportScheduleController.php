@@ -125,22 +125,20 @@ class ImportScheduleController extends Controller
 
            
             DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
-            DB::enableQueryLog();
-            $byMobile   =   ImportExpected::whereNull('tie_logistic_manage_number');
-
-            $sql1 = ImportExpected::with(['import','company'])->groupBy('t_import_expected.tie_logistic_manage_number')->leftjoin('t_export', 't_import_expected.tie_logistic_manage_number', '=', 't_export.te_logistic_manage_number')
+          
+            $import_schedule = ImportExpected::with(['import','company'])->groupBy('t_import_expected.tie_logistic_manage_number')->leftjoin('t_export', 't_import_expected.tie_logistic_manage_number', '=', 't_export.te_logistic_manage_number')
             ->select(['t_import_expected.*','t_export.te_logistic_manage_number','t_export.te_carry_out_number'])
             ->where('tie_is_date','>=','2022-01-04')->where('tie_is_date','<=','2022-10-04')
-            ->groupBy('t_export.te_logistic_manage_number','t_export.te_carry_out_number')->paginate($per_page, ['*'], 'page', $page);
+            ->groupBy('t_export.te_logistic_manage_number','t_export.te_carry_out_number');
 
             //return DB::getQueryLog();
 
-            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            
             
             
             //$sql2 = DB::table('t_export')->select('te_logistic_manage_number','te_carry_out_number')->groupBy('te_logistic_manage_number','te_carry_out_number')->get();
 
-            $import_schedule = ImportExpected::with(['import','company'])->orderBy('tie_no', 'DESC');
+            //$import_schedule = ImportExpected::with(['import','company'])->orderBy('tie_no', 'DESC');
            
             if (isset($validated['from_date'])) {
                 $import_schedule->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
@@ -182,10 +180,11 @@ class ImportScheduleController extends Controller
             // }
 
             //$members = Member::where('mb_no', '!=', 0)->get();
-
+            
             $import_schedule = $import_schedule->paginate($per_page, ['*'], 'page', $page);
-
-            return response()->json($sql1);
+            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            
+            return response()->json($import_schedule);
         } catch (\Exception $e) {
             Log::error($e);
             return $e;
