@@ -485,24 +485,39 @@ class ReceivingGoodsDeliveryController extends Controller
                     foreach ($data['items'] as $item) {
 
 
-                        if(isset($item['warehousing_item'][0]['wi_type']) && $item['warehousing_item'][0]['wi_type'] == "출고_spasys"){
-                            WarehousingItem::where('wi_no', $item['warehousing_item'][0]['wi_no'])->update([
+                        // if(isset($item['warehousing_item'][0]['wi_type']) && $item['warehousing_item'][0]['wi_type'] == "출고_spasys"){
+                        //     WarehousingItem::where('wi_no', $item['warehousing_item'][0]['wi_no'])->update([
+                        //         'item_no' => $item['item_no'],
+                        //         'w_no' => $request->w_no,
+                        //         'wi_number' => $item['schedule_wi_number'],
+                        //        //'wi_number_received' =>  $item['warehousing_item']['wi_number_received'],
+                        //         'wi_type' => '출고_spasys'
+                        //     ]);
+
+                        // }else{
+                        //     WarehousingItem::insert([
+                        //         'item_no' => $item['item_no'],
+                        //         'w_no' => $request->w_no,
+                        //         'wi_number' => $item['schedule_wi_number'],
+                        //         //'wi_number_received' =>  $item['warehousing_item']['wi_number_received'],
+                        //         'wi_type' => '출고_spasys'
+                        //     ]);
+                        // }
+
+                        WarehousingItem::updateOrCreate(
+                            [
+                                'item_no' => $item['item_no'],
+                                'w_no' => $request->w_no,
+                                'wi_type' => '출고_spasys'
+                            ],
+                            [
                                 'item_no' => $item['item_no'],
                                 'w_no' => $request->w_no,
                                 'wi_number' => $item['schedule_wi_number'],
                                //'wi_number_received' =>  $item['warehousing_item']['wi_number_received'],
-                                'wi_type' => '출고_spasys'
-                            ]);
-
-                        }else{
-                            WarehousingItem::insert([
-                                'item_no' => $item['item_no'],
-                                'w_no' => $request->w_no,
-                                'wi_number' => $item['schedule_wi_number'],
-                                //'wi_number_received' =>  $item['warehousing_item']['wi_number_received'],
-                                'wi_type' => '출고_spasys'
-                            ]);
-                        }
+                                'wi_type' => '출고_spasys',
+                            ]
+                        );
                     }
 
                     foreach ($data['location'] as $location) {
