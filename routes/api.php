@@ -296,6 +296,11 @@ Route::middleware('auth')->group(function () {
         Route::post('/create_or_update', [\App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'CreateOrUpdateByCoPu'])->name('create_or_update');
         Route::get('/get_schedule_shipment_info_by_co_no/{co_no}', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'getScheduleShipmentInfoByCono'])->name('get_schedule_shipment_info_by_co_no');
     });
+    Route::prefix('contractwms')->name('contractwms.')->group(function () {
+        // Route::delete('/contractwms/{schedule_shipment_info}', [App\Http\Controllers\ContractWms\ContractwmsController::class, 'deleteContractWms'])->name('delete_contract_wms');
+        Route::post('/create_or_update', [\App\Http\Controllers\ContractWms\ContractwmsController::class, 'CreateOrUpdateByCoPu'])->name('create_or_update');
+        Route::get('/get_contractwms_by_co_no/{co_no}', [App\Http\Controllers\ContractWms\ContractwmsController::class, 'getContractWmsByCono'])->name('get_contractwms_by_co_no');
+    });
 
 
     Route::prefix('rate_data_send_meta')->name('rate_data_send_meta.')->group(function () {
