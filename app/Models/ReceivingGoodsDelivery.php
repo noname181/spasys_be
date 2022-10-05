@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Member;
 use App\Models\Warehousing;
+use App\Models\RateMetaData;
 
 class ReceivingGoodsDelivery extends Model
 {
@@ -71,5 +72,8 @@ class ReceivingGoodsDelivery extends Model
 
     public function rate_data_general(){
         return $this->hasOne(RateDataGeneral::class, 'rgd_no', 'rgd_no');
+    }
+    public function rate_meta_data(){
+        return $this->hasMany(RateMetaData::class, 'rgd_no', 'rgd_no');
     }
 }

@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Models\Service;
 use App\Models\CompanySettlement;
+use App\Models\Export;
 
 class CompanyController extends Controller
 {
@@ -78,7 +79,7 @@ class CompanyController extends Controller
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
-
+    
     public function getCompanies(CompanySearchRequest $request)
     {
         try {
@@ -254,7 +255,7 @@ class CompanyController extends Controller
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
-
+    
     /**
      * Register company
      * @param  \App\Http\Requests\Company\CompanyRegisterController\InvokeRequest  $request
@@ -352,7 +353,13 @@ class CompanyController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
-
+    public function getCompanyFromtcon($tcon)
+    {
+        $export = Export::with(['import'])->where('te_carry_out_number', $tcon)->first();
+        $company = Company::where('co_license',$export->import->ti_co_license)->first();
+        $adjustment_group = AdjustmentGroup::where('co_no','=',$company->co_no)->first();
+        return response()->json(['company'=>$company,'adjustment_group'=>$adjustment_group]);
+    }
     public function  getShopCompaniesMobile(CompanySearchRequest $request)
     {
         try {
