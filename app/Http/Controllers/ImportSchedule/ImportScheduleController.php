@@ -141,16 +141,16 @@ class ImportScheduleController extends Controller
             //$import_schedule = ImportExpected::with(['import','company'])->orderBy('tie_no', 'DESC');
            
             if (isset($validated['from_date'])) {
-                $import_schedule->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                $import_schedule->where('t_import_expected.created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
 
             if (isset($validated['to_date'])) {
-                $import_schedule->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                $import_schedule->where('t_import_expected.created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
             }
 
             if (isset($validated['co_parent_name'])) {
                 $companies->whereHas('company.co_parent', function ($query) use ($validated) {
-                    $query->where(DB::raw('lower(company.co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                    $query->where(DB::raw('lower(co_parent.co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
                 });
             }
 

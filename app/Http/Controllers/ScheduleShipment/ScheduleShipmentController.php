@@ -32,6 +32,7 @@ class ScheduleShipmentController extends Controller
     public function paginateScheduleShipments(ScheduleShipmentRequest $request)
     {
         try {
+            
             $validated = $request->validated();
             $user = Auth::user();
             // If per_page is null set default data = 15
@@ -41,7 +42,7 @@ class ScheduleShipmentController extends Controller
            
             if( $request->type == 'page136'){
                 if ($user->mb_type == 'shop') {
-                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->whereNull('trans_no')->whereHas('ContractWms.company.co_parent', function ($q) use ($user){
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->whereNull('trans_no')->whereHas('ContractWms.company', function ($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     })->orderBy('ss_no', 'DESC');
                 }else if($user->mb_type == 'shipper'){
@@ -55,7 +56,7 @@ class ScheduleShipmentController extends Controller
                 }
             }else{
                 if ($user->mb_type == 'shop') {
-                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->whereNotNull('trans_no')->whereHas('ContractWms.company.co_parent', function ($q) use ($user){
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->whereNotNull('trans_no')->whereHas('ContractWms.company', function ($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     })->orderBy('ss_no', 'DESC');
                 }else if($user->mb_type == 'shipper'){
@@ -68,8 +69,59 @@ class ScheduleShipmentController extends Controller
                     })->orderBy('ss_no', 'DESC');
                 }
             }
-            $schedule_shipment = $schedule_shipment->paginate($per_page, ['*'], 'page', $page);
 
+            if (isset($validated['from_date'])) {
+                $schedule_shipment->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            }
+
+            if (isset($validated['to_date'])) {
+                $schedule_shipment->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            }
+
+            if (isset($validated['co_parent_name'])) {
+                $schedule_shipment->whereHas('ContractWms.company.co_parent', function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(ContractWms.company.co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                });
+            }
+
+            if (isset($validated['co_name'])) {
+                $schedule_shipment->whereHas('ContractWms.company', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                });
+            }
+
+            if (isset($validated['item_brand'])) {
+                $schedule_shipment->whereHas('schedule_shipment_info.item', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(item_brand)'), 'like', '%' . strtolower($validated['item_brand']) . '%');
+                });
+            }
+
+            if (isset($validated['item_channel_name'])) {
+                $schedule_shipment->whereHas('schedule_shipment_info.item.item_channels', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(item_channel_name)'), 'like', '%' . strtolower($validated['item_channel_name']) . '%');
+                });
+            }
+
+            if (isset($validated['item_name'])) {
+                $schedule_shipment->whereHas('schedule_shipment_info.item', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(item_name)'), 'like', '%' . strtolower($validated['item_name']) . '%');
+                });
+            }
+
+            if (isset($validated['status'])) {
+                if($validated['status'] > 0){
+                    $schedule_shipment->where('status', '=', $validated['status']);
+                }
+            }
+
+            if (isset($validated['order_id'])) {
+                
+                $schedule_shipment->where(DB::raw('lower(order_id)'), 'like', '%' . strtolower($validated['order_id']) . '%');
+                
+            }
+           
+            $schedule_shipment = $schedule_shipment->paginate($per_page, ['*'], 'page', $page);
+           
             return response()->json($schedule_shipment);
         } catch (\Exception $e) {
             Log::error($e);

@@ -256,6 +256,14 @@ class ScheduleShipmentRequest extends BaseFormRequest
                 'nullable',
                 'max:255',
             ],
+            'per_page' => [
+                'nullable',
+                'int',
+            ], 
+            'page' => [
+                'nullable',
+                'int',
+            ],
         ];
     }
 

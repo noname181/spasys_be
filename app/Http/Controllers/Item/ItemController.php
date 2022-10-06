@@ -555,12 +555,12 @@ class ItemController extends Controller
                 $item->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
             }
             if (isset($validated['co_name_shop'])) {
-                $item->whereHas('company.co_parent', function ($query) use ($validated) {
+                $item->whereHas('contract_wms.company.co_parent', function ($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name_shop']) . '%');
                 });
             }
             if (isset($validated['co_name_agency'])) {
-                $item->whereHas('company', function ($query) use ($validated) {
+                $item->whereHas('contract_wms.company', function ($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name_agency']) . '%', 'and', 'co_type', '=', 'shipper');
                 });
             }
@@ -671,12 +671,12 @@ class ItemController extends Controller
                 $item->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
             }
             if (isset($validated['co_name_shop'])) {
-                $item->whereHas('company.co_parent', function ($query) use ($validated) {
+                $item->whereHas('ContractWms.company.co_parent', function ($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name_shop']) . '%');
                 });
             }
             if (isset($validated['co_name_agency'])) {
-                $item->whereHas('company', function ($query) use ($validated) {
+                $item->whereHas('ContractWms.company', function ($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name_agency']) . '%', 'and', 'co_type', '=', 'shipper');
                 });
             }
