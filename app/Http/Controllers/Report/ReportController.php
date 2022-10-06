@@ -256,7 +256,7 @@ class ReportController extends Controller
                 });
             }
             if (isset($validated['co_parent_name'])) {
-                $reports->whereHas('warehousing.co_no.co_parent',function($query) use ($validated) {              
+                $reports->whereHas('warehousing.co_no.co_parent',function($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like','%'. strtolower($validated['co_parent_name']) .'%');
                 });
             }
@@ -326,12 +326,12 @@ class ReportController extends Controller
                 $reports->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
             }
 
-            if (isset($validated['rp_cate'])) {
+            if (isset($validated['rp_cate']) && $validated['rp_cate'] != '전체') {
                     $reports->where('rp_cate', '=', $validated['rp_cate']);
-              
+
             }
             if (isset($validated['co_parent_name'])) {
-                $reports->whereHas('warehousing.co_no.co_parent',function($query) use ($validated) {              
+                $reports->whereHas('warehousing.co_no.co_parent',function($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like','%'. strtolower($validated['co_parent_name']) .'%');
                 });
             }
