@@ -29,7 +29,7 @@ class ScheduleShipmentController extends Controller
      * 
      * @return \Illuminate\Http\JsonResponse
      */
-    public function paginateScheduleShipments(ScheduleShipmentSearchRequest $request)
+    public function paginateScheduleShipments(ScheduleShipmentRequest $request)
     {
         try {
             
@@ -80,7 +80,7 @@ class ScheduleShipmentController extends Controller
 
             if (isset($validated['co_parent_name'])) {
                 $schedule_shipment->whereHas('ContractWms.company.co_parent', function ($query) use ($validated) {
-                    $query->where(DB::raw('lower(ContractWms.company.co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                    $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
                 });
             }
 

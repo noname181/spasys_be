@@ -264,6 +264,12 @@ class ScheduleShipmentRequest extends BaseFormRequest
                 'nullable',
                 'int',
             ],
+            'co_parent_name' => [
+                '',
+            ],
+            'co_name' => [
+                '',
+            ],
         ];
     }
 
