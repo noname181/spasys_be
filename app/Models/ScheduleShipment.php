@@ -88,7 +88,7 @@ class ScheduleShipment extends Model
     }
     public function schedule_shipment_info()
     {
-        return $this->belongsTo(ScheduleShipmentInfo::class, 'ss_no', 'ss_no');
+        return $this->belongsTo(ScheduleShipmentInfo::class, 'ss_no', 'ss_no')->with('item');
     }
 
     public function ContractWms()
