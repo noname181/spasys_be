@@ -26,10 +26,10 @@ class Import extends Model
          "ti_status",
          "ti_logistic_manage_number",
          "ti_carry_in_number",
-         "ti_register_id", 
+         "ti_register_id",
          "ti_i_date",
          "ti_i_time",
-         "ti_i_report_type", 
+         "ti_i_report_type",
          "ti_i_division_type",
          "ti_i_confirm_number",
          "ti_i_order",
@@ -55,9 +55,14 @@ class Import extends Model
 
     public function export()
     {
-        return $this->hasMany(Export::class, 'te_logistic_manage_number', 'tie_logistic_manage_number');
+        return $this->hasOne(Export::class, 'te_logistic_manage_number', 'tie_logistic_manage_number');
     }
 
-    
+    public function export_confirm()
+    {
+        return $this->hasOne(ExportConfirm::class, 'tec_logistic_manage_number', 'tie_logistic_manage_number');
+    }
+
+
 
 }
