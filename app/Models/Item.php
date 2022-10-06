@@ -52,6 +52,7 @@ class Item extends Model
         'item_manufacturer',
         'product_id',
         'item_service_name',
+        'supply_code'
     ];
 
     protected $casts = [
@@ -89,7 +90,7 @@ class Item extends Model
     }
     public function ContractWms()
     {
-        return $this->hasOne(ContractWms::class, 'cw_code', 'product_id')->where('cw_tab','=','공급처')->with('company');
+        return $this->hasOne(ContractWms::class, 'cw_code', 'supply_code')->where('cw_tab','=','공급처')->with('company');
 
     }
 }
