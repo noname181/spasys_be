@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\ItemChannel;
 use App\Models\WarehousingItem;
 use App\Models\ItemInfo;
+use App\Models\ContractWms;
 
 
 class Item extends Model
@@ -51,6 +52,7 @@ class Item extends Model
         'item_manufacturer',
         'product_id',
         'item_service_name',
+        'supply_code'
     ];
 
     protected $casts = [
@@ -86,5 +88,9 @@ class Item extends Model
     {
         return $this->belongsTo(ItemInfo::class, 'item_no', 'item_no');
     }
-    
+    public function ContractWms()
+    {
+        return $this->hasOne(ContractWms::class, 'cw_code', 'supply_code')->where('cw_tab','=','공급처')->with('company');
+
+    }
 }
