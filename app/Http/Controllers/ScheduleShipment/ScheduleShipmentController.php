@@ -42,7 +42,7 @@ class ScheduleShipmentController extends Controller
             if( $request->type == 'page136'){
              $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->whereNull('trans_no')->orderBy('ss_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
         }else{
-            $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->orderBy('ss_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
+            $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->whereNotNull('trans_no')->orderBy('ss_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
         }
             return response()->json($schedule_shipment);
         } catch (\Exception $e) {
