@@ -38,8 +38,12 @@ class ScheduleShipmentController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
+           
+            if( $request->type == 'page136'){
+             $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->whereNull('trans_no')->orderBy('ss_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
+        }else{
             $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->orderBy('ss_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
-
+        }
             return response()->json($schedule_shipment);
         } catch (\Exception $e) {
             Log::error($e);
