@@ -104,7 +104,18 @@ class ContractwmsController extends Controller
         }
     }
 
-
+    public function deleteContractWms(ContractWms $contractWms)
+    {
+        try {
+            $contractWms->delete();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0006], 500);
+        }
+    }
 
 
 }
