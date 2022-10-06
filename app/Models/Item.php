@@ -52,6 +52,7 @@ class Item extends Model
         'item_manufacturer',
         'product_id',
         'item_service_name',
+        'supply_code'
     ];
 
     protected $casts = [
