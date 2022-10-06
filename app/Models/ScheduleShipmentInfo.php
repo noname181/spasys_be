@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Models\Item;
 
 class ScheduleShipmentInfo extends Model
 {
@@ -51,5 +51,9 @@ class ScheduleShipmentInfo extends Model
     ];
 
 
+    public function item()
+    {
+        return $this->hasOne(Item::class, 'produc_id', 'produc_id');
+    }
     
 }

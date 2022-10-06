@@ -129,7 +129,7 @@ class ImportScheduleController extends Controller
             $import_schedule = ImportExpected::with(['import','company'])->groupBy('t_import_expected.tie_logistic_manage_number')->leftjoin('t_export', 't_import_expected.tie_logistic_manage_number', '=', 't_export.te_logistic_manage_number')
             ->select(['t_import_expected.*','t_export.te_logistic_manage_number','t_export.te_carry_out_number'])
             ->where('tie_is_date','>=','2022-01-04')->where('tie_is_date','<=','2022-10-04')
-            ->groupBy('t_export.te_logistic_manage_number','t_export.te_carry_out_number');
+            ->groupBy('t_export.te_logistic_manage_number','t_export.te_carry_out_number')->orderBy('t_export.te_carry_out_number','DESC');
 
             //return DB::getQueryLog();
 
