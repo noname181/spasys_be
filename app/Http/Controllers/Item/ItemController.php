@@ -649,11 +649,15 @@ class ItemController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
             if($user->mb_type == 'shop'){
-                $item = Item::with(['file', 'company','item_channels','item_info'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('company.co_parent',function($q) use ($user){
+                $item = Item::with(['file', 'company','item_channels','item_info'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('item_info',function($e){
+                    $e->whereNotNull('stock');
+                })->whereHas('company.co_parent',function($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->orderBy('item_no', 'DESC');
             }else if ($user->mb_type == 'shipper'){
-                $item = Item::with(['file', 'company','item_channels','item_info'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('company',function($q) use ($user){
+                $item = Item::with(['file', 'company','item_channels','item_info'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('item_info',function($e){
+                    $e->whereNotNull('stock');
+                })->whereHas('company',function($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->orderBy('item_no', 'DESC');
             }else if($user->mb_type == 'spasys'){
