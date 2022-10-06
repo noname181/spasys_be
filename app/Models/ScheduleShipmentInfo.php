@@ -50,5 +50,6 @@ class ScheduleShipmentInfo extends Model
 
     ];
 
+
     
 }

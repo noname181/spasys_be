@@ -638,6 +638,118 @@ class ItemController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
+    public function paginateItemsApiStock(ItemSearchRequest $request)
+    {
+        $validated = $request->validated();
+        try {
+            DB::enableQueryLog();
+            // If per_page is null set default data = 15
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+            $user = Auth::user();
+            if($user->mb_type == 'shop'){
+                $item = Item::with(['file', 'company','item_channels','item_info'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('company.co_parent',function($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->orderBy('item_no', 'DESC');
+            }else if ($user->mb_type == 'shipper'){
+                $item = Item::with(['file', 'company','item_channels','item_info'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('company',function($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->orderBy('item_no', 'DESC');
+            }else if($user->mb_type == 'spasys'){
+                $item = Item::with(['file', 'company','item_channels','item_info'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('item_info',function($e){
+                    $e->whereNotNull('stock');
+                })->whereHas('company.co_parent.co_parent',function($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->orderBy('item_no', 'DESC');
+            }
+            if (isset($validated['from_date'])) {
+                $item->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            }
+
+            if (isset($validated['to_date'])) {
+                $item->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            }
+            if (isset($validated['co_name_shop'])) {
+                $item->whereHas('company.co_parent',function($query) use ($validated) {
+                    $query->where(DB::raw('lower(co_name)'), 'like','%'. strtolower($validated['co_name_shop']) .'%');
+                });
+            }
+            if (isset($validated['co_name_agency'])) {
+                $item->whereHas('company',function($query) use ($validated) {
+                    $query->where(DB::raw('lower(co_name)'), 'like','%'. strtolower($validated['co_name_agency']) .'%', 'and' , 'co_type' , '=' , 'shipper');
+                });
+            }
+            if (isset($validated['item_name'])) {
+                $item->where(function($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_name)'), 'like','%'. strtolower($validated['item_name']) .'%');
+                });
+            }
+            if (isset($validated['item_cargo_bar_code'])) {
+                $item->where(function($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_cargo_bar_code)'), 'like','%'. strtolower($validated['item_cargo_bar_code']) .'%');
+                });
+            }
+            if (isset($validated['item_channel_code'])) {
+                $item->whereHas('item_channels',function($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_channel_name)'), 'like','%'. strtolower($validated['item_channel_name']) .'%');
+                });
+            }
+            if (isset($validated['item_bar_code'])) {
+                $item->where(function($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_bar_code)'), 'like','%'. strtolower($validated['item_bar_code']) .'%');
+                });
+            }
+            if (isset($validated['item_upc_code'])) {
+                $item->where(function($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_upc_code)'), 'like','%'. strtolower($validated['item_upc_code']) .'%');
+                });
+            }
+            if (isset($validated['item_channel_name'])) {
+                $item->whereHas('item_channels',function($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_channel_name)'), 'like','%'. strtolower($validated['item_channel_name']) .'%');
+                });
+            }
+            $item2 = $item->get();
+            $count_check = 0;
+            $item3 = collect($item2)->map(function ($q){
+                $item4 = Item::with(['item_info'])->where('item_no', $q->item_no)->first();
+                if(isset($item4['item_info']['stock'])){
+                return [ 'total_amount' => $item4['item_info']['stock']];
+                }
+            })->sum('total_amount');
+            $item5 = collect($item2)->map(function ($q){
+                $item6 = Item::with(['item_info'])->where('item_no', $q->item_no)->first();
+                if(isset($item6['item_info']['stock'])){
+                return [ 'total_price' => $item6->item_price2 * $item6['item_info']['stock']];
+                }
+            })->sum('total_price');
+
+
+            $item = $item->paginate($per_page, ['*'], 'page', $page);
+
+            $custom = collect(['sum1' => $item3,'sum2'=>$item5]);
+
+            //return DB::getQueryLog();
+            $item->setCollection(
+                $item->getCollection()->map(function ($q){
+                    $item = Item::with(['item_info'])->where('item_no', $q->item_no)->first();
+                    if(isset($item['item_info']['stock'])){
+                        $q->total_price_row = $item->item_price2 * $item['item_info']['stock'];
+                    }
+                    return $q;
+                })
+            );
+
+            $data = $custom->merge($item);
+
+            return response()->json($data);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
 
 
     public function getItemById(Item $item)

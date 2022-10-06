@@ -38,12 +38,13 @@ class ScheduleShipmentController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $schedule_shipment = ScheduleShipment::with('schedule_shipment_info')->orderBy('ss_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
+            $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->orderBy('ss_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
 
             return response()->json($schedule_shipment);
         } catch (\Exception $e) {
             Log::error($e);
-            return response()->json(['message' => Messages::MSG_0018], 500);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018,], 500);
         }
     }
     public function apiScheduleShipments(Request $request)
@@ -55,6 +56,7 @@ class ScheduleShipmentController extends Controller
             $user = Auth::user();
                 foreach ($request->data as $i_schedule => $schedule) {
                     $ss_no = ScheduleShipment::insertGetId([
+                        'co_no' => $user->co_no,
                         'seq' => $schedule['seq'],
                         'pack' => $schedule['pack'],
                         'shop_code' => $schedule['shop_id'],
@@ -99,6 +101,7 @@ class ScheduleShipmentController extends Controller
                     foreach ($schedule['order_products'] as $ss_info => $schedule_info) {
                         $ss_info_no = ScheduleShipmentInfo::insertGetId([
                             'ss_no' => $ss_no,
+                            'co_no' => $user->co_no,
                             'barcode' => $schedule_info['barcode'],
                             'brand' => $schedule_info['brand'],
                             'cancel_date' => $schedule_info['cancel_date'],
