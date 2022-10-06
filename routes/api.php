@@ -329,7 +329,9 @@ Route::middleware('auth')->group(function () {
         });
 
         Route::get('/monthly_bill_list/{rgd_no}/{bill_type}', [\App\Http\Controllers\RateData\RateDataController::class, 'monthly_bill_list'])->name('monthly_bill_list');
-
+        Route::get('/get_spasys1_from_te/{is_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'getspasys1fromte'])->name('get_spasys1_from_te');
+        Route::get('/get_spasys2_from_te/{is_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'getspasys2fromte'])->name('get_spasys2_from_te');
+        Route::get('/get_spasys3_from_te/{is_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'getspasys3fromte'])->name('get_spasys3_from_te');
         //REGISTER GENERAL DATA 유통가공
         Route::post('/general', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general'])->name('registe_rate_data_general');
         Route::post('/general_final', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_final'])->name('registe_rate_data_general_final');

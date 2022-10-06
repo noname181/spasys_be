@@ -11,10 +11,12 @@ use App\Models\File;
 use App\Models\ReceivingGoodsDelivery;
 use App\Models\RateData;
 use App\Models\AdjustmentGroup;
+use App\Models\Company;
 use App\Models\Warehousing;
 use App\Models\RateDataGeneral;
 use App\Models\RateMeta;
 use App\Models\RateMetaData;
+use App\Models\Export;
 use App\Utils\CommonFunc;
 use App\Utils\Messages;
 use Illuminate\Support\Facades\Auth;
@@ -800,7 +802,53 @@ class RateDataController extends Controller
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
+    public function getspasys1fromte($is_no)
+    {
+       
+        try {
+           
+            $export = Export::with(['import'])->where('te_carry_out_number', $is_no)->first();
+            $company = Company::where('co_license',$export->import->ti_co_license)->first();
 
+            $rate_data = RateData::where('rd_cate_meta1', '보세화물')->where('co_no', $company->co_no);
+            $rate_data = $rate_data->get();
+            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+    public function getspasys2fromte($is_no)
+    {
+       
+        try {
+            $export = Export::with(['import'])->where('te_carry_out_number', $is_no)->first();
+            $company = Company::where('co_license',$export->import->ti_co_license)->first();
+            $rate_data = RateData::where('rd_cate_meta1', '수입풀필먼트')->where('co_no', $company->co_no);
+            $rate_data = $rate_data->get();
+            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+    public function getspasys3fromte($is_no)
+    {
+        $user = Auth::user();
+        try {
+            $export = Export::with(['import'])->where('te_carry_out_number', $is_no)->first();
+            $company = Company::where('co_license',$export->import->ti_co_license)->first();
+            $rate_data = RateData::where('rd_cate_meta1', '유통가공')->where('co_no', $company->co_no);
+            $rate_data = $rate_data->get();
+            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
     public function getSpasysRateData()
     {
         $user = Auth::user();
