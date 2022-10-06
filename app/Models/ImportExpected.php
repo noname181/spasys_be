@@ -43,7 +43,7 @@ class ImportExpected extends Model
     protected $casts = [
         'created_at' => "date:Y.m.d H:i",
         'updated_at' => "date:Y.m.d H:i",
-        'tie_is_date' => "date:Y.m.d H:i",
+        'tie_is_date' => "date:Y.m.d",
     ];
 
     public function import()

@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Import;
+use App\Models\ImportExpected;
+use App\Models\ExportConfirm;
 class Export extends Model
 {
     use HasFactory;
@@ -59,6 +61,16 @@ class Export extends Model
     public function import()
     {
         return $this->hasOne(Import::class, 'ti_logistic_manage_number', 'te_logistic_manage_number');
+
+    }
+    public function t_export_confirm()
+    {
+        return $this->hasOne(ExportConfirm::class, 'tec_logistic_manage_number', 'te_logistic_manage_number');
+
+    }
+    public function import_expected()
+    {
+        return $this->hasOne(ImportExpected::class, 'tie_logistic_manage_number', 'te_logistic_manage_number');
 
     }
 

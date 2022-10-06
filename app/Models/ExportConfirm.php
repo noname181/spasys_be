@@ -21,14 +21,14 @@ class ExportConfirm extends Model
      * @var string[]
      */
     protected $fillable = [
-         'ti_no',
-         "ti_status",
-         "ti_logistic_manage_number",
-         "ti_ec_confirm_number",
-         "ti_ec_type",
-         "ti_ec_date",
-         "ti_register_id",
-         "ti_ec_number",
+         'tec_no',
+         "tec_status",
+         "tec_logistic_manage_number",
+         "tec_ec_confirm_number",
+         "tec_ec_type",
+         "tec_ec_date",
+         "tec_register_id",
+         "tec_number",
          'created_at',
          'updated_at',
     ];
@@ -36,6 +36,7 @@ class ExportConfirm extends Model
     protected $casts = [
         'created_at' => "date:Y.m.d H:i",
         'updated_at' => "date:Y.m.d H:i",
+        'tec_ec_date' => "date:Y.m.d",
     ];
 
 }

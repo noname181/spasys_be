@@ -355,10 +355,10 @@ class CompanyController extends Controller
     }
     public function getCompanyFromtcon($tcon)
     {
-        $export = Export::with(['import'])->where('te_carry_out_number', $tcon)->first();
+        $export = Export::with(['import','import_expected','t_export_confirm'])->where('te_carry_out_number', $tcon)->first();
         $company = Company::where('co_license',$export->import->ti_co_license)->first();
         $adjustment_group = AdjustmentGroup::where('co_no','=',$company->co_no)->first();
-        return response()->json(['company'=>$company,'adjustment_group'=>$adjustment_group]);
+        return response()->json(['export'=>$export,'company'=>$company,'adjustment_group'=>$adjustment_group]);
     }
     public function  getShopCompaniesMobile(CompanySearchRequest $request)
     {
