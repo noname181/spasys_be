@@ -93,7 +93,7 @@ class ScheduleShipment extends Model
 
     public function ContractWms()
     {
-        return $this->hasOne(ContractWms::class, 'cw_code', 'shop_code')->with('company');
+        return $this->hasOne(ContractWms::class, 'cw_code', 'shop_code')->where('cw_tab','=','판매처')->with('company');
 
     }
     
