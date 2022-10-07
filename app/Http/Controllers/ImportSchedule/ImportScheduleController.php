@@ -123,13 +123,33 @@ class ImportScheduleController extends Controller
             on 
             aaa.tie_logistic_manage_number = bbb.te_logistic_manage_number"));
 
-           
+
+            
             DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
-          
-            $import_schedule = ImportExpected::with(['import','company'])->groupBy('t_import_expected.tie_logistic_manage_number')->leftjoin('t_export', 't_import_expected.tie_logistic_manage_number', '=', 't_export.te_logistic_manage_number')
+            $user = Auth::user();
+            if($user->mb_type == 'shop'){
+                $import_schedule = ImportExpected::with(['import','company'])->whereHas('company.co_parent', function ($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->groupBy('t_import_expected.tie_logistic_manage_number')->leftjoin('t_export', 't_import_expected.tie_logistic_manage_number', '=', 't_export.te_logistic_manage_number')
             ->select(['t_import_expected.*','t_export.te_logistic_manage_number','t_export.te_carry_out_number'])
             ->where('tie_is_date','>=','2022-01-04')->where('tie_is_date','<=','2022-10-04')
             ->groupBy('t_export.te_logistic_manage_number','t_export.te_carry_out_number')->orderBy('t_export.te_carry_out_number','DESC');
+            }else if($user->mb_type == 'shipper'){
+                $import_schedule = ImportExpected::with(['import','company'])->whereHas('company', function ($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->groupBy('t_import_expected.tie_logistic_manage_number')->leftjoin('t_export', 't_import_expected.tie_logistic_manage_number', '=', 't_export.te_logistic_manage_number')
+            ->select(['t_import_expected.*','t_export.te_logistic_manage_number','t_export.te_carry_out_number'])
+            ->where('tie_is_date','>=','2022-01-04')->where('tie_is_date','<=','2022-10-04')
+            ->groupBy('t_export.te_logistic_manage_number','t_export.te_carry_out_number')->orderBy('t_export.te_carry_out_number','DESC');
+            }else if($user->mb_type == 'spasys'){
+                $import_schedule = ImportExpected::with(['import','company'])->whereHas('company.co_parent.co_parent', function ($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->groupBy('t_import_expected.tie_logistic_manage_number')->leftjoin('t_export', 't_import_expected.tie_logistic_manage_number', '=', 't_export.te_logistic_manage_number')
+            ->select(['t_import_expected.*','t_export.te_logistic_manage_number','t_export.te_carry_out_number'])
+            ->where('tie_is_date','>=','2022-01-04')->where('tie_is_date','<=','2022-10-04')
+            ->groupBy('t_export.te_logistic_manage_number','t_export.te_carry_out_number')->orderBy('t_export.te_carry_out_number','DESC');
+            }
+            
 
             //return DB::getQueryLog();
 
@@ -149,8 +169,8 @@ class ImportScheduleController extends Controller
             }
 
             if (isset($validated['co_parent_name'])) {
-                $companies->whereHas('company.co_parent', function ($query) use ($validated) {
-                    $query->where(DB::raw('lower(co_parent.co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                $import_schedule->whereHas('company.co_parent', function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
                 });
             }
 
@@ -171,7 +191,14 @@ class ImportScheduleController extends Controller
             if (isset($validated['logistic_manage_number'])) {
                 $import_schedule->where('logistic_manage_number', 'like', '%' . $validated['logistic_manage_number'] . '%');
             }
-
+            if (isset($validated['tie_status'])) {
+                $import_schedule->where('tie_status', '=', $validated['tie_status']);
+            }
+            if (isset($validated['ti_status'])) {
+                $import_schedule->whereHas('import', function($q) use($validated) {
+                    return $q->where('ti_status', '=', $validated['ti_status']);
+                });
+            }
             // if (isset($validated['import_schedule_status1']) || isset($validated['import_schedule_status2'])) {
             //     $import_schedule->where(function($query) use ($validated) {
             //         $query->orwhere('import_schedule_status', '=', $validated['import_schedule_status1']);

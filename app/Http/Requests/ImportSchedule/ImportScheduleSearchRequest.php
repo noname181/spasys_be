@@ -32,6 +32,10 @@ class ImportScheduleSearchRequest extends BaseFormRequest
                 'string',
                 'date_format:Y-m-d'
             ],
+            'co_parent_name' => [
+                'nullable',
+                'string',
+            ],
             'co_name' => [
                 'nullable',
                 'string',
@@ -55,6 +59,12 @@ class ImportScheduleSearchRequest extends BaseFormRequest
             'page' => [
                 'nullable',
                 'int',
+            ],
+            'tie_status' => [
+                '',
+            ],
+            'ti_status' => [
+                'nullable',
             ],
         ];
     }

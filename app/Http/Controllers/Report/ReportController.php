@@ -316,7 +316,20 @@ class ReportController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 5;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $reports = Report::with(['files', 'reports_child','warehousing'])->orderBy('rp_parent_no', 'DESC');
+            $user = Auth::user();
+            if($user->mb_type == 'shop'){
+                $reports = Report::with(['files', 'reports_child','warehousing'])->whereHas('warehousing.co_no.co_parent',function ($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->orderBy('rp_parent_no', 'DESC');
+            }else if($user->mb_type == 'shipper'){
+                $reports = Report::with(['files', 'reports_child','warehousing'])->whereHas('warehousing.co_no',function ($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->orderBy('rp_parent_no', 'DESC');
+            }else if($user->mb_type == 'spasys'){
+                $reports = Report::with(['files', 'reports_child','warehousing'])->whereHas('warehousing.co_no.co_parent.co_parent',function ($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->orderBy('rp_parent_no', 'DESC');
+            }
 
             if (isset($validated['from_date'])) {
                 $reports->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
