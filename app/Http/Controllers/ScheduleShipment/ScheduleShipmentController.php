@@ -29,7 +29,7 @@ class ScheduleShipmentController extends Controller
      * 
      * @return \Illuminate\Http\JsonResponse
      */
-    public function paginateScheduleShipments(ScheduleShipmentRequest $request)
+    public function paginateScheduleShipments(ScheduleShipmentSearchRequest $request)
     {
         try {
             
