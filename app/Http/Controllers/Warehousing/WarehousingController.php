@@ -31,6 +31,11 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Item;
 use App\Utils\CommonFunc;
 
+use File;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use App\Models\ImportSchedule;
+
 class WarehousingController extends Controller
 {
     /**
@@ -1875,5 +1880,101 @@ class WarehousingController extends Controller
             'message' => 'Upload dữ liệu thành công',
             'status' => 1
         ], 201);
+    }
+
+    public function scheduleListImport(Request $request){
+        return response()->json([
+            'message' => 'Upload dữ liệu thành công',
+            'status' => 1
+        ], 201);
+    }
+    public function downloadBondedSettlement(Request $request){
+        try {
+            $user = Auth::user();
+            $per_page = isset($request['per_page']) ? $request['per_page'] : 100000;
+            $page = isset($request['page']) ? $request['page'] : 1;
+            // $import_schedule = ImportSchedule::with('co_no')->with('files')->orderBy('is_no', 'DESC');
+    
+            // if (isset($request['from_date'])) {
+            //     $import_schedule->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($request['from_date'])));
+            // }
+    
+            // if (isset($request['to_date'])) {
+            //     $import_schedule->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($request['to_date'])));
+            // }
+    
+            // if (isset($request['co_name'])) {
+            //     $import_schedule->whereHas('co_no', function($q) use($request) {
+            //         return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($request['co_name']) . '%');
+            //     });
+            // }
+    
+            // if (isset($request['m_bl'])) {
+            //     $import_schedule->where('m_bl', 'like', '%' . $request['m_bl'] . '%');
+            // }
+    
+            // if (isset($request['h_bl'])) {
+            //     $import_schedule->where('h_bl', 'like', '%' . $request['h_bl'] . '%');
+            // }
+    
+            // if (isset($request['logistic_manage_number'])) {
+            //     $import_schedule->where('logistic_manage_number', 'like', '%' . $request['logistic_manage_number'] . '%');
+            // }
+    
+            // $import_schedule = $import_schedule->get();
+    
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+    
+            $sheet->setCellValue('A1', 'No'); 
+            $sheet->setCellValue('B1', '가맹점');
+            $sheet->setCellValue('C1', '화주'); 
+            $sheet->setCellValue('D1', '서비스'); 
+            $sheet->setCellValue('E1', '정산주기'); 
+            $sheet->setCellValue('F1', '화물번호'); 
+            $sheet->setCellValue('G1', '입고번호');
+            $sheet->setCellValue('H1', '청구번호'); 
+            $sheet->setCellValue('I1', '유형');
+    
+            $num_row = 2;
+            // $data_schedules =  json_decode($import_schedule);
+            if(!empty($data_schedules)){
+                foreach($data_schedules as $data){
+                    $sheet->setCellValue('A'.$num_row, '');
+                    $sheet->setCellValue('B'.$num_row, ''); 
+                    $sheet->setCellValue('C'.$num_row, '');
+                    $sheet->setCellValue('D'.$num_row, ''); 
+                    $sheet->setCellValue('E'.$num_row, ''); 
+                    $sheet->setCellValue('F'.$num_row, ''); 
+                    $sheet->setCellValue('G'.$num_row, ''); 
+                    $sheet->setCellValue('H'.$num_row, ''); 
+                    $sheet->setCellValue('I'.$num_row, '');
+                    $num_row++;
+                }
+            }
+            
+            $Excel_writer = new Xlsx($spreadsheet);
+            if(isset($user->mb_no)){
+                $path = '../storage/download/'.$user->mb_no.'/';
+            }else{
+                $path = '../storage/download/no-name/';
+            }
+            if (!is_dir($path)) {
+                File::makeDirectory($path, $mode = 0777, true, true);
+            }
+            $mask = $path.'DownloadBondedSettlement-*.*';
+            array_map('unlink', glob($mask));
+            $file_name_download = $path.'DownloadBondedSettlement-'.date('YmdHis').'.Xlsx';
+            $Excel_writer->save($file_name_download);
+            return response()->json([
+                'status' => 1,
+                'link_download' => $file_name_download,
+                'message' => 'Download File'
+            ], 500);
+            ob_end_clean();
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+        }
     }
 }
