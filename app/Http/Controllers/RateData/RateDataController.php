@@ -1838,4 +1838,10 @@ class RateDataController extends Controller
             'rmd_no' => $rmd ?  $rmd->rmd_no : null,
         ], 200);
     }
+    public function download_final_month_bill_issue(Request $request){
+        return response()->json([
+            'message' => 'No data',
+            'status' => 1,
+        ], 201);
+    }    
 }

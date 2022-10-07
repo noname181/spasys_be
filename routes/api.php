@@ -401,5 +401,9 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/import_excel_distribution', [\App\Http\Controllers\Warehousing\WarehousingController::class,'importExcelDistribution']);
     Route::post('/update_rgd_status3', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'updateRgdState3'])->name('update_rgd_status3');
+
+    Route::post('/schedule_list_import', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'scheduleListImport']);
+    Route::post('/download_bonded_settlement', [\App\Http\Controllers\Warehousing\WarehousingController::class,'downloadBondedSettlement']);
+    Route::post('/download_final_month_bill_issue', [\App\Http\Controllers\RateData\RateDataController::class, 'download_final_month_bill_issue']);
 });
 
