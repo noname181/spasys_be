@@ -42,7 +42,7 @@ class ScheduleShipmentController extends Controller
            
             if( $request->type == 'page136'){
                 if ($user->mb_type == 'shop') {
-                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->whereNull('trans_no')->whereHas('ContractWms.company', function ($q) use ($user){
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->whereNull('trans_no')->whereHas('ContractWms.company.co_parent', function ($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     })->orderBy('ss_no', 'DESC');
                 }else if($user->mb_type == 'shipper'){
@@ -56,7 +56,7 @@ class ScheduleShipmentController extends Controller
                 }
             }else{
                 if ($user->mb_type == 'shop') {
-                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->whereNotNull('trans_no')->whereHas('ContractWms.company', function ($q) use ($user){
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->whereNotNull('trans_no')->whereHas('ContractWms.company.co_parent', function ($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     })->orderBy('ss_no', 'DESC');
                 }else if($user->mb_type == 'shipper'){
