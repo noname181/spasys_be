@@ -316,6 +316,7 @@ class ReportController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 5;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
+            
             $reports = Report::with(['files', 'reports_child','warehousing'])->orderBy('rp_parent_no', 'DESC');
 
             if (isset($validated['from_date'])) {
