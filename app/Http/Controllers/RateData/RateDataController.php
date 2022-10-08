@@ -1233,7 +1233,7 @@ class RateDataController extends Controller
                 ]);
             }
 
-            if($request->bill_type == 'expectation' || $request->bill_type == 'expectation_monthly' || $request->bill_type == 'final'){
+            if($request->bill_type == 'expectation' || $request->bill_type == 'expectation_monthly'){
                 ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_status4' => $request->status,
                     'rgd_bill_type' => $request->bill_type,
