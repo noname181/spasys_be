@@ -1862,7 +1862,7 @@ class WarehousingController extends Controller
                     }
                     if($warehouse['A'] == $warehousing_item['A']){
                         $warehousingItem = WarehousingItem::where('item_no','=',$warehousing_item['B'])->where('w_no','=',$warehousing_item['A'])->first();
-                        if(!empty($warehousing_item['C'])){
+                        if(!empty($warehousingItem) && !empty($warehousing_item['C'])){
                             $total_wi_number[$warehousing_item['A']][] = $warehousing_item['C'];
                             $warehousingItem->update(array(
                                 'w_no' => $warehousing_item['A'],
@@ -1870,9 +1870,6 @@ class WarehousingController extends Controller
                                 'wi_number' => $warehousing_item['C']
                             ));
                         }
-                        // Warehousing::update(
-                        //     'w_schedule_amount' => array_sum(array_column($total_wi_number,$warehousing_item['A']))
-                        // );
                     }
                 }
                 $check_update = 1;
