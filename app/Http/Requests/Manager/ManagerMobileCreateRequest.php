@@ -57,6 +57,7 @@ class ManagerMobileCreateRequest extends BaseFormRequest
             ],
             'm_etc' => [
                 'string',
+                'nullable',
             ],
             'm_email' => [
                 'string',
