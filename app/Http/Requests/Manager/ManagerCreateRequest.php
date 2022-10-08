@@ -57,6 +57,7 @@ class ManagerCreateRequest extends BaseFormRequest
             ],
             '*.m_etc' => [
                 'string',
+                'nullable',
             ],
             '*.m_email' => [
                 'string',
