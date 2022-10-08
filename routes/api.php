@@ -405,5 +405,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/schedule_list_import', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'scheduleListImport']);
     Route::post('/download_bonded_settlement', [\App\Http\Controllers\Warehousing\WarehousingController::class,'downloadBondedSettlement']);
     Route::post('/download_final_month_bill_issue', [\App\Http\Controllers\RateData\RateDataController::class, 'download_final_month_bill_issue']);
+    Route::post('/download_est_casebill', function(){
+        $data['status'] = 1;
+        return json_encode($data);
+    });
 });
 

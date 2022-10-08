@@ -51,8 +51,8 @@ class ManagerUpdateRequest extends BaseFormRequest
                 'regex:/[0-9]{3}-[0-9]{4}-[0-9]{4}$/',
             ],
             'm_etc' => [
-                'required',
                 'string',
+                'nullable',
             ],
             'm_email' => [
                 'required',

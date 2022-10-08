@@ -1839,52 +1839,60 @@ class WarehousingController extends Controller
         $sheet2 = $spreadsheet->getSheet(1);
         $warehousing_item_data = $sheet2->toArray(null, true, true, true);
 
+        $check_update = 0;
         foreach($warehousing_data as $key=>$warehouse){
             if($key <= 2){
                 continue;
             }
-
+            if(!empty($warehouse['A'])){
             $receivingGoodsDelivery = ReceivingGoodsDelivery::where('w_no', '=', $warehouse['A'])->first();
-            $receivingGoodsDelivery->update(array(
-                'co_name' => isset($warehouse['B'])?$warehouse['B']:'',
-                'rgd_contents' => isset($warehouse['C'])?$warehouse['C']:'',
-                'rgd_address' => isset($warehouse['D'])?$warehouse['D']:'',
-                'rgd_address_detail' => isset($warehouse['E'])?$warehouse['E']:'',
-                'rgd_receiver' => isset($warehouse['F'])?$warehouse['F']:'',
-                'rgd_hp' => isset($warehouse['G'])?$warehouse['G']:'',
-                'rgd_memo' => isset($warehouse['H'])?$warehouse['H']:''
-            ));
-            $total_wi_number = array();
-            foreach($warehousing_item_data as $key2 => $warehousing_item){
-                if($key2 <= 2){
-                    continue;
-                }
-                if($warehouse['A'] == $warehousing_item['A']){
-                    $warehousingItem = WarehousingItem::where('item_no','=',$warehousing_item['B'])->where('w_no','=',$warehousing_item['A'])->first();
-                    if(!empty($warehousing_item['C'])){
-                        $total_wi_number[$warehousing_item['A']][] = $warehousing_item['C'];
-                        $warehousingItem->update(array(
-                            'w_no' => $warehousing_item['A'],
-                            'item_no' => $warehousing_item['B'],
-                            'wi_number' => $warehousing_item['C']
-                        ));
+                $receivingGoodsDelivery->update(array(
+                    'co_name' => isset($warehouse['B'])?$warehouse['B']:'',
+                    'rgd_contents' => isset($warehouse['C'])?$warehouse['C']:'',
+                    'rgd_address' => isset($warehouse['D'])?$warehouse['D']:'',
+                    'rgd_address_detail' => isset($warehouse['E'])?$warehouse['E']:'',
+                    'rgd_receiver' => isset($warehouse['F'])?$warehouse['F']:'',
+                    'rgd_hp' => isset($warehouse['G'])?$warehouse['G']:'',
+                    'rgd_memo' => isset($warehouse['H'])?$warehouse['H']:''
+                ));
+                $total_wi_number = array();
+                foreach($warehousing_item_data as $key2 => $warehousing_item){
+                    if($key2 <= 2){
+                        continue;
                     }
-                    // Warehousing::update(
-                    //     'w_schedule_amount' => array_sum(array_column($total_wi_number,$warehousing_item['A']))
-                    // );
+                    if($warehouse['A'] == $warehousing_item['A']){
+                        $warehousingItem = WarehousingItem::where('item_no','=',$warehousing_item['B'])->where('w_no','=',$warehousing_item['A'])->first();
+                        if(!empty($warehousingItem) && !empty($warehousing_item['C'])){
+                            $total_wi_number[$warehousing_item['A']][] = $warehousing_item['C'];
+                            $warehousingItem->update(array(
+                                'w_no' => $warehousing_item['A'],
+                                'item_no' => $warehousing_item['B'],
+                                'wi_number' => $warehousing_item['C']
+                            ));
+                        }
+                    }
                 }
+                $check_update = 1;
             }
         }
-        DB::commit();
-        return response()->json([
-            'message' => 'Upload dữ liệu thành công',
-            'status' => 1
-        ], 201);
+        if($check_update == 1){
+            DB::commit();
+            return response()->json([
+                'message' => '데이터 업로드 성공',
+                'status' => 1
+            ], 201);
+        }else{
+            DB::rollback();
+            return response()->json([
+                'message' => '데이터 가져오기 실패',
+                'status' => 0
+            ], 201);
+        }
     }
 
     public function scheduleListImport(Request $request){
         return response()->json([
-            'message' => 'Upload dữ liệu thành công',
+            'message' => '데이터 업로드 성공',
             'status' => 1
         ], 201);
     }
