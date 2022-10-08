@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Contract;
 use App\Models\Warehousing;
+use App\Models\CompanyPayment;
 use App\Models\ScheduleShipmentInfo;
 
 class Company extends Model
@@ -79,6 +80,11 @@ class Company extends Model
     public function warehousing()
     {
         return $this->hasOne(Warehousing::class, 'co_no', 'co_no');
+
+    }
+    public function company_payment()
+    {
+        return $this->hasOne(CompanyPayment::class, 'co_no', 'co_no');
 
     }
 }

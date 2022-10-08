@@ -52,6 +52,7 @@ class ReceivingGoodsDelivery extends Model
         // 'created_at' => "date:Y.m.d H:i",
         'created_at' => "date:Y.m.d",
         'updated_at' => "date:Y.m.d H:i",
+        'rgd_delivery_schedule_day'=> "date: Y.m.d"
     ];
 
     public function mb_no()
