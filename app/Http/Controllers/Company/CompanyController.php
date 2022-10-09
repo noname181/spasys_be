@@ -455,6 +455,69 @@ class CompanyController extends Controller
         }
     }
 
+    public function getShopAndShipperCompanies(CompanySearchRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+            //DB::enableQueryLog();
+            // If per_page is null set default data = 15
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $co_no = Auth::user()->co_no ? Auth::user()->co_no : '';
+            $user = Auth::user();
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+
+            if($validated['type'] == "shop"){
+                $companies = Company::with(['contract', 'co_parent'])->where('co_type', 'shop')->orderBy('co_no', 'DESC');
+
+
+                $companies->whereHas('co_parent', function ($query) use ($co_no) {
+                    $query->where('co_no', '=',  $co_no);
+                });
+            }else{
+                $companies_shop_id = Company::with('contract')->with('warehousing')->where('co_type', 'shop')
+                ->where('co_parent_no', $user->co_no)->orderBy('co_no', 'DESC')->pluck('co_no')->toArray();
+
+                $companies = Company::with('contract')->with('warehousing')->where('co_type', 'shipper')->
+                whereIn('co_parent_no', function($query) use ($user){
+                    $query->select('co_no')
+                      ->from(with(new Company)->getTable())
+                      ->where('co_type', 'shop')
+                      ->where('co_parent_no', $user->co_no);
+                 })->orderBy('co_no', 'DESC');
+            }
+
+            if (isset($validated['from_date'])) {
+                $companies->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            }
+
+            if (isset($validated['to_date'])) {
+                $companies->where('updated_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            }
+
+            if (isset($validated['co_name'])) {
+                $companies->where(function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                });
+            }
+
+
+            if (isset($validated['co_service'])) {
+                $companies->where(function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(co_service)'), 'like', '%' . strtolower($validated['co_service']) . '%');
+                });
+            }
+
+            $companies = $companies->paginate($per_page, ['*'], 'page', $page);
+            //return DB::getQueryLog();
+            return response()->json($companies);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
     public function  getShipperCompaniesMobile(CompanySearchRequest $request)
     {
         try {
