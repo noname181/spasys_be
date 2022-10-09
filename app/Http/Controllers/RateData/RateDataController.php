@@ -174,7 +174,6 @@ class RateDataController extends Controller
 
         $rmd = RateMetaData::where(
             [
-                'w_no' => $w_no,
                 'rgd_no' => $rgd_no,
                 'set_type' => $set_type
             ]
@@ -184,7 +183,6 @@ class RateDataController extends Controller
 
             $rmd = RateMetaData::where(
                 [
-                    'w_no' => $w_no,
                     'rgd_no' => $rgd_no,
                     'set_type' => 'work_final'
                 ]
@@ -192,7 +190,6 @@ class RateDataController extends Controller
             if(empty($rmd)){
                 $rmd = RateMetaData::where(
                     [
-                        'w_no' => $w_no,
                         'rgd_no' => $rgd_no,
                         'set_type' => 'work'
                     ]
@@ -201,7 +198,6 @@ class RateDataController extends Controller
             if(empty($rmd) && !empty($rdg)){
                 $rmd = RateMetaData::where(
                     [
-                        'w_no' => $w_no,
                         'rgd_no' => $rdg->rgd_no_expectation,
                         'set_type' => 'work_final'
                     ]
@@ -210,7 +206,6 @@ class RateDataController extends Controller
             if(empty($rmd) && !empty($rdg)){
                 $rmd = RateMetaData::where(
                     [
-                        'w_no' => $w_no,
                         'rgd_no' => $rdg->rgd_no_expectation,
                         'set_type' => 'work'
                     ]
@@ -219,7 +214,6 @@ class RateDataController extends Controller
         }else if(!isset($rmd->rmd_no) && $set_type == 'storage_final'){
             $rmd = RateMetaData::where(
                 [
-                    'w_no' => $w_no,
                     'rgd_no' => $rgd_no,
                     'set_type' => 'storage_final'
                 ]
@@ -227,7 +221,6 @@ class RateDataController extends Controller
             if(empty($rmd)){
                 $rmd = RateMetaData::where(
                     [
-                        'w_no' => $w_no,
                         'rgd_no' => $rgd_no,
                         'set_type' => 'storage'
                     ]
@@ -236,7 +229,6 @@ class RateDataController extends Controller
             if(empty($rmd) && !empty($rdg)){
                 $rmd = RateMetaData::where(
                     [
-                        'w_no' => $w_no,
                         'rgd_no' => $rdg->rgd_no_expectation,
                         'set_type' => 'storage_final'
                     ]
@@ -245,7 +237,6 @@ class RateDataController extends Controller
             if(empty($rmd) && !empty($rdg)){
                 $rmd = RateMetaData::where(
                     [
-                        'w_no' => $w_no,
                         'rgd_no' => $rdg->rgd_no_expectation,
                         'set_type' => 'storage'
                     ]
@@ -316,7 +307,6 @@ class RateDataController extends Controller
         }else if(!isset($rmd->rmd_no) && $set_type == 'work_additional2'){
             $rmd = RateMetaData::where(
                 [
-                    'w_no' => $w_no,
                     'rgd_no' => $rgd_no,
                     'set_type' => 'work_additional'
                 ]
@@ -325,7 +315,6 @@ class RateDataController extends Controller
             if(empty($rmd) && !empty($rdg)){
                 $rmd = RateMetaData::where(
                     [
-                        'w_no' => $w_no,
                         'rgd_no' => $rdg->rgd_no_final,
                         'set_type' => 'work_additional'
                     ]
@@ -334,7 +323,6 @@ class RateDataController extends Controller
         }else if(!isset($rmd->rmd_no) && $set_type == 'storage_additional2'){
             $rmd = RateMetaData::where(
                 [
-                    'w_no' => $w_no,
                     'rgd_no' => $rgd_no,
                     'set_type' => 'storage_additional'
                 ]
@@ -342,7 +330,6 @@ class RateDataController extends Controller
             if(empty($rmd) && !empty($rdg)){
                 $rmd = RateMetaData::where(
                     [
-                        'w_no' => $w_no,
                         'rgd_no' => $rdg->rgd_no_final,
                         'set_type' => 'storage_additional'
                     ]
@@ -353,7 +340,6 @@ class RateDataController extends Controller
 
             $rmd = RateMetaData::where(
                 [
-                    'w_no' => $w_no,
                     'rgd_no' => $rgd_no,
                     'set_type' => 'work_monthly_final'
                 ]
@@ -361,7 +347,6 @@ class RateDataController extends Controller
             if(empty($rmd)){
                 $rmd = RateMetaData::where(
                     [
-                        'w_no' => $w_no,
                         'rgd_no' => $rgd_no,
                         'set_type' => 'work_monthly'
                     ]
@@ -370,7 +355,6 @@ class RateDataController extends Controller
             if(empty($rmd) && !empty($rdg)){
                 $rmd = RateMetaData::where(
                     [
-                        'w_no' => $w_no,
                         'rgd_no' => $rdg->rgd_no_expectation,
                         'set_type' => 'work_monthly_final'
                     ]
@@ -379,7 +363,6 @@ class RateDataController extends Controller
             if(empty($rmd) && !empty($rdg)){
                 $rmd = RateMetaData::where(
                     [
-                        'w_no' => $w_no,
                         'rgd_no' => $rdg->rgd_no_expectation,
                         'set_type' => 'work_monthly'
                     ]
@@ -390,7 +373,6 @@ class RateDataController extends Controller
         }else if(!isset($rmd->rmd_no) && $set_type == 'storage_monthly_final'){
             $rmd = RateMetaData::where(
                 [
-                    'w_no' => $w_no,
                     'rgd_no' => $rgd_no,
                     'set_type' => 'storage_monthly_final'
                 ]
@@ -398,7 +380,6 @@ class RateDataController extends Controller
             if(empty($rmd)){
                 $rmd = RateMetaData::where(
                     [
-                        'w_no' => $w_no,
                         'rgd_no' => $rgd_no,
                         'set_type' => 'storage_monthly'
                     ]
@@ -407,7 +388,6 @@ class RateDataController extends Controller
             if(empty($rmd) && !empty($rdg)){
                 $rmd = RateMetaData::where(
                     [
-                        'w_no' => $w_no,
                         'rgd_no' => $rdg->rgd_no_expectation,
                         'set_type' => 'storage_monthly_final'
                     ]
@@ -416,7 +396,6 @@ class RateDataController extends Controller
             if(empty($rmd) && !empty($rdg)){
                 $rmd = RateMetaData::where(
                     [
-                        'w_no' => $w_no,
                         'rgd_no' => $rdg->rgd_no_expectation,
                         'set_type' => 'storage_monthly'
                     ]
@@ -425,7 +404,6 @@ class RateDataController extends Controller
         }else  if(!isset($rmd->rmd_no) && $set_type == 'work_monthly_additional'){
             $rmd = RateMetaData::where(
                 [
-                    'w_no' => $w_no,
                     'rgd_no' => $rgd_no,
                     'set_type' => 'work_monthly_additional'
                 ]
@@ -433,7 +411,6 @@ class RateDataController extends Controller
             if(empty($rmd)){
                 $rmd = RateMetaData::where(
                     [
-                        'w_no' => $w_no,
                         'rgd_no' => $rgd_no,
                         'set_type' => 'work_monthly_final'
                     ]
@@ -442,7 +419,6 @@ class RateDataController extends Controller
             if(empty($rmd) && !empty($rdg)){
                 $rmd = RateMetaData::where(
                     [
-                        'w_no' => $w_no,
                         'rgd_no' => $rdg->rgd_no_final,
                         'set_type' => 'work_monthly_additional'
                     ]
@@ -451,7 +427,6 @@ class RateDataController extends Controller
         }else if(!isset($rmd->rmd_no) && $set_type == 'storage_monthly_additional'){
             $rmd = RateMetaData::where(
                 [
-                    'w_no' => $w_no,
                     'rgd_no' => $rgd_no,
                     'set_type' => 'storage_monthly_additional'
                 ]
@@ -459,7 +434,6 @@ class RateDataController extends Controller
             if(empty($rmd)){
                 $rmd = RateMetaData::where(
                     [
-                        'w_no' => $w_no,
                         'rgd_no' => $rgd_no,
                         'set_type' => 'storage_monthly_final'
                     ]
@@ -468,26 +442,8 @@ class RateDataController extends Controller
             if(empty($rmd) && !empty($rdg)){
                 $rmd = RateMetaData::where(
                     [
-                        'w_no' => $w_no,
                         'rgd_no' => $rdg->rgd_no_final,
                         'set_type' => 'storage_monthly_additional'
-                    ]
-                )->first();
-            }
-        }else if(!isset($rmd->rmd_no) && $set_type == 'storage_final'){
-            $rmd = RateMetaData::where(
-                [
-                    'w_no' => $w_no,
-                    'rgd_no' => $rgd_no,
-                    'set_type' => 'storage_final'
-                ]
-            )->first();
-            if(empty($rmd)){
-                $rmd = RateMetaData::where(
-                    [
-                        'w_no' => $w_no,
-                        'rgd_no' => $rgd_no,
-                        'set_type' => 'storage'
                     ]
                 )->first();
             }
