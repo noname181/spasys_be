@@ -26,6 +26,7 @@ use App\Models\File;
 use App\Models\Item;
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryRequest;
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryCreateRequest;
+use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryCreateApiRequest;
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryCreateMobileRequest;
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryFileRequest;
 Use \Carbon\Carbon;
@@ -952,6 +953,179 @@ class ReceivingGoodsDeliveryController extends Controller
                 'w_schedule_number' =>  $w_schedule_number,
                 'w_schedule_number2' => isset($w_schedule_number2) ? $w_schedule_number2 : '',
                 'w_no' => isset($w_no) ? $w_no :  $request->w_no,
+            ], 201);
+        } catch (\Throwable $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0001], 500);
+        }
+    }
+
+    public function create_warehousing_api(ReceivingGoodsDeliveryCreateApiRequest $request)
+    {
+        $validated = $request->validated();
+
+        try {
+            DB::beginTransaction();
+           
+            $member = Member::where('mb_id', Auth::user()->mb_id)->first();
+            $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
+
+            if(isset($validated['w_no'])){
+                Warehousing::where('w_no', $validated['w_no'])->update([
+                    'w_schedule_amount' => $validated['w_schedule_amount'],
+                    'w_schedule_day' => $validated['w_schedule_day'],
+                    'w_amount' => $validated['w_amount'],
+                    'w_type' => 'IW',
+                    'w_category_name' => $request->w_category_name,
+                ]);
+            }else{
+                $w_no_data = Warehousing::insertGetId([
+                    'mb_no' => $member->mb_no,
+                    'w_schedule_day' => isset($validated['w_schedule_day']) ? DateTime::createFromFormat('Y-m-d', $validated['w_schedule_day']) : null,
+                    'w_schedule_amount' => $validated['w_schedule_amount'],
+                    'w_amount' => $validated['w_amount'],
+                    'w_type' => 'IW',
+                    'w_category_name' => $request->w_category_name,
+                    'co_no' => isset($validated['co_no']) ? $validated['co_no'] : $co_no,
+                ]);
+            }
+
+            $w_no = isset($validated['w_no']) ? $validated['w_no'] : $w_no_data;
+
+
+
+            if(!isset($validate['w_schedule_number'])){
+                $w_schedule_number = (new CommonFunc)->generate_w_schedule_number($w_no,'IW');
+                if(isset($validated['page_type']) && $validated['page_type'] == 'Page130146'){
+                    $w_schedule_number2 = (new CommonFunc)->generate_w_schedule_number($w_no,'IWC');
+                }
+            }
+
+
+            Warehousing::where('w_no', $w_no)->update([
+                'w_schedule_number' =>  $w_schedule_number
+            ]);
+
+            if(isset($validated['page_type']) && $validated['page_type'] == 'Page130146'){
+                $mytime = Carbon::now();
+                Warehousing::where('w_no', $w_no)->update([
+                    'w_schedule_number2' =>  $w_schedule_number2,
+                    'w_completed_day' => $mytime->toDateTimeString()
+                ]);
+            }
+
+            //T part
+
+
+            if($validated['wr_contents']){
+                WarehousingRequest::insert([
+                    'w_no' => $w_no,
+                    'mb_no' => $member->mb_no,
+                    'wr_contents' => $validated['wr_contents'],
+                    'wr_type' => 'IW',
+                ]);
+            }
+
+            foreach ($validated['remove'] as $remove) {
+                WarehousingItem::where('item_no', $remove['item_no'])->where('w_no', $w_no)->delete();
+            }
+
+            $warehousing_items = [];
+
+            if(isset($validated['item_new'])){
+                if(isset($validated['item_new']['item_name'])){
+                $item_no_new = Item::insertGetId([
+                    'mb_no' => Auth::user()->mb_no,
+                    'item_brand' => $validated['item_new']['item_brand'],
+                    'item_service_name' => '유통가공',
+                    'co_no' => $validated['co_no'] ? $validated['co_no'] : $co_no,
+                    'item_name' => $validated['item_new']['item_name'],
+                    'item_option1' => $validated['item_new']['item_option1'],
+                    'item_option2' => $validated['item_new']['item_option2'],
+                    'item_price3' => $validated['item_new']['item_price3'],
+                    'item_price4' => $validated['item_new']['item_price4']
+                ]);
+
+                WarehousingItem::insert([
+                    'item_no' => $item_no_new,
+                    'w_no' => $w_no,
+                    'wi_number' => $validated['item_new']['wi_number'],
+                    'wi_type' => '입고_shipper'
+                ]);
+
+                ItemChannel::insert(
+                    [
+                        'item_no' => $item_no_new,
+                        'item_channel_code' => $validated['item_new']['item_channel_code'],
+                        'item_channel_name' => $validated['item_new']['item_channel_name']
+                    ]
+                );
+            }
+
+            }
+
+
+            if(isset($validated['w_no'])){
+                foreach ($validated['items'] as $warehousing_item) {
+                    $item_no = $warehousing_item['item_no'] ? $warehousing_item['item_no'] : '';
+
+                   
+                        $checkexit1 = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_spasys')->first();
+                        if(!isset($checkexit1->wi_no)){
+                            WarehousingItem::insert([
+                                'item_no' => $item_no,
+                                'w_no' => $w_no,
+                                'wi_number' => $warehousing_item['warehousing_item2'][0]['wi_number'],
+                                'wi_type' => '입고_spasys'
+                            ]);
+                        }else{
+                            $warehousing_items = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_spasys')->update([
+                                'wi_number' => $warehousing_item['warehousing_item2'][0]['wi_number'],
+                            ]);
+                        }
+
+                        $checkexit2 = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_shipper')->first();
+                        if(!isset($checkexit2->wi_no)){
+                            WarehousingItem::insert([
+                                'item_no' => $item_no,
+                                'w_no' => $w_no,
+                                'wi_number' => $warehousing_item['warehousing_item'][0]['wi_number'],
+                                'wi_type' => '입고_shipper'
+                            ]);
+                        }else{
+                            $warehousing_items = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_shipper')->update([
+                                'wi_number' => $warehousing_item['warehousing_item'][0]['wi_number'],
+                            ]);
+                        }
+
+                    
+                }
+            }else{
+                foreach ($validated['items'] as $warehousing_item) {
+                    WarehousingItem::insert([
+                        'item_no' => $warehousing_item['item_no'],
+                        'w_no' => $w_no,
+                        'wi_number' => isset($warehousing_item['warehousing_item'][0]['wi_number']) ? $warehousing_item['warehousing_item'][0]['wi_number'] : null ,
+                        'wi_type' => '입고_shipper'
+                    ]);
+
+                    WarehousingItem::insert([
+                        'item_no' => $warehousing_item['item_no'],
+                        'w_no' => $w_no,
+                        'wi_number' => isset($warehousing_item['warehousing_item2'][0]['wi_number']) ? $warehousing_item['warehousing_item2'][0]['wi_number'] : null ,
+                        'wi_type' => '입고_spasys'
+                    ]);
+                }
+            }
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'w_schedule_number' =>  $w_schedule_number,
+                'w_schedule_number2' => isset($w_schedule_number2) ? $w_schedule_number2 : '',
+                'w_no' => isset($w_no) ? $w_no :  $validated['w_no'],
             ], 201);
         } catch (\Throwable $e) {
             DB::rollback();
