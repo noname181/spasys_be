@@ -376,6 +376,8 @@ Route::middleware('auth')->group(function () {
         //GET RATE META DATA
         Route::get('/get_rmd_no/{rgd_no}/{set_type}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_rmd_no'])->name('get_rmd_no');
         Route::get('/get_rmd_no_fulfill/{rgd_no}/{type}/{pretype}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_rmd_no_fulfill'])->name('get_rmd_no_fulfill');
+        Route::delete('/delete_row_rate_data/{rd_no}/',[\App\Http\Controllers\RateData\RateDataController::class, 'deleteRowRateData'])->name('delete_row_rate_data');
+
 
         Route::get('/by_rm_no/{rm_no}/{rmd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateData'])->name('get_rate_data');
         Route::get('/by_co_no/{rd_co_no}/{rmd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByCono'])->name('get_rate_data_by_co_no');

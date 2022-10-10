@@ -1774,4 +1774,16 @@ class RateDataController extends Controller
             'status' => 1,
         ], 201);
     }
+    public function deleteRowRateData(RateData $rateData)
+    {
+        try {
+            $rateData->delete();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0006], 500);
+        }
+    }
 }
