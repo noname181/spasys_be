@@ -119,7 +119,7 @@ class ItemRequest extends BaseFormRequest
             ],
             'item_channels.*.item_channel_code' => [
                 'required',
-                'integer',
+                'string',
             ],
             'file' => [
                 'file',
