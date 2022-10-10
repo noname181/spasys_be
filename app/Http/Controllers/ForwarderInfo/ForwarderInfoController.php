@@ -67,7 +67,7 @@ class ForwarderInfoController extends Controller
             DB::rollback();
             Log::error($e);
             // return response()->json(['message' => Messages::MSG_0001], 500);
-            return $e;
+
         }
     }
 
@@ -104,7 +104,7 @@ class ForwarderInfoController extends Controller
             DB::rollback();
             Log::error($e);
             // return response()->json(['message' => Messages::MSG_0001], 500);
-            return $e;
+
         }
     }
 
@@ -134,7 +134,7 @@ class ForwarderInfoController extends Controller
             DB::rollback();
             Log::error($e);
             // return response()->json(['message' => Messages::MSG_0001], 500);
-            return $e;
+
         }
     }
 
@@ -153,7 +153,7 @@ class ForwarderInfoController extends Controller
             return response()->json(['message' => Messages::MSG_0007], 200);
         } catch (\Exception $e) {
             Log::error($e);
-			return $e;
+
             return response()->json(['message' => Messages::MSG_0002], 500);
         }
     }

@@ -91,7 +91,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -164,7 +164,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -562,7 +562,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -738,7 +738,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -1026,7 +1026,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -1058,7 +1058,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -1089,7 +1089,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -1107,7 +1107,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -1206,7 +1206,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -1260,7 +1260,7 @@ class RateDataController extends Controller
                 $settlement_number[2] = str_replace("CF","CA", $settlement_number[2]);
                 $final_rgd->rgd_settlement_number = implode("_",$settlement_number);
                 $final_rgd->save();
-               
+
 
             }
 
@@ -1273,7 +1273,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -1335,7 +1335,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -1357,7 +1357,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -1378,7 +1378,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -1400,7 +1400,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -1476,7 +1476,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -1554,7 +1554,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -1576,7 +1576,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -1597,7 +1597,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -1619,7 +1619,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -1707,7 +1707,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -1736,7 +1736,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }

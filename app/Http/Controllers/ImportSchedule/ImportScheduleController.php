@@ -55,7 +55,7 @@ class ImportScheduleController extends Controller
     public function getImportSchedule(ImportScheduleSearchRequest $request)
     {
         try {
-           
+
             $validated = $request->validated();
 
             // If per_page is null set default data = 15
@@ -63,7 +63,7 @@ class ImportScheduleController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $import_schedule = ImportSchedule::with('co_no')->with('files')->orderBy('i_no', 'DESC');
-            
+
 
             if (isset($validated['from_date'])) {
                 $import_schedule->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
@@ -99,7 +99,7 @@ class ImportScheduleController extends Controller
             return response()->json($import_schedule);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -108,7 +108,7 @@ class ImportScheduleController extends Controller
     public function getImportAPI(ImportScheduleSearchRequest $request)
     {
         try {
-           
+
             $validated = $request->validated();
 
             // If per_page is null set default data = 15
@@ -116,15 +116,15 @@ class ImportScheduleController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
 
-            $sql = DB::select(DB::raw("select * from 
-            (select tie_logistic_manage_number from t_import_expected where tie_is_date >= '2022-01-04' and tie_is_date <= '2022-10-04' group by tie_logistic_manage_number) as aaa 
-            left outer join 
-            (SELECT te_logistic_manage_number,te_carry_out_number FROM t_export group by te_logistic_manage_number, te_carry_out_number ) as bbb 
-            on 
+            $sql = DB::select(DB::raw("select * from
+            (select tie_logistic_manage_number from t_import_expected where tie_is_date >= '2022-01-04' and tie_is_date <= '2022-10-04' group by tie_logistic_manage_number) as aaa
+            left outer join
+            (SELECT te_logistic_manage_number,te_carry_out_number FROM t_export group by te_logistic_manage_number, te_carry_out_number ) as bbb
+            on
             aaa.tie_logistic_manage_number = bbb.te_logistic_manage_number"));
 
 
-            
+
             DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
             $user = Auth::user();
             if($user->mb_type == 'shop'){
@@ -149,17 +149,17 @@ class ImportScheduleController extends Controller
             ->where('tie_is_date','>=','2022-01-04')->where('tie_is_date','<=','2022-10-04')
             ->groupBy('t_export.te_logistic_manage_number','t_export.te_carry_out_number')->orderBy('t_export.te_carry_out_number','DESC');
             }
-            
+
 
             //return DB::getQueryLog();
 
-            
-            
-            
+
+
+
             //$sql2 = DB::table('t_export')->select('te_logistic_manage_number','te_carry_out_number')->groupBy('te_logistic_manage_number','te_carry_out_number')->get();
 
             //$import_schedule = ImportExpected::with(['import','company'])->orderBy('tie_no', 'DESC');
-           
+
             if (isset($validated['from_date'])) {
                 $import_schedule->where('t_import_expected.created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
@@ -207,14 +207,14 @@ class ImportScheduleController extends Controller
             // }
 
             //$members = Member::where('mb_no', '!=', 0)->get();
-            
+
             $import_schedule = $import_schedule->paginate($per_page, ['*'], 'page', $page);
             DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
-            
+
             return response()->json($import_schedule);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             //return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }

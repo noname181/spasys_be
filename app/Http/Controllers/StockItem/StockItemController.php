@@ -23,7 +23,7 @@ class StockItemController extends Controller
 
     public function postStockItems(StockItemSearchRequest $request)
     {
-       
+
         $validated = $request->validated();
        // return  $validated;
         try {
@@ -33,17 +33,17 @@ class StockItemController extends Controller
             }
 
             $items = Item::with('item_channels');
-            
+
             if (isset($item_no)) {
                 $items->whereIn('item_no', $item_no);
             }
 
             if (isset($validated['w_no']) && !isset($validated['items'])) {
                 $items->with('warehousing_item');
-                $items->whereHas('warehousing_item.w_no',function($query) use ($validated) {              
+                $items->whereHas('warehousing_item.w_no',function($query) use ($validated) {
                     $query->where('w_no', '=', $validated['w_no']);
-                });     
-                  
+                });
+
             }
 
             if (!isset($validated['w_no']) && !isset($validated['items'])) {
@@ -51,7 +51,7 @@ class StockItemController extends Controller
             }
 
             $items->where('item_service_name', '유통가공');
-            
+
             $items = $items->get();
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -60,7 +60,7 @@ class StockItemController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }

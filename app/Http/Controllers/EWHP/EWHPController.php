@@ -47,19 +47,19 @@ class EWHPController extends Controller
     {
         $validated = $request->validated();
         try {
-            
+
             DB::beginTransaction();
-           
+
             $count = 0;
             foreach ($validated['import'] as $value) {
                 $import = Import::insertGetId([
                     "ti_status" => $value['status'],
                     "ti_logistic_manage_number" => $value['logistic_manage_number'],
                     "ti_carry_in_number" => $value['carry_in_number'],
-                    "ti_register_id" => $value['register_id'], 
+                    "ti_register_id" => $value['register_id'],
                     "ti_i_date" => $value['i_date'],
                     "ti_i_time" => $value['i_time'],
-                    "ti_i_report_type" => $value['i_report_type'], 
+                    "ti_i_report_type" => $value['i_report_type'],
                     "ti_i_division_type" => $value['i_division_type'],
                     "ti_i_confirm_number" => $value['i_confirm_number'],
                     "ti_i_order" => $value['i_order'],
@@ -73,16 +73,16 @@ class EWHPController extends Controller
                     "ti_i_weight_unit" => $value['i_weight_unit'],
                     "ti_co_license" => $value['co_license'],
                     "ti_logistic_type" => $value['logistic_type'],
-                ]);      
+                ]);
                 if($import >= 1){
                     $count++;
-                }          
+                }
             }
             DB::commit();
             return response()->json(['message' => 'ok', 'count' => $count]);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => "no"], 500);
         }
     }
@@ -90,7 +90,7 @@ class EWHPController extends Controller
     public function export(EWHPRequest $request)
     {
         $validated = $request->validated();
-        try {     
+        try {
             DB::beginTransaction();
             $count = 0;
             foreach ($validated['export'] as $key => $value) {
@@ -118,10 +118,10 @@ class EWHPController extends Controller
                     "te_e_price" => $value['e_price'],
                     "te_co_license" => $value['co_license'],
                     "te_logistic_type" => $value['logistic_type']
-                ]);      
+                ]);
                 if($export >= 1){
                     $count++;
-                }          
+                }
             }
             DB::commit();
             return response()->json(['message' => 'ok', 'count' => $count]);
@@ -152,10 +152,10 @@ class EWHPController extends Controller
                     'tie_m_bl' => $value['m_bl'],
                     'tie_h_bl' => $value['h_bl'],
                     'tie_is_name_eng' => $value['is_name_eng'],
-                ]);      
+                ]);
                 if($import_expected >= 1){
                     $count++;
-                }          
+                }
             }
             DB::commit();
             return response()->json(['message' => 'ok', 'count' => $count]);
@@ -170,9 +170,9 @@ class EWHPController extends Controller
     {
         $validated = $request->validated();
         try {
-            
+
             DB::beginTransaction();
-           
+
             $count = 0;
             foreach ($validated['export_confirm'] as $key => $value) {
                 $export_confirm = ExportConfirm::insertGetId([
@@ -183,10 +183,10 @@ class EWHPController extends Controller
                     "tec_ec_date" => $value['ec_date'],
                     "tec_register_id" => $value['register_id'],
                     "tec_ec_number" => $value['ec_number'],
-                ]);      
+                ]);
                 if($export_confirm >= 1){
                     $count++;
-                }          
+                }
             }
             DB::commit();
             return response()->json(['message' => 'ok', 'count' => $count]);

@@ -26,7 +26,7 @@ class ImportController extends Controller
     public function get_import_data(ImportRequest $request)
     {
         //return $request;
-        
+
         $validated = $request->validated();
         try{
 
@@ -44,7 +44,7 @@ class ImportController extends Controller
             }
 
             //fetchReceivingGoodsDeliveryRequests
-        
+
             $rgd = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->whereHas('w_no', function($q) use ($validated) {
                 return $q->where('w_no', $validated['w_no']);
             })->get();
@@ -80,7 +80,7 @@ class ImportController extends Controller
         if (isset($validated['w_no']) && !isset($validated['items'])) {
             $warehousing = Warehousing::find($validated['w_no']);
 
-            $items->with(['warehousing_item' => function($query) use($validated) { 
+            $items->with(['warehousing_item' => function($query) use($validated) {
                 $query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고_shipper');
 
             }]);
@@ -97,9 +97,9 @@ class ImportController extends Controller
             $count = $sql_count->count();
 
             if($count != 0){
-                $items->with(['warehousing_item2' => function($query) use($validated) { 
+                $items->with(['warehousing_item2' => function($query) use($validated) {
                     $query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고_spasys');
-    
+
                 }]);
 
                 $items->whereHas('warehousing_item2',function($query) use ($validated) {
@@ -129,12 +129,12 @@ class ImportController extends Controller
                                     'items' => $items,
                                     'sql' => DB::getQueryLog()
                                 ],
-                                    
+
 
                                     200);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -142,7 +142,7 @@ class ImportController extends Controller
     public function get_import_data_api(ImportRequest $request)
     {
         //return $request;
-        
+
         $validated = $request->validated();
         try{
 
@@ -160,7 +160,7 @@ class ImportController extends Controller
             }
 
             //fetchReceivingGoodsDeliveryRequests
-        
+
             $rgd = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->whereHas('w_no', function($q) use ($validated) {
                 return $q->where('w_no', $validated['w_no']);
             })->get();
@@ -196,7 +196,7 @@ class ImportController extends Controller
         if (isset($validated['w_no']) && !isset($validated['items'])) {
             $warehousing = Warehousing::find($validated['w_no']);
 
-            $items->with(['warehousing_item' => function($query) use($validated) { 
+            $items->with(['warehousing_item' => function($query) use($validated) {
                 $query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고_shipper');
 
             }]);
@@ -213,9 +213,9 @@ class ImportController extends Controller
             $count = $sql_count->count();
 
             if($count != 0){
-                $items->with(['warehousing_item2' => function($query) use($validated) { 
+                $items->with(['warehousing_item2' => function($query) use($validated) {
                     $query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고_spasys');
-    
+
                 }]);
 
                 $items->whereHas('warehousing_item2',function($query) use ($validated) {
@@ -245,12 +245,12 @@ class ImportController extends Controller
                                     'items' => $items,
                                     'sql' => DB::getQueryLog()
                                 ],
-                                    
+
 
                                     200);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }

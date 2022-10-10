@@ -86,12 +86,12 @@ class RateDataRequest extends BaseFormRequest
                 'nullable'
             ],
             'rate_data.*.rd_cate1' => [
-                'required',
+                'nullable',
                 'string',
                 'max:255',
             ],
             'rate_data.*.rd_cate2' => [
-                'required',
+                'nullable',
                 'string',
                 'max:255',
             ],

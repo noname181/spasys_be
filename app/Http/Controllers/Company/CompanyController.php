@@ -75,11 +75,11 @@ class CompanyController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
-    
+
     public function getCompanies(CompanySearchRequest $request)
     {
         try {
@@ -131,7 +131,7 @@ class CompanyController extends Controller
                     $query->where(DB::raw('lower(company.co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
                 });
             }
-           
+
             if (isset($validated['co_name'])) {
                 $companies->where(function ($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
@@ -178,9 +178,9 @@ class CompanyController extends Controller
                 $companies->getCollection()->map(function ($item){
                     $service_names = explode(" ",$item->co_service);
                     $co_no = $item->co_no;
-             
+
                     $settlement_cycle = [];
-                    
+
                     foreach($service_names as $service_name){
                         $service = Service::where('service_name', $service_name)->first();
                         if(isset($service->service_no)){
@@ -194,7 +194,7 @@ class CompanyController extends Controller
                         }
                     }
                     $settlement_cycle = implode("/", $settlement_cycle);
-                    
+
                     $item->settlement_cycle = $settlement_cycle;
                     return $item;
                 })
@@ -204,7 +204,7 @@ class CompanyController extends Controller
             return response()->json($companies);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -251,11 +251,11 @@ class CompanyController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
-    
+
     /**
      * Register company
      * @param  \App\Http\Requests\Company\CompanyRegisterController\InvokeRequest  $request
@@ -349,7 +349,7 @@ class CompanyController extends Controller
             return response()->json($companies);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -365,9 +365,9 @@ class CompanyController extends Controller
         try {
             $validated = $request->validated();
             //DB::enableQueryLog();
-            
+
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : '';
-            
+
             $companies = Company::with(['contract', 'co_parent'])->where('co_type', 'shop')->orderBy('co_no', 'DESC');
 
 
@@ -402,7 +402,7 @@ class CompanyController extends Controller
             return response()->json(['data' => $companies]);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -411,7 +411,7 @@ class CompanyController extends Controller
     {
         try {
             $validated = $request->validated();
-            
+
             // If per_page is null set default data = 15
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
@@ -450,7 +450,7 @@ class CompanyController extends Controller
             return response()->json($companies);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -513,7 +513,7 @@ class CompanyController extends Controller
             return response()->json($companies);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -522,11 +522,11 @@ class CompanyController extends Controller
     {
         try {
             $validated = $request->validated();
-            
+
             // If per_page is null set default data = 15
-        
+
             // If page is null set default data = 1
-           
+
             $user = Auth::user();
             $companies = Company::with('contract')->with('warehousing')->where('co_type', 'shipper')->where('co_parent_no', $user->co_no)->orderBy('co_no', 'DESC');
 
@@ -561,7 +561,7 @@ class CompanyController extends Controller
             return response()->json($companies);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -570,8 +570,8 @@ class CompanyController extends Controller
     {
         try {
             $validated = $request->validated();
-            
-         
+
+
             $user = Auth::user();
             $companies2 = "";
 
@@ -597,14 +597,14 @@ class CompanyController extends Controller
                 }
             }
 
-       
-            
+
+
             $companies = $companies->get();
 
             return response()->json(['data' => $companies,'selected' => $companies2 ]);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -651,7 +651,7 @@ class CompanyController extends Controller
             return response()->json($companies);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -673,7 +673,7 @@ class CompanyController extends Controller
            return response()->json($infomation);
         }catch(\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -691,7 +691,7 @@ class CompanyController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }

@@ -111,7 +111,7 @@ class BannerController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             //return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -191,7 +191,7 @@ class BannerController extends Controller
             return response()->json(['message' => Messages::MSG_0007], 200);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             //return response()->json(['message' => Messages::MSG_0002], 500);
         }
     }
@@ -232,7 +232,7 @@ class BannerController extends Controller
             return response()->json($data);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
