@@ -1774,12 +1774,13 @@ class RateDataController extends Controller
             'status' => 1,
         ], 201);
     }
-    public function deleteRowRateData(RateData $rateData)
+    public function deleteRowRateData($rd_no)
     {
         try {
-            $rateData->delete();
+
+            $rateData = RateData::where('rd_no', $rd_no)->delete();
             return response()->json([
-                'message' => Messages::MSG_0007,
+                'message' => $rateData,
             ]);
         } catch (\Exception $e) {
             Log::error($e);
