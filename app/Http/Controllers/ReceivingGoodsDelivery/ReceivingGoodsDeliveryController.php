@@ -1307,6 +1307,26 @@ class ReceivingGoodsDeliveryController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
+    public function cancel_settlement(Request $request){
+        try {
+            if($request->bill_type == 'case'){
+                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+
+            }else if ($request->bill_type == 'monthly'){
+                foreach($request->rgds as $rgd){
+                    ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->delete();
+                }
+
+            }
+            return response()->json([
+                'message' => 'Success'
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
 
     public function get_rgd_package($w_no){
 
