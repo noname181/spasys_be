@@ -108,7 +108,7 @@ class ExportController extends Controller
             $items = [];
            
             foreach($warehousing_items as $key =>  $warehousing_item){
-                $item = Item::with('item_channels')->where('item_no', $warehousing_item->item_no)->first();
+                $item = Item::with(['item_channels','file'])->where('item_no', $warehousing_item->item_no)->first();
                 if($type=='EW'){
                     $warehousing_items_import = WarehousingItem::with('item_no')->whereHas('item_no',function($q) use ($warehousing){
                         $q->where('w_no', $warehousing->w_import_no);
