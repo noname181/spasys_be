@@ -108,12 +108,12 @@ class RateDataController extends Controller
                 $w_no = null;
             }
 
-            if($validated['set_type'] == 'work_final' || $validated['set_type'] == 'storage_final' || $validated['set_type'] == 'work_monthly_additional' || $validated['set_type'] == 'storage_monthly_additional'){
+            if($validated['set_type'] == 'work_final' || $validated['set_type'] == 'storage_final'){
                 $validated['rgd_no'] = $rgd->rgd_parent_no;
             }
 
             if(isset($validated['type'])){
-                if($validated['type'] == 'work_additional_edit' || $validated['type'] == 'storage_additional_edit'){
+                if($validated['type'] == 'work_additional_edit' || $validated['type'] == 'storage_additional_edit'  || $validated['type'] == 'work_monthly_additional_edit'  || $validated['type'] == 'storage_monthly_additional_edit' ){
                     $validated['rgd_no'] = $rgd->rgd_parent_no;
                 }
             }
@@ -1167,6 +1167,23 @@ class RateDataController extends Controller
                     'rgd_no' => $final_rgd->rgd_no
                 ]);
 
+                if($request->bill_type == 'final'){
+                    $settlement_number = explode('_',$final_rgd->rgd_settlement_number);
+                    $settlement_number[2] = str_replace("C","CF", $settlement_number[2]);
+                    $final_rgd->rgd_settlement_number = implode("_",$settlement_number);
+                    $final_rgd->save();
+                }else if($request->bill_type == 'final_monthly'){
+                    $settlement_number = explode('_',$final_rgd->rgd_settlement_number);
+                    $settlement_number[2] = str_replace("M","MF", $settlement_number[2]);
+                    $final_rgd->rgd_settlement_number = implode("_",$settlement_number);
+                    $final_rgd->save();
+                }else if($request->bill_type == 'additional_monthly'){
+                    $settlement_number = explode('_',$final_rgd->rgd_settlement_number);
+                    $settlement_number[2] = str_replace("MF","MA", $settlement_number[2]);
+                    $final_rgd->rgd_settlement_number = implode("_",$settlement_number);
+                    $final_rgd->save();
+                }
+
 
             }else {
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
@@ -1241,6 +1258,12 @@ class RateDataController extends Controller
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
                     'rgd_no' => $final_rgd->rgd_no
                 ]);
+
+                $settlement_number = explode('_',$final_rgd->rgd_settlement_number);
+                $settlement_number[2] = str_replace("CF","CA", $settlement_number[2]);
+                $final_rgd->rgd_settlement_number = implode("_",$settlement_number);
+                $final_rgd->save();
+               
 
             }
 
