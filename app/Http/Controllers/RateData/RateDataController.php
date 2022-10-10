@@ -108,12 +108,8 @@ class RateDataController extends Controller
                 $w_no = null;
             }
 
-            if($validated['set_type'] == 'work_final' || $validated['set_type'] == 'storage_final'){
-                $validated['rgd_no'] = $rgd->rgd_parent_no;
-            }
-
             if(isset($validated['type'])){
-                if($validated['type'] == 'work_additional_edit' || $validated['type'] == 'storage_additional_edit'  || $validated['type'] == 'work_monthly_additional_edit'  || $validated['type'] == 'storage_monthly_additional_edit' ){
+                if($validated['type'] == 'work_additional_edit' || $validated['type'] == 'storage_additional_edit'  || $validated['type'] == 'work_monthly_additional_edit'  || $validated['type'] == 'storage_monthly_additional_edit' || $validated['set_type'] == 'work_final_edit' || $validated['set_type'] == 'storage_final_edit'){
                     $validated['rgd_no'] = $rgd->rgd_parent_no;
                 }
             }
@@ -1192,10 +1188,11 @@ class RateDataController extends Controller
             }
 
             if($request->bill_type == 'expectation' || $request->bill_type == 'expectation_monthly'){
+
                 ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_status4' => $request->status,
                     'rgd_bill_type' => $request->bill_type,
-                    'rgd_settlement_number' => $request->settlement_number ? $request->settlement_number : null,
+                    'rgd_settlement_number' => $request->settlement_number ? $request->settlement_number : $rgd->rgd_settlement_number,
                 ]);
             }
 
