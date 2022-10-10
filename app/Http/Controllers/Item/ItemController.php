@@ -264,6 +264,79 @@ class ItemController extends Controller
         }
     }
 
+    public function postItemsApi(ItemSearchRequest $request)
+    {
+
+        $validated = $request->validated();
+        // return  $validated;
+        try {
+            DB::enableQueryLog();
+
+
+
+            //return $warehousing;
+            if (isset($validated['items'])) {
+                $item_no =  array_column($validated['items'], 'item_no');
+            }
+
+            $items = Item::with('item_channels')->orderBy('item_no', 'DESC');
+
+            if (isset($validated['items'])) {
+                $items->whereIn('item_no', $item_no);
+            }
+
+            if (isset($validated['w_no']) && !isset($validated['items'])) {
+                $warehousing = Warehousing::find($validated['w_no']);
+
+                $items->with(['warehousing_item' => function ($query) use ($validated) {
+                    $query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고_shipper');
+                }]);
+
+                $items->whereHas('warehousing_item', function ($query) use ($validated) {
+                    if ($validated['type'] == 'IW') {
+                        $query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고_shipper');
+                    } else {
+                        $query->where('w_no', '=', $validated['w_no']);
+                    }
+                });
+
+                $sql_count = WarehousingItem::where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고_spasys')->get();
+                $count = $sql_count->count();
+
+                if ($count != 0) {
+                    $items->with(['warehousing_item2' => function ($query) use ($validated) {
+                        $query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고_spasys');
+                    }]);
+
+                    $items->whereHas('warehousing_item2', function ($query) use ($validated) {
+                        if ($validated['type'] == 'IW') {
+                            $query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고_spasys');
+                        } else {
+                            $query->where('w_no', '=', $validated['w_no']);
+                        }
+                    });
+                }
+            }
+
+            if (!isset($validated['w_no']) && !isset($validated['items'])) {
+                $items->where(DB::raw('1'), '=', '2');
+            }
+
+            $items->where('item_service_name', '수입풀필먼트');
+
+            $items = $items->get();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'items' => $items,
+                'sql' => DB::getQueryLog()
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
     public function postItemsPopup(ItemSearchRequest $request)
     {
 
@@ -335,6 +408,78 @@ class ItemController extends Controller
         }
     }
 
+    public function postItemsPopupApi(ItemSearchRequest $request)
+    {
+
+        $validated = $request->validated();
+        try {
+            DB::enableQueryLog();
+
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+
+            $co_no = Auth::user()->co_no ? Auth::user()->co_no : '';
+            $items = Item::with(['item_channels','ContractWms'])->where('item_service_name', '수입풀필먼트')->orderBy('item_no', 'DESC');
+
+            if (isset($validated['co_no'])) {
+                $items->whereHas('ContractWms.company', function ($q) use ($validated) {
+                    $q->where('co_no', $validated['co_no']);
+                });
+            }
+
+            if (isset($validated['w_no'])) {
+                $warehousing = Warehousing::where('w_no', $validated['w_no'])->first();
+                $items->where('co_no', $warehousing->co_no);
+            }
+
+
+
+            if (isset($validated['keyword'])) {
+                if ($validated['type'] == 'item_brand' || $validated['type'] == 'item_name') {
+                    $items->where(function ($query) use ($validated) {
+                        $query->where(DB::raw('lower(' . $validated['type'] . ')'), 'like', '%' . strtolower($validated['keyword']) . '%');
+                    });
+                } else {
+                    $items->whereHas('item_channels', function ($query) use ($validated) {
+                        $query->where(DB::raw('lower(' . $validated['type'] . ')'), 'like', '%' . strtolower($validated['keyword']) . '%');
+                    });
+                }
+            }
+
+            // if (Auth::user()->mb_type == "shop") {
+            //     $items->whereHas('company.co_parent', function ($query) use ($co_no) {
+            //         $query->where(DB::raw('co_no'), '=', $co_no);
+            //     });
+            // } elseif (Auth::user()->mb_type == "shipper") {
+            //     $items->where('co_no', $co_no);
+            // } else {
+            //     $co_child = Company::where('co_parent_no', $co_no)->get();
+            //     $co_no = array();
+            //     foreach ($co_child as $o) {
+            //         $co_no[] = $o->co_no;
+            //     }
+
+            //     $items->whereHas('company.co_parent', function ($query) use ($co_no) {
+            //         $query->whereIn(DB::raw('co_no'), $co_no);
+            //     });
+            // }
+
+
+
+            $items = $items->paginate($per_page, ['*'], 'page', $page);
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'items' => $items,
+                'user' => Auth::user(),
+                'sql' => DB::getQueryLog()
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
 
     public function importItemsList(ItemSearchRequest $request)
     {
@@ -524,6 +669,7 @@ class ItemController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
+
     public function paginateItemsApi(ItemSearchRequest $request)
     {
         $validated = $request->validated();

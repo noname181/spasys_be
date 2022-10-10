@@ -69,6 +69,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/customer_center_information', [\App\Http\Controllers\Company\CompanyController::class, 'getCustomerCenterInformation'])->name('get_CustomerCenterInformation');
     Route::get('/get_company_policy/{co_no}', [App\Http\Controllers\Company\CompanyController::class, 'getCompanyPolicy'])->name('get_company_policy');
     Route::get('/get_company_from_te/{tcon}', [App\Http\Controllers\Company\CompanyController::class, 'getCompanyFromtcon'])->name('get_company_from_tcon');
+    Route::post('/get_shop_and_shipper_companies', [\App\Http\Controllers\Company\CompanyController::class, 'getShopAndShipperCompanies'])->name('get_shop_and_shipper_companies');
 
     Route::prefix('service')->name('service.')->group(function () {
         //service route only for spasys admin
@@ -138,6 +139,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/get_warehousing_from_rgd/{rgd_no}/{type}', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingByRgd']);
 
     Route::post('/get_warehousing', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousing']);
+    Route::post('/get_warehousing_api', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingApi']);
     Route::post('/get_warehousing2', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousing2']);
     Route::post('/get_warehousing_export', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingExport']);
     Route::post('/get_warehousing_import', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingImport']); //page 129
@@ -165,6 +167,7 @@ Route::middleware('auth')->group(function () {
     Route::get('receiving_goods_delivery/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'__invoke']);
     Route::get('/get_rgd_package/{co_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'get_rgd_package'])->name('get_rgd_package');
     Route::post('receiving_goods_delivery/update_status5', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_status5']);
+    Route::post('receiving_goods_delivery/cancel_settlement', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'cancel_settlement']);
     Route::get('receiving_goods_delivery/cancel_rgd/{rgd_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_ReceivingGoodsDelivery_cancel']);
     Route::get('receiving_goods_delivery/get_rgd/{is_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'getReceivingGoodsDelivery']);
     Route::get('receiving_goods_delivery/get_rgd_warehousing/{w_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'getReceivingGoodsDeliveryWarehousing']);
@@ -173,7 +176,10 @@ Route::middleware('auth')->group(function () {
     Route::post('receiving_goods_delivery/warehousing/update_rdc_cancel', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_rdc_cancel'])->name('update_rdc_cancel');
     //141
     Route::post('receiving_goods_delivery/warehousing_release/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_warehousing_release'])->name('rgd_warehousing_release');
+    Route::post('receiving_goods_delivery/warehousing_release_mobile/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_warehousing_release_mobile'])->name('rgd_warehousing_release_mobile');
     Route::post('receiving_goods_delivery/import_schedule/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_import_schedule'])->name('rgd_import_schedule');
+
+    Route::post('receiving_goods_delivery/warehousing_api', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_warehousing_api'])->name('rgd_warehousing_api');
 
     Route::post('import_schedule/rgd_mobile', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_import_schedule_mobile'])->name('rgd_import_schedule_mobile');
 
@@ -270,7 +276,9 @@ Route::middleware('auth')->group(function () {
     Route::prefix('item')->name('item.')->group(function () {
         Route::get('/get_item', [App\Http\Controllers\Item\ItemController::class, 'getItems'])->name('get_item');
         Route::post('/post_item', [App\Http\Controllers\Item\ItemController::class, 'postItems'])->name('post_item');
+        Route::post('/post_item_api', [App\Http\Controllers\Item\ItemController::class, 'postItemsApi'])->name('post_item_api');
         Route::post('/post_item_popup', [App\Http\Controllers\Item\ItemController::class, 'postItemsPopup'])->name('post_item_popup');
+        Route::post('/post_item_popup_api', [App\Http\Controllers\Item\ItemController::class, 'postItemsPopupApi'])->name('post_item_popup_api');
         Route::post('/import_items', [App\Http\Controllers\Item\ItemController::class, 'importItemsList'])->name('import_items_list');
         Route::post('/post_item_chk', [App\Http\Controllers\Item\ItemController::class, 'postItemschk'])->name('post_item_chk');
         Route::get('/', [App\Http\Controllers\Item\ItemController::class, 'searchItems'])->name('search');
@@ -373,6 +381,8 @@ Route::middleware('auth')->group(function () {
         //GET RATE META DATA
         Route::get('/get_rmd_no/{rgd_no}/{set_type}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_rmd_no'])->name('get_rmd_no');
         Route::get('/get_rmd_no_fulfill/{rgd_no}/{type}/{pretype}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_rmd_no_fulfill'])->name('get_rmd_no_fulfill');
+        Route::delete('/delete_row_rate_data/{rd_no}/',[\App\Http\Controllers\RateData\RateDataController::class, 'deleteRowRateData'])->name('delete_row_rate_data');
+
 
         Route::get('/by_rm_no/{rm_no}/{rmd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateData'])->name('get_rate_data');
         Route::get('/by_co_no/{rd_co_no}/{rmd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByCono'])->name('get_rate_data_by_co_no');
@@ -393,6 +403,7 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::post('get_import_data', [\App\Http\Controllers\Import\ImportController::class,'get_import_data'])->name('get_import_data');
+    Route::post('get_import_data_api', [\App\Http\Controllers\Import\ImportController::class,'get_import_data_api'])->name('get_import_data_api');
     Route::post('get_export_data', [\App\Http\Controllers\Export\ExportController::class,'get_export_data'])->name('get_export_data');
     Route::post('/download_distribution_stocklist', [\App\Http\Controllers\Excel\ExportExcelController::class,'download_distribution_stocklist'])->name('download_distribution_stocklist');
     Route::post('/dowload_fulfillment_stock_list', [\App\Http\Controllers\Excel\ExportExcelController::class,'dowload_fulfillment_stock_list'])->name('dowload_fulfillment_stock_list');
