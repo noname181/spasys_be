@@ -418,7 +418,7 @@ class WarehousingController extends Controller
             }else if($user->mb_type == 'spasys'){
 
                 $warehousing2 = Warehousing::join(DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
-                'm.w_no', '=', 'warehousing.w_no')->where('warehousing.w_type','=','EW')->whereHas('co_no.co_parent.co_parent',function($q) use ($user){
+                'm.w_no', '=', 'warehousing.w_no')->where('warehousing.w_type','=','EW')->where('w_category_name', '=', '수입풀필먼트')->whereHas('co_no.co_parent.co_parent',function($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->get();
                 $w_import_no = collect($warehousing2)->map(function ($q){
@@ -434,7 +434,7 @@ class WarehousingController extends Controller
 
              
                 $warehousing = Warehousing::with('mb_no')
-                ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent','warehousing_child'])->whereNotIn('w_no',$w_import_no)->where('w_type','IW')->where('w_category_name', '=', '수입풀필먼트')
+                ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent','warehousing_child'])->where('w_category_name', '=', '수입풀필먼트')->whereNotIn('w_no',$w_import_no)->where('w_type','IW')
                 ->whereHas('co_no.co_parent.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->orWhereIn('w_no',$w_no_in)->orderBy('w_no', 'DESC');

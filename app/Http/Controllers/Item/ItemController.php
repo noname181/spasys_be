@@ -428,10 +428,10 @@ class ItemController extends Controller
                 });
             }
 
-            if (isset($validated['w_no'])) {
-                $warehousing = Warehousing::where('w_no', $validated['w_no'])->first();
-                $items->where('co_no', $warehousing->co_no);
-            }
+            // if (isset($validated['w_no'])) {
+            //     $warehousing = Warehousing::where('w_no', $validated['w_no'])->first();
+            //     $items->where('co_no', $warehousing->co_no);
+            // }
 
 
 
