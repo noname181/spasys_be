@@ -109,7 +109,16 @@ class RateDataController extends Controller
             }
 
             if(isset($validated['type'])){
-                if($validated['type'] == 'domestic_additional_edit' || $validated['type'] == 'work_additional_edit' || $validated['type'] == 'storage_additional_edit'  || $validated['type'] == 'work_monthly_additional_edit'  || $validated['type'] == 'storage_monthly_additional_edit' || $validated['set_type'] == 'work_final_edit' || $validated['set_type'] == 'storage_final_edit'){
+                if(
+                    $validated['type'] == 'domestic_additional_edit' ||
+                    $validated['type'] == 'work_additional_edit' ||
+                    $validated['type'] == 'storage_additional_edit'  ||
+                    $validated['type'] == 'work_monthly_additional_edit'  ||
+                    $validated['type'] == 'storage_monthly_additional_edit' ||
+                    $validated['type'] == 'domestic_monthly_additional_edit' ||
+                    $validated['set_type'] == 'work_final_edit' ||
+                    $validated['set_type'] == 'storage_final_edit'
+                ){
                     $validated['rgd_no'] = $rgd->rgd_parent_no;
                 }
             }
@@ -465,6 +474,37 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'domestic_monthly_final'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd_no,
+                    'set_type' => 'domestic_monthly_final'
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd_no,
+                        'set_type' => 'domestic_monthly'
+                    ]
+                )->first();
+            }
+            if(empty($rmd) && !empty($rdg)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rdg->rgd_no_expectation,
+                        'set_type' => 'domestic_monthly_final'
+                    ]
+                )->first();
+            }
+            if(empty($rmd) && !empty($rdg)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rdg->rgd_no_expectation,
+                        'set_type' => 'domestic_monthly'
+                    ]
+                )->first();
+            }
         }else  if(!isset($rmd->rmd_no) && $set_type == 'work_monthly_additional'){
             $rmd = RateMetaData::where(
                 [
@@ -492,6 +532,21 @@ class RateDataController extends Controller
                     [
                         'rgd_no' => $rdg->rgd_no_final,
                         'set_type' => 'storage_monthly_additional'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'domestic_monthly_additional'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd_no,
+                    'set_type' => 'domestic_monthly_additional'
+                ]
+            )->first();
+            if(empty($rmd) && !empty($rdg)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rdg->rgd_no_final,
+                        'set_type' => 'domestic_monthly_additional'
                     ]
                 )->first();
             }
@@ -1554,7 +1609,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
