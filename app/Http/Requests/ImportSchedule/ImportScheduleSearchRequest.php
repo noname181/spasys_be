@@ -63,6 +63,9 @@ class ImportScheduleSearchRequest extends BaseFormRequest
             'tie_status' => [
                 '',
             ],
+            'tie_status_2' => [
+                '',
+            ],
             'ti_status' => [
                 'nullable',
             ],

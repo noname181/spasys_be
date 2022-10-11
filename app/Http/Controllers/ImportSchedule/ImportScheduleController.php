@@ -194,10 +194,8 @@ class ImportScheduleController extends Controller
             if (isset($validated['tie_status'])) {
                 $import_schedule->where('tie_status', '=', $validated['tie_status']);
             }
-            if (isset($validated['ti_status'])) {
-                $import_schedule->whereHas('import', function($q) use($validated) {
-                    return $q->where('ti_status', '=', $validated['ti_status']);
-                });
+            if (isset($validated['tie_status_2'])) {
+                $import_schedule->where('tie_status_2', '=', $validated['tie_status_2']);
             }
             // if (isset($validated['import_schedule_status1']) || isset($validated['import_schedule_status2'])) {
             //     $import_schedule->where(function($query) use ($validated) {
@@ -208,7 +206,19 @@ class ImportScheduleController extends Controller
 
             //$members = Member::where('mb_no', '!=', 0)->get();
 
+            
+            
             $import_schedule = $import_schedule->paginate($per_page, ['*'], 'page', $page);
+
+            $status = DB::table('t_import_expected')
+            ->select('tie_status_2')
+            ->groupBy('tie_status_2')
+            ->get();
+
+            $custom = collect(['status_filter' =>  $status]);
+
+            $import_schedule = $custom->merge($import_schedule);
+
             DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
 
             return response()->json($import_schedule);
