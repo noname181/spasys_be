@@ -24,6 +24,7 @@ class Import extends Model
     protected $fillable = [
          'ti_no',
          "ti_status",
+         "ti_status_2",
          "ti_logistic_manage_number",
          "ti_carry_in_number",
          "ti_register_id",

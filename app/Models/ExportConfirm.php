@@ -23,6 +23,7 @@ class ExportConfirm extends Model
     protected $fillable = [
          'tec_no',
          "tec_status",
+         "tec_status_2",
          "tec_logistic_manage_number",
          "tec_ec_confirm_number",
          "tec_ec_type",

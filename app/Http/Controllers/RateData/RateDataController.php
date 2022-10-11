@@ -164,7 +164,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -244,6 +244,37 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'domestic_final'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd_no,
+                    'set_type' => 'domestic_final'
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd_no,
+                        'set_type' => 'domestic'
+                    ]
+                )->first();
+            }
+            if(empty($rmd) && !empty($rdg)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rdg->rgd_no_expectation,
+                        'set_type' => 'domestic_final'
+                    ]
+                )->first();
+            }
+            if(empty($rmd) && !empty($rdg)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rdg->rgd_no_expectation,
+                        'set_type' => 'domestic'
+                    ]
+                )->first();
+            }
         }else if(!isset($rmd->rmd_no) && $set_type == 'work_additional'){
             $rmd = RateMetaData::where(
                 [
@@ -303,6 +334,37 @@ class RateDataController extends Controller
                     [
                         'rgd_no' => $rdg->rgd_no_expectation,
                         'set_type' => 'storage'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'domestic_additional'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rdg->rgd_no_final,
+                    'set_type' => 'domestic_additional'
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd_no,
+                        'set_type' => 'domestic_final'
+                    ]
+                )->first();
+            }
+            if(empty($rmd) && !empty($rdg)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rdg->rgd_no_expectation,
+                        'set_type' => 'domestic_final'
+                    ]
+                )->first();
+            }
+            if(empty($rmd) && !empty($rdg)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rdg->rgd_no_expectation,
+                        'set_type' => 'domestic'
                     ]
                 )->first();
             }
@@ -1000,16 +1062,20 @@ class RateDataController extends Controller
                     'rdg_set_type' => $request->rdg_set_type,
                     'rdg_supply_price1' => $request->storageData['supply_price'],
                     'rdg_supply_price2' => $request->workData['supply_price'],
-                    'rdg_supply_price3' => $request->total['supply_price'],
+                    'rdg_supply_price3' => $request->domesticData['supply_price'],
+                    'rdg_supply_price4' => $request->total['supply_price'],
                     'rdg_vat1' => $request->storageData['taxes'],
                     'rdg_vat2' => $request->workData['taxes'],
-                    'rdg_vat3' => $request->total['taxes'],
+                    'rdg_vat3' => $request->domesticData['taxes'],
+                    'rdg_vat4' => $request->total['taxes'],
                     'rdg_sum1' => $request->storageData['sum'],
                     'rdg_sum2' => $request->workData['sum'],
-                    'rdg_sum3' => $request->total['sum'],
+                    'rdg_sum3' => $request->domesticData['sum'],
+                    'rdg_sum4' => $request->total['sum'],
                     'rdg_etc1' => $request->storageData['etc'],
                     'rdg_etc2' => $request->workData['etc'],
-                    'rdg_etc3' => $request->total['etc'],
+                    'rdg_etc3' => $request->domesticData['etc'],
+                    'rdg_etc4' => $request->total['etc'],
                 ]
             );
 
@@ -1136,16 +1202,21 @@ class RateDataController extends Controller
                     'rdg_set_type' => $request->rdg_set_type,
                     'rdg_supply_price1' => $request->storageData['supply_price'],
                     'rdg_supply_price2' => $request->workData['supply_price'],
-                    'rdg_supply_price3' => $request->total['supply_price'],
+                    'rdg_supply_price3' => $request->domesticData['supply_price'],
+                    'rdg_supply_price4' => $request->total['supply_price'],
                     'rdg_vat1' => $request->storageData['taxes'],
                     'rdg_vat2' => $request->workData['taxes'],
-                    'rdg_vat3' => $request->total['taxes'],
+                    'rdg_vat3' => $request->domesticData['taxes'],
+                    'rdg_vat4' => $request->total['taxes'],
                     'rdg_sum1' => $request->storageData['sum'],
                     'rdg_sum2' => $request->workData['sum'],
-                    'rdg_sum3' => $request->total['sum'],
+                    'rdg_sum3' => $request->domesticData['sum'],
+                    'rdg_sum4' => $request->total['sum'],
                     'rdg_etc1' => $request->storageData['etc'],
                     'rdg_etc2' => $request->workData['etc'],
-                    'rdg_etc3' => $request->total['etc'],
+                    'rdg_etc3' => $request->domesticData['etc'],
+                    'rdg_etc4' => $request->total['etc'],
+
                 ]
             );
 
@@ -1232,16 +1303,20 @@ class RateDataController extends Controller
                     'rdg_set_type' => $request->rdg_set_type,
                     'rdg_supply_price1' => $request->storageData['supply_price'],
                     'rdg_supply_price2' => $request->workData['supply_price'],
-                    'rdg_supply_price3' => $request->total['supply_price'],
+                    'rdg_supply_price3' => $request->domesticData['supply_price'],
+                    'rdg_supply_price4' => $request->total['supply_price'],
                     'rdg_vat1' => $request->storageData['taxes'],
                     'rdg_vat2' => $request->workData['taxes'],
-                    'rdg_vat3' => $request->total['taxes'],
+                    'rdg_vat3' => $request->domesticData['taxes'],
+                    'rdg_vat4' => $request->total['taxes'],
                     'rdg_sum1' => $request->storageData['sum'],
                     'rdg_sum2' => $request->workData['sum'],
-                    'rdg_sum3' => $request->total['sum'],
+                    'rdg_sum3' => $request->domesticData['sum'],
+                    'rdg_sum4' => $request->total['sum'],
                     'rdg_etc1' => $request->storageData['etc'],
                     'rdg_etc2' => $request->workData['etc'],
-                    'rdg_etc3' => $request->total['etc'],
+                    'rdg_etc3' => $request->domesticData['etc'],
+                    'rdg_etc4' => $request->total['etc'],
                 ]
             );
 
@@ -1298,16 +1373,20 @@ class RateDataController extends Controller
                     'rdg_set_type' => $request->rdg_set_type,
                     'rdg_supply_price1' => $request->storageData['supply_price'],
                     'rdg_supply_price2' => $request->workData['supply_price'],
-                    'rdg_supply_price3' => $request->total['supply_price'],
+                    'rdg_supply_price3' => $request->domesticData['supply_price'],
+                    'rdg_supply_price4' => $request->total['supply_price'],
                     'rdg_vat1' => $request->storageData['taxes'],
                     'rdg_vat2' => $request->workData['taxes'],
-                    'rdg_vat3' => $request->total['taxes'],
+                    'rdg_vat3' => $request->domesticData['taxes'],
+                    'rdg_vat4' => $request->total['taxes'],
                     'rdg_sum1' => $request->storageData['sum'],
                     'rdg_sum2' => $request->workData['sum'],
-                    'rdg_sum3' => $request->total['sum'],
+                    'rdg_sum3' => $request->domesticData['sum'],
+                    'rdg_sum4' => $request->total['sum'],
                     'rdg_etc1' => $request->storageData['etc'],
                     'rdg_etc2' => $request->workData['etc'],
-                    'rdg_etc3' => $request->total['etc'],
+                    'rdg_etc3' => $request->domesticData['etc'],
+                    'rdg_etc4' => $request->total['etc'],
                 ]
             );
 
