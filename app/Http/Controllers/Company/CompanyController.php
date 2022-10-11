@@ -475,10 +475,10 @@ class CompanyController extends Controller
                     $query->where('co_no', '=',  $co_no);
                 });
             }else{
-                $companies_shop_id = Company::with('contract')->with('warehousing')->where('co_type', 'shop')
-                ->where('co_parent_no', $user->co_no)->orderBy('co_no', 'DESC')->pluck('co_no')->toArray();
+                // $companies_shop_id = Company::with('contract')->with('warehousing')->where('co_type', 'shop')
+                // ->where('co_parent_no', $user->co_no)->orderBy('co_no', 'DESC')->pluck('co_no')->toArray();
 
-                $companies = Company::with('contract')->with('warehousing')->where('co_type', 'shipper')->
+                $companies = Company::with(['contract','co_parent'])->with('warehousing')->where('co_type', 'shipper')->
                 whereIn('co_parent_no', function($query) use ($user){
                     $query->select('co_no')
                       ->from(with(new Company)->getTable())
