@@ -337,6 +337,37 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'domestic_additional'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rdg->rgd_no_final,
+                    'set_type' => 'domestic_additional'
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd_no,
+                        'set_type' => 'domestic_final'
+                    ]
+                )->first();
+            }
+            if(empty($rmd) && !empty($rdg)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rdg->rgd_no_expectation,
+                        'set_type' => 'domestic_final'
+                    ]
+                )->first();
+            }
+            if(empty($rmd) && !empty($rdg)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rdg->rgd_no_expectation,
+                        'set_type' => 'domestic'
+                    ]
+                )->first();
+            }
         }else if(!isset($rmd->rmd_no) && $set_type == 'work_additional2'){
             $rmd = RateMetaData::where(
                 [
