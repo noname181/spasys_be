@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Models\RateData;
 class RateMetaData extends Model
 {
     use HasFactory;
@@ -38,7 +38,12 @@ class RateMetaData extends Model
     public function rate_meta() {
         return $this->hasOne(RateMeta::class, 'rm_no', 'rm_no');
     }
-
+    public function rate_data(){
+        return $this->hasMany(RateData::class, 'rmd_no', 'rmd_no');
+    }
+    // public function total1(){
+    //     return $this->hasOne(RateData::class, 'rmd_no', 'rmd_no')->where('set_type','=','work')->sum('rd_data7');
+    // }
     public function company() {
         return $this->hasOne(Company::class, 'co_no', 'co_no')->with(['contract', 'co_parent']);
     }
