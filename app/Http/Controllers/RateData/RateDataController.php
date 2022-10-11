@@ -164,7 +164,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
