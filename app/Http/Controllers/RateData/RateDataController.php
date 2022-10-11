@@ -109,7 +109,7 @@ class RateDataController extends Controller
             }
 
             if(isset($validated['type'])){
-                if($validated['type'] == 'work_additional_edit' || $validated['type'] == 'storage_additional_edit'  || $validated['type'] == 'work_monthly_additional_edit'  || $validated['type'] == 'storage_monthly_additional_edit' || $validated['set_type'] == 'work_final_edit' || $validated['set_type'] == 'storage_final_edit'){
+                if($validated['type'] == 'domestic_additional_edit' || $validated['type'] == 'work_additional_edit' || $validated['type'] == 'storage_additional_edit'  || $validated['type'] == 'work_monthly_additional_edit'  || $validated['type'] == 'storage_monthly_additional_edit' || $validated['set_type'] == 'work_final_edit' || $validated['set_type'] == 'storage_final_edit'){
                     $validated['rgd_no'] = $rgd->rgd_parent_no;
                 }
             }
@@ -1408,13 +1408,12 @@ class RateDataController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'rdg' => $rdg,
-                'final_rgd' => $final_rgd
             ], 201);
 
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
