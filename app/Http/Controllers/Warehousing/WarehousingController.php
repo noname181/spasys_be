@@ -879,7 +879,7 @@ class WarehousingController extends Controller
                 })->orderBy('rgd_no', 'DESC');
             }
 
-
+            $warehousing->whereNull('rgd_parent_no');
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
@@ -993,6 +993,7 @@ class WarehousingController extends Controller
                 })->orderBy('rgd_no', 'DESC');
             }
 
+            $warehousing->whereNull('rgd_parent_no');
 
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
@@ -1114,7 +1115,7 @@ class WarehousingController extends Controller
                     });
                 })->orderBy('rgd_no', 'DESC');
             }
-
+            $warehousing->whereNull('rgd_parent_no');
 
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
@@ -1291,6 +1292,7 @@ class WarehousingController extends Controller
                 });
             }
             $warehousing->where('rgd_status1', '=', '입고')
+            ->whereNull('rgd_parent_no')
             ->whereHas('w_no', function ($query) {
                 $query->where(function ($q) {
                     $q->where(function ($query) {
