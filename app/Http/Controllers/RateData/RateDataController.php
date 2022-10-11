@@ -164,7 +164,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -241,6 +241,37 @@ class RateDataController extends Controller
                     [
                         'rgd_no' => $rdg->rgd_no_expectation,
                         'set_type' => 'storage'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'domestic_final'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd_no,
+                    'set_type' => 'domestic_final'
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd_no,
+                        'set_type' => 'domestic'
+                    ]
+                )->first();
+            }
+            if(empty($rmd) && !empty($rdg)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rdg->rgd_no_expectation,
+                        'set_type' => 'domestic_final'
+                    ]
+                )->first();
+            }
+            if(empty($rmd) && !empty($rdg)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rdg->rgd_no_expectation,
+                        'set_type' => 'domestic'
                     ]
                 )->first();
             }
