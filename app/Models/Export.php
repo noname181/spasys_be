@@ -25,6 +25,7 @@ class Export extends Model
     protected $fillable = [
          'te_no',
          "te_status",
+         "te_status_2",
          "te_logistic_manage_number",
          "te_e_confirm_number",
          "te_e_confirm_type",

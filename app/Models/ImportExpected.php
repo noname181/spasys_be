@@ -24,6 +24,7 @@ class ImportExpected extends Model
     protected $fillable = [
         'tie_no',
         'tie_status',
+        'tie_status_2',
         'tie_logistic_manage_number',
         'tie_register_id',
         'tie_is_date',

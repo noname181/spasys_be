@@ -13,6 +13,9 @@ use App\Models\ItemInfo;
 use App\Models\Company;
 use App\Models\File;
 use App\Models\ItemChannel;
+use App\Models\ImportExpected;
+use App\Models\Export;
+
 use App\Utils\Messages;
 use App\Http\Requests\Item\ExcelRequest;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -1323,6 +1326,84 @@ class ItemController extends Controller
             return response()->json(['message' => Messages::MSG_0019], 500);
         }
     }
+
+    public function apiItemsCargoList(Request $request){
+        
+        try {
+
+            DB::beginTransaction();
+
+            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            $user = Auth::user();
+            if($user->mb_type == 'shop'){
+                $import_schedule = ImportExpected::with(['import','company'])->whereHas('company.co_parent', function ($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->groupBy('t_import_expected.tie_logistic_manage_number')->leftjoin('t_export', 't_import_expected.tie_logistic_manage_number', '=', 't_export.te_logistic_manage_number')
+            ->select(['t_import_expected.*','t_export.te_logistic_manage_number','t_export.te_carry_out_number'])
+            ->where('tie_is_date','>=','2022-01-04')->where('tie_is_date','<=','2022-10-04')
+            ->groupBy('t_export.te_logistic_manage_number','t_export.te_carry_out_number')->orderBy('t_export.te_carry_out_number','DESC');
+            }else if($user->mb_type == 'shipper'){
+                $import_schedule = ImportExpected::with(['import','company'])->whereHas('company', function ($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->groupBy('t_import_expected.tie_logistic_manage_number')->leftjoin('t_export', 't_import_expected.tie_logistic_manage_number', '=', 't_export.te_logistic_manage_number')
+            ->select(['t_import_expected.*','t_export.te_logistic_manage_number','t_export.te_carry_out_number'])
+            ->where('tie_is_date','>=','2022-01-04')->where('tie_is_date','<=','2022-10-04')
+            ->groupBy('t_export.te_logistic_manage_number','t_export.te_carry_out_number')->orderBy('t_export.te_carry_out_number','DESC');
+            }else if($user->mb_type == 'spasys'){
+                $import_schedule = ImportExpected::with(['import','company'])->whereHas('company.co_parent.co_parent', function ($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->groupBy('t_import_expected.tie_logistic_manage_number')->leftjoin('t_export', 't_import_expected.tie_logistic_manage_number', '=', 't_export.te_logistic_manage_number')
+            ->select(['t_import_expected.*','t_export.te_logistic_manage_number','t_export.te_carry_out_number'])
+            ->where('tie_is_date','>=','2022-01-04')->where('tie_is_date','<=','2022-10-04')
+            ->groupBy('t_export.te_logistic_manage_number','t_export.te_carry_out_number')->orderBy('t_export.te_carry_out_number','DESC');
+            }
+
+            $import_schedule = $import_schedule->get();
+
+            
+            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+
+            foreach($import_schedule as $value){
+                if(isset($value['tie_logistic_manage_number'])){
+                    $logistic_manage_number = $value['tie_logistic_manage_number'];
+                    $logistic_manage_number = str_replace('-', '', $logistic_manage_number);
+            
+
+                    $xmlString = simplexml_load_file("https://unipass.customs.go.kr:38010/ext/rest/cargCsclPrgsInfoQry/retrieveCargCsclPrgsInfo?crkyCn=s230z262h044b104n070k070a3&cargMtNo=" . $logistic_manage_number . "") or die("Error: Cannot create object");
+                    $json = json_encode($xmlString);
+                    $array = json_decode($json,TRUE);
+
+                   
+                    
+                    if(isset($array['cargCsclPrgsInfoDtlQryVo']) && $array['cargCsclPrgsInfoDtlQryVo']){
+                        $status = end($array['cargCsclPrgsInfoDtlQryVo'])['cargTrcnRelaBsopTpcd'];
+                        $import_expected = ImportExpected::where('tie_logistic_manage_number', $value['tie_logistic_manage_number'])
+                        ->update([
+                            'tie_status_2' => $status
+                        ]);
+
+                        $export = Export::where('te_logistic_manage_number', $value['te_logistic_manage_number'])
+                        ->update([
+                            'te_status_2' => $status
+                        ]);
+                    }
+                }
+            }
+            
+           
+        
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0019], 500);
+        }
+    }
+
     public function apiupdateStockItems(Request $request)
     {
         //return $request;
