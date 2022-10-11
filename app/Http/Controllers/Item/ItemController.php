@@ -349,7 +349,7 @@ class ItemController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
 
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : '';
-            $items = Item::with(['item_channels', 'company'])->where('item_service_name', '유통가공')->orderBy('item_no', 'DESC');
+            $items = Item::with(['item_channels', 'company','file'])->where('item_service_name', '유통가공')->orderBy('item_no', 'DESC');
 
             if (isset($validated['co_no']) && Auth::user()->mb_type == "shop") {
                 $items->where('co_no', $validated['co_no']);
