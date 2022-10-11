@@ -1549,10 +1549,11 @@ class RateDataController extends Controller
             $start_date = $updated_at->startOfMonth()->toDateString();
             $end_date = $updated_at->endOfMonth()->toDateString();
 
-            $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general'])
+            $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child'])
             ->whereHas('w_no', function($q) use($co_no){
                 $q->where('co_no', $co_no);
             })
+            ->doesntHave('rgd_child')
             ->where('updated_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
             ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
             ->where('rgd_status1', '=', '입고')
@@ -1738,11 +1739,11 @@ class RateDataController extends Controller
     public function get_rate_data_general_monthly_additional($rgd_no) {
         try {
             DB::beginTransaction();
-            $rdg = RateDataGeneral::where('rgd_no_final', $rgd_no)->where('rdg_bill_type', 'additional_monthly')->first();
+            $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'additional_monthly')->first();
 
-            // if(!isset($rdg->rdg_no)){
-            //     $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'final_monthly')->first();
-            // }
+            if(!isset($rdg->rdg_no)){
+                $rdg = RateDataGeneral::where('rgd_no_final', $rgd_no)->where('rdg_bill_type', 'additional_monthly')->first();
+            }
 
             DB::commit();
             return response()->json([
