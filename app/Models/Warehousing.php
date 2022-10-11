@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Member;
 use App\Models\Company;
+use App\Models\AdjustmentGroup;
 
 class Warehousing extends Model
 {
@@ -57,7 +58,7 @@ class Warehousing extends Model
 
     public function co_no()
     {
-        return $this->belongsTo(Company::class, 'co_no', 'co_no')->with(['contract', 'co_parent', 'company_settlement']);
+        return $this->belongsTo(Company::class, 'co_no', 'co_no')->with(['contract', 'co_parent', 'company_settlement','adjustment_group']);
 
     }
 

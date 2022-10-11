@@ -376,7 +376,7 @@ class ReceivingGoodsDeliveryController extends Controller
         } catch (\Throwable $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -957,7 +957,7 @@ class ReceivingGoodsDeliveryController extends Controller
         } catch (\Throwable $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -1156,7 +1156,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'wi_type' => '출고_shipper'
                             ]);
 
-      
+
                         }
 
                         foreach ($data['location'] as $location) {
@@ -1239,7 +1239,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         }
 
                         foreach ($data['location'] as $location) {
-                          
+
                             $rgd_no = ReceivingGoodsDelivery::where('w_no', $request->w_no)->update([
                                 'mb_no' => $member->mb_no,
                                 'w_no' => $request->w_no,
@@ -1304,7 +1304,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         }
 
                         foreach ($data['location'] as $location) {
-                           
+
                             $rgd_no = ReceivingGoodsDelivery::insertGetId([
                                 'mb_no' => $member->mb_no,
                                 'w_no' => $w_no,
@@ -1344,7 +1344,7 @@ class ReceivingGoodsDeliveryController extends Controller
         } catch (\Throwable $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -1355,7 +1355,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
         try {
             DB::beginTransaction();
-           
+
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
 
@@ -1458,7 +1458,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 foreach ($validated['items'] as $warehousing_item) {
                     $item_no = $warehousing_item['item_no'] ? $warehousing_item['item_no'] : '';
 
-                   
+
                         $checkexit1 = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_spasys')->first();
                         if(!isset($checkexit1->wi_no)){
                             WarehousingItem::insert([
@@ -1487,7 +1487,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             ]);
                         }
 
-                    
+
                 }
             }else{
                 foreach ($validated['items'] as $warehousing_item) {
@@ -1517,7 +1517,7 @@ class ReceivingGoodsDeliveryController extends Controller
         } catch (\Throwable $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -1534,7 +1534,7 @@ class ReceivingGoodsDeliveryController extends Controller
             return response()->json(['message' => 'ok']);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -1549,7 +1549,7 @@ class ReceivingGoodsDeliveryController extends Controller
             return response()->json(['message' => 'ok']);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -1566,7 +1566,7 @@ class ReceivingGoodsDeliveryController extends Controller
             return response()->json($rgd);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -1587,7 +1587,7 @@ class ReceivingGoodsDeliveryController extends Controller
             return response()->json($rgd);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -1669,7 +1669,7 @@ class ReceivingGoodsDeliveryController extends Controller
         } catch (\Throwable $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -1751,7 +1751,7 @@ class ReceivingGoodsDeliveryController extends Controller
         } catch (\Throwable $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -1791,7 +1791,7 @@ class ReceivingGoodsDeliveryController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -1809,7 +1809,7 @@ class ReceivingGoodsDeliveryController extends Controller
             return response()->json($file);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -1864,7 +1864,7 @@ class ReceivingGoodsDeliveryController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -1884,7 +1884,7 @@ class ReceivingGoodsDeliveryController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }

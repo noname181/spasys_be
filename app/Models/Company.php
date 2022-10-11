@@ -9,7 +9,7 @@ use App\Models\Contract;
 use App\Models\Warehousing;
 use App\Models\CompanyPayment;
 use App\Models\ScheduleShipmentInfo;
-
+use App\Models\AdjustmentGroup;
 class Company extends Model
 {
     use HasFactory;
@@ -67,10 +67,14 @@ class Company extends Model
     {
         return $this->hasMany(ImportSchedule::class, 'co_license', 'co_license');
     }
-
+    
     public function company_settlement()
     {
         return $this->hasMany(CompanySettlement::class, 'co_no', 'co_no');
+    }
+    public function adjustment_group()
+    {
+        return $this->hasMany(AdjustmentGroup::class, 'co_no', 'co_no');
     }
     public function schedule_shipment_info()
     {

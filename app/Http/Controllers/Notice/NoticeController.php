@@ -270,7 +270,7 @@ class NoticeController extends Controller
         } catch (\Exception $e) {
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0018], 500);
-            //return $e;
+            //
         }
     }
 

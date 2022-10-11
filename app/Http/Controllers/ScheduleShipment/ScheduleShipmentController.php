@@ -26,20 +26,20 @@ use App\Utils\CommonFunc;
 class ScheduleShipmentController extends Controller
 {
     /**
-     * 
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function paginateScheduleShipments(ScheduleShipmentSearchRequest $request)
     {
         try {
-            
+
             $validated = $request->validated();
             $user = Auth::user();
             // If per_page is null set default data = 15
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-           
+
             if( $request->type == 'page136'){
                 if ($user->mb_type == 'shop') {
                     $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->whereNull('trans_no')->whereHas('ContractWms.company.co_parent', function ($q) use ($user){
@@ -115,17 +115,17 @@ class ScheduleShipmentController extends Controller
             }
 
             if (isset($validated['order_id'])) {
-                
+
                 $schedule_shipment->where(DB::raw('lower(order_id)'), 'like', '%' . strtolower($validated['order_id']) . '%');
-                
+
             }
-           
+
             $schedule_shipment = $schedule_shipment->paginate($per_page, ['*'], 'page', $page);
-           
+
             return response()->json($schedule_shipment);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018,], 500);
         }
     }
@@ -205,21 +205,21 @@ class ScheduleShipmentController extends Controller
                             'supply_code' => $schedule_info['supply_code'],
                             'supply_name' => $schedule_info['supply_name'],
                             'supply_options' => $schedule_info['supply_options'],
-  
+
                         ]);
                     }
 
                 }
-            
+
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
-                
+
             ]);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0019], 500);
         }
     }
@@ -299,9 +299,9 @@ class ScheduleShipmentController extends Controller
                     }
 
                 }
-                    
-                    
-            
+
+
+
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -311,7 +311,7 @@ class ScheduleShipmentController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0019], 500);
         }
     }
@@ -326,13 +326,13 @@ class ScheduleShipmentController extends Controller
                     'data' => $schedule_shipment_info,
                     'data2' => $schedule_shipment
                     ], 200);
-           
+
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0006], 500);
         }
-        
+
     }
 
 

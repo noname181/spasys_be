@@ -88,7 +88,7 @@ class WarehousingController extends Controller
             }
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -202,7 +202,7 @@ class WarehousingController extends Controller
             return response()->json($warehousing);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             //return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -359,7 +359,7 @@ class WarehousingController extends Controller
             return response()->json($warehousing);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             //return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -418,7 +418,7 @@ class WarehousingController extends Controller
             }else if($user->mb_type == 'spasys'){
 
                 $warehousing2 = Warehousing::join(DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
-                'm.w_no', '=', 'warehousing.w_no')->where('warehousing.w_type','=','EW')->whereHas('co_no.co_parent.co_parent',function($q) use ($user){
+                'm.w_no', '=', 'warehousing.w_no')->where('warehousing.w_type','=','EW')->where('w_category_name', '=', '수입풀필먼트')->whereHas('co_no.co_parent.co_parent',function($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->get();
                 $w_import_no = collect($warehousing2)->map(function ($q){
@@ -432,9 +432,9 @@ class WarehousingController extends Controller
 
                 });
 
-             
+
                 $warehousing = Warehousing::with('mb_no')
-                ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent','warehousing_child'])->whereNotIn('w_no',$w_import_no)->where('w_type','IW')->where('w_category_name', '=', '수입풀필먼트')
+                ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent','warehousing_child'])->where('w_category_name', '=', '수입풀필먼트')->whereNotIn('w_no',$w_import_no)->where('w_type','IW')
                 ->whereHas('co_no.co_parent.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->orWhereIn('w_no',$w_no_in)->orderBy('w_no', 'DESC');
@@ -517,7 +517,7 @@ class WarehousingController extends Controller
             return response()->json($warehousing);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             //return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -625,7 +625,7 @@ class WarehousingController extends Controller
 
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             //return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -746,7 +746,7 @@ class WarehousingController extends Controller
         } catch (\Throwable $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -843,7 +843,7 @@ class WarehousingController extends Controller
 
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             //return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -879,7 +879,7 @@ class WarehousingController extends Controller
                 })->orderBy('rgd_no', 'DESC');
             }
 
-
+            $warehousing->whereNull('rgd_parent_no');
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
@@ -926,7 +926,7 @@ class WarehousingController extends Controller
 
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             //return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -993,6 +993,7 @@ class WarehousingController extends Controller
                 })->orderBy('rgd_no', 'DESC');
             }
 
+            $warehousing->whereNull('rgd_parent_no');
 
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
@@ -1055,7 +1056,7 @@ class WarehousingController extends Controller
 
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             //return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -1114,7 +1115,7 @@ class WarehousingController extends Controller
                     });
                 })->orderBy('rgd_no', 'DESC');
             }
-
+            $warehousing->whereNull('rgd_parent_no');
 
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
@@ -1188,7 +1189,7 @@ class WarehousingController extends Controller
 
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             //return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -1251,7 +1252,7 @@ class WarehousingController extends Controller
 
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
 
@@ -1291,6 +1292,7 @@ class WarehousingController extends Controller
                 });
             }
             $warehousing->where('rgd_status1', '=', '입고')
+            ->whereNull('rgd_parent_no')
             ->whereHas('w_no', function ($query) {
                 $query->where(function ($q) {
                     $q->where(function ($query) {
@@ -1351,7 +1353,7 @@ class WarehousingController extends Controller
 
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             //return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -1448,7 +1450,7 @@ class WarehousingController extends Controller
 
         } catch (\Exception $e) {
             Log::error($e);
-            //return $e;
+            //
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -1575,7 +1577,7 @@ class WarehousingController extends Controller
 
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             //return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -1702,7 +1704,7 @@ class WarehousingController extends Controller
 
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             //return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -1830,7 +1832,7 @@ class WarehousingController extends Controller
 
         } catch (\Exception $e) {
             Log::error($e);
-            //return $e;
+            //
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -1977,7 +1979,7 @@ class WarehousingController extends Controller
 
         } catch (\Exception $e) {
             Log::error($e);
-            //return $e;
+            //
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -2061,65 +2063,65 @@ class WarehousingController extends Controller
             $per_page = isset($request['per_page']) ? $request['per_page'] : 100000;
             $page = isset($request['page']) ? $request['page'] : 1;
             // $import_schedule = ImportSchedule::with('co_no')->with('files')->orderBy('is_no', 'DESC');
-    
+
             // if (isset($request['from_date'])) {
             //     $import_schedule->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($request['from_date'])));
             // }
-    
+
             // if (isset($request['to_date'])) {
             //     $import_schedule->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($request['to_date'])));
             // }
-    
+
             // if (isset($request['co_name'])) {
             //     $import_schedule->whereHas('co_no', function($q) use($request) {
             //         return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($request['co_name']) . '%');
             //     });
             // }
-    
+
             // if (isset($request['m_bl'])) {
             //     $import_schedule->where('m_bl', 'like', '%' . $request['m_bl'] . '%');
             // }
-    
+
             // if (isset($request['h_bl'])) {
             //     $import_schedule->where('h_bl', 'like', '%' . $request['h_bl'] . '%');
             // }
-    
+
             // if (isset($request['logistic_manage_number'])) {
             //     $import_schedule->where('logistic_manage_number', 'like', '%' . $request['logistic_manage_number'] . '%');
             // }
-    
+
             // $import_schedule = $import_schedule->get();
-    
+
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
-    
-            $sheet->setCellValue('A1', 'No'); 
+
+            $sheet->setCellValue('A1', 'No');
             $sheet->setCellValue('B1', '가맹점');
-            $sheet->setCellValue('C1', '화주'); 
-            $sheet->setCellValue('D1', '서비스'); 
-            $sheet->setCellValue('E1', '정산주기'); 
-            $sheet->setCellValue('F1', '화물번호'); 
+            $sheet->setCellValue('C1', '화주');
+            $sheet->setCellValue('D1', '서비스');
+            $sheet->setCellValue('E1', '정산주기');
+            $sheet->setCellValue('F1', '화물번호');
             $sheet->setCellValue('G1', '입고번호');
-            $sheet->setCellValue('H1', '청구번호'); 
+            $sheet->setCellValue('H1', '청구번호');
             $sheet->setCellValue('I1', '유형');
-    
+
             $num_row = 2;
             // $data_schedules =  json_decode($import_schedule);
             if(!empty($data_schedules)){
                 foreach($data_schedules as $data){
                     $sheet->setCellValue('A'.$num_row, '');
-                    $sheet->setCellValue('B'.$num_row, ''); 
+                    $sheet->setCellValue('B'.$num_row, '');
                     $sheet->setCellValue('C'.$num_row, '');
-                    $sheet->setCellValue('D'.$num_row, ''); 
-                    $sheet->setCellValue('E'.$num_row, ''); 
-                    $sheet->setCellValue('F'.$num_row, ''); 
-                    $sheet->setCellValue('G'.$num_row, ''); 
-                    $sheet->setCellValue('H'.$num_row, ''); 
+                    $sheet->setCellValue('D'.$num_row, '');
+                    $sheet->setCellValue('E'.$num_row, '');
+                    $sheet->setCellValue('F'.$num_row, '');
+                    $sheet->setCellValue('G'.$num_row, '');
+                    $sheet->setCellValue('H'.$num_row, '');
                     $sheet->setCellValue('I'.$num_row, '');
                     $num_row++;
                 }
             }
-            
+
             $Excel_writer = new Xlsx($spreadsheet);
             if(isset($user->mb_no)){
                 $path = '../storage/download/'.$user->mb_no.'/';
@@ -2141,7 +2143,7 @@ class WarehousingController extends Controller
             ob_end_clean();
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
         }
     }
 }

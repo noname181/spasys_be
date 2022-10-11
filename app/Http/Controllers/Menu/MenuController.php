@@ -84,7 +84,7 @@ class MenuController extends Controller
         } catch (\Exception $e) {
             Log::error($e);
             //return response()->json(['message' => Messages::MSG_0018], 500);
-            return $e;
+
         }
     }
     public function create(MenuCreateRequest $request)
@@ -165,7 +165,7 @@ class MenuController extends Controller
         } catch (\Throwable $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
         }
     }
 
@@ -228,7 +228,7 @@ class MenuController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0002], 500);
         }
     }
@@ -254,7 +254,7 @@ class MenuController extends Controller
             return response()->json(['message' => Messages::MSG_0007], 200);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0003], 500);
         }
     }

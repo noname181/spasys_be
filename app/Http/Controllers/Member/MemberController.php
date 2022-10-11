@@ -64,7 +64,7 @@ class MemberController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -94,7 +94,7 @@ class MemberController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -141,7 +141,7 @@ class MemberController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -225,7 +225,7 @@ class MemberController extends Controller
             return response()->json($members);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -339,7 +339,7 @@ class MemberController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -385,7 +385,7 @@ class MemberController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0002], 500);
         }
     }
@@ -405,7 +405,7 @@ class MemberController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0003], 500);
         }
     }
@@ -425,7 +425,7 @@ class MemberController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0003], 500);
         }
     }

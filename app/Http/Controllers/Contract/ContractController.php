@@ -41,7 +41,7 @@ class ContractController extends Controller
             $c_file_license_ = isset($validated['c_file_license']) ? $validated['c_file_license'] : '';
             $c_file_contract_ = isset($validated['c_file_contract']) ? $validated['c_file_contract'] : '';
             $c_file_bank_account_ = isset($validated['c_file_bank_account']) ? $validated['c_file_bank_account'] : '';
-             
+
 
             if(isset($validated['c_file_insulance'])) $inl = Storage::disk('public')->put($c_file_insulance, $c_file_insulance_) ;
             if(isset($validated['c_file_license'])) $lic = Storage::disk('public')->put($c_file_license,  $c_file_license_);
@@ -116,7 +116,7 @@ class ContractController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -251,7 +251,7 @@ class ContractController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }

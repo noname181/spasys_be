@@ -26,7 +26,7 @@ class ExportController extends Controller
 
     {
         //return $request;
-        
+
         $validated = $request->validated();
         try{
 
@@ -34,12 +34,12 @@ class ExportController extends Controller
         //fetchWarehousing
         $warehousing = Warehousing::where('w_no', $validated['w_no'])->first();
 
-           
+
         $type = $warehousing->w_type;
         $warehousings = Warehousing::where('w_import_no',$validated['w_no'])->get();
-        
 
-        
+
+
         if(isset($validated['page_type']) && ($validated['page_type'] == 'Page146_1' || $validated['page_type'] == 'Page146') && $type=='IW'){
             $w_no = array();
             foreach($warehousings as $o) {
@@ -48,8 +48,8 @@ class ExportController extends Controller
         }
 
         //fetchReceivingGoodsDeliveryRequests
-       
-        
+
+
         if(isset($validated['page_type']) && ($validated['page_type'] == 'Page146_1' || $validated['page_type'] == 'Page146') && $type=='IW'){
             $rgd = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->whereHas('w_no', function($q) use ($w_no) {
                 return $q->whereIn('w_no', $w_no);
@@ -77,7 +77,7 @@ class ExportController extends Controller
             $item_no =  array_column($validated['items'], 'item_no');
         }
 
-        
+
 
         //fetchItems
         if (isset($validated['w_no'])) {
@@ -91,7 +91,7 @@ class ExportController extends Controller
                 $warehousing_items = WarehousingItem::where('w_no', $validated['w_no'])->where('wi_type', '=', '입고_spasys')->get();
             }else if(isset($validated['w_no']) && $type=='EW' && !isset($validated['page_type'])){
                 //show for 141 shipper edit 출고
-                
+
 
                 $warehousing_items = WarehousingItem::where('w_no', $validated['w_no'])->where('wi_type', '=', '출고_shipper')->get();
             }else{
@@ -106,9 +106,9 @@ class ExportController extends Controller
             }
 
             $items = [];
-           
+
             foreach($warehousing_items as $key =>  $warehousing_item){
-                $item = Item::with('item_channels')->where('item_no', $warehousing_item->item_no)->first();
+                $item = Item::with(['item_channels','file'])->where('item_no', $warehousing_item->item_no)->first();
                 if($type=='EW'){
                     $warehousing_items_import = WarehousingItem::with('item_no')->whereHas('item_no',function($q) use ($warehousing){
                         $q->where('w_no', $warehousing->w_import_no);
@@ -116,16 +116,16 @@ class ExportController extends Controller
                     foreach($warehousing_items_import as $i => $value){
                         $item->remain = $warehousing_items_import[$i]->wi_number - $warehousing_item->wi_number;
                     }
-                   
+
                     $item->warehousing_items_import = $warehousing_items_import;
                     // $warehousing_item->wi_number = $warehousing_items_import[0]->wi_number - $warehousing_item->wi_number;
                 }
                 // else{
                 //     $item->remain = $warehousing_items_import[0]->wi_number - $warehousing_item->wi_number;
                 // }
-                
+
                 $item->warehousing_item = [$warehousing_item];
-               
+
                 $items[] = $item;
             }
 
@@ -137,18 +137,18 @@ class ExportController extends Controller
                                      'warehousing' => $warehousing,
                                      'warehousings' => $warehousings,
                                      'warehousing_items' => $warehousing_items,
-                                    
+
                                      'rgd' => $rgd,
                                      'warehousing_request' => $warehousing_request,
                                      'items' => $items,
                                      'sql' => DB::getQueryLog()
                                     ],
-                                    
+
 
                                     200);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }

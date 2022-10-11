@@ -20,7 +20,7 @@ use App\Utils\CommonFunc;
 class ContractwmsController extends Controller
 {
     /**
-     * 
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function getContractWmsByCono($request)
@@ -34,13 +34,13 @@ class ContractwmsController extends Controller
                     'data' => $Contractwms_tab1,
                     'data2' => $Contractwms_tab2,
                     ], 200);
-           
+
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0006], 500);
         }
-        
+
     }
     public function CreateOrUpdateByCoPu(ContractWmsRequest $request)
     {
@@ -53,13 +53,13 @@ class ContractwmsController extends Controller
                 $exist2 = [];
                 if(isset($validated['co_no'])){
                     if(isset($validated['contract_wms_tab1'])){
-                       
+
                         foreach ($validated['contract_wms_tab1'] as $ssi) {
                             $contract_code_tab1 = ContractWms::where('cw_tab','=','판매처')->where('cw_code','=',$ssi['cw_code'])->where('mb_no', '!=', $user->mb_no)->first();
 
                             if(!isset($contract_code_tab1->cw_no)){
                                 $co_no = $request->get('co_no');
-                                
+
                                 $update = ContractWms::updateOrCreate(
                                     [
                                         //'cw_no' => $ssi['cw_no'] ?: null,
@@ -70,7 +70,7 @@ class ContractwmsController extends Controller
                                         'co_no' => $co_no,
                                         'cw_name' => ($ssi['cw_name'] && $ssi['cw_name'] !='null') ? $ssi['cw_name']  : null,
                                         'cw_tab' => '판매처',
-                                       
+
                                     ]
                                 );
                                 //return $update;
@@ -78,7 +78,7 @@ class ContractwmsController extends Controller
                                 $exist1[] = $ssi['cw_code'];
 
                             }
-                           
+
 
                         }
                     }
@@ -97,20 +97,20 @@ class ContractwmsController extends Controller
                                         'co_no' => $co_no,
                                         'cw_name' => ($ss['cw_name'] && $ss['cw_name'] !='null') ? $ss['cw_name']: null,
                                         'cw_tab' => '공급처',
-                                      
+
                                     ]
                                 );
                             }else{
                                 $exist2[] = $ss['cw_code'];
                             }
-                           
+
                         }
                     }
 
                 }
-                    
-                    
-            
+
+
+
             DB::commit();
             return response()->json([
                 //'message' => Messages::MSG_0007,
@@ -122,7 +122,7 @@ class ContractwmsController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0019], 500);
         }
     }

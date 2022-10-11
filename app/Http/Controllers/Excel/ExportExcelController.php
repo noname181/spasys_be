@@ -27,7 +27,7 @@ class ExportExcelController extends Controller
         $validated = $request->validated();
         try {
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 100000;
-  
+
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
             if($user->mb_type == 'shop'){
@@ -103,15 +103,15 @@ class ExportExcelController extends Controller
                 $total = $total_get - $total_give;
                 return [ 'total_amount' => $total ,  'total_price' => $item4->item_price2 * $total];
             });
-        
+
             $item = $item->paginate($per_page, ['*'], 'page', $page);
-            
+
             $item5 = $item3->sum('total_amount');
             $item6 = $item3->sum('total_price');
-          
-            
-            
-           
+
+
+
+
             $custom = collect(['sum1' => $item5,'sum2'=>$item6]);
 
             $item->setCollection(
@@ -125,7 +125,7 @@ class ExportExcelController extends Controller
                     return $q;
                 })
             );
-            
+
             $data = $custom->merge($item);
             $data_export = $data['data'];
             $spreadsheet = new Spreadsheet();
@@ -178,7 +178,7 @@ class ExportExcelController extends Controller
             ob_end_clean();
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -338,7 +338,7 @@ class ExportExcelController extends Controller
             ob_end_clean();
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -382,14 +382,14 @@ class ExportExcelController extends Controller
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
 
-            $sheet->setCellValue('A1', 'No'); 
+            $sheet->setCellValue('A1', 'No');
             $sheet->setCellValue('B1', '가맹점');
-            $sheet->setCellValue('C1', '화주'); 
-            $sheet->setCellValue('D1', 'M-BL'); 
-            $sheet->setCellValue('E1', 'H-BL'); 
-            $sheet->setCellValue('F1', '화물상태'); 
+            $sheet->setCellValue('C1', '화주');
+            $sheet->setCellValue('D1', 'M-BL');
+            $sheet->setCellValue('E1', 'H-BL');
+            $sheet->setCellValue('F1', '화물상태');
             $sheet->setCellValue('G1', '통관상태');
-            $sheet->setCellValue('H1', '수량'); 
+            $sheet->setCellValue('H1', '수량');
             $sheet->setCellValue('I1', '화물연계번호');
             $sheet->setCellValue('J1', '반입일');
 
@@ -397,18 +397,18 @@ class ExportExcelController extends Controller
             $data_schedules =  json_decode($import_schedule);
             foreach($data_schedules as $data){
                 $sheet->setCellValue('A'.$num_row, isset($data->is_no)?$data->is_no:'');
-                $sheet->setCellValue('B'.$num_row, isset($data->mb_name)?$data->mb_name:''); 
+                $sheet->setCellValue('B'.$num_row, isset($data->mb_name)?$data->mb_name:'');
                 $sheet->setCellValue('C'.$num_row, isset($data->co_name)?$data->co_name:'');
-                $sheet->setCellValue('D'.$num_row, isset($data->m_bl)?$data->m_bl:''); 
-                $sheet->setCellValue('E'.$num_row, isset($data->h_bl)?$data->h_bl:''); 
-                $sheet->setCellValue('F'.$num_row, isset($data->cargoStatus)?$data->cargoStatus:''); 
-                $sheet->setCellValue('G'.$num_row, isset($data->cargoStatus2)?$data->cargoStatus2:''); 
-                $sheet->setCellValue('H'.$num_row, isset($data->is_number)?$data->is_number:''); 
+                $sheet->setCellValue('D'.$num_row, isset($data->m_bl)?$data->m_bl:'');
+                $sheet->setCellValue('E'.$num_row, isset($data->h_bl)?$data->h_bl:'');
+                $sheet->setCellValue('F'.$num_row, isset($data->cargoStatus)?$data->cargoStatus:'');
+                $sheet->setCellValue('G'.$num_row, isset($data->cargoStatus2)?$data->cargoStatus2:'');
+                $sheet->setCellValue('H'.$num_row, isset($data->is_number)?$data->is_number:'');
                 $sheet->setCellValue('I'.$num_row, isset($data->cargoLink)?$data->cargoLink:'');
                 $sheet->setCellValue('J'.$num_row, isset($data->is_date)?$data->is_date:'');
                 $num_row++;
             }
-            
+
             $Excel_writer = new Xlsx($spreadsheet);
             if(isset($user->mb_no)){
                 $path = '../storage/download/'.$user->mb_no.'/';
@@ -430,7 +430,7 @@ class ExportExcelController extends Controller
             ob_end_clean();
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             //return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }

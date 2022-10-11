@@ -154,7 +154,7 @@ class ItemController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0019], 500);
         }
     }
@@ -186,7 +186,7 @@ class ItemController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -259,7 +259,7 @@ class ItemController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -332,7 +332,7 @@ class ItemController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -403,7 +403,7 @@ class ItemController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -428,10 +428,10 @@ class ItemController extends Controller
                 });
             }
 
-            if (isset($validated['w_no'])) {
-                $warehousing = Warehousing::where('w_no', $validated['w_no'])->first();
-                $items->where('co_no', $warehousing->co_no);
-            }
+            // if (isset($validated['w_no'])) {
+            //     $warehousing = Warehousing::where('w_no', $validated['w_no'])->first();
+            //     $items->where('co_no', $warehousing->co_no);
+            // }
 
 
 
@@ -476,7 +476,7 @@ class ItemController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -517,7 +517,7 @@ class ItemController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -665,7 +665,7 @@ class ItemController extends Controller
             return response()->json($data);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -776,7 +776,7 @@ class ItemController extends Controller
             return response()->json($data);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -892,7 +892,7 @@ class ItemController extends Controller
             return response()->json($data);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -1319,7 +1319,7 @@ class ItemController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0019], 500);
         }
     }
@@ -1343,7 +1343,7 @@ class ItemController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0019], 500);
         }
     }
@@ -1375,7 +1375,7 @@ class ItemController extends Controller
             return response()->json($item);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }

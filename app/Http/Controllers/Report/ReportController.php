@@ -217,7 +217,7 @@ class ReportController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -301,7 +301,7 @@ class ReportController extends Controller
             return response()->json($reports);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
 
         }
@@ -383,7 +383,7 @@ class ReportController extends Controller
             return response()->json($reports);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
 
         }
