@@ -1283,6 +1283,7 @@ class RateDataController extends Controller
                 $final_rgd->rgd_status4 = $request->status;
                 $final_rgd->rgd_is_show = $request->bill_type == 'final_monthly' ? 'n' : 'y';
                 $final_rgd->rgd_parent_no = $previous_rgd->rgd_no;
+                $final_rgd->rgd_status5 = NULL;
                 $final_rgd->save();
 
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
@@ -1379,6 +1380,7 @@ class RateDataController extends Controller
                 $final_rgd = $rgd->replicate();
                 $final_rgd->rgd_bill_type = 'additional'; // the new project_id
                 $final_rgd->rgd_status4 = $request->status;
+                $final_rgd->rgd_status5 = NULL;
                 $final_rgd->rgd_parent_no = $rgd->rgd_no;
                 $final_rgd->save();
 
@@ -1451,6 +1453,7 @@ class RateDataController extends Controller
                 $final_rgd = $expectation_rgd->replicate();
                 $final_rgd->rgd_bill_type = 'additional'; // the new project_id
                 $final_rgd->rgd_status4 = '확정청구서';
+                $final_rgd->rgd_status5 = NULL;
                 $final_rgd->save();
 
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
@@ -1645,6 +1648,7 @@ class RateDataController extends Controller
                         $final_rgd = $expectation_rgd->replicate();
                         $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
                         $final_rgd->rgd_status4 = '확정청구서';
+                        $final_rgd->rgd_status5 = NULL;
                         $final_rgd->rgd_is_show = ($i == 0 ? 'y' : 'n');
                         $final_rgd->rgd_parent_no = $expectation_rgd->rgd_no;
                         $final_rgd->rgd_settlement_number =  $request->settlement_number;
