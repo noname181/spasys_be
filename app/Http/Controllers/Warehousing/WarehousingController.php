@@ -1770,36 +1770,32 @@ class WarehousingController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
-            if($user->mb_type =='shop'){
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
-                    $query->whereHas('co_no.co_parent',function($q) use ($user){
-                        $q->where('co_no', $user->co_no);
-                    });
-                });
-            }else if($user->mb_type == 'shipper' ){
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no' , 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
-                    $query->whereHas('co_no',function($q) use ($user){
-                        $q->where('co_no', $user->co_no);
-                    });
-                });
-            }else if($user->mb_type == 'spasys'){
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
-                    $query->whereHas('co_no.co_parent.co_parent',function($q) use ($user){
-                        $q->where('co_no', $user->co_no);
-                    });
-                });
-            }
-            $warehousing->where('rgd_status1', '=', '출고')
-            ->where('rgd_status2', '=', '작업완료')
-            ->where(function ($q) {
-                $q->where('rgd_status4', '=', '예상경비청구서')
-                ->orWhere('rgd_status4', '=', '확정청구서')
-                ->orWhere('rgd_status4', '=', '추가청구서');
-            })
-            ->whereHas('w_no', function ($query) {
-                $query->where('w_type', '=', 'EW')
-                ->where('w_category_name', '=', '수입풀필먼트');
-            })
+            // if($user->mb_type =='shop'){
+            //     $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
+            //         $query->whereHas('co_no.co_parent',function($q) use ($user){
+            //             $q->where('co_no', $user->co_no);
+            //         });
+            //     });
+            // }else if($user->mb_type == 'shipper' ){
+            //     $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no' , 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
+            //         $query->whereHas('co_no',function($q) use ($user){
+            //             $q->where('co_no', $user->co_no);
+            //         });
+            //     });
+            // }else if($user->mb_type == 'spasys'){
+            //     $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
+            //         $query->whereHas('co_no.co_parent.co_parent',function($q) use ($user){
+            //             $q->where('co_no', $user->co_no);
+            //         });
+            //     });
+            // }
+            $warehousing  = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->where('rgd_status5', '=', 'fulfillment')
+            // ->where(function ($q) {
+            //     $q->where('rgd_status4', '=', '예상경비청구서')
+            //     ->orWhere('rgd_status4', '=', '확정청구서')
+            //     ->orWhere('rgd_status4', '=', '추가청구서');
+            // })
+
             // ->whereHas('mb_no', function ($q) {
             //     $q->whereHas('company', function ($q) {
             //         $q->where('co_type', 'spasys');
