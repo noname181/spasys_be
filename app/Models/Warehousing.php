@@ -88,7 +88,7 @@ class Warehousing extends Model
 
     public function warehousing_request()
     {
-        return $this->hasOne(WarehousingRequest::class, 'w_no', 'w_no');
+        return $this->hasOne(WarehousingRequest::class, 'w_no', 'w_no')->orderBy('wr_no', 'desc');
     }
 
     public function rate_data_general()
