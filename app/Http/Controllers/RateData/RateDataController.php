@@ -1187,18 +1187,18 @@ class RateDataController extends Controller
     public function get_rate_data_general_final($rgd_no) {
         try {
             DB::beginTransaction();
-            $rdg = RateDataGeneral::where('rgd_no_final', $rgd_no)->where('rdg_bill_type', 'additional')->first();
+            $rdg = RateDataGeneral::with(['warehousing'])->where('rgd_no_final', $rgd_no)->where('rdg_bill_type', 'additional')->first();
 
             if(!isset($rdg->rdg_no)){
-                $rdg = RateDataGeneral::where('rgd_no_expectation', $rgd_no)->where('rdg_bill_type', 'final')->first();
+                $rdg = RateDataGeneral::with(['warehousing'])->where('rgd_no_expectation', $rgd_no)->where('rdg_bill_type', 'final')->first();
             }
 
             if(!isset($rdg->rdg_no)){
-                $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'expectation')->first();
+                $rdg = RateDataGeneral::with(['warehousing'])->where('rgd_no', $rgd_no)->where('rdg_bill_type', 'expectation')->first();
             }
 
             if(!isset($rdg->rdg_no)){
-                $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'expectation_monthly')->first();
+                $rdg = RateDataGeneral::with(['warehousing'])->where('rgd_no', $rgd_no)->where('rdg_bill_type', 'expectation_monthly')->first();
             }
 
 
