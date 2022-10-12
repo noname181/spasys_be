@@ -1556,7 +1556,7 @@ class RateDataController extends Controller
             ->whereHas('w_no', function($q) use($co_no){
                 $q->where('co_no', $co_no);
             })
-            ->doesntHave('rgd_child')
+            // ->doesntHave('rgd_child')
             ->where('updated_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
             ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
             ->where('rgd_status1', '=', '입고')
