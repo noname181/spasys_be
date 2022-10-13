@@ -868,12 +868,29 @@ class RateDataController extends Controller
             $export = Export::with(['import'])->where('te_carry_out_number', $is_no)->first();
             $company = Company::where('co_license',$export->import->ti_co_license)->first();
             $rate_data = RateData::where('rd_cate_meta1', '보세화물');
+
+
             if($user->mb_type == 'spasys'){
-                $rate_data = $rate_data->where('co_no', $company->co_no);
-            }else if($user->mb_type == 'shop' || $user->mb_type == 'shipper'){
-                $rate_data = $rate_data->where('rd_co_no', $company->co_no);
+                $co_no =  $company->co_no;
+                $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
+                $rate_data = $rate_data->where('rd_co_no', $co_no);
+                if(isset($rmd->rmd_no)){
+                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+                }
+            }else if($user->mb_type == 'shop'){
+                $co_no =  $company->co_no;
+                $rmd = RateMetaData::where('co_no',  $co_no )->latest('created_at')->first();
+                $rate_data = $rate_data->where('rd_co_no',  $co_no );
+                if(isset($rmd->rmd_no)){
+                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+                }
             }else {
-                $rate_data = $rate_data->where('co_no', $company->co_no);
+                $co_no =  $company->co_no;
+                $rmd = RateMetaData::where('co_no',  $co_no )->latest('created_at')->first();
+                $rate_data = $rate_data->where('rd_co_no',  $co_no );
+                if(isset($rmd->rmd_no)){
+                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+                }
             }
             $rate_data = $rate_data->get();
             return response()->json(['message' => Messages::MSG_0007,'company'=>$company, 'rate_data' => $rate_data], 200);
