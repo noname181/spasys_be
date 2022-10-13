@@ -340,6 +340,9 @@ Route::middleware('auth')->group(function () {
             Route::get('/spasys', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData'])->name('get_spasys_rate_data');
             Route::get('/spasys2', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData2'])->name('get_spasys_rate_data2');
             Route::get('/spasys3', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData3'])->name('get_spasys_rate_data3');
+
+            //GET RATE DATA FOLLOW RGD_NO
+            Route::get('/spasys3/{rgd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataRgd'])->name('get_spasys_rate_data_rgd');
             Route::post('/spasys4', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData4'])->name('get_spasys_rate_data4');
         });
 
