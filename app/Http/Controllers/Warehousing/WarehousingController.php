@@ -1358,7 +1358,9 @@ class WarehousingController extends Controller
                 });
             }
             if (isset($validated['settlement_cycle'])) {
-                $warehousing->where('settlement_cycle', '=', $validated['settlement_cycle']);
+                $warehousing->whereHas('w_no.co_no.company_distribution_cycle', function ($q) use ($validated) {
+                    return $q->where('cs_payment_cycle', $validated['settlement_cycle']);
+                });
             }
 
             $warehousing->orderBy('updated_at', 'DESC');

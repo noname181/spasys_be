@@ -58,7 +58,7 @@ class Warehousing extends Model
 
     public function co_no()
     {
-        return $this->belongsTo(Company::class, 'co_no', 'co_no')->with(['contract', 'co_parent', 'company_settlement','adjustment_group']);
+        return $this->belongsTo(Company::class, 'co_no', 'co_no')->with(['contract', 'co_parent', 'company_settlement','adjustment_group', 'company_distribution_cycle']);
 
     }
 
