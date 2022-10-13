@@ -226,64 +226,70 @@ class ReceivingGoodsDeliveryController extends Controller
 
             if(isset($validated['w_no'])){
                 foreach ($validated['items'] as $warehousing_item) {
+
+                    
                     $item_no = $warehousing_item['item_no'] ? $warehousing_item['item_no'] : '';
 
-                    if(isset($validated['page_type']) && $validated['page_type'] == 'Page130146'){
-                        $checkexit1 = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_spasys')->first();
-                        if(!isset($checkexit1->wi_no)){
-                            WarehousingItem::insert([
-                                'item_no' => $item_no,
-                                'w_no' => $w_no,
-                                'wi_number' => $warehousing_item['warehousing_item2'][0]['wi_number'],
-                                'wi_type' => '입고_spasys'
-                            ]);
-                        }else{
-                            $warehousing_items = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_spasys')->update([
-                                'wi_number' => $warehousing_item['warehousing_item2'][0]['wi_number'],
-                            ]);
-                        }
+                    if(isset($item_no) && $item_no){
+                        if(isset($validated['page_type']) && $validated['page_type'] == 'Page130146'){
+                            $checkexit1 = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_spasys')->first();
+                            if(!isset($checkexit1->wi_no)){
+                                WarehousingItem::insert([
+                                    'item_no' => $item_no,
+                                    'w_no' => $w_no,
+                                    'wi_number' => $warehousing_item['warehousing_item2'][0]['wi_number'],
+                                    'wi_type' => '입고_spasys'
+                                ]);
+                            }else{
+                                $warehousing_items = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_spasys')->update([
+                                    'wi_number' => $warehousing_item['warehousing_item2'][0]['wi_number'],
+                                ]);
+                            }
 
-                        $checkexit2 = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_shipper')->first();
-                        if(!isset($checkexit2->wi_no)){
-                            WarehousingItem::insert([
-                                'item_no' => $item_no,
-                                'w_no' => $w_no,
-                                'wi_number' => 0,
-                                'wi_type' => '입고_shipper'
-                            ]);
-                        }else{
-                            $warehousing_items = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_shipper')->update([
-                                'wi_number' => $warehousing_item['warehousing_item'][0]['wi_number'],
-                            ]);
-                        }
-
-                    }else{
-
-                        $checkexit3 = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_shipper')->first();
-                        if(!isset($checkexit3->wi_no)){
-                            WarehousingItem::insert([
-                                'item_no' => $item_no,
-                                'w_no' => $w_no,
-                                'wi_number' => $warehousing_item['warehousing_item'][0]['wi_number'],
-                                'wi_type' => '입고_shipper'
-                            ]);
-                        }else{
-                            if(isset($warehousing_item['warehousing_item'][0]['wi_number'])){
+                            $checkexit2 = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_shipper')->first();
+                            if(!isset($checkexit2->wi_no)){
+                                WarehousingItem::insert([
+                                    'item_no' => $item_no,
+                                    'w_no' => $w_no,
+                                    'wi_number' => 0,
+                                    'wi_type' => '입고_shipper'
+                                ]);
+                            }else{
                                 $warehousing_items = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_shipper')->update([
                                     'wi_number' => $warehousing_item['warehousing_item'][0]['wi_number'],
                                 ]);
+                            }
+
+                        }else{
+
+                            $checkexit3 = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_shipper')->first();
+                            if(!isset($checkexit3->wi_no)){
+                                WarehousingItem::insert([
+                                    'item_no' => $item_no,
+                                    'w_no' => $w_no,
+                                    'wi_number' => $warehousing_item['warehousing_item'][0]['wi_number'],
+                                    'wi_type' => '입고_shipper'
+                                ]);
+                            }else{
+                                if(isset($warehousing_item['warehousing_item'][0]['wi_number'])){
+                                    $warehousing_items = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_shipper')->update([
+                                        'wi_number' => $warehousing_item['warehousing_item'][0]['wi_number'],
+                                    ]);
+                                }
                             }
                         }
                     }
                 }
             }else{
                 foreach ($validated['items'] as $warehousing_item) {
-                    WarehousingItem::insert([
-                        'item_no' => $warehousing_item['item_no'],
-                        'w_no' => $w_no,
-                        'wi_number' => isset($warehousing_item['warehousing_item'][0]['wi_number']) ? $warehousing_item['warehousing_item'][0]['wi_number'] : null ,
-                        'wi_type' => '입고_shipper'
-                    ]);
+                    if(isset($warehousing_item['item_no']) && $warehousing_item['item_no']){
+                            WarehousingItem::insert([
+                                'item_no' => $warehousing_item['item_no'],
+                                'w_no' => $w_no,
+                                'wi_number' => isset($warehousing_item['warehousing_item'][0]['wi_number']) ? $warehousing_item['warehousing_item'][0]['wi_number'] : null ,
+                                'wi_type' => '입고_shipper'
+                            ]);
+                    }
                 }
             }
 
@@ -376,7 +382,7 @@ class ReceivingGoodsDeliveryController extends Controller
         } catch (\Throwable $e) {
             DB::rollback();
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
