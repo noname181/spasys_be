@@ -1,17 +1,16 @@
 <?php
 
-namespace App\Http\Controllers\Push;
+namespace App\Http\Controllers\SendEmail;
 
-use App\Http\Requests\Push\PushRequest;
-use App\Http\Requests\Push\PushRegisterRequest;
-use App\Http\Requests\Push\PushtUpdateRequest;
+
+use App\Http\Requests\SendEmail\SendEmailRegisterRequest;
 use App\Http\Controllers\Controller;
-use App\Models\Push;
+use App\Models\SendEmail;
 use App\Utils\Messages;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
-class PushController extends Controller
+class SendEmailController extends Controller
 {
    
    
@@ -23,18 +22,18 @@ class PushController extends Controller
      * @param  App\Http\Requests\Push\PushRegisterRequest  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function createPush(PushRegisterRequest $request)
+    public function createSendEmail(SendEmailRegisterRequest $request)
     {
         $validated = $request->validated();
         try {
-            $push = Push::insertGetId([
+            $push = SendEmail::insertGetId([
                 'mb_no' => Auth::user()->mb_no,
-                'push_category' => $validated['push_category'],
-                'push_title' => $validated['push_title'],
-                'push_content' => $validated['push_content'],
-                'push_time' => $validated['push_time'],
-                'push_must_yn' => $validated['push_must_yn'],
-                'push_use_yn' => $validated['push_use_yn']
+                'rm_no' => $validated['rm_no'],
+                'se_email_cc' => $validated['se_email_cc'],
+                'se_email_receiver' => $validated['se_email_receiver'],
+                'se_name_receiver' => $validated['se_name_receiver'],
+                'se_title' => $validated['se_title'],
+                'se_content' => $validated['se_content']
             ]);
 
             return response()->json([

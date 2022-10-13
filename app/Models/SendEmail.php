@@ -22,6 +22,7 @@ class SendEmail extends Model
      */
     protected $fillable = [
         'se_no',
+        'mb_no',
         'se_name_receiver',
         'se_email_receiver', 
         'se_email_cc',
