@@ -1352,6 +1352,14 @@ class WarehousingController extends Controller
                     return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
                 });
             }
+            if (isset($validated['w_schedule_number2'])) {
+                $warehousing->whereHas('w_no', function ($q) use ($validated) {
+                    return $q->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%');
+                });
+            }
+            if (isset($validated['settlement_cycle'])) {
+                $warehousing->where('settlement_cycle', '=', $validated['settlement_cycle']);
+            }
 
             $warehousing->orderBy('updated_at', 'DESC');
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
