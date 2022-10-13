@@ -91,4 +91,11 @@ class Company extends Model
         return $this->hasOne(CompanyPayment::class, 'co_no', 'co_no');
 
     }
+
+    public function company_distribution_cycle()
+    {
+        return $this->hasOne(CompanySettlement::class, 'co_no', 'co_no')->where('service_no', 4);
+
+    }
+
 }

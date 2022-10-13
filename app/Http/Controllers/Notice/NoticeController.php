@@ -98,22 +98,24 @@ class NoticeController extends Controller
             $path = join('/', ['files', 'notice', $notice_no]);
 
             $files = [];
-
-            foreach($validated['files'] as $key => $file) {
-                $url = Storage::disk('public')->put($path, $file);
-                $files[] = [
-                    'file_table' => 'notice',
-                    'file_table_key' => $notice_no,
-                    'file_name_old' => $file->getClientOriginalName(),
-                    'file_name' => basename($url),
-                    'file_size' => $file->getSize(),
-                    'file_extension' => $file->extension(),
-                    'file_position' => $key,
-                    'file_url' => $url
-                ];
+            if(isset($validated['files'])){
+                foreach($validated['files'] as $key => $file) {
+                    $url = Storage::disk('public')->put($path, $file);
+                    $files[] = [
+                        'file_table' => 'notice',
+                        'file_table_key' => $notice_no,
+                        'file_name_old' => $file->getClientOriginalName(),
+                        'file_name' => basename($url),
+                        'file_size' => $file->getSize(),
+                        'file_extension' => $file->extension(),
+                        'file_position' => $key,
+                        'file_url' => $url
+                    ];
+                }
+                File::insert($files);
             }
+            
 
-            File::insert($files);
 
             DB::commit();
             return response()->json([
@@ -123,6 +125,7 @@ class NoticeController extends Controller
             ], 201);
         } catch (\Throwable $e) {
             DB::rollback();
+            //return $e;
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0001], 500);
         }

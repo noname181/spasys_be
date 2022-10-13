@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Notice;
+namespace App\Http\Requests\SendEmail;
 
 use App\Http\Requests\BaseFormRequest;
 
-class NoticeCreateRequest extends BaseFormRequest
+class SendEmailRegisterRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,33 +24,40 @@ class NoticeCreateRequest extends BaseFormRequest
     public function rules()
     {
         return [
-            'notice_title' => [
+            'se_content' => [
                 'required',
                 'string',
-                'max:255',
             ],
-            'notice_content' => [
+            'se_title' => [
                 'required',
                 'string',
-                'max:255',
+                'max:255'
             ],
-            'notice_target' => [
+            'se_name_receiver' => [
                 'required',
                 'string',
-                'max:255',
+                'max:255'
             ],
-            'files' => [
-                'array',
+            'se_email_receiver' => [
+                'required',
+                'string',
+                'max:255'
             ],
-            'files.*' => [
-                'file',
-                'max:5000',
-                'mimes:jpg,jpeg,png,pdf',
+            'se_email_cc' => [
+                'string',
+                'nullable'
             ],
+            'mb_no' => [
+                ''
+            ],
+            'rm_no' => [
+                'int',
+                'nullable'
+            ]
         ];
     }
 
-        /**
+    /**
      * Get custom attributes for validator errors.
      *
      * @return array

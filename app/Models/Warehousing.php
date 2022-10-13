@@ -58,6 +58,12 @@ class Warehousing extends Model
 
     public function co_no()
     {
+        return $this->belongsTo(Company::class, 'co_no', 'co_no')->with(['contract', 'co_parent', 'company_settlement','adjustment_group', 'company_distribution_cycle']);
+
+    }
+
+    public function company()
+    {
         return $this->belongsTo(Company::class, 'co_no', 'co_no')->with(['contract', 'co_parent', 'company_settlement','adjustment_group']);
 
     }
@@ -88,7 +94,7 @@ class Warehousing extends Model
 
     public function warehousing_request()
     {
-        return $this->hasOne(WarehousingRequest::class, 'w_no', 'w_no');
+        return $this->hasMany(WarehousingRequest::class, 'w_no', 'w_no')->orderBy('wr_no', 'desc');
     }
 
     public function rate_data_general()

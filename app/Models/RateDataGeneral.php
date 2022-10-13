@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Models\Warehousing;
 class RateDataGeneral extends Model
 {
     use HasFactory;
@@ -60,5 +60,10 @@ class RateDataGeneral extends Model
         'created_at' => "date:Y.m.d",
         'updated_at' => "date:Y.m.d",
     ];
+    
+    public function warehousing()
+    {
+        return $this->hasOne(Warehousing::class, 'w_no', 'w_no')->with(['co_no', 'warehousing_item','w_import_parent', 'warehousing_request']);
+    }
 
 }

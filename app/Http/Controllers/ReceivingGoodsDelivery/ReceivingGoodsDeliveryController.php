@@ -1874,6 +1874,41 @@ class ReceivingGoodsDeliveryController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
+
+    public function update_status5_fulfillment(Request $request){
+        try {
+            if($request->bill_type == 'case'){
+                ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                    'rgd_status5' => 'confirmed'
+                ]);
+            }else if ($request->bill_type == 'monthly'){
+                foreach($request->rgds as $rgd){
+                    ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
+                        'rgd_status5' => 'confirmed'
+                    ]);
+                }
+
+            }else if ($request->bill_type == 'multiple'){
+                foreach($request->rgds as $rgd){
+                    
+                    ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
+                        'rgd_status3' => 'confirmed'
+                    ]);
+                   
+                }
+
+            }
+
+            return response()->json([
+                'message' => 'Success'
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
     public function cancel_settlement(Request $request){
         try {
             if($request->bill_type == 'case'){
