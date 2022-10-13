@@ -62,6 +62,12 @@ class Warehousing extends Model
 
     }
 
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'co_no', 'co_no')->with(['contract', 'co_parent', 'company_settlement','adjustment_group']);
+
+    }
+
     public function warehousing_item()
     {
         return $this->hasMany(WarehousingItem::class, 'w_no', 'w_no')->with('item_no');
