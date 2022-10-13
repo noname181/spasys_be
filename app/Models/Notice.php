@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\File;
+use App\Models\Member;
 
 class Notice extends Model
 {
@@ -40,5 +41,8 @@ class Notice extends Model
     {
         return $this->hasMany(File::class, 'file_table_key', 'notice_no')->where('file_table', 'notice');
     }
-
+    public function member()
+    {
+        return $this->belongsTo(Member::class, 'mb_no', 'mb_no')->with('company');
+    }
 }

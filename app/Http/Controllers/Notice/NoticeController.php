@@ -234,15 +234,8 @@ class NoticeController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 5;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $notices = Notice::with('files')->orderBy('notice_no', 'DESC');
+            $notices = Notice::with(['files','member'])->orderBy('notice_no', 'DESC');
 
-            // if (isset($validated['from_date'])) {
-            //     $notice->where('created_at', '>=', Date::parse($this->formatDate($validated['from_date']))->startOfDay()->format('Y-m-d H:i:s'));
-            // }
-
-            // if (isset($validated['to_date'])) {
-            //     $notice->where('created_at', '<=', Date::parse($this->formatDate($validated['to_date']))->endOfDay()->format('Y-m-d H:i:s'));
-            // }
 
             if (isset($validated['from_date'])) {
                 $notices->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
