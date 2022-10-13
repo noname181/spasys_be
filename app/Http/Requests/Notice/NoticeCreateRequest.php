@@ -41,7 +41,6 @@ class NoticeCreateRequest extends BaseFormRequest
             ],
             'files' => [
                 'array',
-                'required',
             ],
             'files.*' => [
                 'file',
