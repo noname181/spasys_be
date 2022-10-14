@@ -1303,27 +1303,27 @@ class RateDataController extends Controller
                 ],
                 [
                     'w_no' => $w_no,
-                    'rdg_bill_type' => $request->bill_type,
+                    'rdg_bill_type' => isset($request->bill_type) ? $request->bill_type : '',
                     'rgd_no_expectation' => $request->type  == 'edit_final' ? $is_exist->rgd_no_expectation : (str_contains($request->bill_type, 'final') ? $request->rgd_no : null),
                     'rgd_no_final' => $request->type  == 'edit_additional' ? $is_exist->rgd_no_final : (str_contains($request->bill_type, 'additional') ? $request->rgd_no : null),
                     'mb_no' => Auth::user()->mb_no,
-                    'rdg_set_type' => $request->rdg_set_type,
-                    'rdg_supply_price1' => $request->storageData['supply_price'],
-                    'rdg_supply_price2' => $request->workData['supply_price'],
-                    'rdg_supply_price3' => $request->domesticData['supply_price'],
-                    'rdg_supply_price4' => $request->total['supply_price'],
-                    'rdg_vat1' => $request->storageData['taxes'],
-                    'rdg_vat2' => $request->workData['taxes'],
-                    'rdg_vat3' => $request->domesticData['taxes'],
-                    'rdg_vat4' => $request->total['taxes'],
-                    'rdg_sum1' => $request->storageData['sum'],
-                    'rdg_sum2' => $request->workData['sum'],
-                    'rdg_sum3' => $request->domesticData['sum'],
-                    'rdg_sum4' => $request->total['sum'],
-                    'rdg_etc1' => $request->storageData['etc'],
-                    'rdg_etc2' => $request->workData['etc'],
-                    'rdg_etc3' => $request->domesticData['etc'],
-                    'rdg_etc4' => $request->total['etc'],
+                    'rdg_set_type' => isset($request->rdg_set_type) ? $request->rdg_set_type : '',
+                    'rdg_supply_price1' => isset($request->storageData['supply_price']) ? $request->storageData['supply_price'] : '',
+                    'rdg_supply_price2' => isset($request->workData['supply_price']) ? $request->workData['supply_price'] : '',
+                    'rdg_supply_price3' => isset($request->domesticData['supply_price']) ? $request->domesticData['supply_price'] : '',
+                    'rdg_supply_price4' => isset($request->total['supply_price']) ? $request->total['supply_price'] : '',
+                    'rdg_vat1' => isset($request->storageData['taxes']) ? $request->storageData['taxes'] : '',
+                    'rdg_vat2' => isset($request->workData['taxes']) ? $request->workData['taxes'] : '',
+                    'rdg_vat3' => isset($request->domesticData['taxes']) ? $request->domesticData['taxes'] : '',
+                    'rdg_vat4' => isset($request->total['taxes']) ? $request->total['taxes'] : '',
+                    'rdg_sum1' => isset($request->storageData['sum']) ? $request->storageData['sum'] : '',
+                    'rdg_sum2' => isset($request->workData['sum']) ? $request->workData['sum'] : '',
+                    'rdg_sum3' => isset($request->domesticData['sum']) ? $request->domesticData['sum'] : '',
+                    'rdg_sum4' => isset($request->total['sum']) ? $request->total['sum'] : '',
+                    'rdg_etc1' => isset($request->storageData['etc']) ? $request->storageData['etc'] : '',
+                    'rdg_etc2' => isset($request->workData['etc']) ? $request->workData['etc'] : '',
+                    'rdg_etc3' => isset($request->domesticData['etc']) ? $request->domesticData['etc'] : '',
+                    'rdg_etc4' => isset($request->total['etc']) ? $request->total['etc'] : '',
 
                 ]
             );
@@ -1391,7 +1391,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-
+            //return $e;
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
