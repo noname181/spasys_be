@@ -1331,6 +1331,9 @@ class RateDataController extends Controller
             $previous_rgd = ReceivingGoodsDelivery::where('w_no', $w_no)->where('rgd_bill_type', '=' , $request->previous_bill_type)->first();
 
             if(!isset($is_exist->rdg_no) && isset($request->previous_bill_type)){
+                $previous_rgd->rgd_status5 = 'issued';
+                $previous_rgd->save();
+
                 $final_rgd = $previous_rgd->replicate();
                 $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
                 $final_rgd->rgd_status4 = $request->status;
@@ -1338,6 +1341,8 @@ class RateDataController extends Controller
                 $final_rgd->rgd_parent_no = $previous_rgd->rgd_no;
                 $final_rgd->rgd_status5 = NULL;
                 $final_rgd->save();
+
+               
 
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
                     'rgd_no' => $final_rgd->rgd_no
@@ -1430,12 +1435,17 @@ class RateDataController extends Controller
             );
 
             if(!isset($is_new->rdg_no)){
+                $rgd->rgd_status5 = 'issued';
+                $rgd->save();
+
                 $final_rgd = $rgd->replicate();
                 $final_rgd->rgd_bill_type = 'additional'; // the new project_id
                 $final_rgd->rgd_status4 = $request->status;
                 $final_rgd->rgd_status5 = NULL;
                 $final_rgd->rgd_parent_no = $rgd->rgd_no;
                 $final_rgd->save();
+
+               
 
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
                     'rgd_no' => $final_rgd->rgd_no
@@ -1503,11 +1513,16 @@ class RateDataController extends Controller
             $expectation_rgd = ReceivingGoodsDelivery::where('w_no', $w_no)->where('rgd_bill_type', 'final')->first();
 
             if(!isset($is_new->rdg_no)){
+                $previous_rgd->rgd_status5 = 'issued';
+                $previous_rgd->save();
+
                 $final_rgd = $expectation_rgd->replicate();
                 $final_rgd->rgd_bill_type = 'additional'; // the new project_id
                 $final_rgd->rgd_status4 = '확정청구서';
                 $final_rgd->rgd_status5 = NULL;
                 $final_rgd->save();
+
+             
 
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
                     'rgd_no' => $final_rgd->rgd_no
@@ -1698,6 +1713,10 @@ class RateDataController extends Controller
                     $final_rgd = ReceivingGoodsDelivery::where('rgd_parent_no', $rgd['rgd_no'])->where('rgd_bill_type', 'final_monthly')->first();
 
                     if(!$final_rgd){
+                        $expectation_rgd->rgd_status5 = 'issued';
+                        $expectation_rgd->save();
+
+
                         $final_rgd = $expectation_rgd->replicate();
                         $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
                         $final_rgd->rgd_status4 = '확정청구서';
@@ -1706,6 +1725,8 @@ class RateDataController extends Controller
                         $final_rgd->rgd_parent_no = $expectation_rgd->rgd_no;
                         $final_rgd->rgd_settlement_number =  $request->settlement_number;
                         $final_rgd->save();
+
+                        
 
                         RateDataGeneral::where('rdg_no', $final_rdg->rdg_no)->update([
                             'rgd_no' => $final_rgd->rgd_no,
@@ -1867,11 +1888,16 @@ class RateDataController extends Controller
             $previous_rgd = ReceivingGoodsDelivery::where('w_no', $w_no)->where('rgd_bill_type', '=' , $request->previous_bill_type)->first();
 
             if(!isset($is_exist->rdg_no) && isset($request->previous_bill_type)){
+                $previous_rgd->rgd_status5 = 'issued';
+                $previous_rgd->save();
+                
                 $final_rgd = $previous_rgd->replicate();
                 $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
                 $final_rgd->rgd_status4 = $request->status;
                 $final_rgd->rgd_status5 = 'fulfillment';
                 $final_rgd->save();
+
+                
 
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
                     'rgd_no' => $final_rgd->rgd_no
