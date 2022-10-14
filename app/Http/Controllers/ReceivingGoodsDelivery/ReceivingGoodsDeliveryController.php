@@ -555,7 +555,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 $warehousing_data = Warehousing::where('w_no', $request->w_no)->first();
 
                 if($warehousing_data->w_type == 'IW'){
-                    foreach($request->data as $data){
+                    foreach($request->data as $key => $data){
                         $w_no = Warehousing::insertGetId([
                             'mb_no' => $member->mb_no,
                             'w_schedule_amount' => $data['w_schedule_amount'],
@@ -570,15 +570,15 @@ class ReceivingGoodsDeliveryController extends Controller
                         Warehousing::where('w_no', $data['w_import_no'])->update([
                             'w_children_yn' => "y"
                         ]);
-                        $w_schedule_number = CommonFunc::generate_w_schedule_number($request->w_no,'EW');
+                        $w_schedule_number = CommonFunc::generate_w_schedule_number($request->w_no,'EW',($key+1));
                         Warehousing::where('w_no', $w_no)->update([
-                            'w_schedule_number' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EW')
+                            'w_schedule_number' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EW',($key+1))
                         ]);
 
                         if(isset($request->page_type) && $request->page_type == 'Page130146'){
-                            $w_schedule_number2 = CommonFunc::generate_w_schedule_number($request->w_no,'EWC');
+                            $w_schedule_number2 = CommonFunc::generate_w_schedule_number($request->w_no,'EWC',($key+1));
                             Warehousing::where('w_no', $request->w_no)->update([
-                                'w_schedule_number2' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EWC'),
+                                'w_schedule_number2' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EWC',($key+1)),
                                 'w_completed_day' => Carbon::now()->toDateTimeString()
                             ]);
                         }
@@ -638,7 +638,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         }
                     }
                 } else {
-                    foreach($request->data as $data){
+                    foreach($request->data as $key => $data){
                     if($data['w_no'] != ""){
                         $w_no = Warehousing::where('w_no', $request->w_no)->update([
                             //'mb_no' => $member->mb_no,
@@ -653,14 +653,14 @@ class ReceivingGoodsDeliveryController extends Controller
                         Warehousing::where('w_no', $warehousing_data->w_import_no)->update([
                             'w_children_yn' => "y"
                         ]);
-                        $w_schedule_number = CommonFunc::generate_w_schedule_number($request->w_no,'EW');
+                        $w_schedule_number = CommonFunc::generate_w_schedule_number($request->w_no,'EW',($key+1));
                         Warehousing::where('w_no', $w_no)->update([
-                            'w_schedule_number' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EW')
+                            'w_schedule_number' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EW',($key+1))
                         ]);
                         if(isset($request->page_type) && $request->page_type == 'Page130146'){
-                            $w_schedule_number2 = CommonFunc::generate_w_schedule_number($request->w_no,'EWC');
+                            $w_schedule_number2 = CommonFunc::generate_w_schedule_number($request->w_no,'EWC',($key+1));
                             Warehousing::where('w_no', $request->w_no)->update([
-                                'w_schedule_number2' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EWC'),
+                                'w_schedule_number2' =>   CommonFunc::generate_w_schedule_number($request->w_no,'EWC',($key+1)),
                                 'w_completed_day' => Carbon::now()->toDateTimeString()
                             ]);
                         }

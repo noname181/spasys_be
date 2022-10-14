@@ -27,10 +27,15 @@ class CommonFunc
     }
 
 
-    static function generate_w_schedule_number($data, $type)
+    static function generate_w_schedule_number($data, $type, $key="")
     {
         $string = 'SPA';
-        $string = $string.'_'.date('Ymd').$data.'_'.$type;
+        if($key){
+            $string = $string.'_'.date('Ymd').$data.'_'.$key.'_'.$type;
+        }else{
+            $string = $string.'_'.date('Ymd').$data.'_'.$type;
+        }
+        
         return $string;
     }
 
