@@ -234,7 +234,37 @@ class NoticeController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 5;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $notices = Notice::with(['files','member'])->orderBy('notice_no', 'DESC');
+            $user = Auth::user();
+
+            if($user->mb_type == 'shop'){
+                $notices = Notice::with(['files','member'])->where(function ($q) use ($user){
+                    $q ->where(function ($q) use ($user){
+                        $q->where('notice_target', '=' , '가맹점')->orWhere('notice_target','=','전체');
+                    })->whereHas('member.company',function($q) use ($user){
+                        $q->where('co_no', $user->company->co_parent->co_no);
+                    });
+                })->orWhere(function ($q) use ($user){
+                    $q ->where(function ($q) use ($user){
+                        $q->where('notice_target', '=' , '화주');
+                    })->whereHas('member.company',function($q) use ($user){
+                        $q->where('co_no', $user->company->co_no);
+                    });
+                })->orderBy('notice_no', 'DESC');
+
+            }
+            else if($user->mb_type == 'shipper'){
+                $notices = Notice::with(['files','member'])->where(function ($q) use ($user){
+                    $q->where('notice_target' , '=' , '화주')->orWhere('notice_target', '=','전체');
+                })->whereHas('member.company',function($q) use ($user){
+                    $q->where('co_no', $user->company->co_parent->co_no)
+                    ->orWhere('co_no', $user->company->co_parent->co_parent->co_no);
+                })->orderBy('notice_no', 'DESC');
+
+            } else if ($user->mb_type == 'spasys'){
+                $notices = Notice::with(['files','member'])->whereHas('member',function ($q) use ($user){
+                    $q->where('mb_no',$user->mb_no);
+                })->orderBy('notice_no', 'DESC');
+            }
 
 
             if (isset($validated['from_date'])) {
