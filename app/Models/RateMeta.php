@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Models\SendEmail;
 class RateMeta extends Model
 {
     use HasFactory;
@@ -37,5 +37,9 @@ class RateMeta extends Model
         'created_at' => "date:Y.m.d",
         'updated_at' => "date:Y.m.d",
     ];
+
+    public function send_email() {
+        return $this->hasOne(SendEmail::class, 'rm_no', 'rm_no');
+    }
 
 }

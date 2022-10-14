@@ -56,7 +56,8 @@ class RateMetaController extends Controller
                 'rm_biz_address_detail',
                 'rm_name',
                 'rm_hp',
-            ])->where('rm_no', $rm_no)->first();
+                'rm_no',
+            ])->with(['send_email'])->where('rm_no', $rm_no)->first();
             return response()->json(['message' => Messages::MSG_0007, 'rate_data_send_meta' => $rate_data_send_meta], 200);
         } catch (\Exception $e) {
             DB::rollback();
