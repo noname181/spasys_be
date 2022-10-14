@@ -101,10 +101,10 @@ class RateDataRequest extends BaseFormRequest
                 'max:255',
             ],
             'rate_data.*.rd_data1' => [
-                'required',
+                '',
             ],
             'rate_data.*.rd_data2' => [
-                'required',
+                '',
             ],
             'rate_data.*.rd_data3' => [
                 'nullable'
