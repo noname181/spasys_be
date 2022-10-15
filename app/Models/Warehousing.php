@@ -73,6 +73,15 @@ class Warehousing extends Model
         return $this->hasMany(WarehousingItem::class, 'w_no', 'w_no')->with('item_no');
     }
 
+    public function warehousing_item_IW_spasys_confirm()
+    {
+        return $this->hasMany(WarehousingItem::class, 'w_no', 'w_no')->with('item_no')->where('wi_type', '입고_spasys');
+    }
+    public function warehousing_item_EW_spasys_confirm()
+    {
+        return $this->hasMany(WarehousingItem::class, 'w_no', 'w_no')->with('item_no')->where('wi_type', '출고_spasys');
+    }
+
     public function receving_goods_delivery()
     {
         return $this->hasMany(ReceivingGoodsDelivery::class, 'w_no', 'w_no');
@@ -94,7 +103,7 @@ class Warehousing extends Model
 
     public function warehousing_child()
     {
-        return $this->hasMany(Warehousing::class, 'w_import_no');
+        return $this->hasMany(Warehousing::class, 'w_import_no')->withSum('warehousing_item_EW_spasys_confirm', 'wi_number');
     }
 
     public function warehousing_request()

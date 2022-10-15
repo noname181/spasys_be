@@ -264,7 +264,7 @@ class WarehousingController extends Controller
                     $q->where('co_no', $user->co_no);
                 })->get();
 
-                
+
                 $w_import_no = collect($warehousing2)->map(function ($q){
 
                     return $q -> w_import_no;
@@ -1339,7 +1339,9 @@ class WarehousingController extends Controller
                 $w_no = $rgd->w_no;
                 $check_cofirm = ReceivingGoodsDelivery::where('rgd_status5', 'confirmed')->where('rgd_bill_type','final')->where('w_no',$w_no)->get()->count();
                 $check_paid = ReceivingGoodsDelivery::where('rgd_status5', 'paid')->where('rgd_bill_type','additional')->where('w_no',$w_no)->get()->count();
-                $warehousing = Warehousing::with(['co_no', 'warehousing_request', 'w_import_parent'])->find($w_no);
+
+                $warehousing = Warehousing::with(['co_no', 'warehousing_request', 'w_import_parent', 'warehousing_child'])->withSum('warehousing_item_IW_spasys_confirm', 'wi_number')->find($w_no);
+
                 $adjustment_group2 = AdjustmentGroup::select(['ag_name'])->where('co_no','=',$warehousing->co_no)->get();
                 $adjustment_group = AdjustmentGroup::where('co_no','=',$warehousing->co_no)->first();
             }
@@ -1398,19 +1400,19 @@ class WarehousingController extends Controller
                 });
             }else if($user->mb_type == 'spasys'){
                 $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general','rate_meta_data' => function($q) {
-                    
-                    $q->withCount(['rate_data as bonusQuantity' => function($query) {        
-                          
+
+                    $q->withCount(['rate_data as bonusQuantity' => function($query) {
+
                         $query->select(DB::raw('SUM(rd_data7)'));
-                   
-                                         
+
+
                     }
                 ]);
-                    $q->withCount(['rate_data as bonusQuantity2' => function($query) {        
-                          
+                    $q->withCount(['rate_data as bonusQuantity2' => function($query) {
+
                         $query->select(DB::raw('SUM(rd_data6)'));
-                   
-                                         
+
+
                     }
                 ]);
                 }])->whereHas('w_no', function ($query) use ($user) {
