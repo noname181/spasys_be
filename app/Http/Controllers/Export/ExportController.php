@@ -119,6 +119,17 @@ class ExportController extends Controller
 
                     $item->warehousing_items_import = $warehousing_items_import;
                     // $warehousing_item->wi_number = $warehousing_items_import[0]->wi_number - $warehousing_item->wi_number;
+                    
+                    $warehousing_items_expect = WarehousingItem::with('item_no')->whereHas('item_no',function($q) use ($validated){
+                        $q->where('w_no', $validated['w_no']);
+                    })->where('item_no', $warehousing_item->item_no)->where('wi_type', '=', '출고_shipper')->get();
+                    foreach($warehousing_items_expect as $i => $value){
+                        $item->remain = $warehousing_items_expect[$i]->wi_number - $warehousing_item->wi_number;
+                    }
+
+                    $item->warehousing_items_expect = $warehousing_items_expect;
+
+
                 }
                 // else{
                 //     $item->remain = $warehousing_items_import[0]->wi_number - $warehousing_item->wi_number;
@@ -148,7 +159,7 @@ class ExportController extends Controller
                                     200);
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
