@@ -1328,7 +1328,7 @@ class WarehousingController extends Controller
                     $q->where('rgd_status4', '=', '예상경비청구서')->orWhereNull('rgd_status4');
                 })
                 ->get();
-                $warehousing = Warehousing::with(['co_no', 'warehousing_request', 'w_import_parent'])->find($w_no);
+                $warehousing = Warehousing::with(['w_ew','co_no', 'warehousing_request', 'w_import_parent'])->find($w_no);
                 $adjustment_group = AdjustmentGroup::where('co_no','=',$warehousing->co_no)->first();
                 $adjustment_group2 = AdjustmentGroup::select(['ag_name'])->where('co_no','=',$warehousing->co_no)->get();
 
@@ -1339,7 +1339,7 @@ class WarehousingController extends Controller
                 $w_no = $rgd->w_no;
                 $check_cofirm = ReceivingGoodsDelivery::where('rgd_status5', 'confirmed')->where('rgd_bill_type','final')->where('w_no',$w_no)->get()->count();
                 $check_paid = ReceivingGoodsDelivery::where('rgd_status5', 'paid')->where('rgd_bill_type','additional')->where('w_no',$w_no)->get()->count();
-                $warehousing = Warehousing::with(['co_no', 'warehousing_request', 'w_import_parent'])->find($w_no);
+                $warehousing = Warehousing::with(['w_ew','co_no', 'warehousing_request', 'w_import_parent'])->find($w_no);
                 $adjustment_group2 = AdjustmentGroup::select(['ag_name'])->where('co_no','=',$warehousing->co_no)->get();
                 $adjustment_group = AdjustmentGroup::where('co_no','=',$warehousing->co_no)->first();
             }
