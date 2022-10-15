@@ -474,19 +474,27 @@ class MemberController extends Controller
         try {
             $user = Auth::user();
             if($user->mb_type == 'shop'){
-                $members = Member::with(['company'])->whereHas('company.co_parent',function ($q) use ($user){
+                $members = Member::with(['company'])
+                ->whereHas('company.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
-                })->get();
+                })
+                // ->orWhereHas('company',function ($q) use ($user){
+                //     $q->where('co_no', $user->company->co_parent->co_no);
+                // })
+                ->get();
             }else if($user->mb_type == 'spasys'){
-                $members = Member::with(['company'])->whereHas('company.co_parent.co_parent',function ($q) use ($user){
+                $members = Member::with(['company'])
+                ->whereHas('company.co_parent.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
-                })->get();
+                })
+                ->orWhereHas('company.co_parent',function ($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })
+                ->get();
             }else if($user->mb_type == 'shipper'){
-                $members = Member::with(['company'])->whereHas('company.co_parent',function ($q) use ($user){
-                    $q->where('co_no', $user->co_no);
-                })->whereHas('company.co_parent.co_parent',function ($q) use ($user){
-                    $q->where('co_no', $user->co_no);
-                })->get();
+                $members = Member::where('co_no', $user->company->co_parent->co_no)
+                ->orwhere('co_no', $user->company->co_parent->co_parent->co_no)
+                ->get();
             }
 
             return response()->json(["member" => $members]);
