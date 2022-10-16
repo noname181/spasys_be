@@ -227,7 +227,7 @@ class ReceivingGoodsDeliveryController extends Controller
             if(isset($validated['w_no'])){
                 foreach ($validated['items'] as $warehousing_item) {
 
-                    
+
                     $item_no = $warehousing_item['item_no'] ? $warehousing_item['item_no'] : '';
 
                     if(isset($item_no) && $item_no){
@@ -1383,6 +1383,15 @@ class ReceivingGoodsDeliveryController extends Controller
                     'w_category_name' => $request->w_category_name,
                     'co_no' => isset($validated['co_no']) ? $validated['co_no'] : $co_no,
                 ]);
+
+                //THUONG EDIT TO MAKE SETTLEMENT
+                $rgd_no = ReceivingGoodsDelivery::insertGetId([
+                    'mb_no' => $member->mb_no,
+                    'w_no' => $w_no_data,
+                    'service_korean_name' => $request->w_category_name,
+                    'rgd_status1' => '입고',
+                    'rgd_status1' => '작업완료',
+                ]);
             }
 
             $w_no = isset($validated['w_no']) ? $validated['w_no'] : $w_no_data;
@@ -1890,11 +1899,11 @@ class ReceivingGoodsDeliveryController extends Controller
 
             }else if ($request->bill_type == 'multiple'){
                 foreach($request->rgds as $rgd){
-                    
+
                     ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
                         'rgd_status3' => 'confirmed'
                     ]);
-                   
+
                 }
 
             }
