@@ -1390,7 +1390,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'w_no' => $w_no_data,
                     'service_korean_name' => $request->w_category_name,
                     'rgd_status1' => '입고',
-                    'rgd_status1' => '작업완료',
+                    'rgd_status2' => '작업완료',
                 ]);
             }
 
@@ -1901,7 +1901,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 foreach($request->rgds as $rgd){
 
                     ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
-                        'rgd_status3' => 'confirmed'
+                        'rgd_status5' => 'confirmed'
                     ]);
 
                 }

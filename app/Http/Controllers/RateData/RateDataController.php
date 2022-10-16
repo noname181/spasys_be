@@ -116,6 +116,7 @@ class RateDataController extends Controller
                     $validated['type'] == 'work_monthly_additional_edit'  ||
                     $validated['type'] == 'storage_monthly_additional_edit' ||
                     $validated['type'] == 'domestic_monthly_additional_edit' ||
+                    $validated['type'] == 'edit' ||
                     $validated['set_type'] == 'work_final_edit' ||
                     $validated['set_type'] == 'storage_final_edit'
                 ){
@@ -1216,6 +1217,10 @@ class RateDataController extends Controller
 
             $rdg = RateDataGeneral::where('w_no', $w_no)->where('rgd_no', $rgd_no)->where('rdg_bill_type', $bill_type)->first();
 
+            if(empty($rdg)){
+                $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', $bill_type)->first();
+            }
+
 
             $co_no = $warehousing->co_no;
 
@@ -1271,7 +1276,7 @@ class RateDataController extends Controller
     public function get_rate_data_general_final2($rgd_no) {
         try {
             DB::beginTransaction();
-            $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'final')->first();
+            $rdg = RateDataGeneral::with(['warehousing'])->where('rgd_no', $rgd_no)->where('rdg_bill_type', 'final')->first();
 
             DB::commit();
             return response()->json([
@@ -1342,7 +1347,7 @@ class RateDataController extends Controller
                 $final_rgd->rgd_status5 = NULL;
                 $final_rgd->save();
 
-               
+
 
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
                     'rgd_no' => $final_rgd->rgd_no
@@ -1445,7 +1450,7 @@ class RateDataController extends Controller
                 $final_rgd->rgd_parent_no = $rgd->rgd_no;
                 $final_rgd->save();
 
-               
+
 
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
                     'rgd_no' => $final_rgd->rgd_no
@@ -1522,7 +1527,7 @@ class RateDataController extends Controller
                 $final_rgd->rgd_status5 = NULL;
                 $final_rgd->save();
 
-             
+
 
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
                     'rgd_no' => $final_rgd->rgd_no
@@ -1726,7 +1731,7 @@ class RateDataController extends Controller
                         $final_rgd->rgd_settlement_number =  $request->settlement_number;
                         $final_rgd->save();
 
-                        
+
 
                         RateDataGeneral::where('rdg_no', $final_rdg->rdg_no)->update([
                             'rgd_no' => $final_rgd->rgd_no,
@@ -1840,7 +1845,7 @@ class RateDataController extends Controller
         try {
             DB::beginTransaction();
             //Check is there already RateDataGeneral with rdg_no yet
-            $is_exist = RateDataGeneral::where('rdg_no',  $request->rdg_no)->where('rdg_bill_type', $request->bill_type)->first();
+            $is_exist = RateDataGeneral::where('rgd_no',  $request->rgd_no)->where('rdg_bill_type', $request->bill_type)->first();
 
             //Get RecevingGoodsDelivery base on rgd_no
             $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
@@ -1848,7 +1853,7 @@ class RateDataController extends Controller
 
             $rdg = RateDataGeneral::updateOrCreate(
                 [
-                    'rdg_no' => isset($is_exist->rdg_no) ? $request->rdg_no : null,
+                    'rdg_no' => isset($is_exist->rdg_no) ? $is_exist->rdg_no : null,
                     'rdg_bill_type' => $request->bill_type
                 ],
                 [
@@ -1890,14 +1895,16 @@ class RateDataController extends Controller
             if(!isset($is_exist->rdg_no) && isset($request->previous_bill_type)){
                 $previous_rgd->rgd_status5 = 'issued';
                 $previous_rgd->save();
-                
+
                 $final_rgd = $previous_rgd->replicate();
                 $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
+                $final_rgd->rgd_status3 = NULL;
                 $final_rgd->rgd_status4 = $request->status;
-                $final_rgd->rgd_status5 = 'fulfillment';
+                $final_rgd->rgd_status5 = '';
+                $final_rgd->rgd_parent_no = $previous_rgd->rgd_no;
                 $final_rgd->save();
 
-                
+
 
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
                     'rgd_no' => $final_rgd->rgd_no
@@ -1907,9 +1914,7 @@ class RateDataController extends Controller
                     'rgd_no' =>  $is_exist ?  $is_exist->rgd_no : $rgd->rgd_no
                 ]);
             }
-            ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-                'rgd_status5' =>'fulfillment'
-            ]);
+
             if($request->bill_type == 'final' || $request->bill_type == 'final_monthly'){
                 ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_status4' => $request->status,
@@ -1964,8 +1969,6 @@ class RateDataController extends Controller
     public function get_rmd_no_fulfill($rgd_no, $type, $pretype){
         $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
         $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
-        $w_no = $rgd->w_no;
-
 
         $rmd = RateMetaData::where(
             [
@@ -1973,6 +1976,15 @@ class RateDataController extends Controller
                 'set_type' => $type
             ]
         )->first();
+        if(empty($rmd) && !empty($rdg)){
+            $rmd = RateMetaData::where(
+                [
+
+                    'rgd_no' => $rdg->rgd_no_final,
+                    'set_type' => $type
+                ]
+            )->first();
+        }
         if(empty($rmd)){
             $rmd = RateMetaData::where(
                 [
