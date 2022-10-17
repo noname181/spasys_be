@@ -170,6 +170,8 @@ class RateDataController extends Controller
                 'message' => Messages::MSG_0007,
                 'rmd_no' => isset($rmd) ? $rmd->rmd_no : null,
                 'w_no' => isset($w_no) ? $w_no : null,
+                'rgd_no'=>$rgd,
+                'validated'=>$validated
             ], 201);
         } catch (\Exception $e) {
             DB::rollback();
