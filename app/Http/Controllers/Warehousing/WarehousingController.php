@@ -1301,6 +1301,7 @@ class WarehousingController extends Controller
             if ($type == 'monthly') {
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
                 $w_no = $rgd->w_no;
+                $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
                 $updated_at = Carbon::createFromFormat('Y.m.d H:i:s', $rgd->updated_at->format('Y.m.d H:i:s'));
 
                 $start_date = $updated_at->startOfMonth()->toDateString();
