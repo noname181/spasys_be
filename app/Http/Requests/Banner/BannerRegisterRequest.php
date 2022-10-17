@@ -29,16 +29,6 @@ class BannerRegisterRequest extends BaseFormRequest
                 'string',
                 'max:255',
             ],
-            // 'banner_lat' => [
-            //     'required',
-            //     'numeric',
-            //     'regex:/^[-]?[(\d+)]{1,4}(\.[(\d+)]{1,7})?$/'
-            // ],
-            // 'banner_lng' => [
-            //     'required',
-            //     'numeric',
-            //     'regex:/^[-]?[(\d+)]{1,4}(\.[(\d+)]{1,7})?$/'
-            // ],
             'banner_start' => [
                 'required',
                 'date_format:m/d/Y'
@@ -80,12 +70,6 @@ class BannerRegisterRequest extends BaseFormRequest
 
                 'max:255',
             ],
-            // 'mb_no' => [
-            //     'required',
-            //     'integer',
-            //     'max:255',
-            //     'exists:member,mb_no'
-            // ],
             'bannerFiles1' => [
                 'required',
             ],
@@ -93,16 +77,16 @@ class BannerRegisterRequest extends BaseFormRequest
                 'file'
             ],
             'bannerFiles2' => [
-                ''
+                '',
             ],
             'bannerFiles2.*' => [
-                ''
+                'file'
             ],
             'bannerFiles3' => [
-                ''
+                '',
             ],
             'bannerFiles3.*' => [
-                ''
+                'file'
             ],
         ];
     }

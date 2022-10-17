@@ -1301,6 +1301,7 @@ class WarehousingController extends Controller
             if ($type == 'monthly') {
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
                 $w_no = $rgd->w_no;
+                $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
                 $updated_at = Carbon::createFromFormat('Y.m.d H:i:s', $rgd->updated_at->format('Y.m.d H:i:s'));
 
                 $start_date = $updated_at->startOfMonth()->toDateString();
@@ -1604,7 +1605,21 @@ class WarehousingController extends Controller
                         });
                     });
             } else if ($user->mb_type == 'spasys') {
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 'rate_meta_data'])
+                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 'rate_meta_data' => function ($q) {
+
+                    $q->withCount(['rate_data as bonusQuantity' => function ($query) {
+
+                        $query->select(DB::raw('SUM(rd_data7)'));
+
+                    },
+                    ]);
+                    $q->withCount(['rate_data as bonusQuantity2' => function ($query) {
+
+                        $query->select(DB::raw('SUM(rd_data6)'));
+
+                    },
+                    ]);
+            }])
                     ->whereHas('w_no', function ($query) use ($user) {
                         $query->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                             $q->where('co_no', $user->co_no);
