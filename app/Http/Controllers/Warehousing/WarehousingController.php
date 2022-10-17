@@ -1604,7 +1604,21 @@ class WarehousingController extends Controller
                         });
                     });
             } else if ($user->mb_type == 'spasys') {
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 'rate_meta_data'])
+                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 'rate_meta_data' => function ($q) {
+
+                    $q->withCount(['rate_data as bonusQuantity' => function ($query) {
+
+                        $query->select(DB::raw('SUM(rd_data7)'));
+
+                    },
+                    ]);
+                    $q->withCount(['rate_data as bonusQuantity2' => function ($query) {
+
+                        $query->select(DB::raw('SUM(rd_data6)'));
+
+                    },
+                    ]);
+            }])
                     ->whereHas('w_no', function ($query) use ($user) {
                         $query->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                             $q->where('co_no', $user->co_no);
