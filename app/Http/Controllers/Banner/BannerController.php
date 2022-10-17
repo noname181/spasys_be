@@ -66,8 +66,7 @@ class BannerController extends Controller
         $validated = $request->validated();
 
         try {
-            //DB::beginTransaction();
-            //DateTime::createFromFormat('j/n/Y', ''),
+            DB::beginTransaction();
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
             $banner_no = Banner::insertGetId([
                 'banner_title' => $validated['banner_title'],
@@ -88,22 +87,22 @@ class BannerController extends Controller
             $path = join('/', ['files', 'banner', $banner_no]);
 
             $files = [];
-
             for($i = 1;$i <= 3;$i++){
-                $file = $validated['bannerFiles'.$i.''];
-                $url = Storage::disk('public')->put($path, $file);
-                $files[] = [
-                    'file_table' => 'banner',
-                    'file_table_key' => $banner_no,
-                    'file_name' => basename($url),
-                    'file_name_old' => $file->getClientOriginalName(),
-                    'file_size' => $file->getSize(),
-                    'file_extension' => $file->extension(),
-                    'file_position' => $i,
-                    'file_url' => $url
-                ];
+                $file =  isset($validated['bannerFiles'.$i.''])?$validated['bannerFiles'.$i.'']:'';
+                if(!empty($file)){
+                    $url = Storage::disk('public')->put($path, $file);
+                    $files[] = [
+                        'file_table' => 'banner',
+                        'file_table_key' => $banner_no,
+                        'file_name' => basename($url),
+                        'file_name_old' => $file->getClientOriginalName(),
+                        'file_size' => $file->getSize(),
+                        'file_extension' => $file->extension(),
+                        'file_position' => $i,
+                        'file_url' => $url
+                    ];
+                }
             }
-
             File::insert($files);
 
             DB::commit();
@@ -111,7 +110,7 @@ class BannerController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-
+            return $e;
             //return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -122,7 +121,7 @@ class BannerController extends Controller
      * @param  BannerUpdateRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function update(Banner $banner, BannerUpdateRequest $request)
+    public function update(BannerUpdateRequest $request)
     {
         try {
 
@@ -130,6 +129,7 @@ class BannerController extends Controller
 
             $validated = $request->validated();
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
+
             $banner = Banner::where('banner_no', $validated['banner_no'])->update([
                 'banner_title' => $validated['banner_title'],
                 'banner_lat' => '',
@@ -145,7 +145,6 @@ class BannerController extends Controller
                 'banner_link3' => $validated['banner_link3'] ? $validated['banner_link3'] : '',
                 'mb_no' => $member->mb_no,
             ]);
-            //return DB::getQueryLog();
              //FILE PART
 
              $path = join('/', ['files', 'banner', $validated['banner_no']]);
@@ -191,7 +190,7 @@ class BannerController extends Controller
             return response()->json(['message' => Messages::MSG_0007], 200);
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             //return response()->json(['message' => Messages::MSG_0002], 500);
         }
     }

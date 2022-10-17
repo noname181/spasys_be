@@ -55,11 +55,11 @@ class BannerUpdateRequest extends BaseFormRequest
             ],
             'banner_start' => [
                 'required',
-                'date_format:Y-m-d'
+                'date_format:m/d/Y'
             ],
             'banner_end' => [
                 'required',
-                'date_format:Y-m-d'
+                'date_format:m/d/Y'
             ],
             'banner_use_yn' => [
                 'required',
@@ -84,12 +84,6 @@ class BannerUpdateRequest extends BaseFormRequest
 
                 'max:255',
             ],
-            // 'mb_no' => [
-            //     'required',
-            //     'integer',
-            //     'max:255',
-            //     'exists:member,mb_no'
-            // ],
         ];
     }
 
