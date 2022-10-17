@@ -555,6 +555,7 @@ class RateDataController extends Controller
 
         return response()->json([
             'rmd_no' => $rmd ?  $rmd->rmd_no : null,
+            'rgd_no' => $rgd_no
         ], 200);
     }
 
