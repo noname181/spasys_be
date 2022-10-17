@@ -13,7 +13,7 @@ use App\Models\File;
 use App\Models\ItemChannel;
 use App\Models\ReceivingGoodsDelivery;
 use App\Models\WarehousingItem;
-
+use App\Models\Package;
 use App\Utils\Messages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -142,13 +142,16 @@ class ExportController extends Controller
 
         }
 
+        //PACKAGE
+        $package = Package::where('w_no', $request->w_no)->first();
+
 
 
             return response()->json(['message' => Messages::MSG_0007,
                                      'warehousing' => $warehousing,
                                      'warehousings' => $warehousings,
                                      'warehousing_items' => $warehousing_items,
-
+                                     'package' =>  $package,
                                      'rgd' => $rgd,
                                      'warehousing_request' => $warehousing_request,
                                      'items' => $items,
