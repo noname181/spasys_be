@@ -1739,13 +1739,13 @@ class WarehousingController extends Controller
 
             $warehousing->setCollection(
                 $warehousing->getCollection()->map(function ($item) {
-                    
+
                     $updated_at = Carbon::createFromFormat('Y.m.d H:i:s', $item->updated_at->format('Y.m.d H:i:s'));
 
                     $start_date = $updated_at->startOfMonth()->toDateString();
                     $end_date = $updated_at->endOfMonth()->toDateString();
                     $item->time = str_replace('-', '.', $start_date) . ' ~ ' . str_replace('-', '.', $end_date);
-                    
+
 
                     return $item;
                 })
@@ -1790,8 +1790,7 @@ class WarehousingController extends Controller
                     });
                 });
             }
-            $warehousing->where('rgd_status1', '=', '출고')
-                ->where('rgd_status2', '=', '작업완료')
+            $warehousing->where('rgd_status1', '=', '입고')
                 ->where(function ($q) {
                     $q->where(function ($query) {
                         $query->where('rgd_status4', '!=', '예상경비청구서')
@@ -1800,7 +1799,7 @@ class WarehousingController extends Controller
                         ->orWhereNull('rgd_status4');
                 })
                 ->whereHas('w_no', function ($query) {
-                    $query->where('w_type', '=', 'EW')
+                    $query->where('w_type', '=', 'IW')
                         ->where('w_category_name', '=', '보세화물');
                 });
             // ->whereHas('mb_no', function ($q) {
@@ -1876,6 +1875,23 @@ class WarehousingController extends Controller
             $warehousing->orderBy('updated_at', 'DESC');
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             //return DB::getQueryLog();
+
+            $warehousing->setCollection(
+                $warehousing->getCollection()->map(function ($item) {
+                    $service_name = $item->service_korean_name;
+                    $w_no = $item->w_no;
+                    $co_no = Warehousing::where('w_no', $w_no)->first()->co_no;
+                    $service_no = Service::where('service_name', $service_name)->first()->service_no;
+
+                    $company_settlement = CompanySettlement::where([
+                        'co_no' => $co_no,
+                        'service_no' => $service_no,
+                    ])->first();
+                    $item->settlement_cycle = $company_settlement ? $company_settlement->cs_payment_cycle : "";
+
+                    return $item;
+                })
+            );
 
             return response()->json($warehousing);
 

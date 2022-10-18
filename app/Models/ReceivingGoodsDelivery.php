@@ -44,6 +44,7 @@ class ReceivingGoodsDelivery extends Model
         'rgd_delivery_man_hp',
         'rgd_delivery_schedule_day',
         'rgd_arrive_day',
+        'service_korean_name',
         'created_at',
         'updated_at',
     ];
@@ -62,7 +63,7 @@ class ReceivingGoodsDelivery extends Model
 
     public function w_no()
     {
-        return $this->hasOne(Warehousing::class, 'w_no', 'w_no')->with(['co_no', 'warehousing_item','w_import_parent','warehousing_child', 'warehousing_request'])->withSum('warehousing_item_IW_spasys_confirm', 'wi_number');;
+        return $this->hasOne(Warehousing::class, 'w_no', 'w_no')->with(['co_no', 'warehousing_item','w_import_parent','warehousing_child', 'warehousing_request', 'import_expect'])->withSum('warehousing_item_IW_spasys_confirm', 'wi_number');;
     }
 
     public function warehousing()

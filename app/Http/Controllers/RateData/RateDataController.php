@@ -1318,11 +1318,13 @@ class RateDataController extends Controller
         try {
             DB::beginTransaction();
             $rdg = RateDataGeneral::with(['warehousing'])->where('rgd_no', $rgd_no)->where('rdg_bill_type', 'final')->first();
+            $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
 
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'rdg' => $rdg
+                'rdg' => $rdg,
+                'rgd' => $rgd
             ], 201);
         } catch (\Exception $e) {
             DB::rollback();
@@ -2073,16 +2075,16 @@ class RateDataController extends Controller
         $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
         $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
         $w_no = $rgd->w_no;
-    
+
         $rmd = RateMetaData::where(
             [
                 'rgd_no' => $rgd_no,
                 'set_type' => $set_type
             ]
         )->first();
-    
+
         if(!isset($rmd->rmd_no) && $set_type == 'work_final'){
-        
+
             $rmd = RateMetaData::where(
                 [
                     'rgd_no' => $rgd_no,
@@ -2275,7 +2277,7 @@ class RateDataController extends Controller
                     'set_type' => 'work_additional'
                 ]
             )->first();
-        
+
             if(empty($rmd) && !empty($rdg)){
                 $rmd = RateMetaData::where(
                     [
@@ -2299,9 +2301,9 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
-        
+
         }else  if(!isset($rmd->rmd_no) && $set_type == 'work_monthly_final'){
-        
+
             $rmd = RateMetaData::where(
                 [
                     'rgd_no' => $rgd_no,
@@ -2332,8 +2334,8 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
-        
-        
+
+
         }else if(!isset($rmd->rmd_no) && $set_type == 'storage_monthly_final'){
             $rmd = RateMetaData::where(
                 [
@@ -2444,56 +2446,56 @@ class RateDataController extends Controller
         }
         return $rmd ?  $rmd->rmd_no : null;
     }
-    
+
     public function download_data_general($rgd_no){
         $data = array();
-        
+
         DB::beginTransaction();
         $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
         $w_no = $rgd->w_no;
         $rdg = RateDataGeneral::where('w_no', $w_no)->where('rgd_no', $rgd_no)->where('rdg_bill_type', 'expectation')->first();
-        
+
         if(empty($rdg)){
             $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'expectation')->first();
         }
         $user = Auth::user();
-        
+
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet(0);
         $spreadsheet->getActiveSheet()->getProtection()->setSheet(true);
         $sheet->setTitle('종합');
-        
-        $sheet->setCellValue('A1', '종합'); 
-        $sheet->setCellValue('B1', '공급가'); 
-        $sheet->setCellValue('C1', '부가세'); 
-        $sheet->setCellValue('D1', '합계'); 
-        $sheet->setCellValue('E1', '비고'); 
-        
+
+        $sheet->setCellValue('A1', '종합');
+        $sheet->setCellValue('B1', '공급가');
+        $sheet->setCellValue('C1', '부가세');
+        $sheet->setCellValue('D1', '합계');
+        $sheet->setCellValue('E1', '비고');
+
         $sheet->setCellValue('A2', '유통가공 작업료');
-        $sheet->setCellValue('B2', $rdg['rdg_supply_price2']); 
-        $sheet->setCellValue('C2', $rdg['rdg_vat2']); 
-        $sheet->setCellValue('D2', $rdg['rdg_sum2']); 
-        $sheet->setCellValue('E2', $rdg['rdg_etc2']); 
-        
+        $sheet->setCellValue('B2', $rdg['rdg_supply_price2']);
+        $sheet->setCellValue('C2', $rdg['rdg_vat2']);
+        $sheet->setCellValue('D2', $rdg['rdg_sum2']);
+        $sheet->setCellValue('E2', $rdg['rdg_etc2']);
+
         $sheet->setCellValue('A3', '부자재 보관료');
-        $sheet->setCellValue('B3', $rdg['rdg_supply_price1']); 
-        $sheet->setCellValue('C3', $rdg['rdg_vat1']); 
-        $sheet->setCellValue('D3', $rdg['rdg_sum1']); 
-        $sheet->setCellValue('E3', $rdg['rdg_etc1']); 
-        
+        $sheet->setCellValue('B3', $rdg['rdg_supply_price1']);
+        $sheet->setCellValue('C3', $rdg['rdg_vat1']);
+        $sheet->setCellValue('D3', $rdg['rdg_sum1']);
+        $sheet->setCellValue('E3', $rdg['rdg_etc1']);
+
         $sheet->setCellValue('A4', '국내운송료');
-        $sheet->setCellValue('B4', $rdg['rdg_supply_price3']); 
-        $sheet->setCellValue('C4', $rdg['rdg_vat3']); 
-        $sheet->setCellValue('D4', $rdg['rdg_sum3']); 
-        $sheet->setCellValue('E4', $rdg['rdg_etc3']); 
-        
+        $sheet->setCellValue('B4', $rdg['rdg_supply_price3']);
+        $sheet->setCellValue('C4', $rdg['rdg_vat3']);
+        $sheet->setCellValue('D4', $rdg['rdg_sum3']);
+        $sheet->setCellValue('E4', $rdg['rdg_etc3']);
+
         $sheet->setCellValue('A5', '합계');
-        $sheet->setCellValue('B5', $rdg['rdg_supply_price4']); 
-        $sheet->setCellValue('C5', $rdg['rdg_vat4']); 
-        $sheet->setCellValue('D5', $rdg['rdg_sum4']); 
-        $sheet->setCellValue('E5', $rdg['rdg_etc4']); 
-        
-        
+        $sheet->setCellValue('B5', $rdg['rdg_supply_price4']);
+        $sheet->setCellValue('C5', $rdg['rdg_vat4']);
+        $sheet->setCellValue('D5', $rdg['rdg_sum4']);
+        $sheet->setCellValue('E5', $rdg['rdg_etc4']);
+
+
         $spreadsheet->createSheet();
         $sheet2 = $spreadsheet->getSheet(1);
         $rmd_no = $this->get_rmd_no_raw($rgd_no,'work');
@@ -2503,15 +2505,15 @@ class RateDataController extends Controller
         }
         $sheet2->setTitle('작업료');
         $sheet2->mergeCells('A1:B1');
-        $sheet2->setCellValue('A1', '항목'); 
-        $sheet2->setCellValue('C1', '단위'); 
-        $sheet2->setCellValue('D1', '단가'); 
-        $sheet2->setCellValue('E1', '건수'); 
-        $sheet2->setCellValue('F1', '공급가'); 
-        $sheet2->setCellValue('G1', '부가세'); 
-        $sheet2->setCellValue('H1', '합계'); 
+        $sheet2->setCellValue('A1', '항목');
+        $sheet2->setCellValue('C1', '단위');
+        $sheet2->setCellValue('D1', '단가');
+        $sheet2->setCellValue('E1', '건수');
+        $sheet2->setCellValue('F1', '공급가');
+        $sheet2->setCellValue('G1', '부가세');
+        $sheet2->setCellValue('H1', '합계');
         $sheet2->setCellValue('I1', '비고');
-        
+
         $row_2 = 2;
         if(!empty($rate_data)){
             $data_sheet2 = json_decode($rate_data,1);
@@ -2528,7 +2530,7 @@ class RateDataController extends Controller
                 $row_2++;
             }
         }
-        
+
         $spreadsheet->createSheet();
         $sheet3 = $spreadsheet->getSheet(2);
         $data_sheet3 = array();
@@ -2536,16 +2538,16 @@ class RateDataController extends Controller
             $rmd_no_storage = $this->get_rmd_no_raw($rgd_no,'storage');
             $rate_data_storage = $this->get_rate_data_raw($rmd_no_storage);
         }
-        
+
         $sheet3->setTitle('보관료');
         $sheet3->mergeCells('A1:B1');
-        $sheet3->setCellValue('A1', '항목'); 
-        $sheet3->setCellValue('C1', '단위'); 
-        $sheet3->setCellValue('D1', '단가'); 
-        $sheet3->setCellValue('E1', '건수'); 
-        $sheet3->setCellValue('F1', '공급가'); 
-        $sheet3->setCellValue('G1', '부가세'); 
-        $sheet3->setCellValue('H1', '합계'); 
+        $sheet3->setCellValue('A1', '항목');
+        $sheet3->setCellValue('C1', '단위');
+        $sheet3->setCellValue('D1', '단가');
+        $sheet3->setCellValue('E1', '건수');
+        $sheet3->setCellValue('F1', '공급가');
+        $sheet3->setCellValue('G1', '부가세');
+        $sheet3->setCellValue('H1', '합계');
         $sheet3->setCellValue('I1', '비고');
         $row_3 = 2;
         if(!empty($rate_data_storage)){
@@ -2563,7 +2565,7 @@ class RateDataController extends Controller
                 $row_3++;
             }
         }
-        
+
         $spreadsheet->createSheet();
         $sheet4 = $spreadsheet->getSheet(3);
         $data_sheet4 = array();
@@ -2571,18 +2573,18 @@ class RateDataController extends Controller
             $rmd_no_domestic = $this->get_rmd_no_raw($rgd_no,'domestic');
             $rate_data_domestic = $this->get_rate_data_raw($rmd_no_domestic);
         }
-        
+
         $sheet4->setTitle('국내운송료');
         $sheet4->mergeCells('A1:B1');
-        $sheet4->setCellValue('A1', '항목'); 
-        $sheet4->setCellValue('C1', '단위'); 
-        $sheet4->setCellValue('D1', '단가'); 
-        $sheet4->setCellValue('E1', '건수'); 
-        $sheet4->setCellValue('F1', '공급가'); 
-        $sheet4->setCellValue('G1', '부가세'); 
-        $sheet4->setCellValue('H1', '합계'); 
+        $sheet4->setCellValue('A1', '항목');
+        $sheet4->setCellValue('C1', '단위');
+        $sheet4->setCellValue('D1', '단가');
+        $sheet4->setCellValue('E1', '건수');
+        $sheet4->setCellValue('F1', '공급가');
+        $sheet4->setCellValue('G1', '부가세');
+        $sheet4->setCellValue('H1', '합계');
         $sheet4->setCellValue('I1', '비고');
-        
+
         $row_4 = 2;
         if(!empty($rate_data_domestic)){
             $data_sheet4 = json_decode($rate_data_domestic,1);
@@ -2599,7 +2601,7 @@ class RateDataController extends Controller
                 $row_4++;
             }
         }
-        
+
         $Excel_writer = new Xlsx($spreadsheet);
         if(isset($user->mb_no)){
             $path = '../storage/download/'.$user->mb_no.'/';
@@ -2619,7 +2621,7 @@ class RateDataController extends Controller
             'message' => 'Download File'
         ], 500);
         ob_end_clean();
-        
+
     }
 
     public function download_data_casebill_edit($rgd_no){
@@ -2633,43 +2635,43 @@ class RateDataController extends Controller
             $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'final')->first();
         }
         $user = Auth::user();
-    
+
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet(0);
         $spreadsheet->getActiveSheet()->getProtection()->setSheet(true);
         $sheet->setTitle('종합');
-        
-        $sheet->setCellValue('A1', '종합'); 
-        $sheet->setCellValue('B1', '공급가'); 
-        $sheet->setCellValue('C1', '부가세'); 
-        $sheet->setCellValue('D1', '합계'); 
-        $sheet->setCellValue('E1', '비고'); 
-        
+
+        $sheet->setCellValue('A1', '종합');
+        $sheet->setCellValue('B1', '공급가');
+        $sheet->setCellValue('C1', '부가세');
+        $sheet->setCellValue('D1', '합계');
+        $sheet->setCellValue('E1', '비고');
+
         $sheet->setCellValue('A2', '유통가공 작업료');
-        $sheet->setCellValue('B2', $rdg['rdg_supply_price2']); 
-        $sheet->setCellValue('C2', $rdg['rdg_vat2']); 
-        $sheet->setCellValue('D2', $rdg['rdg_sum2']); 
-        $sheet->setCellValue('E2', $rdg['rdg_etc2']); 
-        
+        $sheet->setCellValue('B2', $rdg['rdg_supply_price2']);
+        $sheet->setCellValue('C2', $rdg['rdg_vat2']);
+        $sheet->setCellValue('D2', $rdg['rdg_sum2']);
+        $sheet->setCellValue('E2', $rdg['rdg_etc2']);
+
         $sheet->setCellValue('A3', '부자재 보관료');
-        $sheet->setCellValue('B3', $rdg['rdg_supply_price1']); 
-        $sheet->setCellValue('C3', $rdg['rdg_vat1']); 
-        $sheet->setCellValue('D3', $rdg['rdg_sum1']); 
-        $sheet->setCellValue('E3', $rdg['rdg_etc1']); 
-        
+        $sheet->setCellValue('B3', $rdg['rdg_supply_price1']);
+        $sheet->setCellValue('C3', $rdg['rdg_vat1']);
+        $sheet->setCellValue('D3', $rdg['rdg_sum1']);
+        $sheet->setCellValue('E3', $rdg['rdg_etc1']);
+
         $sheet->setCellValue('A4', '국내운송료');
-        $sheet->setCellValue('B4', $rdg['rdg_supply_price3']); 
-        $sheet->setCellValue('C4', $rdg['rdg_vat3']); 
-        $sheet->setCellValue('D4', $rdg['rdg_sum3']); 
-        $sheet->setCellValue('E4', $rdg['rdg_etc3']); 
-        
+        $sheet->setCellValue('B4', $rdg['rdg_supply_price3']);
+        $sheet->setCellValue('C4', $rdg['rdg_vat3']);
+        $sheet->setCellValue('D4', $rdg['rdg_sum3']);
+        $sheet->setCellValue('E4', $rdg['rdg_etc3']);
+
         $sheet->setCellValue('A5', '합계');
-        $sheet->setCellValue('B5', $rdg['rdg_supply_price4']); 
-        $sheet->setCellValue('C5', $rdg['rdg_vat4']); 
-        $sheet->setCellValue('D5', $rdg['rdg_sum4']); 
-        $sheet->setCellValue('E5', $rdg['rdg_etc4']); 
-        
-        
+        $sheet->setCellValue('B5', $rdg['rdg_supply_price4']);
+        $sheet->setCellValue('C5', $rdg['rdg_vat4']);
+        $sheet->setCellValue('D5', $rdg['rdg_sum4']);
+        $sheet->setCellValue('E5', $rdg['rdg_etc4']);
+
+
         $spreadsheet->createSheet();
         $sheet2 = $spreadsheet->getSheet(1);
         $rmd_no = $this->get_rmd_no_raw($rgd_no,'work_additional');
@@ -2679,15 +2681,15 @@ class RateDataController extends Controller
         }
         $sheet2->setTitle('작업료');
         $sheet2->mergeCells('A1:B1');
-        $sheet2->setCellValue('A1', '항목'); 
-        $sheet2->setCellValue('C1', '단위'); 
-        $sheet2->setCellValue('D1', '단가'); 
-        $sheet2->setCellValue('E1', '건수'); 
-        $sheet2->setCellValue('F1', '공급가'); 
-        $sheet2->setCellValue('G1', '부가세'); 
-        $sheet2->setCellValue('H1', '합계'); 
+        $sheet2->setCellValue('A1', '항목');
+        $sheet2->setCellValue('C1', '단위');
+        $sheet2->setCellValue('D1', '단가');
+        $sheet2->setCellValue('E1', '건수');
+        $sheet2->setCellValue('F1', '공급가');
+        $sheet2->setCellValue('G1', '부가세');
+        $sheet2->setCellValue('H1', '합계');
         $sheet2->setCellValue('I1', '비고');
-        
+
         $row_2 = 2;
         if(!empty($rate_data)){
             $data_sheet2 = json_decode($rate_data,1);
@@ -2704,7 +2706,7 @@ class RateDataController extends Controller
                 $row_2++;
             }
         }
-        
+
         $spreadsheet->createSheet();
         $sheet3 = $spreadsheet->getSheet(2);
         $data_sheet3 = array();
@@ -2712,16 +2714,16 @@ class RateDataController extends Controller
             $rmd_no_storage = $this->get_rmd_no_raw($rgd_no,'storage_additional');
             $rate_data_storage = $this->get_rate_data_raw($rmd_no_storage);
         }
-        
+
         $sheet3->setTitle('보관료');
         $sheet3->mergeCells('A1:B1');
-        $sheet3->setCellValue('A1', '항목'); 
-        $sheet3->setCellValue('C1', '단위'); 
-        $sheet3->setCellValue('D1', '단가'); 
-        $sheet3->setCellValue('E1', '건수'); 
-        $sheet3->setCellValue('F1', '공급가'); 
-        $sheet3->setCellValue('G1', '부가세'); 
-        $sheet3->setCellValue('H1', '합계'); 
+        $sheet3->setCellValue('A1', '항목');
+        $sheet3->setCellValue('C1', '단위');
+        $sheet3->setCellValue('D1', '단가');
+        $sheet3->setCellValue('E1', '건수');
+        $sheet3->setCellValue('F1', '공급가');
+        $sheet3->setCellValue('G1', '부가세');
+        $sheet3->setCellValue('H1', '합계');
         $sheet3->setCellValue('I1', '비고');
         $row_3 = 2;
         if(!empty($rate_data_storage)){
@@ -2739,7 +2741,7 @@ class RateDataController extends Controller
                 $row_3++;
             }
         }
-        
+
         $spreadsheet->createSheet();
         $sheet4 = $spreadsheet->getSheet(3);
         $data_sheet4 = array();
@@ -2747,18 +2749,18 @@ class RateDataController extends Controller
             $rmd_no_domestic = $this->get_rmd_no_raw($rgd_no,'domestic_additional');
             $rate_data_domestic = $this->get_rate_data_raw($rmd_no_domestic);
         }
-        
+
         $sheet4->setTitle('국내운송료');
         $sheet4->mergeCells('A1:B1');
-        $sheet4->setCellValue('A1', '항목'); 
-        $sheet4->setCellValue('C1', '단위'); 
-        $sheet4->setCellValue('D1', '단가'); 
-        $sheet4->setCellValue('E1', '건수'); 
-        $sheet4->setCellValue('F1', '공급가'); 
-        $sheet4->setCellValue('G1', '부가세'); 
-        $sheet4->setCellValue('H1', '합계'); 
+        $sheet4->setCellValue('A1', '항목');
+        $sheet4->setCellValue('C1', '단위');
+        $sheet4->setCellValue('D1', '단가');
+        $sheet4->setCellValue('E1', '건수');
+        $sheet4->setCellValue('F1', '공급가');
+        $sheet4->setCellValue('G1', '부가세');
+        $sheet4->setCellValue('H1', '합계');
         $sheet4->setCellValue('I1', '비고');
-        
+
         $row_4 = 2;
         if(!empty($rate_data_domestic)){
             $data_sheet4 = json_decode($rate_data_domestic,1);
@@ -2775,7 +2777,7 @@ class RateDataController extends Controller
                 $row_4++;
             }
         }
-        
+
         $Excel_writer = new Xlsx($spreadsheet);
         if(isset($user->mb_no)){
             $path = '../storage/download/'.$user->mb_no.'/';
@@ -2810,11 +2812,11 @@ class RateDataController extends Controller
         $user = Auth::user();
 
         $data_sheet4 = $data_sheet3 = $data_sheet2 = $rate_data = array();
-    
+
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet(0);
         $spreadsheet->getActiveSheet()->getProtection()->setSheet(true);
-        
+
         if($rgd_no){
             $rmd_no = $this->get_rmd_no_raw($rgd_no,'work_final');
             $rate_data = $this->get_rate_data_raw($rmd_no);
@@ -2825,58 +2827,58 @@ class RateDataController extends Controller
             $supply_price = array_sum(array_column($data_sheet4,'rd_data5'));
             $vat_price = array_sum(array_column($data_sheet4,'rd_data6'));
             $sum_price = array_sum(array_column($data_sheet4,'rd_data7'));
-            
+
             $rmd_no_storage = $this->get_rmd_no_raw($rgd_no,'storage_final');
             $rate_data_storage = $this->get_rate_data_raw($rmd_no_storage);
         }
 
         $sheet->setTitle('종합');
-        
-        $sheet->setCellValue('A1', '종합'); 
-        $sheet->setCellValue('B1', '공급가'); 
-        $sheet->setCellValue('C1', '부가세'); 
-        $sheet->setCellValue('D1', '합계'); 
-        $sheet->setCellValue('E1', '비고'); 
-        
+
+        $sheet->setCellValue('A1', '종합');
+        $sheet->setCellValue('B1', '공급가');
+        $sheet->setCellValue('C1', '부가세');
+        $sheet->setCellValue('D1', '합계');
+        $sheet->setCellValue('E1', '비고');
+
         $sheet->setCellValue('A2', '유통가공 작업료');
-        $sheet->setCellValue('B2', $rdg['rdg_supply_price2']); 
-        $sheet->setCellValue('C2', $rdg['rdg_vat2']); 
-        $sheet->setCellValue('D2', $rdg['rdg_sum2']); 
-        $sheet->setCellValue('E2', $rdg['rdg_etc2']); 
-        
+        $sheet->setCellValue('B2', $rdg['rdg_supply_price2']);
+        $sheet->setCellValue('C2', $rdg['rdg_vat2']);
+        $sheet->setCellValue('D2', $rdg['rdg_sum2']);
+        $sheet->setCellValue('E2', $rdg['rdg_etc2']);
+
         $sheet->setCellValue('A3', '부자재 보관료');
-        $sheet->setCellValue('B3', $rdg['rdg_supply_price1']); 
-        $sheet->setCellValue('C3', $rdg['rdg_vat1']); 
-        $sheet->setCellValue('D3', $rdg['rdg_sum1']); 
-        $sheet->setCellValue('E3', $rdg['rdg_etc1']); 
-        
+        $sheet->setCellValue('B3', $rdg['rdg_supply_price1']);
+        $sheet->setCellValue('C3', $rdg['rdg_vat1']);
+        $sheet->setCellValue('D3', $rdg['rdg_sum1']);
+        $sheet->setCellValue('E3', $rdg['rdg_etc1']);
+
         $sheet->setCellValue('A4', '국내운송료');
-        $sheet->setCellValue('B4', $supply_price); 
-        $sheet->setCellValue('C4', $vat_price); 
-        $sheet->setCellValue('D4', $sum_price); 
-        $sheet->setCellValue('E4', $rdg['rdg_etc3']); 
-        
+        $sheet->setCellValue('B4', $supply_price);
+        $sheet->setCellValue('C4', $vat_price);
+        $sheet->setCellValue('D4', $sum_price);
+        $sheet->setCellValue('E4', $rdg['rdg_etc3']);
+
         $sheet->setCellValue('A5', '합계');
-        $sheet->setCellValue('B5', $rdg['rdg_supply_price4']); 
-        $sheet->setCellValue('C5', $rdg['rdg_vat4']); 
-        $sheet->setCellValue('D5', $rdg['rdg_sum4']); 
-        $sheet->setCellValue('E5', $rdg['rdg_etc4']); 
-        
-        
+        $sheet->setCellValue('B5', $rdg['rdg_supply_price4']);
+        $sheet->setCellValue('C5', $rdg['rdg_vat4']);
+        $sheet->setCellValue('D5', $rdg['rdg_sum4']);
+        $sheet->setCellValue('E5', $rdg['rdg_etc4']);
+
+
         $spreadsheet->createSheet();
         $sheet2 = $spreadsheet->getSheet(1);
 
         $sheet2->setTitle('작업료');
         $sheet2->mergeCells('A1:B1');
-        $sheet2->setCellValue('A1', '항목'); 
-        $sheet2->setCellValue('C1', '단위'); 
-        $sheet2->setCellValue('D1', '단가'); 
-        $sheet2->setCellValue('E1', '건수'); 
-        $sheet2->setCellValue('F1', '공급가'); 
-        $sheet2->setCellValue('G1', '부가세'); 
-        $sheet2->setCellValue('H1', '합계'); 
+        $sheet2->setCellValue('A1', '항목');
+        $sheet2->setCellValue('C1', '단위');
+        $sheet2->setCellValue('D1', '단가');
+        $sheet2->setCellValue('E1', '건수');
+        $sheet2->setCellValue('F1', '공급가');
+        $sheet2->setCellValue('G1', '부가세');
+        $sheet2->setCellValue('H1', '합계');
         $sheet2->setCellValue('I1', '비고');
-        
+
         $row_2 = 2;
         if(!empty($rate_data)){
             $data_sheet2 = json_decode($rate_data,1);
@@ -2893,19 +2895,19 @@ class RateDataController extends Controller
                 $row_2++;
             }
         }
-        
+
         $spreadsheet->createSheet();
         $sheet3 = $spreadsheet->getSheet(2);
-        
+
         $sheet3->setTitle('보관료');
         $sheet3->mergeCells('A1:B1');
-        $sheet3->setCellValue('A1', '항목'); 
-        $sheet3->setCellValue('C1', '단위'); 
-        $sheet3->setCellValue('D1', '단가'); 
-        $sheet3->setCellValue('E1', '건수'); 
-        $sheet3->setCellValue('F1', '공급가'); 
-        $sheet3->setCellValue('G1', '부가세'); 
-        $sheet3->setCellValue('H1', '합계'); 
+        $sheet3->setCellValue('A1', '항목');
+        $sheet3->setCellValue('C1', '단위');
+        $sheet3->setCellValue('D1', '단가');
+        $sheet3->setCellValue('E1', '건수');
+        $sheet3->setCellValue('F1', '공급가');
+        $sheet3->setCellValue('G1', '부가세');
+        $sheet3->setCellValue('H1', '합계');
         $sheet3->setCellValue('I1', '비고');
         $row_3 = 2;
         if(!empty($rate_data_storage)){
@@ -2923,35 +2925,35 @@ class RateDataController extends Controller
                 $row_3++;
             }
         }
-        
+
         $spreadsheet->createSheet();
         $sheet4 = $spreadsheet->getSheet(3);
-        
+
         $sheet4->setTitle('국내운송료');
         $sheet4->mergeCells('A1:B1');
         $sheet4->mergeCells('A2:A4');
-        $sheet4->setCellValue('A1', '항목'); 
-        $sheet4->setCellValue('A2', '운송'); 
-        $sheet4->setCellValue('C1', '단위'); 
-        $sheet4->setCellValue('D1', '단가'); 
-        $sheet4->setCellValue('E1', '건수'); 
-        $sheet4->setCellValue('F1', '공급가'); 
-        $sheet4->setCellValue('G1', '부가세'); 
-        $sheet4->setCellValue('H1', '합계'); 
+        $sheet4->setCellValue('A1', '항목');
+        $sheet4->setCellValue('A2', '운송');
+        $sheet4->setCellValue('C1', '단위');
+        $sheet4->setCellValue('D1', '단가');
+        $sheet4->setCellValue('E1', '건수');
+        $sheet4->setCellValue('F1', '공급가');
+        $sheet4->setCellValue('G1', '부가세');
+        $sheet4->setCellValue('H1', '합계');
         $sheet4->setCellValue('I1', '비고');
-        
+
         $row_4 = 2;
         if(!empty($data_sheet4)){
             foreach($data_sheet4 as $dt4){
                 if($row_4 < 5) {
                     switch($row_4){
-                        case 2: 
+                        case 2:
                             $sheet4->setCellValue('B'.$row_4, '픽업료');
                         break;
-                        case 3: 
+                        case 3:
                             $sheet4->setCellValue('B'.$row_4, '배차(내륙운송)');
                             break;
-                        case 4: 
+                        case 4:
                             $sheet4->setCellValue('B'.$row_4, '국내 택배료');
                             break;
                         default:
@@ -2970,7 +2972,7 @@ class RateDataController extends Controller
                 $row_4++;
             }
         }
-        
+
         $Excel_writer = new Xlsx($spreadsheet);
         if(isset($user->mb_no)){
             $path = '../storage/download/'.$user->mb_no.'/';
@@ -3003,11 +3005,11 @@ class RateDataController extends Controller
         $user = Auth::user();
 
         $data_sheet4 = $data_sheet3 = $data_sheet2 = $rate_data = array();
-    
+
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet(0);
         $spreadsheet->getActiveSheet()->getProtection()->setSheet(true);
-        
+
         if($rgd_no){
             $rmd_no = $this->get_rmd_no_raw($rgd_no,'storage_monthly_final');
             $rate_data = $this->get_rate_data_raw($rmd_no);
@@ -3018,58 +3020,58 @@ class RateDataController extends Controller
             $supply_price = array_sum(array_column($data_sheet4,'rd_data5'));
             $vat_price = array_sum(array_column($data_sheet4,'rd_data6'));
             $sum_price = array_sum(array_column($data_sheet4,'rd_data7'));
-            
+
             $rmd_no_storage = $this->get_rmd_no_raw($rgd_no,'storage_monthly_final');
             $rate_data_storage = $this->get_rate_data_raw($rmd_no_storage);
         }
 
         $sheet->setTitle('종합');
-        
-        $sheet->setCellValue('A1', '종합'); 
-        $sheet->setCellValue('B1', '공급가'); 
-        $sheet->setCellValue('C1', '부가세'); 
-        $sheet->setCellValue('D1', '합계'); 
-        $sheet->setCellValue('E1', '비고'); 
-        
+
+        $sheet->setCellValue('A1', '종합');
+        $sheet->setCellValue('B1', '공급가');
+        $sheet->setCellValue('C1', '부가세');
+        $sheet->setCellValue('D1', '합계');
+        $sheet->setCellValue('E1', '비고');
+
         $sheet->setCellValue('A2', '유통가공 작업료');
-        $sheet->setCellValue('B2', $rdg['rdg_supply_price2']); 
-        $sheet->setCellValue('C2', $rdg['rdg_vat2']); 
-        $sheet->setCellValue('D2', $rdg['rdg_sum2']); 
-        $sheet->setCellValue('E2', $rdg['rdg_etc2']); 
-        
+        $sheet->setCellValue('B2', $rdg['rdg_supply_price2']);
+        $sheet->setCellValue('C2', $rdg['rdg_vat2']);
+        $sheet->setCellValue('D2', $rdg['rdg_sum2']);
+        $sheet->setCellValue('E2', $rdg['rdg_etc2']);
+
         $sheet->setCellValue('A3', '부자재 보관료');
-        $sheet->setCellValue('B3', $rdg['rdg_supply_price1']); 
-        $sheet->setCellValue('C3', $rdg['rdg_vat1']); 
-        $sheet->setCellValue('D3', $rdg['rdg_sum1']); 
-        $sheet->setCellValue('E3', $rdg['rdg_etc1']); 
-        
+        $sheet->setCellValue('B3', $rdg['rdg_supply_price1']);
+        $sheet->setCellValue('C3', $rdg['rdg_vat1']);
+        $sheet->setCellValue('D3', $rdg['rdg_sum1']);
+        $sheet->setCellValue('E3', $rdg['rdg_etc1']);
+
         $sheet->setCellValue('A4', '국내운송료');
-        $sheet->setCellValue('B4', $supply_price); 
-        $sheet->setCellValue('C4', $vat_price); 
-        $sheet->setCellValue('D4', $sum_price); 
-        $sheet->setCellValue('E4', $rdg['rdg_etc3']); 
-        
+        $sheet->setCellValue('B4', $supply_price);
+        $sheet->setCellValue('C4', $vat_price);
+        $sheet->setCellValue('D4', $sum_price);
+        $sheet->setCellValue('E4', $rdg['rdg_etc3']);
+
         $sheet->setCellValue('A5', '합계');
-        $sheet->setCellValue('B5', $rdg['rdg_supply_price4']); 
-        $sheet->setCellValue('C5', $rdg['rdg_vat4']); 
-        $sheet->setCellValue('D5', $rdg['rdg_sum4']); 
-        $sheet->setCellValue('E5', $rdg['rdg_etc4']); 
-        
-        
+        $sheet->setCellValue('B5', $rdg['rdg_supply_price4']);
+        $sheet->setCellValue('C5', $rdg['rdg_vat4']);
+        $sheet->setCellValue('D5', $rdg['rdg_sum4']);
+        $sheet->setCellValue('E5', $rdg['rdg_etc4']);
+
+
         $spreadsheet->createSheet();
         $sheet2 = $spreadsheet->getSheet(1);
 
         $sheet2->setTitle('작업료');
         $sheet2->mergeCells('A1:B1');
-        $sheet2->setCellValue('A1', '항목'); 
-        $sheet2->setCellValue('C1', '단위'); 
-        $sheet2->setCellValue('D1', '단가'); 
-        $sheet2->setCellValue('E1', '건수'); 
-        $sheet2->setCellValue('F1', '공급가'); 
-        $sheet2->setCellValue('G1', '부가세'); 
-        $sheet2->setCellValue('H1', '합계'); 
+        $sheet2->setCellValue('A1', '항목');
+        $sheet2->setCellValue('C1', '단위');
+        $sheet2->setCellValue('D1', '단가');
+        $sheet2->setCellValue('E1', '건수');
+        $sheet2->setCellValue('F1', '공급가');
+        $sheet2->setCellValue('G1', '부가세');
+        $sheet2->setCellValue('H1', '합계');
         $sheet2->setCellValue('I1', '비고');
-        
+
         $row_2 = 2;
         if(!empty($rate_data)){
             $data_sheet2 = json_decode($rate_data,1);
@@ -3086,19 +3088,19 @@ class RateDataController extends Controller
                 $row_2++;
             }
         }
-        
+
         $spreadsheet->createSheet();
         $sheet3 = $spreadsheet->getSheet(2);
-        
+
         $sheet3->setTitle('보관료');
         $sheet3->mergeCells('A1:B1');
-        $sheet3->setCellValue('A1', '항목'); 
-        $sheet3->setCellValue('C1', '단위'); 
-        $sheet3->setCellValue('D1', '단가'); 
-        $sheet3->setCellValue('E1', '건수'); 
-        $sheet3->setCellValue('F1', '공급가'); 
-        $sheet3->setCellValue('G1', '부가세'); 
-        $sheet3->setCellValue('H1', '합계'); 
+        $sheet3->setCellValue('A1', '항목');
+        $sheet3->setCellValue('C1', '단위');
+        $sheet3->setCellValue('D1', '단가');
+        $sheet3->setCellValue('E1', '건수');
+        $sheet3->setCellValue('F1', '공급가');
+        $sheet3->setCellValue('G1', '부가세');
+        $sheet3->setCellValue('H1', '합계');
         $sheet3->setCellValue('I1', '비고');
         $row_3 = 2;
         if(!empty($rate_data_storage)){
@@ -3116,35 +3118,35 @@ class RateDataController extends Controller
                 $row_3++;
             }
         }
-        
+
         $spreadsheet->createSheet();
         $sheet4 = $spreadsheet->getSheet(3);
-        
+
         $sheet4->setTitle('국내운송료');
         $sheet4->mergeCells('A1:B1');
         $sheet4->mergeCells('A2:A4');
-        $sheet4->setCellValue('A1', '항목'); 
-        $sheet4->setCellValue('A2', '운송'); 
-        $sheet4->setCellValue('C1', '단위'); 
-        $sheet4->setCellValue('D1', '단가'); 
-        $sheet4->setCellValue('E1', '건수'); 
-        $sheet4->setCellValue('F1', '공급가'); 
-        $sheet4->setCellValue('G1', '부가세'); 
-        $sheet4->setCellValue('H1', '합계'); 
+        $sheet4->setCellValue('A1', '항목');
+        $sheet4->setCellValue('A2', '운송');
+        $sheet4->setCellValue('C1', '단위');
+        $sheet4->setCellValue('D1', '단가');
+        $sheet4->setCellValue('E1', '건수');
+        $sheet4->setCellValue('F1', '공급가');
+        $sheet4->setCellValue('G1', '부가세');
+        $sheet4->setCellValue('H1', '합계');
         $sheet4->setCellValue('I1', '비고');
-        
+
         $row_4 = 2;
         if(!empty($data_sheet4)){
             foreach($data_sheet4 as $dt4){
                 if($row_4 < 5) {
                     switch($row_4){
-                        case 2: 
+                        case 2:
                             $sheet4->setCellValue('B'.$row_4, '픽업료');
                         break;
-                        case 3: 
+                        case 3:
                             $sheet4->setCellValue('B'.$row_4, '배차(내륙운송)');
                             break;
-                        case 4: 
+                        case 4:
                             $sheet4->setCellValue('B'.$row_4, '국내 택배료');
                             break;
                         default:
@@ -3163,7 +3165,7 @@ class RateDataController extends Controller
                 $row_4++;
             }
         }
-        
+
         $Excel_writer = new Xlsx($spreadsheet);
         if(isset($user->mb_no)){
             $path = '../storage/download/'.$user->mb_no.'/';

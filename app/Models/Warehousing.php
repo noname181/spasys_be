@@ -32,11 +32,13 @@ class Warehousing extends Model
         'co_no',
         'w_schedule_day',
         'w_schedule_amount',
+        'w_completed_day',
         'w_amount',
         'm_bl',
         'h_bl',
         'logistic_manage_number',
         'connection_number',
+        'tie_no',
         'created_at',
         'updated_at',
     ];
@@ -114,5 +116,10 @@ class Warehousing extends Model
     public function rate_data_general()
     {
         return $this->hasOne(RateDataGeneral::class, 'w_no', 'w_no');
+    }
+
+    public function import_expect()
+    {
+        return $this->belongsTo(ImportExpected::class, 'tie_no', 'tie_no');
     }
 }
