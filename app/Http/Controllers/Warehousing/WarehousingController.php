@@ -1737,6 +1737,20 @@ class WarehousingController extends Controller
 
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
 
+            $warehousing->setCollection(
+                $warehousing->getCollection()->map(function ($item) {
+                    
+                    $updated_at = Carbon::createFromFormat('Y.m.d H:i:s', $item->updated_at->format('Y.m.d H:i:s'));
+
+                    $start_date = $updated_at->startOfMonth()->toDateString();
+                    $end_date = $updated_at->endOfMonth()->toDateString();
+                    $item->time = str_replace('-', '.', $start_date) . ' ~ ' . str_replace('-', '.', $end_date);
+                    
+
+                    return $item;
+                })
+            );
+
             return response()->json($warehousing);
         } catch (\Exception $e) {
             Log::error($e);
