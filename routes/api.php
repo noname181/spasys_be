@@ -364,6 +364,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/general_final_service2_mobile', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_final_service2_mobile'])->name('registe_rate_data_general_final_service2_mobile');
 
         //GET GENERAL DATA FOLLOW BILL TYPE
+        Route::get('/downloadExcel/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_data_general']);
         Route::get('/general/{rgd_no}/{bill_type}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general'])->name('get_rate_data_general');
         //GET FINAL BILL DATA
         Route::get('/general_final/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_final'])->name('get_rate_data_general_final');

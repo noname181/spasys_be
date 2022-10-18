@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\RateData\RateDataImportFulfillmentRequest;
 use App\Http\Requests\RateData\RateDataRequest;
 use App\Http\Requests\RateData\RateDataSendMailRequest;
-use App\Models\File;
+use File;
 use App\Models\ReceivingGoodsDelivery;
 use App\Models\RateData;
 use App\Models\AdjustmentGroup;
@@ -25,6 +25,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 
 class RateDataController extends Controller
@@ -1557,8 +1559,8 @@ class RateDataController extends Controller
             $expectation_rgd = ReceivingGoodsDelivery::where('w_no', $w_no)->where('rgd_bill_type', 'final')->first();
 
             if(!isset($is_new->rdg_no)){
-                $previous_rgd->rgd_status5 = 'issued';
-                $previous_rgd->save();
+                $expectation_rgd->rgd_status5 = 'issued';
+                $expectation_rgd->save();
 
                 $final_rgd = $expectation_rgd->replicate();
                 $final_rgd->rgd_bill_type = 'additional'; // the new project_id
@@ -2058,4 +2060,571 @@ class RateDataController extends Controller
             return response()->json(['message' => Messages::MSG_0006], 500);
         }
     }
+    public function get_rate_data_raw($rmd_no)
+    {
+        $rate_data = RateData::where('rmd_no', $rmd_no)->where(function($q) {
+            $q->where('rd_cate_meta1', '유통가공')
+            ->orWhere('rd_cate_meta1', '수입풀필먼트');
+        })->get();
+        return $rate_data;
+    }
+    public function get_rmd_no_raw($rgd_no, $set_type){
+
+        $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
+        $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
+        $w_no = $rgd->w_no;
+    
+        $rmd = RateMetaData::where(
+            [
+                'rgd_no' => $rgd_no,
+                'set_type' => $set_type
+            ]
+        )->first();
+    
+    if(!isset($rmd->rmd_no) && $set_type == 'work_final'){
+    
+        $rmd = RateMetaData::where(
+            [
+                'rgd_no' => $rgd_no,
+                'set_type' => 'work_final'
+            ]
+        )->first();
+        if(empty($rmd)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd_no,
+                    'set_type' => 'work'
+                ]
+            )->first();
+        }
+        if(empty($rmd) && !empty($rdg)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rdg->rgd_no_expectation,
+                    'set_type' => 'work_final'
+                ]
+            )->first();
+        }
+        if(empty($rmd) && !empty($rdg)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rdg->rgd_no_expectation,
+                    'set_type' => 'work'
+                ]
+            )->first();
+        }
+    }else if(!isset($rmd->rmd_no) && $set_type == 'storage_final'){
+        $rmd = RateMetaData::where(
+            [
+                'rgd_no' => $rgd_no,
+                'set_type' => 'storage_final'
+            ]
+        )->first();
+        if(empty($rmd)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd_no,
+                    'set_type' => 'storage'
+                ]
+            )->first();
+        }
+        if(empty($rmd) && !empty($rdg)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rdg->rgd_no_expectation,
+                    'set_type' => 'storage_final'
+                ]
+            )->first();
+        }
+        if(empty($rmd) && !empty($rdg)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rdg->rgd_no_expectation,
+                    'set_type' => 'storage'
+                ]
+            )->first();
+        }
+    }else if(!isset($rmd->rmd_no) && $set_type == 'domestic_final'){
+        $rmd = RateMetaData::where(
+            [
+                'rgd_no' => $rgd_no,
+                'set_type' => 'domestic_final'
+            ]
+        )->first();
+        if(empty($rmd)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd_no,
+                    'set_type' => 'domestic'
+                ]
+            )->first();
+        }
+        if(empty($rmd) && !empty($rdg)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rdg->rgd_no_expectation,
+                    'set_type' => 'domestic_final'
+                ]
+            )->first();
+        }
+        if(empty($rmd) && !empty($rdg)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rdg->rgd_no_expectation,
+                    'set_type' => 'domestic'
+                ]
+            )->first();
+        }
+    }else if(!isset($rmd->rmd_no) && $set_type == 'work_additional'){
+        $rmd = RateMetaData::where(
+            [
+                'rgd_no' => $rdg->rgd_no_final,
+                'set_type' => 'work_additional'
+            ]
+        )->first();
+        if(empty($rmd)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd_no,
+                    'set_type' => 'work_final'
+                ]
+            )->first();
+        }
+        if(empty($rmd) && !empty($rdg)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rdg->rgd_no_expectation,
+                    'set_type' => 'work_final'
+                ]
+            )->first();
+        }
+        if(empty($rmd) && !empty($rdg)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rdg->rgd_no_expectation,
+                    'set_type' => 'work'
+                ]
+            )->first();
+        }
+    }else if(!isset($rmd->rmd_no) && $set_type == 'storage_additional'){
+        $rmd = RateMetaData::where(
+            [
+                'rgd_no' => $rdg->rgd_no_final,
+                'set_type' => 'storage_additional'
+            ]
+        )->first();
+        if(empty($rmd)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd_no,
+                    'set_type' => 'storage_final'
+                ]
+            )->first();
+        }
+        if(empty($rmd) && !empty($rdg)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rdg->rgd_no_expectation,
+                    'set_type' => 'storage_final'
+                ]
+            )->first();
+        }
+        if(empty($rmd) && !empty($rdg)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rdg->rgd_no_expectation,
+                    'set_type' => 'storage'
+                ]
+            )->first();
+        }
+    }else if(!isset($rmd->rmd_no) && $set_type == 'domestic_additional'){
+        $rmd = RateMetaData::where(
+            [
+                'rgd_no' => $rdg->rgd_no_final,
+                'set_type' => 'domestic_additional'
+            ]
+        )->first();
+        if(empty($rmd)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd_no,
+                    'set_type' => 'domestic_final'
+                ]
+            )->first();
+        }
+        if(empty($rmd) && !empty($rdg)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rdg->rgd_no_expectation,
+                    'set_type' => 'domestic_final'
+                ]
+            )->first();
+        }
+        if(empty($rmd) && !empty($rdg)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rdg->rgd_no_expectation,
+                    'set_type' => 'domestic'
+                ]
+            )->first();
+        }
+    }else if(!isset($rmd->rmd_no) && $set_type == 'work_additional2'){
+        $rmd = RateMetaData::where(
+            [
+                'rgd_no' => $rgd_no,
+                'set_type' => 'work_additional'
+            ]
+        )->first();
+    
+        if(empty($rmd) && !empty($rdg)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rdg->rgd_no_final,
+                    'set_type' => 'work_additional'
+                ]
+            )->first();
+        }
+    }else if(!isset($rmd->rmd_no) && $set_type == 'storage_additional2'){
+        $rmd = RateMetaData::where(
+            [
+                'rgd_no' => $rgd_no,
+                'set_type' => 'storage_additional'
+            ]
+        )->first();
+        if(empty($rmd) && !empty($rdg)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rdg->rgd_no_final,
+                    'set_type' => 'storage_additional'
+                ]
+            )->first();
+        }
+    
+    }else  if(!isset($rmd->rmd_no) && $set_type == 'work_monthly_final'){
+    
+        $rmd = RateMetaData::where(
+            [
+                'rgd_no' => $rgd_no,
+                'set_type' => 'work_monthly_final'
+            ]
+        )->first();
+        if(empty($rmd)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd_no,
+                    'set_type' => 'work_monthly'
+                ]
+            )->first();
+        }
+        if(empty($rmd) && !empty($rdg)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rdg->rgd_no_expectation,
+                    'set_type' => 'work_monthly_final'
+                ]
+            )->first();
+        }
+        if(empty($rmd) && !empty($rdg)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rdg->rgd_no_expectation,
+                    'set_type' => 'work_monthly'
+                ]
+            )->first();
+        }
+    
+    
+    }else if(!isset($rmd->rmd_no) && $set_type == 'storage_monthly_final'){
+        $rmd = RateMetaData::where(
+            [
+                'rgd_no' => $rgd_no,
+                'set_type' => 'storage_monthly_final'
+            ]
+        )->first();
+        if(empty($rmd)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd_no,
+                    'set_type' => 'storage_monthly'
+                ]
+            )->first();
+        }
+        if(empty($rmd) && !empty($rdg)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rdg->rgd_no_expectation,
+                    'set_type' => 'storage_monthly_final'
+                ]
+            )->first();
+        }
+        if(empty($rmd) && !empty($rdg)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rdg->rgd_no_expectation,
+                    'set_type' => 'storage_monthly'
+                ]
+            )->first();
+        }
+    }else if(!isset($rmd->rmd_no) && $set_type == 'domestic_monthly_final'){
+        $rmd = RateMetaData::where(
+            [
+                'rgd_no' => $rgd_no,
+                'set_type' => 'domestic_monthly_final'
+            ]
+        )->first();
+        if(empty($rmd)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd_no,
+                    'set_type' => 'domestic_monthly'
+                ]
+            )->first();
+        }
+        if(empty($rmd) && !empty($rdg)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rdg->rgd_no_expectation,
+                    'set_type' => 'domestic_monthly_final'
+                ]
+            )->first();
+        }
+        if(empty($rmd) && !empty($rdg)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rdg->rgd_no_expectation,
+                    'set_type' => 'domestic_monthly'
+                ]
+            )->first();
+        }
+    }else  if(!isset($rmd->rmd_no) && $set_type == 'work_monthly_additional'){
+        $rmd = RateMetaData::where(
+            [
+                'rgd_no' => $rgd_no,
+                'set_type' => 'work_monthly_additional'
+            ]
+        )->first();
+        if(empty($rmd) && !empty($rdg)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rdg->rgd_no_final,
+                    'set_type' => 'work_monthly_additional'
+                ]
+            )->first();
+        }
+    }else if(!isset($rmd->rmd_no) && $set_type == 'storage_monthly_additional'){
+        $rmd = RateMetaData::where(
+            [
+                'rgd_no' => $rgd_no,
+                'set_type' => 'storage_monthly_additional'
+            ]
+        )->first();
+        if(empty($rmd) && !empty($rdg)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rdg->rgd_no_final,
+                    'set_type' => 'storage_monthly_additional'
+                ]
+            )->first();
+        }
+    }else if(!isset($rmd->rmd_no) && $set_type == 'domestic_monthly_additional'){
+        $rmd = RateMetaData::where(
+            [
+                'rgd_no' => $rgd_no,
+                'set_type' => 'domestic_monthly_additional'
+            ]
+        )->first();
+        if(empty($rmd) && !empty($rdg)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rdg->rgd_no_final,
+                    'set_type' => 'domestic_monthly_additional'
+                ]
+            )->first();
+        }
+    }
+    return $rmd ?  $rmd->rmd_no : null;
+    }
+    
+    public function download_data_general($rgd_no){
+    $data = array();
+    
+    DB::beginTransaction();
+    $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
+    $w_no = $rgd->w_no;
+    $rdg = RateDataGeneral::where('w_no', $w_no)->where('rgd_no', $rgd_no)->where('rdg_bill_type', 'expectation')->first();
+    
+    if(empty($rdg)){
+        $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'expectation')->first();
+    }
+    $user = Auth::user();
+    
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet(0);
+    $spreadsheet->getActiveSheet()->getProtection()->setSheet(true);
+    $sheet->setTitle('종합');
+    
+    $sheet->setCellValue('A1', '종합'); 
+    $sheet->setCellValue('B1', '공급가'); 
+    $sheet->setCellValue('C1', '부가세'); 
+    $sheet->setCellValue('D1', '합계'); 
+    $sheet->setCellValue('E1', '비고'); 
+    
+    $sheet->setCellValue('A2', '유통가공 작업료');
+    $sheet->setCellValue('B2', $rdg['rdg_supply_price2']); 
+    $sheet->setCellValue('C2', $rdg['rdg_vat2']); 
+    $sheet->setCellValue('D2', $rdg['rdg_sum2']); 
+    $sheet->setCellValue('E2', $rdg['rdg_etc2']); 
+    
+    $sheet->setCellValue('A3', '부자재 보관료');
+    $sheet->setCellValue('B3', $rdg['rdg_supply_price1']); 
+    $sheet->setCellValue('C3', $rdg['rdg_vat1']); 
+    $sheet->setCellValue('D3', $rdg['rdg_sum1']); 
+    $sheet->setCellValue('E3', $rdg['rdg_etc1']); 
+    
+    $sheet->setCellValue('A4', '국내운송료');
+    $sheet->setCellValue('B4', $rdg['rdg_supply_price3']); 
+    $sheet->setCellValue('C4', $rdg['rdg_vat3']); 
+    $sheet->setCellValue('D4', $rdg['rdg_sum3']); 
+    $sheet->setCellValue('E4', $rdg['rdg_etc3']); 
+    
+    $sheet->setCellValue('A5', '합계');
+    $sheet->setCellValue('B5', $rdg['rdg_supply_price4']); 
+    $sheet->setCellValue('C5', $rdg['rdg_vat4']); 
+    $sheet->setCellValue('D5', $rdg['rdg_sum4']); 
+    $sheet->setCellValue('E5', $rdg['rdg_etc4']); 
+    
+    
+    $spreadsheet->createSheet();
+    $sheet2 = $spreadsheet->getSheet(1);
+    $rmd_no = $this->get_rmd_no_raw($rgd_no,'work');
+    $data_sheet2 = $rate_data = array();
+    if($rmd_no){
+        $rate_data = $this->get_rate_data_raw($rmd_no);
+    }
+    $sheet2->setTitle('작업료');
+    $sheet2->mergeCells('A1:B1');
+    $sheet2->setCellValue('A1', '항목'); 
+    $sheet2->setCellValue('C1', '단위'); 
+    $sheet2->setCellValue('D1', '단가'); 
+    $sheet2->setCellValue('E1', '건수'); 
+    $sheet2->setCellValue('F1', '공급가'); 
+    $sheet2->setCellValue('G1', '부가세'); 
+    $sheet2->setCellValue('H1', '합계'); 
+    $sheet2->setCellValue('I1', '비고');
+    
+    $row_2 = 2;
+    if(!empty($rate_data)){
+        $data_sheet2 = json_decode($rate_data,1);
+        foreach($data_sheet2 as $dt2){
+            $sheet2->setCellValue('A'.$row_2, $dt2['rd_cate1']);
+            $sheet2->setCellValue('B'.$row_2, $dt2['rd_cate2']);
+            $sheet2->setCellValue('C'.$row_2, $dt2['rd_data1']);
+            $sheet2->setCellValue('D'.$row_2, $dt2['rd_data2']);
+            $sheet2->setCellValue('E'.$row_2, $dt2['rd_data4']);
+            $sheet2->setCellValue('F'.$row_2, $dt2['rd_data5']);
+            $sheet2->setCellValue('G'.$row_2, $dt2['rd_data6']);
+            $sheet2->setCellValue('H'.$row_2, $dt2['rd_data7']);
+            $sheet2->setCellValue('I'.$row_2, $dt2['rd_cate1']);
+            $row_2++;
+        }
+    }
+    
+    $spreadsheet->createSheet();
+    $sheet3 = $spreadsheet->getSheet(2);
+    $data_sheet3 = array();
+    if($rgd_no){
+        $rmd_no_storage = $this->get_rmd_no_raw($rgd_no,'storage');
+        $rate_data_storage = $this->get_rate_data_raw($rmd_no_storage);
+    }
+    
+    $sheet3->setTitle('보관료');
+    $sheet3->mergeCells('A1:B1');
+    $sheet3->setCellValue('A1', '항목'); 
+    $sheet3->setCellValue('C1', '단위'); 
+    $sheet3->setCellValue('D1', '단가'); 
+    $sheet3->setCellValue('E1', '건수'); 
+    $sheet3->setCellValue('F1', '공급가'); 
+    $sheet3->setCellValue('G1', '부가세'); 
+    $sheet3->setCellValue('H1', '합계'); 
+    $sheet3->setCellValue('I1', '비고');
+    $row_3 = 2;
+    if(!empty($rate_data_storage)){
+        $data_sheet3 = json_decode($rate_data_storage,1);
+        foreach($data_sheet3 as $dt3){
+            $sheet3->setCellValue('A'.$row_3, $dt3['rd_cate1']);
+            $sheet3->setCellValue('B'.$row_3, $dt3['rd_cate2']);
+            $sheet3->setCellValue('C'.$row_3, $dt3['rd_data1']);
+            $sheet3->setCellValue('D'.$row_3, $dt3['rd_data2']);
+            $sheet3->setCellValue('E'.$row_3, $dt3['rd_data4']);
+            $sheet3->setCellValue('F'.$row_3, $dt3['rd_data5']);
+            $sheet3->setCellValue('G'.$row_3, $dt3['rd_data6']);
+            $sheet3->setCellValue('H'.$row_3, $dt3['rd_data7']);
+            $sheet3->setCellValue('I'.$row_3, $dt3['rd_cate1']);
+            $row_3++;
+        }
+    }
+    
+    $spreadsheet->createSheet();
+    $sheet4 = $spreadsheet->getSheet(3);
+    $data_sheet4 = array();
+    if($rgd_no){
+        $rmd_no_domestic = $this->get_rmd_no_raw($rgd_no,'domestic');
+        $rate_data_domestic = $this->get_rate_data_raw($rmd_no_domestic);
+    }
+    
+    $sheet4->setTitle('국내운송료');
+    $sheet4->mergeCells('A1:B1');
+    $sheet4->setCellValue('A1', '항목'); 
+    $sheet4->setCellValue('C1', '단위'); 
+    $sheet4->setCellValue('D1', '단가'); 
+    $sheet4->setCellValue('E1', '건수'); 
+    $sheet4->setCellValue('F1', '공급가'); 
+    $sheet4->setCellValue('G1', '부가세'); 
+    $sheet4->setCellValue('H1', '합계'); 
+    $sheet4->setCellValue('I1', '비고');
+    
+    $row_4 = 2;
+    if(!empty($rate_data_domestic)){
+        $data_sheet4 = json_decode($rate_data_storage,1);
+        foreach($data_sheet4 as $dt4){
+            $sheet4->setCellValue('A'.$row_4, $dt4['rd_cate1']);
+            $sheet4->setCellValue('B'.$row_4, $dt4['rd_cate2']);
+            $sheet4->setCellValue('C'.$row_4, $dt4['rd_data1']);
+            $sheet4->setCellValue('D'.$row_4, $dt4['rd_data2']);
+            $sheet4->setCellValue('E'.$row_4, $dt4['rd_data4']);
+            $sheet4->setCellValue('F'.$row_4, $dt4['rd_data5']);
+            $sheet4->setCellValue('G'.$row_4, $dt4['rd_data6']);
+            $sheet4->setCellValue('H'.$row_4, $dt4['rd_data7']);
+            $sheet4->setCellValue('I'.$row_4, $dt4['rd_cate1']);
+            $row_4++;
+        }
+    }
+    
+    $Excel_writer = new Xlsx($spreadsheet);
+    if(isset($user->mb_no)){
+        $path = '../storage/download/'.$user->mb_no.'/';
+    }else{
+        $path = '../storage/download/no-name/';
+    }
+    if (!is_dir($path)) {
+        File::makeDirectory($path, $mode = 0777, true, true);
+    }
+    $mask = $path.'Rate-Data-General-*.*';
+    array_map('unlink', glob($mask));
+    $file_name_download = $path.'Rate-Data-General-'.date('YmdHis').'.Xlsx';
+    $check_status = $Excel_writer->save($file_name_download);
+    return response()->json([
+        'status' => 1,
+        'link_download' => $file_name_download,
+        'message' => 'Download File'
+    ], 500);
+    ob_end_clean();
+    
+    return response()->json([
+        'message' => 'Data download',
+        'data' => $data,
+        'rgd_no' => $rgd_no
+    ]);
+    }
+
 }
