@@ -147,7 +147,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/get_warehousing_export', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingExport']);
     Route::post('/get_warehousing_import', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingImport']); //page 129
     Route::post('/get_warehousing_import_status1', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingImportStatus1']); //page 134 
-    Route::post('/get_warehousing_delivery', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingDelivery']); //page 715
+    Route::post('/get_warehousing_delivery_3', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingDelivery3']); //page 715_3
+    Route::post('/get_warehousing_delivery_2', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingDelivery2']); //page 715_2
+    Route::post('/get_warehousing_delivery_1', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingDelivery1']); //page 715_1
 
     Route::post('/update_status_delivery', [\App\Http\Controllers\Warehousing\WarehousingController::class,'UpdateStatusDelivery']); //page 715 update status
 
