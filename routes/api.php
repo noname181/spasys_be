@@ -372,6 +372,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/downloadFinalCaseBill/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_final_case_bill']);
         //distribution_final_monthbill_edit
         Route::get('/downloadFinalMonthBill/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_final_month_bill']);
+        //distribution_est_monthbill_edit
+        Route::get('/downloadEstMonthbill/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_est_month_bill']);
         //GET GENERAL DATA FOLLOW BILL TYPE
         Route::get('/general/{rgd_no}/{bill_type}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general'])->name('get_rate_data_general');
         //GET FINAL BILL DATA
