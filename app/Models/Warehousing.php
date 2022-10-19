@@ -46,6 +46,7 @@ class Warehousing extends Model
     protected $casts = [
         'created_at' => "date:Y.m.d H:i",
         'updated_at' => "date:Y.m.d H:i",
+        'w_completed_day'=> "date:Y.m.d"
     ];
 
     public function mb_no()
