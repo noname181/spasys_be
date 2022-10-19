@@ -1142,7 +1142,7 @@ class WarehousingController extends Controller
     public function getWarehousingDelivery1(WarehousingSearchRequest $request) //page715 show delivery
     {
         try {
-
+            DB::enableQueryLog();
             $validated = $request->validated();
 
             // If per_page is null set default data = 15
@@ -1150,12 +1150,7 @@ class WarehousingController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
 
-            $sql = DB::select(DB::raw("select * from
-            (select tie_logistic_manage_number from t_import_expected where tie_is_date >= '2022-01-04' and tie_is_date <= '2022-10-04' group by tie_logistic_manage_number) as aaa
-            left outer join
-            (SELECT te_logistic_manage_number,te_carry_out_number FROM t_export group by te_logistic_manage_number, te_carry_out_number ) as bbb
-            on
-            aaa.tie_logistic_manage_number = bbb.te_logistic_manage_number"));
+            
 
             DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
             $user = Auth::user();
@@ -1227,20 +1222,27 @@ class WarehousingController extends Controller
             }
 
             if (isset($validated['order_id'])) {
-                $import_schedule->where('t_export.te_carry_out_number', '=', $validated['order_id']);
+                $import_schedule->where('t_export.te_carry_out_number', 'like', '%' . $validated['order_id'] . '%');
             }
 
             if (isset($validated['status'])) {
                
-                // $import_schedule->with('receiving_goods_delivery', function ($q) use ($validated) {
-                //     return $q->where(DB::raw('lower(receiving_goods_delivery.rgd_status3)'), '=', $validated['status']);
+                // $import_schedule->leftJoin('t_export', function ($query) use ($validated) {
+                //     $query->on('tie_logistic_manage_number', '=', 't_export.te_logistic_manage_number')->whereHas('receiving_goods_delivery',function($query) use ($validated) {
+                //         return $query->where(DB::raw('lower(receiving_goods_delivery.rgd_status3)'), '=', $validated['status']);
+                //      });
                 // });
-                $import_schedule->with('receiving_goods_delivery', function($q) use ($validated) { 
+                // $import_schedule->leftJoin('receiving_goods_delivery', function($q) use ($validated) { 
                     
-                    return $q->where('receiving_goods_delivery.rgd_status3', '=', $validated['status']);
-                });
-                
+                //     return $q->on('t_export.te_carry_out_number','=','receiving_goods_delivery.is_no')->where(DB::raw('lower(receiving_goods_delivery.rgd_status3)'), '=', $validated['status']);
+                // });
+                // $import_schedule->leftJoin('receiving_goods_delivery', function($q) use ($validated) { 
+                    
+                //     return $q->on('te_carry_out_number','=','receiving_goods_delivery.is_no')->where(DB::raw('lower(receiving_goods_delivery.rgd_status3)'), '=', $validated['status']);
+                // });
+              
             }
+            
 
             // if (isset($validated['import_schedule_status1']) || isset($validated['import_schedule_status2'])) {
             //     $import_schedule->where(function($query) use ($validated) {
@@ -1263,7 +1265,7 @@ class WarehousingController extends Controller
             $import_schedule = $custom->merge($import_schedule);
 
             DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
-
+            //return DB::getQueryLog();
             return response()->json($import_schedule);
         } catch (\Exception $e) {
             Log::error($e);
