@@ -24,6 +24,12 @@ class WarehousingSearchRequest extends BaseFormRequest
     public function rules()
     {
         return [
+            'status' => [
+                ''
+            ],
+            'order_id' => [
+                ''
+            ],
             'page_type' => [
                 ''
             ],

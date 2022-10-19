@@ -215,8 +215,8 @@ class ImportScheduleController extends Controller
                         ],
                         [
                             'mb_no' => $user->mb_no,
-                            'w_completed_day' => $item['import']['ti_i_date'] ? $item['import']['ti_i_date'] : NULL,
-                            'w_schedule_day' => $item['tie_is_date'] ? $item['tie_is_date'] : NULL,
+                            // 'w_completed_day' => $item['import']['ti_i_date'] ? $item['import']['ti_i_date'] : NULL,
+                            // 'w_schedule_day' => $item['tie_is_date'] ? $item['tie_is_date'] : NULL,
                             'logistic_manage_number' => $item['tie_logistic_manage_number'],
                             'w_schedule_amount' => $item['tie_is_number'],
                             'w_amount' => $item['import']['ti_i_number'],
