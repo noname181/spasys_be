@@ -234,6 +234,7 @@ class ImportScheduleController extends Controller
                             'mb_no' => $user->mb_no,
                             'service_korean_name' => '보세화물',
                             'rgd_status1' => '입고',
+                            'rgd_tracking_code' => $item['te_carry_out_number']
                         ]
                     );
                 }

@@ -1056,6 +1056,42 @@ class RateDataController extends Controller
         }
     }
 
+    public function getBondedRateDataRgd($rgd_no)
+    {
+        $user = Auth::user();
+        $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd_no)->first();
+
+        try {
+            $rate_data = RateData::where('rd_cate_meta1', '보세화물');
+
+            if($user->mb_type == 'spasys'){
+                $co_no = $rgd->warehousing->company->co_parent->co_no;
+                $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
+                $rate_data = $rate_data->where('rd_co_no', $co_no);
+                if(isset($rmd->rmd_no)){
+                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+                }
+            }else if($user->mb_type == 'shop'){
+                $co_no = $rgd->warehousing->company->co_no;
+                $rmd = RateMetaData::where('co_no',  $co_no )->latest('created_at')->first();
+                $rate_data = $rate_data->where('rd_co_no',  $co_no );
+                if(isset($rmd->rmd_no)){
+                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+                }
+            }else {
+                $rate_data = $rate_data->where('co_no', $user->co_no);
+            }
+
+            $rate_data = $rate_data->get();
+
+            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data, 'co_no' => $co_no], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
     public function getFulfillRateDataRgd($rgd_no)
     {
         $user = Auth::user();
