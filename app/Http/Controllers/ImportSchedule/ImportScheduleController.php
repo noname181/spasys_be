@@ -119,21 +119,21 @@ class ImportScheduleController extends Controller
             DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
             $user = Auth::user();
             if ($user->mb_type == 'shop') {
-                $import_schedule = ImportExpected::with(['import', 'company'])->whereHas('company.co_parent', function ($q) use ($user) {
+                $import_schedule = ImportExpected::with(['import', 'company','receiving_goods_delivery'])->whereHas('company.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 })->groupBy('t_import_expected.tie_logistic_manage_number')->leftjoin('t_export', 't_import_expected.tie_logistic_manage_number', '=', 't_export.te_logistic_manage_number')
                     ->select(['t_import_expected.*', 't_export.te_logistic_manage_number', 't_export.te_carry_out_number'])
                     ->where('tie_is_date', '>=', '2022-01-04')->where('tie_is_date', '<=', '2022-10-04')
                     ->groupBy('t_export.te_logistic_manage_number', 't_export.te_carry_out_number')->orderBy('t_export.te_carry_out_number', 'DESC');
             } else if ($user->mb_type == 'shipper') {
-                $import_schedule = ImportExpected::with(['import', 'company'])->whereHas('company', function ($q) use ($user) {
+                $import_schedule = ImportExpected::with(['import', 'company','receiving_goods_delivery'])->whereHas('company', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 })->groupBy('t_import_expected.tie_logistic_manage_number')->leftjoin('t_export', 't_import_expected.tie_logistic_manage_number', '=', 't_export.te_logistic_manage_number')
                     ->select(['t_import_expected.*', 't_export.te_logistic_manage_number', 't_export.te_carry_out_number'])
                     ->where('tie_is_date', '>=', '2022-01-04')->where('tie_is_date', '<=', '2022-10-04')
                     ->groupBy('t_export.te_logistic_manage_number', 't_export.te_carry_out_number')->orderBy('t_export.te_carry_out_number', 'DESC');
             } else if ($user->mb_type == 'spasys') {
-                $import_schedule = ImportExpected::with(['import', 'company'])->whereHas('company.co_parent.co_parent', function ($q) use ($user) {
+                $import_schedule = ImportExpected::with(['import', 'company','receiving_goods_delivery'])->whereHas('company.co_parent.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 })->groupBy('t_import_expected.tie_logistic_manage_number')->leftjoin('t_export', 't_import_expected.tie_logistic_manage_number', '=', 't_export.te_logistic_manage_number')
                     ->select(['t_import_expected.*', 't_export.te_logistic_manage_number', 't_export.te_carry_out_number'])
@@ -243,7 +243,7 @@ class ImportScheduleController extends Controller
             return response()->json($import_schedule);
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             //return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }

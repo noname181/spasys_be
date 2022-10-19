@@ -81,4 +81,7 @@ class ReceivingGoodsDelivery extends Model
     public function rate_meta_data(){
         return $this->hasMany(RateMetaData::class, 'rgd_no', 'rgd_no')->with(['rate_data']);
     }
+    public function rate_meta_data_parent(){
+        return $this->hasMany(RateMetaData::class, 'rgd_no', 'rgd_parent_no')->with(['rate_data']);
+    }
 }

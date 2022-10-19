@@ -5,7 +5,7 @@ use App\Models\Import;
 use App\Models\Company;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Models\ReceivingGoodsDelivery;
 class ImportExpected extends Model
 {
     use HasFactory;
@@ -55,6 +55,11 @@ class ImportExpected extends Model
     public function company()
     {
         return $this->hasOne(Company::class,'co_license','tie_co_license')->with('co_parent');
+    }
+
+    public function receiving_goods_delivery()
+    {
+        return $this->hasMany(ReceivingGoodsDelivery::class, 'is_no', 'te_carry_out_number');
     }
 
 }
