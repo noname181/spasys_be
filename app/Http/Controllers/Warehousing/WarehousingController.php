@@ -15,6 +15,8 @@ use App\Models\ReceivingGoodsDelivery;
 use App\Models\Service;
 use App\Models\Warehousing;
 use App\Models\WarehousingItem;
+use App\Models\ScheduleShipment;
+use App\Models\ScheduleShipmentInfo;
 use App\Utils\CommonFunc;
 use App\Utils\Messages;
 use Carbon\Carbon;
@@ -1032,97 +1034,84 @@ class WarehousingController extends Controller
     public function getWarehousingDelivery2(WarehousingSearchRequest $request) //page715 show delivery
     {
         try {
-            DB::enableQueryLog();
-            $validated = $request->validated();
 
+            $validated = $request->validated();
+            $user = Auth::user();
             // If per_page is null set default data = 15
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $user = Auth::user();
+
+           
             if ($user->mb_type == 'shop') {
-                $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
-                    $query->where('w_type', '=', 'EW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
-                        $q->where('rgd_status1', '=', '출고')->where('rgd_status3', '!=', '배송완료')->orWhereNull('rgd_status1');
-                    })->whereHas('co_no.co_parent', function ($q) use ($user) {
-                        $q->where('co_no', $user->co_no);
-                    });
-                })->orderBy('rgd_no', 'DESC');
-            } else if ($user->mb_type == 'shipper') {
-                $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
-                    $query->where('w_type', '=', 'EW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
-                        $q->where('rgd_status1', '=', '출고')->where('rgd_status3', '!=', '배송완료')->orWhereNull('rgd_status1');
-                    })->whereHas('co_no', function ($q) use ($user) {
-                        $q->where('co_no', $user->co_no);
-                    });
-                })->orderBy('rgd_no', 'DESC');
-            } else if ($user->mb_type == 'spasys') {
-                $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
-                    $query->where('w_type', '=', 'EW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
-                        $q->where('rgd_status1', '=', '출고')->where('rgd_status3', '!=', '배송완료')->orWhereNull('rgd_status1');
-                    })->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
-                        $q->where('co_no', $user->co_no);
-                    });
-                })->orderBy('rgd_no', 'DESC');
+                $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->whereNotNull('trans_no')->where('status', '!=', '8')->whereHas('ContractWms.company.co_parent', function ($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->orderBy('ss_no', 'DESC');
+            }else if($user->mb_type == 'shipper'){
+                $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->whereNotNull('trans_no')->where('status', '!=', '8')->whereHas('ContractWms.company', function ($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->orderBy('ss_no', 'DESC');
+            }else if($user->mb_type == 'spasys'){
+                $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->whereNotNull('trans_no')->where('status', '!=', '8')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->orderBy('ss_no', 'DESC');
             }
+            
 
             if (isset($validated['from_date'])) {
-                $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                $schedule_shipment->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
 
             if (isset($validated['to_date'])) {
-                $warehousing->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                $schedule_shipment->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
             }
 
             if (isset($validated['co_parent_name'])) {
-                $warehousing->whereHas('w_no.co_no.co_parent', function ($query) use ($validated) {
+                $schedule_shipment->whereHas('ContractWms.company.co_parent', function ($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
                 });
             }
+
             if (isset($validated['co_name'])) {
-                $warehousing->whereHas('w_no.co_no', function ($q) use ($validated) {
+                $schedule_shipment->whereHas('ContractWms.company', function($q) use($validated) {
                     return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
                 });
             }
 
-            if (isset($validated['w_schedule_number'])) {
-                $warehousing->whereHas('w_no', function ($q) use ($validated) {
-                    return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
-                });
-            }
-            if (isset($validated['rgd_status1'])) {
-                $warehousing->where('rgd_status1', '=', $validated['rgd_status1']);
-            }
-            if (isset($validated['rgd_status2'])) {
-                $warehousing->where('rgd_status2', '=', $validated['rgd_status2']);
-            }
-            if (isset($validated['rgd_status3'])) {
-                $warehousing->where('rgd_status3', '=', $validated['rgd_status3']);
-            }
-            if (isset($validated['m_bl'])) {
-                $warehousing->whereHas('w_no', function ($q) use ($validated) {
-                    return $q->where('m_bl', 'like', '%' . $validated['m_bl'] . '%');
-                });
-            }
-            if (isset($validated['h_bl'])) {
-                $warehousing->whereHas('w_no', function ($q) use ($validated) {
-                    return $q->where('h_bl', 'like', '%' . $validated['h_bl'] . '%');
-                });
-            }
-            if (isset($validated['rgd_status1_1']) || isset($validated['rgd_status1_2']) || isset($validated['rgd_status1_3'])) {
-                $warehousing->where(function ($q) use ($validated) {
-                    $q->Where('rgd_status1', '=', $validated['rgd_status1_1'] ? $validated['rgd_status1_1'] : "")
-                        ->orWhere('rgd_status1', '=', $validated['rgd_status1_2'] ? $validated['rgd_status1_2'] : "")
-                        ->orWhere('rgd_status1', '=', $validated['rgd_status1_3'] ? $validated['rgd_status1_3'] : "");
+            if (isset($validated['item_brand'])) {
+                $schedule_shipment->whereHas('schedule_shipment_info.item', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(item_brand)'), 'like', '%' . strtolower($validated['item_brand']) . '%');
                 });
             }
 
-            $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
-            //return DB::getQueryLog();
+            if (isset($validated['item_channel_name'])) {
+                $schedule_shipment->whereHas('schedule_shipment_info.item.item_channels', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(item_channel_name)'), 'like', '%' . strtolower($validated['item_channel_name']) . '%');
+                });
+            }
 
-            return response()->json($warehousing);
+            if (isset($validated['item_name'])) {
+                $schedule_shipment->whereHas('schedule_shipment_info.item', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(item_name)'), 'like', '%' . strtolower($validated['item_name']) . '%');
+                });
+            }
 
-        } catch (\Exception $e) {
+            if (isset($validated['status'])) {
+                if($validated['status'] > 0){
+                    $schedule_shipment->where('status', '=', $validated['status']);
+                }
+            }
+
+            if (isset($validated['order_id'])) {
+
+                $schedule_shipment->where(DB::raw('lower(order_id)'), 'like', '%' . strtolower($validated['order_id']) . '%');
+
+            }
+
+            $schedule_shipment = $schedule_shipment->paginate($per_page, ['*'], 'page', $page);
+
+            return response()->json($schedule_shipment);
+        }  catch (\Exception $e) {
             Log::error($e);
 
             //return response()->json(['message' => Messages::MSG_0018], 500);
@@ -2437,12 +2426,30 @@ class WarehousingController extends Controller
     {
         try {
             DB::beginTransaction();
-            foreach($request->datachkbox as $value){
-                $rgd = ReceivingGoodsDelivery::where('rgd_no', $value['rgd_no'])
-                        ->update([
-                            'rgd_status3' => "배송완료"
-                        ]);
+
+            if($request->service == "유통가공"){
+                foreach($request->datachkbox as $value){
+                    $rgd = ReceivingGoodsDelivery::where('rgd_no', $value['rgd_no'])
+                            ->update([
+                                'rgd_status3' => "배송완료"
+                            ]);
+                }
+            }elseif($request->service == "수입풀필먼트"){
+                foreach($request->datachkbox as $value){
+                    $rgd = ScheduleShipment::where('ss_no', $value['ss_no'])
+                            ->update([
+                                'status' => 8
+                            ]);
+                }
+            }else{
+                foreach($request->datachkbox as $value){
+                    $rgd = ReceivingGoodsDelivery::where('rgd_no', $value['rgd_no'])
+                            ->update([
+                                'rgd_status3' => "배송완료"
+                            ]);
+                }
             }
+            
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
