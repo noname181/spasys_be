@@ -1235,10 +1235,11 @@ class WarehousingController extends Controller
                 // $import_schedule->with('receiving_goods_delivery', function ($q) use ($validated) {
                 //     return $q->where(DB::raw('lower(receiving_goods_delivery.rgd_status3)'), '=', $validated['status']);
                 // });
-                // $import_schedule->leftJoin('receiving_goods_delivery', function($q) use ($validated) { 
-                //     return $q->on('t_export.te_carry_out_number','=','receiving_goods_delivery.is_no')->where(DB::raw('lower(receiving_goods_delivery.rgd_status3)'), '=', $validated['status']);
-                // });
-              
+                $import_schedule->with('receiving_goods_delivery', function($q) use ($validated) { 
+                    
+                    return $q->where('receiving_goods_delivery.rgd_status3', '=', $validated['status']);
+                });
+                
             }
 
             // if (isset($validated['import_schedule_status1']) || isset($validated['import_schedule_status2'])) {
