@@ -1611,6 +1611,7 @@ class WarehousingController extends Controller
                             $q->where('co_no', $user->co_no);
                         });
                     });
+
             } else if ($user->mb_type == 'shipper') {
                 $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 'rate_meta_data' => function ($q) {
 
@@ -1735,7 +1736,7 @@ class WarehousingController extends Controller
 
             $members = Member::where('mb_no', '!=', 0)->get();
 
-            $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
+            $warehousing = $warehousing->orderBy('rgd_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
 
             $warehousing->setCollection(
                 $warehousing->getCollection()->map(function ($item) {
