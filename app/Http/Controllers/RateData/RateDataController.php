@@ -1668,7 +1668,7 @@ class RateDataController extends Controller
             $start_date = $updated_at->startOfMonth()->toDateString();
             $end_date = $updated_at->endOfMonth()->toDateString();
 
-            $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child'])
+            $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child','rate_meta_data','rate_meta_data_parent'])
             ->whereHas('w_no', function($q) use($co_no){
                 $q->where('co_no', $co_no);
             })
