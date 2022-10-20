@@ -24,6 +24,9 @@ class WarehousingSearchRequest extends BaseFormRequest
     public function rules()
     {
         return [
+            'service' => [
+                ''
+            ],
             'status' => [
                 ''
             ],

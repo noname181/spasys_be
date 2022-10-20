@@ -944,6 +944,305 @@ class WarehousingController extends Controller
         }
     }
 
+    public function getWarehousingDelivery(WarehousingSearchRequest $request) //page715 show delivery
+
+    {
+        try {
+            DB::enableQueryLog();
+
+            $validated = $request->validated();
+            if ($validated['service'] == "유통가공") {
+                // If per_page is null set default data = 15
+                $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+                // If page is null set default data = 1
+                $page = isset($validated['page']) ? $validated['page'] : 1;
+                $user = Auth::user();
+                if ($user->mb_type == 'shop') {
+                    $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                        $query->where('w_type', '=', 'EW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
+                            $q->where('rgd_status1', '=', '출고')->where('rgd_status3', '!=', '배송완료')->orWhereNull('rgd_status1');
+                        })->whereHas('co_no.co_parent', function ($q) use ($user) {
+                            $q->where('co_no', $user->co_no);
+                        });
+                    })->orderBy('rgd_no', 'DESC');
+                } else if ($user->mb_type == 'shipper') {
+                    $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                        $query->where('w_type', '=', 'EW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
+                            $q->where('rgd_status1', '=', '출고')->where('rgd_status3', '!=', '배송완료')->orWhereNull('rgd_status1');
+                        })->whereHas('co_no', function ($q) use ($user) {
+                            $q->where('co_no', $user->co_no);
+                        });
+                    })->orderBy('rgd_no', 'DESC');
+                } else if ($user->mb_type == 'spasys') {
+                    $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                        $query->where('w_type', '=', 'EW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
+                            $q->where('rgd_status1', '=', '출고')->where('rgd_status3', '!=', '배송완료')->orWhereNull('rgd_status1');
+                        })->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
+                            $q->where('co_no', $user->co_no);
+                        });
+                    })->orderBy('rgd_no', 'DESC');
+                }
+
+                if (isset($validated['from_date'])) {
+                    $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                }
+
+                if (isset($validated['to_date'])) {
+                    $warehousing->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                }
+
+                if (isset($validated['co_parent_name'])) {
+                    $warehousing->whereHas('w_no.co_no.co_parent', function ($query) use ($validated) {
+                        $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                    });
+                }
+                if (isset($validated['co_name'])) {
+                    $warehousing->whereHas('w_no.co_no', function ($q) use ($validated) {
+                        return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    });
+                }
+
+                if (isset($validated['order_id'])) {
+                    $warehousing->whereHas('w_no', function ($q) use ($validated) {
+                        return $q->where('w_schedule_number', 'like', '%' . $validated['order_id'] . '%');
+                    });
+                }
+
+                if (isset($validated['status'])) {
+                    $warehousing->where('rgd_status3', '=', $validated['status']);
+                }
+
+                if (isset($validated['rgd_status1'])) {
+                    $warehousing->where('rgd_status1', '=', $validated['rgd_status1']);
+                }
+                if (isset($validated['rgd_status2'])) {
+                    $warehousing->where('rgd_status2', '=', $validated['rgd_status2']);
+                }
+                if (isset($validated['rgd_status3'])) {
+                    $warehousing->where('rgd_status3', '=', $validated['rgd_status3']);
+                }
+                if (isset($validated['m_bl'])) {
+                    $warehousing->whereHas('w_no', function ($q) use ($validated) {
+                        return $q->where('m_bl', 'like', '%' . $validated['m_bl'] . '%');
+                    });
+                }
+                if (isset($validated['h_bl'])) {
+                    $warehousing->whereHas('w_no', function ($q) use ($validated) {
+                        return $q->where('h_bl', 'like', '%' . $validated['h_bl'] . '%');
+                    });
+                }
+                if (isset($validated['rgd_status1_1']) || isset($validated['rgd_status1_2']) || isset($validated['rgd_status1_3'])) {
+                    $warehousing->where(function ($q) use ($validated) {
+                        $q->Where('rgd_status1', '=', $validated['rgd_status1_1'] ? $validated['rgd_status1_1'] : "")
+                            ->orWhere('rgd_status1', '=', $validated['rgd_status1_2'] ? $validated['rgd_status1_2'] : "")
+                            ->orWhere('rgd_status1', '=', $validated['rgd_status1_3'] ? $validated['rgd_status1_3'] : "");
+                    });
+                }
+
+                $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
+                return response()->json($warehousing);
+            } else  if ($validated['service'] == "수입풀필먼트") {
+                $user = Auth::user();
+                // If per_page is null set default data = 15
+                $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+                // If page is null set default data = 1
+                $page = isset($validated['page']) ? $validated['page'] : 1;
+
+
+                if ($user->mb_type == 'shop') {
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->whereNotNull('trans_no')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
+                    })->orderBy('ss_no', 'DESC');
+                } else if ($user->mb_type == 'shipper') {
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->whereNotNull('trans_no')->where('status', '!=', '8')->whereHas('ContractWms.company', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
+                    })->orderBy('ss_no', 'DESC');
+                } else if ($user->mb_type == 'spasys') {
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->whereNotNull('trans_no')->where('status', '!=', '8')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
+                    })->orderBy('ss_no', 'DESC');
+                }
+
+
+                if (isset($validated['from_date'])) {
+                    $schedule_shipment->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                }
+
+                if (isset($validated['to_date'])) {
+                    $schedule_shipment->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                }
+
+                if (isset($validated['co_parent_name'])) {
+                    $schedule_shipment->whereHas('ContractWms.company.co_parent', function ($query) use ($validated) {
+                        $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                    });
+                }
+
+                if (isset($validated['co_name'])) {
+                    $schedule_shipment->whereHas('ContractWms.company', function ($q) use ($validated) {
+                        return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    });
+                }
+
+                if (isset($validated['item_brand'])) {
+                    $schedule_shipment->whereHas('schedule_shipment_info.item', function ($q) use ($validated) {
+                        return $q->where(DB::raw('lower(item_brand)'), 'like', '%' . strtolower($validated['item_brand']) . '%');
+                    });
+                }
+
+                if (isset($validated['item_channel_name'])) {
+                    $schedule_shipment->whereHas('schedule_shipment_info.item.item_channels', function ($q) use ($validated) {
+                        return $q->where(DB::raw('lower(item_channel_name)'), 'like', '%' . strtolower($validated['item_channel_name']) . '%');
+                    });
+                }
+
+                if (isset($validated['item_name'])) {
+                    $schedule_shipment->whereHas('schedule_shipment_info.item', function ($q) use ($validated) {
+                        return $q->where(DB::raw('lower(item_name)'), 'like', '%' . strtolower($validated['item_name']) . '%');
+                    });
+                }
+
+                if (isset($validated['status'])) {
+                    if ($validated['status'] == "배송준비") {
+                        $schedule_shipment->where('status', '=', 1);
+                    } else if ($validated['status'] == "배송중") {
+                        $schedule_shipment->where('status', '=', 7);
+                    } else {
+                        $schedule_shipment->where('status', '=', 8);
+                    }
+                }
+
+                if (isset($validated['order_id'])) {
+
+                    $schedule_shipment->where(DB::raw('lower(order_id)'), 'like', '%' . strtolower($validated['order_id']) . '%');
+                }
+
+                $schedule_shipment = $schedule_shipment->paginate($per_page, ['*'], 'page', $page);
+
+                return response()->json($schedule_shipment);
+            } else {
+                // If per_page is null set default data = 15
+                $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+                // If page is null set default data = 1
+                $page = isset($validated['page']) ? $validated['page'] : 1;
+
+
+
+                DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+                $user = Auth::user();
+                if ($user->mb_type == 'shop') {
+                    $import_schedule = ImportExpected::with(['import', 'company', 'receiving_goods_delivery'])->whereHas('company.co_parent', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
+                    })->groupBy('t_import_expected.tie_logistic_manage_number')->leftjoin('t_export', 't_import_expected.tie_logistic_manage_number', '=', 't_export.te_logistic_manage_number')
+                        ->select(['t_import_expected.*', 't_export.te_logistic_manage_number', 't_export.te_carry_out_number'])
+                        ->where('tie_is_date', '>=', '2022-01-04')->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
+                        ->groupBy('t_export.te_logistic_manage_number', 't_export.te_carry_out_number')->orderBy('t_export.te_carry_out_number', 'DESC');
+                } else if ($user->mb_type == 'shipper') {
+                    $import_schedule = ImportExpected::with(['import', 'company', 'receiving_goods_delivery'])->whereHas('company', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
+                    })->groupBy('t_import_expected.tie_logistic_manage_number')->leftjoin('t_export', 't_import_expected.tie_logistic_manage_number', '=', 't_export.te_logistic_manage_number')
+                        ->select(['t_import_expected.*', 't_export.te_logistic_manage_number', 't_export.te_carry_out_number'])
+                        ->where('tie_is_date', '>=', '2022-01-04')->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
+                        ->groupBy('t_export.te_logistic_manage_number', 't_export.te_carry_out_number')->orderBy('t_export.te_carry_out_number', 'DESC');
+                } else if ($user->mb_type == 'spasys') {
+                    $import_schedule = ImportExpected::with(['import', 'company'])->whereHas('company.co_parent.co_parent', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
+                    })->with(['receiving_goods_delivery' => function ($q) {
+                        $q->where('rgd_status3', '=', "배송준비");
+                    }])->groupBy('t_import_expected.tie_logistic_manage_number')->leftjoin('t_export', 't_import_expected.tie_logistic_manage_number', '=', 't_export.te_logistic_manage_number')
+                        ->select(['t_import_expected.*', 't_export.te_logistic_manage_number', 't_export.te_carry_out_number'])
+                        ->where('tie_is_date', '>=', '2022-01-04')->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
+                        ->groupBy('t_export.te_logistic_manage_number', 't_export.te_carry_out_number')->orderBy('t_export.te_carry_out_number', 'DESC');
+                }
+
+                //return DB::getQueryLog();
+
+                //$sql2 = DB::table('t_export')->select('te_logistic_manage_number','te_carry_out_number')->groupBy('te_logistic_manage_number','te_carry_out_number')->get();
+
+                //$import_schedule = ImportExpected::with(['import','company'])->orderBy('tie_no', 'DESC');
+
+                if (isset($validated['from_date'])) {
+                    $import_schedule->where('t_import_expected.created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                }
+
+                if (isset($validated['to_date'])) {
+                    $import_schedule->where('t_import_expected.created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                }
+
+                if (isset($validated['co_parent_name'])) {
+                    $import_schedule->whereHas('company.co_parent', function ($query) use ($validated) {
+                        $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                    });
+                }
+
+                if (isset($validated['co_name'])) {
+                    $import_schedule->whereHas('company', function ($q) use ($validated) {
+                        return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    });
+                }
+
+                if (isset($validated['m_bl'])) {
+                    $import_schedule->where(DB::raw('tie_m_bl'), 'like', '%' . strtolower($validated['m_bl']) . '%');
+                }
+
+                if (isset($validated['h_bl'])) {
+                    $import_schedule->where(DB::raw('tie_h_bl'), 'like', '%' . strtolower($validated['h_bl']) . '%');
+                }
+
+                if (isset($validated['logistic_manage_number'])) {
+                    $import_schedule->where('logistic_manage_number', 'like', '%' . $validated['logistic_manage_number'] . '%');
+                }
+                if (isset($validated['tie_status'])) {
+                    $import_schedule->where('tie_status', '=', $validated['tie_status']);
+                }
+                if (isset($validated['tie_status_2'])) {
+                    $import_schedule->where('tie_status_2', '=', $validated['tie_status_2']);
+                }
+
+                if (isset($validated['order_id'])) {
+                    $import_schedule->where('t_export.te_carry_out_number', 'like', '%' . $validated['order_id'] . '%');
+                }
+
+                if (isset($validated['status'])) {
+
+                    // $import_schedule->leftJoin('t_export', function ($query) use ($validated) {
+                    //     $query->on('tie_logistic_manage_number', '=', 't_export.te_logistic_manage_number')->whereHas('receiving_goods_delivery',function($query) use ($validated) {
+                    //         return $query->where(DB::raw('lower(receiving_goods_delivery.rgd_status3)'), '=', $validated['status']);
+                    //      });
+                    // });
+                    // $import_schedule->leftJoin('receiving_goods_delivery', function($q) use ($validated) { 
+
+                    //     return $q->on('t_export.te_carry_out_number','=','receiving_goods_delivery.is_no')->where(DB::raw('lower(receiving_goods_delivery.rgd_status3)'), '=', $validated['status']);
+                    // });
+                    // $import_schedule->leftJoin('receiving_goods_delivery', function($q) use ($validated) { 
+
+                    //     return $q->on('te_carry_out_number','=','receiving_goods_delivery.is_no')->where(DB::raw('lower(receiving_goods_delivery.rgd_status3)'), '=', $validated['status']);
+                    // });
+
+                }
+
+                $import_schedule = $import_schedule->paginate($per_page, ['*'], 'page', $page);
+
+                $status = DB::table('t_import_expected')
+                    ->select('tie_status_2')
+                    ->groupBy('tie_status_2')
+                    ->get();
+
+                $custom = collect(['status_filter' => $status]);
+
+                $import_schedule = $custom->merge($import_schedule);
+
+                DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+                //return DB::getQueryLog();
+                return response()->json($import_schedule);
+            }
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            //return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
     public function getWarehousingDelivery3(WarehousingSearchRequest $request) //page715 show delivery
 
     {
@@ -1117,9 +1416,9 @@ class WarehousingController extends Controller
             if (isset($validated['status'])) {
                 if ($validated['status'] == "배송준비") {
                     $schedule_shipment->where('status', '=', 1);
-                } else if ($validated['status'] == "배송중"){
+                } else if ($validated['status'] == "배송중") {
                     $schedule_shipment->where('status', '=', 7);
-                }else{
+                } else {
                     $schedule_shipment->where('status', '=', 8);
                 }
             }
@@ -1150,7 +1449,7 @@ class WarehousingController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
 
-            
+
 
             DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
             $user = Auth::user();
@@ -1226,23 +1525,23 @@ class WarehousingController extends Controller
             }
 
             if (isset($validated['status'])) {
-               
+
                 // $import_schedule->leftJoin('t_export', function ($query) use ($validated) {
                 //     $query->on('tie_logistic_manage_number', '=', 't_export.te_logistic_manage_number')->whereHas('receiving_goods_delivery',function($query) use ($validated) {
                 //         return $query->where(DB::raw('lower(receiving_goods_delivery.rgd_status3)'), '=', $validated['status']);
                 //      });
                 // });
                 // $import_schedule->leftJoin('receiving_goods_delivery', function($q) use ($validated) { 
-                    
+
                 //     return $q->on('t_export.te_carry_out_number','=','receiving_goods_delivery.is_no')->where(DB::raw('lower(receiving_goods_delivery.rgd_status3)'), '=', $validated['status']);
                 // });
                 // $import_schedule->leftJoin('receiving_goods_delivery', function($q) use ($validated) { 
-                    
+
                 //     return $q->on('te_carry_out_number','=','receiving_goods_delivery.is_no')->where(DB::raw('lower(receiving_goods_delivery.rgd_status3)'), '=', $validated['status']);
                 // });
-              
+
             }
-            
+
 
             // if (isset($validated['import_schedule_status1']) || isset($validated['import_schedule_status2'])) {
             //     $import_schedule->where(function($query) use ($validated) {
@@ -2588,13 +2887,12 @@ class WarehousingController extends Controller
                 }
             } else {
                 foreach ($request->datachkbox as $value) {
-                    foreach($value['receiving_goods_delivery'] as $receiving_goods_delivery){
+                    foreach ($value['receiving_goods_delivery'] as $receiving_goods_delivery) {
                         $rgd = ReceivingGoodsDelivery::where('rgd_no', $receiving_goods_delivery['rgd_no'])
-                        ->update([
-                            'rgd_status3' => "배송완료"
-                        ]);
+                            ->update([
+                                'rgd_status3' => "배송완료"
+                            ]);
                     }
-                    
                 }
             }
 
