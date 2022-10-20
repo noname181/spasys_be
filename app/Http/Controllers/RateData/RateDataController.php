@@ -568,7 +568,8 @@ class RateDataController extends Controller
         try {
             $rate_data = RateData::where('rmd_no', $rmd_no)->where(function($q) {
                 $q->where('rd_cate_meta1', '유통가공')
-                ->orWhere('rd_cate_meta1', '수입풀필먼트');
+                ->orWhere('rd_cate_meta1', '수입풀필먼트')
+                ->orWhere('rd_cate_meta1', '보세화물');
             })->get();
             $w_no = $rate_data[0]->w_no;
             $warehousing = Warehousing::with(['co_no', 'w_import_parent'])->where('w_no', $w_no)->first();
@@ -576,6 +577,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -1444,8 +1446,8 @@ class RateDataController extends Controller
                     $final_rgd->save();
                 }else if($request->bill_type == 'additional_monthly'){
                     $settlement_number = explode('_',$final_rgd->rgd_settlement_number);
-                    $settlement_number[2] = str_replace("MF","MA", $settlement_number[2]);
-                    $final_rgd->rgd_settlement_number = implode("_",$settlement_number);
+                    // $settlement_number[2] = str_replace("MF","MA", $settlement_number[2]);
+                    $final_rgd->rgd_settlement_number = $final_rgd->rgd_settlement_number;
                     $final_rgd->save();
                 }
 
@@ -1475,7 +1477,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            //return $e;
+            return $e;
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
