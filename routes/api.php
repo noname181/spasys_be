@@ -371,15 +371,19 @@ Route::middleware('auth')->group(function () {
         Route::post('/general_final_service2_mobile', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_final_service2_mobile'])->name('registe_rate_data_general_final_service2_mobile');
         
         //distribution_est_casebill_edit
-        Route::get('/downloadExcel/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_data_general']);
+        Route::get('/download_data_general/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_data_general']);
         //distribution_add_casebill_edit
-        Route::get('/downloadCaseBillEdit/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_data_casebill_edit']);
+        Route::get('/download_data_casebill_edit/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_data_casebill_edit']);
         //distribution_final_casebill_edit
-        Route::get('/downloadFinalCaseBill/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_final_case_bill']);
+        Route::get('/download_final_case_bill/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_final_case_bill']);
         //distribution_final_monthbill_edit
-        Route::get('/downloadFinalMonthBill/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_final_month_bill']);
+        Route::get('/download_final_month_bill/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_final_month_bill']);
         //distribution_est_monthbill_edit
-        Route::get('/downloadEstMonthbill/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_est_month_bill']);
+        Route::get('/download_est_month_bill/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_est_month_bill']);
+        //distribution_add_monthbill_edit
+        Route::get('/download_add_month_bill/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_add_month_bill']);
+        //distribution_est_monthbill_check
+        Route::get('/download_est_month_check/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_est_month_check']);
         //GET GENERAL DATA FOLLOW BILL TYPE
         Route::get('/general/{rgd_no}/{bill_type}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general'])->name('get_rate_data_general');
         //GET FINAL BILL DATA
