@@ -384,6 +384,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/download_add_month_bill/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_add_month_bill']);
         //distribution_est_monthbill_check
         Route::get('/download_est_month_check/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_est_month_check']);
+        //distribution_final_casebill_check
+        Route::get('/download_distribution_final/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_distribution_final']);
         //GET GENERAL DATA FOLLOW BILL TYPE
         Route::get('/general/{rgd_no}/{bill_type}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general'])->name('get_rate_data_general');
         //GET FINAL BILL DATA
@@ -419,6 +421,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/by_co_no/{rd_co_no}/{rmd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByCono'])->name('get_rate_data_by_co_no');
 
         Route::post('/send_mail', [App\Http\Controllers\RateData\RateDataController::class, 'sendMail'])->name('send_mail');
+        //quotation_send_details
+        Route::get('/download_excel_send_meta/{rm_no}/{rmd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'download_excel_send_meta']);
     });
 
     Route::prefix('alarm')->name('alarm.')->group(function () {
