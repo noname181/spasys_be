@@ -875,8 +875,8 @@ class RateDataController extends Controller
                         'rmd_no' => $rmd_no,
                         'mb_no' => Auth::user()->mb_no,
                         'rdg_set_type' => 'estimated_costs',
-                        'rdg_supply_price1' => $request->total1['total1_3'],
-                        'rdg_supply_price2' => $request->total2['total2_3'],
+                        'rdg_supply_price1' => isset($request->total1['total1_3']) ? $request->total1['total1_3'] : '' ,
+                        'rdg_supply_price2' => isset($request->total2['total2_3']) ? $request->total2['total2_3'] : '',
                         'rdg_supply_price3' => isset($request->total3['total3_3']) ? $request->total3['total3_3'] : '',
                         'rdg_supply_price4' => isset($request->total4['total4_3']) ? $request->total4['total4_3'] : '',
                         'rdg_supply_price5' => isset($request->total5['total5_3']) ? $request->total5['total5_3'] : '',
@@ -908,7 +908,7 @@ class RateDataController extends Controller
                 'message' => Messages::MSG_0007,
             ], 201);
         } catch (\Exception $e) {
-           // return $e;
+            //return $e;
             DB::rollback();
             Log::error($e);
 
