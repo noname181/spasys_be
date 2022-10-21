@@ -1441,6 +1441,7 @@ class ReceivingGoodsDeliveryController extends Controller
             }
 
             if ($validated['wr_contents']) {
+               
                 WarehousingRequest::insert([
                     'w_no' => $validated['is_no'],
                     'wr_type' => "IW",
