@@ -572,7 +572,7 @@ class RateDataController extends Controller
                 ->orWhere('rd_cate_meta1', '보세화물');
             })->get();
             $w_no = $rate_data[0]->w_no;
-            $warehousing = Warehousing::with(['co_no', 'w_import_parent'])->where('w_no', $w_no)->first();
+            $warehousing = Warehousing::with(['co_no', 'w_import_parent','w_ew'])->where('w_no', $w_no)->first();
             return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data,'warehousing'=>$warehousing], 200);
         } catch (\Exception $e) {
             DB::rollback();
@@ -586,7 +586,7 @@ class RateDataController extends Controller
         try {
             $rate_data = RateData::where('rmd_no', $rmd_no)->where('rd_cate_meta1', '유통가공')->get();
             $w_no = $rate_data[0]->w_no;
-            $warehousing = Warehousing::with(['co_no', 'w_import_parent'])->where('w_no', $w_no)->first();
+            $warehousing = Warehousing::with(['co_no', 'w_import_parent','w_ew'])->where('w_no', $w_no)->first();
             $rdg = RateDataGeneral::where('w_no', $w_no)->where('rdg_bill_type', $bill_type)->first();
             return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data,'rdg'=>$rdg,'warehousing'=>$warehousing], 200);
         } catch (\Exception $e) {
@@ -858,9 +858,9 @@ class RateDataController extends Controller
                             'rd_cate1' => $val['rd_cate1'],
                             'rd_cate2' => $val['rd_cate2'],
                             'rd_cate3' => '',
-                            'rd_data1' => $val['rd_data1'],
-                            'rd_data2' => $val['rd_data2'],
-                            'rd_data3' => $val['rd_data3'],
+                            'rd_data1' => isset($val['rd_data1']) ? $val['rd_data1'] : '',
+                            'rd_data2' => isset($val['rd_data2']) ? $val['rd_data2'] : '',
+                            'rd_data3' => isset($val['rd_data3']) ? $val['rd_data3'] : '',
                             'rd_data4' => isset($val['rd_data4']) ? $val['rd_data4'] : '',
                             'rd_data5' => isset($val['rd_data5']) ? $val['rd_data5'] : '',
                             'rd_data6' => isset($val['rd_data6']) ? $val['rd_data6'] : '',
@@ -875,8 +875,8 @@ class RateDataController extends Controller
                         'rmd_no' => $rmd_no,
                         'mb_no' => Auth::user()->mb_no,
                         'rdg_set_type' => 'estimated_costs',
-                        'rdg_supply_price1' => $request->total1['total1_3'],
-                        'rdg_supply_price2' => $request->total2['total2_3'],
+                        'rdg_supply_price1' => isset($request->total1['total1_3']) ? $request->total1['total1_3'] : '' ,
+                        'rdg_supply_price2' => isset($request->total2['total2_3']) ? $request->total2['total2_3'] : '',
                         'rdg_supply_price3' => isset($request->total3['total3_3']) ? $request->total3['total3_3'] : '',
                         'rdg_supply_price4' => isset($request->total4['total4_3']) ? $request->total4['total4_3'] : '',
                         'rdg_supply_price5' => isset($request->total5['total5_3']) ? $request->total5['total5_3'] : '',
@@ -908,6 +908,7 @@ class RateDataController extends Controller
                 'message' => Messages::MSG_0007,
             ], 201);
         } catch (\Exception $e) {
+            //return $e;
             DB::rollback();
             Log::error($e);
 
