@@ -24,6 +24,9 @@ class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
     public function rules()
     {
         return [
+            'is_no' => [
+                ''
+            ], 
             'w_no' => [
                 '',
             ],

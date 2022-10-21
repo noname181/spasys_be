@@ -1442,7 +1442,8 @@ class ReceivingGoodsDeliveryController extends Controller
 
             if ($validated['wr_contents']) {
                 WarehousingRequest::insert([
-
+                    'w_no' => $validated['is_no'],
+                    'wr_type' => "IW",
                     'mb_no' => $member->mb_no,
                     'wr_contents' => $validated['wr_contents'],
                 ]);
@@ -1509,6 +1510,7 @@ class ReceivingGoodsDeliveryController extends Controller
             if ($validated['wr_contents']) {
                 WarehousingRequest::insert([
                     'wr_type' => "IW",
+                    'w_no' => $validated['is_no'],
                     'mb_no' => $member->mb_no,
                     'wr_contents' => $validated['wr_contents'],
                 ]);
