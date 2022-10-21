@@ -163,6 +163,7 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/get_warehousing_import_status4', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingImportStatus4']); //page 263
     Route::post('/get_fulfillment_export_status4', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getFulfillmentExportStatus4']); //page 252
+    Route::post('/get_bonded_export_status4', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getBondedExportStatus4']); //page 221
 
     Route::get('/get_fulfillment_export_status4_by_id/{rgd_no}', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getFulfillmentExportStatus4ById']); //page 253 mobile
 
