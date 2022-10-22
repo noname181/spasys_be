@@ -290,7 +290,9 @@ class ReceivingGoodsDeliveryController extends Controller
 
             if (isset($validated['page_type']) && $validated['page_type'] == 'Page130146') {
             if($status1 == "입고" && $status2 == "작업완료"){
-                $w_schedule_amount = 0;
+                $check_ex = Warehousing::where('w_import_no','=',$w_no)->first();
+                if(!$check_ex){
+                    $w_schedule_amount = 0;
                 foreach ($validated['items'] as $item) {
                     $w_schedule_amount += $item['warehousing_item2'][0]['wi_number'];
                 }
@@ -346,6 +348,8 @@ class ReceivingGoodsDeliveryController extends Controller
                         'wi_type' => '출고_shipper'
                     ]);
                 }
+                }
+                
                 }
             }
 
