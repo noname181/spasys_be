@@ -107,32 +107,32 @@ class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
             ],
            
             'location.*.rgd_contents' => [
-                'required',
+                'nullable',
                 'string',
                 'max:255',
             ],
             'location.*.rgd_address' => [
-                'required',
+                'nullable',
                 'string',
                 'max:255',
             ],
             'location.*.rgd_address_detail' => [
-                'required',
+                'nullable',
                 'string',
                 'max:255',
             ],
             'location.*.rgd_receiver' => [
-                'required',
+                'nullable',
                 'string',
                 'max:255',
             ],            
             'location.*.rgd_hp' => [
-                'required',
+                'nullable',
                 'string',
                 'max:255',
             ],
             'location.*.rgd_memo' => [
-                'required',
+                'nullable',
                 'string',
             ],
             'location.*.rgd_status1' => [

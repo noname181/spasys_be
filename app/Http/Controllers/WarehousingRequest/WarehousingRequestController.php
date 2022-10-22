@@ -64,8 +64,11 @@ class WarehousingRequestController extends Controller
             $warehousing = Warehousing::where('w_no', '=', $validated['w_no'])->first();
 
             $warehousing_request = WarehousingRequest::with(['mb_no','warehousing'])->orderBy('wr_no', 'DESC');
-
-            $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no'])->orwhere('w_no', '=', $warehousing->w_import_no);
+            if($warehousing){
+                $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no'])->orwhere('w_no', '=', $warehousing->w_import_no);
+            }else{
+                $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no']);
+            }
 
             $members = Member::where('mb_no', '!=', 0)->get();
 
@@ -74,7 +77,7 @@ class WarehousingRequestController extends Controller
             return response()->json($warehousing_request);
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             //return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
