@@ -2173,7 +2173,7 @@ class RateDataController extends Controller
                     'rgd_status4' => '예상경비청구서',
                     'rgd_bill_type' => $request->bill_type,
                     'rgd_settlement_number' => $request->rgd_settlement_number
-                ]);    
+                ]);
             }
 
             $previous_rgd = ReceivingGoodsDelivery::where('w_no', $w_no)->where('rgd_bill_type', '=' , $request->previous_bill_type)->first();
@@ -2303,6 +2303,23 @@ class RateDataController extends Controller
             $rateData = RateData::where('rd_no', $rd_no)->delete();
             return response()->json([
                 'message' => $rateData,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0006], 500);
+        }
+    }
+    //DELETE SET RATE DATA FOR BONDED SERVICE
+    public function deleteSetRateData($rd_no)
+    {
+        try {
+
+            $rate_data = RateData::where('rd_no', $rd_no)->first();
+
+            RateData::where(['rmd_no' => $rate_data->rmd_no, 'rd_cate1' => $rate_data->rd_cate1])->delete();
+
+            return response()->json([
+                'message' => $rate_data,
             ]);
         } catch (\Exception $e) {
             Log::error($e);
@@ -4229,7 +4246,7 @@ class RateDataController extends Controller
         $sheet->setCellValue('J3', '상세');
         $sheet->setCellValue('K3', '기본료');
         $sheet->setCellValue('L3', '단가/KG');
-        
+
         $sheet->setCellValue('O3', '');
         $sheet->setCellValue('P3', '항목');
         $sheet->setCellValue('Q3', '상세');
@@ -4313,7 +4330,7 @@ class RateDataController extends Controller
             }
         }
 
-    
+
         $Excel_writer = new Xlsx($spreadsheet);
         if(isset($user->mb_no)){
             $path = '../storage/download/'.$user->mb_no.'/';
@@ -4391,7 +4408,7 @@ class RateDataController extends Controller
             $sheet->setCellValue('J'.$sheet_row, array_sum(array_column($datas, 'rdg_etc3')));
         }
 
-    
+
         $Excel_writer = new Xlsx($spreadsheet);
         if(isset($user->mb_no)){
             $path = '../storage/download/'.$user->mb_no.'/';
@@ -4464,12 +4481,12 @@ class RateDataController extends Controller
         $sheet->setCellValue('C4', $vat_price);
         $sheet->setCellValue('D4', $sum_price);
         $sheet->setCellValue('E4', $rdg['rdg_etc3']);
-        
+
         /*Total sheet 1*/
         $sheet1_rdg_supply_price = !empty($rdg['rdg_supply_price4'])?$rdg['rdg_supply_price4'] : ($rdg['rdg_supply_price2'] + $rdg['rdg_supply_price1'] + $supply_price);
         $sheet1_rdg_vat = !empty($rdg['rdg_vat4'])?$rdg['rdg_vat4']:($rdg['rdg_vat2'] + $rdg['rdg_vat1'] + $vat_price);
-        $sheet1_rdg_sum = !empty($rdg['rdg_sum4'])?$rdg['rdg_sum4']:($rdg['rdg_sum2'] + $rdg['rdg_sum1'] + $sum_price); 
-        $sheet1_rdg_etc = !empty($rdg['rdg_etc4'])?$rdg['rdg_etc4']:($rdg['rdg_etc2'] + $rdg['rdg_etc1'] + $rdg['rdg_etc3']); 
+        $sheet1_rdg_sum = !empty($rdg['rdg_sum4'])?$rdg['rdg_sum4']:($rdg['rdg_sum2'] + $rdg['rdg_sum1'] + $sum_price);
+        $sheet1_rdg_etc = !empty($rdg['rdg_etc4'])?$rdg['rdg_etc4']:($rdg['rdg_etc2'] + $rdg['rdg_etc1'] + $rdg['rdg_etc3']);
 
         $sheet->setCellValue('A5', '합계');
         $sheet->setCellValue('B5', $sheet1_rdg_supply_price);
@@ -4636,7 +4653,7 @@ class RateDataController extends Controller
         ], 500);
         ob_end_clean();
     }
-    
+
     public function download_distribution_monthbill(Request $request){
         $datas = $request->all();
         DB::beginTransaction();
@@ -4691,7 +4708,7 @@ class RateDataController extends Controller
             $sheet->setCellValue('J'.$sheet_row, array_sum(array_column($datas, 'rdg_etc3')));
         }
 
-    
+
         $Excel_writer = new Xlsx($spreadsheet);
         if(isset($user->mb_no)){
             $path = '../storage/download/'.$user->mb_no.'/';
@@ -4764,7 +4781,7 @@ class RateDataController extends Controller
             $sheet->setCellValue('J'.$sheet_row, array_sum(array_column($datas, 'rdg_etc3')));
         }
 
-    
+
         $Excel_writer = new Xlsx($spreadsheet);
         if(isset($user->mb_no)){
             $path = '../storage/download/'.$user->mb_no.'/';
@@ -4785,7 +4802,7 @@ class RateDataController extends Controller
         ], 500);
         ob_end_clean();
     }
-    
+
     public function download_fulfillment_final_monthbill($rgd_no){
 
         $data_fullfill1 = $data_fullfill2 = $data_fullfill3 = $data_fullfill4 = $data_fullfill5 = null;
@@ -4822,7 +4839,7 @@ class RateDataController extends Controller
         }
 
         $overseas_shipping_supply_price = $overseas_shipping_vat = $overseas_shipping_sum = 0;
-        
+
         if(!empty($data_fullfill3)){
             foreach($data_fullfill3 as $dt3){
                 $overseas_shipping_supply_price += !empty($dt3->rd_data5)?$dt3->rd_data5:0;
@@ -4832,7 +4849,7 @@ class RateDataController extends Controller
         }
 
         $keep_supply_price = $keep_vat = $keep_sum = 0;
-        
+
         if(!empty($data_fullfill4)){
             foreach($data_fullfill4 as $dt4){
                 $keep_supply_price += !empty($dt4->rd_data5)?$dt4->rd_data5:0;
@@ -4842,7 +4859,7 @@ class RateDataController extends Controller
         }
 
         $subsidiary_supply_price = $subsidiary_supply_vat = $subsidiary_supply_sum = 0;
-        
+
         if(!empty($data_fullfill5)){
             foreach($data_fullfill5 as $dt5){
                 $subsidiary_supply_price += !empty($dt5->rd_data5)?$dt5->rd_data5:0;
@@ -4925,7 +4942,7 @@ class RateDataController extends Controller
 
         $spreadsheet->createSheet();
         $sheet2 = $spreadsheet->getSheet(1);
-        
+
         $sheet2->setTitle('센터 작업료');
 
         $sheet2->setCellValue('A1', '항목');
@@ -4939,7 +4956,7 @@ class RateDataController extends Controller
         $sheet2->setCellValue('I1', '비고');
         $sheet2->mergeCells('I1:J1');
 
-        
+
         if(!empty($data_fullfill1)){
             $sheet_row = 2;
             foreach($data_fullfill1 as $data){
@@ -4968,7 +4985,7 @@ class RateDataController extends Controller
 
         $spreadsheet->createSheet();
         $sheet3 = $spreadsheet->getSheet(2);
-        
+
         $sheet3->setTitle('센터 작업료');
 
         $sheet3->setCellValue('A1', '항목');
@@ -4982,7 +4999,7 @@ class RateDataController extends Controller
         $sheet3->setCellValue('I1', '비고');
         $sheet3->mergeCells('I1:J1');
 
-        
+
         if(!empty($data_fullfill2)){
             $sheet_row = 2;
             foreach($data_fullfill2 as $data){
@@ -5011,7 +5028,7 @@ class RateDataController extends Controller
 
         $spreadsheet->createSheet();
         $sheet4 = $spreadsheet->getSheet(3);
-        
+
         $sheet4->setTitle('센터 작업료');
 
         $sheet4->setCellValue('A1', '항목');
@@ -5025,7 +5042,7 @@ class RateDataController extends Controller
         $sheet4->setCellValue('I1', '비고');
         $sheet4->mergeCells('I1:J1');
 
-        
+
         if(!empty($data_fullfill3)){
             $sheet_row = 2;
             foreach($data_fullfill3 as $data){
@@ -5054,7 +5071,7 @@ class RateDataController extends Controller
 
         $spreadsheet->createSheet();
         $sheet5 = $spreadsheet->getSheet(4);
-        
+
         $sheet5->setTitle('센터 작업료');
 
         $sheet5->setCellValue('A1', '항목');
@@ -5068,7 +5085,7 @@ class RateDataController extends Controller
         $sheet5->setCellValue('I1', '비고');
         $sheet5->mergeCells('I1:J1');
 
-        
+
         if(!empty($data_fullfill4)){
             $sheet_row = 2;
             foreach($data_fullfill4 as $data){
@@ -5097,7 +5114,7 @@ class RateDataController extends Controller
 
         $spreadsheet->createSheet();
         $sheet6 = $spreadsheet->getSheet(5);
-        
+
         $sheet6->setTitle('센터 작업료');
 
         $sheet6->setCellValue('A1', '항목');
@@ -5111,7 +5128,7 @@ class RateDataController extends Controller
         $sheet6->setCellValue('I1', '비고');
         $sheet6->mergeCells('I1:J1');
 
-        
+
         if(!empty($data_fullfill5)){
             $sheet_row = 2;
             foreach($data_fullfill5 as $data){
@@ -5137,7 +5154,7 @@ class RateDataController extends Controller
             $sheet6->setCellValue('I'.$sheet_row, '');
         }
 
-    
+
         $Excel_writer = new Xlsx($spreadsheet);
         if(isset($user->mb_no)){
             $path = '../storage/download/'.$user->mb_no.'/';
