@@ -163,6 +163,7 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/get_warehousing_import_status4', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingImportStatus4']); //page 263
     Route::post('/get_fulfillment_export_status4', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getFulfillmentExportStatus4']); //page 252
+    Route::post('/get_bonded_export_status4', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getBondedExportStatus4']); //page 221
 
     Route::get('/get_fulfillment_export_status4_by_id/{rgd_no}', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getFulfillmentExportStatus4ById']); //page 253 mobile
 
@@ -370,6 +371,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/general_final_service2', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_final_service2'])->name('registe_rate_data_general_final_service2');
         Route::post('/general_final_service2_mobile', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_final_service2_mobile'])->name('registe_rate_data_general_final_service2_mobile');
         
+         //REGISTER GENERAL DATA FOR 보세화물 SERVICE
+         Route::post('/general_data_service1', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_service1'])->name('registe_rate_data_general_service1');
+
+
         //distribution_est_casebill_edit
         Route::get('/download_data_general/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_data_general']);
         //distribution_add_casebill_edit

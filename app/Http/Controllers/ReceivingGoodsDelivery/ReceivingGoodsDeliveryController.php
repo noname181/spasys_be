@@ -166,8 +166,8 @@ class ReceivingGoodsDeliveryController extends Controller
                     ]);
                 }
 
-                $status1 = $rgd['rgd_status1'];
-                $status2 = $rgd['rgd_status2'];
+                $status1 = isset($rgd['rgd_status1']) ? $rgd['rgd_status1'] : null;
+                $status2 = isset($rgd['rgd_status2']) ? $rgd['rgd_status2'] : null;
             }
 
             //warehousing content
@@ -1442,7 +1442,8 @@ class ReceivingGoodsDeliveryController extends Controller
 
             if ($validated['wr_contents']) {
                 WarehousingRequest::insert([
-
+                    'w_no' => $validated['is_no'],
+                    'wr_type' => "IW",
                     'mb_no' => $member->mb_no,
                     'wr_contents' => $validated['wr_contents'],
                 ]);
@@ -1509,6 +1510,7 @@ class ReceivingGoodsDeliveryController extends Controller
             if ($validated['wr_contents']) {
                 WarehousingRequest::insert([
                     'wr_type' => "IW",
+                    'w_no' => $validated['is_no'],
                     'mb_no' => $member->mb_no,
                     'wr_contents' => $validated['wr_contents'],
                 ]);
