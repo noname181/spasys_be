@@ -166,8 +166,8 @@ class ReceivingGoodsDeliveryController extends Controller
                     ]);
                 }
 
-                $status1 = $rgd['rgd_status1'];
-                $status2 = $rgd['rgd_status2'];
+                $status1 = isset($rgd['rgd_status1']) ? $rgd['rgd_status1'] : null;
+                $status2 = isset($rgd['rgd_status2']) ? $rgd['rgd_status2'] : null;
             }
 
             //warehousing content

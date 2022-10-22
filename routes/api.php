@@ -163,6 +163,7 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/get_warehousing_import_status4', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingImportStatus4']); //page 263
     Route::post('/get_fulfillment_export_status4', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getFulfillmentExportStatus4']); //page 252
+    Route::post('/get_bonded_export_status4', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getBondedExportStatus4']); //page 221
 
     Route::get('/get_fulfillment_export_status4_by_id/{rgd_no}', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getFulfillmentExportStatus4ById']); //page 253 mobile
 
@@ -396,6 +397,12 @@ Route::middleware('auth')->group(function () {
         Route::post('/download_final_monthbill_issue',[\App\Http\Controllers\RateData\RateDataController::class, 'download_final_monthbill_issue']);
         //distribution_add_casebill_issue
         Route::get('/download_add_casebill_issue/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_add_casebill_issue']);
+        //distribution_add_monthbill_issue
+        Route::post('/download_distribution_monthbill',[\App\Http\Controllers\RateData\RateDataController::class, 'download_distribution_monthbill']);
+        //distribution_final_monthbill_check
+        Route::post('/download_distribution_final_monthbill',[\App\Http\Controllers\RateData\RateDataController::class, 'download_distribution_final_monthbill']);
+        //fulfillment_final_monthbill_edit
+        Route::get('/download_fulfillment_final_monthbill/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_fulfillment_final_monthbill']);
 
         //GET GENERAL DATA FOLLOW BILL TYPE
         Route::get('/general/{rgd_no}/{bill_type}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general'])->name('get_rate_data_general');
