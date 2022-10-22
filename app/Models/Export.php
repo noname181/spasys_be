@@ -55,7 +55,7 @@ class Export extends Model
     protected $casts = [
         'created_at' => "date:Y.m.d H:i",
         'updated_at' => "date:Y.m.d H:i",
-        'te_e_date' => "date:Y.m.d",
+        'te_e_date' => "date:Y.m.d H:i",
         'te_e_confirm_date' => "date:Y.m.d",
     ];
 

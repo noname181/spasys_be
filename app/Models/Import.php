@@ -51,7 +51,7 @@ class Import extends Model
     protected $casts = [
         'created_at' => "date:Y.m.d H:i",
         'updated_at' => "date:Y.m.d H:i",
-        'ti_i_date' => "date:Y.m.d",
+        'ti_i_date' => "date:Y.m.d H:i",
     ];
 
     public function export()
