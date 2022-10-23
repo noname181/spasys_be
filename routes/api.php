@@ -373,6 +373,7 @@ Route::middleware('auth')->group(function () {
 
          //REGISTER GENERAL DATA FOR 보세화물 SERVICE
          Route::post('/general_data_service1', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_service1'])->name('registe_rate_data_general_service1');
+         Route::post('/update_storage_days', [\App\Http\Controllers\RateData\RateDataController::class, 'update_storage_days'])->name('update_storage_days');
 
 
         //distribution_est_casebill_edit

@@ -31,6 +31,10 @@ class RateDataRequest extends BaseFormRequest
                 'int',
                 'nullable'
             ],
+            'storage_days' => [
+                'int',
+                'nullable'
+            ],
             'rmd_no' => [
                 'int',
                 'nullable'

@@ -349,7 +349,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     ]);
                 }
                 }
-                
+
                 }
             }
 
@@ -379,7 +379,7 @@ class ReceivingGoodsDeliveryController extends Controller
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
 
-            //Page130146 
+            //Page130146
             if ($request->page_type == 'Page130146') {
                 $warehousing_data = Warehousing::where('w_no', $request->w_no)->first();
                 foreach ($request->data as $data) {
@@ -1445,7 +1445,7 @@ class ReceivingGoodsDeliveryController extends Controller
             }
 
             if ($validated['wr_contents']) {
-               
+
                 WarehousingRequest::insert([
                     'w_no' => $validated['is_no'],
                     'wr_type' => "IW",
@@ -1492,7 +1492,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         'rgd_receiver' => $rgd['rgd_receiver'],
                         'rgd_hp' => $rgd['rgd_hp'],
                         'rgd_memo' => $rgd['rgd_memo'],
-                       
+
                     ]);
                 } else {
 
@@ -1503,7 +1503,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         'rgd_receiver' => $rgd['rgd_receiver'],
                         'rgd_hp' => $rgd['rgd_hp'],
                         'rgd_memo' => $rgd['rgd_memo'],
-                       
+
                     ]);
                 }
             }
@@ -1691,11 +1691,11 @@ class ReceivingGoodsDeliveryController extends Controller
                 }
             } else if ($request->bill_type == 'multiple') {
                 foreach ($request->rgds as $rgd) {
-                    if ($rgd['settlement_cycle'] == '건별' && $rgd['rgd_bill_type'] == 'final') {
+                    if ($rgd['rgd_bill_type'] == 'final') {
                         ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
                             'rgd_status5' => 'confirmed'
                         ]);
-                    } else if ($rgd['settlement_cycle'] == '월별' && $rgd['rgd_bill_type'] == 'final_monthly') {
+                    } else if ($rgd['rgd_bill_type'] == 'final_monthly') {
                         $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd['rgd_no'])->first();
                         $co_no = $rgd->warehousing->co_no;
 

@@ -167,6 +167,15 @@ class RateDataController extends Controller
                     ],
                 );
             }
+
+            //ONLY FOR 보세화물
+            if(isset($validated['storage_days']) && isset($validated['rgd_no'])){
+                ReceivingGoodsDelivery::where('rgd_no', $validated['rgd_no'])->update([
+                    'rgd_storage_days' => $validated['storage_days']
+                ]);
+            }
+
+
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -552,6 +561,96 @@ class RateDataController extends Controller
                     [
                         'rgd_no' => $rdg->rgd_no_final,
                         'set_type' => 'domestic_monthly_additional'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded1_final'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_parent_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded1'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded2_final'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_parent_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded2'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded3_final'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_parent_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded3'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded4_final'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_parent_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded4'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded5_final'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_parent_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded5'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded6_final'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_parent_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded6'
                     ]
                 )->first();
             }
@@ -2172,11 +2271,12 @@ class RateDataController extends Controller
                 ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_status4' => '예상경비청구서',
                     'rgd_bill_type' => $request->bill_type,
+                    'rgd_storage_days' => $request->storage_days,
                     'rgd_settlement_number' => $request->rgd_settlement_number
                 ]);
             }
 
-            $previous_rgd = ReceivingGoodsDelivery::where('w_no', $w_no)->where('rgd_bill_type', '=' , $request->previous_bill_type)->first();
+            $previous_rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->where('rgd_bill_type', '=' , $request->previous_bill_type)->first();
 
             if(!isset($is_exist->rdg_no) && isset($request->previous_bill_type) && !empty($previous_rgd)){
                 $previous_rgd->rgd_status5 = 'issued';
@@ -2213,6 +2313,29 @@ class RateDataController extends Controller
                 'message' => Messages::MSG_0007,
                 'rdg' => $rdg,
                 // 'final_rgd' => $final_rgd
+            ], 201);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+    public function update_storage_days(Request $request) {
+        try {
+            DB::beginTransaction();
+            //Check is there already RateDataGeneral with rdg_no yet
+
+            $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                'rgd_storage_days' => $request->storage_days
+            ]);
+
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
             ], 201);
 
         } catch (\Exception $e) {
