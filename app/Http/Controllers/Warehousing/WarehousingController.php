@@ -2059,7 +2059,8 @@ class WarehousingController extends Controller
                         $q->where('rgd_status4', '=', '예상경비청구서')
                             ->orWhere('rgd_status4', '=', '확정청구서')
                             ->orWhere('rgd_status4', '=', '추가청구서');
-                    });
+                    })
+                    ->where('w_category_name', '=', '유통가공');
             })
                 ->where('rgd_is_show', 'y')
                 ->orderBy('updated_at', 'DESC');
