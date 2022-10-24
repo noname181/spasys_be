@@ -2021,6 +2021,7 @@ class RateDataController extends Controller
             ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
             ->where('rgd_status1', '=', '입고')
             ->where('rgd_bill_type', $bill_type)
+            ->whereDoesntHave('rgd_child')
             ->get();
 
             $rdgs = [];
@@ -2089,6 +2090,7 @@ class RateDataController extends Controller
                 }
             }else {
                 $i = 0;
+                $final_rgds = [];
                 foreach($request->rgds as $key=>$rgd){
                     $is_exist = RateDataGeneral::where('rgd_no_expectation', $rgd['rgd_no'])->where('rdg_bill_type', 'final_monthly')->first();
                     if(!$is_exist){
@@ -2103,6 +2105,8 @@ class RateDataController extends Controller
 
                     $expectation_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->where('rgd_bill_type', 'expectation_monthly')->first();
                     $final_rgd = ReceivingGoodsDelivery::where('rgd_parent_no', $rgd['rgd_no'])->where('rgd_bill_type', 'final_monthly')->first();
+                    
+                    $final_rgds[] = $final_rgd;
 
                     if(!$final_rgd){
                         $expectation_rgd->rgd_status5 = 'issued';
@@ -2152,6 +2156,7 @@ class RateDataController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'rdg' => $is_exist,
+                'final_rgds' => $final_rgds
                 // 'final_rgd' => $final_rgd
             ], 201);
 

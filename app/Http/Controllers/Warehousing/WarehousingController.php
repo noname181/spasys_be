@@ -2064,7 +2064,8 @@ class WarehousingController extends Controller
                         $q->where('rgd_status4', '=', '예상경비청구서')
                             ->orWhere('rgd_status4', '=', '확정청구서')
                             ->orWhere('rgd_status4', '=', '추가청구서');
-                    });
+                    })
+                    ->where('w_category_name', '=', '유통가공');
             })
                 ->where('rgd_is_show', 'y')
                 ->orderBy('updated_at', 'DESC');
@@ -2314,7 +2315,7 @@ class WarehousingController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
             if ($user->mb_type == 'shop') {
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general','t_export'])->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
