@@ -1481,19 +1481,20 @@ class ReceivingGoodsDeliveryController extends Controller
             foreach ($validated['location'] as $rgd) {
 
                 if (!isset($rgd['rgd_no'])) {
-
-                    $rgd_no = ReceivingGoodsDelivery::insertGetId([
-                        'mb_no' => $member->mb_no,
-                        'is_no' => $rgd['is_no'],
-                        'service_korean_name' => '보세화물',
-                        'rgd_contents' => $rgd['rgd_contents'],
-                        'rgd_address' => $rgd['rgd_address'],
-                        'rgd_address_detail' => $rgd['rgd_address_detail'],
-                        'rgd_receiver' => $rgd['rgd_receiver'],
-                        'rgd_hp' => $rgd['rgd_hp'],
-                        'rgd_memo' => $rgd['rgd_memo'],
-                       
-                    ]);
+                    if($rgd['is_no']){
+                        $rgd_no = ReceivingGoodsDelivery::insertGetId([
+                            'mb_no' => $member->mb_no,
+                            'is_no' => $rgd['is_no'],
+                            'service_korean_name' => '보세화물',
+                            'rgd_contents' => $rgd['rgd_contents'],
+                            'rgd_address' => $rgd['rgd_address'],
+                            'rgd_address_detail' => $rgd['rgd_address_detail'],
+                            'rgd_receiver' => $rgd['rgd_receiver'],
+                            'rgd_hp' => $rgd['rgd_hp'],
+                            'rgd_memo' => $rgd['rgd_memo'],
+                           
+                        ]);
+                    }       
                 } else {
 
                     $rgd_no = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
@@ -1512,7 +1513,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 ReceivingGoodsDelivery::where('rgd_no', $remove['rgd_no'])->delete();
             }
 
-            if ($validated['wr_contents']) {
+            if ($validated['wr_contents'] && $validated['is_no']) {
                 WarehousingRequest::insert([
                     'wr_type' => "IW",
                     'w_no' => $validated['is_no'],
