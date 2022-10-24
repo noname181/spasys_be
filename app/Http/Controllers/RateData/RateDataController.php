@@ -167,6 +167,15 @@ class RateDataController extends Controller
                     ],
                 );
             }
+
+            //ONLY FOR 보세화물
+            if(isset($validated['storage_days']) && isset($validated['rgd_no'])){
+                ReceivingGoodsDelivery::where('rgd_no', $validated['rgd_no'])->update([
+                    'rgd_storage_days' => $validated['storage_days']
+                ]);
+            }
+
+
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -185,6 +194,7 @@ class RateDataController extends Controller
 
     public function get_rmd_no($rgd_no, $set_type){
         $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
+        $previous_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
         $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
         $w_no = $rgd->w_no;
 
@@ -552,6 +562,234 @@ class RateDataController extends Controller
                     [
                         'rgd_no' => $rdg->rgd_no_final,
                         'set_type' => 'domestic_monthly_additional'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded1_final'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_parent_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded1'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded2_final'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_parent_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded2'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded3_final'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_parent_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded3'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded4_final'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_parent_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded4'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded5_final'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_parent_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded5'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded6_final'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_parent_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded6'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded1_additional'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_parent_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded1_final'
+                    ]
+                )->first();
+            }
+            if(empty($rmd) && !empty($previous_rgd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $previous_rgd->rgd_parent_no,
+                        'set_type' => 'bonded1'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded2_additional'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_parent_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded2_final'
+                    ]
+                )->first();
+            }
+            if(empty($rmd) && !empty($previous_rgd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $previous_rgd->rgd_parent_no,
+                        'set_type' => 'bonded2'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded3_additional'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_parent_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded3_final'
+                    ]
+                )->first();
+            }
+            if(empty($rmd) && !empty($previous_rgd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $previous_rgd->rgd_parent_no,
+                        'set_type' => 'bonded3'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded4_additional'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_parent_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded4_final'
+                    ]
+                )->first();
+            }
+            if(empty($rmd) && !empty($previous_rgd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $previous_rgd->rgd_parent_no,
+                        'set_type' => 'bonded4'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded5_additional'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_parent_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded5_final'
+                    ]
+                )->first();
+            }
+            if(empty($rmd) && !empty($previous_rgd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $previous_rgd->rgd_parent_no,
+                        'set_type' => 'bonded5'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded6_additional'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_parent_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded6_final'
+                    ]
+                )->first();
+            }
+            if(empty($rmd) && !empty($previous_rgd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $previous_rgd->rgd_parent_no,
+                        'set_type' => 'bonded6'
                     ]
                 )->first();
             }
@@ -1783,6 +2021,7 @@ class RateDataController extends Controller
             ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
             ->where('rgd_status1', '=', '입고')
             ->where('rgd_bill_type', $bill_type)
+            ->whereDoesntHave('rgd_child')
             ->get();
 
             $rdgs = [];
@@ -1851,6 +2090,7 @@ class RateDataController extends Controller
                 }
             }else {
                 $i = 0;
+                $final_rgds = [];
                 foreach($request->rgds as $key=>$rgd){
                     $is_exist = RateDataGeneral::where('rgd_no_expectation', $rgd['rgd_no'])->where('rdg_bill_type', 'final_monthly')->first();
                     if(!$is_exist){
@@ -1865,6 +2105,8 @@ class RateDataController extends Controller
 
                     $expectation_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->where('rgd_bill_type', 'expectation_monthly')->first();
                     $final_rgd = ReceivingGoodsDelivery::where('rgd_parent_no', $rgd['rgd_no'])->where('rgd_bill_type', 'final_monthly')->first();
+                    
+                    $final_rgds[] = $final_rgd;
 
                     if(!$final_rgd){
                         $expectation_rgd->rgd_status5 = 'issued';
@@ -1914,6 +2156,7 @@ class RateDataController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'rdg' => $is_exist,
+                'final_rgds' => $final_rgds
                 // 'final_rgd' => $final_rgd
             ], 201);
 
@@ -2172,11 +2415,12 @@ class RateDataController extends Controller
                 ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_status4' => '예상경비청구서',
                     'rgd_bill_type' => $request->bill_type,
+                    'rgd_storage_days' => $request->storage_days,
                     'rgd_settlement_number' => $request->rgd_settlement_number
-                ]);    
+                ]);
             }
 
-            $previous_rgd = ReceivingGoodsDelivery::where('w_no', $w_no)->where('rgd_bill_type', '=' , $request->previous_bill_type)->first();
+            $previous_rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->where('rgd_bill_type', '=' , $request->previous_bill_type)->first();
 
             if(!isset($is_exist->rdg_no) && isset($request->previous_bill_type) && !empty($previous_rgd)){
                 $previous_rgd->rgd_status5 = 'issued';
@@ -2213,6 +2457,29 @@ class RateDataController extends Controller
                 'message' => Messages::MSG_0007,
                 'rdg' => $rdg,
                 // 'final_rgd' => $final_rgd
+            ], 201);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+    public function update_storage_days(Request $request) {
+        try {
+            DB::beginTransaction();
+            //Check is there already RateDataGeneral with rdg_no yet
+
+            $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                'rgd_storage_days' => $request->storage_days
+            ]);
+
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
             ], 201);
 
         } catch (\Exception $e) {
@@ -2303,6 +2570,23 @@ class RateDataController extends Controller
             $rateData = RateData::where('rd_no', $rd_no)->delete();
             return response()->json([
                 'message' => $rateData,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0006], 500);
+        }
+    }
+    //DELETE SET RATE DATA FOR BONDED SERVICE
+    public function deleteSetRateData($rd_no)
+    {
+        try {
+
+            $rate_data = RateData::where('rd_no', $rd_no)->first();
+
+            RateData::where(['rmd_no' => $rate_data->rmd_no, 'rd_cate1' => $rate_data->rd_cate1])->delete();
+
+            return response()->json([
+                'message' => $rate_data,
             ]);
         } catch (\Exception $e) {
             Log::error($e);
@@ -4229,7 +4513,7 @@ class RateDataController extends Controller
         $sheet->setCellValue('J3', '상세');
         $sheet->setCellValue('K3', '기본료');
         $sheet->setCellValue('L3', '단가/KG');
-        
+
         $sheet->setCellValue('O3', '');
         $sheet->setCellValue('P3', '항목');
         $sheet->setCellValue('Q3', '상세');
@@ -4313,7 +4597,7 @@ class RateDataController extends Controller
             }
         }
 
-    
+
         $Excel_writer = new Xlsx($spreadsheet);
         if(isset($user->mb_no)){
             $path = '../storage/download/'.$user->mb_no.'/';
@@ -4391,7 +4675,7 @@ class RateDataController extends Controller
             $sheet->setCellValue('J'.$sheet_row, array_sum(array_column($datas, 'rdg_etc3')));
         }
 
-    
+
         $Excel_writer = new Xlsx($spreadsheet);
         if(isset($user->mb_no)){
             $path = '../storage/download/'.$user->mb_no.'/';
@@ -4464,12 +4748,12 @@ class RateDataController extends Controller
         $sheet->setCellValue('C4', $vat_price);
         $sheet->setCellValue('D4', $sum_price);
         $sheet->setCellValue('E4', $rdg['rdg_etc3']);
-        
+
         /*Total sheet 1*/
         $sheet1_rdg_supply_price = !empty($rdg['rdg_supply_price4'])?$rdg['rdg_supply_price4'] : ($rdg['rdg_supply_price2'] + $rdg['rdg_supply_price1'] + $supply_price);
         $sheet1_rdg_vat = !empty($rdg['rdg_vat4'])?$rdg['rdg_vat4']:($rdg['rdg_vat2'] + $rdg['rdg_vat1'] + $vat_price);
-        $sheet1_rdg_sum = !empty($rdg['rdg_sum4'])?$rdg['rdg_sum4']:($rdg['rdg_sum2'] + $rdg['rdg_sum1'] + $sum_price); 
-        $sheet1_rdg_etc = !empty($rdg['rdg_etc4'])?$rdg['rdg_etc4']:($rdg['rdg_etc2'] + $rdg['rdg_etc1'] + $rdg['rdg_etc3']); 
+        $sheet1_rdg_sum = !empty($rdg['rdg_sum4'])?$rdg['rdg_sum4']:($rdg['rdg_sum2'] + $rdg['rdg_sum1'] + $sum_price);
+        $sheet1_rdg_etc = !empty($rdg['rdg_etc4'])?$rdg['rdg_etc4']:($rdg['rdg_etc2'] + $rdg['rdg_etc1'] + $rdg['rdg_etc3']);
 
         $sheet->setCellValue('A5', '합계');
         $sheet->setCellValue('B5', $sheet1_rdg_supply_price);
@@ -4636,7 +4920,7 @@ class RateDataController extends Controller
         ], 500);
         ob_end_clean();
     }
-    
+
     public function download_distribution_monthbill(Request $request){
         $datas = $request->all();
         DB::beginTransaction();
@@ -4691,7 +4975,7 @@ class RateDataController extends Controller
             $sheet->setCellValue('J'.$sheet_row, array_sum(array_column($datas, 'rdg_etc3')));
         }
 
-    
+
         $Excel_writer = new Xlsx($spreadsheet);
         if(isset($user->mb_no)){
             $path = '../storage/download/'.$user->mb_no.'/';
@@ -4764,7 +5048,7 @@ class RateDataController extends Controller
             $sheet->setCellValue('J'.$sheet_row, array_sum(array_column($datas, 'rdg_etc3')));
         }
 
-    
+
         $Excel_writer = new Xlsx($spreadsheet);
         if(isset($user->mb_no)){
             $path = '../storage/download/'.$user->mb_no.'/';
@@ -4785,7 +5069,7 @@ class RateDataController extends Controller
         ], 500);
         ob_end_clean();
     }
-    
+
     public function download_fulfillment_final_monthbill($rgd_no){
 
         $data_fullfill1 = $data_fullfill2 = $data_fullfill3 = $data_fullfill4 = $data_fullfill5 = null;
@@ -4822,7 +5106,7 @@ class RateDataController extends Controller
         }
 
         $overseas_shipping_supply_price = $overseas_shipping_vat = $overseas_shipping_sum = 0;
-        
+
         if(!empty($data_fullfill3)){
             foreach($data_fullfill3 as $dt3){
                 $overseas_shipping_supply_price += !empty($dt3->rd_data5)?$dt3->rd_data5:0;
@@ -4832,7 +5116,7 @@ class RateDataController extends Controller
         }
 
         $keep_supply_price = $keep_vat = $keep_sum = 0;
-        
+
         if(!empty($data_fullfill4)){
             foreach($data_fullfill4 as $dt4){
                 $keep_supply_price += !empty($dt4->rd_data5)?$dt4->rd_data5:0;
@@ -4842,7 +5126,7 @@ class RateDataController extends Controller
         }
 
         $subsidiary_supply_price = $subsidiary_supply_vat = $subsidiary_supply_sum = 0;
-        
+
         if(!empty($data_fullfill5)){
             foreach($data_fullfill5 as $dt5){
                 $subsidiary_supply_price += !empty($dt5->rd_data5)?$dt5->rd_data5:0;
@@ -4851,7 +5135,7 @@ class RateDataController extends Controller
             }
         }
 
-        $total_supply_price = $center_work_supply_price + $domestic_shipping_supply_price + $overseas_shipping_supply_price + $overseas_shipping_supply_price + $subsidiary_supply_price;
+        $total_supply_price = $center_work_supply_price + $domestic_shipping_supply_price + $overseas_shipping_supply_price + $keep_supply_price + $subsidiary_supply_price;
         $total_supply_vat = $center_work_vat + $domestic_shipping_vat + $overseas_shipping_vat + $keep_vat + $subsidiary_supply_vat;
         $total_sum = $center_work_sum + $domestic_shipping_sum + $overseas_shipping_sum + $keep_sum + $subsidiary_supply_sum;
 
@@ -4969,7 +5253,7 @@ class RateDataController extends Controller
         $spreadsheet->createSheet();
         $sheet3 = $spreadsheet->getSheet(2);
         
-        $sheet3->setTitle('센터 작업료');
+        $sheet3->setTitle('국내운송료');
 
         $sheet3->setCellValue('A1', '항목');
         $sheet3->mergeCells('A1:B1');
@@ -5012,7 +5296,7 @@ class RateDataController extends Controller
         $spreadsheet->createSheet();
         $sheet4 = $spreadsheet->getSheet(3);
         
-        $sheet4->setTitle('센터 작업료');
+        $sheet4->setTitle('해외운송료');
 
         $sheet4->setCellValue('A1', '항목');
         $sheet4->mergeCells('A1:B1');
@@ -5055,7 +5339,7 @@ class RateDataController extends Controller
         $spreadsheet->createSheet();
         $sheet5 = $spreadsheet->getSheet(4);
         
-        $sheet5->setTitle('센터 작업료');
+        $sheet5->setTitle('보관');
 
         $sheet5->setCellValue('A1', '항목');
         $sheet5->mergeCells('A1:B1');
@@ -5098,7 +5382,7 @@ class RateDataController extends Controller
         $spreadsheet->createSheet();
         $sheet6 = $spreadsheet->getSheet(5);
         
-        $sheet6->setTitle('센터 작업료');
+        $sheet6->setTitle('부자재');
 
         $sheet6->setCellValue('A1', '항목');
         $sheet6->mergeCells('A1:B1');
@@ -5147,9 +5431,1127 @@ class RateDataController extends Controller
         if (!is_dir($path)) {
             File::makeDirectory($path, $mode = 0777, true, true);
         }
-        $mask = $path.'Excel-Distribution-Final-Monthbill-Check-*.*';
+        $mask = $path.'Excel-Fulfillment-Final-Monthbill-Edit-*.*';
         array_map('unlink', glob($mask) ?: []);
-        $file_name_download = $path.'Excel-Distribution-Final-Monthbill-Check-'.date('YmdHis').'.Xlsx';
+        $file_name_download = $path.'Excel-Fulfillment-Final-Monthbill-Edit-'.date('YmdHis').'.Xlsx';
+        $check_status = $Excel_writer->save($file_name_download);
+        return response()->json([
+            'status' => 1,
+            'link_download' => $file_name_download,
+            'message' => 'Download File'
+        ], 500);
+        ob_end_clean();
+    }
+    
+    
+    public function download_fulfillment_additional($rgd_no){
+
+        $data_fullfill1 = $data_fullfill2 = $data_fullfill3 = $data_fullfill4 = $data_fullfill5 = null;
+
+        $rmd_no1 = $this->get_rmd_no_fulfill_raw($rgd_no,'fulfill1_final','fulfill1_additional');
+        $rmd_no2 = $this->get_rmd_no_fulfill_raw($rgd_no,'fulfill2_final','fulfill2_additional');
+        $rmd_no3 = $this->get_rmd_no_fulfill_raw($rgd_no,'fulfill3_final','fulfill3_additional');
+        $rmd_no4 = $this->get_rmd_no_fulfill_raw($rgd_no,'fulfill4_final','fulfill4_additional');
+        $rmd_no5 = $this->get_rmd_no_fulfill_raw($rgd_no,'fulfill5_final','fulfill5_additional');
+
+        $data_fullfill1 = !empty($rmd_no1)?$this->get_set_data_raw($rmd_no1):array();
+        $data_fullfill2 = !empty($rmd_no2)?$this->get_set_data_raw($rmd_no2):array();
+        $data_fullfill3 = !empty($rmd_no3)?$this->get_set_data_raw($rmd_no3):array();
+        $data_fullfill4 = !empty($rmd_no4)?$this->get_set_data_raw($rmd_no4):array();
+        $data_fullfill5 = !empty($rmd_no5)?$this->get_set_data_raw($rmd_no5):array();
+
+        $center_work_supply_price = $center_work_vat = $center_work_sum = 0;
+        if(!empty($data_fullfill1)){
+            foreach($data_fullfill1 as $dt1){
+                $center_work_supply_price += !empty($dt1->rd_data5)?$dt1->rd_data5:0;
+                $center_work_vat += !empty($dt1->rd_data6)?$dt1->rd_data6:0;
+                $center_work_sum += !empty($dt1->rd_data7)?$dt1->rd_data7:0;
+            }
+        }
+
+        $domestic_shipping_supply_price = $domestic_shipping_vat = $domestic_shipping_sum = 0;
+
+        if(!empty($data_fullfill2)){
+            foreach($data_fullfill2 as $dt2){
+                $domestic_shipping_supply_price += !empty($dt2->rd_data5)?$dt2->rd_data5:0;
+                $domestic_shipping_vat += !empty($dt2->rd_data6)?$dt2->rd_data6:0;
+                $domestic_shipping_sum += !empty($dt2->rd_data7)?$dt2->rd_data7:0;
+            }
+        }
+
+        $overseas_shipping_supply_price = $overseas_shipping_vat = $overseas_shipping_sum = 0;
+        
+        if(!empty($data_fullfill3)){
+            foreach($data_fullfill3 as $dt3){
+                $overseas_shipping_supply_price += !empty($dt3->rd_data5)?$dt3->rd_data5:0;
+                $overseas_shipping_vat += !empty($dt3->rd_data6)?$dt3->rd_data6:0;
+                $overseas_shipping_sum += !empty($dt3->rd_data7)?$dt3->rd_data7:0;
+            }
+        }
+
+        $keep_supply_price = $keep_vat = $keep_sum = 0;
+        
+        if(!empty($data_fullfill4)){
+            foreach($data_fullfill4 as $dt4){
+                $keep_supply_price += !empty($dt4->rd_data5)?$dt4->rd_data5:0;
+                $keep_vat += !empty($dt4->rd_data6)?$dt4->rd_data6:0;
+                $keep_sum += !empty($dt4->rd_data7)?$dt4->rd_data7:0;
+            }
+        }
+
+        $subsidiary_supply_price = $subsidiary_supply_vat = $subsidiary_supply_sum = 0;
+        
+        if(!empty($data_fullfill5)){
+            foreach($data_fullfill5 as $dt5){
+                $subsidiary_supply_price += !empty($dt5->rd_data5)?$dt5->rd_data5:0;
+                $subsidiary_supply_vat += !empty($dt5->rd_data6)?$dt5->rd_data6:0;
+                $subsidiary_supply_sum += !empty($dt5->rd_data7)?$dt5->rd_data7:0;
+            }
+        }
+
+        $total_supply_price = $center_work_supply_price + $domestic_shipping_supply_price + $overseas_shipping_supply_price + $keep_supply_price + $subsidiary_supply_price;
+        $total_supply_vat = $center_work_vat + $domestic_shipping_vat + $overseas_shipping_vat + $keep_vat + $subsidiary_supply_vat;
+        $total_sum = $center_work_sum + $domestic_shipping_sum + $overseas_shipping_sum + $keep_sum + $subsidiary_supply_sum;
+
+        DB::beginTransaction();
+        $co_no = Auth::user()->co_no;
+        DB::commit();
+        $user = Auth::user();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet(0);
+        $spreadsheet->getActiveSheet()->getProtection()->setSheet(true);
+
+        $sheet->setTitle('종합');
+
+        $sheet->setCellValue('A1', '항목');
+        $sheet->mergeCells('A1:B1');
+        $sheet->setCellValue('C1', '공급가');
+        $sheet->setCellValue('D1', '부가세');
+        $sheet->setCellValue('E1', '합계');
+        $sheet->setCellValue('F1', '비고');
+        $sheet->mergeCells('F1:G1');
+
+        $sheet->setCellValue('A2', '센터작업료');
+        $sheet->mergeCells('A2:B2');
+        $sheet->setCellValue('C2', $center_work_supply_price);
+        $sheet->setCellValue('D2', $center_work_vat);
+        $sheet->setCellValue('E2', $center_work_sum);
+        $sheet->setCellValue('F2', '');
+        $sheet->mergeCells('F2:G2');
+
+        $sheet->setCellValue('A3', '국내 운송료');
+        $sheet->mergeCells('A3:B3');
+        $sheet->setCellValue('C3', $domestic_shipping_supply_price);
+        $sheet->setCellValue('D3', $domestic_shipping_vat);
+        $sheet->setCellValue('E3', $domestic_shipping_sum);
+        $sheet->setCellValue('F3', '');
+        $sheet->mergeCells('F3:G3');
+
+        $sheet->setCellValue('A4', '해외 운송료');
+        $sheet->mergeCells('A4:B4');
+        $sheet->setCellValue('C4', $overseas_shipping_supply_price);
+        $sheet->setCellValue('D4', $overseas_shipping_vat);
+        $sheet->setCellValue('E4', $overseas_shipping_sum);
+        $sheet->setCellValue('F4', '');
+        $sheet->mergeCells('F4:G4');
+
+        $sheet->setCellValue('A5', '보관');
+        $sheet->mergeCells('A5:B5');
+        $sheet->setCellValue('C5', $keep_supply_price);
+        $sheet->setCellValue('D5', $keep_vat);
+        $sheet->setCellValue('E5', $keep_sum);
+        $sheet->setCellValue('F5', '');
+        $sheet->mergeCells('F5:G5');
+
+        $sheet->setCellValue('A6', '부자재');
+        $sheet->mergeCells('A6:B6');
+        $sheet->setCellValue('C6', $subsidiary_supply_price);
+        $sheet->setCellValue('D6', $subsidiary_supply_vat);
+        $sheet->setCellValue('E6', $subsidiary_supply_sum);
+        $sheet->setCellValue('F6', '');
+        $sheet->mergeCells('F6:G6');
+
+        $sheet->setCellValue('A7', '합계');
+        $sheet->mergeCells('A7:B7');
+        $sheet->setCellValue('C7', $total_supply_price);
+        $sheet->setCellValue('D7', $total_supply_vat);
+        $sheet->setCellValue('E7', $total_sum);
+        $sheet->setCellValue('F7', '');
+        $sheet->mergeCells('F7:G7');
+
+
+        $spreadsheet->createSheet();
+        $sheet2 = $spreadsheet->getSheet(1);
+
+        $sheet2->setTitle('센터 작업료');
+
+        $sheet2->setCellValue('A1', '항목');
+        $sheet2->mergeCells('A1:B1');
+        $sheet2->setCellValue('C1', '단위');
+        $sheet2->setCellValue('D1', '단가');
+        $sheet2->setCellValue('E1', '건수');
+        $sheet2->setCellValue('F1', '공급가');
+        $sheet2->setCellValue('G1', '부가세');
+        $sheet2->setCellValue('H1', '급액');
+        $sheet2->setCellValue('I1', '비고');
+        $sheet2->mergeCells('I1:J1');
+
+
+        if(!empty($data_fullfill1)){
+            $sheet_row = 2;
+            foreach($data_fullfill1 as $data){
+                $sheet2->setCellValue('A'.$sheet_row, $data->rd_cate1);
+                $sheet2->setCellValue('B'.$sheet_row, $data->rd_cate2);
+                $sheet2->setCellValue('C'.$sheet_row, !empty($data->rd_data1)?$data->rd_data1:'');
+                $sheet2->setCellValue('D'.$sheet_row, !empty($data->rd_data2)?$data->rd_data2:'');
+                $sheet2->setCellValue('E'.$sheet_row, !empty($data->rd_data4)?$data->rd_data4:'');
+                $sheet2->setCellValue('F'.$sheet_row, !empty($data->rd_data5)?$data->rd_data5:'');
+                $sheet2->setCellValue('G'.$sheet_row, !empty($data->rd_data6)?$data->rd_data6:'');
+                $sheet2->setCellValue('H'.$sheet_row, !empty($data->rd_data7)?$data->rd_data7:'');
+                $sheet2->setCellValue('I'.$sheet_row, !empty($data->rd_data8)?$data->rd_data8:'');
+                $sheet_row++;
+            }
+            $sheet2->setCellValue('A'.$sheet_row, '합계');
+            $sheet2->setCellValue('B'.$sheet_row, '');
+            $sheet2->setCellValue('C'.$sheet_row, '');
+            $sheet2->setCellValue('D'.$sheet_row, '');
+            $sheet2->setCellValue('E'.$sheet_row, '');
+            $sheet2->setCellValue('F'.$sheet_row, $center_work_supply_price);
+            $sheet2->setCellValue('G'.$sheet_row, $center_work_vat);
+            $sheet2->setCellValue('H'.$sheet_row, $center_work_sum);
+            $sheet2->setCellValue('I'.$sheet_row, '');
+        }
+
+
+        $spreadsheet->createSheet();
+        $sheet3 = $spreadsheet->getSheet(2);
+        
+        $sheet3->setTitle('센터 작업료');
+
+        $sheet3->setCellValue('A1', '항목');
+        $sheet3->mergeCells('A1:B1');
+        $sheet3->setCellValue('C1', '단위');
+        $sheet3->setCellValue('D1', '단가');
+        $sheet3->setCellValue('E1', '건수');
+        $sheet3->setCellValue('F1', '공급가');
+        $sheet3->setCellValue('G1', '부가세');
+        $sheet3->setCellValue('H1', '급액');
+        $sheet3->setCellValue('I1', '비고');
+        $sheet3->mergeCells('I1:J1');
+
+
+        if(!empty($data_fullfill2)){
+            $sheet_row = 2;
+            foreach($data_fullfill2 as $data){
+                $sheet3->setCellValue('A'.$sheet_row, $data->rd_cate1);
+                $sheet3->setCellValue('B'.$sheet_row, $data->rd_cate2);
+                $sheet3->setCellValue('C'.$sheet_row, !empty($data->rd_data1)?$data->rd_data1:'');
+                $sheet3->setCellValue('D'.$sheet_row, !empty($data->rd_data2)?$data->rd_data2:'');
+                $sheet3->setCellValue('E'.$sheet_row, !empty($data->rd_data4)?$data->rd_data4:'');
+                $sheet3->setCellValue('F'.$sheet_row, !empty($data->rd_data5)?$data->rd_data5:'');
+                $sheet3->setCellValue('G'.$sheet_row, !empty($data->rd_data6)?$data->rd_data6:'');
+                $sheet3->setCellValue('H'.$sheet_row, !empty($data->rd_data7)?$data->rd_data7:'');
+                $sheet3->setCellValue('I'.$sheet_row, !empty($data->rd_data8)?$data->rd_data8:'');
+                $sheet_row++;
+            }
+            $sheet3->setCellValue('A'.$sheet_row, '합계');
+            $sheet3->setCellValue('B'.$sheet_row, '');
+            $sheet3->setCellValue('C'.$sheet_row, '');
+            $sheet3->setCellValue('D'.$sheet_row, '');
+            $sheet3->setCellValue('E'.$sheet_row, '');
+            $sheet3->setCellValue('F'.$sheet_row, $domestic_shipping_supply_price);
+            $sheet3->setCellValue('G'.$sheet_row, $domestic_shipping_vat);
+            $sheet3->setCellValue('H'.$sheet_row, $domestic_shipping_sum);
+            $sheet3->setCellValue('I'.$sheet_row, '');
+        }
+
+
+        $spreadsheet->createSheet();
+        $sheet4 = $spreadsheet->getSheet(3);
+        
+        $sheet4->setTitle('센터 작업료');
+
+        $sheet4->setCellValue('A1', '항목');
+        $sheet4->mergeCells('A1:B1');
+        $sheet4->setCellValue('C1', '단위');
+        $sheet4->setCellValue('D1', '단가');
+        $sheet4->setCellValue('E1', '건수');
+        $sheet4->setCellValue('F1', '공급가');
+        $sheet4->setCellValue('G1', '부가세');
+        $sheet4->setCellValue('H1', '급액');
+        $sheet4->setCellValue('I1', '비고');
+        $sheet4->mergeCells('I1:J1');
+
+
+        if(!empty($data_fullfill3)){
+            $sheet_row = 2;
+            foreach($data_fullfill3 as $data){
+                $sheet4->setCellValue('A'.$sheet_row, $data->rd_cate1);
+                $sheet4->setCellValue('B'.$sheet_row, $data->rd_cate2);
+                $sheet4->setCellValue('C'.$sheet_row, !empty($data->rd_data1)?$data->rd_data1:'');
+                $sheet4->setCellValue('D'.$sheet_row, !empty($data->rd_data2)?$data->rd_data2:'');
+                $sheet4->setCellValue('E'.$sheet_row, !empty($data->rd_data4)?$data->rd_data4:'');
+                $sheet4->setCellValue('F'.$sheet_row, !empty($data->rd_data5)?$data->rd_data5:'');
+                $sheet4->setCellValue('G'.$sheet_row, !empty($data->rd_data6)?$data->rd_data6:'');
+                $sheet4->setCellValue('H'.$sheet_row, !empty($data->rd_data7)?$data->rd_data7:'');
+                $sheet4->setCellValue('I'.$sheet_row, !empty($data->rd_data8)?$data->rd_data8:'');
+                $sheet_row++;
+            }
+            $sheet4->setCellValue('A'.$sheet_row, '합계');
+            $sheet4->setCellValue('B'.$sheet_row, '');
+            $sheet4->setCellValue('C'.$sheet_row, '');
+            $sheet4->setCellValue('D'.$sheet_row, '');
+            $sheet4->setCellValue('E'.$sheet_row, '');
+            $sheet4->setCellValue('F'.$sheet_row, $overseas_shipping_supply_price);
+            $sheet4->setCellValue('G'.$sheet_row, $overseas_shipping_vat);
+            $sheet4->setCellValue('H'.$sheet_row, $overseas_shipping_sum);
+            $sheet4->setCellValue('I'.$sheet_row, '');
+        }
+
+
+        $spreadsheet->createSheet();
+        $sheet5 = $spreadsheet->getSheet(4);
+        
+        $sheet5->setTitle('센터 작업료');
+
+        $sheet5->setCellValue('A1', '항목');
+        $sheet5->mergeCells('A1:B1');
+        $sheet5->setCellValue('C1', '단위');
+        $sheet5->setCellValue('D1', '단가');
+        $sheet5->setCellValue('E1', '건수');
+        $sheet5->setCellValue('F1', '공급가');
+        $sheet5->setCellValue('G1', '부가세');
+        $sheet5->setCellValue('H1', '급액');
+        $sheet5->setCellValue('I1', '비고');
+        $sheet5->mergeCells('I1:J1');
+
+
+        if(!empty($data_fullfill4)){
+            $sheet_row = 2;
+            foreach($data_fullfill4 as $data){
+                $sheet5->setCellValue('A'.$sheet_row, $data->rd_cate1);
+                $sheet5->setCellValue('B'.$sheet_row, $data->rd_cate2);
+                $sheet5->setCellValue('C'.$sheet_row, !empty($data->rd_data1)?$data->rd_data1:'');
+                $sheet5->setCellValue('D'.$sheet_row, !empty($data->rd_data2)?$data->rd_data2:'');
+                $sheet5->setCellValue('E'.$sheet_row, !empty($data->rd_data4)?$data->rd_data4:'');
+                $sheet5->setCellValue('F'.$sheet_row, !empty($data->rd_data5)?$data->rd_data5:'');
+                $sheet5->setCellValue('G'.$sheet_row, !empty($data->rd_data6)?$data->rd_data6:'');
+                $sheet5->setCellValue('H'.$sheet_row, !empty($data->rd_data7)?$data->rd_data7:'');
+                $sheet5->setCellValue('I'.$sheet_row, !empty($data->rd_data8)?$data->rd_data8:'');
+                $sheet_row++;
+            }
+            $sheet5->setCellValue('A'.$sheet_row, '합계');
+            $sheet5->setCellValue('B'.$sheet_row, '');
+            $sheet5->setCellValue('C'.$sheet_row, '');
+            $sheet5->setCellValue('D'.$sheet_row, '');
+            $sheet5->setCellValue('E'.$sheet_row, '');
+            $sheet5->setCellValue('F'.$sheet_row, $keep_supply_price);
+            $sheet5->setCellValue('G'.$sheet_row, $keep_vat);
+            $sheet5->setCellValue('H'.$sheet_row, $keep_sum);
+            $sheet5->setCellValue('I'.$sheet_row, '');
+        }
+
+
+        $spreadsheet->createSheet();
+        $sheet6 = $spreadsheet->getSheet(5);
+        
+        $sheet6->setTitle('센터 작업료');
+
+        $sheet6->setCellValue('A1', '항목');
+        $sheet6->mergeCells('A1:B1');
+        $sheet6->setCellValue('C1', '단위');
+        $sheet6->setCellValue('D1', '단가');
+        $sheet6->setCellValue('E1', '건수');
+        $sheet6->setCellValue('F1', '공급가');
+        $sheet6->setCellValue('G1', '부가세');
+        $sheet6->setCellValue('H1', '급액');
+        $sheet6->setCellValue('I1', '비고');
+        $sheet6->mergeCells('I1:J1');
+
+
+        if(!empty($data_fullfill5)){
+            $sheet_row = 2;
+            foreach($data_fullfill5 as $data){
+                $sheet6->setCellValue('A'.$sheet_row, $data->rd_cate1);
+                $sheet6->setCellValue('B'.$sheet_row, $data->rd_cate2);
+                $sheet6->setCellValue('C'.$sheet_row, !empty($data->rd_data1)?$data->rd_data1:'');
+                $sheet6->setCellValue('D'.$sheet_row, !empty($data->rd_data2)?$data->rd_data2:'');
+                $sheet6->setCellValue('E'.$sheet_row, !empty($data->rd_data4)?$data->rd_data4:'');
+                $sheet6->setCellValue('F'.$sheet_row, !empty($data->rd_data5)?$data->rd_data5:'');
+                $sheet6->setCellValue('G'.$sheet_row, !empty($data->rd_data6)?$data->rd_data6:'');
+                $sheet6->setCellValue('H'.$sheet_row, !empty($data->rd_data7)?$data->rd_data7:'');
+                $sheet6->setCellValue('I'.$sheet_row, !empty($data->rd_data8)?$data->rd_data8:'');
+                $sheet_row++;
+            }
+            $sheet6->setCellValue('A'.$sheet_row, '합계');
+            $sheet6->setCellValue('B'.$sheet_row, '');
+            $sheet6->setCellValue('C'.$sheet_row, '');
+            $sheet6->setCellValue('D'.$sheet_row, '');
+            $sheet6->setCellValue('E'.$sheet_row, '');
+            $sheet6->setCellValue('F'.$sheet_row, $subsidiary_supply_price);
+            $sheet6->setCellValue('G'.$sheet_row, $subsidiary_supply_vat);
+            $sheet6->setCellValue('H'.$sheet_row, $subsidiary_supply_sum);
+            $sheet6->setCellValue('I'.$sheet_row, '');
+        }
+
+
+        $Excel_writer = new Xlsx($spreadsheet);
+        if(isset($user->mb_no)){
+            $path = '../storage/download/'.$user->mb_no.'/';
+        }else{
+            $path = '../storage/download/no-name/';
+        }
+        if (!is_dir($path)) {
+            File::makeDirectory($path, $mode = 0777, true, true);
+        }
+        $mask = $path.'Excel-FulfillMent-Month-Bill-Issue-*.*';
+        array_map('unlink', glob($mask) ?: []);
+        $file_name_download = $path.'Excel-FulfillMent-Month-Bill-Issue-'.date('YmdHis').'.Xlsx';
+        $check_status = $Excel_writer->save($file_name_download);
+        return response()->json([
+            'status' => 1,
+            'link_download' => $file_name_download,
+            'message' => 'Download File'
+        ], 500);
+        ob_end_clean();
+    }
+    public function download_full_fillment_final($rgd_no){
+        
+        $data_fullfill1 = $data_fullfill2 = $data_fullfill3 = $data_fullfill4 = $data_fullfill5 = null; 
+
+        $rmd_no1 = $this->get_rmd_no_fulfill_raw($rgd_no,'fulfill1_final','fulfill1');
+        $rmd_no2 = $this->get_rmd_no_fulfill_raw($rgd_no,'fulfill2_final','fulfill2');
+        $rmd_no3 = $this->get_rmd_no_fulfill_raw($rgd_no,'fulfill3_final','fulfill3');
+        $rmd_no4 = $this->get_rmd_no_fulfill_raw($rgd_no,'fulfill4_final','fulfill4');
+        $rmd_no5 = $this->get_rmd_no_fulfill_raw($rgd_no,'fulfill5_final','fulfill5');
+
+        $data_fullfill1 = !empty($rmd_no1)?$this->get_set_data_raw($rmd_no1):array();
+        $data_fullfill2 = !empty($rmd_no2)?$this->get_set_data_raw($rmd_no2):array();
+        $data_fullfill3 = !empty($rmd_no3)?$this->get_set_data_raw($rmd_no3):array();
+        $data_fullfill4 = !empty($rmd_no4)?$this->get_set_data_raw($rmd_no4):array();
+        $data_fullfill5 = !empty($rmd_no5)?$this->get_set_data_raw($rmd_no5):array();
+
+        $center_work_supply_price = $center_work_vat = $center_work_sum = 0;
+        if(!empty($data_fullfill1)){
+            foreach($data_fullfill1 as $dt1){
+                $center_work_supply_price += !empty($dt1->rd_data5)?$dt1->rd_data5:0;
+                $center_work_vat += !empty($dt1->rd_data6)?$dt1->rd_data6:0;
+                $center_work_sum += !empty($dt1->rd_data7)?$dt1->rd_data7:0;
+            }
+        }
+
+        $domestic_shipping_supply_price = $domestic_shipping_vat = $domestic_shipping_sum = 0;
+
+        if(!empty($data_fullfill2)){
+            foreach($data_fullfill2 as $dt2){
+                $domestic_shipping_supply_price += !empty($dt2->rd_data5)?$dt2->rd_data5:0;
+                $domestic_shipping_vat += !empty($dt2->rd_data6)?$dt2->rd_data6:0;
+                $domestic_shipping_sum += !empty($dt2->rd_data7)?$dt2->rd_data7:0;
+            }
+        }
+
+        $overseas_shipping_supply_price = $overseas_shipping_vat = $overseas_shipping_sum = 0;
+        
+        if(!empty($data_fullfill3)){
+            foreach($data_fullfill3 as $dt3){
+                $overseas_shipping_supply_price += !empty($dt3->rd_data5)?$dt3->rd_data5:0;
+                $overseas_shipping_vat += !empty($dt3->rd_data6)?$dt3->rd_data6:0;
+                $overseas_shipping_sum += !empty($dt3->rd_data7)?$dt3->rd_data7:0;
+            }
+        }
+
+        $keep_supply_price = $keep_vat = $keep_sum = 0;
+        
+        if(!empty($data_fullfill4)){
+            foreach($data_fullfill4 as $dt4){
+                $keep_supply_price += !empty($dt4->rd_data5)?$dt4->rd_data5:0;
+                $keep_vat += !empty($dt4->rd_data6)?$dt4->rd_data6:0;
+                $keep_sum += !empty($dt4->rd_data7)?$dt4->rd_data7:0;
+            }
+        }
+
+        $subsidiary_supply_price = $subsidiary_supply_vat = $subsidiary_supply_sum = 0;
+        
+        if(!empty($data_fullfill5)){
+            foreach($data_fullfill5 as $dt5){
+                $subsidiary_supply_price += !empty($dt5->rd_data5)?$dt5->rd_data5:0;
+                $subsidiary_supply_vat += !empty($dt5->rd_data6)?$dt5->rd_data6:0;
+                $subsidiary_supply_sum += !empty($dt5->rd_data7)?$dt5->rd_data7:0;
+            }
+        }
+
+        $total_supply_price = $center_work_supply_price + $domestic_shipping_supply_price + $overseas_shipping_supply_price + $keep_supply_price + $subsidiary_supply_price;
+        $total_supply_vat = $center_work_vat + $domestic_shipping_vat + $overseas_shipping_vat + $keep_vat + $subsidiary_supply_vat;
+        $total_sum = $center_work_sum + $domestic_shipping_sum + $overseas_shipping_sum + $keep_sum + $subsidiary_supply_sum;
+
+        DB::beginTransaction();
+        $co_no = Auth::user()->co_no;
+        DB::commit();
+        $user = Auth::user();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet(0);
+        $spreadsheet->getActiveSheet()->getProtection()->setSheet(true);
+
+        $sheet->setTitle('종합');
+
+        $sheet->setCellValue('A1', '항목');
+        $sheet->mergeCells('A1:B1');
+        $sheet->setCellValue('C1', '공급가');
+        $sheet->setCellValue('D1', '부가세');
+        $sheet->setCellValue('E1', '합계');
+        $sheet->setCellValue('F1', '비고');
+        $sheet->mergeCells('F1:G1');
+
+        $sheet->setCellValue('A2', '센터작업료');
+        $sheet->mergeCells('A2:B2');
+        $sheet->setCellValue('C2', $center_work_supply_price);
+        $sheet->setCellValue('D2', $center_work_vat);
+        $sheet->setCellValue('E2', $center_work_sum);
+        $sheet->setCellValue('F2', '');
+        $sheet->mergeCells('F2:G2');
+
+        $sheet->setCellValue('A3', '국내 운송료');
+        $sheet->mergeCells('A3:B3');
+        $sheet->setCellValue('C3', $domestic_shipping_supply_price);
+        $sheet->setCellValue('D3', $domestic_shipping_vat);
+        $sheet->setCellValue('E3', $domestic_shipping_sum);
+        $sheet->setCellValue('F3', '');
+        $sheet->mergeCells('F3:G3');
+
+        $sheet->setCellValue('A4', '해외 운송료');
+        $sheet->mergeCells('A4:B4');
+        $sheet->setCellValue('C4', $overseas_shipping_supply_price);
+        $sheet->setCellValue('D4', $overseas_shipping_vat);
+        $sheet->setCellValue('E4', $overseas_shipping_sum);
+        $sheet->setCellValue('F4', '');
+        $sheet->mergeCells('F4:G4');
+
+        $sheet->setCellValue('A5', '보관');
+        $sheet->mergeCells('A5:B5');
+        $sheet->setCellValue('C5', $keep_supply_price);
+        $sheet->setCellValue('D5', $keep_vat);
+        $sheet->setCellValue('E5', $keep_sum);
+        $sheet->setCellValue('F5', '');
+        $sheet->mergeCells('F5:G5');
+
+        $sheet->setCellValue('A6', '부자재');
+        $sheet->mergeCells('A6:B6');
+        $sheet->setCellValue('C6', $subsidiary_supply_price);
+        $sheet->setCellValue('D6', $subsidiary_supply_vat);
+        $sheet->setCellValue('E6', $subsidiary_supply_sum);
+        $sheet->setCellValue('F6', '');
+        $sheet->mergeCells('F6:G6');
+
+        $sheet->setCellValue('A7', '합계');
+        $sheet->mergeCells('A7:B7');
+        $sheet->setCellValue('C7', $total_supply_price);
+        $sheet->setCellValue('D7', $total_supply_vat);
+        $sheet->setCellValue('E7', $total_sum);
+        $sheet->setCellValue('F7', '');
+        $sheet->mergeCells('F7:G7');
+
+
+        $spreadsheet->createSheet();
+        $sheet2 = $spreadsheet->getSheet(1);
+
+        $sheet2->setTitle('센터 작업료');
+
+        $sheet2->setCellValue('A1', '항목');
+        $sheet2->mergeCells('A1:B1');
+        $sheet2->setCellValue('C1', '단위');
+        $sheet2->setCellValue('D1', '단가');
+        $sheet2->setCellValue('E1', '건수');
+        $sheet2->setCellValue('F1', '공급가');
+        $sheet2->setCellValue('G1', '부가세');
+        $sheet2->setCellValue('H1', '급액');
+        $sheet2->setCellValue('I1', '비고');
+        $sheet2->mergeCells('I1:J1');
+
+
+        if(!empty($data_fullfill1)){
+            $sheet_row = 2;
+            foreach($data_fullfill1 as $data){
+                $sheet2->setCellValue('A'.$sheet_row, $data->rd_cate1);
+                $sheet2->setCellValue('B'.$sheet_row, $data->rd_cate2);
+                $sheet2->setCellValue('C'.$sheet_row, !empty($data->rd_data1)?$data->rd_data1:'');
+                $sheet2->setCellValue('D'.$sheet_row, !empty($data->rd_data2)?$data->rd_data2:'');
+                $sheet2->setCellValue('E'.$sheet_row, !empty($data->rd_data4)?$data->rd_data4:'');
+                $sheet2->setCellValue('F'.$sheet_row, !empty($data->rd_data5)?$data->rd_data5:'');
+                $sheet2->setCellValue('G'.$sheet_row, !empty($data->rd_data6)?$data->rd_data6:'');
+                $sheet2->setCellValue('H'.$sheet_row, !empty($data->rd_data7)?$data->rd_data7:'');
+                $sheet2->setCellValue('I'.$sheet_row, !empty($data->rd_data8)?$data->rd_data8:'');
+                $sheet_row++;
+            }
+            $sheet2->setCellValue('A'.$sheet_row, '합계');
+            $sheet2->setCellValue('B'.$sheet_row, '');
+            $sheet2->setCellValue('C'.$sheet_row, '');
+            $sheet2->setCellValue('D'.$sheet_row, '');
+            $sheet2->setCellValue('E'.$sheet_row, '');
+            $sheet2->setCellValue('F'.$sheet_row, $center_work_supply_price);
+            $sheet2->setCellValue('G'.$sheet_row, $center_work_vat);
+            $sheet2->setCellValue('H'.$sheet_row, $center_work_sum);
+            $sheet2->setCellValue('I'.$sheet_row, '');
+        }
+
+
+        $spreadsheet->createSheet();
+        $sheet3 = $spreadsheet->getSheet(2);
+        
+        $sheet3->setTitle('센터 작업료');
+
+        $sheet3->setCellValue('A1', '항목');
+        $sheet3->mergeCells('A1:B1');
+        $sheet3->setCellValue('C1', '단위');
+        $sheet3->setCellValue('D1', '단가');
+        $sheet3->setCellValue('E1', '건수');
+        $sheet3->setCellValue('F1', '공급가');
+        $sheet3->setCellValue('G1', '부가세');
+        $sheet3->setCellValue('H1', '급액');
+        $sheet3->setCellValue('I1', '비고');
+        $sheet3->mergeCells('I1:J1');
+
+
+        if(!empty($data_fullfill2)){
+            $sheet_row = 2;
+            foreach($data_fullfill2 as $data){
+                $sheet3->setCellValue('A'.$sheet_row, $data->rd_cate1);
+                $sheet3->setCellValue('B'.$sheet_row, $data->rd_cate2);
+                $sheet3->setCellValue('C'.$sheet_row, !empty($data->rd_data1)?$data->rd_data1:'');
+                $sheet3->setCellValue('D'.$sheet_row, !empty($data->rd_data2)?$data->rd_data2:'');
+                $sheet3->setCellValue('E'.$sheet_row, !empty($data->rd_data4)?$data->rd_data4:'');
+                $sheet3->setCellValue('F'.$sheet_row, !empty($data->rd_data5)?$data->rd_data5:'');
+                $sheet3->setCellValue('G'.$sheet_row, !empty($data->rd_data6)?$data->rd_data6:'');
+                $sheet3->setCellValue('H'.$sheet_row, !empty($data->rd_data7)?$data->rd_data7:'');
+                $sheet3->setCellValue('I'.$sheet_row, !empty($data->rd_data8)?$data->rd_data8:'');
+                $sheet_row++;
+            }
+            $sheet3->setCellValue('A'.$sheet_row, '합계');
+            $sheet3->setCellValue('B'.$sheet_row, '');
+            $sheet3->setCellValue('C'.$sheet_row, '');
+            $sheet3->setCellValue('D'.$sheet_row, '');
+            $sheet3->setCellValue('E'.$sheet_row, '');
+            $sheet3->setCellValue('F'.$sheet_row, $domestic_shipping_supply_price);
+            $sheet3->setCellValue('G'.$sheet_row, $domestic_shipping_vat);
+            $sheet3->setCellValue('H'.$sheet_row, $domestic_shipping_sum);
+            $sheet3->setCellValue('I'.$sheet_row, '');
+        }
+
+
+        $spreadsheet->createSheet();
+        $sheet4 = $spreadsheet->getSheet(3);
+        
+        $sheet4->setTitle('센터 작업료');
+
+        $sheet4->setCellValue('A1', '항목');
+        $sheet4->mergeCells('A1:B1');
+        $sheet4->setCellValue('C1', '단위');
+        $sheet4->setCellValue('D1', '단가');
+        $sheet4->setCellValue('E1', '건수');
+        $sheet4->setCellValue('F1', '공급가');
+        $sheet4->setCellValue('G1', '부가세');
+        $sheet4->setCellValue('H1', '급액');
+        $sheet4->setCellValue('I1', '비고');
+        $sheet4->mergeCells('I1:J1');
+
+
+        if(!empty($data_fullfill3)){
+            $sheet_row = 2;
+            foreach($data_fullfill3 as $data){
+                $sheet4->setCellValue('A'.$sheet_row, $data->rd_cate1);
+                $sheet4->setCellValue('B'.$sheet_row, $data->rd_cate2);
+                $sheet4->setCellValue('C'.$sheet_row, !empty($data->rd_data1)?$data->rd_data1:'');
+                $sheet4->setCellValue('D'.$sheet_row, !empty($data->rd_data2)?$data->rd_data2:'');
+                $sheet4->setCellValue('E'.$sheet_row, !empty($data->rd_data4)?$data->rd_data4:'');
+                $sheet4->setCellValue('F'.$sheet_row, !empty($data->rd_data5)?$data->rd_data5:'');
+                $sheet4->setCellValue('G'.$sheet_row, !empty($data->rd_data6)?$data->rd_data6:'');
+                $sheet4->setCellValue('H'.$sheet_row, !empty($data->rd_data7)?$data->rd_data7:'');
+                $sheet4->setCellValue('I'.$sheet_row, !empty($data->rd_data8)?$data->rd_data8:'');
+                $sheet_row++;
+            }
+            $sheet4->setCellValue('A'.$sheet_row, '합계');
+            $sheet4->setCellValue('B'.$sheet_row, '');
+            $sheet4->setCellValue('C'.$sheet_row, '');
+            $sheet4->setCellValue('D'.$sheet_row, '');
+            $sheet4->setCellValue('E'.$sheet_row, '');
+            $sheet4->setCellValue('F'.$sheet_row, $overseas_shipping_supply_price);
+            $sheet4->setCellValue('G'.$sheet_row, $overseas_shipping_vat);
+            $sheet4->setCellValue('H'.$sheet_row, $overseas_shipping_sum);
+            $sheet4->setCellValue('I'.$sheet_row, '');
+        }
+
+
+        $spreadsheet->createSheet();
+        $sheet5 = $spreadsheet->getSheet(4);
+        
+        $sheet5->setTitle('센터 작업료');
+
+        $sheet5->setCellValue('A1', '항목');
+        $sheet5->mergeCells('A1:B1');
+        $sheet5->setCellValue('C1', '단위');
+        $sheet5->setCellValue('D1', '단가');
+        $sheet5->setCellValue('E1', '건수');
+        $sheet5->setCellValue('F1', '공급가');
+        $sheet5->setCellValue('G1', '부가세');
+        $sheet5->setCellValue('H1', '급액');
+        $sheet5->setCellValue('I1', '비고');
+        $sheet5->mergeCells('I1:J1');
+
+
+        if(!empty($data_fullfill4)){
+            $sheet_row = 2;
+            foreach($data_fullfill4 as $data){
+                $sheet5->setCellValue('A'.$sheet_row, $data->rd_cate1);
+                $sheet5->setCellValue('B'.$sheet_row, $data->rd_cate2);
+                $sheet5->setCellValue('C'.$sheet_row, !empty($data->rd_data1)?$data->rd_data1:'');
+                $sheet5->setCellValue('D'.$sheet_row, !empty($data->rd_data2)?$data->rd_data2:'');
+                $sheet5->setCellValue('E'.$sheet_row, !empty($data->rd_data4)?$data->rd_data4:'');
+                $sheet5->setCellValue('F'.$sheet_row, !empty($data->rd_data5)?$data->rd_data5:'');
+                $sheet5->setCellValue('G'.$sheet_row, !empty($data->rd_data6)?$data->rd_data6:'');
+                $sheet5->setCellValue('H'.$sheet_row, !empty($data->rd_data7)?$data->rd_data7:'');
+                $sheet5->setCellValue('I'.$sheet_row, !empty($data->rd_data8)?$data->rd_data8:'');
+                $sheet_row++;
+            }
+            $sheet5->setCellValue('A'.$sheet_row, '합계');
+            $sheet5->setCellValue('B'.$sheet_row, '');
+            $sheet5->setCellValue('C'.$sheet_row, '');
+            $sheet5->setCellValue('D'.$sheet_row, '');
+            $sheet5->setCellValue('E'.$sheet_row, '');
+            $sheet5->setCellValue('F'.$sheet_row, $keep_supply_price);
+            $sheet5->setCellValue('G'.$sheet_row, $keep_vat);
+            $sheet5->setCellValue('H'.$sheet_row, $keep_sum);
+            $sheet5->setCellValue('I'.$sheet_row, '');
+        }
+
+
+        $spreadsheet->createSheet();
+        $sheet6 = $spreadsheet->getSheet(5);
+        
+        $sheet6->setTitle('센터 작업료');
+
+        $sheet6->setCellValue('A1', '항목');
+        $sheet6->mergeCells('A1:B1');
+        $sheet6->setCellValue('C1', '단위');
+        $sheet6->setCellValue('D1', '단가');
+        $sheet6->setCellValue('E1', '건수');
+        $sheet6->setCellValue('F1', '공급가');
+        $sheet6->setCellValue('G1', '부가세');
+        $sheet6->setCellValue('H1', '급액');
+        $sheet6->setCellValue('I1', '비고');
+        $sheet6->mergeCells('I1:J1');
+
+
+        if(!empty($data_fullfill5)){
+            $sheet_row = 2;
+            foreach($data_fullfill5 as $data){
+                $sheet6->setCellValue('A'.$sheet_row, $data->rd_cate1);
+                $sheet6->setCellValue('B'.$sheet_row, $data->rd_cate2);
+                $sheet6->setCellValue('C'.$sheet_row, !empty($data->rd_data1)?$data->rd_data1:'');
+                $sheet6->setCellValue('D'.$sheet_row, !empty($data->rd_data2)?$data->rd_data2:'');
+                $sheet6->setCellValue('E'.$sheet_row, !empty($data->rd_data4)?$data->rd_data4:'');
+                $sheet6->setCellValue('F'.$sheet_row, !empty($data->rd_data5)?$data->rd_data5:'');
+                $sheet6->setCellValue('G'.$sheet_row, !empty($data->rd_data6)?$data->rd_data6:'');
+                $sheet6->setCellValue('H'.$sheet_row, !empty($data->rd_data7)?$data->rd_data7:'');
+                $sheet6->setCellValue('I'.$sheet_row, !empty($data->rd_data8)?$data->rd_data8:'');
+                $sheet_row++;
+            }
+            $sheet6->setCellValue('A'.$sheet_row, '합계');
+            $sheet6->setCellValue('B'.$sheet_row, '');
+            $sheet6->setCellValue('C'.$sheet_row, '');
+            $sheet6->setCellValue('D'.$sheet_row, '');
+            $sheet6->setCellValue('E'.$sheet_row, '');
+            $sheet6->setCellValue('F'.$sheet_row, $subsidiary_supply_price);
+            $sheet6->setCellValue('G'.$sheet_row, $subsidiary_supply_vat);
+            $sheet6->setCellValue('H'.$sheet_row, $subsidiary_supply_sum);
+            $sheet6->setCellValue('I'.$sheet_row, '');
+        }
+
+
+        $Excel_writer = new Xlsx($spreadsheet);
+        if(isset($user->mb_no)){
+            $path = '../storage/download/'.$user->mb_no.'/';
+        }else{
+            $path = '../storage/download/no-name/';
+        }
+        if (!is_dir($path)) {
+            File::makeDirectory($path, $mode = 0777, true, true);
+        }
+        $mask = $path.'Excel-Fulfillment-Final-Monthbill-Check-*.*';
+        array_map('unlink', glob($mask) ?: []);
+        $file_name_download = $path.'Excel-Fulfillment-Final-Monthbill-Check-'.date('YmdHis').'.Xlsx';
+        $check_status = $Excel_writer->save($file_name_download);
+        return response()->json([
+            'status' => 1,
+            'link_download' => $file_name_download,
+            'message' => 'Download File'
+        ], 500);
+        ob_end_clean();
+    }
+    public function fulfillment_add_monthbill_check($rgd_no){
+        
+        $data_fullfill1 = $data_fullfill2 = $data_fullfill3 = $data_fullfill4 = $data_fullfill5 = null; 
+
+        $rmd_no1 = $this->get_rmd_no_fulfill_raw($rgd_no,'fulfill1_additional','fulfill1_final');
+        $rmd_no2 = $this->get_rmd_no_fulfill_raw($rgd_no,'fulfill2_additional','fulfill2_final');
+        $rmd_no3 = $this->get_rmd_no_fulfill_raw($rgd_no,'fulfill3_additional','fulfill3_final');
+        $rmd_no4 = $this->get_rmd_no_fulfill_raw($rgd_no,'fulfill4_additional','fulfill4_final');
+        $rmd_no5 = $this->get_rmd_no_fulfill_raw($rgd_no,'fulfill5_additional','fulfill5_final');
+
+        $data_fullfill1 = !empty($rmd_no1)?$this->get_set_data_raw($rmd_no1):array();
+        $data_fullfill2 = !empty($rmd_no2)?$this->get_set_data_raw($rmd_no2):array();
+        $data_fullfill3 = !empty($rmd_no3)?$this->get_set_data_raw($rmd_no3):array();
+        $data_fullfill4 = !empty($rmd_no4)?$this->get_set_data_raw($rmd_no4):array();
+        $data_fullfill5 = !empty($rmd_no5)?$this->get_set_data_raw($rmd_no5):array();
+
+        $center_work_supply_price = $center_work_vat = $center_work_sum = 0;
+        if(!empty($data_fullfill1)){
+            foreach($data_fullfill1 as $dt1){
+                $center_work_supply_price += !empty($dt1->rd_data5)?$dt1->rd_data5:0;
+                $center_work_vat += !empty($dt1->rd_data6)?$dt1->rd_data6:0;
+                $center_work_sum += !empty($dt1->rd_data7)?$dt1->rd_data7:0;
+            }
+        }
+
+        $domestic_shipping_supply_price = $domestic_shipping_vat = $domestic_shipping_sum = 0;
+
+        if(!empty($data_fullfill2)){
+            foreach($data_fullfill2 as $dt2){
+                $domestic_shipping_supply_price += !empty($dt2->rd_data5)?$dt2->rd_data5:0;
+                $domestic_shipping_vat += !empty($dt2->rd_data6)?$dt2->rd_data6:0;
+                $domestic_shipping_sum += !empty($dt2->rd_data7)?$dt2->rd_data7:0;
+            }
+        }
+
+        $overseas_shipping_supply_price = $overseas_shipping_vat = $overseas_shipping_sum = 0;
+        
+        if(!empty($data_fullfill3)){
+            foreach($data_fullfill3 as $dt3){
+                $overseas_shipping_supply_price += !empty($dt3->rd_data5)?$dt3->rd_data5:0;
+                $overseas_shipping_vat += !empty($dt3->rd_data6)?$dt3->rd_data6:0;
+                $overseas_shipping_sum += !empty($dt3->rd_data7)?$dt3->rd_data7:0;
+            }
+        }
+
+        $keep_supply_price = $keep_vat = $keep_sum = 0;
+        
+        if(!empty($data_fullfill4)){
+            foreach($data_fullfill4 as $dt4){
+                $keep_supply_price += !empty($dt4->rd_data5)?$dt4->rd_data5:0;
+                $keep_vat += !empty($dt4->rd_data6)?$dt4->rd_data6:0;
+                $keep_sum += !empty($dt4->rd_data7)?$dt4->rd_data7:0;
+            }
+        }
+
+        $subsidiary_supply_price = $subsidiary_supply_vat = $subsidiary_supply_sum = 0;
+        
+        if(!empty($data_fullfill5)){
+            foreach($data_fullfill5 as $dt5){
+                $subsidiary_supply_price += !empty($dt5->rd_data5)?$dt5->rd_data5:0;
+                $subsidiary_supply_vat += !empty($dt5->rd_data6)?$dt5->rd_data6:0;
+                $subsidiary_supply_sum += !empty($dt5->rd_data7)?$dt5->rd_data7:0;
+            }
+        }
+
+        $total_supply_price = $center_work_supply_price + $domestic_shipping_supply_price + $overseas_shipping_supply_price + $keep_supply_price + $subsidiary_supply_price;
+        $total_supply_vat = $center_work_vat + $domestic_shipping_vat + $overseas_shipping_vat + $keep_vat + $subsidiary_supply_vat;
+        $total_sum = $center_work_sum + $domestic_shipping_sum + $overseas_shipping_sum + $keep_sum + $subsidiary_supply_sum;
+
+        DB::beginTransaction();
+        $co_no = Auth::user()->co_no;
+        DB::commit();
+        $user = Auth::user();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet(0);
+        $spreadsheet->getActiveSheet()->getProtection()->setSheet(true);
+
+        $sheet->setTitle('종합');
+
+        $sheet->setCellValue('A1', '항목');
+        $sheet->mergeCells('A1:B1');
+        $sheet->setCellValue('C1', '공급가');
+        $sheet->setCellValue('D1', '부가세');
+        $sheet->setCellValue('E1', '합계');
+        $sheet->setCellValue('F1', '비고');
+        $sheet->mergeCells('F1:G1');
+
+        $sheet->setCellValue('A2', '센터작업료');
+        $sheet->mergeCells('A2:B2');
+        $sheet->setCellValue('C2', $center_work_supply_price);
+        $sheet->setCellValue('D2', $center_work_vat);
+        $sheet->setCellValue('E2', $center_work_sum);
+        $sheet->setCellValue('F2', '');
+        $sheet->mergeCells('F2:G2');
+
+        $sheet->setCellValue('A3', '국내 운송료');
+        $sheet->mergeCells('A3:B3');
+        $sheet->setCellValue('C3', $domestic_shipping_supply_price);
+        $sheet->setCellValue('D3', $domestic_shipping_vat);
+        $sheet->setCellValue('E3', $domestic_shipping_sum);
+        $sheet->setCellValue('F3', '');
+        $sheet->mergeCells('F3:G3');
+
+        $sheet->setCellValue('A4', '해외 운송료');
+        $sheet->mergeCells('A4:B4');
+        $sheet->setCellValue('C4', $overseas_shipping_supply_price);
+        $sheet->setCellValue('D4', $overseas_shipping_vat);
+        $sheet->setCellValue('E4', $overseas_shipping_sum);
+        $sheet->setCellValue('F4', '');
+        $sheet->mergeCells('F4:G4');
+
+        $sheet->setCellValue('A5', '보관');
+        $sheet->mergeCells('A5:B5');
+        $sheet->setCellValue('C5', $keep_supply_price);
+        $sheet->setCellValue('D5', $keep_vat);
+        $sheet->setCellValue('E5', $keep_sum);
+        $sheet->setCellValue('F5', '');
+        $sheet->mergeCells('F5:G5');
+
+        $sheet->setCellValue('A6', '부자재');
+        $sheet->mergeCells('A6:B6');
+        $sheet->setCellValue('C6', $subsidiary_supply_price);
+        $sheet->setCellValue('D6', $subsidiary_supply_vat);
+        $sheet->setCellValue('E6', $subsidiary_supply_sum);
+        $sheet->setCellValue('F6', '');
+        $sheet->mergeCells('F6:G6');
+
+        $sheet->setCellValue('A7', '합계');
+        $sheet->mergeCells('A7:B7');
+        $sheet->setCellValue('C7', $total_supply_price);
+        $sheet->setCellValue('D7', $total_supply_vat);
+        $sheet->setCellValue('E7', $total_sum);
+        $sheet->setCellValue('F7', '');
+        $sheet->mergeCells('F7:G7');
+
+
+        $spreadsheet->createSheet();
+        $sheet2 = $spreadsheet->getSheet(1);
+
+        $sheet2->setTitle('센터 작업료');
+
+        $sheet2->setCellValue('A1', '항목');
+        $sheet2->mergeCells('A1:B1');
+        $sheet2->setCellValue('C1', '단위');
+        $sheet2->setCellValue('D1', '단가');
+        $sheet2->setCellValue('E1', '건수');
+        $sheet2->setCellValue('F1', '공급가');
+        $sheet2->setCellValue('G1', '부가세');
+        $sheet2->setCellValue('H1', '급액');
+        $sheet2->setCellValue('I1', '비고');
+        $sheet2->mergeCells('I1:J1');
+
+
+        if(!empty($data_fullfill1)){
+            $sheet_row = 2;
+            foreach($data_fullfill1 as $data){
+                $sheet2->setCellValue('A'.$sheet_row, $data->rd_cate1);
+                $sheet2->setCellValue('B'.$sheet_row, $data->rd_cate2);
+                $sheet2->setCellValue('C'.$sheet_row, !empty($data->rd_data1)?$data->rd_data1:'');
+                $sheet2->setCellValue('D'.$sheet_row, !empty($data->rd_data2)?$data->rd_data2:'');
+                $sheet2->setCellValue('E'.$sheet_row, !empty($data->rd_data4)?$data->rd_data4:'');
+                $sheet2->setCellValue('F'.$sheet_row, !empty($data->rd_data5)?$data->rd_data5:'');
+                $sheet2->setCellValue('G'.$sheet_row, !empty($data->rd_data6)?$data->rd_data6:'');
+                $sheet2->setCellValue('H'.$sheet_row, !empty($data->rd_data7)?$data->rd_data7:'');
+                $sheet2->setCellValue('I'.$sheet_row, !empty($data->rd_data8)?$data->rd_data8:'');
+                $sheet_row++;
+            }
+            $sheet2->setCellValue('A'.$sheet_row, '합계');
+            $sheet2->setCellValue('B'.$sheet_row, '');
+            $sheet2->setCellValue('C'.$sheet_row, '');
+            $sheet2->setCellValue('D'.$sheet_row, '');
+            $sheet2->setCellValue('E'.$sheet_row, '');
+            $sheet2->setCellValue('F'.$sheet_row, $center_work_supply_price);
+            $sheet2->setCellValue('G'.$sheet_row, $center_work_vat);
+            $sheet2->setCellValue('H'.$sheet_row, $center_work_sum);
+            $sheet2->setCellValue('I'.$sheet_row, '');
+        }
+
+
+        $spreadsheet->createSheet();
+        $sheet3 = $spreadsheet->getSheet(2);
+        
+        $sheet3->setTitle('센터 작업료');
+
+        $sheet3->setCellValue('A1', '항목');
+        $sheet3->mergeCells('A1:B1');
+        $sheet3->setCellValue('C1', '단위');
+        $sheet3->setCellValue('D1', '단가');
+        $sheet3->setCellValue('E1', '건수');
+        $sheet3->setCellValue('F1', '공급가');
+        $sheet3->setCellValue('G1', '부가세');
+        $sheet3->setCellValue('H1', '급액');
+        $sheet3->setCellValue('I1', '비고');
+        $sheet3->mergeCells('I1:J1');
+
+
+        if(!empty($data_fullfill2)){
+            $sheet_row = 2;
+            foreach($data_fullfill2 as $data){
+                $sheet3->setCellValue('A'.$sheet_row, $data->rd_cate1);
+                $sheet3->setCellValue('B'.$sheet_row, $data->rd_cate2);
+                $sheet3->setCellValue('C'.$sheet_row, !empty($data->rd_data1)?$data->rd_data1:'');
+                $sheet3->setCellValue('D'.$sheet_row, !empty($data->rd_data2)?$data->rd_data2:'');
+                $sheet3->setCellValue('E'.$sheet_row, !empty($data->rd_data4)?$data->rd_data4:'');
+                $sheet3->setCellValue('F'.$sheet_row, !empty($data->rd_data5)?$data->rd_data5:'');
+                $sheet3->setCellValue('G'.$sheet_row, !empty($data->rd_data6)?$data->rd_data6:'');
+                $sheet3->setCellValue('H'.$sheet_row, !empty($data->rd_data7)?$data->rd_data7:'');
+                $sheet3->setCellValue('I'.$sheet_row, !empty($data->rd_data8)?$data->rd_data8:'');
+                $sheet_row++;
+            }
+            $sheet3->setCellValue('A'.$sheet_row, '합계');
+            $sheet3->setCellValue('B'.$sheet_row, '');
+            $sheet3->setCellValue('C'.$sheet_row, '');
+            $sheet3->setCellValue('D'.$sheet_row, '');
+            $sheet3->setCellValue('E'.$sheet_row, '');
+            $sheet3->setCellValue('F'.$sheet_row, $domestic_shipping_supply_price);
+            $sheet3->setCellValue('G'.$sheet_row, $domestic_shipping_vat);
+            $sheet3->setCellValue('H'.$sheet_row, $domestic_shipping_sum);
+            $sheet3->setCellValue('I'.$sheet_row, '');
+        }
+
+
+        $spreadsheet->createSheet();
+        $sheet4 = $spreadsheet->getSheet(3);
+        
+        $sheet4->setTitle('센터 작업료');
+
+        $sheet4->setCellValue('A1', '항목');
+        $sheet4->mergeCells('A1:B1');
+        $sheet4->setCellValue('C1', '단위');
+        $sheet4->setCellValue('D1', '단가');
+        $sheet4->setCellValue('E1', '건수');
+        $sheet4->setCellValue('F1', '공급가');
+        $sheet4->setCellValue('G1', '부가세');
+        $sheet4->setCellValue('H1', '급액');
+        $sheet4->setCellValue('I1', '비고');
+        $sheet4->mergeCells('I1:J1');
+
+
+        if(!empty($data_fullfill3)){
+            $sheet_row = 2;
+            foreach($data_fullfill3 as $data){
+                $sheet4->setCellValue('A'.$sheet_row, $data->rd_cate1);
+                $sheet4->setCellValue('B'.$sheet_row, $data->rd_cate2);
+                $sheet4->setCellValue('C'.$sheet_row, !empty($data->rd_data1)?$data->rd_data1:'');
+                $sheet4->setCellValue('D'.$sheet_row, !empty($data->rd_data2)?$data->rd_data2:'');
+                $sheet4->setCellValue('E'.$sheet_row, !empty($data->rd_data4)?$data->rd_data4:'');
+                $sheet4->setCellValue('F'.$sheet_row, !empty($data->rd_data5)?$data->rd_data5:'');
+                $sheet4->setCellValue('G'.$sheet_row, !empty($data->rd_data6)?$data->rd_data6:'');
+                $sheet4->setCellValue('H'.$sheet_row, !empty($data->rd_data7)?$data->rd_data7:'');
+                $sheet4->setCellValue('I'.$sheet_row, !empty($data->rd_data8)?$data->rd_data8:'');
+                $sheet_row++;
+            }
+            $sheet4->setCellValue('A'.$sheet_row, '합계');
+            $sheet4->setCellValue('B'.$sheet_row, '');
+            $sheet4->setCellValue('C'.$sheet_row, '');
+            $sheet4->setCellValue('D'.$sheet_row, '');
+            $sheet4->setCellValue('E'.$sheet_row, '');
+            $sheet4->setCellValue('F'.$sheet_row, $overseas_shipping_supply_price);
+            $sheet4->setCellValue('G'.$sheet_row, $overseas_shipping_vat);
+            $sheet4->setCellValue('H'.$sheet_row, $overseas_shipping_sum);
+            $sheet4->setCellValue('I'.$sheet_row, '');
+        }
+
+
+        $spreadsheet->createSheet();
+        $sheet5 = $spreadsheet->getSheet(4);
+        
+        $sheet5->setTitle('센터 작업료');
+
+        $sheet5->setCellValue('A1', '항목');
+        $sheet5->mergeCells('A1:B1');
+        $sheet5->setCellValue('C1', '단위');
+        $sheet5->setCellValue('D1', '단가');
+        $sheet5->setCellValue('E1', '건수');
+        $sheet5->setCellValue('F1', '공급가');
+        $sheet5->setCellValue('G1', '부가세');
+        $sheet5->setCellValue('H1', '급액');
+        $sheet5->setCellValue('I1', '비고');
+        $sheet5->mergeCells('I1:J1');
+
+
+        if(!empty($data_fullfill4)){
+            $sheet_row = 2;
+            foreach($data_fullfill4 as $data){
+                $sheet5->setCellValue('A'.$sheet_row, $data->rd_cate1);
+                $sheet5->setCellValue('B'.$sheet_row, $data->rd_cate2);
+                $sheet5->setCellValue('C'.$sheet_row, !empty($data->rd_data1)?$data->rd_data1:'');
+                $sheet5->setCellValue('D'.$sheet_row, !empty($data->rd_data2)?$data->rd_data2:'');
+                $sheet5->setCellValue('E'.$sheet_row, !empty($data->rd_data4)?$data->rd_data4:'');
+                $sheet5->setCellValue('F'.$sheet_row, !empty($data->rd_data5)?$data->rd_data5:'');
+                $sheet5->setCellValue('G'.$sheet_row, !empty($data->rd_data6)?$data->rd_data6:'');
+                $sheet5->setCellValue('H'.$sheet_row, !empty($data->rd_data7)?$data->rd_data7:'');
+                $sheet5->setCellValue('I'.$sheet_row, !empty($data->rd_data8)?$data->rd_data8:'');
+                $sheet_row++;
+            }
+            $sheet5->setCellValue('A'.$sheet_row, '합계');
+            $sheet5->setCellValue('B'.$sheet_row, '');
+            $sheet5->setCellValue('C'.$sheet_row, '');
+            $sheet5->setCellValue('D'.$sheet_row, '');
+            $sheet5->setCellValue('E'.$sheet_row, '');
+            $sheet5->setCellValue('F'.$sheet_row, $keep_supply_price);
+            $sheet5->setCellValue('G'.$sheet_row, $keep_vat);
+            $sheet5->setCellValue('H'.$sheet_row, $keep_sum);
+            $sheet5->setCellValue('I'.$sheet_row, '');
+        }
+
+
+        $spreadsheet->createSheet();
+        $sheet6 = $spreadsheet->getSheet(5);
+        
+        $sheet6->setTitle('센터 작업료');
+
+        $sheet6->setCellValue('A1', '항목');
+        $sheet6->mergeCells('A1:B1');
+        $sheet6->setCellValue('C1', '단위');
+        $sheet6->setCellValue('D1', '단가');
+        $sheet6->setCellValue('E1', '건수');
+        $sheet6->setCellValue('F1', '공급가');
+        $sheet6->setCellValue('G1', '부가세');
+        $sheet6->setCellValue('H1', '급액');
+        $sheet6->setCellValue('I1', '비고');
+        $sheet6->mergeCells('I1:J1');
+
+
+        if(!empty($data_fullfill5)){
+            $sheet_row = 2;
+            foreach($data_fullfill5 as $data){
+                $sheet6->setCellValue('A'.$sheet_row, $data->rd_cate1);
+                $sheet6->setCellValue('B'.$sheet_row, $data->rd_cate2);
+                $sheet6->setCellValue('C'.$sheet_row, !empty($data->rd_data1)?$data->rd_data1:'');
+                $sheet6->setCellValue('D'.$sheet_row, !empty($data->rd_data2)?$data->rd_data2:'');
+                $sheet6->setCellValue('E'.$sheet_row, !empty($data->rd_data4)?$data->rd_data4:'');
+                $sheet6->setCellValue('F'.$sheet_row, !empty($data->rd_data5)?$data->rd_data5:'');
+                $sheet6->setCellValue('G'.$sheet_row, !empty($data->rd_data6)?$data->rd_data6:'');
+                $sheet6->setCellValue('H'.$sheet_row, !empty($data->rd_data7)?$data->rd_data7:'');
+                $sheet6->setCellValue('I'.$sheet_row, !empty($data->rd_data8)?$data->rd_data8:'');
+                $sheet_row++;
+            }
+            $sheet6->setCellValue('A'.$sheet_row, '합계');
+            $sheet6->setCellValue('B'.$sheet_row, '');
+            $sheet6->setCellValue('C'.$sheet_row, '');
+            $sheet6->setCellValue('D'.$sheet_row, '');
+            $sheet6->setCellValue('E'.$sheet_row, '');
+            $sheet6->setCellValue('F'.$sheet_row, $subsidiary_supply_price);
+            $sheet6->setCellValue('G'.$sheet_row, $subsidiary_supply_vat);
+            $sheet6->setCellValue('H'.$sheet_row, $subsidiary_supply_sum);
+            $sheet6->setCellValue('I'.$sheet_row, '');
+        }
+
+
+        $Excel_writer = new Xlsx($spreadsheet);
+        if(isset($user->mb_no)){
+            $path = '../storage/download/'.$user->mb_no.'/';
+        }else{
+            $path = '../storage/download/no-name/';
+        }
+        if (!is_dir($path)) {
+            File::makeDirectory($path, $mode = 0777, true, true);
+        }
+        $mask = $path.'Excel-Fulfillment_Add_Monthbill_Check-*.*';
+        array_map('unlink', glob($mask) ?: []);
+        $file_name_download = $path.'Excel-Fulfillment_Add_Monthbill_Check-'.date('YmdHis').'.Xlsx';
         $check_status = $Excel_writer->save($file_name_download);
         return response()->json([
             'status' => 1,

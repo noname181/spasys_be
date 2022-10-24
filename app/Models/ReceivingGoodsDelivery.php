@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Member;
 use App\Models\Warehousing;
 use App\Models\RateMetaData;
+use App\Models\Export;
 
 class ReceivingGoodsDelivery extends Model
 {
@@ -83,5 +84,8 @@ class ReceivingGoodsDelivery extends Model
     }
     public function rate_meta_data_parent(){
         return $this->hasMany(RateMetaData::class, 'rgd_no', 'rgd_parent_no')->with(['rate_data']);
+    }
+    public function t_export(){
+        return $this->belongsTo(Export::class, 'rgd_tracking_code', 'te_carry_out_number')->with(['import']);
     }
 }

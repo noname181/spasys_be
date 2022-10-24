@@ -209,7 +209,7 @@ class ItemController extends Controller
                 $item_no =  array_column($validated['items'], 'item_no');
             }
 
-            $items = Item::with('item_channels')->orderBy('item_no', 'DESC');
+            $items = Item::with(['item_channels','file'])->orderBy('item_no', 'DESC');
 
             if (isset($validated['items'])) {
                 $items->whereIn('item_no', $item_no);
