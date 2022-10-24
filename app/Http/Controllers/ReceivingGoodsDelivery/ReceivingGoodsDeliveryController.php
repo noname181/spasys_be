@@ -288,6 +288,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
             //Create 출고예정 after 입고 is done.
 
+
             if (isset($validated['page_type']) && $validated['page_type'] == 'Page130146') {
             if($status1 == "입고" && $status2 == "작업완료"){
                 $check_ex = Warehousing::where('w_import_no','=',$w_no)->first();
@@ -328,8 +329,8 @@ class ReceivingGoodsDeliveryController extends Controller
                         'rgd_receiver' => $rgd['rgd_receiver'],
                         'rgd_hp' => $rgd['rgd_hp'],
                         'rgd_memo' => $rgd['rgd_memo'],
-                        'rgd_status1' => isset($rgd['rgd_status1']) ? $rgd['rgd_status1'] : null,
-                        'rgd_status2' => isset($rgd['rgd_status2']) ? $rgd['rgd_status2'] : null,
+                        'rgd_status1' => '출고예정',
+                        'rgd_status2' => '작업완료',
                         'rgd_status3' => isset($rgd['rgd_status3']) ? $rgd['rgd_status3'] : null,
                         'rgd_delivery_company' => isset($rgd['rgd_delivery_company']) ? $rgd['rgd_delivery_company'] : null,
                         'rgd_tracking_code' => isset($rgd['rgd_tracking_code']) ? $rgd['rgd_tracking_code'] : null,
@@ -379,7 +380,7 @@ class ReceivingGoodsDeliveryController extends Controller
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
 
-            //Page130146
+            //Page130146 spasys
             if ($request->page_type == 'Page130146') {
                 $warehousing_data = Warehousing::where('w_no', $request->w_no)->first();
                 foreach ($request->data as $data) {
@@ -677,7 +678,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'w_amount' => $data['w_amount'],
                                 'w_type' => 'EW',
                                 'w_category_name' => $request->w_category_name,
-                                'co_no' => $co_no
+                                'co_no' => $request->co_no ? $request->co_no : $co_no
                             ]);
                             $w_schedule_number = CommonFunc::generate_w_schedule_number($w_no, 'EW');
                             Warehousing::where('w_no', $w_no)->update([
