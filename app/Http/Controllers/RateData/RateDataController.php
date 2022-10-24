@@ -2411,7 +2411,7 @@ class RateDataController extends Controller
                 ]
             );
 
-            if($request->type == 'create_expectation'){
+            if($request->type == 'create_expectation' || $request->type == 'create_expectation_monthly'){
                 ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_status4' => '예상경비청구서',
                     'rgd_bill_type' => $request->bill_type,
