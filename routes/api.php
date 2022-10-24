@@ -406,6 +406,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/download_fulfillment_final_monthbill/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_fulfillment_final_monthbill']);
         //fulfillment_add_monthbill_issue
         Route::get('/download_fulfillment_additional/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_fulfillment_additional']);
+        //fulfillment_add_monthbill_check
+        Route::get('/fulfillment_add_monthbill_check/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'fulfillment_add_monthbill_check']);
 
         //GET GENERAL DATA FOLLOW BILL TYPE
         Route::get('/general/{rgd_no}/{bill_type}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general'])->name('get_rate_data_general');
