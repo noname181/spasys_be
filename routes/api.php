@@ -146,7 +146,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/get_warehousing2', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousing2']);
     Route::post('/get_warehousing_export', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingExport']);
     Route::post('/get_warehousing_import', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingImport']); //page 129
-    Route::post('/get_warehousing_import_status1', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingImportStatus1']); //page 134 
+    Route::post('/get_warehousing_import_status1', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingImportStatus1']); //page 134
     Route::post('/get_warehousing_delivery', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingDelivery']); //page 715
     Route::post('/get_warehousing_delivery_3', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingDelivery3']); //page 715_3
     Route::post('/get_warehousing_delivery_2', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingDelivery2']); //page 715_2
@@ -370,9 +370,10 @@ Route::middleware('auth')->group(function () {
         //REGISTER GENERAL DATA FOR 수입풀필먼트 SERVICE
         Route::post('/general_final_service2', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_final_service2'])->name('registe_rate_data_general_final_service2');
         Route::post('/general_final_service2_mobile', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_final_service2_mobile'])->name('registe_rate_data_general_final_service2_mobile');
-        
+
          //REGISTER GENERAL DATA FOR 보세화물 SERVICE
          Route::post('/general_data_service1', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_service1'])->name('registe_rate_data_general_service1');
+         Route::post('/update_storage_days', [\App\Http\Controllers\RateData\RateDataController::class, 'update_storage_days'])->name('update_storage_days');
 
 
         //distribution_est_casebill_edit
@@ -435,6 +436,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/get_rmd_no/{rgd_no}/{set_type}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_rmd_no'])->name('get_rmd_no');
         Route::get('/get_rmd_no_fulfill/{rgd_no}/{type}/{pretype}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_rmd_no_fulfill'])->name('get_rmd_no_fulfill');
         Route::delete('/delete_row_rate_data/{rd_no}/',[\App\Http\Controllers\RateData\RateDataController::class, 'deleteRowRateData'])->name('delete_row_rate_data');
+        //DELETE SET RATE DATA FOR BONDED SERVICE
+        Route::delete('/delete_set_rate_data/{rd_no}/',[\App\Http\Controllers\RateData\RateDataController::class, 'deleteSetRateData']);
 
 
         Route::get('/by_rm_no/{rm_no}/{rmd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateData'])->name('get_rate_data');
