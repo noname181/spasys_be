@@ -1695,7 +1695,12 @@ class WarehousingController extends Controller
 
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             //return DB::getQueryLog();
-
+            $warehousing->setCollection(
+                $warehousing->getCollection()->map(function ($item) {
+                    $item->total_wi_number = WarehousingItem::where('w_no', $item->w_no)->sum('wi_number');
+                    return $item;
+                })
+            );
             return response()->json($warehousing);
         } catch (\Exception $e) {
             Log::error($e);
