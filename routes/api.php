@@ -357,6 +357,7 @@ Route::middleware('auth')->group(function () {
         });
 
         Route::get('/monthly_bill_list/{rgd_no}/{bill_type}', [\App\Http\Controllers\RateData\RateDataController::class, 'monthly_bill_list'])->name('monthly_bill_list');
+        Route::get('/bonded_monthly_bill_list/{rgd_no}/{bill_type}', [\App\Http\Controllers\RateData\RateDataController::class, 'bonded_monthly_bill_list'])->name('bonded_monthly_bill_list');
         Route::get('/get_spasys1_from_te/{is_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'getspasys1fromte'])->name('get_spasys1_from_te');
         Route::get('/get_spasys2_from_te/{is_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'getspasys2fromte'])->name('get_spasys2_from_te');
         Route::get('/get_spasys3_from_te/{is_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'getspasys3fromte'])->name('get_spasys3_from_te');
@@ -373,6 +374,8 @@ Route::middleware('auth')->group(function () {
 
          //REGISTER GENERAL DATA FOR 보세화물 SERVICE
          Route::post('/general_data_service1', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_service1'])->name('registe_rate_data_general_service1');
+         Route::post('/general_data_service1_final', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_service1_final'])->name('registe_rate_data_general_service1_final');
+         Route::post('/general_monthly_final_bonded', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_monthly_final_bonded'])->name('registe_rate_data_general_monthly_final_bonded');
          Route::post('/update_storage_days', [\App\Http\Controllers\RateData\RateDataController::class, 'update_storage_days'])->name('update_storage_days');
 
 

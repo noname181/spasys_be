@@ -793,6 +793,144 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded1_final_monthly'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_parent_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded1_monthly'
+                    ]
+                )->first();
+            }
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_no,
+                        'set_type' => 'bonded1_monthly'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded2_final_monthly'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_parent_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded2_monthly'
+                    ]
+                )->first();
+            }
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_no,
+                        'set_type' => 'bonded2_monthly'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded3_final_monthly'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_parent_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded3_monthly'
+                    ]
+                )->first();
+            }
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_no,
+                        'set_type' => 'bonded3_monthly'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded4_final_monthly'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_parent_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded4_monthly'
+                    ]
+                )->first();
+            }
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_no,
+                        'set_type' => 'bonded4_monthly'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded5_final_monthly'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_parent_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded5_monthly'
+                    ]
+                )->first();
+            }
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_no,
+                        'set_type' => 'bonded5_monthly'
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded6_final_monthly'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_parent_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded6_monthly'
+                    ]
+                )->first();
+            }
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_no,
+                        'set_type' => 'bonded6_monthly'
+                    ]
+                )->first();
+            }
         }
 
         return response()->json([
@@ -2014,14 +2152,18 @@ class RateDataController extends Controller
 
             $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child','rate_meta_data','rate_meta_data_parent'])
             ->whereHas('w_no', function($q) use($co_no){
-                $q->where('co_no', $co_no);
+                $q->where('co_no', $co_no)
+                ->where('w_category_name', '유통가공');
             })
             // ->doesntHave('rgd_child')
             ->where('updated_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
             ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
             ->where('rgd_status1', '=', '입고')
             ->where('rgd_bill_type', $bill_type)
-            ->whereDoesntHave('rgd_child')
+            ->where(function($q){
+                $q->whereDoesntHave('rgd_child')
+                ->orWhere('rgd_status5', 'issued');
+            })
             ->get();
 
             $rdgs = [];
@@ -2079,6 +2221,81 @@ class RateDataController extends Controller
         }
     }
 
+    public function bonded_monthly_bill_list($rgd_no, $bill_type) {
+        try {
+            DB::beginTransaction();
+            $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd_no)->first();
+            $co_no = $rgd->warehousing->co_no;
+            $adjustmentgroupall = AdjustmentGroup::where('co_no', $co_no)->get();
+            $updated_at = Carbon::createFromFormat('Y.m.d H:i:s',  $rgd->updated_at->format('Y.m.d H:i:s'));
+
+            $start_date = $updated_at->startOfMonth()->toDateString();
+            $end_date = $updated_at->endOfMonth()->toDateString();
+
+            $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child','rate_meta_data','rate_meta_data_parent'])
+            ->whereHas('w_no', function($q) use($co_no){
+                $q->where('co_no', $co_no)
+                ->where('w_category_name', '보세화물');
+            })
+            // ->doesntHave('rgd_child')
+            ->where('updated_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
+            ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
+            ->where('rgd_status1', '=', '입고')
+            ->where('rgd_bill_type', $bill_type)
+            ->where(function($q){
+                $q->whereDoesntHave('rgd_child')
+                ->orWhere('rgd_status5', 'issued');
+            })
+            // ->whereDoesntHave('rgd_child')
+            ->get();
+
+            $rdgs = [];
+            foreach($rgds as $rgd){
+                $rdg = RateDataGeneral::where('rgd_no_expectation', $rgd->rgd_no)
+                ->where('rdg_bill_type', 'final_monthly')->first();
+                $rdgs[] = $rdg;
+            }
+
+            $rdgs2 = [];
+
+            foreach($rgds as $rgd2){
+                $rdg2 = RateDataGeneral::where('rgd_no', $rgd2->rgd_no)
+                ->where('rdg_bill_type', 'expectation_monthly')->first();
+                $rdgs2[] = $rdg2;
+            }
+
+            return response()->json([
+                'rgds' => $rgds,
+                'rdgs' => $rdgs,
+                'adjustmentgroupall'=>$adjustmentgroupall,
+            ], 201);
+
+            // if (isset($validated['from_date'])) {
+            //     $notices->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            // }
+
+            // if (isset($validated['to_date'])) {
+            //     $notices->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            // }
+
+
+            // if(!isset($rdg->rdg_no)){
+            //     $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'final')->first();
+            // }
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'rdg' => $rdg
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
 
     public function registe_rate_data_general_monthly_final(Request $request) {
         try {
@@ -2105,7 +2322,7 @@ class RateDataController extends Controller
 
                     $expectation_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->where('rgd_bill_type', 'expectation_monthly')->first();
                     $final_rgd = ReceivingGoodsDelivery::where('rgd_parent_no', $rgd['rgd_no'])->where('rgd_bill_type', 'final_monthly')->first();
-                    
+
                     $final_rgds[] = $final_rgd;
 
                     if(!$final_rgd){
@@ -2132,6 +2349,98 @@ class RateDataController extends Controller
                         RateMetaData::where('rgd_no', $request->rgd_no)->where(function($q){
                             $q->where('set_type', 'storage_monthly_final')
                             ->orWhere('set_type', 'work_monthly_final');
+                        })->update([
+                            'rgd_no' => $final_rgd->rgd_no
+                        ]);
+
+                    }else {
+                        if($i == 0){
+                            $final_rgd->rgd_is_show = 'y';
+                            $final_rgd->save();
+                        }
+                        RateDataGeneral::where('rdg_no', $final_rdg->rdg_no)->update([
+                            'rgd_no' => $final_rgd->rgd_no,
+                            'rgd_no_expectation' => $expectation_rgd->rgd_no
+                        ]);
+                    }
+                    $i++;
+                }
+            }
+
+
+            DB::commit();
+
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'rdg' => $is_exist,
+                'final_rgds' => $final_rgds
+                // 'final_rgd' => $final_rgd
+            ], 201);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+    public function registe_rate_data_general_monthly_final_bonded(Request $request) {
+        try {
+            DB::beginTransaction();
+            if($request->is_edit == 'edit'){
+                $i = 0;
+                foreach($request->rgds as $key=>$rgd){
+                    $is_exist = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', 'final_monthly')->first();
+                }
+            }else {
+                $i = 0;
+                $final_rgds = [];
+                foreach($request->rgds as $key=>$rgd){
+                    $is_exist = RateDataGeneral::where('rgd_no_expectation', $rgd['rgd_no'])->where('rdg_bill_type', 'final_monthly')->first();
+                    if(!$is_exist){
+                        $is_exist = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', 'expectation_monthly')->first();
+
+                        $final_rdg = $is_exist->replicate();
+                        $final_rdg->rdg_bill_type = $request->bill_type; // the new project_id
+                        $final_rdg->save();
+                    }else {
+                        $final_rdg = $is_exist;
+                    }
+
+                    $expectation_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->where('rgd_bill_type', 'expectation_monthly')->first();
+                    $final_rgd = ReceivingGoodsDelivery::where('rgd_parent_no', $rgd['rgd_no'])->where('rgd_bill_type', 'final_monthly')->first();
+
+                    $final_rgds[] = $final_rgd;
+
+                    if(!$final_rgd){
+                        $expectation_rgd->rgd_status5 = 'issued';
+                        $expectation_rgd->save();
+
+
+                        $final_rgd = $expectation_rgd->replicate();
+                        $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
+                        $final_rgd->rgd_status4 = '확정청구서';
+                        $final_rgd->rgd_status5 = NULL;
+                        $final_rgd->rgd_is_show = ($i == 0 ? 'y' : 'n');
+                        $final_rgd->rgd_parent_no = $expectation_rgd->rgd_no;
+                        $final_rgd->rgd_settlement_number =  $expectation_rgd->settlement_number;
+                        $final_rgd->save();
+
+
+
+                        RateDataGeneral::where('rdg_no', $final_rdg->rdg_no)->update([
+                            'rgd_no' => $final_rgd->rgd_no,
+                            'rgd_no_expectation' => $expectation_rgd->rgd_no,
+                            'rdg_set_type' => $request->rdg_set_type
+                        ]);
+                        RateMetaData::where('rgd_no', $request->rgd_no)->where(function($q){
+                            $q->where('set_type', 'bonded1_final_monthly')
+                            ->orWhere('set_type', 'bonded2_final_monthly')
+                            ->orWhere('set_type', 'bonded3_final_monthly')
+                            ->orWhere('set_type', 'bonded4_final_monthly')
+                            ->orWhere('set_type', 'bonded5_final_monthly')
+                            ->orWhere('set_type', 'bonded6_final_monthly');
                         })->update([
                             'rgd_no' => $final_rgd->rgd_no
                         ]);
@@ -2446,10 +2755,126 @@ class RateDataController extends Controller
             }
 
             if($request->bill_type == 'final' || $request->bill_type == 'final_monthly'){
+                if($request->type != 'create_final_monthly'){
+                    ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                        'rgd_status4' => $request->status,
+                        'rgd_bill_type' => $request->bill_type
+                    ]);
+                }
+
+            }
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'rdg' => $rdg,
+                // 'final_rgd' => $final_rgd
+            ], 201);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+    public function registe_rate_data_general_service1_final(Request $request) {
+        try {
+            DB::beginTransaction();
+            //Check is there already RateDataGeneral with rdg_no yet
+            $is_exist = RateDataGeneral::where('rgd_no_expectation',  $request->rgd_no)->where('rdg_bill_type', $request->bill_type)->first();
+
+            //Get RecevingGoodsDelivery base on rgd_no
+            $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+            $w_no = $rgd->w_no;
+
+            $rdg = RateDataGeneral::updateOrCreate(
+                [
+                    'rdg_no' => isset($is_exist->rdg_no) ? $is_exist->rdg_no : null,
+                    'rdg_bill_type' => $request->bill_type
+                ],
+                [
+                    'w_no' => $w_no,
+                    'rdg_bill_type' => $request->bill_type,
+                    'rgd_no_expectation' => $request->type  == 'edit_final' ? $is_exist->rgd_no_expectation : (str_contains($request->bill_type, 'final') ? $request->rgd_no : null),
+                    'rgd_no_final' => $request->type  == 'edit_additional' ? $is_exist->rgd_no_final : (str_contains($request->bill_type, 'additional') ? $request->rgd_no : null),
+                    'mb_no' => Auth::user()->mb_no,
+                    'rdg_set_type' => $request->rdg_set_type,
+                    'rdg_supply_price1' => $request->bonded1['supply_price'],
+                    'rdg_supply_price2' => $request->bonded2['supply_price'],
+                    'rdg_supply_price3' => $request->bonded3['supply_price'],
+                    'rdg_supply_price4' => $request->bonded4['supply_price'],
+                    'rdg_supply_price5' => $request->bonded5['supply_price'],
+                    'rdg_supply_price6' => $request->bonded6['supply_price'],
+                    'rdg_supply_price6' => $request->total['supply_price'],
+                    'rdg_vat1' => $request->bonded1['taxes'],
+                    'rdg_vat2' => $request->bonded2['taxes'],
+                    'rdg_vat3' => $request->bonded3['taxes'],
+                    'rdg_vat4' => $request->bonded4['taxes'],
+                    'rdg_vat5' => $request->bonded5['taxes'],
+                    'rdg_vat6' => $request->bonded6['taxes'],
+                    'rdg_vat6' => $request->total['taxes'],
+                    'rdg_sum1' => $request->bonded1['sum'],
+                    'rdg_sum2' => $request->bonded2['sum'],
+                    'rdg_sum3' => $request->bonded3['sum'],
+                    'rdg_sum4' => $request->bonded4['sum'],
+                    'rdg_sum5' => $request->bonded5['sum'],
+                    'rdg_sum6' => $request->bonded6['sum'],
+                    'rdg_sum6' => $request->total['sum'],
+                    'rdg_etc1' => $request->bonded1['etc'],
+                    'rdg_etc2' => $request->bonded2['etc'],
+                    'rdg_etc3' => $request->bonded3['etc'],
+                    'rdg_etc4' => $request->bonded4['etc'],
+                    'rdg_etc5' => $request->bonded5['etc'],
+                    'rdg_etc6' => $request->bonded6['etc'],
+                    'rdg_etc6' => $request->total['etc'],
+                ]
+            );
+
+            if($request->type == 'create_expectation' || $request->type == 'create_expectation_monthly'){
                 ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-                    'rgd_status4' => $request->status,
-                    'rgd_bill_type' => $request->bill_type
+                    'rgd_status4' => '예상경비청구서',
+                    'rgd_bill_type' => $request->bill_type,
+                    'rgd_storage_days' => $request->storage_days,
+                    'rgd_settlement_number' => $request->rgd_settlement_number
                 ]);
+            }
+
+            $previous_rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->where('rgd_bill_type', '=' , $request->previous_bill_type)->first();
+
+            if(!isset($is_exist->rdg_no) && isset($request->previous_bill_type) && !empty($previous_rgd)){
+                $previous_rgd->rgd_status5 = 'issued';
+                $previous_rgd->save();
+
+                $final_rgd = $previous_rgd->replicate();
+                $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
+                $final_rgd->rgd_status3 = NULL;
+                $final_rgd->rgd_status4 = $request->status;
+                $final_rgd->rgd_status5 = '';
+                $final_rgd->rgd_is_show = 'n';
+                $final_rgd->rgd_parent_no = $previous_rgd->rgd_no;
+                $final_rgd->save();
+
+
+
+                RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
+                    'rgd_no' => $final_rgd->rgd_no
+                ]);
+            }else {
+                RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
+                    'rgd_no' =>  $is_exist ?  $is_exist->rgd_no : $rgd->rgd_no
+                ]);
+            }
+
+            if($request->bill_type == 'final' || $request->bill_type == 'final_monthly'){
+                if($request->type != 'create_final_monthly'){
+                    ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                        'rgd_status4' => $request->status,
+                        'rgd_bill_type' => $request->bill_type
+                    ]);
+                }
+
             }
 
             DB::commit();
@@ -5209,7 +5634,7 @@ class RateDataController extends Controller
 
         $spreadsheet->createSheet();
         $sheet2 = $spreadsheet->getSheet(1);
-        
+
         $sheet2->setTitle('센터 작업료');
 
         $sheet2->setCellValue('A1', '항목');
@@ -5223,7 +5648,7 @@ class RateDataController extends Controller
         $sheet2->setCellValue('I1', '비고');
         $sheet2->mergeCells('I1:J1');
 
-        
+
         if(!empty($data_fullfill1)){
             $sheet_row = 2;
             foreach($data_fullfill1 as $data){
@@ -5252,7 +5677,7 @@ class RateDataController extends Controller
 
         $spreadsheet->createSheet();
         $sheet3 = $spreadsheet->getSheet(2);
-        
+
         $sheet3->setTitle('국내운송료');
 
         $sheet3->setCellValue('A1', '항목');
@@ -5266,7 +5691,7 @@ class RateDataController extends Controller
         $sheet3->setCellValue('I1', '비고');
         $sheet3->mergeCells('I1:J1');
 
-        
+
         if(!empty($data_fullfill2)){
             $sheet_row = 2;
             foreach($data_fullfill2 as $data){
@@ -5295,7 +5720,7 @@ class RateDataController extends Controller
 
         $spreadsheet->createSheet();
         $sheet4 = $spreadsheet->getSheet(3);
-        
+
         $sheet4->setTitle('해외운송료');
 
         $sheet4->setCellValue('A1', '항목');
@@ -5309,7 +5734,7 @@ class RateDataController extends Controller
         $sheet4->setCellValue('I1', '비고');
         $sheet4->mergeCells('I1:J1');
 
-        
+
         if(!empty($data_fullfill3)){
             $sheet_row = 2;
             foreach($data_fullfill3 as $data){
@@ -5338,7 +5763,7 @@ class RateDataController extends Controller
 
         $spreadsheet->createSheet();
         $sheet5 = $spreadsheet->getSheet(4);
-        
+
         $sheet5->setTitle('보관');
 
         $sheet5->setCellValue('A1', '항목');
@@ -5352,7 +5777,7 @@ class RateDataController extends Controller
         $sheet5->setCellValue('I1', '비고');
         $sheet5->mergeCells('I1:J1');
 
-        
+
         if(!empty($data_fullfill4)){
             $sheet_row = 2;
             foreach($data_fullfill4 as $data){
@@ -5381,7 +5806,7 @@ class RateDataController extends Controller
 
         $spreadsheet->createSheet();
         $sheet6 = $spreadsheet->getSheet(5);
-        
+
         $sheet6->setTitle('부자재');
 
         $sheet6->setCellValue('A1', '항목');
@@ -5395,7 +5820,7 @@ class RateDataController extends Controller
         $sheet6->setCellValue('I1', '비고');
         $sheet6->mergeCells('I1:J1');
 
-        
+
         if(!empty($data_fullfill5)){
             $sheet_row = 2;
             foreach($data_fullfill5 as $data){
@@ -5421,7 +5846,7 @@ class RateDataController extends Controller
             $sheet6->setCellValue('I'.$sheet_row, '');
         }
 
-    
+
         $Excel_writer = new Xlsx($spreadsheet);
         if(isset($user->mb_no)){
             $path = '../storage/download/'.$user->mb_no.'/';
@@ -5442,8 +5867,8 @@ class RateDataController extends Controller
         ], 500);
         ob_end_clean();
     }
-    
-    
+
+
     public function download_fulfillment_additional($rgd_no){
 
         $data_fullfill1 = $data_fullfill2 = $data_fullfill3 = $data_fullfill4 = $data_fullfill5 = null;
@@ -5480,7 +5905,7 @@ class RateDataController extends Controller
         }
 
         $overseas_shipping_supply_price = $overseas_shipping_vat = $overseas_shipping_sum = 0;
-        
+
         if(!empty($data_fullfill3)){
             foreach($data_fullfill3 as $dt3){
                 $overseas_shipping_supply_price += !empty($dt3->rd_data5)?$dt3->rd_data5:0;
@@ -5490,7 +5915,7 @@ class RateDataController extends Controller
         }
 
         $keep_supply_price = $keep_vat = $keep_sum = 0;
-        
+
         if(!empty($data_fullfill4)){
             foreach($data_fullfill4 as $dt4){
                 $keep_supply_price += !empty($dt4->rd_data5)?$dt4->rd_data5:0;
@@ -5500,7 +5925,7 @@ class RateDataController extends Controller
         }
 
         $subsidiary_supply_price = $subsidiary_supply_vat = $subsidiary_supply_sum = 0;
-        
+
         if(!empty($data_fullfill5)){
             foreach($data_fullfill5 as $dt5){
                 $subsidiary_supply_price += !empty($dt5->rd_data5)?$dt5->rd_data5:0;
@@ -5626,7 +6051,7 @@ class RateDataController extends Controller
 
         $spreadsheet->createSheet();
         $sheet3 = $spreadsheet->getSheet(2);
-        
+
         $sheet3->setTitle('센터 작업료');
 
         $sheet3->setCellValue('A1', '항목');
@@ -5669,7 +6094,7 @@ class RateDataController extends Controller
 
         $spreadsheet->createSheet();
         $sheet4 = $spreadsheet->getSheet(3);
-        
+
         $sheet4->setTitle('센터 작업료');
 
         $sheet4->setCellValue('A1', '항목');
@@ -5712,7 +6137,7 @@ class RateDataController extends Controller
 
         $spreadsheet->createSheet();
         $sheet5 = $spreadsheet->getSheet(4);
-        
+
         $sheet5->setTitle('센터 작업료');
 
         $sheet5->setCellValue('A1', '항목');
@@ -5755,7 +6180,7 @@ class RateDataController extends Controller
 
         $spreadsheet->createSheet();
         $sheet6 = $spreadsheet->getSheet(5);
-        
+
         $sheet6->setTitle('센터 작업료');
 
         $sheet6->setCellValue('A1', '항목');
@@ -5817,8 +6242,8 @@ class RateDataController extends Controller
         ob_end_clean();
     }
     public function download_full_fillment_final($rgd_no){
-        
-        $data_fullfill1 = $data_fullfill2 = $data_fullfill3 = $data_fullfill4 = $data_fullfill5 = null; 
+
+        $data_fullfill1 = $data_fullfill2 = $data_fullfill3 = $data_fullfill4 = $data_fullfill5 = null;
 
         $rmd_no1 = $this->get_rmd_no_fulfill_raw($rgd_no,'fulfill1_final','fulfill1');
         $rmd_no2 = $this->get_rmd_no_fulfill_raw($rgd_no,'fulfill2_final','fulfill2');
@@ -5852,7 +6277,7 @@ class RateDataController extends Controller
         }
 
         $overseas_shipping_supply_price = $overseas_shipping_vat = $overseas_shipping_sum = 0;
-        
+
         if(!empty($data_fullfill3)){
             foreach($data_fullfill3 as $dt3){
                 $overseas_shipping_supply_price += !empty($dt3->rd_data5)?$dt3->rd_data5:0;
@@ -5862,7 +6287,7 @@ class RateDataController extends Controller
         }
 
         $keep_supply_price = $keep_vat = $keep_sum = 0;
-        
+
         if(!empty($data_fullfill4)){
             foreach($data_fullfill4 as $dt4){
                 $keep_supply_price += !empty($dt4->rd_data5)?$dt4->rd_data5:0;
@@ -5872,7 +6297,7 @@ class RateDataController extends Controller
         }
 
         $subsidiary_supply_price = $subsidiary_supply_vat = $subsidiary_supply_sum = 0;
-        
+
         if(!empty($data_fullfill5)){
             foreach($data_fullfill5 as $dt5){
                 $subsidiary_supply_price += !empty($dt5->rd_data5)?$dt5->rd_data5:0;
@@ -5998,7 +6423,7 @@ class RateDataController extends Controller
 
         $spreadsheet->createSheet();
         $sheet3 = $spreadsheet->getSheet(2);
-        
+
         $sheet3->setTitle('센터 작업료');
 
         $sheet3->setCellValue('A1', '항목');
@@ -6041,7 +6466,7 @@ class RateDataController extends Controller
 
         $spreadsheet->createSheet();
         $sheet4 = $spreadsheet->getSheet(3);
-        
+
         $sheet4->setTitle('센터 작업료');
 
         $sheet4->setCellValue('A1', '항목');
@@ -6084,7 +6509,7 @@ class RateDataController extends Controller
 
         $spreadsheet->createSheet();
         $sheet5 = $spreadsheet->getSheet(4);
-        
+
         $sheet5->setTitle('센터 작업료');
 
         $sheet5->setCellValue('A1', '항목');
@@ -6127,7 +6552,7 @@ class RateDataController extends Controller
 
         $spreadsheet->createSheet();
         $sheet6 = $spreadsheet->getSheet(5);
-        
+
         $sheet6->setTitle('센터 작업료');
 
         $sheet6->setCellValue('A1', '항목');
@@ -6189,8 +6614,8 @@ class RateDataController extends Controller
         ob_end_clean();
     }
     public function fulfillment_add_monthbill_check($rgd_no){
-        
-        $data_fullfill1 = $data_fullfill2 = $data_fullfill3 = $data_fullfill4 = $data_fullfill5 = null; 
+
+        $data_fullfill1 = $data_fullfill2 = $data_fullfill3 = $data_fullfill4 = $data_fullfill5 = null;
 
         $rmd_no1 = $this->get_rmd_no_fulfill_raw($rgd_no,'fulfill1_additional','fulfill1_final');
         $rmd_no2 = $this->get_rmd_no_fulfill_raw($rgd_no,'fulfill2_additional','fulfill2_final');
@@ -6224,7 +6649,7 @@ class RateDataController extends Controller
         }
 
         $overseas_shipping_supply_price = $overseas_shipping_vat = $overseas_shipping_sum = 0;
-        
+
         if(!empty($data_fullfill3)){
             foreach($data_fullfill3 as $dt3){
                 $overseas_shipping_supply_price += !empty($dt3->rd_data5)?$dt3->rd_data5:0;
@@ -6234,7 +6659,7 @@ class RateDataController extends Controller
         }
 
         $keep_supply_price = $keep_vat = $keep_sum = 0;
-        
+
         if(!empty($data_fullfill4)){
             foreach($data_fullfill4 as $dt4){
                 $keep_supply_price += !empty($dt4->rd_data5)?$dt4->rd_data5:0;
@@ -6244,7 +6669,7 @@ class RateDataController extends Controller
         }
 
         $subsidiary_supply_price = $subsidiary_supply_vat = $subsidiary_supply_sum = 0;
-        
+
         if(!empty($data_fullfill5)){
             foreach($data_fullfill5 as $dt5){
                 $subsidiary_supply_price += !empty($dt5->rd_data5)?$dt5->rd_data5:0;
@@ -6370,7 +6795,7 @@ class RateDataController extends Controller
 
         $spreadsheet->createSheet();
         $sheet3 = $spreadsheet->getSheet(2);
-        
+
         $sheet3->setTitle('센터 작업료');
 
         $sheet3->setCellValue('A1', '항목');
@@ -6413,7 +6838,7 @@ class RateDataController extends Controller
 
         $spreadsheet->createSheet();
         $sheet4 = $spreadsheet->getSheet(3);
-        
+
         $sheet4->setTitle('센터 작업료');
 
         $sheet4->setCellValue('A1', '항목');
@@ -6456,7 +6881,7 @@ class RateDataController extends Controller
 
         $spreadsheet->createSheet();
         $sheet5 = $spreadsheet->getSheet(4);
-        
+
         $sheet5->setTitle('센터 작업료');
 
         $sheet5->setCellValue('A1', '항목');
@@ -6499,7 +6924,7 @@ class RateDataController extends Controller
 
         $spreadsheet->createSheet();
         $sheet6 = $spreadsheet->getSheet(5);
-        
+
         $sheet6->setTitle('센터 작업료');
 
         $sheet6->setCellValue('A1', '항목');
