@@ -2311,6 +2311,7 @@ class RateDataController extends Controller
         try {
             DB::beginTransaction();
             $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd_no)->first();
+            return $rgd;
             $co_no = $rgd->warehousing->co_no;
             $adjustmentgroupall = AdjustmentGroup::where('co_no', $co_no)->get();
             $updated_at = Carbon::createFromFormat('Y.m.d H:i:s',  $rgd->updated_at->format('Y.m.d H:i:s'));
@@ -2330,7 +2331,7 @@ class RateDataController extends Controller
             ->where('rgd_bill_type', $bill_type)
             ->where(function($q){
                 $q->whereDoesntHave('rgd_child')
-                ->orWhere('rgd_status5', 'issued');
+                ->orWhere('rgd_status5', '!=' ,'issued');
             })
             // ->whereDoesntHave('rgd_child')
             ->get();
