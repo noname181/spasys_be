@@ -310,9 +310,9 @@ class ReceivingGoodsDeliveryController extends Controller
                 Warehousing::where('w_no', $w_no)->update([
                     'w_children_yn' => "y"
                 ]);
-                $w_schedule_number = CommonFunc::generate_w_schedule_number($w_no, 'EW');
+                $w_schedule_number = CommonFunc::generate_w_schedule_number($w_no_ew, 'EW');
                 Warehousing::where('w_no', $w_no_ew)->update([
-                    'w_schedule_number' =>   CommonFunc::generate_w_schedule_number($w_no, 'EW')
+                    'w_schedule_number' =>   CommonFunc::generate_w_schedule_number($w_no_ew, 'EW')
                 ]);
 
                 foreach ($validated['location'] as $rgd) {
@@ -616,14 +616,14 @@ class ReceivingGoodsDeliveryController extends Controller
                             Warehousing::where('w_no', $warehousing_data->w_import_no)->update([
                                 'w_children_yn' => "y"
                             ]);
-                            $w_schedule_number = CommonFunc::generate_w_schedule_number($request->w_no, 'EW', ($key + 1));
-                            Warehousing::where('w_no', $w_no)->update([
-                                'w_schedule_number' =>   CommonFunc::generate_w_schedule_number($request->w_no, 'EW', ($key + 1))
+                            $w_schedule_number = CommonFunc::generate_w_schedule_number($request->w_no, 'EW', $key);
+                            Warehousing::where('w_no', $request->w_no)->update([
+                                'w_schedule_number' =>   CommonFunc::generate_w_schedule_number($request->w_no, 'EW', $key)
                             ]);
                             if (isset($request->page_type) && $request->page_type == 'Page130146') {
-                                $w_schedule_number2 = CommonFunc::generate_w_schedule_number($request->w_no, 'EWC', ($key + 1));
+                                $w_schedule_number2 = CommonFunc::generate_w_schedule_number($request->w_no, 'EWC', $key);
                                 Warehousing::where('w_no', $request->w_no)->update([
-                                    'w_schedule_number2' =>   CommonFunc::generate_w_schedule_number($request->w_no, 'EWC', ($key + 1)),
+                                    'w_schedule_number2' =>   CommonFunc::generate_w_schedule_number($request->w_no, 'EWC', $key),
                                     'w_completed_day' => Carbon::now()->toDateTimeString()
                                 ]);
                             }
@@ -686,9 +686,9 @@ class ReceivingGoodsDeliveryController extends Controller
                             ]);
 
                             if (isset($request->page_type) && $request->page_type == 'Page130146') {
-                                $w_schedule_number2 = CommonFunc::generate_w_schedule_number($request->w_no, 'EWC');
-                                Warehousing::where('w_no', $request->w_no)->update([
-                                    'w_schedule_number2' =>   CommonFunc::generate_w_schedule_number($request->w_no, 'EWC'),
+                                $w_schedule_number2 = CommonFunc::generate_w_schedule_number($w_no, 'EWC');
+                                Warehousing::where('w_no', $w_no)->update([
+                                    'w_schedule_number2' =>   CommonFunc::generate_w_schedule_number($w_no, 'EWC'),
                                     'w_completed_day' => Carbon::now()->toDateTimeString()
                                 ]);
                             }
