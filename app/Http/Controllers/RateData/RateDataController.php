@@ -931,6 +931,96 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded1_additional_monthly'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => $set_type
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded2_additional_monthly'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => $set_type
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded3_additional_monthly'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => $set_type
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded4_additional_monthly'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => $set_type
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded5_additional_monthly'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => $set_type
+                    ]
+                )->first();
+            }
+        }else if(!isset($rmd->rmd_no) && $set_type == 'bonded6_additional_monthly'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd->rgd_no,
+                    'set_type' => $set_type
+                ]
+            )->first();
+            if(empty($rmd)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => $set_type
+                    ]
+                )->first();
+            }
         }
 
         return response()->json([
