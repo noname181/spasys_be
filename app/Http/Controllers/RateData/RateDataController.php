@@ -196,7 +196,6 @@ class RateDataController extends Controller
         $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
         $previous_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
         $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
-        $w_no = $rgd->w_no;
 
         $rmd = RateMetaData::where(
             [
@@ -206,13 +205,6 @@ class RateDataController extends Controller
         )->first();
 
         if(!isset($rmd->rmd_no) && $set_type == 'work_final'){
-
-            $rmd = RateMetaData::where(
-                [
-                    'rgd_no' => $rgd_no,
-                    'set_type' => 'work_final'
-                ]
-            )->first();
             if(empty($rmd)){
                 $rmd = RateMetaData::where(
                     [
@@ -238,12 +230,6 @@ class RateDataController extends Controller
                 )->first();
             }
         }else if(!isset($rmd->rmd_no) && $set_type == 'storage_final'){
-            $rmd = RateMetaData::where(
-                [
-                    'rgd_no' => $rgd_no,
-                    'set_type' => 'storage_final'
-                ]
-            )->first();
             if(empty($rmd)){
                 $rmd = RateMetaData::where(
                     [
@@ -269,12 +255,6 @@ class RateDataController extends Controller
                 )->first();
             }
         }else if(!isset($rmd->rmd_no) && $set_type == 'domestic_final'){
-            $rmd = RateMetaData::where(
-                [
-                    'rgd_no' => $rgd_no,
-                    'set_type' => 'domestic_final'
-                ]
-            )->first();
             if(empty($rmd)){
                 $rmd = RateMetaData::where(
                     [
@@ -420,6 +400,22 @@ class RateDataController extends Controller
                     [
                         'rgd_no' => $rdg->rgd_no_final,
                         'set_type' => 'storage_additional'
+                    ]
+                )->first();
+            }
+
+        }else if(!isset($rmd->rmd_no) && $set_type == 'domestic_additional2'){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd_no,
+                    'set_type' => 'domestic_additional'
+                ]
+            )->first();
+            if(empty($rmd) && !empty($rdg)){
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rdg->rgd_no_final,
+                        'set_type' => 'domestic_additional'
                     ]
                 )->first();
             }
