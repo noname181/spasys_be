@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Warehousing;
+use App\Models\ReceivingGoodsDelivery;
 class RateDataGeneral extends Model
 {
     use HasFactory;
@@ -64,6 +65,11 @@ class RateDataGeneral extends Model
     public function warehousing()
     {
         return $this->hasOne(Warehousing::class, 'w_no', 'w_no')->with(['co_no', 'warehousing_item','w_import_parent', 'warehousing_request']);
+    }
+    public function rgd_no_final()
+    {
+     
+        return $this->belongsTo(RateDataGeneral::class, 'rgd_no_final', 'rgd_no');
     }
 
 }
