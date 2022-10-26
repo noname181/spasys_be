@@ -26,7 +26,7 @@ class ImportRequest extends BaseFormRequest
         return [
             'w_no' => [
                 '',
-                
+                'nullable',   
             ],
             'type' => [
                 '',

@@ -66,11 +66,20 @@ class ExportController extends Controller
         // If page is null set default data = 1
         $page = isset($validated['page']) ? $validated['page'] : 1;
 
-        $warehousing_request = WarehousingRequest::with('mb_no')->orderBy('wr_no', 'DESC');
+        if (isset($validated['w_no'])){
+            $warehousing = Warehousing::where('w_no', '=', $validated['w_no'])->first();
 
-        $members = Member::where('mb_no', '!=', 0)->get();
+            $warehousing_request = WarehousingRequest::with(['mb_no','warehousing'])->orderBy('wr_no', 'DESC');
+            if($warehousing){
+                $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no'])->orwhere('w_no', '=', $warehousing->w_import_no);
+            }else{
+                $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no']);
+            }
 
-        $warehousing_request = $warehousing_request->paginate($per_page, ['*'], 'page', $page);
+            $warehousing_request = $warehousing_request->paginate($per_page, ['*'], 'page', $page);
+        }else{
+            $warehousing_request = [];
+        }
 
 
         if(isset($validated['items'])){
