@@ -45,7 +45,7 @@ class ImportController extends Controller
 
             //fetchReceivingGoodsDeliveryRequests
 
-            $rgd = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->whereHas('w_no', function($q) use ($validated) {
+            $rgd = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->whereNull("rgd_parent_no")->whereHas('w_no', function($q) use ($validated) {
                 return $q->where('w_no', $validated['w_no']);
             })->get();
         }else{
