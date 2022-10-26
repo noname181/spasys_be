@@ -2065,7 +2065,8 @@ class WarehousingController extends Controller
                     ->where('w_category_name', '=', '유통가공');
             })
                 ->where('rgd_is_show', 'y')
-                ->orderBy('updated_at', 'DESC');
+                ->orderBy('updated_at', 'DESC')
+                ->orderBy('rgd_no', 'DESC');
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
