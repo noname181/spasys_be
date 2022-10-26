@@ -1909,7 +1909,7 @@ class WarehousingController extends Controller
                 $adjustment_group = AdjustmentGroup::where('co_no', '=', $warehousing->co_no)->first();
             }
             $adjustment_group_choose = '';
-            $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
+            $rdg = RateDataGeneral::with(['rgd_no_final'])->where('rgd_no', $rgd_no)->first();
             if ($rdg) {
                 $adjustment_group_choose = AdjustmentGroup::where('co_no', '=', $warehousing->co_no)->where('ag_name', '=', $rdg->rdg_set_type)->first();
             }
