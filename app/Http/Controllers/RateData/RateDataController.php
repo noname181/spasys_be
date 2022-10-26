@@ -2248,7 +2248,8 @@ class RateDataController extends Controller
             ->where('rgd_bill_type', $bill_type)
             ->where(function($q){
                 $q->whereDoesntHave('rgd_child')
-                ->orWhere('rgd_status5', 'issued');
+                ->orWhere('rgd_status5', '!=' ,'issued')
+                ->orWhereNull('rgd_status5');
             })
             ->get();
 
@@ -2311,7 +2312,6 @@ class RateDataController extends Controller
         try {
             DB::beginTransaction();
             $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd_no)->first();
-            return $rgd;
             $co_no = $rgd->warehousing->co_no;
             $adjustmentgroupall = AdjustmentGroup::where('co_no', $co_no)->get();
             $updated_at = Carbon::createFromFormat('Y.m.d H:i:s',  $rgd->updated_at->format('Y.m.d H:i:s'));
@@ -2331,7 +2331,8 @@ class RateDataController extends Controller
             ->where('rgd_bill_type', $bill_type)
             ->where(function($q){
                 $q->whereDoesntHave('rgd_child')
-                ->orWhere('rgd_status5', '!=' ,'issued');
+                ->orWhere('rgd_status5', '!=' ,'issued')
+                ->orWhereNull('rgd_status5');
             })
             // ->whereDoesntHave('rgd_child')
             ->get();
@@ -2351,6 +2352,8 @@ class RateDataController extends Controller
                 $rdgs2[] = $rdg2;
             }
 
+            DB::commit();
+
             return response()->json([
                 'rgds' => $rgds,
                 'rdgs' => $rdgs,
@@ -2369,12 +2372,6 @@ class RateDataController extends Controller
             // if(!isset($rdg->rdg_no)){
             //     $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'final')->first();
             // }
-
-            DB::commit();
-            return response()->json([
-                'message' => Messages::MSG_0007,
-                'rdg' => $rdg
-            ], 201);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
