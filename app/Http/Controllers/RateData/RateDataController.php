@@ -1956,8 +1956,8 @@ class RateDataController extends Controller
             $previous_rgd = ReceivingGoodsDelivery::where('w_no', $w_no)->where('rgd_bill_type', '=' , $request->previous_bill_type)->first();
 
             if(!isset($is_exist->rdg_no) && isset($request->previous_bill_type)){
-                $previous_rgd->rgd_status5 = 'issued';
-                $previous_rgd->save();
+                // $previous_rgd->rgd_status5 = 'issued';
+                // $previous_rgd->save();
 
                 $final_rgd = $previous_rgd->replicate();
                 $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
@@ -2781,8 +2781,8 @@ class RateDataController extends Controller
             $previous_rgd = ReceivingGoodsDelivery::where('w_no', $w_no)->where('rgd_bill_type', '=' , $request->previous_bill_type)->first();
 
             if(!isset($is_exist->rdg_no) && isset($request->previous_bill_type)){
-                // $previous_rgd->rgd_status5 = 'issued';
-                // $previous_rgd->save();
+                $previous_rgd->rgd_status5 = 'issued';
+                $previous_rgd->save();
 
                 $final_rgd = $previous_rgd->replicate();
                 $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
