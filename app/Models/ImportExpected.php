@@ -49,7 +49,7 @@ class ImportExpected extends Model
 
     public function import()
     {
-        return $this->hasOne(Import::class,'ti_logistic_manage_number','tie_logistic_manage_number')->with('export');
+        return $this->hasOne(Import::class,'ti_logistic_manage_number','tie_logistic_manage_number');
     }
 
     public function company()
