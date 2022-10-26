@@ -1839,7 +1839,7 @@ class WarehousingController extends Controller
             $check_cofirm = 0;
             $check_paid = 0;
             if ($type == 'monthly') {
-                $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
+                $rgd = ReceivingGoodsDelivery::with(['rgd_child'])->where('rgd_no', $rgd_no)->first();
                 $w_no = $rgd->w_no;
                 $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
                 $updated_at = Carbon::createFromFormat('Y.m.d H:i:s', $rgd->updated_at->format('Y.m.d H:i:s'));
@@ -1856,7 +1856,25 @@ class WarehousingController extends Controller
                         $q->where('rgd_status4', '=', '예상경비청구서')->orWhereNull('rgd_status4');
                     })
                     ->get();
-                $warehousing = Warehousing::with(['w_ew', 'co_no', 'warehousing_request', 'w_import_parent'])->find($w_no);
+                $warehousing = Warehousing::with(['w_ew_many' => function ($q) {
+
+                    $q->withCount([
+                        'warehousing_item as bonusQuantity' => function ($query) {
+    
+                            $query->select(DB::raw('SUM(wi_number)'))->where('wi_type', '출고_spasys');
+                        },
+                    ]);
+                  
+                },'w_ew' => function ($q) {
+
+                    $q->withCount([
+                        'warehousing_item as bonusQuantity' => function ($query) {
+    
+                            $query->select(DB::raw('SUM(wi_number)'))->where('wi_type', '출고_spasys');
+                        },
+                    ]);
+                  
+                }, 'co_no', 'warehousing_request', 'w_import_parent'])->find($w_no);
                 $adjustment_group = AdjustmentGroup::where('co_no', '=', $warehousing->co_no)->first();
                 $adjustment_group2 = AdjustmentGroup::select(['ag_name'])->where('co_no', '=', $warehousing->co_no)->get();
 
@@ -1867,7 +1885,25 @@ class WarehousingController extends Controller
                 $check_cofirm = ReceivingGoodsDelivery::where('rgd_status5', 'confirmed')->where('rgd_bill_type', 'final')->where('w_no', $w_no)->get()->count();
                 $check_paid = ReceivingGoodsDelivery::where('rgd_status5', 'paid')->where('rgd_bill_type', 'additional')->where('w_no', $w_no)->get()->count();
 
-                $warehousing = Warehousing::with(['w_ew', 'co_no', 'warehousing_request', 'w_import_parent', 'warehousing_child'])->withSum('warehousing_item_IW_spasys_confirm', 'wi_number')->find($w_no);
+                $warehousing = Warehousing::with(['w_ew_many' => function ($q) {
+
+                    $q->withCount([
+                        'warehousing_item as bonusQuantity' => function ($query) {
+    
+                            $query->select(DB::raw('SUM(wi_number)'))->where('wi_type', '출고_spasys');
+                        },
+                    ]);
+                  
+                },'w_ew' => function ($q) {
+
+                    $q->withCount([
+                        'warehousing_item as bonusQuantity' => function ($query) {
+    
+                            $query->select(DB::raw('SUM(wi_number)'))->where('wi_type', '출고_spasys');
+                        },
+                    ]);
+                  
+                }, 'co_no', 'warehousing_request', 'w_import_parent', 'warehousing_child'])->withSum('warehousing_item_IW_spasys_confirm', 'wi_number')->find($w_no);
 
                 $adjustment_group2 = AdjustmentGroup::select(['ag_name'])->where('co_no', '=', $warehousing->co_no)->get();
                 $adjustment_group = AdjustmentGroup::where('co_no', '=', $warehousing->co_no)->first();
@@ -2065,7 +2101,8 @@ class WarehousingController extends Controller
                     ->where('w_category_name', '=', '유통가공');
             })
                 ->where('rgd_is_show', 'y')
-                ->orderBy('updated_at', 'DESC');
+                ->orderBy('updated_at', 'DESC')
+                ->orderBy('rgd_no', 'DESC');
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }

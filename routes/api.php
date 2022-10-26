@@ -59,6 +59,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/get_company/{co_no}', [App\Http\Controllers\Company\CompanyController::class, 'getCompany'])->name('get_company');
     Route::patch('/update_company/{company}', [App\Http\Controllers\Company\CompanyController::class, 'updateCompany'])->name('update_company');
+    Route::patch('/update_company_co_license/{company}', [App\Http\Controllers\Company\CompanyController::class, 'updateCompanyColicense'])->name('update_company_co_license');
     Route::post('/register_contract', \App\Http\Controllers\Contract\ContractController::class)->name('register_contract');
     Route::post('/get_shop_companies', [\App\Http\Controllers\Company\CompanyController::class, 'getShopCompanies'])->name('get_shop_companies');
     Route::post('/get_shop_companies_mobile', [\App\Http\Controllers\Company\CompanyController::class, 'getShopCompaniesMobile'])->name('get_shop_companies_mobile');
@@ -357,6 +358,7 @@ Route::middleware('auth')->group(function () {
         });
 
         Route::get('/monthly_bill_list/{rgd_no}/{bill_type}', [\App\Http\Controllers\RateData\RateDataController::class, 'monthly_bill_list'])->name('monthly_bill_list');
+        Route::get('/monthly_bill_list_edit/{rgd_no}/{bill_type}', [\App\Http\Controllers\RateData\RateDataController::class, 'monthly_bill_list_edit'])->name('monthly_bill_list_edit');
         Route::get('/bonded_monthly_bill_list/{rgd_no}/{bill_type}', [\App\Http\Controllers\RateData\RateDataController::class, 'bonded_monthly_bill_list'])->name('bonded_monthly_bill_list');
         Route::get('/bonded_monthly_bill_list_edit/{rgd_no}/{bill_type}', [\App\Http\Controllers\RateData\RateDataController::class, 'bonded_monthly_bill_list_edit'])->name('bonded_monthly_bill_list_edit');
         Route::get('/get_spasys1_from_te/{is_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'getspasys1fromte'])->name('get_spasys1_from_te');

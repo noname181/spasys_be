@@ -1822,7 +1822,16 @@ class RateDataController extends Controller
 
             $w_no = $rgd->w_no;
 
-            $warehousing = Warehousing::with(['w_ew','co_no', 'w_import_parent', 'member', 'warehousing_request'])->where('w_no', $w_no)->first();
+            $warehousing = Warehousing::with(['w_ew' => function ($q) {
+
+                $q->withCount([
+                    'warehousing_item as bonusQuantity' => function ($query) {
+
+                        $query->select(DB::raw('SUM(wi_number)'))->where('wi_type', '출고_spasys');
+                    },
+                ]);
+              
+            },'co_no', 'w_import_parent', 'member', 'warehousing_request','warehousing_item'])->where('w_no', $w_no)->first();
 
             $rdg = RateDataGeneral::where('w_no', $w_no)->where('rgd_no', $rgd_no)->where('rdg_bill_type', $bill_type)->first();
 
@@ -1947,8 +1956,8 @@ class RateDataController extends Controller
             $previous_rgd = ReceivingGoodsDelivery::where('w_no', $w_no)->where('rgd_bill_type', '=' , $request->previous_bill_type)->first();
 
             if(!isset($is_exist->rdg_no) && isset($request->previous_bill_type)){
-                $previous_rgd->rgd_status5 = 'issued';
-                $previous_rgd->save();
+                // $previous_rgd->rgd_status5 = 'issued';
+                // $previous_rgd->save();
 
                 $final_rgd = $previous_rgd->replicate();
                 $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
@@ -2269,11 +2278,102 @@ class RateDataController extends Controller
             }
 
             $adjustment_group_choose = [];
-              if($rdgs[0] != null){
-                  $adjustment_group_choose = AdjustmentGroup::where('co_no','=', $co_no )->where('ag_name','=',$rdgs[0]->rdg_set_type)->first();
-             }else if($rdgs2[0] != null){
-               $adjustment_group_choose = AdjustmentGroup::where('co_no','=', $co_no )->where('ag_name','=',$rdgs2[0]->rdg_set_type)->first();
+
+            if(!empty($rgds) && isset($rdgs[0])){
+                if($rdgs[0] != null){
+                    $adjustment_group_choose = AdjustmentGroup::where('co_no','=', $co_no )->where('ag_name','=',$rdgs[0]->rdg_set_type)->first();
+                }else if($rdgs2[0] != null){
+                    $adjustment_group_choose = AdjustmentGroup::where('co_no','=', $co_no )->where('ag_name','=',$rdgs2[0]->rdg_set_type)->first();
+                 }
             }
+           
+
+            return response()->json([
+                'rgds' => $rgds,
+                'rdgs' => $rdgs,
+                'adjustmentgroupall'=>$adjustmentgroupall,
+                'adjustment_group_choose'=>$adjustment_group_choose
+            ], 201);
+
+            // if (isset($validated['from_date'])) {
+            //     $notices->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            // }
+
+            // if (isset($validated['to_date'])) {
+            //     $notices->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            // }
+
+
+            // if(!isset($rdg->rdg_no)){
+            //     $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'final')->first();
+            // }
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'rdg' => $rdg
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+    public function monthly_bill_list_edit($rgd_no, $bill_type) {
+        try {
+            DB::beginTransaction();
+            $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd_no)->first();
+            $co_no = $rgd->warehousing->co_no;
+            $adjustmentgroupall = AdjustmentGroup::where('co_no', $co_no)->get();
+            $updated_at = Carbon::createFromFormat('Y.m.d H:i:s',  $rgd->updated_at->format('Y.m.d H:i:s'));
+
+            $start_date = $updated_at->startOfMonth()->toDateString();
+            $end_date = $updated_at->endOfMonth()->toDateString();
+
+            $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child','rate_meta_data','rate_meta_data_parent'])
+            ->whereHas('w_no', function($q) use($co_no){
+                $q->where('co_no', $co_no)
+                ->where('w_category_name', '유통가공');
+            })
+            // ->doesntHave('rgd_child')
+            ->where('updated_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
+            ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
+            ->where('rgd_status1', '=', '입고')
+            ->where('rgd_bill_type', $bill_type)
+            ->where('rgd_settlement_number', $rgd->rgd_settlement_number)
+            ->where(function($q){
+                $q->whereDoesntHave('rgd_child')
+                ->orWhere('rgd_status5', '!=' ,'issued')
+                ->orWhereNull('rgd_status5');
+            })
+            ->get();
+
+            $rdgs = [];
+            foreach($rgds as $rgd){
+                $rdg = RateDataGeneral::where('rgd_no_expectation', $rgd->rgd_no)
+                ->where('rdg_bill_type', 'final_monthly')->first();
+                $rdgs[] = $rdg;
+            }
+
+            $rdgs2 = [];
+
+            foreach($rgds as $rgd2){
+                $rdg2 = RateDataGeneral::where('rgd_no', $rgd2->rgd_no)
+                ->where('rdg_bill_type', 'expectation_monthly')->first();
+                $rdgs2[] = $rdg2;
+            }
+
+            $adjustment_group_choose = [];
+
+            if(!empty($rgds)){
+                if($rdgs[0] != null){
+                    $adjustment_group_choose = AdjustmentGroup::where('co_no','=', $co_no )->where('ag_name','=',$rdgs[0]->rdg_set_type)->first();
+                }else if($rdgs2[0] != null){
+                    $adjustment_group_choose = AdjustmentGroup::where('co_no','=', $co_no )->where('ag_name','=',$rdgs2[0]->rdg_set_type)->first();
+                 }
+            }
+           
 
             return response()->json([
                 'rgds' => $rgds,
@@ -2438,10 +2538,13 @@ class RateDataController extends Controller
                         ]);
 
                     }else {
+                        $expectation_rgd->rgd_status5 = 'issued';
+                        $expectation_rgd->save();
                         if($i == 0){
-                            $final_rgd->rgd_is_show = 'y';
+                            $final_rgd->rgd_is_show = 'y';  
                             $final_rgd->save();
                         }
+                       
                         RateDataGeneral::where('rdg_no', $final_rdg->rdg_no)->update([
                             'rgd_no' => $final_rgd->rgd_no,
                             'rgd_no_expectation' => $expectation_rgd->rgd_no
