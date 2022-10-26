@@ -1860,21 +1860,21 @@ class WarehousingController extends Controller
 
                     $q->withCount([
                         'warehousing_item as bonusQuantity' => function ($query) {
-    
+
                             $query->select(DB::raw('SUM(wi_number)'))->where('wi_type', '출고_spasys');
                         },
                     ]);
-                  
+
                 },'w_ew' => function ($q) {
 
                     $q->withCount([
                         'warehousing_item as bonusQuantity' => function ($query) {
-    
+
                             $query->select(DB::raw('SUM(wi_number)'))->where('wi_type', '출고_spasys');
                         },
                     ]);
-                  
-                }, 'co_no', 'warehousing_request', 'w_import_parent'])->find($w_no);
+
+                }, 'co_no', 'warehousing_request', 'w_import_parent', 'warehousing_child'])->withSum('warehousing_item_IW_spasys_confirm', 'wi_number')->find($w_no);
                 $adjustment_group = AdjustmentGroup::where('co_no', '=', $warehousing->co_no)->first();
                 $adjustment_group2 = AdjustmentGroup::select(['ag_name'])->where('co_no', '=', $warehousing->co_no)->get();
 
@@ -1889,20 +1889,20 @@ class WarehousingController extends Controller
 
                     $q->withCount([
                         'warehousing_item as bonusQuantity' => function ($query) {
-    
+
                             $query->select(DB::raw('SUM(wi_number)'))->where('wi_type', '출고_spasys');
                         },
                     ]);
-                  
+
                 },'w_ew' => function ($q) {
 
                     $q->withCount([
                         'warehousing_item as bonusQuantity' => function ($query) {
-    
+
                             $query->select(DB::raw('SUM(wi_number)'))->where('wi_type', '출고_spasys');
                         },
                     ]);
-                  
+
                 }, 'co_no', 'warehousing_request', 'w_import_parent', 'warehousing_child'])->withSum('warehousing_item_IW_spasys_confirm', 'wi_number')->find($w_no);
 
                 $adjustment_group2 = AdjustmentGroup::select(['ag_name'])->where('co_no', '=', $warehousing->co_no)->get();
@@ -2029,7 +2029,7 @@ class WarehousingController extends Controller
                 });
             }
 
-            $warehousing->orderBy('updated_at', 'DESC');
+            $warehousing->orderBy('rgd_no', 'DESC');
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             //return DB::getQueryLog();
             $warehousing->setCollection(
