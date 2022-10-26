@@ -1956,8 +1956,8 @@ class RateDataController extends Controller
             $previous_rgd = ReceivingGoodsDelivery::where('w_no', $w_no)->where('rgd_bill_type', '=' , $request->previous_bill_type)->first();
 
             if(!isset($is_exist->rdg_no) && isset($request->previous_bill_type)){
-                $previous_rgd->rgd_status5 = 'issued';
-                $previous_rgd->save();
+                // $previous_rgd->rgd_status5 = 'issued';
+                // $previous_rgd->save();
 
                 $final_rgd = $previous_rgd->replicate();
                 $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
@@ -2279,7 +2279,7 @@ class RateDataController extends Controller
 
             $adjustment_group_choose = [];
 
-            if(!empty($rgds)){
+            if(!empty($rgds) && isset($rdgs[0])){
                 if($rdgs[0] != null){
                     $adjustment_group_choose = AdjustmentGroup::where('co_no','=', $co_no )->where('ag_name','=',$rdgs[0]->rdg_set_type)->first();
                 }else if($rdgs2[0] != null){
@@ -2538,10 +2538,13 @@ class RateDataController extends Controller
                         ]);
 
                     }else {
+                        $expectation_rgd->rgd_status5 = 'issued';
+                        $expectation_rgd->save();
                         if($i == 0){
-                            $final_rgd->rgd_is_show = 'y';
+                            $final_rgd->rgd_is_show = 'y';  
                             $final_rgd->save();
                         }
+                       
                         RateDataGeneral::where('rdg_no', $final_rdg->rdg_no)->update([
                             'rgd_no' => $final_rgd->rgd_no,
                             'rgd_no_expectation' => $expectation_rgd->rgd_no
