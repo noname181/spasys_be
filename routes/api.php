@@ -59,6 +59,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/get_company/{co_no}', [App\Http\Controllers\Company\CompanyController::class, 'getCompany'])->name('get_company');
     Route::patch('/update_company/{company}', [App\Http\Controllers\Company\CompanyController::class, 'updateCompany'])->name('update_company');
+    Route::patch('/update_company_co_license/{company}', [App\Http\Controllers\Company\CompanyController::class, 'updateCompanyColicense'])->name('update_company_co_license');
     Route::post('/register_contract', \App\Http\Controllers\Contract\ContractController::class)->name('register_contract');
     Route::post('/get_shop_companies', [\App\Http\Controllers\Company\CompanyController::class, 'getShopCompanies'])->name('get_shop_companies');
     Route::post('/get_shop_companies_mobile', [\App\Http\Controllers\Company\CompanyController::class, 'getShopCompaniesMobile'])->name('get_shop_companies_mobile');

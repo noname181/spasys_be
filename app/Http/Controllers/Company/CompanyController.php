@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Service;
 use App\Models\CompanySettlement;
 use App\Models\Export;
-
+use Illuminate\Http\Request;
 class CompanyController extends Controller
 {
     /**
@@ -300,6 +300,36 @@ class CompanyController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollback();
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0002], 500);
+        }
+    }
+    public function updateCompanyColicense(Request $request, Company $company)
+    {
+        try {
+            DB::beginTransaction();
+
+            // $comp = Company::where('co_no', $company->co_no)
+            //     ->update([
+            //         'co_license' => $request->co_license,
+            //     ]);
+                $update = Company::updateOrCreate(
+                    [
+                        'co_no' =>  $company->co_no
+                    ],
+                    [
+                        'co_license' => $request->co_license,
+                    ]
+                );
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'company' => $update,
+                'sql' => $company->co_no,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return $e;
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0002], 500);
         }
