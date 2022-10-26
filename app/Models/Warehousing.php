@@ -101,7 +101,16 @@ class Warehousing extends Model
 
     public function w_ew()
     {
-        return $this->hasOne(Warehousing::class, 'w_import_no', 'w_no')->orderBy('w_no','desc');
+        return $this->hasOne(Warehousing::class, 'w_import_no', 'w_no')->with(['warehousing_item'])->orderBy('w_no','desc');
+    }
+    public function w_ew_many()
+    {
+        return $this->hasMany(Warehousing::class, 'w_import_no', 'w_no')->with(['warehousing_item']);
+    }
+
+    public function w_ew2()
+    {
+        return $this->hasOne(Warehousing::class, 'w_import_no', 'w_no')->with(['warehousing_item'])->orderBy('w_no','desc');
     }
 
     public function warehousing_child()
