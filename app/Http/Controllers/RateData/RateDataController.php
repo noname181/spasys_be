@@ -1822,7 +1822,7 @@ class RateDataController extends Controller
 
             $w_no = $rgd->w_no;
 
-            $warehousing = Warehousing::with(['w_ew' => function ($q) {
+            $warehousing = Warehousing::with(['w_ew_many' => function ($q) {
 
                 $q->withCount([
                     'warehousing_item as bonusQuantity' => function ($query) {
@@ -1831,7 +1831,7 @@ class RateDataController extends Controller
                     },
                 ]);
               
-            },'co_no', 'w_import_parent', 'member', 'warehousing_request','warehousing_item'])->where('w_no', $w_no)->first();
+            },'w_ew','co_no', 'w_import_parent', 'member', 'warehousing_request','warehousing_item'])->where('w_no', $w_no)->first();
 
             $rdg = RateDataGeneral::where('w_no', $w_no)->where('rgd_no', $rgd_no)->where('rdg_bill_type', $bill_type)->first();
 
