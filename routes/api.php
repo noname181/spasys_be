@@ -486,5 +486,9 @@ Route::middleware('auth')->group(function () {
         $data['status'] = 1;
         return json_encode($data);
     });
+
+
+    Route::get('/fulfillment_billing', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'fulfillment_billing']);
+    Route::post('/fulfillment_create_billing', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'fulfillment_create_billing']);
 });
 

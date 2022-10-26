@@ -9,9 +9,12 @@ use App\Http\Requests\Warehousing\WarehousingRequest;
 use App\Http\Requests\Warehousing\WarehousingSearchRequest;
 use App\Models\AdjustmentGroup;
 use App\Models\CompanySettlement;
+use App\Models\Company;
+use App\Models\RateData;
 use App\Models\ImportExpected;
 use App\Models\Member;
 use App\Models\RateDataGeneral;
+use App\Models\RateMetaData;
 use App\Models\ReceivingGoodsDelivery;
 use App\Models\ScheduleShipment;
 use App\Models\Service;
@@ -1931,7 +1934,7 @@ class WarehousingController extends Controller
             );
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -3066,5 +3069,102 @@ class WarehousingController extends Controller
             return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
+    }
+
+
+    public function fulfillment_billing(){
+        try {
+            $user = Auth::user();
+            $co_no = $user->co_no;
+
+            $companies = Company::with(['co_parent', 'adjustment_group'])->where(function($q) use($co_no, $user){
+                if($user->mb_type == 'spasys'){
+                    $q->WhereHas('co_parent.co_parent', function($q) use($co_no){
+                        $q->where('co_no', $co_no);
+                    });
+                }else if($user->mb_type == 'shop'){
+                    $q->WhereHas('co_parent', function($q) use($co_no){
+                        $q->where('co_no', $co_no);
+                    });
+                }
+
+                // $q->whereHas('co_parent', function($q) use($co_no){
+                //     $q->where('co_no', $co_no);
+                // })->orWhereHas('co_parent.co_parent', function($q) use($co_no){
+                //     $q->where('co_no', $co_no);
+                // });
+            })->get();
+
+            $rate_data = RateData::where('rd_cate_meta1', '수입풀필먼트');
+
+            if ($user->mb_type == 'spasys') {
+                $rate_data = $rate_data->where('co_no', $co_no);
+            } else if ($user->mb_type == 'shop' || $user->mb_type == 'shipper') {
+                $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
+                $rate_data = $rate_data->where('rd_co_no', $co_no);
+                if (isset($rmd->rmd_no)) {
+                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+                }
+            } else {
+                $rate_data = $rate_data->where('co_no', $co_no);
+            }
+
+            $rate_data = $rate_data->get();
+
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'companies' => $companies,
+                'rate_data' => $rate_data,
+            ]);
+        }catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+
+
+
+    }
+
+    public function fulfillment_create_billing(Request $request){
+        try {
+            DB::beginTransaction();
+            $user = Auth::user();
+
+            $w_no_data = Warehousing::insertGetId([
+                'mb_no' => $user->mb_no,
+                'w_schedule_amount' => $request->total4,
+                'w_amount' => $request->total4,
+                'w_type' => 'IW',
+                'w_category_name' => '수입풀필먼트',
+                'co_no' => $request->co_no,
+            ]);
+
+            $schedule_number = (new CommonFunc)->generate_w_schedule_number($w_no_data, 'IW');
+            Warehousing::where('w_no', $w_no_data)->update([
+                'w_schedule_number' => $schedule_number
+            ]);
+
+            //THUONG EDIT TO MAKE SETTLEMENT
+            $rgd_no = ReceivingGoodsDelivery::insertGetId([
+                'mb_no' => $user->mb_no,
+                'w_no' => $w_no_data,
+                'service_korean_name' => '수입풀필먼트',
+                'rgd_status1' => '입고',
+                'rgd_status2' => '작업완료',
+            ]);
+            DB::commit();
+
+            return response()->json([
+                'message' => Messages::MSG_0007,
+            ]);
+        }catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+
+
+
     }
 }
