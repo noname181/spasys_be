@@ -1844,8 +1844,9 @@ class WarehousingController extends Controller
             $check_cofirm = 0;
             $check_paid = 0;
             if ($type == 'monthly') {
-                $rgd = ReceivingGoodsDelivery::with(['rgd_child'])->where('rgd_no', $rgd_no)->first();
+                $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing'])->where('rgd_no', $rgd_no)->first();
                 $w_no = $rgd->w_no;
+                $co_no = $rgd->warehousing->co_no;
                 $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
                 $updated_at = Carbon::createFromFormat('Y.m.d H:i:s', $rgd->updated_at->format('Y.m.d H:i:s'));
 
@@ -1853,6 +1854,10 @@ class WarehousingController extends Controller
                 $end_date = $updated_at->endOfMonth()->toDateString();
 
                 $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general'])
+                    ->whereHas('w_no', function ($q) use ($co_no) {
+                        $q->where('co_no', $co_no)
+                            ->where('w_category_name', '유통가공');
+                    })
                     ->where('updated_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
                     ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
                     ->where('rgd_status1', '=', '입고')

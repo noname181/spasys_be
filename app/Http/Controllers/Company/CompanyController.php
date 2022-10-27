@@ -7,6 +7,7 @@ use App\Http\Requests\Company\CompanyRequest;
 use App\Http\Requests\Company\CompanySearchRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Models\Manager;
 use App\Models\AdjustmentGroup;
 use App\Models\CoAddress;
 use App\Models\ForwarderInfo;
@@ -239,6 +240,7 @@ class CompanyController extends Controller
             $co_address = CoAddress::select(['ca_is_default','ca_no', 'co_no', 'ca_name', 'ca_manager', 'ca_hp', 'ca_address', 'ca_address_detail'])->where('co_no', $co_no)->get();
             $forwarder_info = ForwarderInfo::select(['fi_no', 'co_no', 'fi_name', 'fi_manager', 'fi_hp', 'fi_address', 'fi_address_detail'])->where('co_no', $co_no)->get();
             $customs_info = CustomsInfo::select(['ci_no', 'co_no', 'ci_name', 'ci_manager', 'ci_hp', 'ci_address', 'ci_address_detail'])->where('co_no', $co_no)->get();
+            $manager = Manager::where('co_no', $co_no)->first();
 
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -247,6 +249,7 @@ class CompanyController extends Controller
                 'co_address' => $co_address,
                 'forwarder_info' => $forwarder_info,
                 'customs_info' => $customs_info,
+                'manager' => $manager,
             ]);
         } catch (\Exception $e) {
             DB::rollback();
