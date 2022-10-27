@@ -1856,6 +1856,11 @@ class WarehousingController extends Controller
                     ->where('rgd_status1', '=', '입고')
                     ->where('rgd_bill_type', 'expectation_monthly')
                     ->where(function ($q) {
+                        $q->whereDoesntHave('rgd_child')
+                            ->orWhere('rgd_status5', '!=', 'issued')
+                            ->orWhereNull('rgd_status5');
+                    })
+                    ->where(function ($q) {
                         $q->where('rgd_status4', '=', '예상경비청구서')->orWhereNull('rgd_status4');
                     })
                     ->get();
