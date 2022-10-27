@@ -71,7 +71,9 @@ class WarehousingController extends Controller
                 $warehousing_import = '';
             }
             if ($warehousing->w_import_no) {
-                $warehousings = Warehousing::where('w_import_no', $warehousing->w_import_no)->get();
+                $warehousings = Warehousing::with('receving_goods_delivery')->whereHas('receving_goods_delivery', function ($q) {
+                    $q->whereNull("rgd_parent_no");
+                })->where('w_import_no', $warehousing->w_import_no)->get();
             } else {
                 $warehousings = [];
             }
