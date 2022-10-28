@@ -1534,7 +1534,11 @@ class RateDataController extends Controller
                     $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
                 }
             } else {
+                $rmd = RateMetaData::where('co_no', $user->co_no)->latest('created_at')->first();
                 $rate_data = $rate_data->where('co_no', $user->co_no);
+                if (isset($rmd->rmd_no)) {
+                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+                }
             }
 
             $rate_data = $rate_data->get();
