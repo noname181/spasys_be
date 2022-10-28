@@ -1520,9 +1520,9 @@ class RateDataController extends Controller
             $rate_data = RateData::where('rd_cate_meta1', $service_korean_name);
 
             if ($user->mb_type == 'spasys') {
-                $co_no = $item->warehousing->company->co_parent->co_no;
+                $co_no = $rgd->warehousing->company->co_parent->co_no;
             } else if ($user->mb_type == 'shop') {
-                $co_no = $item->warehousing->company->co_no;
+                $co_no = $rgd->warehousing->company->co_no;
             } else {
                 $co_no = $user->co_no;
             }
@@ -1541,6 +1541,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
