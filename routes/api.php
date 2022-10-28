@@ -350,10 +350,9 @@ Route::middleware('auth')->group(function () {
             Route::get('/spasys2', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData2'])->name('get_spasys_rate_data2');
             Route::get('/spasys3', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData3'])->name('get_spasys_rate_data3');
 
-            //GET RATE DATA FOLLOW RGD_NO
-            Route::get('/spasys1/{rgd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getBondedRateDataRgd']);
-            Route::get('/spasys2/{rgd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getFulfillRateDataRgd']);
-            Route::get('/spasys3/{rgd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataRgd'])->name('get_spasys_rate_data_rgd');
+            //GET RATE DATA BY RGD_NO
+            Route::get('/spasys/{rgd_no}/{service}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByRgd']);
+
             Route::post('/spasys4', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData4'])->name('get_spasys_rate_data4');
         });
 
