@@ -458,7 +458,7 @@ class WarehousingController extends Controller
                     ->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     })
-                    
+
                     ;
             }
 
@@ -467,7 +467,7 @@ class WarehousingController extends Controller
             }
 
             if (isset($validated['from_date'])) {
-                
+
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
 
@@ -2082,7 +2082,7 @@ class WarehousingController extends Controller
                     }else {
                         $rate_data = [];
                     }
-                   
+
 
                     $item->rate_data = empty($rate_data) ? 0 : 1;
 
@@ -2367,7 +2367,7 @@ class WarehousingController extends Controller
                     //CHECK SHIPPER COMPANY IS SENT RATE DATA YET
 
                     $rate_data = RateData::where('rd_cate_meta1', '유통가공');
-                    
+
                     if ($user->mb_type == 'spasys') {
                         $co_no = $item->warehousing->company->co_parent->co_no;
                     } else if ($user->mb_type == 'shop') {
@@ -2383,7 +2383,7 @@ class WarehousingController extends Controller
                     }else {
                         $rate_data = [];
                     }
-                   
+
 
                     $item->rate_data = empty($rate_data) ? 0 : 1;
 
@@ -2532,7 +2532,7 @@ class WarehousingController extends Controller
                     //CHECK SHIPPER COMPANY IS SENT RATE DATA YET
 
                     $rate_data = RateData::where('rd_cate_meta1', '유통가공');
-                    
+
                     if ($user->mb_type == 'spasys') {
                         $co_no = $item->warehousing->company->co_parent->co_no;
                     } else if ($user->mb_type == 'shop') {
@@ -2548,7 +2548,7 @@ class WarehousingController extends Controller
                     }else {
                         $rate_data = [];
                     }
-                   
+
 
                     $item->rate_data = empty($rate_data) ? 0 : 1;
 
@@ -3213,6 +3213,107 @@ class WarehousingController extends Controller
         try {
             DB::beginTransaction();
             $user = Auth::user();
+
+            if ($user->mb_type == 'shop') {
+                $warehousing2 = Warehousing::join(
+                    DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
+                    'm.w_no',
+                    '=',
+                    'warehousing.w_no'
+                )->where('warehousing.w_type', '=', 'EW')->where('w_category_name', '=', '수입풀필먼트')->whereHas('co_no.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                })->get();
+                $w_import_no = collect($warehousing2)->map(function ($q) {
+
+                    return $q->w_import_no;
+                });
+                $w_no_in = collect($warehousing2)->map(function ($q) {
+
+                    return $q->w_no;
+                });
+                $warehousing = Warehousing::with('mb_no')
+                    ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')->where('w_category_name', '=', '수입풀필먼트')
+                    ->whereHas('co_no.co_parent', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
+                    });
+            } else if ($user->mb_type == 'shipper') {
+                $warehousing2 = Warehousing::join(
+                    DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
+                    'm.w_no',
+                    '=',
+                    'warehousing.w_no'
+                )->where('warehousing.w_type', '=', 'EW')->where('w_category_name', '=', '수입풀필먼트')->whereHas('co_no', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                })->get();
+                $w_import_no = collect($warehousing2)->map(function ($q) {
+
+                    return $q->w_import_no;
+                });
+                $w_no_in = collect($warehousing2)->map(function ($q) {
+
+                    return $q->w_no;
+                });
+                $warehousing = Warehousing::with('mb_no')
+                    ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')->where('w_category_name', '=', '수입풀필먼트')
+                    ->whereHas('co_no', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
+                    });
+            } else if ($user->mb_type == 'spasys') {
+
+                $warehousing2 = Warehousing::join(
+                    DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
+                    'm.w_no',
+                    '=',
+                    'warehousing.w_no'
+                )->where('warehousing.w_type', '=', 'EW')->where('w_category_name', '=', '수입풀필먼트')->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                })->get();
+                $w_import_no = collect($warehousing2)->map(function ($q) {
+
+                    return $q->w_import_no;
+                });
+                $w_no_in = collect($warehousing2)->map(function ($q) {
+
+                    return $q->w_no;
+                });
+
+                $warehousing = Warehousing::with('mb_no')
+                    ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent', 'warehousing_child'])->where('w_category_name', '=', '수입풀필먼트')->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')
+                    ->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
+                    })
+
+                    ;
+            }
+
+            if (isset($validated['page_type']) && $validated['page_type'] == "page130") {
+                $warehousing->where('w_type', '=', 'IW')->where('w_category_name', '=', '수입풀필먼트');
+            }
+
+            if (isset($validated['from_date'])) {
+
+                $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            }
+
+            if (isset($validated['to_date'])) {
+                $warehousing->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            }
+
+            if (isset($validated['mb_name'])) {
+                $warehousing->whereHas('mb_no', function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(mb_name)'), 'like', '%' . strtolower($validated['mb_name']) . '%');
+                });
+            }
+            if (isset($validated['co_parent_name'])) {
+                $warehousing->whereHas('co_no.co_parent', function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                });
+            }
+            if (isset($validated['co_name'])) {
+                $warehousing->whereHas('co_no', function ($q) use ($validated) {
+                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                });
+            }
 
             $w_no_data = Warehousing::insertGetId([
                 'mb_no' => $user->mb_no,
