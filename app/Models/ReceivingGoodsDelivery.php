@@ -46,6 +46,7 @@ class ReceivingGoodsDelivery extends Model
         'rgd_delivery_schedule_day',
         'rgd_arrive_day',
         'service_korean_name',
+        'rgd_paid_date',
         'created_at',
         'updated_at',
     ];
@@ -54,7 +55,8 @@ class ReceivingGoodsDelivery extends Model
         // 'created_at' => "date:Y.m.d H:i",
         'created_at' => "date:Y.m.d",
         'updated_at' => "date:Y.m.d H:i",
-        'rgd_delivery_schedule_day'=> "date: Y.m.d"
+        'rgd_delivery_schedule_day'=> "date: Y.m.d",
+        'rgd_paid_date'=> "date: Y.m.d"
     ];
 
     public function mb_no()

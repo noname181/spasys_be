@@ -3248,4 +3248,16 @@ class WarehousingController extends Controller
 
 
     }
+    public function load_table_top_right($rgd_no)
+    {
+        $data = ReceivingGoodsDelivery::find($rgd_no);
+        if (!empty($data)) {
+            return response()->json(
+                ['message' => Messages::MSG_0007,
+                 'data' => $data
+                ], 200);
+        } else {
+            return response()->json(['message' => CommonFunc::renderMessage(Messages::MSG_0016, ['ReceivingGoodsDelivery'])], 400);
+        }
+    }
 }
