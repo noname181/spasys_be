@@ -9,6 +9,7 @@ use App\Models\AdjustmentGroup;
 use App\Models\Company;
 use App\Models\Export;
 use App\Models\RateData;
+use App\Models\RateMeta;
 use App\Models\RateDataGeneral;
 use App\Models\RateMetaData;
 use App\Models\ReceivingGoodsDelivery;
@@ -1509,30 +1510,30 @@ class RateDataController extends Controller
         }
     }
 
-    public function getRateDataRgd($rgd_no)
+    public function getRateDataByRgd($rgd_no, $service)
     {
         $user = Auth::user();
         $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd_no)->first();
 
+        $service_korean_name = $service == 'distribution' ? '유통가공' : ($service == 'fulfillment' ? '수입풀필먼트' : '보세화물');
+
         try {
-            $rate_data = RateData::where('rd_cate_meta1', '유통가공');
+            $rate_data = RateData::where('rd_cate_meta1', $service_korean_name);
 
             if ($user->mb_type == 'spasys') {
                 $co_no = $rgd->warehousing->company->co_parent->co_no;
-                $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
-                $rate_data = $rate_data->where('rd_co_no', $co_no);
-                if (isset($rmd->rmd_no)) {
-                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
-                }
             } else if ($user->mb_type == 'shop') {
                 $co_no = $rgd->warehousing->company->co_no;
-                $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
-                $rate_data = $rate_data->where('rd_co_no', $co_no);
-                if (isset($rmd->rmd_no)) {
-                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
-                }
             } else {
-                $rate_data = $rate_data->where('co_no', $user->co_no);
+                $co_no = $user->co_no;
+            }
+
+            $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
+            $rate_data = $rate_data->where('rd_co_no', $co_no);
+            if (isset($rmd->rmd_no)) {
+                $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+            }else {
+                $rate_data = [];
             }
 
             $rate_data = $rate_data->get();
@@ -1541,78 +1542,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return response()->json(['message' => Messages::MSG_0020], 500);
-        }
-    }
-
-    public function getBondedRateDataRgd($rgd_no)
-    {
-        $user = Auth::user();
-        $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd_no)->first();
-
-        try {
-            $rate_data = RateData::where('rd_cate_meta1', '보세화물');
-
-            if ($user->mb_type == 'spasys') {
-                $co_no = $rgd->warehousing->company->co_parent->co_no;
-                $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
-                $rate_data = $rate_data->where('rd_co_no', $co_no);
-                if (isset($rmd->rmd_no)) {
-                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
-                }
-            } else if ($user->mb_type == 'shop') {
-                $co_no = $rgd->warehousing->company->co_no;
-                $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
-                $rate_data = $rate_data->where('rd_co_no', $co_no);
-                if (isset($rmd->rmd_no)) {
-                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
-                }
-            } else {
-                $rate_data = $rate_data->where('co_no', $user->co_no);
-            }
-
-            $rate_data = $rate_data->get();
-
-            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data, 'co_no' => $co_no], 200);
-        } catch (\Exception $e) {
-            DB::rollback();
-            Log::error($e);
-            return response()->json(['message' => Messages::MSG_0020], 500);
-        }
-    }
-
-    public function getFulfillRateDataRgd($rgd_no)
-    {
-        $user = Auth::user();
-        $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd_no)->first();
-
-        try {
-            $rate_data = RateData::where('rd_cate_meta1', '수입풀필먼트');
-
-            if ($user->mb_type == 'spasys') {
-                $co_no = $rgd->warehousing->company->co_parent->co_no;
-                $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
-                $rate_data = $rate_data->where('rd_co_no', $co_no);
-                if (isset($rmd->rmd_no)) {
-                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
-                }
-            } else if ($user->mb_type == 'shop') {
-                $co_no = $rgd->warehousing->company->co_no;
-                $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
-                $rate_data = $rate_data->where('rd_co_no', $co_no);
-                if (isset($rmd->rmd_no)) {
-                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
-                }
-            } else {
-                $rate_data = $rate_data->where('co_no', $user->co_no);
-            }
-
-            $rate_data = $rate_data->get();
-
-            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data, 'co_no' => $co_no], 200);
-        } catch (\Exception $e) {
-            DB::rollback();
-            Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -7077,5 +7007,19 @@ class RateDataController extends Controller
             'message' => 'Download File',
         ], 500);
         ob_end_clean();
+    }
+    public function deleteRateData($rm_no){
+        try {
+            $rmd_no = RateMetaData::where('rm_no', $rm_no)->first()->rmd_no;
+            $delete_rate_data = RateData::where('rmd_no', $rmd_no)->delete();
+            $delete_rate_meta = RateMeta::where('rm_no',$rm_no)->delete();
+            $delete_rate_meta_data = RateMetaData::where('rm_no',$rm_no)->delete();
+
+            return response()->json(['message' => Messages::MSG_0007], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
     }
 }

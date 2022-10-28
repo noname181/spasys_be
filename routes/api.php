@@ -350,10 +350,9 @@ Route::middleware('auth')->group(function () {
             Route::get('/spasys2', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData2'])->name('get_spasys_rate_data2');
             Route::get('/spasys3', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData3'])->name('get_spasys_rate_data3');
 
-            //GET RATE DATA FOLLOW RGD_NO
-            Route::get('/spasys1/{rgd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getBondedRateDataRgd']);
-            Route::get('/spasys2/{rgd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getFulfillRateDataRgd']);
-            Route::get('/spasys3/{rgd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataRgd'])->name('get_spasys_rate_data_rgd');
+            //GET RATE DATA BY RGD_NO
+            Route::get('/spasys/{rgd_no}/{service}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByRgd']);
+
             Route::post('/spasys4', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData4'])->name('get_spasys_rate_data4');
         });
 
@@ -454,6 +453,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/send_mail', [App\Http\Controllers\RateData\RateDataController::class, 'sendMail'])->name('send_mail');
         //quotation_send_details
         Route::get('/download_excel_send_meta/{rm_no}/{rmd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'download_excel_send_meta']);
+        Route::delete('/delete_rate_data/{rm_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'deleteRateData'])->name('delete_rate_data');
     });
 
     Route::prefix('alarm')->name('alarm.')->group(function () {
@@ -492,5 +492,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/fulfillment_create_billing', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'fulfillment_create_billing']);
 
     Route::post('/get_warehousing_status', [\App\Http\Controllers\WarehousingStatus\WarehousingStatusController::class, 'getWarehousingStatus']);
+    Route::get('/load_table_top_right/{rgd_no}', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'load_table_top_right']);
 });
 

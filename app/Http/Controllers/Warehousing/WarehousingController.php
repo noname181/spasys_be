@@ -1954,7 +1954,7 @@ class WarehousingController extends Controller
         }
     }
 
-    public function getWarehousingImportStatusComplete(WarehousingSearchRequest $request) //page 263
+    public function getWarehousingImportStatusComplete(WarehousingSearchRequest $request) //page 260
 
     {
         try {
@@ -2051,7 +2051,7 @@ class WarehousingController extends Controller
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             //return DB::getQueryLog();
             $warehousing->setCollection(
-                $warehousing->getCollection()->map(function ($item) {
+                $warehousing->getCollection()->map(function ($item) use($user) {
                     $service_name = $item->service_korean_name;
                     $w_no = $item->w_no;
                     $co_no = Warehousing::where('w_no', $w_no)->first()->co_no;
@@ -2063,6 +2063,29 @@ class WarehousingController extends Controller
                     ])->first();
                     $item->settlement_cycle = $company_settlement ? $company_settlement->cs_payment_cycle : "";
 
+                    //CHECK SHIPPER COMPANY IS SENT RATE DATA YET
+
+                    $rate_data = RateData::where('rd_cate_meta1', '유통가공');
+
+                    if ($user->mb_type == 'spasys') {
+                        $co_no = $item->warehousing->company->co_parent->co_no;
+                    } else if ($user->mb_type == 'shop') {
+                        $co_no = $item->warehousing->company->co_no;
+                    } else {
+                        $co_no = $user->co_no;
+                    }
+
+                    $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
+                    $rate_data = $rate_data->where('rd_co_no', $co_no);
+                    if (isset($rmd->rmd_no)) {
+                        $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+                    }else {
+                        $rate_data = [];
+                    }
+                   
+
+                    $item->rate_data = empty($rate_data) ? 0 : 1;
+
                     return $item;
                 })
             );
@@ -2070,8 +2093,8 @@ class WarehousingController extends Controller
             return response()->json($warehousing);
         } catch (\Exception $e) {
             Log::error($e);
-
-            //return response()->json(['message' => Messages::MSG_0018], 500);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
     public function getWarehousingImportStatus4(WarehousingSearchRequest $request) //page 144 show EW,rgd_status1 and rgd_status2 = complete
@@ -2333,13 +2356,36 @@ class WarehousingController extends Controller
             $warehousing = $warehousing->orderBy('rgd_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
 
             $warehousing->setCollection(
-                $warehousing->getCollection()->map(function ($item) {
+                $warehousing->getCollection()->map(function ($item) use($user) {
 
                     $updated_at = Carbon::createFromFormat('Y.m.d H:i:s', $item->updated_at->format('Y.m.d H:i:s'));
 
                     $start_date = $updated_at->startOfMonth()->toDateString();
                     $end_date = $updated_at->endOfMonth()->toDateString();
                     $item->time = str_replace('-', '.', $start_date) . ' ~ ' . str_replace('-', '.', $end_date);
+
+                    //CHECK SHIPPER COMPANY IS SENT RATE DATA YET
+
+                    $rate_data = RateData::where('rd_cate_meta1', '유통가공');
+                    
+                    if ($user->mb_type == 'spasys') {
+                        $co_no = $item->warehousing->company->co_parent->co_no;
+                    } else if ($user->mb_type == 'shop') {
+                        $co_no = $item->warehousing->company->co_no;
+                    } else {
+                        $co_no = $user->co_no;
+                    }
+
+                    $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
+                    $rate_data = $rate_data->where('rd_co_no', $co_no);
+                    if (isset($rmd->rmd_no)) {
+                        $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+                    }else {
+                        $rate_data = [];
+                    }
+                   
+
+                    $item->rate_data = empty($rate_data) ? 0 : 1;
 
                     return $item;
                 })
@@ -2471,7 +2517,7 @@ class WarehousingController extends Controller
             //return DB::getQueryLog();
 
             $warehousing->setCollection(
-                $warehousing->getCollection()->map(function ($item) {
+                $warehousing->getCollection()->map(function ($item) use($user) {
                     $service_name = $item->service_korean_name;
                     $w_no = $item->w_no;
                     $co_no = Warehousing::where('w_no', $w_no)->first()->co_no;
@@ -2482,6 +2528,29 @@ class WarehousingController extends Controller
                         'service_no' => $service_no,
                     ])->first();
                     $item->settlement_cycle = $company_settlement ? $company_settlement->cs_payment_cycle : "";
+
+                    //CHECK SHIPPER COMPANY IS SENT RATE DATA YET
+
+                    $rate_data = RateData::where('rd_cate_meta1', '유통가공');
+                    
+                    if ($user->mb_type == 'spasys') {
+                        $co_no = $item->warehousing->company->co_parent->co_no;
+                    } else if ($user->mb_type == 'shop') {
+                        $co_no = $item->warehousing->company->co_no;
+                    } else {
+                        $co_no = $user->co_no;
+                    }
+
+                    $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
+                    $rate_data = $rate_data->where('rd_co_no', $co_no);
+                    if (isset($rmd->rmd_no)) {
+                        $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+                    }else {
+                        $rate_data = [];
+                    }
+                   
+
+                    $item->rate_data = empty($rate_data) ? 0 : 1;
 
                     return $item;
                 })
@@ -3181,5 +3250,17 @@ class WarehousingController extends Controller
 
 
 
+    }
+    public function load_table_top_right($rgd_no)
+    {
+        $data = ReceivingGoodsDelivery::find($rgd_no);
+        if (!empty($data)) {
+            return response()->json(
+                ['message' => Messages::MSG_0007,
+                 'data' => $data
+                ], 200);
+        } else {
+            return response()->json(['message' => CommonFunc::renderMessage(Messages::MSG_0016, ['ReceivingGoodsDelivery'])], 400);
+        }
     }
 }
