@@ -9,6 +9,7 @@ use App\Models\AdjustmentGroup;
 use App\Models\Company;
 use App\Models\Export;
 use App\Models\RateData;
+use App\Models\RateMeta;
 use App\Models\RateDataGeneral;
 use App\Models\RateMetaData;
 use App\Models\ReceivingGoodsDelivery;
@@ -7077,5 +7078,19 @@ class RateDataController extends Controller
             'message' => 'Download File',
         ], 500);
         ob_end_clean();
+    }
+    public function deleteRateData($rm_no){
+        try {
+            $rmd_no = RateMetaData::where('rm_no', $rm_no)->first()->rmd_no;
+            $delete_rate_data = RateData::where('rmd_no', $rmd_no)->delete();
+            $delete_rate_meta = RateMeta::where('rm_no',$rm_no)->delete();
+            $delete_rate_meta_data = RateMetaData::where('rm_no',$rm_no)->delete();
+
+            return response()->json(['message' => Messages::MSG_0007], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
     }
 }
