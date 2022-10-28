@@ -490,5 +490,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/fulfillment_billing', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'fulfillment_billing']);
     Route::post('/fulfillment_create_billing', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'fulfillment_create_billing']);
+
+    Route::post('/get_warehousing_status', [\App\Http\Controllers\WarehousingStatus\WarehousingStatusController::class, 'getWarehousingStatus']);
 });
 

@@ -6,6 +6,7 @@ use DateTime;
 use App\Models\Warehousing;
 use App\Models\Member;
 use App\Models\WarehousingRequest;
+use App\Models\WarehousingStatus;
 use App\Models\ReceivingGoodsDelivery;
 use App\Models\RateDataGeneral;
 use App\Models\WarehousingItem;
@@ -145,7 +146,18 @@ class ReceivingGoodsDeliveryController extends Controller
                         'rgd_delivery_schedule_day' => isset($rgd['rgd_delivery_schedule_day']) ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_delivery_schedule_day']) : null,
                         'rgd_arrive_day' => isset($rgd['rgd_arrive_day']) ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']) : null,
                     ]);
+
+                    $warehousing_status =  isset($rgd['rgd_status1']) ? $rgd['rgd_status1'] : null;
                 } else {
+
+                    $warehousing_status = isset($rgd['rgd_status1']) ? $rgd['rgd_status1'] : null;
+                    $rgd_data = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->first();
+                    
+                    if($warehousing_status != $rgd_data->rgd_status1){
+                        $warehousing_status = isset($rgd['rgd_status1']) ? $rgd['rgd_status1'] : null;
+                    }else{
+                        $warehousing_status = null;
+                    }
 
                     $rgd_no = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
                         'rgd_contents' => $rgd['rgd_contents'],
@@ -164,10 +176,22 @@ class ReceivingGoodsDeliveryController extends Controller
                         'rgd_delivery_schedule_day' => $rgd['rgd_delivery_schedule_day'] ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_delivery_schedule_day']) : null,
                         'rgd_arrive_day' => $rgd['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']) : null,
                     ]);
+
+                   
+
                 }
 
                 $status1 = isset($rgd['rgd_status1']) ? $rgd['rgd_status1'] : null;
                 $status2 = isset($rgd['rgd_status2']) ? $rgd['rgd_status2'] : null;
+            }
+
+            if($warehousing_status){
+                WarehousingStatus::insert([
+                    'w_no' => $w_no,
+                    'mb_no' => $member->mb_no,
+                    'status' => $warehousing_status,
+                    'w_category_name' => $request->w_category_name,
+                ]);
             }
 
             //warehousing content
