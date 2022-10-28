@@ -1520,25 +1520,19 @@ class RateDataController extends Controller
             $rate_data = RateData::where('rd_cate_meta1', $service_korean_name);
 
             if ($user->mb_type == 'spasys') {
-                $co_no = $rgd->warehousing->company->co_parent->co_no;
-                $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
-                $rate_data = $rate_data->where('rd_co_no', $co_no);
-                if (isset($rmd->rmd_no)) {
-                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
-                }
+                $co_no = $item->warehousing->company->co_parent->co_no;
             } else if ($user->mb_type == 'shop') {
-                $co_no = $rgd->warehousing->company->co_no;
-                $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
-                $rate_data = $rate_data->where('rd_co_no', $co_no);
-                if (isset($rmd->rmd_no)) {
-                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
-                }
+                $co_no = $item->warehousing->company->co_no;
             } else {
-                $rmd = RateMetaData::where('co_no', $user->co_no)->latest('created_at')->first();
-                $rate_data = $rate_data->where('co_no', $user->co_no);
-                if (isset($rmd->rmd_no)) {
-                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
-                }
+                $co_no = $user->co_no;
+            }
+
+            $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
+            $rate_data = $rate_data->where('rd_co_no', $co_no);
+            if (isset($rmd->rmd_no)) {
+                $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+            }else {
+                $rate_data = [];
             }
 
             $rate_data = $rate_data->get();
