@@ -1514,8 +1514,10 @@ class RateDataController extends Controller
         $user = Auth::user();
         $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd_no)->first();
 
+        $service_korean_name = $service == 'distribution' ? '유통가공' : ($service == 'fulfillment' ? '수입풀필먼트' : '보세화물');
+
         try {
-            $rate_data = RateData::where('rd_cate_meta1', $service);
+            $rate_data = RateData::where('rd_cate_meta1', $service_korean_name);
 
             if ($user->mb_type == 'spasys') {
                 $co_no = $rgd->warehousing->company->co_parent->co_no;
