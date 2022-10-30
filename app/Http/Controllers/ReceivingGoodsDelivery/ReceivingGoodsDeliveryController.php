@@ -152,7 +152,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                     $warehousing_status = isset($rgd['rgd_status1']) ? $rgd['rgd_status1'] : null;
                     $rgd_data = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->first();
-                    
+
                     if($warehousing_status != $rgd_data->rgd_status1){
                         $warehousing_status = isset($rgd['rgd_status1']) ? $rgd['rgd_status1'] : null;
                     }else{
@@ -177,7 +177,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         'rgd_arrive_day' => $rgd['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']) : null,
                     ]);
 
-                   
+
 
                 }
 
@@ -1710,31 +1710,31 @@ class ReceivingGoodsDeliveryController extends Controller
                 }
             } else if ($request->bill_type == 'multiple') {
                 foreach ($request->rgds as $rgd) {
-                    if ($rgd['rgd_bill_type'] == 'final') {
+                    // if ($rgd['rgd_bill_type'] == 'final') {
                         ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
                             'rgd_status5' => 'confirmed'
                         ]);
-                    } else if ($rgd['rgd_bill_type'] == 'final_monthly') {
-                        $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd['rgd_no'])->first();
-                        $co_no = $rgd->warehousing->co_no;
+                    // } else if ($rgd['rgd_bill_type'] == 'final_monthly') {
+                    //     $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd['rgd_no'])->first();
+                    //     $co_no = $rgd->warehousing->co_no;
 
-                        $updated_at = Carbon::createFromFormat('Y.m.d H:i:s',  $rgd->updated_at->format('Y.m.d H:i:s'));
+                    //     $updated_at = Carbon::createFromFormat('Y.m.d H:i:s',  $rgd->updated_at->format('Y.m.d H:i:s'));
 
-                        $start_date = $updated_at->startOfMonth()->toDateString();
-                        $end_date = $updated_at->endOfMonth()->toDateString();
+                    //     $start_date = $updated_at->startOfMonth()->toDateString();
+                    //     $end_date = $updated_at->endOfMonth()->toDateString();
 
-                        $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general'])
-                            ->whereHas('w_no', function ($q) use ($co_no) {
-                                $q->where('co_no', $co_no);
-                            })
-                            ->where('updated_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
-                            ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
-                            ->where('rgd_status1', '=', '입고')
-                            ->where('rgd_bill_type', 'final_monthly')
-                            ->update([
-                                'rgd_status5' => 'confirmed'
-                            ]);
-                    }
+                    //     $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general'])
+                    //         ->whereHas('w_no', function ($q) use ($co_no) {
+                    //             $q->where('co_no', $co_no);
+                    //         })
+                    //         ->where('updated_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
+                    //         ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
+                    //         ->where('rgd_status1', '=', '입고')
+                    //         ->where('rgd_bill_type', 'final_monthly')
+                    //         ->update([
+                    //             'rgd_status5' => 'confirmed'
+                    //         ]);
+                    // }
                 }
             }
 
