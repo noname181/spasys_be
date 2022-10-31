@@ -2614,6 +2614,41 @@ class WarehousingController extends Controller
 
                     $item->rate_data = empty($rate_data) ? 0 : 1;
 
+                    $rmd = RateMetaData::where(
+                        [
+                            'rgd_no' => $item->rgd_no,
+                            'set_type' => 'fulfill1_final',
+                        ]
+                    )->first();
+                    
+                    if(!empty($rmd)){
+                        $rate_data = RateData::where('rmd_no', $rmd->rmd_no)->where(function ($q) {
+                            $q->orWhere('rd_cate_meta1', '수입풀필먼트');
+                        })->get();
+
+                        $pcs = 0;
+                        $box = 0;
+                        $caton = 0;
+
+                        foreach($rate_data as $rate){
+                            if($rate['rd_data1'] == 'PCS'){
+                                $pcs += intval($rate['rd_data4']);
+                            }else if($rate['rd_data1'] == 'BOX'){
+                                $box += intval($rate['rd_data4']);
+                            }else if($rate['rd_data1'] == 'CATON'){
+                                $caton += intval($rate['rd_data4']);
+                            }
+                        }
+
+                        $item->pcs = $pcs;
+                        $item->box = $box;
+                        $item->caton = $caton;
+                    }else {
+                        $item->pcs = 0;
+                        $item->box = 0;
+                        $item->caton = 0;
+                    }
+
                     return $item;
                 })
             );
@@ -2621,7 +2656,7 @@ class WarehousingController extends Controller
             return response()->json($warehousing);
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
