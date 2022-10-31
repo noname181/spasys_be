@@ -2669,6 +2669,7 @@ class RateDataController extends Controller
                 $final_rgd->rgd_status4 = $request->status;
                 $final_rgd->rgd_status5 = '';
                 $final_rgd->rgd_parent_no = $previous_rgd->rgd_no;
+                $final_rgd->rgd_settlement_number = $request->settlement_number;
                 $final_rgd->save();
 
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
