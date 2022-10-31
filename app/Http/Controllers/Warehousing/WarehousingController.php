@@ -1894,32 +1894,54 @@ class WarehousingController extends Controller
                     })
                     ->get();
 
-                    if($rgds->count() == 0){
+                    if($rgds->count() == 0 ){
                         $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing'])->where('rgd_no', $rgd->rgd_parent_no)->first();
-                        $w_no = $rgd->w_no;
-                        $co_no = $rgd->warehousing->co_no;
-                        $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
-                        $updated_at = Carbon::createFromFormat('Y.m.d H:i:s', $rgd->updated_at->format('Y.m.d H:i:s'));
-
-                        $start_date = $updated_at->startOfMonth()->toDateString();
-                        $end_date = $updated_at->endOfMonth()->toDateString();
-                        $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent'])
-                        ->whereHas('w_no', function ($q) use ($co_no) {
-                            $q->where('co_no', $co_no)
-                                ->where('w_category_name', '유통가공');
-                        })
-                    // ->doesntHave('rgd_child')
-                        ->where('updated_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
-                        ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
-                        ->where('rgd_status1', '=', '입고')
-                        ->where('rgd_bill_type', 'final_monthly')
-                        ->where('rgd_settlement_number', $rgd->rgd_settlement_number)
-                        ->where(function ($q) {
-                            $q->whereDoesntHave('rgd_child')
-                                ->orWhere('rgd_status5', '!=', 'issued')
-                                ->orWhereNull('rgd_status5');
-                        })
-                        ->get();
+                        if(!empty($rgd)){
+                            $w_no = $rgd->w_no;
+                            $co_no = $rgd->warehousing->co_no;
+                            $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
+                            $updated_at = Carbon::createFromFormat('Y.m.d H:i:s', $rgd->updated_at->format('Y.m.d H:i:s'));
+    
+                            $start_date = $updated_at->startOfMonth()->toDateString();
+                            $end_date = $updated_at->endOfMonth()->toDateString();
+                            $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent'])
+                            ->whereHas('w_no', function ($q) use ($co_no) {
+                                $q->where('co_no', $co_no)
+                                    ->where('w_category_name', '유통가공');
+                            })
+                        // ->doesntHave('rgd_child')
+                            ->where('updated_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
+                            ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
+                            ->where('rgd_status1', '=', '입고')
+                            ->where('rgd_bill_type', 'final_monthly')
+                            ->where('rgd_settlement_number', $rgd->rgd_settlement_number)
+                            ->where(function ($q) {
+                                $q->whereDoesntHave('rgd_child')
+                                    ->orWhere('rgd_status5', '!=', 'issued')
+                                    ->orWhereNull('rgd_status5');
+                            })
+                            ->get();
+                        }else {
+                            $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general'])
+                            ->whereHas('w_no', function ($q) use ($co_no) {
+                                $q->where('co_no', $co_no)
+                                    ->where('w_category_name', '유통가공');
+                            })
+                            ->where('updated_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
+                            ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
+                            ->where('rgd_status1', '=', '입고')
+                            ->whereNull('rgd_bill_type')
+                            ->where(function ($q) {
+                                $q->whereDoesntHave('rgd_child')
+                                    ->orWhere('rgd_status5', '!=', 'issued')
+                                    ->orWhereNull('rgd_status5');
+                            })
+                            ->where(function ($q) {
+                                $q->where('rgd_status4', '=', '예상경비청구서')->orWhereNull('rgd_status4');
+                            })
+                            ->get();
+                            }
+                       
                     }
                 }
                 $warehousing = Warehousing::with(['w_ew_many' => function ($q) {
