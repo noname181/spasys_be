@@ -461,6 +461,7 @@ class WarehousingController extends Controller
 
                     ;
             }
+            $warehousing->whereDoesntHave('receving_goods_delivery');
 
             if (isset($validated['page_type']) && $validated['page_type'] == "page130") {
                 $warehousing->where('w_type', '=', 'IW')->where('w_category_name', '=', '수입풀필먼트');
@@ -1893,6 +1894,185 @@ class WarehousingController extends Controller
                     })
                     ->get();
 
+                    if($rgds->count() == 0 ){
+                        $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing'])->where('rgd_no', $rgd->rgd_parent_no)->first();
+                        if(!empty($rgd)){
+                            $w_no = $rgd->w_no;
+                            $co_no = $rgd->warehousing->co_no;
+                            $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
+                            $updated_at = Carbon::createFromFormat('Y.m.d H:i:s', $rgd->updated_at->format('Y.m.d H:i:s'));
+    
+                            $start_date = $updated_at->startOfMonth()->toDateString();
+                            $end_date = $updated_at->endOfMonth()->toDateString();
+                            $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent'])
+                            ->whereHas('w_no', function ($q) use ($co_no) {
+                                $q->where('co_no', $co_no)
+                                    ->where('w_category_name', '유통가공');
+                            })
+                        // ->doesntHave('rgd_child')
+                            ->where('updated_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
+                            ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
+                            ->where('rgd_status1', '=', '입고')
+                            ->where('rgd_bill_type', 'final_monthly')
+                            ->where('rgd_settlement_number', $rgd->rgd_settlement_number)
+                            ->where(function ($q) {
+                                $q->whereDoesntHave('rgd_child')
+                                    ->orWhere('rgd_status5', '!=', 'issued')
+                                    ->orWhereNull('rgd_status5');
+                            })
+                            ->get();
+                        }else {
+                            $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general'])
+                            ->whereHas('w_no', function ($q) use ($co_no) {
+                                $q->where('co_no', $co_no)
+                                    ->where('w_category_name', '유통가공');
+                            })
+                            ->where('updated_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
+                            ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
+                            ->where('rgd_status1', '=', '입고')
+                            ->whereNull('rgd_bill_type')
+                            ->where(function ($q) {
+                                $q->whereDoesntHave('rgd_child')
+                                    ->orWhere('rgd_status5', '!=', 'issued')
+                                    ->orWhereNull('rgd_status5');
+                            })
+                            ->where(function ($q) {
+                                $q->where('rgd_status4', '=', '예상경비청구서')->orWhereNull('rgd_status4');
+                            })
+                            ->get();
+                            }
+                       
+                    }
+                }
+                $warehousing = Warehousing::with(['w_ew_many' => function ($q) {
+
+                    $q->withCount([
+                        'warehousing_item as bonusQuantity' => function ($query) {
+
+                            $query->select(DB::raw('SUM(wi_number)'))->where('wi_type', '출고_spasys');
+                        },
+                    ]);
+
+                },'w_ew' => function ($q) {
+
+                    $q->withCount([
+                        'warehousing_item as bonusQuantity' => function ($query) {
+
+                            $query->select(DB::raw('SUM(wi_number)'))->where('wi_type', '출고_spasys');
+                        },
+                    ]);
+
+                }, 'co_no', 'warehousing_request', 'w_import_parent', 'warehousing_child'])->withSum('warehousing_item_IW_spasys_confirm', 'wi_number')->find($w_no);
+                $adjustment_group = AdjustmentGroup::where('co_no', '=', $warehousing->co_no)->first();
+                $adjustment_group2 = AdjustmentGroup::select(['ag_name'])->where('co_no', '=', $warehousing->co_no)->get();
+
+                $time = str_replace('-', '.', $start_date) . ' ~ ' . str_replace('-', '.', $end_date);
+            } else {
+                $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
+                $w_no = $rgd->w_no;
+                $check_cofirm = ReceivingGoodsDelivery::where('rgd_status5', 'confirmed')->where('rgd_bill_type', 'final')->where('w_no', $w_no)->get()->count();
+                $check_paid = ReceivingGoodsDelivery::where('rgd_status5', 'paid')->where('rgd_bill_type', 'additional')->where('w_no', $w_no)->get()->count();
+
+                $warehousing = Warehousing::with(['w_ew_many' => function ($q) {
+
+                    $q->withCount([
+                        'warehousing_item as bonusQuantity' => function ($query) {
+
+                            $query->select(DB::raw('SUM(wi_number)'))->where('wi_type', '출고_spasys');
+                        },
+                    ]);
+
+                },'w_ew' => function ($q) {
+
+                    $q->withCount([
+                        'warehousing_item as bonusQuantity' => function ($query) {
+
+                            $query->select(DB::raw('SUM(wi_number)'))->where('wi_type', '출고_spasys');
+                        },
+                    ]);
+
+                }, 'co_no', 'warehousing_request', 'w_import_parent', 'warehousing_child'])->withSum('warehousing_item_IW_spasys_confirm', 'wi_number')->find($w_no);
+
+                $adjustment_group2 = AdjustmentGroup::select(['ag_name'])->where('co_no', '=', $warehousing->co_no)->get();
+                $adjustment_group = AdjustmentGroup::where('co_no', '=', $warehousing->co_no)->first();
+            }
+            $adjustment_group_choose = '';
+            $rdg = RateDataGeneral::with(['rgd_no_final'])->where('rgd_no', $rgd_no)->first();
+            if ($rdg) {
+                $adjustment_group_choose = AdjustmentGroup::where('co_no', '=', $warehousing->co_no)->where('ag_name', '=', $rdg->rdg_set_type)->first();
+            }
+            return response()->json(
+                [
+                    'message' => Messages::MSG_0007,
+                    'adjustment_group2' => $adjustment_group2,
+                    'rgds' => isset($rgds) ? $rgds : null,
+                    'adjustment_group_choose' => $adjustment_group_choose,
+                    'adjustment_group' => $adjustment_group,
+                    'warehousing' => isset($warehousing) ? $warehousing : null,
+                    'rgd' => $rgd,
+                    'check_cofirm' => $check_cofirm,
+                    'rdg' => $rdg,
+                    'time' => isset($time) ? $time : '',
+                    'check_paid' => $check_paid,
+                ],
+                200
+            );
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function getWarehousingByRgdFulfillment($rgd_no, $type)
+    {
+        try {
+            $check_cofirm = 0;
+            $check_paid = 0;
+            if ($type == 'monthly') {
+                $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing'])->where('rgd_no', $rgd_no)->first();
+                $w_no = $rgd->w_no;
+                $co_no = $rgd->warehousing->co_no;
+                $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
+                $updated_at = Carbon::createFromFormat('Y.m.d H:i:s', $rgd->updated_at->format('Y.m.d H:i:s'));
+
+                $start_date = $updated_at->startOfMonth()->toDateString();
+                $end_date = $updated_at->endOfMonth()->toDateString();
+
+                $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general'])
+                    ->whereHas('w_no', function ($q) use ($co_no) {
+                        $q->where('co_no', $co_no)
+                            ->where('w_category_name', '수입풀필먼트');
+                    })
+                    ->where('updated_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
+                    ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
+                    ->where('rgd_status1', '=', '입고')
+                    ->whereNull('rgd_bill_type')
+                    ->where(function ($q) {
+                        $q->whereDoesntHave('rgd_child')
+                            ->orWhere('rgd_status5', '!=', 'issued')
+                            ->orWhereNull('rgd_status5');
+                    })
+                    ->get();
+                if($rgds->count() == 0){
+                    $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent'])
+                    ->whereHas('w_no', function ($q) use ($co_no) {
+                        $q->where('co_no', $co_no)
+                            ->where('w_category_name', '수입풀필먼트');
+                    })
+                // ->doesntHave('rgd_child')
+                    ->where('updated_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
+                    ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
+                    ->where('rgd_status1', '=', '입고')
+                    ->where('rgd_bill_type', 'final_monthly')
+                    ->where('rgd_settlement_number', $rgd->rgd_settlement_number)
+                    ->where(function ($q) {
+                        $q->whereDoesntHave('rgd_child')
+                            ->orWhere('rgd_status5', '!=', 'issued')
+                            ->orWhereNull('rgd_status5');
+                    })
+                    ->get();
+
                     if($rgds->count() == 0){
                         $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing'])->where('rgd_no', $rgd->rgd_parent_no)->first();
                         $w_no = $rgd->w_no;
@@ -2413,12 +2593,12 @@ class WarehousingController extends Controller
 
                     //CHECK SHIPPER COMPANY IS SENT RATE DATA YET
 
-                    $rate_data = RateData::where('rd_cate_meta1', '유통가공');
+                    $rate_data = RateData::where('rd_cate_meta1', '수입풀필먼트');
 
                     if ($user->mb_type == 'spasys') {
-                        $co_no = $item->warehousing->company->co_parent->co_no;
+                        $co_no = $item->warehousing->co_no;
                     } else if ($user->mb_type == 'shop') {
-                        $co_no = $item->warehousing->company->co_no;
+                        $co_no = $item->warehousing->co_no;
                     } else {
                         $co_no = $user->co_no;
                     }
@@ -2434,6 +2614,41 @@ class WarehousingController extends Controller
 
                     $item->rate_data = empty($rate_data) ? 0 : 1;
 
+                    $rmd = RateMetaData::where(
+                        [
+                            'rgd_no' => $item->rgd_no,
+                            'set_type' => 'fulfill1_final',
+                        ]
+                    )->first();
+                    
+                    if(!empty($rmd)){
+                        $rate_data = RateData::where('rmd_no', $rmd->rmd_no)->where(function ($q) {
+                            $q->orWhere('rd_cate_meta1', '수입풀필먼트');
+                        })->get();
+
+                        $pcs = 0;
+                        $box = 0;
+                        $caton = 0;
+
+                        foreach($rate_data as $rate){
+                            if($rate['rd_data1'] == 'PCS'){
+                                $pcs += intval($rate['rd_data4']);
+                            }else if($rate['rd_data1'] == 'BOX'){
+                                $box += intval($rate['rd_data4']);
+                            }else if($rate['rd_data1'] == 'CATON'){
+                                $caton += intval($rate['rd_data4']);
+                            }
+                        }
+
+                        $item->pcs = $pcs;
+                        $item->box = $box;
+                        $item->caton = $caton;
+                    }else {
+                        $item->pcs = 0;
+                        $item->box = 0;
+                        $item->caton = 0;
+                    }
+
                     return $item;
                 })
             );
@@ -2441,7 +2656,7 @@ class WarehousingController extends Controller
             return response()->json($warehousing);
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -2636,7 +2851,7 @@ class WarehousingController extends Controller
                 });
             } else if ($user->mb_type == 'spasys') {
                 $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
-                    $query->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
+                    $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
                 });
@@ -2645,10 +2860,12 @@ class WarehousingController extends Controller
                 $q->where('rgd_status4', '=', '예상경비청구서')
                     ->orWhere('rgd_status4', '=', '확정청구서')
                     ->orWhere('rgd_status4', '=', '추가청구서');
-            })->whereHas('w_no', function ($query) {
+            })
+            ->whereHas('w_no', function ($query) {
                 $query->where('w_category_name', '=', '수입풀필먼트');
             })
-                ->orderBy('rgd_no', 'DESC');
+            ->where('rgd_is_show', 'y')
+            ->orderBy('rgd_no', 'DESC');
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
@@ -3329,6 +3546,8 @@ class WarehousingController extends Controller
                     ;
             }
 
+            $warehousing->whereDoesntHave('receving_goods_delivery');
+
             if (isset($request->from_date)) {
 
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($request->from_date)));
@@ -3380,6 +3599,16 @@ class WarehousingController extends Controller
                 'rgd_status1' => '입고',
                 'rgd_status2' => '작업완료',
             ]);
+
+            $rdg_no = RateDataGeneral::insertGetId([
+                'mb_no' => $user->mb_no,
+                'w_no' => $w_no_data,
+                'rgd_no' => $rgd_no,
+                'rgd_no_expectation' => $rgd_no,
+                'rdg_set_type' => $request->adjustment_group,
+                'rdg_bill_type' => 'final',
+            ]);
+
             DB::commit();
 
             return response()->json([
