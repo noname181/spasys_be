@@ -2688,13 +2688,18 @@ class RateDataController extends Controller
                         $q->whereDoesntHave('rgd_child')
                             ->orWhere('rgd_status5', '!=', 'issued')
                             ->orWhereNull('rgd_status5');
-                    })
-                    ->update([
+                    })->get();
+                
+                foreach($rgds as $rgd){
+                    ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_no) ->update([
                         'rgd_status4' => $request->status,
                         'rgd_bill_type' => $request->bill_type,
                         'rgd_settlement_number' => $request->settlement_number,
                         'rgd_is_show' => 'n'
                     ]);
+                }
+
+                  
 
                 ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_is_show' => 'y'
@@ -2732,7 +2737,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
