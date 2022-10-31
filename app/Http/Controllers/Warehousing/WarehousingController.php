@@ -2571,12 +2571,12 @@ class WarehousingController extends Controller
 
                     //CHECK SHIPPER COMPANY IS SENT RATE DATA YET
 
-                    $rate_data = RateData::where('rd_cate_meta1', '유통가공');
+                    $rate_data = RateData::where('rd_cate_meta1', '수입풀필먼트');
 
                     if ($user->mb_type == 'spasys') {
-                        $co_no = $item->warehousing->company->co_parent->co_no;
+                        $co_no = $item->warehousing->co_no;
                     } else if ($user->mb_type == 'shop') {
-                        $co_no = $item->warehousing->company->co_no;
+                        $co_no = $item->warehousing->co_no;
                     } else {
                         $co_no = $user->co_no;
                     }
