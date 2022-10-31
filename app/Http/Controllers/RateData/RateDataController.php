@@ -1708,7 +1708,7 @@ class RateDataController extends Controller
             $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
 
             $w_no = $rgd->w_no;
-
+            $user = Auth::user();
             $warehousing = Warehousing::with(['w_ew_many' => function ($q) {
 
                 $q->withCount([
@@ -1725,12 +1725,17 @@ class RateDataController extends Controller
             if (empty($rdg)) {
                 $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', $bill_type)->first();
             }
-
-            $co_no = $warehousing->co_no;
-
+            if($user->mb_type == 'spasys'){
+                $co_no = Company::with(['co_parent'])->where('co_no',$warehousing->co_no)->first();
+                $co_no = $co_no->co_parent->co_no;
+            }else if($user->mb_type == 'shop'){
+                $co_no = $warehousing->co_no;
+            }
+        
             $ag_name = AdjustmentGroup::where('co_no', $co_no)->get();
 
             DB::commit();
+            
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'rdg' => $rdg,
