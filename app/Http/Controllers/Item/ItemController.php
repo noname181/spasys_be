@@ -1256,7 +1256,7 @@ class ItemController extends Controller
                                 'item_price3' => $item['supply_price'],
                                 'item_url' => $item['img_500'],
                                 'item_option1' => $item['options'],
-                                'item_bar_code' => $item['barcode'],
+                                'item_bar_code' => isset($item['barcode']) ? $item['barcode'] : null,
                                 'item_service_name' => '수입풀필먼트',
                             ]
                         );
@@ -1322,7 +1322,7 @@ class ItemController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0019], 500);
         }
     }
