@@ -2803,10 +2803,12 @@ class WarehousingController extends Controller
                 $q->where('rgd_status4', '=', '예상경비청구서')
                     ->orWhere('rgd_status4', '=', '확정청구서')
                     ->orWhere('rgd_status4', '=', '추가청구서');
-            })->whereHas('w_no', function ($query) {
+            })
+            ->whereHas('w_no', function ($query) {
                 $query->where('w_category_name', '=', '수입풀필먼트');
             })
-                ->orderBy('rgd_no', 'DESC');
+            ->where('rgd_is_show', 'y')
+            ->orderBy('rgd_no', 'DESC');
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
