@@ -298,6 +298,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [App\Http\Controllers\Item\ItemController::class, 'searchItems'])->name('search');
         Route::post('/paginate', [App\Http\Controllers\Item\ItemController::class, 'paginateItems'])->name('paginate');
         Route::post('/paginateapi', [App\Http\Controllers\Item\ItemController::class, 'paginateItemsApi'])->name('paginateapi');
+        Route::post('/paginateapiid', [App\Http\Controllers\Item\ItemController::class, 'paginateItemsApiId'])->name('paginateapiid');
+
         Route::post('/paginateapi_stock', [App\Http\Controllers\Item\ItemController::class, 'paginateItemsApiStock'])->name('paginateapi_stock');
 
         Route::post('/', \App\Http\Controllers\Item\ItemController::class)->name('create_or_update');
