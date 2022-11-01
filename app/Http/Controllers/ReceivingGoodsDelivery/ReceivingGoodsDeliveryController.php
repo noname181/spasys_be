@@ -1893,4 +1893,21 @@ class ReceivingGoodsDeliveryController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
+
+    public function payment(Request $request)
+    {
+        try {
+            ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                'rgd_status6' => 'paid',
+                'rgd_paid_date' =>  Carbon::now()
+            ]);
+
+            return response()->json([
+                'message' => 'Success'
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
 }

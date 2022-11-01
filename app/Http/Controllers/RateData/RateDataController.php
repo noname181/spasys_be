@@ -2148,7 +2148,7 @@ class RateDataController extends Controller
                         ->where('w_category_name', '유통가공');
                 })
             // ->doesntHave('rgd_child')
-                ->where('updated_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
+                ->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
                 ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
                 ->where('rgd_status1', '=', '입고')
                 ->where('rgd_bill_type', $bill_type)
@@ -2233,16 +2233,11 @@ class RateDataController extends Controller
                         ->where('w_category_name', '유통가공');
                 })
             // ->doesntHave('rgd_child')
-                ->where('updated_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
+                ->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
                 ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
                 ->where('rgd_status1', '=', '입고')
                 ->where('rgd_bill_type', $bill_type)
                 ->where('rgd_settlement_number', $rgd->rgd_settlement_number)
-                ->where(function ($q) {
-                    $q->whereDoesntHave('rgd_child')
-                        ->orWhere('rgd_status5', '!=', 'issued')
-                        ->orWhereNull('rgd_status5');
-                })
                 ->get();
 
             $rdgs = [];
@@ -2262,7 +2257,7 @@ class RateDataController extends Controller
 
             $adjustment_group_choose = [];
 
-            if (!empty($rgds)) {
+            if ($rgds->count() != 0) {
                 if ($rdgs[0] != null) {
                     $adjustment_group_choose = AdjustmentGroup::where('co_no', '=', $co_no)->where('ag_name', '=', $rdgs[0]->rdg_set_type)->first();
                 } else if ($rdgs2[0] != null) {
@@ -2320,7 +2315,7 @@ class RateDataController extends Controller
                         ->where('w_category_name', '보세화물');
                 })
             // ->doesntHave('rgd_child')
-                ->where('updated_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
+                ->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
                 ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
                 ->where('rgd_status1', '=', '입고')
                 ->where('rgd_bill_type', $bill_type)
@@ -2681,7 +2676,7 @@ class RateDataController extends Controller
                         $q->where('co_no', $co_no)
                             ->where('w_category_name', '수입풀필먼트');
                     })
-                    ->where('updated_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
+                    ->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
                     ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
                     ->where('rgd_status1', '=', '입고')
                     ->whereNull('rgd_bill_type')
