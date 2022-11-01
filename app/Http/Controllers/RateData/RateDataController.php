@@ -14,6 +14,7 @@ use App\Models\RateDataGeneral;
 use App\Models\RateMetaData;
 use App\Models\ReceivingGoodsDelivery;
 use App\Models\Warehousing;
+use App\Models\CancelBillHistory;
 use App\Utils\CommonFunc;
 use App\Utils\Messages;
 use Carbon\Carbon;
@@ -7055,6 +7056,36 @@ class RateDataController extends Controller
             DB::rollback();
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+    public function cancel_bill($rgd_no)
+    {
+        try {
+            // if ($request->bill_type == 'case') {
+            //     $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+            // } else if ($request->bill_type == 'monthly') {
+            //     foreach ($request->rgds as $rgd) {
+            //         ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->delete();
+            //     }
+            // }
+                $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->update([
+                    'rgd_status5' => 'cancel'
+                ]);
+                $insert_cancel_bill = CancelBillHistory::insertGetId([
+                    'mb_no' => Auth::user()->mb_no,
+                    'rgd_no' => $rgd_no,
+                ]);
+            
+            
+            
+            return response()->json([
+                'message' => 'Success'
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+
+            return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
 }
