@@ -455,6 +455,8 @@ Route::middleware('auth')->group(function () {
         //quotation_send_details
         Route::get('/download_excel_send_meta/{rm_no}/{rmd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'download_excel_send_meta']);
         Route::delete('/delete_rate_data/{rm_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'deleteRateData'])->name('delete_rate_data');
+        //cancel_bill
+        Route::get('/cancel_bill/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class,'cancel_bill'])->name('cancel_bill');
     });
 
     Route::prefix('alarm')->name('alarm.')->group(function () {
