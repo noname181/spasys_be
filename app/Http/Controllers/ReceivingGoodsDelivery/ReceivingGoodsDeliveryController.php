@@ -1400,10 +1400,24 @@ class ReceivingGoodsDeliveryController extends Controller
     {
 
         try {
-
-            Warehousing::where('w_no', $request->w_no)->update([
-                'w_cancel_yn' => 'y'
-            ]);
+            if($request->datachkbox){
+                
+                foreach($request->datachkbox as $value){
+                    //return $value['w_no']['w_no'];
+                    if($value['w_no']['w_no']){
+                        Warehousing::where('w_no', $value['w_no']['w_no'])->update([
+                            'w_cancel_yn' => 'y'
+                        ]);
+                    }  
+                }
+            }else{
+                if($request->w_no){
+                    Warehousing::where('w_no', $request->w_no)->update([
+                        'w_cancel_yn' => 'y'
+                    ]);
+                }
+            }
+           
 
             return response()->json(['message' => 'ok']);
         } catch (\Exception $e) {
