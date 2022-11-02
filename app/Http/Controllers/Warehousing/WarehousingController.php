@@ -2981,7 +2981,7 @@ class WarehousingController extends Controller
             $user = Auth::user();
             if ($user->mb_type == 'shop') {
                 $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
-                    $query->whereHas('co_no.co_parent', function ($q) use ($user) {
+                    $query->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
                 });
