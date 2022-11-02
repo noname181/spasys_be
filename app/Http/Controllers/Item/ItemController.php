@@ -1486,6 +1486,7 @@ class ItemController extends Controller
                             // ->update([
                             //     'te_status_2' => $status
                             // ]);
+                            break;
                         }
                     }
                 }
