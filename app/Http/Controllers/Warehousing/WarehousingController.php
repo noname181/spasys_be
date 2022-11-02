@@ -2434,10 +2434,12 @@ class WarehousingController extends Controller
 
                     if($i == $k){
                         $item->is_completed = true;
+                        $item->completed_date = Carbon::parse($completed_date)->format('Y.m.d');
                     }else {
                         $item->is_completed = false;
+                        $item->completed_date = null;
                     }
-                    $item->completed_date =  $completed_date ? Carbon::parse($completed_date)->format('Y.m.d') : null;
+
                     return $item;
                 })
             );
@@ -2534,6 +2536,25 @@ class WarehousingController extends Controller
                         'service_no' => $service_no,
                     ])->first();
                     $item->settlement_cycle = $company_settlement ? $company_settlement->cs_payment_cycle : "";
+
+                    $i = 0;
+                    $k = 0;
+                    $completed_date = null;
+                    foreach($item->warehousing->warehousing_child as $child){
+                        $i++;
+                        if($child['w_completed_day'] != null){
+                            $completed_date = $child['w_completed_day'];
+                            $k++;
+                        }
+                    }
+
+                    if($i == $k){
+                        $item->is_completed = true;
+                        $item->completed_date = Carbon::parse($completed_date)->format('Y.m.d');
+                    }else {
+                        $item->is_completed = false;
+                        $item->completed_date = null;
+                    }
 
                     return $item;
                 })
@@ -2966,7 +2987,7 @@ class WarehousingController extends Controller
             $user = Auth::user();
             if ($user->mb_type == 'shop') {
                 $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
-                    $query->whereHas('co_no.co_parent', function ($q) use ($user) {
+                    $query->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
                 });
