@@ -454,14 +454,14 @@ class WarehousingController extends Controller
                 });
 
                 $warehousing = Warehousing::with('mb_no')
-                    ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent', 'warehousing_child'])->where('w_category_name', '=', '수입풀필먼트')->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')
+                    ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent', 'warehousing_child', 'rate_data_general'])->where('w_category_name', '=', '수입풀필먼트')->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')
                     ->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     })
 
                     ;
             }
-            //$warehousing->whereDoesntHave('receving_goods_delivery');
+            $warehousing->whereDoesntHave('rate_data_general');
 
             if (isset($validated['page_type']) && $validated['page_type'] == "page130") {
                 $warehousing->where('w_type', '=', 'IW')->where('w_category_name', '=', '수입풀필먼트');
