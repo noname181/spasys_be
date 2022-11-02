@@ -2854,16 +2854,6 @@ class RateDataController extends Controller
                 ]);
             }
 
-            if ($request->bill_type == 'final' || $request->bill_type == 'final_monthly') {
-                if ($request->type != 'create_final_monthly') {
-                    ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-                        'rgd_status4' => $request->status,
-                        'rgd_bill_type' => $request->bill_type,
-                    ]);
-                }
-
-            }
-
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
