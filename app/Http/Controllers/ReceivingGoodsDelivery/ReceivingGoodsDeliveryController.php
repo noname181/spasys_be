@@ -532,7 +532,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         );
                     }
 
-                    
+
 
                     foreach ($data['location'] as $location) {
 
@@ -648,7 +648,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'rgd_delivery_schedule_day' => $location['rgd_delivery_schedule_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_delivery_schedule_day']) : null,
                                 'rgd_arrive_day' => $location['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']) : null,
                             ]);
-                            
+
                         }
 
                         if($warehousing_status){
