@@ -7059,7 +7059,9 @@ class RateDataController extends Controller
             //         ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->delete();
             //     }
             // }
-                if($request->bill_type == 'case_bill_final'){
+
+                //month_bill_edit && case_bill_edit && case_bill_final
+                if($request->bill_type == 'case_bill_final' || $request->bill_type == 'case_bill_edit' || $request->bill_type == 'month_bill_edit' ){
                     $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                         'rgd_status5' => 'cancel'
                     ]);
@@ -7072,7 +7074,7 @@ class RateDataController extends Controller
                         'rgd_status5' => null
                     ]);
 
-                }else if($request->bill_type == 'monthly'){
+                }else if($request->bill_type == 'monthly'){ //final bill 
                     
                     $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
 
@@ -7096,7 +7098,7 @@ class RateDataController extends Controller
                             'rgd_no' => $rgd['rgd_parent_no'],
                         ]);
                     }
-                }else{
+                }else{ //case_bill,monthly_bill
                     $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                         'rgd_status5' => 'cancel'
                     ]);
