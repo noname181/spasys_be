@@ -2428,10 +2428,12 @@ class WarehousingController extends Controller
 
                     if($i == $k){
                         $item->is_completed = true;
+                        $item->completed_date = Carbon::parse($completed_date)->format('Y.m.d');
                     }else {
                         $item->is_completed = false;
+                        $item->completed_date = null;
                     }
-                    $item->completed_date =  $completed_date ? Carbon::parse($completed_date)->format('Y.m.d') : null;
+
                     return $item;
                 })
             );
@@ -2542,10 +2544,11 @@ class WarehousingController extends Controller
 
                     if($i == $k){
                         $item->is_completed = true;
+                        $item->completed_date = Carbon::parse($completed_date)->format('Y.m.d');
                     }else {
                         $item->is_completed = false;
+                        $item->completed_date = null;
                     }
-                    $item->completed_date =  ($completed_date && ($i == $k)) ? Carbon::parse($completed_date)->format('Y.m.d') : null;
 
                     return $item;
                 })
