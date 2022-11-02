@@ -2417,9 +2417,11 @@ class WarehousingController extends Controller
                     $item->rate_data = empty($rate_data) ? 0 : 1;
                     $i = 0;
                     $k = 0;
+                    $completed_date = null;
                     foreach($item->warehousing->warehousing_child as $child){
                         $i++;
                         if($child['w_completed_day'] != null){
+                            $completed_date = $child['w_completed_day'];
                             $k++;
                         }
                     }
@@ -2429,7 +2431,7 @@ class WarehousingController extends Controller
                     }else {
                         $item->is_completed = false;
                     }
-
+                    $item->completed_date =  $completed_date ? Carbon::parse($completed_date)->format('Y.m.d') : null;
                     return $item;
                 })
             );
