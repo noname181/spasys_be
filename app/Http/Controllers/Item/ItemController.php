@@ -1437,7 +1437,7 @@ class ItemController extends Controller
 
             
             DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
-            return $import_schedule;
+
             foreach($import_schedule as $value){
                 if(isset($value['tie_logistic_manage_number'])){
                     $logistic_manage_number = $value['tie_logistic_manage_number'];
@@ -1451,20 +1451,22 @@ class ItemController extends Controller
                    
                     
                     if(isset($array['cargCsclPrgsInfoDtlQryVo']) && $array['cargCsclPrgsInfoDtlQryVo']){
-                        $status = end($array['cargCsclPrgsInfoDtlQryVo'])['cargTrcnRelaBsopTpcd'];
-                        if($status == '입항적하목록 심사완료' || $status == '입항보고 제출' || 
-                        $status == '입항보고 수리' || $status == '입항적하목록 운항정보 정정' || $status == '하기신고 수리'
-                        || $status == '반입신고' || $status == '보세운송 신고 접수' || $status == '보세운송 신고 수리' || $status == '반출신고'
-                        || $status == '반입신고' || $status == '수입신고'
-                        ){
-                            $status = '수입신고접수';
-                        }else if($status == '수입(사용소비) 심사진행' || $status == '수입신고수리'){
-                            $status = '수입신고수리';
-                        }else if($status == '수입신고 수리후 정정 접수'){
-                            $status = '수입신고정정접수';
-                        }else if($status == '수입신고 수리후 정정 완료'){
-                            $status = '수입신고정정완료';
-                        }
+                        $data_apis = $array['cargCsclPrgsInfoDtlQryVo'];
+                        foreach($data_apis as $data){
+                            $status = isset($data['cargTrcnRelaBsopTpcd'])?$data['cargTrcnRelaBsopTpcd']:'';
+                            if($status == '입항적하목록 심사완료' || $status == '입항보고 제출' || 
+                            $status == '입항보고 수리' || $status == '입항적하목록 운항정보 정정' || $status == '하기신고 수리'
+                            || $status == '반입신고' || $status == '보세운송 신고 접수' || $status == '보세운송 신고 수리' || $status == '반출신고'
+                            || $status == '반입신고' || $status == '수입신고'
+                            ){
+                                $status = '수입신고접수';
+                            }else if($status == '수입(사용소비) 심사진행' || $status == '수입신고수리'){
+                                $status = '수입신고수리';
+                            }else if($status == '수입신고 수리후 정정 접수'){
+                                $status = '수입신고정정접수';
+                            }else if($status == '수입신고 수리후 정정 완료'){
+                                $status = '수입신고정정완료';
+                            }
                             $import_expected = ImportExpected::where('tie_logistic_manage_number', $value['tie_logistic_manage_number'])
                             ->update([
                                 'tie_status_2' => $status
@@ -1472,7 +1474,7 @@ class ItemController extends Controller
 
                             $import = Import::where('ti_logistic_manage_number', $value['ti_logistic_manage_number'])->where('ti_i_confirm_number', $value['ti_i_confirm_number'])
                             ->update([
-                                'tie_status_2' => $status
+                                'ti_status_2' => $status
                             ]);
 
                             $export = Export::where('te_logistic_manage_number', $value['te_logistic_manage_number'])->where('te_carry_out_number', $value['te_carry_out_number'])
@@ -1484,6 +1486,8 @@ class ItemController extends Controller
                             // ->update([
                             //     'te_status_2' => $status
                             // ]);
+                            break;
+                        }
                     }
                 }
             }
