@@ -1364,7 +1364,7 @@ class RateDataController extends Controller
             $user = Auth::user();
 
             $export = Export::with(['import', 'import_expected'])->where('te_carry_out_number', $is_no)->first();
-            $company = Company::where('co_license', $export->import_expected->tie_co_license)->first();
+            $company = Company::with(['co_parent'])->where('co_license', $export->import_expected->tie_co_license)->first();
             $rate_data = RateData::where('rd_cate_meta1', '보세화물');
 
             if ($user->mb_type == 'spasys') {
@@ -2378,6 +2378,70 @@ class RateDataController extends Controller
         }
     }
 
+    public function bonded_monthly_bill_list_edit($rgd_no, $bill_type)
+    {
+        try {
+            DB::beginTransaction();
+            $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd_no)->first();
+            $co_no = $rgd->warehousing->co_no;
+            $adjustmentgroupall = AdjustmentGroup::where('co_no', $co_no)->get();
+            $created_at = Carbon::createFromFormat('Y.m.d H:i:s', $rgd->created_at->format('Y.m.d H:i:s'));
+
+            $start_date = $created_at->startOfMonth()->toDateString();
+            $end_date = $created_at->endOfMonth()->toDateString();
+
+            $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent'])
+                ->whereHas('w_no', function ($q) use ($co_no) {
+                    $q->where('co_no', $co_no)
+                        ->where('w_category_name', '보세화물');
+                })
+            // ->doesntHave('rgd_child')
+                ->where('rgd_settlement_number', $rgd->rgd_settlement_number)
+            // ->whereDoesntHave('rgd_child')
+                ->get();
+
+            $rdgs = [];
+            foreach ($rgds as $rgd) {
+                $rdg = RateDataGeneral::where('rgd_no_expectation', $rgd->rgd_no)
+                    ->where('rdg_bill_type', 'final_monthly')->first();
+                $rdgs[] = $rdg;
+            }
+
+            $rdgs2 = [];
+
+            foreach ($rgds as $rgd2) {
+                $rdg2 = RateDataGeneral::where('rgd_no', $rgd2->rgd_no)
+                    ->where('rdg_bill_type', 'expectation_monthly')->first();
+                $rdgs2[] = $rdg2;
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'rgds' => $rgds,
+                'rdgs' => $rdgs,
+                'adjustmentgroupall' => $adjustmentgroupall,
+            ], 201);
+
+            // if (isset($validated['from_date'])) {
+            //     $notices->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            // }
+
+            // if (isset($validated['to_date'])) {
+            //     $notices->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            // }
+
+            // if(!isset($rdg->rdg_no)){
+            //     $rdg = RateDataGeneral::where('rgd_no', $w_no)->where('rdg_bill_type', 'final')->first();
+            // }
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
     public function registe_rate_data_general_monthly_final(Request $request)
     {
         try {
@@ -2502,7 +2566,7 @@ class RateDataController extends Controller
                         $final_rgd->rgd_status5 = null;
                         $final_rgd->rgd_is_show = ($i == 0 ? 'y' : 'n');
                         $final_rgd->rgd_parent_no = $expectation_rgd->rgd_no;
-                        $final_rgd->rgd_settlement_number = $expectation_rgd->rgd_settlement_number;
+                        $final_rgd->rgd_settlement_number = $request->settlement_number;
                         $final_rgd->save();
 
                         RateDataGeneral::where('rdg_no', $final_rdg->rdg_no)->update([
@@ -2842,6 +2906,7 @@ class RateDataController extends Controller
                     'rgd_bill_type' => $request->bill_type,
                     'rgd_storage_days' => $request->storage_days,
                     'rgd_settlement_number' => $request->rgd_settlement_number,
+                    'mb_no' => Auth::user()->mb_no,
                 ]);
             }
 
@@ -2855,7 +2920,9 @@ class RateDataController extends Controller
                 $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
                 $final_rgd->rgd_status3 = null;
                 $final_rgd->rgd_status4 = $request->status;
+                $final_rgd->rgd_settlement_number = $request->rgd_settlement_number;
                 $final_rgd->rgd_status5 = '';
+                $final_rgd->mb_no = Auth::user()->mb_no;
                 $final_rgd->rgd_parent_no = $previous_rgd->rgd_no;
                 $final_rgd->save();
 
@@ -2943,6 +3010,7 @@ class RateDataController extends Controller
                     'rgd_bill_type' => $request->bill_type,
                     'rgd_storage_days' => $request->storage_days,
                     'rgd_settlement_number' => $request->rgd_settlement_number,
+                    'mb_no' => Auth::user()->mb_no,
                 ]);
             }
 
@@ -2958,7 +3026,9 @@ class RateDataController extends Controller
                 $final_rgd->rgd_status4 = $request->status;
                 $final_rgd->rgd_status5 = '';
                 $final_rgd->rgd_is_show = 'n';
+                $final_rgd->rgd_settlement_number = $request->rgd_settlement_number;
                 $final_rgd->rgd_parent_no = $previous_rgd->rgd_no;
+                $final_rgd->mb_no =  Auth::user()->mb_no;
                 $final_rgd->save();
 
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
@@ -2975,6 +3045,7 @@ class RateDataController extends Controller
                     ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                         'rgd_status4' => $request->status,
                         'rgd_bill_type' => $request->bill_type,
+                        'mb_no' => Auth::user()->mb_no,
                     ]);
                 }
 
