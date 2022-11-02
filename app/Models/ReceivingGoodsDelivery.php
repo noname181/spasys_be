@@ -66,7 +66,7 @@ class ReceivingGoodsDelivery extends Model
 
     public function w_no()
     {
-        return $this->hasOne(Warehousing::class, 'w_no', 'w_no')->with(['co_no', 'warehousing_item','w_import_parent','warehousing_child', 'warehousing_request', 'import_expect','w_ew'])->withSum('warehousing_item_IW_spasys_confirm', 'wi_number');;
+        return $this->hasOne(Warehousing::class, 'w_no', 'w_no')->with(['co_no', 'warehousing_item','w_import_parent','warehousing_child', 'warehousing_request', 'import_expect','w_ew'])->withSum('warehousing_item_IW_spasys_confirm', 'wi_number');
     }
 
     public function warehousing()
