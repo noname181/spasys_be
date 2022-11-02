@@ -79,13 +79,14 @@ class ScheduleShipment extends Model
         'created_at' => "date:Y.m.d H:i",
         'updated_at' => "date:Y.m.d H:i",
     ];
-    public function item()
-    {
-        return $this->hasOne(Item::class, 'item_no', 'item_no');
-    }
+   
     public function item_channels()
     {
         return $this->hasMany(ItemChannel::class, 'item_no', 'item_no');
+    }
+    public function item()
+    {
+        return $this->hasOne(Item::class, 'item_no', 'item_no');
     }
     public function schedule_shipment_info()
     {
