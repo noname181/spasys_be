@@ -7059,7 +7059,7 @@ class RateDataController extends Controller
         }
     }
 
-    public function cancel_bill($rgd_no)
+    public function cancel_bill(Request $request)
     {
         try {
             // if ($request->bill_type == 'case') {
@@ -7069,12 +7069,12 @@ class RateDataController extends Controller
             //         ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->delete();
             //     }
             // }
-                $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->update([
+                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_status5' => 'cancel'
                 ]);
                 $insert_cancel_bill = CancelBillHistory::insertGetId([
                     'mb_no' => Auth::user()->mb_no,
-                    'rgd_no' => $rgd_no,
+                    'rgd_no' => $request->rgd_no,
                 ]);
 
 
