@@ -1864,6 +1864,7 @@ class RateDataController extends Controller
                 $final_rgd->rgd_is_show = $request->bill_type == 'final_monthly' ? 'n' : 'y';
                 $final_rgd->rgd_parent_no = $previous_rgd->rgd_no;
                 $final_rgd->rgd_status5 = null;
+                $final_rgd->mb_no = Auth::user()->mb_no;
                 $final_rgd->save();
 
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
@@ -1896,6 +1897,7 @@ class RateDataController extends Controller
             if ($request->bill_type == 'expectation' || $request->bill_type == 'expectation_monthly') {
 
                 ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                    'mb_no' => Auth::user()->mb_no,
                     'rgd_status4' => $request->status,
                     'rgd_bill_type' => $request->bill_type,
                     'rgd_settlement_number' => $request->settlement_number ? $request->settlement_number : $rgd->rgd_settlement_number,
@@ -2137,15 +2139,22 @@ class RateDataController extends Controller
             $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd_no)->first();
             $co_no = $rgd->warehousing->co_no;
             $adjustmentgroupall = AdjustmentGroup::where('co_no', $co_no)->get();
-            $updated_at = Carbon::createFromFormat('Y.m.d H:i:s', $rgd->updated_at->format('Y.m.d H:i:s'));
+            $created_at = Carbon::createFromFormat('Y.m.d H:i:s', $rgd->created_at->format('Y.m.d H:i:s'));
 
-            $start_date = $updated_at->startOfMonth()->toDateString();
-            $end_date = $updated_at->endOfMonth()->toDateString();
+            $start_date = $created_at->startOfMonth()->toDateString();
+            $end_date = $created_at->endOfMonth()->toDateString();
 
-            $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent'])
+            $rgds = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent'])
                 ->whereHas('w_no', function ($q) use ($co_no) {
                     $q->where('co_no', $co_no)
                         ->where('w_category_name', '유통가공');
+                })->whereHas('mb_no', function ($q) {
+                    if(Auth::user()->mb_type == 'spasys'){
+                        $q->where('mb_type', 'spasys');
+                    }else if(Auth::user()->mb_type == 'shop'){
+                        $q->where('mb_type', 'shop');
+                    }
+
                 })
             // ->doesntHave('rgd_child')
                 ->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
@@ -2222,10 +2231,10 @@ class RateDataController extends Controller
             $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd_no)->first();
             $co_no = $rgd->warehousing->co_no;
             $adjustmentgroupall = AdjustmentGroup::where('co_no', $co_no)->get();
-            $updated_at = Carbon::createFromFormat('Y.m.d H:i:s', $rgd->updated_at->format('Y.m.d H:i:s'));
+            $created_at = Carbon::createFromFormat('Y.m.d H:i:s', $rgd->created_at->format('Y.m.d H:i:s'));
 
-            $start_date = $updated_at->startOfMonth()->toDateString();
-            $end_date = $updated_at->endOfMonth()->toDateString();
+            $start_date = $created_at->startOfMonth()->toDateString();
+            $end_date = $created_at->endOfMonth()->toDateString();
 
             $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent'])
                 ->whereHas('w_no', function ($q) use ($co_no) {

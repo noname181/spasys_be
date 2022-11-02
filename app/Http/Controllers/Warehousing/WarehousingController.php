@@ -1924,12 +1924,12 @@ class WarehousingController extends Controller
                 $w_no = $rgd->w_no;
                 $co_no = $rgd->warehousing->co_no;
                 $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
-                $updated_at = Carbon::createFromFormat('Y.m.d H:i:s', $rgd->updated_at->format('Y.m.d H:i:s'));
+                $created_at = Carbon::createFromFormat('Y.m.d H:i:s', $rgd->created_at->format('Y.m.d H:i:s'));
 
-                $start_date = $updated_at->startOfMonth()->toDateString();
-                $end_date = $updated_at->endOfMonth()->toDateString();
+                $start_date = $created_at->startOfMonth()->toDateString();
+                $end_date = $created_at->endOfMonth()->toDateString();
 
-                $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general'])
+                $rgds = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])
                     ->whereHas('w_no', function ($q) use ($co_no) {
                         $q->where('co_no', $co_no)
                             ->where('w_category_name', '유통가공');
@@ -1942,73 +1942,59 @@ class WarehousingController extends Controller
                         $q->whereDoesntHave('rgd_child')
                             ->orWhere('rgd_status5', '!=', 'issued')
                             ->orWhereNull('rgd_status5');
+                    })->whereHas('mb_no', function ($q) {
+                        if(Auth::user()->mb_type == 'spasys'){
+                            $q->where('mb_type', 'spasys');
+                        }else if(Auth::user()->mb_type == 'shop'){
+                            $q->where('mb_type', 'shop');
+                        }
+
                     })
                     ->where(function ($q) {
                         $q->where('rgd_status4', '=', '예상경비청구서')->orWhereNull('rgd_status4');
                     })
                     ->get();
-                if($rgds->count() == 0){
-                    $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent'])
+                $warehousing = Warehousing::with(['w_ew_many' => function ($q) {
+
+                    $q->withCount([
+                        'warehousing_item as bonusQuantity' => function ($query) {
+
+                            $query->select(DB::raw('SUM(wi_number)'))->where('wi_type', '출고_spasys');
+                        },
+                    ]);
+
+                },'w_ew' => function ($q) {
+
+                    $q->withCount([
+                        'warehousing_item as bonusQuantity' => function ($query) {
+
+                            $query->select(DB::raw('SUM(wi_number)'))->where('wi_type', '출고_spasys');
+                        },
+                    ]);
+
+                }, 'co_no', 'warehousing_request', 'w_import_parent', 'warehousing_child'])->withSum('warehousing_item_IW_spasys_confirm', 'wi_number')->find($w_no);
+                $adjustment_group = AdjustmentGroup::where('co_no', '=', $warehousing->co_no)->first();
+                $adjustment_group2 = AdjustmentGroup::select(['ag_name'])->where('co_no', '=', $warehousing->co_no)->get();
+
+                $time = str_replace('-', '.', $start_date) . ' ~ ' . str_replace('-', '.', $end_date);
+            }if ($type == 'monthly_edit') {
+                $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing'])->where('rgd_no', $rgd_no)->first();
+                $w_no = $rgd->w_no;
+                $co_no = $rgd->warehousing->co_no;
+                $created_at = Carbon::createFromFormat('Y.m.d H:i:s', $rgd->created_at->format('Y.m.d H:i:s'));
+
+                $start_date = $created_at->startOfMonth()->toDateString();
+                $end_date = $created_at->endOfMonth()->toDateString();
+                $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
+
+                $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general'])
                     ->whereHas('w_no', function ($q) use ($co_no) {
                         $q->where('co_no', $co_no)
                             ->where('w_category_name', '유통가공');
                     })
-                // ->doesntHave('rgd_child')
-                    ->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
-                    ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
-                    ->where('rgd_status1', '=', '입고')
-                    ->where('rgd_bill_type', 'final_monthly')
                     ->where('rgd_settlement_number', $rgd->rgd_settlement_number)
+
                     ->get();
-
-                    if($rgds->count() == 0 ){
-
-                        $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing'])->where('rgd_no', $rgd->rgd_parent_no)->first();
-                        if(!empty($rgd)){
-                            $w_no = $rgd->w_no;
-                            $co_no = $rgd->warehousing->co_no;
-                            $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
-                            $updated_at = Carbon::createFromFormat('Y.m.d H:i:s', $rgd->updated_at->format('Y.m.d H:i:s'));
-
-                            $start_date = $updated_at->startOfMonth()->toDateString();
-                            $end_date = $updated_at->endOfMonth()->toDateString();
-                            $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent'])
-                            ->whereHas('w_no', function ($q) use ($co_no) {
-                                $q->where('co_no', $co_no)
-                                    ->where('w_category_name', '유통가공');
-                            })
-                        // ->doesntHave('rgd_child')
-                            ->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
-                            ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
-                            ->where('rgd_status1', '=', '입고')
-                            ->where('rgd_bill_type', 'final_monthly')
-                            ->where('rgd_settlement_number', $rgd->rgd_settlement_number)
-                            ->get();
-                        }else {
-                            $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general'])
-                            ->whereHas('w_no', function ($q) use ($co_no) {
-                                $q->where('co_no', $co_no)
-                                    ->where('w_category_name', '유통가공');
-                            })
-                            ->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
-                            ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
-                            ->where('rgd_status1', '=', '입고')
-                            ->whereNull('rgd_bill_type')
-                            ->where(function ($q) {
-                                $q->whereDoesntHave('rgd_child')
-                                    ->orWhere('rgd_status5', '!=', 'issued')
-                                    ->orWhereNull('rgd_status5');
-                            })
-                            ->where(function ($q) {
-                                $q->where('rgd_status4', '=', '예상경비청구서')->orWhereNull('rgd_status4');
-                            })
-                            ->get();
-
-
-                        }
-
-                    }
-                }
                 $warehousing = Warehousing::with(['w_ew_many' => function ($q) {
 
                     $q->withCount([
@@ -2034,13 +2020,14 @@ class WarehousingController extends Controller
                 $time = str_replace('-', '.', $start_date) . ' ~ ' . str_replace('-', '.', $end_date);
             } else if ($type == 'additional_monthly') {
                 $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing'])->where('rgd_no', $rgd_no)->first();
+                $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing'])->where('rgd_no', $rgd->rgd_parent_no)->first();
                 $w_no = $rgd->w_no;
                 $co_no = $rgd->warehousing->co_no;
                 $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
-                $updated_at = Carbon::createFromFormat('Y.m.d H:i:s', $rgd->updated_at->format('Y.m.d H:i:s'));
+                $created_at = Carbon::createFromFormat('Y.m.d H:i:s', $rgd->created_at->format('Y.m.d H:i:s'));
 
-                $start_date = $updated_at->startOfMonth()->toDateString();
-                $end_date = $updated_at->endOfMonth()->toDateString();
+                $start_date = $created_at->startOfMonth()->toDateString();
+                $end_date = $created_at->endOfMonth()->toDateString();
 
                 $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general'])
                     ->whereHas('w_no', function ($q) use ($co_no) {
@@ -2076,6 +2063,7 @@ class WarehousingController extends Controller
                 $adjustment_group2 = AdjustmentGroup::select(['ag_name'])->where('co_no', '=', $warehousing->co_no)->get();
 
                 $time = str_replace('-', '.', $start_date) . ' ~ ' . str_replace('-', '.', $end_date);
+                $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing'])->where('rgd_no', $rgd_no)->first();
             }  else {
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
                 $w_no = $rgd->w_no;
@@ -2432,9 +2420,9 @@ class WarehousingController extends Controller
                         }
                     }
 
-                    if($i == $k){
+                    if($i == $k || $i == 1){
                         $item->is_completed = true;
-                        $item->completed_date = Carbon::parse($completed_date)->format('Y.m.d');
+                        $item->completed_date = $completed_date != null ? Carbon::parse($completed_date)->format('Y.m.d') : null;
                     }else {
                         $item->is_completed = false;
                         $item->completed_date = null;
@@ -2463,23 +2451,39 @@ class WarehousingController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
-            if ($user->mb_type == 'shop') {
+            if ($user->mb_type == 'shop' && $request->type == 'check_list') {
                 $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
+                })->whereHas('mb_no', function($q) {
+                    $q->where('mb_type', 'spasys');
+                });
+            }else if ($user->mb_type == 'shop') {
+                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
+                    $query->whereHas('co_no.co_parent', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
+                    });
+                })->whereHas('mb_no', function($q) {
+                    $q->where('mb_type', 'shop');
                 });
             } else if ($user->mb_type == 'shipper') {
                 $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
+                })->whereHas('mb_no', function($q) {
+                    $q->where('mb_type', 'shop');
                 });
+            }else if ($user->mb_type == 'spasys' && $request->type == 'check_list') {
+
             } else if ($user->mb_type == 'spasys') {
                 $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general','settlement_number'])->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
+                })->whereHas('mb_no', function($q) {
+                    $q->where('mb_type', 'spasys');
                 });
             }
             $warehousing->whereHas('w_no', function ($query) {
