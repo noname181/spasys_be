@@ -7074,22 +7074,26 @@ class RateDataController extends Controller
 
                 }else if($request->bill_type == 'monthly'){
                     
-                    $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-                        'rgd_status5' => 'cancel'
-                    ]);
-                    $insert_cancel_bill = CancelBillHistory::insertGetId([
-                        'mb_no' => Auth::user()->mb_no,
-                        'rgd_no' => $request->rgd_no,
-                    ]);
+                    $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
 
-                    $rgd_child = ReceivingGoodsDelivery::where('rgd_parent_no', $request->rgd_no)->get();
-                    foreach($rgd_child as $rgd){
-                        $rgd_update = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_no)->update([
+                    $settlement_number = $rgd->rgd_settlement_number;
+                   
+
+                    $rgds = ReceivingGoodsDelivery::where('rgd_settlement_number', $settlement_number)->get();
+                    foreach($rgds as $rgd){
+                        $rgd_update = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
                             'rgd_status5' => 'cancel'
                         ]);
-                        $rgd2 = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_no)->first();
-                        $rgd_update_parent = ReceivingGoodsDelivery::where('rgd_no', $rgd2->rgd_parent_no)->update([
+                        CancelBillHistory::insertGetId([
+                            'mb_no' => Auth::user()->mb_no,
+                            'rgd_no' =>  $rgd['rgd_no'],
+                        ]);
+                        $rgd_update_parent = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_parent_no'])->update([
                             'rgd_status5' => 'cancel'
+                        ]);
+                        CancelBillHistory::insertGetId([
+                            'mb_no' => Auth::user()->mb_no,
+                            'rgd_no' => $rgd['rgd_parent_no'],
                         ]);
                     }
                 }else{
