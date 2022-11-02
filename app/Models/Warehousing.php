@@ -115,7 +115,7 @@ class Warehousing extends Model
 
     public function warehousing_child()
     {
-        return $this->hasMany(Warehousing::class, 'w_import_no')->withSum('warehousing_item_EW_spasys_confirm', 'wi_number');
+        return $this->hasMany(Warehousing::class, 'w_import_no')->withSum('warehousing_item_EW_spasys_confirm', 'wi_number')->orderBy('w_completed_day');
     }
 
     public function warehousing_request()

@@ -1400,10 +1400,24 @@ class ReceivingGoodsDeliveryController extends Controller
     {
 
         try {
-
-            Warehousing::where('w_no', $request->w_no)->update([
-                'w_cancel_yn' => 'y'
-            ]);
+            if($request->datachkbox){
+                
+                foreach($request->datachkbox as $value){
+                    //return $value['w_no']['w_no'];
+                    if($value['w_no']['w_no']){
+                        ReceivingGoodsDelivery::where('w_no', $value['w_no']['w_no'])->where('rgd_status1' , '!=', '입고')->where('rgd_status2' , '!=', '작업완료')->update([
+                            'rgd_status1' => '입고예정 취소'
+                        ]);
+                    }  
+                }
+            }else{
+                if($request->w_no){
+                    ReceivingGoodsDelivery::where('w_no', $request->w_no)->where('rgd_status1' , '!=', '입고')->where('rgd_status2' , '!=', '작업완료')->update([
+                        'rgd_status1' => '입고예정 취소'
+                    ]);
+                }
+            }
+           
 
             return response()->json(['message' => 'ok']);
         } catch (\Exception $e) {
