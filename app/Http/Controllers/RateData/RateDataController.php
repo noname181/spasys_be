@@ -7098,6 +7098,22 @@ class RateDataController extends Controller
                             'rgd_no' => $rgd['rgd_parent_no'],
                         ]);
                     }
+                }else if($request->bill_type == 'monthly_service2'){ //page 253 service 2
+                    $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+
+                    $settlement_number = $rgd->rgd_settlement_number;
+                   
+
+                    $rgds = ReceivingGoodsDelivery::where('rgd_settlement_number', $settlement_number)->get();
+                    foreach($rgds as $rgd){
+                        $rgd_update = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
+                            'rgd_status5' => 'cancel'
+                        ]);
+                        CancelBillHistory::insertGetId([
+                            'mb_no' => Auth::user()->mb_no,
+                            'rgd_no' =>  $rgd['rgd_no'],
+                        ]);
+                    }
                 }else{ //case_bill,monthly_bill
                     $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                         'rgd_status5' => 'cancel'
