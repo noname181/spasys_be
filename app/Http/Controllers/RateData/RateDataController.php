@@ -2665,42 +2665,45 @@ class RateDataController extends Controller
 
             if($request->bill_type == 'final'){
                 //UPDATE OTHER SAME MONTH RGD
-                $co_no = $rgd->warehousing->co_no;
-                $updated_at = Carbon::createFromFormat('Y.m.d H:i:s', $rgd->updated_at->format('Y.m.d H:i:s'));
+                // $co_no = $rgd->warehousing->co_no;
+                // $updated_at = Carbon::createFromFormat('Y.m.d H:i:s', $rgd->updated_at->format('Y.m.d H:i:s'));
 
-                $start_date = $updated_at->startOfMonth()->toDateString();
-                $end_date = $updated_at->endOfMonth()->toDateString();
+                // $start_date = $updated_at->startOfMonth()->toDateString();
+                // $end_date = $updated_at->endOfMonth()->toDateString();
 
-                $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general'])
-                    ->whereHas('w_no', function ($q) use ($co_no) {
-                        $q->where('co_no', $co_no)
-                            ->where('w_category_name', '수입풀필먼트');
-                    })
-                    ->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
-                    ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
-                    ->where('rgd_status1', '=', '입고')
-                    ->whereNull('rgd_bill_type')
-                    ->where(function ($q) {
-                        $q->whereDoesntHave('rgd_child')
-                            ->orWhere('rgd_status5', '!=', 'issued')
-                            ->orWhereNull('rgd_status5');
-                    })->get();
+                // $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general'])
+                //     ->whereHas('w_no', function ($q) use ($co_no) {
+                //         $q->where('co_no', $co_no)
+                //             ->where('w_category_name', '수입풀필먼트');
+                //     })
+                //     ->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
+                //     ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
+                //     ->where('rgd_status1', '=', '입고')
+                //     ->whereNull('rgd_bill_type')
+                //     ->where(function ($q) {
+                //         $q->whereDoesntHave('rgd_child')
+                //             ->orWhere('rgd_status5', '!=', 'issued')
+                //             ->orWhereNull('rgd_status5');
+                //     })->get();
 
-                foreach($rgds as $rgd){
-                    ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_no) ->update([
-                        'rgd_status4' => $request->status,
-                        'rgd_bill_type' => $request->bill_type,
-                        'rgd_settlement_number' => $request->settlement_number,
-                        'rgd_is_show' => 'n'
-                    ]);
-                }
+                // foreach($rgds as $rgd){
+                //     ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_no) ->update([
+                //         'rgd_status4' => $request->status,
+                //         'rgd_bill_type' => $request->bill_type,
+                //         'rgd_settlement_number' => $request->settlement_number,
+                //         'rgd_is_show' => 'n'
+                //     ]);
+                // }
 
 
 
                 ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-                    'rgd_is_show' => 'y'
+                    'rgd_is_show' => 'y',
+                    'rgd_status4' => $request->status,
+                    'rgd_bill_type' => $request->bill_type,
+                    'rgd_settlement_number' => $request->settlement_number,
                 ]);
-            }else if($request->bill_type == 'additional'){
+            }else if($request->bill_type == 'additional' && $request->type != 'edit_additional'){
                 $previous_rgd->rgd_status5 = 'issued';
                 $previous_rgd->save();
 
@@ -2720,6 +2723,8 @@ class RateDataController extends Controller
                 RateDataGeneral::where('rgd_no_final', $previous_rgd->rgd_no)->update([
                     'rgd_no' => $final_rgd->rgd_no,
                 ]);
+            }else if($request->type == 'edit_additional'){
+
             }
 
 
@@ -7074,12 +7079,12 @@ class RateDataController extends Controller
                         'rgd_status5' => null
                     ]);
 
-                }else if($request->bill_type == 'monthly'){ //final bill 
-                    
+                }else if($request->bill_type == 'monthly'){ //final bill
+
                     $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
 
                     $settlement_number = $rgd->rgd_settlement_number;
-                   
+
 
                     $rgds = ReceivingGoodsDelivery::where('rgd_settlement_number', $settlement_number)->get();
                     foreach($rgds as $rgd){
@@ -7102,7 +7107,7 @@ class RateDataController extends Controller
                     $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
 
                     $settlement_number = $rgd->rgd_settlement_number;
-                   
+
 
                     $rgds = ReceivingGoodsDelivery::where('rgd_settlement_number', $settlement_number)->get();
                     foreach($rgds as $rgd){
@@ -7123,7 +7128,7 @@ class RateDataController extends Controller
                         'rgd_no' => $request->rgd_no,
                     ]);
                 }
-                
+
 
 
 

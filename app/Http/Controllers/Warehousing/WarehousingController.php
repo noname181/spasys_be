@@ -1152,17 +1152,17 @@ class WarehousingController extends Controller
                         ->leftjoin(DB::raw('(SELECT ti_logistic_manage_number, ti_i_confirm_number, ti_i_date, ti_i_order, ti_i_number, ti_carry_in_number
                         FROM t_import group by ti_logistic_manage_number, ti_i_confirm_number, ti_i_date, ti_i_order, ti_i_number, ti_carry_in_number)
                         bbb'), function ($leftJoin) {
-    
+
                             $leftJoin->on('t_import_expected.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
                         })->leftjoin(DB::raw('(SELECT tec_logistic_manage_number, tec_ec_confirm_number, tec_ec_date, tec_ec_number
                         FROM t_export_confirm group by tec_logistic_manage_number, tec_ec_confirm_number, tec_ec_date, tec_ec_number)
                         ccc'), function ($leftjoin) {
-    
+
                             $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
                         })->leftjoin(DB::raw('(SELECT te_logistic_manage_number, te_carry_out_number, te_e_date, te_carry_in_number, te_e_order, te_e_number
                         FROM t_export group by te_logistic_manage_number, te_carry_out_number, te_e_date, te_carry_in_number, te_e_order, te_e_number)
                         ddd'), function ($leftjoin) {
-    
+
                             $leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
                             $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
                         })->where('tie_is_date', '>=', '2022-01-04')->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
@@ -1180,17 +1180,17 @@ class WarehousingController extends Controller
                         ->leftjoin(DB::raw('(SELECT ti_logistic_manage_number, ti_i_confirm_number, ti_i_date, ti_i_order, ti_i_number, ti_carry_in_number
                     FROM t_import group by ti_logistic_manage_number, ti_i_confirm_number, ti_i_date, ti_i_order, ti_i_number, ti_carry_in_number)
                     bbb'), function ($leftJoin) {
-    
+
                             $leftJoin->on('t_import_expected.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
                         })->leftjoin(DB::raw('(SELECT tec_logistic_manage_number, tec_ec_confirm_number, tec_ec_date, tec_ec_number
                     FROM t_export_confirm group by tec_logistic_manage_number, tec_ec_confirm_number, tec_ec_date, tec_ec_number)
                     ccc'), function ($leftjoin) {
-    
+
                             $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
                         })->leftjoin(DB::raw('(SELECT te_logistic_manage_number, te_carry_out_number, te_e_date, te_carry_in_number, te_e_order, te_e_number
                     FROM t_export group by te_logistic_manage_number, te_carry_out_number, te_e_date, te_carry_in_number, te_e_order, te_e_number)
                     ddd'), function ($leftjoin) {
-    
+
                             $leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
                             $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
                         })->where('tie_is_date', '>=', '2022-01-04')->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
@@ -1210,17 +1210,17 @@ class WarehousingController extends Controller
                    ->leftjoin(DB::raw('(SELECT ti_logistic_manage_number, ti_i_confirm_number, ti_i_date, ti_i_order, ti_i_number, ti_carry_in_number
                FROM t_import group by ti_logistic_manage_number, ti_i_confirm_number, ti_i_date, ti_i_order, ti_i_number, ti_carry_in_number)
                bbb'), function ($leftJoin) {
-    
+
                        $leftJoin->on('t_import_expected.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
                    })->leftjoin(DB::raw('(SELECT tec_logistic_manage_number, tec_ec_confirm_number, tec_ec_date, tec_ec_number
                FROM t_export_confirm group by tec_logistic_manage_number, tec_ec_confirm_number, tec_ec_date, tec_ec_number)
                ccc'), function ($leftjoin) {
-    
+
                        $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
                    })->leftjoin(DB::raw('(SELECT te_logistic_manage_number, te_carry_out_number, te_e_date, te_carry_in_number, te_e_order, te_e_number
                FROM t_export group by te_logistic_manage_number, te_carry_out_number, te_e_date, te_carry_in_number, te_e_order, te_e_number)
                ddd'), function ($leftjoin) {
-    
+
                        $leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
                        $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
                    })->where('tie_is_date', '>=', '2022-01-04')->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
@@ -1795,7 +1795,7 @@ class WarehousingController extends Controller
                     $query->where('w_type', '=', 'EW')
                         ->where('rgd_status1', '=', '출고')
                         ->where('rgd_status2', '=', '작업완료')
-                        
+
                         ->where(function ($q) {
                             $q->where(function ($query) {
                                 $query->where('rgd_status4', '!=', '예상경비청구서')->where('rgd_status4', '!=', '확정청구서');
@@ -1810,7 +1810,7 @@ class WarehousingController extends Controller
                     $query->where('w_type', '=', 'EW')
                         ->where('rgd_status1', '=', '출고')
                         ->where('rgd_status2', '=', '작업완료')
-                        
+
                         ->where(function ($q) {
                             $q->where(function ($query) {
                                 $query->where('rgd_status4', '!=', '예상경비청구서')->where('rgd_status4', '!=', '확정청구서');
@@ -1825,7 +1825,7 @@ class WarehousingController extends Controller
                     $query->where('w_type', '=', 'EW')
                         ->where('rgd_status1', '=', '출고')
                         ->where('rgd_status2', '=', '작업완료')
-                        
+
                         ->where(function ($q) {
                             $q->where(function ($query) {
                                 $query->where('rgd_status4', '!=', '예상경비청구서')->where('rgd_status4', '!=', '확정청구서');
@@ -1962,14 +1962,14 @@ class WarehousingController extends Controller
                     ->get();
 
                     if($rgds->count() == 0 ){
-                        
+
                         $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing'])->where('rgd_no', $rgd->rgd_parent_no)->first();
                         if(!empty($rgd)){
                             $w_no = $rgd->w_no;
                             $co_no = $rgd->warehousing->co_no;
                             $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
                             $updated_at = Carbon::createFromFormat('Y.m.d H:i:s', $rgd->updated_at->format('Y.m.d H:i:s'));
-    
+
                             $start_date = $updated_at->startOfMonth()->toDateString();
                             $end_date = $updated_at->endOfMonth()->toDateString();
                             $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent'])
@@ -2004,9 +2004,9 @@ class WarehousingController extends Controller
                             })
                             ->get();
 
-                            
+
                         }
-                       
+
                     }
                 }
                 $warehousing = Warehousing::with(['w_ew_many' => function ($q) {
@@ -2052,7 +2052,7 @@ class WarehousingController extends Controller
                     ->where('rgd_status1', '=', '입고')
                     ->where('rgd_settlement_number', $rgd->rgd_settlement_number)
                     ->get();
-             
+
                 $warehousing = Warehousing::with(['w_ew_many' => function ($q) {
 
                     $q->withCount([
@@ -2768,7 +2768,7 @@ class WarehousingController extends Controller
                             'set_type' => 'fulfill1_final',
                         ]
                     )->first();
-                    
+
                     if(!empty($rmd)){
                         $rate_data = RateData::where('rmd_no', $rmd->rmd_no)->where(function ($q) {
                             $q->orWhere('rd_cate_meta1', '수입풀필먼트');
@@ -2979,13 +2979,18 @@ class WarehousingController extends Controller
         try {
             DB::enableQueryLog();
             $validated = $request->validated();
-
             // If per_page is null set default data = 15
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
-            if ($user->mb_type == 'shop') {
+            if ($user->mb_type == 'shop' && $request->type == 'view_list') {
+                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
+                    $query->whereHas('co_no.co_parent', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
+                    });
+                });
+            }else if ($user->mb_type == 'shop') {
                 $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
@@ -2997,7 +3002,7 @@ class WarehousingController extends Controller
                         $q->where('co_no', $user->co_no);
                     });
                 });
-            } else if ($user->mb_type == 'spasys') {
+            } else if ($user->mb_type == 'spasys' && $request->type == 'view_list') {
                 $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
@@ -3746,6 +3751,8 @@ class WarehousingController extends Controller
                 'service_korean_name' => '수입풀필먼트',
                 'rgd_status1' => '입고',
                 'rgd_status2' => '작업완료',
+                'rgd_monthbill_start' =>Carbon::createFromFormat('Y-m-d', $request->from_date),
+                'rgd_monthbill_end' =>Carbon::createFromFormat('Y-m-d', $request->to_date),
             ]);
 
             $rdg_no = RateDataGeneral::insertGetId([
