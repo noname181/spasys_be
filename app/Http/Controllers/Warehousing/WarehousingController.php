@@ -2417,9 +2417,11 @@ class WarehousingController extends Controller
                     $item->rate_data = empty($rate_data) ? 0 : 1;
                     $i = 0;
                     $k = 0;
+                    $completed_date = null;
                     foreach($item->warehousing->warehousing_child as $child){
                         $i++;
                         if($child['w_completed_day'] != null){
+                            $completed_date = $child['w_completed_day'];
                             $k++;
                         }
                     }
@@ -2429,7 +2431,7 @@ class WarehousingController extends Controller
                     }else {
                         $item->is_completed = false;
                     }
-
+                    $item->completed_date =  $completed_date ? Carbon::parse($completed_date)->format('Y.m.d') : null;
                     return $item;
                 })
             );
@@ -2628,6 +2630,8 @@ class WarehousingController extends Controller
                         ->where('w_category_name', '=', '수입풀필먼트')->where('w_type', '=', 'IW');
                 });
 
+            $warehousing->whereHas('rate_data_general');
+
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
@@ -2748,11 +2752,11 @@ class WarehousingController extends Controller
                         $caton = 0;
 
                         foreach($rate_data as $rate){
-                            if($rate['rd_data1'] == 'PCS'){
+                            if($rate['rd_data1'] == 'PCS' && $rate['rd_cate1'] == '출고'){
                                 $pcs += intval($rate['rd_data4']);
-                            }else if($rate['rd_data1'] == 'BOX'){
+                            }else if($rate['rd_data1'] == 'BOX' && $rate['rd_cate1'] == '출고'){
                                 $box += intval($rate['rd_data4']);
-                            }else if($rate['rd_data1'] == 'CATON'){
+                            }else if($rate['rd_data1'] == 'CATON' && $rate['rd_cate1'] == '출고'){
                                 $caton += intval($rate['rd_data4']);
                             }
                         }
@@ -2956,7 +2960,7 @@ class WarehousingController extends Controller
             $user = Auth::user();
             if ($user->mb_type == 'shop') {
                 $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
-                    $query->whereHas('co_no', function ($q) use ($user) {
+                    $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
                 });
