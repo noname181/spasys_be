@@ -2529,6 +2529,24 @@ class WarehousingController extends Controller
                     ])->first();
                     $item->settlement_cycle = $company_settlement ? $company_settlement->cs_payment_cycle : "";
 
+                    $i = 0;
+                    $k = 0;
+                    $completed_date = null;
+                    foreach($item->warehousing->warehousing_child as $child){
+                        $i++;
+                        if($child['w_completed_day'] != null){
+                            $completed_date = $child['w_completed_day'];
+                            $k++;
+                        }
+                    }
+
+                    if($i == $k){
+                        $item->is_completed = true;
+                    }else {
+                        $item->is_completed = false;
+                    }
+                    $item->completed_date =  ($completed_date && ($i == $k)) ? Carbon::parse($completed_date)->format('Y.m.d') : null;
+
                     return $item;
                 })
             );
