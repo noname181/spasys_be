@@ -14,7 +14,9 @@ use App\Models\Company;
 use App\Models\File;
 use App\Models\ItemChannel;
 use App\Models\ImportExpected;
+use App\Models\Import;
 use App\Models\Export;
+use App\Models\ExportConfirm;
 
 use App\Utils\Messages;
 use App\Http\Requests\Item\ExcelRequest;
@@ -1435,7 +1437,7 @@ class ItemController extends Controller
 
             
             DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
-
+            return $import_schedule;
             foreach($import_schedule as $value){
                 if(isset($value['tie_logistic_manage_number'])){
                     $logistic_manage_number = $value['tie_logistic_manage_number'];
@@ -1468,10 +1470,20 @@ class ItemController extends Controller
                                 'tie_status_2' => $status
                             ]);
 
-                            $export = Export::where('te_logistic_manage_number', $value['te_logistic_manage_number'])
+                            $import = Import::where('ti_logistic_manage_number', $value['ti_logistic_manage_number'])->where('ti_i_confirm_number', $value['ti_i_confirm_number'])
+                            ->update([
+                                'tie_status_2' => $status
+                            ]);
+
+                            $export = Export::where('te_logistic_manage_number', $value['te_logistic_manage_number'])->where('te_carry_out_number', $value['te_carry_out_number'])
                             ->update([
                                 'te_status_2' => $status
                             ]);
+
+                            // $export_confirm = ExportConfirm::where('te_logistic_manage_number', $value['te_logistic_manage_number'])
+                            // ->update([
+                            //     'te_status_2' => $status
+                            // ]);
                     }
                 }
             }
