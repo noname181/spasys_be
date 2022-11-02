@@ -2628,6 +2628,8 @@ class WarehousingController extends Controller
                         ->where('w_category_name', '=', '수입풀필먼트')->where('w_type', '=', 'IW');
                 });
 
+            $warehousing->whereHas('rate_data_general');
+
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
@@ -2748,11 +2750,11 @@ class WarehousingController extends Controller
                         $caton = 0;
 
                         foreach($rate_data as $rate){
-                            if($rate['rd_data1'] == 'PCS'){
+                            if($rate['rd_data1'] == 'PCS' && $rate['rd_cate1'] == '출고'){
                                 $pcs += intval($rate['rd_data4']);
-                            }else if($rate['rd_data1'] == 'BOX'){
+                            }else if($rate['rd_data1'] == 'BOX' && $rate['rd_cate1'] == '출고'){
                                 $box += intval($rate['rd_data4']);
-                            }else if($rate['rd_data1'] == 'CATON'){
+                            }else if($rate['rd_data1'] == 'CATON' && $rate['rd_cate1'] == '출고'){
                                 $caton += intval($rate['rd_data4']);
                             }
                         }
