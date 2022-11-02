@@ -673,6 +673,34 @@ class ItemController extends Controller
         }
     }
 
+    public function paginateItemsApiId(Request $request)
+    {
+        try {
+            $user = Auth::user();
+            if ($user->mb_type == 'shop') {
+                $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                })->orderBy('item_no', 'DESC');
+            } else if ($user->mb_type == 'shipper') {
+                $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('ContractWms.company', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                })->orderBy('item_no', 'DESC');
+            } else if ($user->mb_type == 'spasys') {
+                $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                })->orderBy('item_no', 'DESC');
+            }
+
+            $item = $item->get();
+
+            return response()->json(['item' => $item]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
     public function paginateItemsApi(ItemSearchRequest $request)
     {
         $validated = $request->validated();

@@ -532,7 +532,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         );
                     }
 
-                    
+
 
                     foreach ($data['location'] as $location) {
 
@@ -648,7 +648,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'rgd_delivery_schedule_day' => $location['rgd_delivery_schedule_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_delivery_schedule_day']) : null,
                                 'rgd_arrive_day' => $location['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']) : null,
                             ]);
-                            
+
                         }
 
                         if($warehousing_status){
@@ -1886,6 +1886,23 @@ class ReceivingGoodsDeliveryController extends Controller
             ]);
             return response()->json([
                 'status' => 1,
+                'message' => 'Success'
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function payment(Request $request)
+    {
+        try {
+            ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                'rgd_status6' => 'paid',
+                'rgd_paid_date' =>  Carbon::now()
+            ]);
+
+            return response()->json([
                 'message' => 'Success'
             ]);
         } catch (\Exception $e) {
