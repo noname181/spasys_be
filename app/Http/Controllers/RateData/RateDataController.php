@@ -7059,13 +7059,49 @@ class RateDataController extends Controller
             //         ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->delete();
             //     }
             // }
-                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-                    'rgd_status5' => 'cancel'
-                ]);
-                $insert_cancel_bill = CancelBillHistory::insertGetId([
-                    'mb_no' => Auth::user()->mb_no,
-                    'rgd_no' => $request->rgd_no,
-                ]);
+                if($request->bill_type == 'case_bill_final'){
+                    $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                        'rgd_status5' => 'cancel'
+                    ]);
+                    $insert_cancel_bill = CancelBillHistory::insertGetId([
+                        'mb_no' => Auth::user()->mb_no,
+                        'rgd_no' => $request->rgd_no,
+                    ]);
+                    $rgd_parent_no = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first()->rgd_parent_no;
+                    ReceivingGoodsDelivery::where('rgd_no', $rgd_parent_no)->update([
+                        'rgd_status5' => null
+                    ]);
+
+                }else if($request->bill_type == 'monthly'){
+                    
+                    $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                        'rgd_status5' => 'cancel'
+                    ]);
+                    $insert_cancel_bill = CancelBillHistory::insertGetId([
+                        'mb_no' => Auth::user()->mb_no,
+                        'rgd_no' => $request->rgd_no,
+                    ]);
+
+                    $rgd_child = ReceivingGoodsDelivery::where('rgd_parent_no', $request->rgd_no)->get();
+                    foreach($rgd_child as $rgd){
+                        $rgd_update = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_no)->update([
+                            'rgd_status5' => 'cancel'
+                        ]);
+                        $rgd2 = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_no)->first();
+                        $rgd_update_parent = ReceivingGoodsDelivery::where('rgd_no', $rgd2->rgd_parent_no)->update([
+                            'rgd_status5' => 'cancel'
+                        ]);
+                    }
+                }else{
+                    $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                        'rgd_status5' => 'cancel'
+                    ]);
+                    $insert_cancel_bill = CancelBillHistory::insertGetId([
+                        'mb_no' => Auth::user()->mb_no,
+                        'rgd_no' => $request->rgd_no,
+                    ]);
+                }
+                
 
 
 
