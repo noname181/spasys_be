@@ -1400,23 +1400,44 @@ class ReceivingGoodsDeliveryController extends Controller
     {
 
         try {
-            if($request->datachkbox){
+            if($request->page_type == 'IW'){
+                if($request->datachkbox){
                 
-                foreach($request->datachkbox as $value){
-                    //return $value['w_no']['w_no'];
-                    if($value['w_no']['w_no']){
-                        ReceivingGoodsDelivery::where('w_no', $value['w_no']['w_no'])->where('rgd_status1' , '!=', '입고')->where('rgd_status2' , '!=', '작업완료')->update([
+                    foreach($request->datachkbox as $value){
+                        //return $value['w_no']['w_no'];
+                        if($value['w_no']['w_no']){
+                            ReceivingGoodsDelivery::where('w_no', $value['w_no']['w_no'])->where('rgd_status1' , '!=', '입고')->where('rgd_status2' , '!=', '작업완료')->update([
+                                'rgd_status1' => '입고예정 취소'
+                            ]);
+                        }  
+                    }
+                }else{
+                    if($request->w_no){
+                        ReceivingGoodsDelivery::where('w_no', $request->w_no)->where('rgd_status1' , '!=', '입고')->where('rgd_status2' , '!=', '작업완료')->update([
                             'rgd_status1' => '입고예정 취소'
                         ]);
-                    }  
+                    }
                 }
             }else{
-                if($request->w_no){
-                    ReceivingGoodsDelivery::where('w_no', $request->w_no)->where('rgd_status1' , '!=', '입고')->where('rgd_status2' , '!=', '작업완료')->update([
-                        'rgd_status1' => '입고예정 취소'
-                    ]);
+                if($request->datachkbox){
+                
+                    foreach($request->datachkbox as $value){
+                        //return $value['w_no']['w_no'];
+                        if($value['w_no']['w_no']){
+                            ReceivingGoodsDelivery::where('w_no', $value['w_no']['w_no'])->where('rgd_status1' , '!=', '출고')->update([
+                                'rgd_status1' => '출고예정 취소'
+                            ]);
+                        }  
+                    }
+                }else{
+                    if($request->w_no){
+                        ReceivingGoodsDelivery::where('w_no', $request->w_no)->where('rgd_status1' , '!=', '출고')->update([
+                            'rgd_status1' => '출고예정 취소'
+                        ]);
+                    }
                 }
             }
+            
            
 
             return response()->json(['message' => 'ok']);
