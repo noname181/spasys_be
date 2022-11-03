@@ -2489,10 +2489,6 @@ class WarehousingController extends Controller
             $warehousing->whereHas('w_no', function ($query) {
                 $query->where('rgd_status1', '=', '입고')
                     ->where(function ($q) {
-                        $q->where('rgd_status5', '!=', 'cancel')
-                            ->orWhereNull('rgd_status5');
-                    })
-                    ->where(function ($q) {
                         $q->where('rgd_status4', '=', '예상경비청구서')
                             ->orWhere('rgd_status4', '=', '확정청구서')
                             ->orWhere('rgd_status4', '=', '추가청구서');
