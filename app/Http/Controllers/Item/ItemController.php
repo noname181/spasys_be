@@ -1478,7 +1478,7 @@ class ItemController extends Controller
                             // }else{
                             //     $status1 = null;
                             // }
-
+                            $status1 = '';
                             switch($status){
                                 case '수입신고 수리후 정정 완료':
                                     $status1 = '수입신고정정완료';
