@@ -1400,21 +1400,38 @@ class ReceivingGoodsDeliveryController extends Controller
     {
 
         try {
+
+            $member = Member::where('mb_id', Auth::user()->mb_id)->first();
             if($request->page_type == 'IW'){
                 if($request->datachkbox){
                 
                     foreach($request->datachkbox as $value){
                         //return $value['w_no']['w_no'];
                         if($value['w_no']['w_no']){
-                            ReceivingGoodsDelivery::where('w_no', $value['w_no']['w_no'])->where('rgd_status1' , '!=', '입고')->where('rgd_status2' , '!=', '작업완료')->update([
+                            ReceivingGoodsDelivery::where('w_no', $value['w_no']['w_no'])->where('rgd_status1' , '!=', '입고')->orWhere('rgd_status2' , '!=', '작업완료')->orWhereNull('rgd_status2')->update([
                                 'rgd_status1' => '입고예정 취소'
                             ]);
-                        }  
+
+                            WarehousingStatus::insert([
+                                'w_no' => $value['w_no']['w_no'],
+                                'mb_no' => $member->mb_no,
+                                'status' => '입고예정 취소',
+                                'w_category_name' => '유통가공',
+                            ]);
+                        }
                     }
                 }else{
                     if($request->w_no){
-                        ReceivingGoodsDelivery::where('w_no', $request->w_no)->where('rgd_status1' , '!=', '입고')->where('rgd_status2' , '!=', '작업완료')->update([
+                        ReceivingGoodsDelivery::where('w_no', $request->w_no)
+                        ->where('rgd_status1' , '!=', '입고')->orWhere('rgd_status2' , '!=', '작업완료')->orWhereNull('rgd_status2')->update([
                             'rgd_status1' => '입고예정 취소'
+                        ]);
+
+                        WarehousingStatus::insert([
+                            'w_no' => $request->w_no,
+                            'mb_no' => $member->mb_no,
+                            'status' => '입고예정 취소',
+                            'w_category_name' => '유통가공',
                         ]);
                     }
                 }
@@ -1427,12 +1444,26 @@ class ReceivingGoodsDeliveryController extends Controller
                             ReceivingGoodsDelivery::where('w_no', $value['w_no']['w_no'])->where('rgd_status1' , '!=', '출고')->update([
                                 'rgd_status1' => '출고예정 취소'
                             ]);
-                        }  
+
+                            WarehousingStatus::insert([
+                                'w_no' => $value['w_no']['w_no'],
+                                'mb_no' => $member->mb_no,
+                                'status' => '출고예정 취소',
+                                'w_category_name' => '유통가공',
+                            ]);
+                        }        
                     }
                 }else{
                     if($request->w_no){
                         ReceivingGoodsDelivery::where('w_no', $request->w_no)->where('rgd_status1' , '!=', '출고')->update([
                             'rgd_status1' => '출고예정 취소'
+                        ]);
+
+                        WarehousingStatus::insert([
+                            'w_no' => $request->w_no,
+                            'mb_no' => $member->mb_no,
+                            'status' => '출고예정 취소',
+                            'w_category_name' => '유통가공',
                         ]);
                     }
                 }

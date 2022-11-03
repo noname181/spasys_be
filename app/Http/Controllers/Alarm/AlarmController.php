@@ -66,6 +66,10 @@ class AlarmController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $alarm = Alarm::with('warehousing','member')->orderBy('alarm_no', 'DESC');
 
+            if (isset($validated['w_no'])) {
+                $alarm->where('w_no', $validated['w_no']);
+            }
+
             if (isset($validated['from_date'])) {
                 $alarm->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
