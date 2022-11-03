@@ -7154,10 +7154,10 @@ class RateDataController extends Controller
                         'mb_no' => Auth::user()->mb_no,
                         'rgd_no' => $request->rgd_no,
                     ]);
-                    $rgd_parent_no = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first()->rgd_parent_no;
-                    ReceivingGoodsDelivery::where('rgd_no', $rgd_parent_no)->update([
-                        'rgd_status5' => null
-                    ]);
+                    // $rgd_parent_no = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first()->rgd_parent_no;
+                    // ReceivingGoodsDelivery::where('rgd_no', $rgd_parent_no)->update([
+                    //     'rgd_status5' => null
+                    // ]);
 
                 }else if($request->bill_type == 'monthly'){ //final bill
 
@@ -7175,13 +7175,13 @@ class RateDataController extends Controller
                             'mb_no' => Auth::user()->mb_no,
                             'rgd_no' =>  $rgd['rgd_no'],
                         ]);
-                        $rgd_update_parent = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_parent_no'])->update([
-                            'rgd_status5' => 'cancel'
-                        ]);
-                        CancelBillHistory::insertGetId([
-                            'mb_no' => Auth::user()->mb_no,
-                            'rgd_no' => $rgd['rgd_parent_no'],
-                        ]);
+                        // $rgd_update_parent = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_parent_no'])->update([
+                        //     'rgd_status5' => 'cancel'
+                        // ]);
+                        // CancelBillHistory::insertGetId([
+                        //     'mb_no' => Auth::user()->mb_no,
+                        //     'rgd_no' => $rgd['rgd_parent_no'],
+                        // ]);
                     }
                 }else if($request->bill_type == 'monthly_service2'){ //page 253 service 2
                     $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
