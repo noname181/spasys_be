@@ -2503,7 +2503,14 @@ class WarehousingController extends Controller
                 $warehousing->getCollection()->map(function ($item) use ($user) {
                     $service_name = $item->service_korean_name;
                     $w_no = $item->w_no;
-                    $co_no = Warehousing::where('w_no', $w_no)->first()->co_no;
+                    
+                    if ($user->mb_type == 'spasys') {
+                        $co_no = $item->warehousing->company->co_parent->co_no;
+                    } else if ($user->mb_type == 'shop') {
+                        $co_no = $item->warehousing->company->co_no;
+                    } else {
+                        $co_no = $user->co_no;
+                    }
                     $service_no = Service::where('service_name', $service_name)->first()->service_no;
 
                     $company_settlement = CompanySettlement::where([
@@ -2516,13 +2523,7 @@ class WarehousingController extends Controller
 
                     $rate_data = RateData::where('rd_cate_meta1', '유통가공');
 
-                    if ($user->mb_type == 'spasys') {
-                        $co_no = $item->warehousing->company->co_parent->co_no;
-                    } else if ($user->mb_type == 'shop') {
-                        $co_no = $item->warehousing->company->co_no;
-                    } else {
-                        $co_no = $user->co_no;
-                    }
+                   
 
                     $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
                     $rate_data = $rate_data->where('rd_co_no', $co_no);
@@ -3054,7 +3055,15 @@ class WarehousingController extends Controller
                 $warehousing->getCollection()->map(function ($item) use ($user) {
                     $service_name = $item->service_korean_name;
                     $w_no = $item->w_no;
-                    $co_no = Warehousing::where('w_no', $w_no)->first()->co_no;
+
+                    if ($user->mb_type == 'spasys') {
+                        $co_no = $item->warehousing->company->co_parent->co_no;
+                    } else if ($user->mb_type == 'shop') {
+                        $co_no = $item->warehousing->company->co_no;
+                    } else {
+                        $co_no = $user->co_no;
+                    }
+
                     $service_no = Service::where('service_name', $service_name)->first()->service_no;
 
                     $company_settlement = CompanySettlement::where([
@@ -3066,14 +3075,6 @@ class WarehousingController extends Controller
                     //CHECK SHIPPER COMPANY IS SENT RATE DATA YET
 
                     $rate_data = RateData::where('rd_cate_meta1', '유통가공');
-
-                    if ($user->mb_type == 'spasys') {
-                        $co_no = $item->warehousing->company->co_parent->co_no;
-                    } else if ($user->mb_type == 'shop') {
-                        $co_no = $item->warehousing->company->co_no;
-                    } else {
-                        $co_no = $user->co_no;
-                    }
 
                     $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
                     $rate_data = $rate_data->where('rd_co_no', $co_no);
