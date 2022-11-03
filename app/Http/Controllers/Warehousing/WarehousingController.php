@@ -3242,13 +3242,7 @@ class WarehousingController extends Controller
                     $q->where('mb_type', 'shop');
                 });
             } else if ($user->mb_type == 'shop' && $request->type == 'check_list') {
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
-                    $query->whereHas('co_no.co_parent', function ($q) use ($user) {
-                        $q->where('co_no', $user->co_no);
-                    });
-                })->whereHas('mb_no', function ($q) use ($user) {
-                    $q->where('mb_type', 'spasys');
-                });
+                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general']);
             } else if ($user->mb_type == 'shipper') {
                 $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no', function ($q) use ($user) {
