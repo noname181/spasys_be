@@ -7211,6 +7211,22 @@ class RateDataController extends Controller
                             'rgd_no' =>  $rgd['rgd_no'],
                         ]);
                     }
+                }else if($request->bill_type == 'case_bill_final_issue'){ //page 264
+                    $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                        'rgd_status5' => 'issued'
+                    ]);
+                    $insert_cancel_bill = CancelBillHistory::insertGetId([
+                        'mb_no' => Auth::user()->mb_no,
+                        'rgd_no' => $request->rgd_no,
+                        'cbh_status_before' => 'confirmed',
+                        'cbh_status_after' => 'issued'
+                    ]);
+                    $rgd_parent_no = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first()->rgd_parent_no;
+                    if($rgd_parent_no->rgd_status5 == 'confirmed'){
+                        ReceivingGoodsDelivery::where('rgd_no', $rgd_parent_no)->update([
+                            'rgd_status5' => 'issued'
+                        ]);
+                    } 
                 }else{ //case_bill,monthly_bill
                     $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                         'rgd_status5' => 'cancel'
@@ -7229,7 +7245,7 @@ class RateDataController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
