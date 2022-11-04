@@ -7163,7 +7163,7 @@ class RateDataController extends Controller
                         'mb_no' => Auth::user()->mb_no,
                         'rgd_no' => $request->rgd_no,
                     ]);
-                    $rgd_parent_no = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first()->rgd_parent_no;
+                    $rgd_parent_no = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
                     if($rgd_parent_no->rgd_status5 == 'issued'){
                         ReceivingGoodsDelivery::where('rgd_no', $rgd_parent_no)->update([
                             'rgd_status5' => ($rgd_parent_no->rgd_status4 == '확정청구서' ? 'confirmed' : null)
@@ -7186,7 +7186,7 @@ class RateDataController extends Controller
                             'mb_no' => Auth::user()->mb_no,
                             'rgd_no' =>  $rgd['rgd_no'],
                         ]);
-                        $rgd_parent_no = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first()->rgd_parent_no;
+                        $rgd_parent_no = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
                         $rgd_update_parent = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_parent_no'])->update([
                             'rgd_status5' => ($rgd_parent_no->rgd_status4 == '확정청구서' ? 'confirmed' : null)
                         ]);
@@ -7221,10 +7221,38 @@ class RateDataController extends Controller
                         'cbh_status_before' => 'confirmed',
                         'cbh_status_after' => 'issued'
                     ]);
-                    $rgd_parent_no = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first()->rgd_parent_no;
+                    $rgd_parent_no = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
                     if($rgd_parent_no->rgd_status5 == 'confirmed'){
                         ReceivingGoodsDelivery::where('rgd_no', $rgd_parent_no)->update([
                             'rgd_status5' => 'issued'
+                        ]);
+                    } 
+                }else if($request->bill_type == 'month_bill_final_issue'){ //page 264
+                    $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+
+                    $settlement_number = $rgd->rgd_settlement_number;
+
+
+                    $rgds = ReceivingGoodsDelivery::where('rgd_settlement_number', $settlement_number)->get();
+                    foreach($rgds as $rgd){
+                        $rgd_update = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
+                            'rgd_status5' => 'issued'
+                        ]);
+                        CancelBillHistory::insertGetId([
+                            'mb_no' => Auth::user()->mb_no,
+                            'rgd_no' =>  $rgd['rgd_no'],
+                            'cbh_status_before' => 'confirmed',
+                            'cbh_status_after' => 'issued'
+                        ]);
+                        $rgd_parent_no = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+                        $rgd_update_parent = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_parent_no'])->update([
+                            'rgd_status5' => 'issued'
+                        ]);
+                        CancelBillHistory::insertGetId([
+                            'mb_no' => Auth::user()->mb_no,
+                            'rgd_no' => $rgd['rgd_parent_no'],
+                            'cbh_status_before' => 'confirmed',
+                            'cbh_status_after' => 'issued'
                         ]);
                     } 
                 }else{ //case_bill,monthly_bill
@@ -7245,7 +7273,7 @@ class RateDataController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+            //return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
