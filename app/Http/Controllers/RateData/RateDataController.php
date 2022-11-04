@@ -1395,8 +1395,8 @@ class RateDataController extends Controller
 
             $rate_data = $rate_data->get();
             return response()->json([
-                'message' => Messages::MSG_0007, 
-                'company' => $company, 
+                'message' => Messages::MSG_0007,
+                'company' => $company,
                 'rate_data' => $rate_data,
                 'adjustment_group' => $adjustment_group,
             ], 200);
@@ -1436,27 +1436,26 @@ class RateDataController extends Controller
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
-    public function getSpasysRateData()
+    public function getSpasysRateData($co_no)
     {
         $user = Auth::user();
-        try {
-            $rate_data = RateData::where('rd_cate_meta1', '보세화물');
 
-            if ($user->mb_type == 'spasys') {
-                $rate_data = $rate_data->where('co_no', $user->co_no);
-            } else if ($user->mb_type == 'shop' || $user->mb_type == 'shipper') {
-                $rmd = RateMetaData::where('co_no', $user->co_no)->latest('created_at')->first();
-                $rate_data = $rate_data->where('rd_co_no', $user->co_no);
-                if (isset($rmd->rmd_no)) {
-                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
-                }
-            } else {
-                $rate_data = $rate_data->where('co_no', $user->co_no);
+        $service_korean_name = '보세화물';
+
+        try {
+            $rate_data = RateData::where('rd_cate_meta1', $service_korean_name);
+
+            $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
+            $rate_data = $rate_data->where('rd_co_no', $co_no);
+            if (isset($rmd->rmd_no)) {
+                $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+            }else {
+                $rate_data = [];
             }
 
             $rate_data = $rate_data->get();
 
-            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data, 'mb_type' => $user->mb_type], 200);
+            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data, 'co_no' => $co_no], 200);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
@@ -7168,7 +7167,7 @@ class RateDataController extends Controller
                         ReceivingGoodsDelivery::where('rgd_no', $rgd_parent_no)->update([
                             'rgd_status5' => ($rgd_parent_no->rgd_status4 == '확정청구서' ? 'confirmed' : null)
                         ]);
-                    } 
+                    }
 
                 }else if($request->bill_type == 'monthly'){ //final bill
 
@@ -7226,7 +7225,7 @@ class RateDataController extends Controller
                         ReceivingGoodsDelivery::where('rgd_no', $rgd_parent_no)->update([
                             'rgd_status5' => 'issued'
                         ]);
-                    } 
+                    }
                 }else if($request->bill_type == 'month_bill_final_issue'){ //page 264
                     $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
 
@@ -7254,7 +7253,7 @@ class RateDataController extends Controller
                             'cbh_status_before' => 'confirmed',
                             'cbh_status_after' => 'issued'
                         ]);
-                    } 
+                    }
                 }else{ //case_bill,monthly_bill
                     $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                         'rgd_status5' => 'cancel'

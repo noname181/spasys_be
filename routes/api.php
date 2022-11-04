@@ -352,7 +352,7 @@ Route::middleware('auth')->group(function () {
         Route::middleware('role:spasys_manager,spasys_admin,spasys_operator,shop_manager,shop_operator,shipper_manager,shipper_operator')->group(function () {
             Route::post('/spasys', [\App\Http\Controllers\RateData\RateDataController::class, 'spasysRegisterRateData'])->name('spasys_registe_rate_data');
             Route::post('/spasys2', [\App\Http\Controllers\RateData\RateDataController::class, 'spasysRegisterRateData2'])->name('spasys_registe_rate_data2');
-            Route::get('/spasys', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData'])->name('get_spasys_rate_data');
+            Route::get('/spasys/{co_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData'])->name('get_spasys_rate_data');
             Route::get('/spasys2', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData2'])->name('get_spasys_rate_data2');
             Route::get('/spasys3', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData3'])->name('get_spasys_rate_data3');
 
