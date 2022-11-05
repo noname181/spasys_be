@@ -55,7 +55,8 @@ class Export extends Model
     protected $casts = [
         'created_at' => "date:Y.m.d H:i",
         'updated_at' => "date:Y.m.d H:i",
-        'te_e_date' => "date:Y.m.d H:i",
+        'te_e_date' => "date:Y.m.d",
+        'te_e_time' => "date: H:i",
         'te_e_confirm_date' => "date:Y.m.d",
     ];
 
@@ -71,7 +72,7 @@ class Export extends Model
     }
     public function import_expected()
     {
-        return $this->hasOne(ImportExpected::class, 'tie_logistic_manage_number', 'te_logistic_manage_number');
+        return $this->hasOne(ImportExpected::class, 'tie_logistic_manage_number', 'te_logistic_manage_number')->with('company');
 
     }
 

@@ -54,7 +54,7 @@ class ImportExpected extends Model
 
     public function company()
     {
-        return $this->hasOne(Company::class,'co_license','tie_co_license')->with('co_parent');
+        return $this->hasOne(Company::class,'co_license','tie_co_license')->with(['co_parent','rate_data_1']);
     }
 
     public function receiving_goods_delivery()

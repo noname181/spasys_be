@@ -90,7 +90,7 @@ class ReceivingGoodsDelivery extends Model
         return $this->hasMany(RateMetaData::class, 'rgd_no', 'rgd_parent_no')->with(['rate_data']);
     }
     public function t_export(){
-        return $this->belongsTo(Export::class, 'rgd_tracking_code', 'te_carry_out_number')->with(['import']);
+        return $this->belongsTo(Export::class, 'rgd_tracking_code', 'te_carry_out_number')->with(['import','import_expected']);
     }
     public function settlement_number(){
         return $this->hasMany(ReceivingGoodsDelivery::class, 'rgd_settlement_number', 'rgd_settlement_number')->with(['rate_data_general']);
