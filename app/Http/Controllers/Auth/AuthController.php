@@ -11,6 +11,7 @@ use App\Utils\Messages;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use phpDocumentor\Reflection\PseudoTypes\LowercaseString;
 
 class AuthController extends Controller
 {
@@ -24,7 +25,10 @@ class AuthController extends Controller
         $input = $request->validated();
         try {
 
-            $member = Member::with('role')->where('mb_id', $input['mb_id'])->first();
+            $member = Member::with('role')
+            ->where('mb_id', strtolower($input['mb_id']))
+            ->orWhere('mb_id', strtoupper($input['mb_id']))
+            ->first();
             if (is_null($member)) {
                 return response()->json([
                     'message' => Messages::MSG_0008,
