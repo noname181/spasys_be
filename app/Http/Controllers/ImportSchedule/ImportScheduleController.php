@@ -145,7 +145,7 @@ class ImportScheduleController extends Controller
                     FROM t_export_confirm group by tec_logistic_manage_number, tec_ec_confirm_number, tec_ec_date, tec_ec_number)
                     ccc'), function ($leftjoin) {
                         $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
-                    })->leftjoin(DB::raw('(SELECT te_logistic_manage_number, te_carry_out_number, te_e_date, te_carry_in_number, te_e_order, te_e_number
+                    })->leftjoin(DB::raw('(SELECT t_export.te_status_2,te_logistic_manage_number, te_carry_out_number, te_e_date, te_carry_in_number, te_e_order, te_e_number
                     FROM t_export group by te_logistic_manage_number, te_carry_out_number, te_e_date, te_carry_in_number, te_e_order, te_e_number)
                     ddd'), function ($leftjoin) {
 

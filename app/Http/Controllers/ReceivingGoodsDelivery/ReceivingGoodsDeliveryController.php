@@ -96,6 +96,13 @@ class ReceivingGoodsDeliveryController extends Controller
             }
 
             $w_no = isset($validated['w_no']) ? $validated['w_no'] : $w_no_data;
+            //Connect_id
+            if (isset($validated['w_no'])) {
+
+
+            }else{
+
+            }
 
 
 
