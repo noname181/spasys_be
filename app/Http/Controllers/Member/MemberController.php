@@ -79,7 +79,7 @@ class MemberController extends Controller
         try {
             $member = Member::where('mb_name', $request['mb_name'])
                 ->where('mb_email', $request['mb_email'])->first();
-
+            return $member;
             if (is_null($member)) {
                 return response()->json([
                     'message' => Messages::MSG_0020,
