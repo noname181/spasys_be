@@ -190,6 +190,70 @@ class RateDataController extends Controller
         }
     }
 
+    public function register_set_data_precalculate(request $request)
+    {
+        try {
+            DB::beginTransaction();
+           
+        
+            $is_new = RateMetaData::where(['co_no' => $request['co_no'],
+                'set_type' => $request['set_type']])->first();
+
+            $rmd = RateMetaData::updateOrCreate(
+                [
+                    'co_no' => $request['co_no'],
+                    'set_type' => $request['set_type'],
+                ],
+                [
+                    'mb_no' => Auth::user()->mb_no,
+                ]
+            );
+            
+
+
+
+
+            foreach ($request['rate_data'] as $val) {
+                Log::error($val);
+                $rd_no = RateData::updateOrCreate(
+                    [
+                        'rd_no' => isset($is_new->rmd_no) ? (isset($val['rd_no']) ? $val['rd_no'] : null) : null,
+                        'rmd_no' => isset($rmd) ? $rmd->rmd_no : null,
+                    ],
+                    [
+                        'w_no' => isset($w_no) ? $w_no : null,
+                        'rd_cate_meta1' => $val['rd_cate_meta1'],
+                        'rd_cate_meta2' => $val['rd_cate_meta2'],
+                        'rd_cate1' => isset($val['rd_cate1']) ? $val['rd_cate1'] : '',
+                        'rd_cate2' => isset($val['rd_cate2']) ? $val['rd_cate2'] : '',
+                        'rd_cate3' => isset($val['rd_cate3']) ? $val['rd_cate3'] : '',
+                        'rd_data1' => isset($val['rd_data1']) ? $val['rd_data1'] : '',
+                        'rd_data2' => isset($val['rd_data2']) ? $val['rd_data2'] : '',
+                        'rd_data3' => isset($val['rd_data3']) ? $val['rd_data3'] : '',
+                        'rd_data4' => isset($val['rd_data4']) ? $val['rd_data4'] : '',
+                        'rd_data5' => isset($val['rd_data5']) ? $val['rd_data5'] : '',
+                        'rd_data6' => isset($val['rd_data6']) ? $val['rd_data6'] : '',
+                        'rd_data7' => isset($val['rd_data7']) ? $val['rd_data7'] : '',
+                        'rd_data8' => isset($val['rd_data8']) ? $val['rd_data8'] : '',
+                    ],
+                );
+            }
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'rmd_no' => isset($rmd) ? $rmd->rmd_no : null,
+                'request' => $request,
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0001], 500);
+        }
+    }
+
+
     public function get_rmd_no($rgd_no, $set_type)
     {
         $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
