@@ -34,6 +34,7 @@ class Warehousing extends Model
         'w_schedule_amount',
         'w_completed_day',
         'w_amount',
+        'w_amount_export',
         'm_bl',
         'h_bl',
         'logistic_manage_number',
