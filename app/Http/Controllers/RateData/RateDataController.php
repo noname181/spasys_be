@@ -141,6 +141,7 @@ class RateDataController extends Controller
                 );
             }
 
+            $index = 0;
             foreach ($validated['rate_data'] as $val) {
                 Log::error($val);
                 $rd_no = RateData::updateOrCreate(
@@ -152,6 +153,7 @@ class RateDataController extends Controller
                         'w_no' => isset($w_no) ? $w_no : null,
                         'rd_cate_meta1' => $val['rd_cate_meta1'],
                         'rd_cate_meta2' => $val['rd_cate_meta2'],
+                        'rd_index' => $index,
                         'rd_cate1' => isset($val['rd_cate1']) ? $val['rd_cate1'] : '',
                         'rd_cate2' => isset($val['rd_cate2']) ? $val['rd_cate2'] : '',
                         'rd_cate3' => isset($val['rd_cate3']) ? $val['rd_cate3'] : '',
@@ -165,6 +167,7 @@ class RateDataController extends Controller
                         'rd_data8' => isset($val['rd_data8']) ? $val['rd_data8'] : '',
                     ],
                 );
+                $index++;
             }
 
             //ONLY FOR 보세화물
@@ -996,7 +999,7 @@ class RateDataController extends Controller
                 $q->where('rd_cate_meta1', '유통가공')
                     ->orWhere('rd_cate_meta1', '수입풀필먼트')
                     ->orWhere('rd_cate_meta1', '보세화물');
-            })->get();
+            })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
             $w_no = $rate_data[0]->w_no;
             $warehousing = Warehousing::with(['co_no', 'w_import_parent', 'w_ew'])->where('w_no', $w_no)->first();
             return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data, 'warehousing' => $warehousing], 200);
@@ -1015,7 +1018,7 @@ class RateDataController extends Controller
                 $q->where('rd_cate_meta1', '유통가공')
                     ->orWhere('rd_cate_meta1', '수입풀필먼트')
                     ->orWhere('rd_cate_meta1', '보세화물');
-            })->get();
+            })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
             $w_no = $rate_data[0]->w_no;
             $warehousing = Warehousing::with(['co_no', 'w_import_parent'])->where('w_no', $w_no)->first();
             return !empty($rate_data) ? $rate_data : array();
