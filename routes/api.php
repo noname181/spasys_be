@@ -442,6 +442,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/', \App\Http\Controllers\RateData\RateDataController::class)->name('registe_rate_data');
         //REGISTER RATE DATA
         Route::post('/set_data',[\App\Http\Controllers\RateData\RateDataController::class, 'register_set_data'])->name('registe_set_data');
+
+        //REGISTER RATE DATA FOR 보세화물 PRECALCULATE
+        Route::post('/set_data_precalculate',[\App\Http\Controllers\RateData\RateDataController::class, 'register_set_data_precalculate'])->name('registe_set_data_precalculate');
+
         //GET RATE DATA
         Route::get('/get_set_data/{rmd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_set_data'])->name('get_set_data');
         Route::get('/get_set_data_mobile/{bill_type}/{rmd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_set_data_mobile'])->name('get_set_data2');
