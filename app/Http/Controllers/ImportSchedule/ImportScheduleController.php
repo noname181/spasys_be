@@ -281,22 +281,8 @@ class ImportScheduleController extends Controller
             // }
 
             //$members = Member::where('mb_no', '!=', 0)->get();
-
-            $import_schedule = $import_schedule->paginate($per_page, ['*'], 'page', $page);
-
-            $status = DB::table('t_import_expected')
-                ->select('tie_status_2')
-                ->groupBy('tie_status_2')
-                ->get();
-
-            $custom = collect(['status_filter' => $status]);
-
-            $import_schedule = $custom->merge($import_schedule);
-
-            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
-
-            foreach ($import_schedule['data'] as $item) {
-                if (!empty($item['import']['ti_no'])) {
+            foreach ($import_schedule->get() as $item) {
+                if (!empty($item['import']['ti_no']) && !empty($item['ti_logistic_manage_number']) && empty($item['te_logistic_manage_number']) && empty($item['tec_logistic_manage_number'])) {
                     $warehousing = Warehousing::updateOrCreate(
                         [
                             'w_category_name' => '보세화물',
@@ -328,6 +314,19 @@ class ImportScheduleController extends Controller
                     );
                 }
             }
+
+            $import_schedule = $import_schedule->paginate($per_page, ['*'], 'page', $page);
+
+            $status = DB::table('t_import_expected')
+                ->select('tie_status_2')
+                ->groupBy('tie_status_2')
+                ->get();
+
+            $custom = collect(['status_filter' => $status]);
+
+            $import_schedule = $custom->merge($import_schedule);
+
+            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
 
             return response()->json($import_schedule);
         } catch (\Exception $e) {

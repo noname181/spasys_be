@@ -125,7 +125,7 @@ class ItemRequest extends BaseFormRequest
                 'file',
                 'nullable',
                 'max:5000',
-                'mimes:jpg,jpeg,png,pdf'
+                'mimes:jpg,jpeg,png'
             ],
             'item_origin' => [
                 'string',
@@ -161,7 +161,7 @@ class ItemRequest extends BaseFormRequest
     public function messages()
     {
         return [
-            'file.mimes' => 'jpg, jpeg, png, pdf 파일만 업로드 할 수 있습니다'
+            'file.mimes' => 'jpg, jpeg, png 파일만 업로드 할 수 있습니다'
         ];
     }
 }
