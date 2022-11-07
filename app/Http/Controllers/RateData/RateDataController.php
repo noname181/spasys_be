@@ -1449,8 +1449,6 @@ class RateDataController extends Controller
             $rate_data = $rate_data->where('rd_co_no', $co_no);
             if (isset($rmd->rmd_no)) {
                 $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
-            }else {
-                $rate_data = [];
             }
 
             $rate_data = $rate_data->get();
@@ -1541,8 +1539,6 @@ class RateDataController extends Controller
             $rate_data = $rate_data->where('rd_co_no', $co_no);
             if (isset($rmd->rmd_no)) {
                 $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
-            }else {
-                $rate_data = [];
             }
 
             $rate_data = $rate_data->get();
