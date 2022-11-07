@@ -522,6 +522,14 @@ class ScheduleShipmentSearchRequest extends BaseFormRequest
                 'nullable',
                 'max:255',
             ],
+            'from_date' => [
+                'string',
+                'date_format:Y-m-d'
+            ],
+            'to_date' => [
+                'string',
+                'date_format:Y-m-d'
+            ],
             'per_page' => [
                 'nullable',
                 'int',

@@ -3827,15 +3827,15 @@ class WarehousingController extends Controller
                     });
             }
 
-            $warehousing->whereDoesntHave('receving_goods_delivery');
+            $warehousing->whereDoesntHave('rate_data_general');
 
             if (isset($request->from_date)) {
 
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($request->from_date)));
             }
 
-            if (isset($validated->to_date)) {
-                $warehousing->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated->to_date)));
+            if (isset($request->to_date)) {
+                $warehousing->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($request->to_date)));
             }
             // if (isset($validated['co_parent_name'])) {
             //     $warehousing->whereHas('co_no.co_parent', function ($query) use ($validated) {
@@ -3857,6 +3857,30 @@ class WarehousingController extends Controller
 
             $amount = $warehousing->orWhereIn('w_no', $w_no_in)->orderBy('w_no', 'DESC')->sum('w_amount');
 
+            if ($user->mb_type == 'shop') {
+                $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->whereNotNull('trans_no')->whereHas('ContractWms.company.co_parent', function ($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->orderBy('ss_no', 'DESC');
+            }else if($user->mb_type == 'shipper'){
+                $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->whereNotNull('trans_no')->whereHas('ContractWms.company', function ($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->orderBy('ss_no', 'DESC');
+            }else if($user->mb_type == 'spasys'){
+                $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->whereNotNull('trans_no')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->orderBy('ss_no', 'DESC');
+            }
+
+            if (isset($request->from_date)) {
+
+                $schedule_shipment->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($request->from_date)));
+            }
+
+            if (isset($request->to_date)) {
+                $schedule_shipment->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($request->to_date)));
+            }
+
+            $amount_export = $schedule_shipment->sum('qty');
 
             $w_no_data = Warehousing::insertGetId([
                 'mb_no' => $user->mb_no,
@@ -3864,6 +3888,7 @@ class WarehousingController extends Controller
                 'w_amount' => $amount,
                 'w_type' => 'IW',
                 'w_category_name' => '수입풀필먼트',
+                'w_amount_export'=>$amount_export,
                 'co_no' => $request->co_no,
             ]);
 
