@@ -496,6 +496,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/update_rgd_status3', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'updateRgdState3'])->name('update_rgd_status3');
 
     Route::post('/schedule_list_import', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'scheduleListImport']);
+    Route::post('/save_import_storeday', [\App\Http\Controllers\Import\ImportController::class,'save_import_storeday'])->name('save_import_storeday');
     Route::post('/download_bonded_settlement', [\App\Http\Controllers\Warehousing\WarehousingController::class,'downloadBondedSettlement']);
     Route::post('/download_final_month_bill_issue', [\App\Http\Controllers\RateData\RateDataController::class, 'download_final_month_bill_issue']);
     Route::post('/download_est_casebill', function(){

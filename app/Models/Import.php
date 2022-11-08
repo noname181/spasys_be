@@ -37,6 +37,7 @@ class Import extends Model
          "ti_i_type",
          "ti_m_bl",
          "ti_h_bl",
+         "ti_i_storeday",
          "ti_i_report_number",
          "ti_i_packing_type",
          "ti_i_number",
