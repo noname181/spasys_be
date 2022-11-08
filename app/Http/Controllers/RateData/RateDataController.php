@@ -197,8 +197,8 @@ class RateDataController extends Controller
     {
         try {
             DB::beginTransaction();
-           
-        
+
+
             $is_new = RateMetaData::where(['co_no' => $request['co_no'],
                 'set_type' => $request['set_type']])->first();
 
@@ -211,10 +211,6 @@ class RateDataController extends Controller
                     'mb_no' => Auth::user()->mb_no,
                 ]
             );
-            
-
-
-
 
             foreach ($request['rate_data'] as $val) {
                 Log::error($val);
@@ -259,6 +255,22 @@ class RateDataController extends Controller
 
     public function get_rmd_no($rgd_no, $set_type)
     {
+        //FOR ONLY PRECALCULATE PAGE
+        if($set_type == 'precalculate'){
+            $rmd = RateMetaData::where(
+                [
+                    'co_no' => $rgd_no,
+                    'set_type' => $set_type,
+                ]
+            )->first();
+
+            return response()->json([
+                'rmd_no' => $rmd ? $rmd->rmd_no : null,
+                'co_no' => $rgd_no,
+            ], 200);
+        }
+
+
         $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
         $previous_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
         $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
@@ -1512,7 +1524,7 @@ class RateDataController extends Controller
         try {
             $rate_data = RateData::where('rd_cate_meta1', $service_korean_name);
 
-            $rmd = RateMetaData::where('co_no', $co_no)->orderBy('rmd_no', 'DESC')->first();
+            $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->orderBy('rmd_no', 'DESC')->first();
             $rate_data = $rate_data->where('rd_co_no', $co_no);
             if (isset($rmd->rmd_no)) {
                 $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
