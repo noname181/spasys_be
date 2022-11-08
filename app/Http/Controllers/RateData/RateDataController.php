@@ -5,6 +5,7 @@ namespace App\Http\Controllers\RateData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RateData\RateDataRequest;
 use App\Http\Requests\RateData\RateDataSendMailRequest;
+use App\Http\Requests\CancelBill\CancelBillRequest;
 use App\Models\AdjustmentGroup;
 use App\Models\Company;
 use App\Models\Export;
@@ -7259,6 +7260,7 @@ class RateDataController extends Controller
                         CancelBillHistory::insertGetId([
                             'mb_no' => Auth::user()->mb_no,
                             'rgd_no' =>  $rgd['rgd_no'],
+                            'cbh_status_after' => 'cancel'
                         ]);
                         $rgd_parent_no = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
                         $rgd_update_parent = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_parent_no'])->update([
@@ -7267,6 +7269,8 @@ class RateDataController extends Controller
                         CancelBillHistory::insertGetId([
                             'mb_no' => Auth::user()->mb_no,
                             'rgd_no' => $rgd['rgd_parent_no'],
+                            'cbh_status_after' => 'cancel'
+
                         ]);
                     }
                 }else if($request->bill_type == 'monthly_service2'){ //page 253 service 2
@@ -7283,6 +7287,7 @@ class RateDataController extends Controller
                         CancelBillHistory::insertGetId([
                             'mb_no' => Auth::user()->mb_no,
                             'rgd_no' =>  $rgd['rgd_no'],
+                            'cbh_status_after' => 'cancel'
                         ]);
                     }
                 }else if($request->bill_type == 'case_bill_final_issue'){ //page 264
@@ -7336,6 +7341,7 @@ class RateDataController extends Controller
                     $insert_cancel_bill = CancelBillHistory::insertGetId([
                         'mb_no' => Auth::user()->mb_no,
                         'rgd_no' => $request->rgd_no,
+                        'cbh_status_after' => 'cancel'
                     ]);
                 }
 
@@ -7351,4 +7357,23 @@ class RateDataController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
+    public function get_list_cancel_bill(CancelBillRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+
+            // If per_page is null set default data = 15
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+            $list = CancelBillHistory::where('rgd_no','=',$request->rgd_no)->paginate($per_page, ['*'], 'page', $page);
+
+            return response()->json($list);
+        } catch (\Exception $e) {
+            return $e;
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
 }

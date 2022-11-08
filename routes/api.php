@@ -469,6 +469,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/delete_rate_data/{rm_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'deleteRateData'])->name('delete_rate_data');
         //cancel_bill
         Route::post('/cancel_bill', [\App\Http\Controllers\RateData\RateDataController::class,'cancel_bill'])->name('cancel_bill');
+        Route::post('/get_list_cancel_bill', [\App\Http\Controllers\RateData\RateDataController::class,'get_list_cancel_bill'])->name('get_list_cancel_bill');
 
     });
 

@@ -8,6 +8,7 @@ use App\Models\Member;
 use App\Models\Warehousing;
 use App\Models\RateMetaData;
 use App\Models\Export;
+use App\Models\CancelBillHistory;
 
 class ReceivingGoodsDelivery extends Model
 {
@@ -94,5 +95,8 @@ class ReceivingGoodsDelivery extends Model
     }
     public function settlement_number(){
         return $this->hasMany(ReceivingGoodsDelivery::class, 'rgd_settlement_number', 'rgd_settlement_number')->with(['rate_data_general']);
+    }
+    public function cancel_bill_history(){
+        return $this->hasOne(CancelBillHistory::class, 'rgd_no', 'rgd_no');
     }
 }
