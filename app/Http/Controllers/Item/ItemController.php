@@ -1934,7 +1934,7 @@ class ItemController extends Controller
         $url_api .= '&domain_key='.$filter['domain_key'];
         $url_api .= '&action='.$filter['action'];
         $url_api .= '&date_type='.$filter['date_type'];
-        $url_api .= '&start_date= 2022-08-01';
+        $url_api .= '&start_date='.$filter['start_date'];
         $url_api .= '&end_date='.$filter['end_date'];
         if($filter['limit'] != ''){
             $url_api .= '&limit='.$filter['limit'];
