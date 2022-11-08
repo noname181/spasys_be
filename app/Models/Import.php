@@ -66,6 +66,9 @@ class Import extends Model
         return $this->hasOne(ExportConfirm::class, 'tec_logistic_manage_number', 'tie_logistic_manage_number');
     }
 
-
+    public function import_expect()
+    {
+        return $this->hasOne(ImportExpected::class, 'tie_logistic_manage_number', 'ti_logistic_manage_number');
+    }
 
 }
