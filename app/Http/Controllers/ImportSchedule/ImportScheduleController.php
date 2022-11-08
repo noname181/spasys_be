@@ -251,10 +251,27 @@ class ImportScheduleController extends Controller
                 $import_schedule->where('tie_logistic_manage_number', 'like', '%' . $validated['logistic_manage_number'] . '%');
             }
             if (isset($validated['tie_status'])) {
-                $import_schedule->where('tie_status', '=', $validated['tie_status']);
+                
+                if($validated['tie_status'] == '반출'){
+                    $import_schedule->whereNotNull('te_logistic_manage_number');
+                }else if($validated['tie_status'] == '반출승인'){
+                    $import_schedule->whereNotNull('tec_logistic_manage_number')->whereNull('te_logistic_manage_number');
+                }else if($validated['tie_status'] == '반입'){
+                    $import_schedule->whereNotNull('ti_logistic_manage_number')->whereNull('tec_logistic_manage_number')->whereNull('te_logistic_manage_number');
+                }else if($validated['tie_status'] == '반입예정'){
+                    $import_schedule->whereNotNull('tie_logistic_manage_number')->whereNull('ti_logistic_manage_number')->whereNull('tec_logistic_manage_number')->whereNull('te_logistic_manage_number');
+                }
             }
             if (isset($validated['tie_status_2'])) {
-                $import_schedule->where('tie_status_2', '=', $validated['tie_status_2']);
+                if($validated['tie_status'] == '반출'){
+                    $import_schedule->where('te_status_2', '=', $validated['tie_status_2']);
+                }else if($validated['tie_status'] == '반출승인'){
+                    $import_schedule->where('tec_status_2', '=', $validated['tie_status_2']);
+                }else if($validated['tie_status'] == '반입'){
+                    $import_schedule->where('ti_status_2', '=', $validated['tie_status_2']);
+                }else if($validated['tie_status'] == '반입예정'){
+                    $import_schedule->where('tie_status_2', '=', $validated['tie_status_2']);
+                }
             }
             // if (isset($validated['import_schedule_status1']) || isset($validated['import_schedule_status2'])) {
             //     $import_schedule->where(function($query) use ($validated) {
@@ -292,7 +309,7 @@ class ImportScheduleController extends Controller
                             'mb_no' => $user->mb_no,
                             'service_korean_name' => '보세화물',
                             'rgd_status1' => '입고',
-                            'rgd_tracking_code' => $item['te_carry_out_number']
+                            'rgd_tracking_code' => $item['ti_logistic_manage_number']
                         ]
                     );
                 }
