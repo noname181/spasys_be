@@ -2482,12 +2482,15 @@ class RateDataController extends Controller
                     ->where('rdg_bill_type', 'expectation_monthly')->first();
                 $rdgs2[] = $rdg2;
             }
+            $time = str_replace('-', '.', $start_date) . ' ~ ' . str_replace('-', '.', $end_date);
 
             DB::commit();
+            
 
             return response()->json([
                 'rgds' => $rgds,
                 'rdgs' => $rdgs,
+                'time' => $time,
                 'adjustmentgroupall' => $adjustmentgroupall,
             ], 201);
 
@@ -2547,11 +2550,15 @@ class RateDataController extends Controller
                 $rdgs2[] = $rdg2;
             }
 
+            $time = str_replace('-', '.', $start_date) . ' ~ ' . str_replace('-', '.', $end_date);
+
             DB::commit();
+            
 
             return response()->json([
                 'rgds' => $rgds,
                 'rdgs' => $rdgs,
+                'time' => $time,
                 'adjustmentgroupall' => $adjustmentgroupall,
             ], 201);
 
