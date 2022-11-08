@@ -1437,7 +1437,7 @@ class ItemController extends Controller
                         );
                     }
                 }
-            } else if ($user->mb_type == 'shop') {
+            } else if ($user->mb_type == 'shop') { 
                 $get_shipper_company = Company::with(['co_parent'])->whereHas('co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 })->get();
@@ -1664,14 +1664,16 @@ class ItemController extends Controller
 
             DB::commit();
             return response()->json([
-                'message' => '데이터 없음',
+                'message' => '완료되었습니다',
                 'status' => 1
             ], 200);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
             return $e;
-            return response()->json(['message' => Messages::MSG_0019], 500);
+            return response()->json([
+                'message' => '오류가 발생하였습니다',
+            ], 500);
         }
     }
 
@@ -1946,6 +1948,11 @@ class ItemController extends Controller
         $api_data = json_decode($response);
         if(!empty($api_data->data)){
             return $this->apiItemsRaw($api_data);
+        }else{
+            return response()->json([
+                'message' => '새로운 데이터가 없습니다',
+                'status' => 1
+            ], 200);
         }
         return $api_data;
     }
