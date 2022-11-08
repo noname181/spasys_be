@@ -7,6 +7,7 @@ use App\Http\Requests\RateData\RateDataRequest;
 use App\Http\Requests\RateData\RateDataSendMailRequest;
 use App\Models\AdjustmentGroup;
 use App\Models\Company;
+use App\Models\Import;
 use App\Models\Export;
 use App\Models\RateData;
 use App\Models\RateMeta;
@@ -1482,6 +1483,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -1515,6 +1517,53 @@ class RateDataController extends Controller
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
+
+    public function getspasys1fromlogisticnumber($is_no)
+    {
+
+        try {
+            $user = Auth::user();
+
+            $import = Import::with(['export_confirm', 'export', 'import_expect'])->where('ti_logistic_manage_number', $is_no)->first();
+            $company = Company::with(['co_parent'])->where('co_license',$import->ti_co_license)->first();
+
+            $rate_data = RateData::where('rd_cate_meta1', '보세화물');
+
+            $rmd = RateMetaData::where('co_no', $company->co_no)->whereNull('set_type')->orderBy('rmd_no', 'DESC')->first();
+            $rate_data = $rate_data->where('rd_co_no', $company->co_no);
+            if (isset($rmd->rmd_no)) {
+                $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+            }
+
+            $rate_data = $rate_data->get();
+
+            $adjustment_group = AdjustmentGroup::where('co_no','=',$company->co_no)->first();
+
+            $export = Export::with(['import','import_expected','t_export_confirm'])->where('te_logistic_manage_number', $is_no)->first();
+            
+            if(empty($export)){
+                $export = [
+                    'import' => $import,
+                    'import_expected' => $import->import_expect
+                ];
+            }
+
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'company' => $company,
+                'rate_data' => $rate_data,
+                'export' => $export,
+                'adjustment_group' => $adjustment_group,
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+
     public function getSpasysRateData($co_no)
     {
         $user = Auth::user();
