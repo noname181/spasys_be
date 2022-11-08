@@ -52,7 +52,7 @@ Route::middleware('auth')->group(function () {
     });
 
     
-    Route::get('/api_item_cron', [App\Http\Controllers\Item\ItemController::class, 'apiItemCron'])->name('api_item_cron');
+    Route::post('/api_item_cron', [App\Http\Controllers\Item\ItemController::class, 'apiItemCron'])->name('api_item_cron');
 
     // Manger Role
     Route::middleware('role:spasys_manager,spasys_admin,shop_manager')->group(function () {
@@ -372,6 +372,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/get_spasys1_from_te/{is_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'getspasys1fromte'])->name('get_spasys1_from_te');
         Route::get('/get_spasys2_from_te/{is_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'getspasys2fromte'])->name('get_spasys2_from_te');
         Route::get('/get_spasys3_from_te/{is_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'getspasys3fromte'])->name('get_spasys3_from_te');
+
+        //FOR SETTLEMENT 보세화물
+        Route::get('/get_spasys1_from_logistic_number/{is_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'getspasys1fromlogisticnumber']);
         //REGISTER GENERAL DATA 유통가공
         Route::post('/general', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general'])->name('registe_rate_data_general');
         Route::post('/general_final', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_final'])->name('registe_rate_data_general_final');
@@ -497,6 +500,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/update_rgd_status3', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'updateRgdState3'])->name('update_rgd_status3');
 
     Route::post('/schedule_list_import', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'scheduleListImport']);
+    Route::post('/save_import_storeday', [\App\Http\Controllers\Import\ImportController::class,'save_import_storeday'])->name('save_import_storeday');
     Route::post('/download_bonded_settlement', [\App\Http\Controllers\Warehousing\WarehousingController::class,'downloadBondedSettlement']);
     Route::post('/download_final_month_bill_issue', [\App\Http\Controllers\RateData\RateDataController::class, 'download_final_month_bill_issue']);
     Route::post('/download_est_casebill', function(){

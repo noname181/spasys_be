@@ -37,6 +37,7 @@ class Import extends Model
          "ti_i_type",
          "ti_m_bl",
          "ti_h_bl",
+         "ti_i_storeday",
          "ti_i_report_number",
          "ti_i_packing_type",
          "ti_i_number",
@@ -65,6 +66,9 @@ class Import extends Model
         return $this->hasOne(ExportConfirm::class, 'tec_logistic_manage_number', 'tie_logistic_manage_number');
     }
 
-
+    public function import_expect()
+    {
+        return $this->hasOne(ImportExpected::class, 'tie_logistic_manage_number', 'ti_logistic_manage_number');
+    }
 
 }
