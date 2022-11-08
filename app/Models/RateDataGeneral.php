@@ -25,6 +25,7 @@ class RateDataGeneral extends Model
         'rdg_no ',
         'w_no',
         'rgd_no',
+        'rmd_no',
         'rgd_no_expectation',
         'rgd_no_final',
         'rgd_no_additional',
@@ -61,14 +62,14 @@ class RateDataGeneral extends Model
         'created_at' => "date:Y.m.d H:i",
         'updated_at' => "date:Y.m.d",
     ];
-    
+
     public function warehousing()
     {
         return $this->hasOne(Warehousing::class, 'w_no', 'w_no')->with(['co_no', 'warehousing_item','w_import_parent', 'warehousing_request']);
     }
     public function rgd_no_final()
     {
-     
+
         return $this->belongsTo(RateDataGeneral::class, 'rgd_no_final', 'rgd_no');
     }
 

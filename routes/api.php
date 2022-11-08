@@ -51,7 +51,7 @@ Route::middleware('auth')->group(function () {
         });
     });
 
-    
+
     Route::post('/api_item_cron', [App\Http\Controllers\Item\ItemController::class, 'apiItemCron'])->name('api_item_cron');
 
     // Manger Role
@@ -451,6 +451,9 @@ Route::middleware('auth')->group(function () {
 
         //REGISTER RATE DATA FOR 보세화물 PRECALCULATE
         Route::post('/set_data_precalculate',[\App\Http\Controllers\RateData\RateDataController::class, 'register_set_data_precalculate'])->name('registe_set_data_precalculate');
+        Route::post('/register_data_general_precalculate',[\App\Http\Controllers\RateData\RateDataController::class, 'register_data_general_precalculate']);
+        Route::get('/get_set_data_precalculate/{rmd_no}/{meta_cate}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_set_data_precalculate']);
+        Route::get('/get_data_general_precalculate/{rmd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_data_general_precalculate']);
 
         //GET RATE DATA
         Route::get('/get_set_data/{rmd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_set_data'])->name('get_set_data');

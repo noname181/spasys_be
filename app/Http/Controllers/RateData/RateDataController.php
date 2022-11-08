@@ -200,26 +200,23 @@ class RateDataController extends Controller
         try {
             DB::beginTransaction();
 
+            if(!isset($request->rmd_no)){
+                $rmd_no = RateMetaData::insertGetId(
+                    [
+                        'co_no' => $request['co_no'],
+                        'set_type' => $request['set_type'],
+                        'mb_no' => Auth::user()->mb_no,
+                    ]
+                );
+            }
 
-            $is_new = RateMetaData::where(['co_no' => $request['co_no'],
-                'set_type' => $request['set_type']])->first();
-
-            $rmd = RateMetaData::updateOrCreate(
-                [
-                    'co_no' => $request['co_no'],
-                    'set_type' => $request['set_type'],
-                ],
-                [
-                    'mb_no' => Auth::user()->mb_no,
-                ]
-            );
 
             foreach ($request['rate_data'] as $val) {
                 Log::error($val);
                 $rd_no = RateData::updateOrCreate(
                     [
-                        'rd_no' => isset($is_new->rmd_no) ? (isset($val['rd_no']) ? $val['rd_no'] : null) : null,
-                        'rmd_no' => isset($rmd) ? $rmd->rmd_no : null,
+                        'rd_no' => isset($val['rd_no']) ? $val['rd_no'] : null,
+                        'rmd_no' => isset($rmd_no) ? $rmd_no : null,
                     ],
                     [
                         'w_no' => isset($w_no) ? $w_no : null,
@@ -243,7 +240,7 @@ class RateDataController extends Controller
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'rmd_no' => isset($rmd) ? $rmd->rmd_no : null,
+                'rmd_no' => isset($rmd_no) ? $rmd_no : null,
                 'request' => $request,
             ], 201);
         } catch (\Exception $e) {
@@ -1089,6 +1086,76 @@ class RateDataController extends Controller
         }
     }
 
+    public function get_set_data_precalculate($rmd_no, $meta_cate)
+    {
+        try {
+            $rate_data = RateData::where('rmd_no', $rmd_no)->where(function ($q) use($meta_cate) {
+                $q->where('rd_cate_meta1', $meta_cate);
+            })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
+
+            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+    public function get_data_general_precalculate($rmd_no)
+    {
+        try {
+            $rate_data_general = RateDataGeneral::where('rmd_no', $rmd_no)->where('rdg_set_type', 'estimated_costs')->first();
+
+            return response()->json(['message' => Messages::MSG_0007, 'rate_data_general' => $rate_data_general], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+    public function register_data_general_precalculate(Request $request)
+    {
+        try {
+            $user = Auth::user();
+
+            $rmd = RateMetaData::updateOrCreate(
+                [
+                    'rmd_no' => isset($request->rmd_no) ? $request->rmd_no : null,
+                    'set_type' => 'precalculate',
+                    'co_no' => isset($request->co_no) ? $request->co_no : null,
+                ],
+                [
+                    'mb_no' => $user->mb_no
+                ]
+            );
+
+            $rate_data_general = RateDataGeneral::updateOrCreate(
+                [
+                    'rmd_no' => $rmd->rmd_no,
+                ],
+                [
+                    'rdg_set_type' => 'estimated_costs',
+                    'rdg_sum1' => $request->data1,
+                    'rdg_sum2' => $request->data2,
+                    'rdg_sum3' => $request->data3,
+                    'rdg_sum4' => $request->data4,
+                    'rdg_sum5' => $request->data5,
+                    'mb_no' => $user->mb_no
+                ]
+            );
+
+            return response()->json(['message' => Messages::MSG_0007, 'rmd_no' => $rmd->rmd_no, 'rate_data_general' => $rate_data_general], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
     public function get_set_data_raw($rmd_no)
     {
         try {
@@ -1310,9 +1377,13 @@ class RateDataController extends Controller
 
             if (isset($request->rmd_no)) {
                 foreach ($request->rate_data as $val) {
-                    RateData::where('rmd_no', $request->rmd_no)->update(
+                    RateData::updateOrCreate(
                         [
-                            'rmd_no' => $request->rmd_no,
+                            'rmd_no' => isset($val['rmd_no']) && isset($val['rd_no']) ? $val['rmd_no'] : $request->rmd_no,
+                            'rd_no' => isset($val['rmd_no']) && isset($val['rd_no']) ? $val['rd_no'] : null,
+                        ],
+                        [
+
                             'co_no' => $request->co_no,
                             'rd_cate_meta1' => $val['rd_cate_meta1'],
                             'rd_cate_meta2' => $val['rd_cate_meta2'],
@@ -1434,7 +1505,7 @@ class RateDataController extends Controller
             //return $e;
             DB::rollback();
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -1541,7 +1612,7 @@ class RateDataController extends Controller
             $adjustment_group = AdjustmentGroup::where('co_no','=',$company->co_no)->first();
 
             $export = Export::with(['import','import_expected','t_export_confirm'])->where('te_logistic_manage_number', $is_no)->first();
-            
+
             if(empty($export)){
                 $export = [
                     'import' => $import,
@@ -2486,7 +2557,7 @@ class RateDataController extends Controller
             $time = str_replace('-', '.', $start_date) . ' ~ ' . str_replace('-', '.', $end_date);
 
             DB::commit();
-            
+
 
             return response()->json([
                 'rgds' => $rgds,
@@ -2554,7 +2625,7 @@ class RateDataController extends Controller
             $time = str_replace('-', '.', $start_date) . ' ~ ' . str_replace('-', '.', $end_date);
 
             DB::commit();
-            
+
 
             return response()->json([
                 'rgds' => $rgds,
