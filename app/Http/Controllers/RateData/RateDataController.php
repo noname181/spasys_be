@@ -1623,19 +1623,22 @@ class RateDataController extends Controller
             $rate_data = $rate_data->get();
 
             $adjustment_group = AdjustmentGroup::where('co_no','=',$company->co_no)->first();
+            $adjustment_group_all = AdjustmentGroup::where('co_no','=',$company->co_no)->get();
 
             $export = Export::with(['import','import_expected','t_export_confirm'])->where('te_logistic_manage_number', $is_no)->first();
 
             if(empty($export)){
                 $export = [
                     'import' => $import,
-                    'import_expected' => $import->import_expect
+                    'import_expected' => $import->import_expect,
+                    
                 ];
             }
 
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'company' => $company,
+                'adjustment_group_all'=>$adjustment_group_all,
                 'rate_data' => $rate_data,
                 'export' => $export,
                 'adjustment_group' => $adjustment_group,
