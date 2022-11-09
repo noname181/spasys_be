@@ -216,7 +216,7 @@ class RateDataController extends Controller
                 $rd_no = RateData::updateOrCreate(
                     [
                         'rd_no' => isset($val['rd_no']) ? $val['rd_no'] : null,
-                        'rmd_no' => isset($rmd_no) ? $rmd_no : null,
+                        'rmd_no' => isset($rmd_no) ? $rmd_no : ($request->rmd_no ? $request->rmd_no : null),
                     ],
                     [
                         'w_no' => isset($w_no) ? $w_no : null,
@@ -240,7 +240,7 @@ class RateDataController extends Controller
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'rmd_no' => isset($rmd_no) ? $rmd_no : null,
+                'rmd_no' => isset($rmd_no) ? $rmd_no : ($request->rmd_no ? $request->rmd_no : null),
                 'request' => $request,
             ], 201);
         } catch (\Exception $e) {
@@ -1105,7 +1105,7 @@ class RateDataController extends Controller
     public function get_data_general_precalculate($rmd_no)
     {
         try {
-            $rate_data_general = RateDataGeneral::where('rmd_no', $rmd_no)->where('rdg_set_type', 'estimated_costs')->first();
+            $rate_data_general = RateDataGeneral::where('rmd_no', $rmd_no)->where('rdg_set_type', 'bonded_estimated_costs')->first();
 
             return response()->json(['message' => Messages::MSG_0007, 'rate_data_general' => $rate_data_general], 200);
         } catch (\Exception $e) {
@@ -1137,7 +1137,7 @@ class RateDataController extends Controller
                     'rmd_no' => $rmd->rmd_no,
                 ],
                 [
-                    'rdg_set_type' => 'estimated_costs',
+                    'rdg_set_type' => 'bonded_estimated_costs',
                     'rdg_sum1' => $request->data1,
                     'rdg_sum2' => $request->data2,
                     'rdg_sum3' => $request->data3,
@@ -1377,10 +1377,17 @@ class RateDataController extends Controller
 
             if (isset($request->rmd_no)) {
                 foreach ($request->rate_data as $val) {
+                    $update_or_create = null;
+                    if(isset($val['rmd_no']) && isset($val['rd_no'])){
+                        if($val['rmd_no'] == $request->rmd_no){
+                            $update_or_create =  $request->rmd_no;
+                        }
+                    }
+
                     RateData::updateOrCreate(
                         [
-                            'rmd_no' => isset($val['rmd_no']) && isset($val['rd_no']) ? $val['rmd_no'] : $request->rmd_no,
-                            'rd_no' => isset($val['rmd_no']) && isset($val['rd_no']) ? $val['rd_no'] : null,
+                            'rmd_no' => $request->rmd_no,
+                            'rd_no' => $update_or_create,
                         ],
                         [
 
@@ -1402,7 +1409,11 @@ class RateDataController extends Controller
                     );
                 }
 
-                $rdg = RateDataGeneral::where('rmd_no', $request->rmd_no)->update(
+                $rdg = RateDataGeneral::updateOrCreate(
+                    [
+                        'rmd_no' => isset($val['rmd_no']) && isset($val['rd_no']) ? $val['rmd_no'] : $request->rmd_no,
+                        'rdg_set_type' => 'estimated_costs'
+                    ],
                     [
                         'rmd_no' => $request->rmd_no,
                         'mb_no' => Auth::user()->mb_no,
