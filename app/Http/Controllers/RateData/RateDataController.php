@@ -201,10 +201,12 @@ class RateDataController extends Controller
             DB::beginTransaction();
 
             if(!isset($request->rmd_no)){
+                $index = RateMetaData::where('rm_no', $request['co_no'])->get()->count() + 1;
                 $rmd_no = RateMetaData::insertGetId(
                     [
                         'co_no' => $request['co_no'],
                         'set_type' => $request['set_type'],
+                        'rmd_number' => CommonFunc::generate_rmd_number($request['co_no'], $index),
                         'mb_no' => Auth::user()->mb_no,
                     ]
                 );
@@ -7511,6 +7513,30 @@ class RateDataController extends Controller
             return $e;
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function tax_invoice_issue(request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            foreach($request->rgds as $rgd){
+                ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
+                    'rgd_status7' => 'taxed'
+                ]);
+            }
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
 
