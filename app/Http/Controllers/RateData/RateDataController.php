@@ -7521,7 +7521,11 @@ class RateDataController extends Controller
         try {
             DB::beginTransaction();
 
-          
+            foreach($request->rgds as $rgd){
+                ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
+                    'rgd_status7' => 'taxed'
+                ]);
+            }
 
             DB::commit();
             return response()->json([
