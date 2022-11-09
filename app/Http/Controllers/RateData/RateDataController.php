@@ -7516,4 +7516,24 @@ class RateDataController extends Controller
         }
     }
 
+    public function tax_invoice_issue(request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+          
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0001], 500);
+        }
+    }
+
 }
