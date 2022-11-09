@@ -7519,4 +7519,28 @@ class RateDataController extends Controller
         }
     }
 
+    public function tax_invoice_issue(request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            foreach($request->rgds as $rgd){
+                ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
+                    'rgd_status7' => 'taxed'
+                ]);
+            }
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0001], 500);
+        }
+    }
+
 }

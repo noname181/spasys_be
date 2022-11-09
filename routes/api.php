@@ -386,11 +386,13 @@ Route::middleware('auth')->group(function () {
         Route::post('/general_final_service2', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_final_service2'])->name('registe_rate_data_general_final_service2');
         Route::post('/general_final_service2_mobile', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_final_service2_mobile'])->name('registe_rate_data_general_final_service2_mobile');
 
-         //REGISTER GENERAL DATA FOR 보세화물 SERVICE
-         Route::post('/general_data_service1', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_service1'])->name('registe_rate_data_general_service1');
-         Route::post('/general_data_service1_final', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_service1_final'])->name('registe_rate_data_general_service1_final');
-         Route::post('/general_monthly_final_bonded', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_monthly_final_bonded'])->name('registe_rate_data_general_monthly_final_bonded');
-         Route::post('/update_storage_days', [\App\Http\Controllers\RateData\RateDataController::class, 'update_storage_days'])->name('update_storage_days');
+        //REGISTER GENERAL DATA FOR 보세화물 SERVICE
+        Route::post('/general_data_service1', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_service1'])->name('registe_rate_data_general_service1');
+        Route::post('/general_data_service1_final', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_service1_final'])->name('registe_rate_data_general_service1_final');
+        Route::post('/general_monthly_final_bonded', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_monthly_final_bonded'])->name('registe_rate_data_general_monthly_final_bonded');
+        Route::post('/update_storage_days', [\App\Http\Controllers\RateData\RateDataController::class, 'update_storage_days'])->name('update_storage_days');
+
+        Route::post('/tax_invoice_issue', [\App\Http\Controllers\RateData\RateDataController::class, 'tax_invoice_issue']);
 
 
         //distribution_est_casebill_edit
