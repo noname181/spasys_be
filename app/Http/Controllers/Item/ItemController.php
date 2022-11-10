@@ -1371,7 +1371,7 @@ class ItemController extends Controller
                         ],
                         [
                             'mb_no' => Auth::user()->mb_no,
-                            'co_no' =>  isset($item->co_no) ? $item->co_no : Auth::user()->co_no,
+                            'co_no' => isset($item->co_no) ? $item->co_no : Auth::user()->co_no,
                             'item_name' => $item->name,
                             'supply_code' => $item->supply_code,
                             'item_brand' => $item->brand,
@@ -1381,60 +1381,100 @@ class ItemController extends Controller
                             'item_price2' => $item->shop_price,
                             'item_price3' => $item->supply_price,
                             'item_url' => $item->img_500,
-                            'item_option1' => $item->options,
-                            'item_bar_code' => $item->barcode,
                             'item_service_name' => '수입풀필먼트',
                         ]
                     );
                     if ($item_no->item_no) {
-                        $item_info_no = ItemInfo::updateOrCreate(
-
-                            [
-
-                                'item_no' => $item_no->item_no,
-                            ],
-                            [
-                                'product_id' => $item->product_id,
-                                'supply_code' => $item->supply_code,
-                                'trans_fee' => $item->trans_fee,
-                                'img_desc1' => $item->img_desc1,
-                                'img_desc2' => $item->img_desc2,
-                                'img_desc3' => $item->img_desc3,
-                                'img_desc4' => $item->img_desc4,
-                                'img_desc5' => $item->img_desc5,
-                                'product_desc' => $item->product_desc,
-                                'product_desc2' => $item->product_desc2,
-                                'location' => $item->location,
-                                'memo' => $item->memo,
-                                'category' => $item->category,
-                                'maker' => $item->maker,
-                                'md' => $item->md,
-                                'manager1' => $item->manager1,
-                                'manager2' => $item->manager2,
-                                'supply_options' => $item->supply_options,
-                                'enable_sale' => $item->enable_sale,
-                                'use_temp_soldout' => $item->use_temp_soldout,
-                                'stock_alarm1' => $item->stock_alarm1,
-                                'stock_alarm2' => $item->stock_alarm2,
-                                'extra_price' => $item->extra_price,
-                                'extra_shop_price' => $item->extra_shop_price,
-
-                                'extra_column1' => $item->extra_column1,
-                                'extra_column2' => $item->extra_column2,
-                                'extra_column3' => $item->extra_column3,
-                                'extra_column4' => $item->extra_column4,
-                                'extra_column5' => $item->extra_column5,
-                                'extra_column6' => $item->extra_column6,
-                                'extra_column7' => $item->extra_column7,
-                                'extra_column8' => $item->extra_column8,
-                                'extra_column9' => $item->extra_column9,
-                                'extra_column10' => $item->extra_column10,
-                                'reg_date' => $item->reg_date,
-                                'last_update_date' => $item->last_update_date,
-                                'new_link_id' => $item->new_link_id,
-                                'link_id' => $item->link_id,
-                            ]
-                        );
+                        if(!empty($item->options)){
+                            // foreach($item->options as $option){
+                            //     $item_info_no = ItemInfo::updateOrCreate(
+                            //         [
+                            //             'item_no' => $item_no->item_no,
+                            //         ],
+                            //         [
+                            //             'product_id' => $item->product_id,
+                            //             'supply_code' => $item->supply_code,
+                            //             'trans_fee' => $item->trans_fee,
+                            //             'img_desc1' => $item->img_desc1,
+                            //             'img_desc2' => $item->img_desc2,
+                            //             'img_desc3' => $item->img_desc3,
+                            //             'img_desc4' => $item->img_desc4,
+                            //             'img_desc5' => $item->img_desc5,
+                            //             'product_desc' => $item->product_desc,
+                            //             'product_desc2' => $item->product_desc2,
+                            //             'location' => $item->location,
+                            //             'memo' => $item->memo,
+                            //             'category' => $item->category,
+                            //             'maker' => $item->maker,
+                            //             'md' => $item->md,
+                            //             'manager1' => $item->manager1,
+                            //             'manager2' => $item->manager2,
+                            //             'supply_options' => $option->supply_options,
+                            //             'enable_sale' => $option->enable_sale,
+                            //             'use_temp_soldout' => $option->use_temp_soldout,
+                            //             'stock_alarm1' => $option->stock_alarm1,
+                            //             'stock_alarm2' => $option->stock_alarm2,
+                            //             'extra_price' => $option->extra_price,
+                            //             'extra_shop_price' => $option->extra_shop_price,
+                            //             'extra_column1' => !empty($option->extra_column1)?$option->extra_column1:'',
+                            //             'extra_column2' => !empty($option->extra_column2)?$option->extra_column2:'',
+                            //             'extra_column3' => !empty($option->extra_column3)?$option->extra_column3:'',
+                            //             'extra_column4' => !empty($option->extra_column4)?$option->extra_column4:'',
+                            //             'extra_column5' => !empty($option->extra_column5)?$option->extra_column5:'',
+                            //             'extra_column6' => $option->extra_column6,
+                            //             'extra_column7' => $option->extra_column7,
+                            //             'extra_column8' => $option->extra_column8,
+                            //             'extra_column9' => $option->extra_column9,
+                            //             'extra_column10' => $option->extra_column10,
+                            //             'reg_date' => $option->reg_date,
+                            //             'last_update_date' => $option->last_update_date,
+                            //             'new_link_id' => $option->new_link_id,
+                            //             'link_id' => $option->link_id,
+                            //         ]
+                            //     );
+                            // }
+                        }else{
+                            $item_info_no = ItemInfo::updateOrCreate(
+                                [
+                                    'item_no' => $item_no->item_no,
+                                ],
+                                [
+                                    'product_id' => $item->product_id,
+                                    'supply_code' => $item->supply_code,
+                                    'trans_fee' => $item->trans_fee,
+                                    'img_desc1' => $item->img_desc1,
+                                    'img_desc2' => $item->img_desc2,
+                                    'img_desc3' => $item->img_desc3,
+                                    'img_desc4' => $item->img_desc4,
+                                    'img_desc5' => $item->img_desc5,
+                                    'product_desc' => $item->product_desc,
+                                    'product_desc2' => $item->product_desc2,
+                                    'location' => $item->location,
+                                    'memo' => $item->memo,
+                                    'category' => $item->category,
+                                    'maker' => $item->maker,
+                                    'md' => $item->md,
+                                    'manager1' => $item->manager1,
+                                    'manager2' => $item->manager2,
+                                    'supply_options' => $option->supply_options,
+                                    'use_temp_soldout' => $option->use_temp_soldout,
+                                    'stock_alarm1' => $option->stock_alarm1,
+                                    'stock_alarm2' => $option->stock_alarm2,
+                                    'extra_price' => $option->extra_price,
+                                    'extra_shop_price' => $option->extra_shop_price,
+                                    'extra_column6' => $option->extra_column6,
+                                    'extra_column7' => $option->extra_column7,
+                                    'extra_column8' => $option->extra_column8,
+                                    'extra_column9' => $option->extra_column9,
+                                    'extra_column10' => $option->extra_column10,
+                                    'reg_date' => $option->reg_date,
+                                    'last_update_date' => $option->last_update_date,
+                                    'new_link_id' => $option->new_link_id,
+                                    'link_id' => $option->link_id,
+                                    'item_bar_code' => $option->barcode,
+                                ]
+                            );
+                        }
                     }
                 }
             } else if ($user->mb_type == 'shop') { 
@@ -1443,7 +1483,6 @@ class ItemController extends Controller
                 })->get();
                 $co_no_shipper = array();
                 foreach ($get_shipper_company as $shipper_company) {
-
                     foreach ($data_select as $i_item => $item) {
                         $item_no = Item::updateOrCreate(
                             [
@@ -1461,14 +1500,11 @@ class ItemController extends Controller
                                 'item_price2' => $item->shop_price,
                                 'item_price3' => $item->supply_price,
                                 'item_url' => $item->img_500,
-                                'item_option1' => $item->options,
-                                'item_bar_code' => $item->barcode,
                                 'item_service_name' => '수입풀필먼트',
                             ]
                         );
                         if ($item_no->item_no) {
                             $item_info_no = ItemInfo::updateOrCreate(
-
                                 [
 
                                     'item_no' => $item_no->item_no,
@@ -1491,29 +1527,57 @@ class ItemController extends Controller
                                     'md' => $item->md,
                                     'manager1' => $item->manager1,
                                     'manager2' => $item->manager2,
-                                    'supply_options' => $item->supply_options,
-                                    'enable_sale' => $item->enable_sale,
-                                    'use_temp_soldout' => $item->use_temp_soldout,
-                                    'stock_alarm1' => $item->stock_alarm1,
-                                    'stock_alarm2' => $item->stock_alarm2,
-                                    'extra_price' => $item->extra_price,
-                                    'extra_shop_price' => $item->extra_shop_price,
                                     'extra_column1' => $item->extra_column1,
                                     'extra_column2' => $item->extra_column2,
                                     'extra_column3' => $item->extra_column3,
                                     'extra_column4' => $item->extra_column4,
                                     'extra_column5' => $item->extra_column5,
-                                    'extra_column6' => $item->extra_column6,
-                                    'extra_column7' => $item->extra_column7,
-                                    'extra_column8' => $item->extra_column8,
-                                    'extra_column9' => $item->extra_column9,
-                                    'extra_column10' => $item->extra_column10,
                                     'reg_date' => $item->reg_date,
                                     'last_update_date' => $item->last_update_date,
-                                    'new_link_id' => $item->new_link_id,
-                                    'link_id' => $item->link_id
                                 ]
                             );
+                            if(!empty($item_no->options)){
+                                $item_info_no = ItemInfo::updateOrCreate(
+                                    [
+                                        'item_no' => $item_no->item_no,
+                                    ],
+                                    [
+                                        'product_id' => $item->product_id,
+                                        'supply_code' => $item->supply_code,
+                                        'trans_fee' => $item->trans_fee,
+                                        'img_desc1' => $item->img_desc1,
+                                        'img_desc2' => $item->img_desc2,
+                                        'img_desc3' => $item->img_desc3,
+                                        'img_desc4' => $item->img_desc4,
+                                        'img_desc5' => $item->img_desc5,
+                                        'product_desc' => $item->product_desc,
+                                        'product_desc2' => $item->product_desc2,
+                                        'location' => $item->location,
+                                        'memo' => $item->memo,
+                                        'category' => $item->category,
+                                        'maker' => $item->maker,
+                                        'md' => $item->md,
+                                        'manager1' => $item->manager1,
+                                        'manager2' => $item->manager2,
+                                        'supply_options' => $option->supply_options,
+                                        'use_temp_soldout' => $option->use_temp_soldout,
+                                        'stock_alarm1' => $option->stock_alarm1,
+                                        'stock_alarm2' => $option->stock_alarm2,
+                                        'extra_price' => $option->extra_price,
+                                        'extra_shop_price' => $option->extra_shop_price,
+                                        'extra_column6' => $option->extra_column6,
+                                        'extra_column7' => $option->extra_column7,
+                                        'extra_column8' => $option->extra_column8,
+                                        'extra_column9' => $option->extra_column9,
+                                        'extra_column10' => $option->extra_column10,
+                                        'reg_date' => $option->reg_date,
+                                        'last_update_date' => $option->last_update_date,
+                                        'new_link_id' => $option->new_link_id,
+                                        'link_id' => $option->link_id,
+                                        'item_bar_code' => $option->barcode,
+                                    ]
+                                );
+                            }
                         }
                     }
                 }
