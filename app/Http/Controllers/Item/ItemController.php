@@ -1386,53 +1386,52 @@ class ItemController extends Controller
                     );
                     if ($item_no->item_no) {
                         if(!empty($item->options)){
-                            // foreach($item->options as $option){
-                            //     $item_info_no = ItemInfo::updateOrCreate(
-                            //         [
-                            //             'item_no' => $item_no->item_no,
-                            //         ],
-                            //         [
-                            //             'product_id' => $item->product_id,
-                            //             'supply_code' => $item->supply_code,
-                            //             'trans_fee' => $item->trans_fee,
-                            //             'img_desc1' => $item->img_desc1,
-                            //             'img_desc2' => $item->img_desc2,
-                            //             'img_desc3' => $item->img_desc3,
-                            //             'img_desc4' => $item->img_desc4,
-                            //             'img_desc5' => $item->img_desc5,
-                            //             'product_desc' => $item->product_desc,
-                            //             'product_desc2' => $item->product_desc2,
-                            //             'location' => $item->location,
-                            //             'memo' => $item->memo,
-                            //             'category' => $item->category,
-                            //             'maker' => $item->maker,
-                            //             'md' => $item->md,
-                            //             'manager1' => $item->manager1,
-                            //             'manager2' => $item->manager2,
-                            //             'supply_options' => $option->supply_options,
-                            //             'enable_sale' => $option->enable_sale,
-                            //             'use_temp_soldout' => $option->use_temp_soldout,
-                            //             'stock_alarm1' => $option->stock_alarm1,
-                            //             'stock_alarm2' => $option->stock_alarm2,
-                            //             'extra_price' => $option->extra_price,
-                            //             'extra_shop_price' => $option->extra_shop_price,
-                            //             'extra_column1' => !empty($option->extra_column1)?$option->extra_column1:'',
-                            //             'extra_column2' => !empty($option->extra_column2)?$option->extra_column2:'',
-                            //             'extra_column3' => !empty($option->extra_column3)?$option->extra_column3:'',
-                            //             'extra_column4' => !empty($option->extra_column4)?$option->extra_column4:'',
-                            //             'extra_column5' => !empty($option->extra_column5)?$option->extra_column5:'',
-                            //             'extra_column6' => $option->extra_column6,
-                            //             'extra_column7' => $option->extra_column7,
-                            //             'extra_column8' => $option->extra_column8,
-                            //             'extra_column9' => $option->extra_column9,
-                            //             'extra_column10' => $option->extra_column10,
-                            //             'reg_date' => $option->reg_date,
-                            //             'last_update_date' => $option->last_update_date,
-                            //             'new_link_id' => $option->new_link_id,
-                            //             'link_id' => $option->link_id,
-                            //         ]
-                            //     );
-                            // }
+                            $item_arr = (array)$item->options;
+                            if (is_array($item_arr) || is_object($item_arr))
+                            {
+                                foreach($item_arr as $option){
+                                    $item_info_no = ItemInfo::updateOrCreate(
+                                        [
+                                            'item_no' => $item_no->item_no,
+                                        ],
+                                        [
+                                            'product_id' => $item->product_id,
+                                            'supply_code' => $item->supply_code,
+                                            'trans_fee' => $item->trans_fee,
+                                            'img_desc1' => $item->img_desc1,
+                                            'img_desc2' => $item->img_desc2,
+                                            'img_desc3' => $item->img_desc3,
+                                            'img_desc4' => $item->img_desc4,
+                                            'img_desc5' => $item->img_desc5,
+                                            'product_desc' => $item->product_desc,
+                                            'product_desc2' => $item->product_desc2,
+                                            'location' => $item->location,
+                                            'memo' => $item->memo,
+                                            'category' => $item->category,
+                                            'maker' => $item->maker,
+                                            'md' => $item->md,
+                                            'manager1' => $item->manager1,
+                                            'manager2' => $item->manager2,
+                                            'supply_options' => !empty($option->supply_options)?$option->supply_options:'',
+                                            'enable_sale' => !empty($option->enable_sale)?$option->enable_sale:1,
+                                            'use_temp_soldout' => !empty($option->use_temp_soldout)?$option->use_temp_soldout:0,
+                                            'stock_alarm1' => !empty($option->stock_alarm1)?$option->stock_alarm1:0,
+                                            'stock_alarm2' => !empty($option->stock_alarm2)?$option->stock_alarm2:0,
+                                            'extra_price' => !empty($option->extra_price)?$option->extra_price:0,
+                                            'extra_shop_price' => !empty($option->extra_shop_price)?$option->extra_shop_price:0,
+                                            'extra_column6' => !empty($option->extra_column6)?$option->extra_column6:'',
+                                            'extra_column7' => !empty($option->extra_column7)?$option->extra_column7:'',
+                                            'extra_column8' => !empty($option->extra_column8)?$option->extra_column8:'',
+                                            'extra_column9' => !empty($option->extra_column9)?$option->extra_column9:'',
+                                            'extra_column10' => !empty($option->extra_column10)?$option->extra_column10:'',
+                                            'reg_date' => !empty($option->reg_date)?$option->reg_date:null,
+                                            'last_update_date' => !empty($option->last_update_date)?$option->last_update_date:null,
+                                            'new_link_id' => !empty($option->new_link_id)?$option->new_link_id:'',
+                                            'link_id' => !empty($option->link_id)?$option->link_id:'',
+                                        ]
+                                    );
+                                }
+                            }
                         }else{
                             $item_info_no = ItemInfo::updateOrCreate(
                                 [
@@ -1456,22 +1455,12 @@ class ItemController extends Controller
                                     'md' => $item->md,
                                     'manager1' => $item->manager1,
                                     'manager2' => $item->manager2,
-                                    'supply_options' => $option->supply_options,
-                                    'use_temp_soldout' => $option->use_temp_soldout,
-                                    'stock_alarm1' => $option->stock_alarm1,
-                                    'stock_alarm2' => $option->stock_alarm2,
-                                    'extra_price' => $option->extra_price,
-                                    'extra_shop_price' => $option->extra_shop_price,
-                                    'extra_column6' => $option->extra_column6,
-                                    'extra_column7' => $option->extra_column7,
-                                    'extra_column8' => $option->extra_column8,
-                                    'extra_column9' => $option->extra_column9,
-                                    'extra_column10' => $option->extra_column10,
-                                    'reg_date' => $option->reg_date,
-                                    'last_update_date' => $option->last_update_date,
-                                    'new_link_id' => $option->new_link_id,
-                                    'link_id' => $option->link_id,
-                                    'item_bar_code' => $option->barcode,
+                                    
+                                    'extra_column1' => $item->extra_column1,
+                                    'extra_column2' => $item->extra_column2,
+                                    'extra_column3' => $item->extra_column3,
+                                    'extra_column4' => $item->extra_column4,
+                                    'extra_column5' => $item->extra_column5
                                 ]
                             );
                         }
@@ -1537,46 +1526,48 @@ class ItemController extends Controller
                                 ]
                             );
                             if(!empty($item_no->options)){
-                                $item_info_no = ItemInfo::updateOrCreate(
-                                    [
-                                        'item_no' => $item_no->item_no,
-                                    ],
-                                    [
-                                        'product_id' => $item->product_id,
-                                        'supply_code' => $item->supply_code,
-                                        'trans_fee' => $item->trans_fee,
-                                        'img_desc1' => $item->img_desc1,
-                                        'img_desc2' => $item->img_desc2,
-                                        'img_desc3' => $item->img_desc3,
-                                        'img_desc4' => $item->img_desc4,
-                                        'img_desc5' => $item->img_desc5,
-                                        'product_desc' => $item->product_desc,
-                                        'product_desc2' => $item->product_desc2,
-                                        'location' => $item->location,
-                                        'memo' => $item->memo,
-                                        'category' => $item->category,
-                                        'maker' => $item->maker,
-                                        'md' => $item->md,
-                                        'manager1' => $item->manager1,
-                                        'manager2' => $item->manager2,
-                                        'supply_options' => $option->supply_options,
-                                        'use_temp_soldout' => $option->use_temp_soldout,
-                                        'stock_alarm1' => $option->stock_alarm1,
-                                        'stock_alarm2' => $option->stock_alarm2,
-                                        'extra_price' => $option->extra_price,
-                                        'extra_shop_price' => $option->extra_shop_price,
-                                        'extra_column6' => $option->extra_column6,
-                                        'extra_column7' => $option->extra_column7,
-                                        'extra_column8' => $option->extra_column8,
-                                        'extra_column9' => $option->extra_column9,
-                                        'extra_column10' => $option->extra_column10,
-                                        'reg_date' => $option->reg_date,
-                                        'last_update_date' => $option->last_update_date,
-                                        'new_link_id' => $option->new_link_id,
-                                        'link_id' => $option->link_id,
-                                        'item_bar_code' => $option->barcode,
-                                    ]
-                                );
+                                foreach($item_no->options as $option){
+                                    $item_info_no = ItemInfo::updateOrCreate(
+                                        [
+                                            'item_no' => $item_no->item_no,
+                                        ],
+                                        [
+                                            'product_id' => $item->product_id,
+                                            'supply_code' => $item->supply_code,
+                                            'trans_fee' => $item->trans_fee,
+                                            'img_desc1' => $item->img_desc1,
+                                            'img_desc2' => $item->img_desc2,
+                                            'img_desc3' => $item->img_desc3,
+                                            'img_desc4' => $item->img_desc4,
+                                            'img_desc5' => $item->img_desc5,
+                                            'product_desc' => $item->product_desc,
+                                            'product_desc2' => $item->product_desc2,
+                                            'location' => $item->location,
+                                            'memo' => $item->memo,
+                                            'category' => $item->category,
+                                            'maker' => $item->maker,
+                                            'md' => $item->md,
+                                            'manager1' => $item->manager1,
+                                            'manager2' => $item->manager2,
+                                            'supply_options' => $option->supply_options,
+                                            'use_temp_soldout' => $option->use_temp_soldout,
+                                            'stock_alarm1' => $option->stock_alarm1,
+                                            'stock_alarm2' => $option->stock_alarm2,
+                                            'extra_price' => $option->extra_price,
+                                            'extra_shop_price' => $option->extra_shop_price,
+                                            'extra_column6' => $option->extra_column6,
+                                            'extra_column7' => $option->extra_column7,
+                                            'extra_column8' => $option->extra_column8,
+                                            'extra_column9' => $option->extra_column9,
+                                            'extra_column10' => $option->extra_column10,
+                                            'reg_date' => $option->reg_date,
+                                            'last_update_date' => $option->last_update_date,
+                                            'new_link_id' => $option->new_link_id,
+                                            'link_id' => $option->link_id,
+                                            'item_bar_code' => $option->barcode,
+                                        ]
+                                    );
+                                }
                             }
                         }
                     }
