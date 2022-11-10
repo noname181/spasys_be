@@ -1941,7 +1941,6 @@ class ItemController extends Controller
             $url_api .= '&page='.$filter['page'];
         }
         $response = file_get_contents($url_api);
-        return $response;
         $api_data = json_decode($response);
         return $api_data;
         if(!empty($api_data->data)){
