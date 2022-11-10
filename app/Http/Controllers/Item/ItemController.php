@@ -1942,7 +1942,6 @@ class ItemController extends Controller
         }
         $response = file_get_contents($url_api);
         $api_data = json_decode($response);
-        return $api_data;
         if(!empty($api_data->data)){
             return $this->apiItemsRaw($api_data);
         }else{
