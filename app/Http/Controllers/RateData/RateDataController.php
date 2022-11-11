@@ -623,7 +623,7 @@ class RateDataController extends Controller
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
                     [
-                        'rgd_no' => $rgd,
+                        'rgd_no' => $rgd->rgd_no,
                         'set_type' => 'bonded1',
                     ]
                 )->first();
@@ -646,7 +646,7 @@ class RateDataController extends Controller
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
                     [
-                        'rgd_no' => $rgd,
+                        'rgd_no' => $rgd->rgd_no,
                         'set_type' => 'bonded2',
                     ]
                 )->first();
@@ -669,7 +669,7 @@ class RateDataController extends Controller
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
                     [
-                        'rgd_no' => $rgd,
+                        'rgd_no' => $rgd->rgd_no,
                         'set_type' => 'bonded3',
                     ]
                 )->first();
@@ -692,7 +692,7 @@ class RateDataController extends Controller
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
                     [
-                        'rgd_no' => $rgd,
+                        'rgd_no' => $rgd->rgd_no,
                         'set_type' => 'bonded4',
                     ]
                 )->first();
@@ -715,7 +715,7 @@ class RateDataController extends Controller
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
                     [
-                        'rgd_no' => $rgd,
+                        'rgd_no' => $rgd->rgd_no,
                         'set_type' => 'bonded5',
                     ]
                 )->first();
