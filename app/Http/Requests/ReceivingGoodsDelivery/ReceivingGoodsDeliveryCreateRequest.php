@@ -24,6 +24,15 @@ class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
     public function rules()
     {
         return [
+            'connection_number' => [
+                ''
+            ], 
+            'connect_w' => [
+                ''
+            ], 
+            'type_w_choose' => [
+                ''
+            ], 
             'is_no' => [
                 ''
             ], 

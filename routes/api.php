@@ -172,7 +172,10 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/get_fulfillment_export_status4_by_id/{rgd_no}', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getFulfillmentExportStatus4ById']); //page 253 mobile
 
-    Route::post('/get_tax_invoice_list', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getTaxInvoiceList']); //page tax_invoice_list
+    Route::post('/get_tax_invoice_list', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getTaxInvoiceList']); //page 277
+    Route::post('/get_tax_invoice_completed_list', [\App\Http\Controllers\Warehousing\WarehousingController::class,'get_tax_invoice_completed_list']); //page 282
+    Route::post('/get_tid_list', [\App\Http\Controllers\Warehousing\WarehousingController::class,'get_tid_list']); //page 277
+    Route::post('/create_tid', [\App\Http\Controllers\Warehousing\WarehousingController::class,'create_tid']); //page 277
 
     Route::get('/warehousing_request', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class,'__invoke']);
     Route::post('/warehousing_request_paginate', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class,'paginateWarehousingRequest']);
@@ -185,6 +188,8 @@ Route::middleware('auth')->group(function () {
     Route::post('receiving_goods_delivery/update_status5_fulfillment', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_status5_fulfillment']);
 
     Route::post('receiving_goods_delivery/payment', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'payment']);
+
+    Route::post('receiving_goods_delivery/connection', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'connection']);
 
     Route::post('receiving_goods_delivery/cancel_settlement', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'cancel_settlement']);
     Route::get('receiving_goods_delivery/cancel_rgd/{rgd_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_ReceivingGoodsDelivery_cancel']);
@@ -485,6 +490,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/', \App\Http\Controllers\Alarm\AlarmController::class)->name('registe_or_update_alarm');
         Route::get('/{alarm}', [App\Http\Controllers\Alarm\AlarmController::class, 'getAlarmById'])->name('get_alarm_by_id');
         Route::post('/search', [App\Http\Controllers\Alarm\AlarmController::class, 'searchAlarms'])->name('search');
+        Route::post('/search_mobile', [App\Http\Controllers\Alarm\AlarmController::class, 'searchAlarmsMobile'])->name('searchmobile');
     });
 
 
@@ -518,6 +524,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/fulfillment_create_billing', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'fulfillment_create_billing']);
 
     Route::post('/get_warehousing_status', [\App\Http\Controllers\WarehousingStatus\WarehousingStatusController::class, 'getWarehousingStatus']);
+    Route::post('/get_warehousing_status_mobile', [\App\Http\Controllers\WarehousingStatus\WarehousingStatusController::class, 'getWarehousingStatusMobile']);
     Route::get('/load_table_top_right/{rgd_no}', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'load_table_top_right']);
 });
 

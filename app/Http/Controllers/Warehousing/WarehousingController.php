@@ -11,6 +11,7 @@ use App\Models\AdjustmentGroup;
 use App\Models\CompanySettlement;
 use App\Models\Company;
 use App\Models\RateData;
+use App\Models\TaxInvoiceDivide;
 use App\Models\ImportExpected;
 use App\Models\Member;
 use App\Models\RateDataGeneral;
@@ -1618,7 +1619,7 @@ class WarehousingController extends Controller
 
                 }
 
-                
+
 
                 $warehousing = $warehousing->get();
 
@@ -1640,14 +1641,14 @@ class WarehousingController extends Controller
                     return $q;
                 });
                 $final4 = $final->merge($final2)->merge($final3);
-                
+
                 $data = $this->paginate($final4, $validated['per_page'], $validated['page']);
                 //$final = $final->paginate($per_page, ['*'], 'page', $page);
 
                 DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
 
                 return $data;
-               
+
 
             }
         } catch (\Exception $e) {
@@ -2708,7 +2709,7 @@ class WarehousingController extends Controller
                 $warehousing->getCollection()->map(function ($item) use ($user) {
                     $service_name = $item->service_korean_name;
                     $w_no = $item->w_no;
-                    
+
                     if ($user->mb_type == 'spasys') {
                         $co_no = $item->warehousing->company->co_parent->co_no;
                     } else if ($user->mb_type == 'shop') {
@@ -2728,7 +2729,7 @@ class WarehousingController extends Controller
 
                     $rate_data = RateData::where('rd_cate_meta1', '유통가공');
 
-                   
+
 
                     $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
                     $rate_data = $rate_data->where('rd_co_no', $co_no);
@@ -3152,7 +3153,7 @@ class WarehousingController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
             if ($user->mb_type == 'shop') {
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 't_export','rate_meta_data' => function ($q) {
+                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 't_export', 't_import', 'rate_meta_data' => function ($q) {
 
                     $q->withCount([
                         'rate_data as bonusQuantity' => function ($query) {
@@ -3160,14 +3161,14 @@ class WarehousingController extends Controller
                             $query->select(DB::raw('SUM(rd_data4)'))->where('rd_cate2','소계');
                         },
                     ]);
-                   
+
                 }])->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
                 });
             } else if ($user->mb_type == 'shipper') {
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general','rate_meta_data' => function ($q) {
+                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general','t_import','rate_meta_data' => function ($q) {
 
                     $q->withCount([
                         'rate_data as bonusQuantity' => function ($query) {
@@ -3175,14 +3176,14 @@ class WarehousingController extends Controller
                             $query->select(DB::raw('SUM(rd_data4)'))->where('rd_cate2','소계');
                         },
                     ]);
-                   
+
                 }])->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
                 });
             } else if ($user->mb_type == 'spasys') {
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general','rate_meta_data' => function ($q) {
+                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 't_import','rate_meta_data' => function ($q) {
 
                     $q->withCount([
                         'rate_data as bonusQuantity' => function ($query) {
@@ -3190,7 +3191,7 @@ class WarehousingController extends Controller
                             $query->select(DB::raw('SUM(rd_data4)'))->where('rd_cate2','소계');
                         },
                     ]);
-                   
+
                 }])->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
@@ -3637,13 +3638,15 @@ class WarehousingController extends Controller
                 $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
+                    })->orWhereHas('co_no.co_parent', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
                     });
                 });
             }
             $warehousing->where(function ($q) {
                 $q->where('rgd_status4', '추가청구서')
                     ->orWhere('rgd_status4', '확정청구서');
-            })->where('rgd_is_show', 'y');
+            })->where('rgd_is_show', 'y')->orderBy('rgd_no', 'DESC');
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
@@ -3721,6 +3724,168 @@ class WarehousingController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
+
+    public function get_tax_invoice_completed_list(WarehousingSearchRequest $request) //page277
+
+    {
+        try {
+            DB::enableQueryLog();
+            $validated = $request->validated();
+
+            // If per_page is null set default data = 15
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+            $user = Auth::user();
+            if ($user->mb_type == 'shop') {
+                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 't_export'])->whereHas('w_no', function ($query) use ($user) {
+                    $query->whereHas('co_no.co_parent', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
+                    });
+                });
+            } else if ($user->mb_type == 'shipper') {
+                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
+                    $query->whereHas('co_no', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
+                    });
+                });
+            } else if ($user->mb_type == 'spasys') {
+                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
+                    $query->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
+                    })->orWhereHas('co_no.co_parent', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
+                    });
+                });
+            }
+            $warehousing->where(function ($q) {
+                $q->where('rgd_status4', '추가청구서')
+                    ->orWhere('rgd_status4', '확정청구서');
+            })
+            ->where('rgd_status7', 'taxed')
+            ->where('rgd_is_show', 'y')->orderBy('rgd_no', 'DESC');
+            if (isset($validated['from_date'])) {
+                $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            }
+
+            if (isset($validated['to_date'])) {
+                $warehousing->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            }
+
+            if (isset($validated['co_parent_name'])) {
+                $warehousing->whereHas('w_no.co_no.co_parent', function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                });
+            }
+            if (isset($validated['co_name'])) {
+                $warehousing->whereHas('w_no.co_no', function ($q) use ($validated) {
+                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                });
+            }
+            if (isset($validated['w_type'])) {
+                $warehousing->whereHas('w_no', function ($q) use ($validated) {
+                    return $q->where('w_type', 'like', '%' . $validated['w_type'] . '%');
+                });
+            }
+            if (isset($validated['w_schedule_number'])) {
+                $warehousing->whereHas('w_no', function ($q) use ($validated) {
+                    return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
+                });
+            }
+            if (isset($validated['rgd_status1'])) {
+                $warehousing->where('rgd_status1', '=', $validated['rgd_status1']);
+            }
+            if (isset($validated['rgd_status2'])) {
+                $warehousing->where('rgd_status2', '=', $validated['rgd_status2']);
+            }
+            if (isset($validated['rgd_status3'])) {
+                $warehousing->where('rgd_status3', '=', $validated['rgd_status3']);
+            }
+            if (isset($validated['item_brand'])) {
+                $warehousing->whereHas('w_no.warehousing_item.item_no', function ($q) use ($validated) {
+                    return $q->where(DB::raw('lower(item_brand)'), 'like', '%' . strtolower($validated['item_brand']) . '%');
+                });
+            }
+            if (isset($validated['item_bar_code'])) {
+                $warehousing->whereHas('w_no.warehousing_item.item_no', function ($q) use ($validated) {
+                    return $q->where(DB::raw('lower(item_bar_code)'), 'like', '%' . strtolower($validated['item_bar_code']) . '%');
+                });
+            }
+            if (isset($validated['item_cargo_bar_code'])) {
+                $warehousing->whereHas('w_no.warehousing_item.item_no', function ($q) use ($validated) {
+                    return $q->where(DB::raw('lower(item_cargo_bar_code)'), 'like', '%' . strtolower($validated['item_cargo_bar_code']) . '%');
+                });
+            }
+            if (isset($validated['item_upc_code'])) {
+                $warehousing->whereHas('w_no.warehousing_item.item_no', function ($q) use ($validated) {
+                    return $q->where(DB::raw('lower(item_upc_code)'), 'like', '%' . strtolower($validated['item_upc_code']) . '%');
+                });
+            }
+            if (isset($validated['rgd_status3_1']) || isset($validated['rgd_status3_2']) || isset($validated['rgd_status3_3'])) {
+                $warehousing->where(function ($q) use ($validated) {
+                    $q->Where('rgd_status3', '=', $validated['rgd_status3_1'] ? $validated['rgd_status3_1'] : "")
+                        ->orWhere('rgd_status3', '=', $validated['rgd_status3_2'] ? $validated['rgd_status3_2'] : "")
+                        ->orWhere('rgd_status3', '=', $validated['rgd_status3_3'] ? $validated['rgd_status3_3'] : "");
+                });
+            }
+            if (isset($validated['service_korean_name'])) {
+                $warehousing->where('service_korean_name', '=', $validated['service_korean_name']);
+            }
+            $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
+            //return DB::getQueryLog();
+
+            return response()->json($warehousing);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function get_tid_list(Request $request) //page277
+    {
+        try {
+            DB::enableQueryLog();
+            $tid = TaxInvoiceDivide::where('rgd_no', $request->rgd_no)->get();
+
+
+            return response()->json($tid);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function create_tid(Request $request) //page277
+    {
+        try {
+            $user = Auth::user();
+            DB::enableQueryLog();
+            $tid = TaxInvoiceDivide::insertGetId([
+                'rgd_no' => $request->rgd_no,
+                'tid_number' => $request->tid_number,
+                'tid_price' => $request->tid_price,
+                'tid_price_left' => $request->tid_price_left,
+                'mb_no' => $user->mb_no,
+
+            ]);
+
+            if($request->tid_price_left == 0){
+                ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                    'rgd_status7' => 'taxed',
+                ]);
+            }
+
+
+            return response()->json($tid);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
     public function importExcelDistribution(WarehousingSearchRequest $request)
     {
         DB::beginTransaction();
