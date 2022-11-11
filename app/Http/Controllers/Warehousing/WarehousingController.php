@@ -3153,7 +3153,7 @@ class WarehousingController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
             if ($user->mb_type == 'shop') {
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 't_export','rate_meta_data' => function ($q) {
+                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 't_export', 't_import', 'rate_meta_data' => function ($q) {
 
                     $q->withCount([
                         'rate_data as bonusQuantity' => function ($query) {
@@ -3168,7 +3168,7 @@ class WarehousingController extends Controller
                     });
                 });
             } else if ($user->mb_type == 'shipper') {
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general','rate_meta_data' => function ($q) {
+                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general','t_import','rate_meta_data' => function ($q) {
 
                     $q->withCount([
                         'rate_data as bonusQuantity' => function ($query) {
@@ -3183,7 +3183,7 @@ class WarehousingController extends Controller
                     });
                 });
             } else if ($user->mb_type == 'spasys') {
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general','rate_meta_data' => function ($q) {
+                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 't_import','rate_meta_data' => function ($q) {
 
                     $q->withCount([
                         'rate_data as bonusQuantity' => function ($query) {
