@@ -1609,7 +1609,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 ReceivingGoodsDelivery::where('rgd_no', $remove['rgd_no'])->delete();
             }
 
-            if ($validated['connection_number']) {
+            if (isset($validated['connection_number'])) {
                 if (isset($validated['is_no'])) {
                     Export::where('te_carry_out_number', $validated['is_no'])->update([
                         'connection_number' => $validated['connection_number']
@@ -1627,7 +1627,7 @@ class ReceivingGoodsDeliveryController extends Controller
             }
 
 
-            if ($validated['wr_contents']) {
+            if (isset($validated['wr_contents'])) {
 
                 WarehousingRequest::insert([
                     'w_no' => $validated['is_no'],

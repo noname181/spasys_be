@@ -96,6 +96,42 @@ class AlarmController extends Controller
         }
     }
 
+    public function searchAlarmsMobile(AlarmSearchRequest $request)
+    {
+        $validated = $request->validated();
+        try {
+           
+            $alarm = Alarm::with('warehousing','member')->orderBy('alarm_no', 'DESC');
+
+            if (isset($validated['w_no'])) {
+                $alarm->where('w_no', $validated['w_no']);
+            }
+
+            if (isset($validated['from_date'])) {
+                $alarm->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            }
+
+            if (isset($validated['to_date'])) {
+                $alarm->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            }
+            if (isset($validated['co_parent_name'])) {
+                $alarm->whereHas('member.company.co_parent', function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                });
+            }
+            if (isset($validated['co_name'])) {
+                $alarm->whereHas('member.company', function ($q) use ($validated) {
+                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                });
+            }
+            $alarm = $alarm->get();
+
+            return response()->json($alarm);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
 
     public function getAlarmById($alarm_no)
     {
