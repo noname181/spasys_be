@@ -620,6 +620,14 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
+            if (empty($rmd)) {
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd,
+                        'set_type' => 'bonded1',
+                    ]
+                )->first();
+            }
         } else if (!isset($rmd->rmd_no) && $set_type == 'bonded2_final') {
             $rmd = RateMetaData::where(
                 [
@@ -631,6 +639,14 @@ class RateDataController extends Controller
                 $rmd = RateMetaData::where(
                     [
                         'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded2',
+                    ]
+                )->first();
+            }
+            if (empty($rmd)) {
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd,
                         'set_type' => 'bonded2',
                     ]
                 )->first();
@@ -650,6 +666,14 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
+            if (empty($rmd)) {
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd,
+                        'set_type' => 'bonded3',
+                    ]
+                )->first();
+            }
         } else if (!isset($rmd->rmd_no) && $set_type == 'bonded4_final') {
             $rmd = RateMetaData::where(
                 [
@@ -661,6 +685,14 @@ class RateDataController extends Controller
                 $rmd = RateMetaData::where(
                     [
                         'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded4',
+                    ]
+                )->first();
+            }
+            if (empty($rmd)) {
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd,
                         'set_type' => 'bonded4',
                     ]
                 )->first();
@@ -680,6 +712,14 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
+            if (empty($rmd)) {
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd,
+                        'set_type' => 'bonded5',
+                    ]
+                )->first();
+            }
         } else if (!isset($rmd->rmd_no) && $set_type == 'bonded6_final') {
             $rmd = RateMetaData::where(
                 [
@@ -691,6 +731,14 @@ class RateDataController extends Controller
                 $rmd = RateMetaData::where(
                     [
                         'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded6',
+                    ]
+                )->first();
+            }
+            if (empty($rmd)) {
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd,
                         'set_type' => 'bonded6',
                     ]
                 )->first();
