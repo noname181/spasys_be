@@ -117,6 +117,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/reply_qna', [App\Http\Controllers\Qna\QnaController::class, 'reply_qna'])->name('reply_qna');
         Route::patch('/', [App\Http\Controllers\Qna\QnaController::class, 'update'])->name('update_qna');
         Route::post('/get_qnas', [App\Http\Controllers\Qna\QnaController::class, 'getQnA'])->name('get_qna');
+        Route::post('/delete_qna', [App\Http\Controllers\Qna\QnaController::class, 'delete_qna'])->name('delete_qna');
     });
 
     Route::prefix('banner')->name('banner.')->group(function () {
@@ -490,6 +491,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/', \App\Http\Controllers\Alarm\AlarmController::class)->name('registe_or_update_alarm');
         Route::get('/{alarm}', [App\Http\Controllers\Alarm\AlarmController::class, 'getAlarmById'])->name('get_alarm_by_id');
         Route::post('/search', [App\Http\Controllers\Alarm\AlarmController::class, 'searchAlarms'])->name('search');
+        Route::post('/search_mobile', [App\Http\Controllers\Alarm\AlarmController::class, 'searchAlarmsMobile'])->name('searchmobile');
     });
 
 
@@ -523,6 +525,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/fulfillment_create_billing', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'fulfillment_create_billing']);
 
     Route::post('/get_warehousing_status', [\App\Http\Controllers\WarehousingStatus\WarehousingStatusController::class, 'getWarehousingStatus']);
+    Route::post('/get_warehousing_status_mobile', [\App\Http\Controllers\WarehousingStatus\WarehousingStatusController::class, 'getWarehousingStatusMobile']);
     Route::get('/load_table_top_right/{rgd_no}', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'load_table_top_right']);
 });
 

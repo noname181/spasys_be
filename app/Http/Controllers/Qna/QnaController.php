@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Request;
 
 class QnaController extends Controller
 {
@@ -308,6 +309,11 @@ class QnaController extends Controller
 
             //return response()->json(['message' => Messages::MSG_0018], 500);
         }
+    }
+
+    public function delete_qna(QnaRequest $request){
+        $check = Qna::where('qna_no',$request->qna_no)->update(['qna_status'=>'삭제']);
+        return response()->json(['status'=> $check]);
     }
 
     private function formatDate($dateStr) {

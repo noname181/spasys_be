@@ -82,6 +82,32 @@ class WarehousingStatusController extends Controller
         }
     }
 
+    public function getWarehousingStatusMobile(WarehousingStatusRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+
+            $warehousing = Warehousing::where('w_no', '=', $validated['w_no'])->first();
+
+            $warehousing_status = WarehousingStatus::with(['mb_no','warehousing'])->orderBy('ws_no', 'DESC');
+            if($warehousing){
+                $warehousing_status = $warehousing_status->where('w_no', '=', $validated['w_no'])->orwhere('w_no', '=', $warehousing->w_import_no);
+            }else{
+                $warehousing_status = $warehousing_status->where('w_no', '=', $validated['w_no']);
+            }
+
+            $members = Member::where('mb_no', '!=', 0)->get();
+
+            $warehousing_status = $warehousing_status->get();
+
+            return response()->json($warehousing_status);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            //return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
     public function paginateWarehousingStatus(WarehousingStatusRequest $request)
     {
         try {

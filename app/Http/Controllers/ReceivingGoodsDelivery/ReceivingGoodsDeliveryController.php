@@ -1609,7 +1609,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 ReceivingGoodsDelivery::where('rgd_no', $remove['rgd_no'])->delete();
             }
 
-            if ($validated['connection_number']) {
+            if (isset($validated['connection_number'])) {
                 if (isset($validated['is_no'])) {
                     Export::where('te_carry_out_number', $validated['is_no'])->update([
                         'connection_number' => $validated['connection_number']
@@ -1627,7 +1627,7 @@ class ReceivingGoodsDeliveryController extends Controller
             }
 
 
-            if ($validated['wr_contents']) {
+            if (isset($validated['wr_contents'])) {
 
                 WarehousingRequest::insert([
                     'w_no' => $validated['is_no'],
@@ -1864,13 +1864,17 @@ class ReceivingGoodsDeliveryController extends Controller
     {
         try {
             if ($request->bill_type == 'case') {
-                ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+                
+                ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     'rgd_status5' => 'confirmed',
                     'rgd_confirmed_date' => Carbon::now()->toDateTimeString()
                 ]);
             } else if ($request->bill_type == 'monthly') {
                 foreach ($request->rgds as $rgd) {
-                    ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
+                    $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->first();
+                    
+                    ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                         'rgd_status5' => 'confirmed',
                         'rgd_confirmed_date' => Carbon::now()->toDateTimeString()
                     ]);
@@ -1878,7 +1882,9 @@ class ReceivingGoodsDeliveryController extends Controller
             } else if ($request->bill_type == 'multiple') {
                 foreach ($request->rgds as $rgd) {
                     // if ($rgd['rgd_bill_type'] == 'final') {
-                    ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
+                    $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->first();
+                    
+                    ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                         'rgd_status5' => 'confirmed',
                         'rgd_confirmed_date' => Carbon::now()->toDateTimeString()
                     ]);
