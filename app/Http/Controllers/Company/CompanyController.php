@@ -645,8 +645,8 @@ class CompanyController extends Controller
     public function  getItemCompanies(CompanySearchRequest $request)
     {
         try {
+            return $request;
             $validated = $request->validated();
-
             // If per_page is null set default data = 15
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
@@ -684,7 +684,7 @@ class CompanyController extends Controller
             return response()->json($companies);
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
