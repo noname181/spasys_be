@@ -117,6 +117,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/reply_qna', [App\Http\Controllers\Qna\QnaController::class, 'reply_qna'])->name('reply_qna');
         Route::patch('/', [App\Http\Controllers\Qna\QnaController::class, 'update'])->name('update_qna');
         Route::post('/get_qnas', [App\Http\Controllers\Qna\QnaController::class, 'getQnA'])->name('get_qna');
+        Route::post('/delete_qna', [App\Http\Controllers\Qna\QnaController::class, 'delete_qna'])->name('delete_qna');
     });
 
     Route::prefix('banner')->name('banner.')->group(function () {
