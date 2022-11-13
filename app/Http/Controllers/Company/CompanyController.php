@@ -45,7 +45,7 @@ class CompanyController extends Controller
                 'co_parent_no' => Auth::user()->co_no,
                 'co_name' => $validated['co_name'],
                 'co_address' => $validated['co_address'],
-                'co_zipcode' => $validated['co_zipcode'],
+                'co_zipcode' => isset($validated['co_zipcode']) ? $validated['co_zipcode'] : '',
                 'co_address_detail' => $validated['co_address_detail'],
                 'co_country' => $validated['co_country'],
                 'co_major' => $validated['co_major'],
@@ -76,7 +76,7 @@ class CompanyController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
