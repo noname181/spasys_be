@@ -3647,6 +3647,20 @@ class WarehousingController extends Controller
                 $q->where('rgd_status4', '추가청구서')
                     ->orWhere('rgd_status4', '확정청구서');
             })->where('rgd_is_show', 'y')->orderBy('rgd_no', 'DESC');
+
+            if (isset($validated['status'])) {
+                if($validated['status'] == 'waiting')
+                    $warehousing->whereNull('rgd_status7');
+                else if($validated['status'] == 'taxed')
+                    $warehousing->where('rgd_status7', '=', 'taxed');
+                else 
+                    $warehousing->where('rgd_status7', '=', 'cancelled');
+            }
+
+            if (isset($validated['service']) && $validated['service'] != '전체') {
+                $warehousing->where(DB::raw('lower(service_korean_name)'), 'like', '%' . strtolower($validated['service']) . '%');
+            }
+
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
