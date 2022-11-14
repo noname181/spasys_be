@@ -48,6 +48,7 @@ class ReceivingGoodsDelivery extends Model
         'rgd_arrive_day',
         'service_korean_name',
         'rgd_paid_date',
+        'rgd_tax_invoice_number',
         'created_at',
         'updated_at',
     ];

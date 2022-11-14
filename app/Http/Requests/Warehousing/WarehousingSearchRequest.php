@@ -30,6 +30,9 @@ class WarehousingSearchRequest extends BaseFormRequest
             'status' => [
                 ''
             ],
+            'settlement_cycle' => [
+                ''
+            ],
             'order_id' => [
                 ''
             ],

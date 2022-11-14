@@ -3778,6 +3778,18 @@ class WarehousingController extends Controller
             })
             ->where('rgd_status7', 'taxed')
             ->where('rgd_is_show', 'y')->orderBy('rgd_no', 'DESC');
+
+            if (isset($validated['service']) && $validated['service'] != '전체') {
+                $warehousing->where(DB::raw('lower(service_korean_name)'), 'like', '%' . strtolower($validated['service']) . '%');
+            }
+
+            if (isset($validated['settlement_cycle'])) {
+                if($validated['settlement_cycle'] == '건별')
+                    $warehousing->where(DB::raw('lower(rgd_bill_type)'), 'not like', '%' . 'monthly' . '%');
+                else if($validated['settlement_cycle'] == '월별')
+                    $warehousing->where(DB::raw('lower(rgd_bill_type)'), 'like', '%' . 'monthly' . '%');
+            }
+
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }

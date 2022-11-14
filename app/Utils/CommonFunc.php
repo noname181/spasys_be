@@ -44,4 +44,13 @@ class CommonFunc
         $string = date('Ymd').$id.'_'.$index;
         return $string;
     }
+
+    static function generate_tax_number($data)
+    {
+        $string = 'TAX';
+      
+        $string = $string.'_'.date('Ymd').$data;
+        
+        return $string;
+    }
 }
