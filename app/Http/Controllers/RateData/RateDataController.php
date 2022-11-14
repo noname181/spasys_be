@@ -7483,8 +7483,10 @@ class RateDataController extends Controller
             DB::beginTransaction();
 
             foreach($request->rgds as $rgd){
+                $tax_number = CommonFunc::generate_tax_number($request->rgds[0]['rgd_no']);
                 ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
-                    'rgd_status7' => 'taxed'
+                    'rgd_status7' => 'taxed',
+                    'rgd_tax_invoice_number' => $tax_number ? $tax_number : NULL,
                 ]);
             }
 
@@ -7492,6 +7494,28 @@ class RateDataController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007,
                 
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0001], 500);
+        }
+    }
+
+    public function get_tax_invoice_by_rgd_no(request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            $rgd = ReceivingGoodsDelivery::with('w_no')->where('rgd_no', $request['rgd_no'])->first();
+      
+            $rgds = ReceivingGoodsDelivery::with('w_no')->where('rgd_tax_invoice_number', $rgd['rgd_tax_invoice_number'])->get();
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'rgds' => $rgds,
             ], 201);
         } catch (\Exception $e) {
             DB::rollback();
