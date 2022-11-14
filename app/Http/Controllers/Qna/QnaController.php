@@ -85,18 +85,20 @@ class QnaController extends Controller
             $path = join('/', ['files', 'qna', $qna_no]);
 
             $files = [];
-            foreach ($validated['files'] as $key => $file) {
-                $url = Storage::disk('public')->put($path, $file);
-                $files[] = [
-                    'file_table' => 'qna',
-                    'file_table_key' => $qna_no,
-                    'file_name' => basename($url),
-                    'file_name_old' => $file->getClientOriginalName(),
-                    'file_size' => $file->getSize(),
-                    'file_extension' => $file->extension(),
-                    'file_position' => $key,
-                    'file_url' => $url
-                ];
+            if(!empty($validated['files'])){
+                foreach ($validated['files'] as $key => $file) {
+                    $url = Storage::disk('public')->put($path, $file);
+                    $files[] = [
+                        'file_table' => 'qna',
+                        'file_table_key' => $qna_no,
+                        'file_name' => basename($url),
+                        'file_name_old' => $file->getClientOriginalName(),
+                        'file_size' => $file->getSize(),
+                        'file_extension' => $file->extension(),
+                        'file_position' => $key,
+                        'file_url' => $url
+                    ];
+                }
             }
 
             File::insert($files);
@@ -137,18 +139,20 @@ class QnaController extends Controller
             $path = join('/', ['files', 'qna', $qna_no]);
 
             $files = [];
-            foreach ($validated['files'] as $key => $file) {
-                $url = Storage::disk('public')->put($path, $file);
-                $files[] = [
-                    'file_table' => 'qna',
-                    'file_table_key' => $qna_no,
-                    'file_name' => basename($url),
-                    'file_name_old' => $file->getClientOriginalName(),
-                    'file_size' => $file->getSize(),
-                    'file_extension' => $file->extension(),
-                    'file_position' => $key,
-                    'file_url' => $url
-                ];
+            if(!empty($validated['files'])){
+                foreach ($validated['files'] as $key => $file) {
+                    $url = Storage::disk('public')->put($path, $file);
+                    $files[] = [
+                        'file_table' => 'qna',
+                        'file_table_key' => $qna_no,
+                        'file_name' => basename($url),
+                        'file_name_old' => $file->getClientOriginalName(),
+                        'file_size' => $file->getSize(),
+                        'file_extension' => $file->extension(),
+                        'file_position' => $key,
+                        'file_url' => $url
+                    ];
+                }
             }
 
             File::insert($files);
