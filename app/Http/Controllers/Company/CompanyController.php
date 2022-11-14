@@ -241,7 +241,8 @@ class CompanyController extends Controller
             $forwarder_info = ForwarderInfo::select(['fi_no', 'co_no', 'fi_name', 'fi_manager', 'fi_hp', 'fi_address', 'fi_address_detail'])->where('co_no', $co_no)->get();
             $customs_info = CustomsInfo::select(['ci_no', 'co_no', 'ci_name', 'ci_manager', 'ci_hp', 'ci_address', 'ci_address_detail'])->where('co_no', $co_no)->get();
             $manager = Manager::where('co_no', $co_no)->first();
-
+            $services = Service::where('service_use_yn', 'y')->where('service_no', '!=', 1)->get();
+            
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'company' => $company,
@@ -250,6 +251,7 @@ class CompanyController extends Controller
                 'forwarder_info' => $forwarder_info,
                 'customs_info' => $customs_info,
                 'manager' => $manager,
+                'services' => $services,
             ]);
         } catch (\Exception $e) {
             DB::rollback();
@@ -645,7 +647,7 @@ class CompanyController extends Controller
     public function  getItemCompanies(CompanySearchRequest $request)
     {
         try {
-            return $request;
+            //return $request;
             $validated = $request->validated();
             // If per_page is null set default data = 15
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;

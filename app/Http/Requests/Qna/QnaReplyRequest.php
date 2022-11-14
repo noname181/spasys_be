@@ -47,7 +47,7 @@ class QnaReplyRequest extends BaseFormRequest
             ],
             'files' => [
                 'array',
-                'required',
+                // 'required',
             ],
             'files.*' => [
                 'file',

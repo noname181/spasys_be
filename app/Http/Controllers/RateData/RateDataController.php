@@ -2042,6 +2042,8 @@ class RateDataController extends Controller
                 $final_rgd->rgd_is_show = $request->bill_type == 'final_monthly' ? 'n' : 'y';
                 $final_rgd->rgd_parent_no = $previous_rgd->rgd_no;
                 $final_rgd->rgd_status5 = null;
+                $final_rgd->rgd_status6 = null;
+                $final_rgd->rgd_status7 = null;
                 $final_rgd->mb_no = Auth::user()->mb_no;
                 $final_rgd->save();
 
@@ -2144,6 +2146,8 @@ class RateDataController extends Controller
                 $final_rgd->rgd_bill_type = 'additional'; // the new project_id
                 $final_rgd->rgd_status4 = $request->status;
                 $final_rgd->rgd_status5 = null;
+                $final_rgd->rgd_status6 = null;
+                $final_rgd->rgd_status7 = null;
                 $final_rgd->rgd_parent_no = $rgd->rgd_no;
                 $final_rgd->save();
 
@@ -2220,6 +2224,8 @@ class RateDataController extends Controller
                 $final_rgd->rgd_bill_type = 'additional'; // the new project_id
                 $final_rgd->rgd_status4 = '확정청구서';
                 $final_rgd->rgd_status5 = null;
+                $final_rgd->rgd_status6 = null;
+                $final_rgd->rgd_status7 = null;
                 $final_rgd->save();
 
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
@@ -2662,6 +2668,8 @@ class RateDataController extends Controller
                         $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
                         $final_rgd->rgd_status4 = '확정청구서';
                         $final_rgd->rgd_status5 = null;
+                        $final_rgd->rgd_status6 = null;
+                        $final_rgd->rgd_status7 = null;
                         $final_rgd->rgd_is_show = ($i == 0 ? 'y' : 'n');
                         $final_rgd->rgd_parent_no = $expectation_rgd->rgd_no;
                         $final_rgd->rgd_settlement_number = $request->settlement_number;
@@ -2749,6 +2757,8 @@ class RateDataController extends Controller
                         $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
                         $final_rgd->rgd_status4 = '확정청구서';
                         $final_rgd->rgd_status5 = null;
+                        $final_rgd->rgd_status6 = null;
+                        $final_rgd->rgd_status7 = null;
                         $final_rgd->rgd_is_show = ($i == 0 ? 'y' : 'n');
                         $final_rgd->rgd_parent_no = $expectation_rgd->rgd_no;
                         $final_rgd->rgd_settlement_number = $request->settlement_number;
@@ -2970,6 +2980,8 @@ class RateDataController extends Controller
                 $final_rgd->rgd_status3 = null;
                 $final_rgd->rgd_status4 = $request->status;
                 $final_rgd->rgd_status5 = null;
+                $final_rgd->rgd_status6 = null;
+                $final_rgd->rgd_status7 = null;
                 $final_rgd->rgd_parent_no = $previous_rgd->rgd_no;
                 $final_rgd->save();
 
@@ -3106,7 +3118,9 @@ class RateDataController extends Controller
                 $final_rgd->rgd_status3 = null;
                 $final_rgd->rgd_status4 = $request->status;
                 $final_rgd->rgd_settlement_number = $request->rgd_settlement_number;
-                $final_rgd->rgd_status5 = '';
+                $final_rgd->rgd_status5 = null;
+                $final_rgd->rgd_status6 = null;
+                $final_rgd->rgd_status7 = null;
                 $final_rgd->mb_no = Auth::user()->mb_no;
                 $final_rgd->rgd_parent_no = $previous_rgd->rgd_no;
                 $final_rgd->save();
@@ -3164,28 +3178,28 @@ class RateDataController extends Controller
                     'rdg_supply_price4' => $request->bonded4['supply_price'],
                     'rdg_supply_price5' => $request->bonded5['supply_price'],
                     'rdg_supply_price6' => $request->bonded6['supply_price'],
-                    'rdg_supply_price6' => $request->total['supply_price'],
+                    'rdg_supply_price7' => $request->total['supply_price'],
                     'rdg_vat1' => $request->bonded1['taxes'],
                     'rdg_vat2' => $request->bonded2['taxes'],
                     'rdg_vat3' => $request->bonded3['taxes'],
                     'rdg_vat4' => $request->bonded4['taxes'],
                     'rdg_vat5' => $request->bonded5['taxes'],
                     'rdg_vat6' => $request->bonded6['taxes'],
-                    'rdg_vat6' => $request->total['taxes'],
+                    'rdg_vat7' => $request->total['taxes'],
                     'rdg_sum1' => $request->bonded1['sum'],
                     'rdg_sum2' => $request->bonded2['sum'],
                     'rdg_sum3' => $request->bonded3['sum'],
                     'rdg_sum4' => $request->bonded4['sum'],
                     'rdg_sum5' => $request->bonded5['sum'],
                     'rdg_sum6' => $request->bonded6['sum'],
-                    'rdg_sum6' => $request->total['sum'],
+                    'rdg_sum7' => $request->total['sum'],
                     'rdg_etc1' => $request->bonded1['etc'],
                     'rdg_etc2' => $request->bonded2['etc'],
                     'rdg_etc3' => $request->bonded3['etc'],
                     'rdg_etc4' => $request->bonded4['etc'],
                     'rdg_etc5' => $request->bonded5['etc'],
                     'rdg_etc6' => $request->bonded6['etc'],
-                    'rdg_etc6' => $request->total['etc'],
+                    'rdg_etc7' => $request->total['etc'],
                 ]
             );
 
@@ -3209,7 +3223,9 @@ class RateDataController extends Controller
                 $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
                 $final_rgd->rgd_status3 = null;
                 $final_rgd->rgd_status4 = $request->status;
-                $final_rgd->rgd_status5 = '';
+                $final_rgd->rgd_status5 = null;
+                $final_rgd->rgd_status6 = null;
+                $final_rgd->rgd_status7 = null;
                 $final_rgd->rgd_is_show = 'n';
                 $final_rgd->rgd_settlement_number = $request->rgd_settlement_number;
                 $final_rgd->rgd_parent_no = $previous_rgd->rgd_no;
@@ -7483,8 +7499,10 @@ class RateDataController extends Controller
             DB::beginTransaction();
 
             foreach($request->rgds as $rgd){
+                $tax_number = CommonFunc::generate_tax_number($request->rgds[0]['rgd_no']);
                 ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
-                    'rgd_status7' => 'taxed'
+                    'rgd_status7' => 'taxed',
+                    'rgd_tax_invoice_number' => $tax_number ? $tax_number : NULL,
                 ]);
             }
 
@@ -7492,6 +7510,28 @@ class RateDataController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007,
                 
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0001], 500);
+        }
+    }
+
+    public function get_tax_invoice_by_rgd_no(request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            $rgd = ReceivingGoodsDelivery::with('w_no')->where('rgd_no', $request['rgd_no'])->first();
+      
+            $rgds = ReceivingGoodsDelivery::with('w_no')->where('rgd_tax_invoice_number', $rgd['rgd_tax_invoice_number'])->get();
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'rgds' => $rgds,
             ], 201);
         } catch (\Exception $e) {
             DB::rollback();

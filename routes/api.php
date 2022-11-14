@@ -399,6 +399,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/update_storage_days', [\App\Http\Controllers\RateData\RateDataController::class, 'update_storage_days'])->name('update_storage_days');
 
         Route::post('/tax_invoice_issue', [\App\Http\Controllers\RateData\RateDataController::class, 'tax_invoice_issue']);
+        Route::post('/get_tax_invoice_by_rgd_no', [\App\Http\Controllers\RateData\RateDataController::class, 'get_tax_invoice_by_rgd_no']);
 
 
         //distribution_est_casebill_edit
