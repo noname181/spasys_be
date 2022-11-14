@@ -121,7 +121,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 ]);
             }
 
-            if ($validated['connection_number']) {
+            if (isset($validated['connection_number'])) {
                 if (isset($validated['w_no'])) {
                     Warehousing::where('w_no', $validated['w_no'])->update([
                         'connection_number' => $validated['connection_number']
