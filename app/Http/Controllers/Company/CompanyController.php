@@ -645,7 +645,7 @@ class CompanyController extends Controller
     public function  getItemCompanies(CompanySearchRequest $request)
     {
         try {
-            return $request;
+            //return $request;
             $validated = $request->validated();
             // If per_page is null set default data = 15
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
