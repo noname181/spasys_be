@@ -230,6 +230,7 @@ class CompanyController extends Controller
                 'company.co_email',
                 'company.co_etc',
                 'contract.c_integrated_calculate_yn as c_integrated_calculate_yn',
+                'contract.c_calculate_deadline_yn as c_calculate_deadline_yn',
                 // 'co_address.ca_address_detail as co_address_detail',
                 // ])->join('co_address', 'co_address.co_no', 'company.co_no')
             ])->join('contract', 'contract.co_no', 'company.co_no')->where('company.co_no', $co_no)

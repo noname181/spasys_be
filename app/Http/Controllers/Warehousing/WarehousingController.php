@@ -2734,13 +2734,13 @@ class WarehousingController extends Controller
                     $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
                     $rate_data = $rate_data->where('rd_co_no', $co_no);
                     if (isset($rmd->rmd_no)) {
-                        $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+                        $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no)->get();
                     } else {
                         $rate_data = [];
                     }
 
 
-                    $item->rate_data = empty($rate_data) ? 0 : 1;
+                    $item->rate_data = $rate_data->count() == 0 ? 0 : 1;
                     $i = 0;
                     $k = 0;
                     $completed_date = null;
@@ -3085,13 +3085,13 @@ class WarehousingController extends Controller
                     $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
                     $rate_data = $rate_data->where('rd_co_no', $co_no);
                     if (isset($rmd->rmd_no)) {
-                        $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+                        $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no)->get();
                     } else {
                         $rate_data = [];
                     }
 
 
-                    $item->rate_data = empty($rate_data) ? 0 : 1;
+                    $item->rate_data = $rate_data->count() == 0 ? 0 : 1;
 
                     $rmd = RateMetaData::where(
                         [
@@ -3312,13 +3312,13 @@ class WarehousingController extends Controller
                     $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
                     $rate_data = $rate_data->where('rd_co_no', $co_no);
                     if (isset($rmd->rmd_no)) {
-                        $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+                        $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no)->get();
                     } else {
                         $rate_data = [];
                     }
 
 
-                    $item->rate_data = empty($rate_data) ? 0 : 1;
+                    $item->rate_data = $rate_data->count() == 0 ? 0 : 1;
 
                     return $item;
                 })
