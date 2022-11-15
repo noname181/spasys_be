@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Collection;
+use App\Utils\CommonFunc;
 
 class ReportController extends Controller
 {
@@ -40,7 +41,11 @@ class ReportController extends Controller
                     ]);
                     if ($i == 0) {
                         $parent_no = $report_no;
-                        Report::where('rp_no', $report_no)->update(['rp_parent_no'=> $report_no]);
+                        Report::where('rp_no', $report_no)->update([
+                            'rp_parent_no'=> $report_no,
+                            'rp_number' =>  CommonFunc::report_number($report_no)
+                        ]);
+
                     }
                     $reports[] = $report_no;
                     $filename = 'file' . (string) $i;

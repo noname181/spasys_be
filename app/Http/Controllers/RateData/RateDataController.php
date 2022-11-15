@@ -1583,6 +1583,7 @@ class RateDataController extends Controller
                 'company.co_email',
                 'company.co_etc',
                 'contract.c_integrated_calculate_yn as c_integrated_calculate_yn',
+                'contract.c_calculate_deadline_yn as c_calculate_deadline_yn',
             ])->join('contract', 'contract.co_no', 'company.co_no')->with(['co_parent'])->where('co_license',$import->ti_co_license)->first();
 
             $rate_data = RateData::where('rd_cate_meta1', '보세화물');
