@@ -53,4 +53,13 @@ class CommonFunc
         
         return $string;
     }
+
+    static function report_number($data)
+    {
+        $string = 'PHOTO';
+      
+        $string = $string.'_'.date('Ymd').$data;
+        
+        return $string;
+    }
 }
