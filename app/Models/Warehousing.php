@@ -132,6 +132,6 @@ class Warehousing extends Model
 
     public function import_expect()
     {
-        return $this->belongsTo(ImportExpected::class, 'tie_no', 'tie_no');
+        return $this->belongsTo(ImportExpected::class, 'tie_no', 'tie_no')->with(['import']);
     }
 }
