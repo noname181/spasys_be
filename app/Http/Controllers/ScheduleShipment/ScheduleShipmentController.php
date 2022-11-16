@@ -117,7 +117,23 @@ class ScheduleShipmentController extends Controller
             if (isset($validated['order_id'])) {
 
                 $schedule_shipment->where(DB::raw('lower(order_id)'), 'like', '%' . strtolower($validated['order_id']) . '%');
-
+                
+            }
+            if (isset($validated['recv_name'])) {
+                $schedule_shipment->where(DB::raw('lower(recv_name)'), 'like', '%' . strtolower($validated['recv_name']) . '%');
+            }
+            if (isset($validated['name'])) {
+                $schedule_shipment->whereHas('schedule_shipment_info', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(name)'), 'like', '%' . strtolower($validated['name']) . '%');
+                });
+            }
+            if (isset($validated['qty'])) {
+                $schedule_shipment->whereHas('schedule_shipment_info', function($q) use($validated) {
+                    return $q->where(DB::raw('lower(qty)'), 'like', '%' . strtolower($validated['qty']) . '%');
+                });
+            }
+            if (isset($validated['trans_corp'])) {
+                $schedule_shipment->where(DB::raw('lower(trans_corp)'), 'like', '%' . strtolower($validated['trans_corp']) . '%');
             }
 
             $schedule_shipment = $schedule_shipment->paginate($per_page, ['*'], 'page', $page);
