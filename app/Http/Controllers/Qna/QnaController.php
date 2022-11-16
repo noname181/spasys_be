@@ -286,6 +286,10 @@ class QnaController extends Controller
                 $qna->where('qna_content', 'like', '%' . $validated['qna_content'] . '%');
             }
 
+            if (isset($validated['qna_content'])) {
+                $qna->where('qna_content', 'like', '%' . $validated['qna_content'] . '%');
+            }
+
             if (isset($validated['qna_status1']) || isset($validated['qna_status2']) || isset($validated['qna_status3'])) {
                 $qna->where(function($query) use ($validated) {
                     $query->orwhere('qna_status', '=', $validated['qna_status1']);

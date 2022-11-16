@@ -35,6 +35,12 @@ class BannerSearchRequest extends BaseFormRequest
             'search_string' => [
                 '',
             ],
+            'banner_position' => [
+                '',
+            ],
+            'banner_use_yn' => [
+                '',
+            ],
             'per_page' => [
                 'nullable',
                 'int',

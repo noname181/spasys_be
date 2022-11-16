@@ -219,6 +219,15 @@ class BannerController extends Controller
                     $query->where('banner_title', 'like', '%' . $validated['search_string'] . '%');
                 });
             }
+            if (isset($validated['banner_position'])) {
+                if($validated['banner_position'] != '전체')
+                    $banner->where('banner_position', $validated['banner_position']);
+
+            }
+            if (isset($validated['banner_use_yn'])) {
+                if($validated['banner_use_yn'] != '전체')
+                    $banner->where('banner_use_yn', $validated['banner_use_yn'] == 'y' ? '1' : '0');
+            }
 
             $members = Member::where('mb_no', '!=', 0)->get();
 
@@ -231,7 +240,6 @@ class BannerController extends Controller
             return response()->json($data);
         } catch (\Exception $e) {
             Log::error($e);
-
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }

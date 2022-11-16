@@ -35,6 +35,9 @@ class QnaSearchRequest extends BaseFormRequest
             'search_string' => [
                 '',
             ],
+            'status' => [
+                '',
+            ],
             'qna_title' => [
                 '',
             ],
