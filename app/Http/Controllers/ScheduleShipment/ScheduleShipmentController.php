@@ -229,7 +229,7 @@ class ScheduleShipmentController extends Controller
     }
     public function getScheduleShipmentById($ss_no)
     {
-        $schedule_shipment = ScheduleShipment::with('schedule_shipment_info')->find($ss_no);
+        $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info','receving_goods_delivery'])->find($ss_no);
         if (!empty($schedule_shipment)) {
             return response()->json(
                 ['message' => Messages::MSG_0007,

@@ -463,6 +463,10 @@ class WarehousingController extends Controller
                     });
             }
             $warehousing->whereDoesntHave('rate_data_general');
+            
+            if(isset($validated['connection_number_type'])){
+                $warehousing->whereNull('connection_number');
+            }
 
             if (isset($validated['page_type']) && $validated['page_type'] == "page130") {
                 $warehousing->where('w_type', '=', 'IW')->where('w_category_name', '=', '수입풀필먼트');

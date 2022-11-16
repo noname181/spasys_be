@@ -202,6 +202,7 @@ Route::middleware('auth')->group(function () {
     //141
     Route::post('receiving_goods_delivery/warehousing_release/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_warehousing_release'])->name('rgd_warehousing_release');
     Route::post('receiving_goods_delivery/warehousing_release_mobile/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_warehousing_release_mobile'])->name('rgd_warehousing_release_mobile');
+    Route::post('receiving_goods_delivery/warehousing_release_fulfillment/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_warehousing_release_fulfillment'])->name('create_warehousing_release_fulfillment');
     Route::post('receiving_goods_delivery/import_schedule/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_import_schedule'])->name('rgd_import_schedule');
     Route::post('receiving_goods_delivery/import_schedule_list/rgd_list', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_import_schedule_list'])->name('rgd_import_schedule_list');
 

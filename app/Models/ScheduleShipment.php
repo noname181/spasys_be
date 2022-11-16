@@ -10,7 +10,7 @@ use App\Models\ItemInfo;
 use App\Models\Item;
 use App\Models\ScheduleShipmentInfo;
 use App\Models\ContractWms;
-
+use App\Models\ReceivingGoodsDelivery;
 
 class ScheduleShipment extends Model
 {
@@ -99,6 +99,11 @@ class ScheduleShipment extends Model
     {
         return $this->hasOne(ContractWms::class, 'cw_code', 'shop_code')->where('cw_tab','=','판매처')->with('company');
 
+    }
+
+    public function receving_goods_delivery()
+    {
+        return $this->hasMany(ReceivingGoodsDelivery::class, 'ss_no', 'ss_no');
     }
     
 }

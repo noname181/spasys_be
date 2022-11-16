@@ -29,6 +29,7 @@ class ReceivingGoodsDelivery extends Model
         'rgd_no',
         'mb_no',
         'w_no',
+        'ss_no',
         'rgd_contents',
         'rgd_address',
         'rgd_address_detail',
