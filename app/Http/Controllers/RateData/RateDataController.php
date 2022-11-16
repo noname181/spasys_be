@@ -2797,10 +2797,17 @@ class RateDataController extends Controller
                         ]);
 
                     } else {
+                        $expectation_rgd->rgd_status5 = 'issued';
+                        $expectation_rgd->save();
+
+                        $final_rgd->rgd_settlement_number = $request->settlement_number;
                         if ($i == 0) {
                             $final_rgd->rgd_is_show = 'y';
-                            $final_rgd->save();
+                        }else {
+                            $final_rgd->rgd_is_show = 'n';
                         }
+                        $final_rgd->save();
+
                         RateDataGeneral::where('rdg_no', $final_rdg->rdg_no)->update([
                             'rgd_no' => $final_rgd->rgd_no,
                             'rgd_no_expectation' => $expectation_rgd->rgd_no,
@@ -3232,7 +3239,6 @@ class RateDataController extends Controller
             $previous_rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->where('rgd_bill_type', '=', $request->previous_bill_type)->first();
 
             if (!isset($is_exist->rdg_no) && isset($request->previous_bill_type) && !empty($previous_rgd)) {
-                $previous_rgd->rgd_status5 = 'issued';
                 $previous_rgd->save();
 
                 $final_rgd = $previous_rgd->replicate();
@@ -3243,7 +3249,7 @@ class RateDataController extends Controller
                 $final_rgd->rgd_status6 = null;
                 $final_rgd->rgd_status7 = null;
                 $final_rgd->rgd_is_show = 'n';
-                $final_rgd->rgd_settlement_number = $request->rgd_settlement_number;
+                $final_rgd->rgd_settlement_number = null;
                 $final_rgd->rgd_parent_no = $previous_rgd->rgd_no;
                 $final_rgd->mb_no =  Auth::user()->mb_no;
                 $final_rgd->save();
