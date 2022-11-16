@@ -4091,6 +4091,7 @@ class WarehousingController extends Controller
 
     public function UpdateStatusDelivery(Request $request)
     {
+        //return $request;
         try {
             DB::beginTransaction();
 
@@ -4108,7 +4109,7 @@ class WarehousingController extends Controller
                             'status' => 8,
                         ]);
                 }
-            } else {
+            } else if($request->service == "보세화물") {
                 foreach ($request->datachkbox as $value) {
                     foreach ($value['receiving_goods_delivery'] as $receiving_goods_delivery) {
                         $rgd = ReceivingGoodsDelivery::where('rgd_no', $receiving_goods_delivery['rgd_no'])
@@ -4117,12 +4118,33 @@ class WarehousingController extends Controller
                             ]);
                     }
                 }
+            }else{
+                    foreach ($request->datachkbox as $value) {
+                        if(isset($value['rgd_no'])){
+                            $rgd = ReceivingGoodsDelivery::where('rgd_no', $value['rgd_no'])
+                            ->update([
+                                'rgd_status3' => "배송완료",
+                            ]);
+                        }else if(isset($value['ss_no'])){
+                            $rgd = ScheduleShipment::where('ss_no', $value['ss_no'])
+                            ->update([
+                                'status' => 8,
+                            ]);
+                        }else{
+                            foreach ($value['receiving_goods_delivery'] as $receiving_goods_delivery) {
+                                $rgd = ReceivingGoodsDelivery::where('rgd_no', $receiving_goods_delivery['rgd_no'])
+                                    ->update([
+                                        'rgd_status3' => "배송완료",
+                                    ]);
+                            }
+                        }
+                    }
             }
 
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'rgd' => $rgd,
+                'rgd' => isset($rgd) ? $rgd : '',
             ]);
         } catch (\Exception $e) {
             Log::error($e);
