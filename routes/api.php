@@ -52,7 +52,7 @@ Route::middleware('auth')->group(function () {
     });
 
 
-    Route::get('/api_item_cron', [App\Http\Controllers\Item\ItemController::class, 'apiItemCron'])->name('api_item_cron');
+    Route::post('/api_item_cron', [App\Http\Controllers\Item\ItemController::class, 'apiItemCron'])->name('api_item_cron');
 
     // Manger Role
     Route::middleware('role:spasys_manager,spasys_admin,shop_manager')->group(function () {
