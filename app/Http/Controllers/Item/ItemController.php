@@ -1400,6 +1400,26 @@ class ItemController extends Controller
                             if (is_array($item_arr) || is_object($item_arr))
                             {
                                 foreach($item_arr as $option){
+                                    
+                                    $item_no = Item::updateOrCreate(
+                                        [
+                                            'product_id' => $item->product_id
+                                        ],
+                                        [
+                                            'mb_no' => Auth::user()->mb_no,
+                                            'co_no' => isset($item->co_no) ? $item->co_no : Auth::user()->co_no,
+                                            'item_name' => $item->name,
+                                            'supply_code' => $item->supply_code,
+                                            'item_brand' => $item->brand,
+                                            'item_origin' => $item->origin,
+                                            'item_weight' => $item->weight,
+                                            'item_price1' => $item->org_price,
+                                            'item_price2' => $item->shop_price,
+                                            'item_price3' => $item->supply_price,
+                                            'item_url' => $item->img_500,
+                                            'item_service_name' => '수입풀필먼트'
+                                        ]
+                                    );
                                     $item_info_no = ItemInfo::updateOrCreate(
                                         [
                                             'item_no' => $item_no->item_no,
