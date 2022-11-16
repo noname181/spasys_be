@@ -452,8 +452,26 @@ class CompanyController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
+            $co_no = Auth::user()->co_no ? Auth::user()->co_no : '';
             $user = Auth::user();
-            $companies = Company::with('contract')->with('warehousing')->where('co_type', 'shipper')->where('co_parent_no', $user->co_no)->orderBy('co_no', 'DESC');
+            if($user->mb_type == "shop"){
+                $companies = Company::with(['contract', 'co_parent','warehousing'])->where('co_type', 'shipper')->orderBy('co_no', 'DESC');
+
+
+                $companies->whereHas('co_parent', function ($query) use ($user) {
+                    $query->where('co_no', '=',  $user->co_no);
+                });
+            }else{
+                $companies = Company::with(['contract','co_parent'])->with('warehousing')->where('co_type', 'shipper')->
+                whereIn('co_parent_no', function($query) use ($user){
+                    $query->select('co_no')
+                      ->from(with(new Company)->getTable())
+                      ->where('co_type', 'shop')
+                      ->where('co_parent_no', $user->co_no);
+                 })->orderBy('co_no', 'DESC');
+            }
+            //$companies = Company::with('contract')->with('warehousing')->where('co_type', 'shipper')->where('co_parent_no', $user->co_no)->orderBy('co_no', 'DESC');
+            
 
             // if (isset($validated['w_no'])) {
             //     $companies->whereHas('warehousing', function ($query) use ($validated) {
