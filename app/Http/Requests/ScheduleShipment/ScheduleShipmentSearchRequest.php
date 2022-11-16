@@ -538,6 +538,9 @@ class ScheduleShipmentSearchRequest extends BaseFormRequest
                 'nullable',
                 'int',
             ],
+            'name' => [
+                '',
+            ],
         ];
     }
 

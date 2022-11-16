@@ -774,6 +774,11 @@ class ItemController extends Controller
                     $query->where(DB::raw('lower(item_channel_name)'), 'like', '%' . strtolower($validated['item_channel_name']) . '%');
                 });
             }
+            if (isset($validated['item_brand'])) {
+                $item->where(function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_brand)'), 'like', '%' . strtolower($validated['item_brand']) . '%');
+                });
+            }
             $item2 = $item->get();
             $count_check = 0;
             $item3 = collect($item2)->map(function ($q) {
@@ -888,6 +893,11 @@ class ItemController extends Controller
             if (isset($validated['item_channel_name'])) {
                 $item->whereHas('item_channels', function ($query) use ($validated) {
                     $query->where(DB::raw('lower(item_channel_name)'), 'like', '%' . strtolower($validated['item_channel_name']) . '%');
+                });
+            }
+            if (isset($validated['item_brand'])) {
+                $item->where(function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_brand)'), 'like', '%' . strtolower($validated['item_brand']) . '%');
                 });
             }
             $item2 = $item->get();
