@@ -97,8 +97,6 @@ class ContractUpdateRequest extends BaseFormRequest
             'cp_card_cvc' => [
             ],
             'c_account_number' => [
-                'required',
-                'string',
                 'max:255'
             ],
             'c_deposit_price' => [
