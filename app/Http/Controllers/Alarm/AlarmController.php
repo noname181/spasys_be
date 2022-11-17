@@ -87,6 +87,11 @@ class AlarmController extends Controller
                     return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
                 });
             }
+            if (isset($validated['service'])) {
+                $alarm->whereHas('warehousing', function ($q) use ($validated) {
+                    return $q->where(DB::raw('lower(w_category_name)'), 'like', '%' . strtolower($validated['service']) . '%');
+                });
+            }
             $alarm = $alarm->paginate($per_page, ['*'], 'page', $page);
 
             return response()->json($alarm);
