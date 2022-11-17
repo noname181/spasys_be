@@ -322,4 +322,9 @@ class NoticeController extends Controller
     private function formatDate($dateStr) {
         return DateTime::createFromFormat('j/n/Y', $dateStr)->format('Y-m-d');
     }
+
+    public function deleteNotices(Request $request){
+        $check = Notice::where('notice_no',$request->notice_no)->delete();
+        return response()->json(['status'=> $check]);
+    }
 }
