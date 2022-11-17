@@ -3245,9 +3245,9 @@ class WarehousingController extends Controller
                     return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
                 });
             }
-            if (isset($validated['w_type'])) {
-                $warehousing->whereHas('w_no', function ($q) use ($validated) {
-                    return $q->where('w_type', 'like', '%' . $validated['w_type'] . '%');
+            if (isset($validated['settlement_cycle'])) {
+                $warehousing->whereHas('w_no.co_no.company_bonded_cycle', function ($q) use ($validated) {
+                    return $q->where('cs_payment_cycle', $validated['settlement_cycle']);
                 });
             }
             if (isset($validated['w_schedule_number'])) {

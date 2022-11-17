@@ -98,6 +98,14 @@ class Company extends Model
         return $this->hasOne(CompanySettlement::class, 'co_no', 'co_no')->where('service_no', 4);
 
     }
+
+    public function company_bonded_cycle()
+    {
+        return $this->hasOne(CompanySettlement::class, 'co_no', 'co_no')->where('service_no', 2);
+
+    }
+
+
     public function rate_data_1()
     {
         return $this->hasMany(RateData::class, 'rd_co_no', 'co_no')->where('rd_cate_meta1', '보세화물');
