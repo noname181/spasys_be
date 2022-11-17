@@ -1400,6 +1400,26 @@ class ItemController extends Controller
                             if (is_array($item_arr) || is_object($item_arr))
                             {
                                 foreach($item_arr as $option){
+                                    $item_no = Item::updateOrCreate(
+                                        [
+                                            'product_id' => $item->product_id
+                                        ],
+                                        [
+                                            'mb_no' => Auth::user()->mb_no,
+                                            'co_no' => isset($item->co_no) ? $item->co_no : Auth::user()->co_no,
+                                            'item_name' => $item->name,
+                                            'supply_code' => $item->supply_code,
+                                            'item_brand' => $item->brand,
+                                            'item_origin' => $item->origin,
+                                            'item_weight' => $item->weight,
+                                            'item_price1' => $item->org_price,
+                                            'item_price2' => $item->shop_price,
+                                            'item_price3' => $item->supply_price,
+                                            'item_url' => $item->img_500,
+                                            'item_option1' => $option->options,
+                                            'item_service_name' => '수입풀필먼트'
+                                        ]
+                                    );
                                     $item_info_no = ItemInfo::updateOrCreate(
                                         [
                                             'item_no' => $item_no->item_no,
@@ -1441,6 +1461,52 @@ class ItemController extends Controller
                                         ]
                                     );
                                 }
+                            }else{
+                                $item_no = Item::updateOrCreate(
+                                    [
+                                        'product_id' => $item->product_id
+                                    ],
+                                    [
+                                        'mb_no' => Auth::user()->mb_no,
+                                        'co_no' => isset($item->co_no) ? $item->co_no : Auth::user()->co_no,
+                                        'item_name' => $item->name,
+                                        'supply_code' => $item->supply_code,
+                                        'item_brand' => $item->brand,
+                                        'item_origin' => $item->origin,
+                                        'item_weight' => $item->weight,
+                                        'item_price1' => $item->org_price,
+                                        'item_price2' => $item->shop_price,
+                                        'item_price3' => $item->supply_price,
+                                        'item_url' => $item->img_500,
+                                        'item_option1' => $item->options?$item->options:'',
+                                        'item_service_name' => '수입풀필먼트'
+                                    ]
+                                );
+                                
+                                $item_info_no = ItemInfo::updateOrCreate(
+                                    [
+                                        'item_no' => $item_no->item_no,
+                                    ],
+                                    [
+                                        'product_id' => $item->product_id,
+                                        'supply_code' => $item->supply_code,
+                                        'trans_fee' => $item->trans_fee,
+                                        'img_desc1' => $item->img_desc1,
+                                        'img_desc2' => $item->img_desc2,
+                                        'img_desc3' => $item->img_desc3,
+                                        'img_desc4' => $item->img_desc4,
+                                        'img_desc5' => $item->img_desc5,
+                                        'product_desc' => $item->product_desc,
+                                        'product_desc2' => $item->product_desc2,
+                                        'location' => $item->location,
+                                        'memo' => $item->memo,
+                                        'category' => $item->category,
+                                        'maker' => $item->maker,
+                                        'md' => $item->md,
+                                        'manager1' => $item->manager1,
+                                        'manager2' => $item->manager2
+                                    ]
+                                );
                             }
                         }else{
                             $item_info_no = ItemInfo::updateOrCreate(
@@ -1499,13 +1565,12 @@ class ItemController extends Controller
                                 'item_price2' => $item->shop_price,
                                 'item_price3' => $item->supply_price,
                                 'item_url' => $item->img_500,
-                                'item_service_name' => '수입풀필먼트',
+                                'item_service_name' => '수입풀필먼트'
                             ]
                         );
                         if ($item_no->item_no) {
                             $item_info_no = ItemInfo::updateOrCreate(
                                 [
-
                                     'item_no' => $item_no->item_no,
                                 ],
                                 [
@@ -1535,8 +1600,92 @@ class ItemController extends Controller
                                     'last_update_date' => $item->last_update_date,
                                 ]
                             );
-                            if(!empty($item_no->options)){
-                                foreach($item_no->options as $option){
+                            if(!empty($item->options)){
+                                if (is_array($item->options) || is_object($item->options))
+                                {
+                                    foreach($item->options as $option){
+                                        $item_no = Item::updateOrCreate(
+                                            [
+                                                'product_id' => $option->product_id
+                                            ],
+                                            [
+                                                'mb_no' => Auth::user()->mb_no,
+                                                'co_no' => isset($item->co_no) ? $item->co_no : Auth::user()->co_no,
+                                                'item_name' => $item->name,
+                                                'supply_code' => $item->supply_code,
+                                                'item_brand' => $item->brand,
+                                                'item_origin' => $item->origin,
+                                                'item_weight' => $item->weight,
+                                                'item_price1' => $item->org_price,
+                                                'item_price2' => $item->shop_price,
+                                                'item_price3' => $item->supply_price,
+                                                'item_url' => $item->img_500,
+                                                'item_option1' => $option->options,
+                                                'item_service_name' => '수입풀필먼트'
+                                            ]
+                                        );
+                                        $item_info_no = ItemInfo::updateOrCreate(
+                                            [
+                                                'item_no' => $item_no->item_no,
+                                            ],
+                                            [
+                                                'product_id' => $item->product_id,
+                                                'supply_code' => $item->supply_code,
+                                                'trans_fee' => $item->trans_fee,
+                                                'img_desc1' => $item->img_desc1,
+                                                'img_desc2' => $item->img_desc2,
+                                                'img_desc3' => $item->img_desc3,
+                                                'img_desc4' => $item->img_desc4,
+                                                'img_desc5' => $item->img_desc5,
+                                                'product_desc' => $item->product_desc,
+                                                'product_desc2' => $item->product_desc2,
+                                                'location' => $item->location,
+                                                'memo' => $item->memo,
+                                                'category' => $item->category,
+                                                'maker' => $item->maker,
+                                                'md' => $item->md,
+                                                'manager1' => $item->manager1,
+                                                'manager2' => $item->manager2,
+                                                'supply_options' => !empty($option->supply_options)?$option->supply_options:'',
+                                                'enable_sale' => !empty($option->enable_sale)?$option->enable_sale:1,
+                                                'use_temp_soldout' => !empty($option->use_temp_soldout)?$option->use_temp_soldout:0,
+                                                'stock_alarm1' => !empty($option->stock_alarm1)?$option->stock_alarm1:0,
+                                                'stock_alarm2' => !empty($option->stock_alarm2)?$option->stock_alarm2:0,
+                                                'extra_price' => !empty($option->extra_price)?$option->extra_price:0,
+                                                'extra_shop_price' => !empty($option->extra_shop_price)?$option->extra_shop_price:0,
+                                                'extra_column6' => !empty($option->extra_column6)?$option->extra_column6:'',
+                                                'extra_column7' => !empty($option->extra_column7)?$option->extra_column7:'',
+                                                'extra_column8' => !empty($option->extra_column8)?$option->extra_column8:'',
+                                                'extra_column9' => !empty($option->extra_column9)?$option->extra_column9:'',
+                                                'extra_column10' => !empty($option->extra_column10)?$option->extra_column10:'',
+                                                'reg_date' => !empty($option->reg_date)?$option->reg_date:null,
+                                                'last_update_date' => !empty($option->last_update_date)?$option->last_update_date:null,
+                                                'new_link_id' => !empty($option->new_link_id)?$option->new_link_id:'',
+                                                'link_id' => !empty($option->link_id)?$option->link_id:'',
+                                            ]
+                                        );
+                                    }
+                                }else{
+                                    $item_no = Item::updateOrCreate(
+                                        [
+                                            'product_id' => $item->product_id
+                                        ],
+                                        [
+                                            'mb_no' => Auth::user()->mb_no,
+                                            'co_no' => isset($item->co_no) ? $item->co_no : Auth::user()->co_no,
+                                            'item_name' => $item->name,
+                                            'supply_code' => $item->supply_code,
+                                            'item_brand' => $item->brand,
+                                            'item_origin' => $item->origin,
+                                            'item_weight' => $item->weight,
+                                            'item_price1' => $item->org_price,
+                                            'item_price2' => $item->shop_price,
+                                            'item_price3' => $item->supply_price,
+                                            'item_url' => $item->img_500,
+                                            'item_option1' => $item->options,
+                                            'item_service_name' => '수입풀필먼트'
+                                        ]
+                                    );
                                     $item_info_no = ItemInfo::updateOrCreate(
                                         [
                                             'item_no' => $item_no->item_no,
@@ -1559,22 +1708,12 @@ class ItemController extends Controller
                                             'md' => $item->md,
                                             'manager1' => $item->manager1,
                                             'manager2' => $item->manager2,
-                                            'supply_options' => !empty($option->supply_options)?$option->supply_options:'',
-                                            'enable_sale' => !empty($option->enable_sale)?$option->enable_sale:1,
-                                            'use_temp_soldout' => !empty($option->use_temp_soldout)?$option->use_temp_soldout:0,
-                                            'stock_alarm1' => !empty($option->stock_alarm1)?$option->stock_alarm1:0,
-                                            'stock_alarm2' => !empty($option->stock_alarm2)?$option->stock_alarm2:0,
-                                            'extra_price' => !empty($option->extra_price)?$option->extra_price:0,
-                                            'extra_shop_price' => !empty($option->extra_shop_price)?$option->extra_shop_price:0,
-                                            'extra_column6' => !empty($option->extra_column6)?$option->extra_column6:'',
-                                            'extra_column7' => !empty($option->extra_column7)?$option->extra_column7:'',
-                                            'extra_column8' => !empty($option->extra_column8)?$option->extra_column8:'',
-                                            'extra_column9' => !empty($option->extra_column9)?$option->extra_column9:'',
-                                            'extra_column10' => !empty($option->extra_column10)?$option->extra_column10:'',
-                                            'reg_date' => !empty($option->reg_date)?$option->reg_date:null,
-                                            'last_update_date' => !empty($option->last_update_date)?$option->last_update_date:null,
-                                            'new_link_id' => !empty($option->new_link_id)?$option->new_link_id:'',
-                                            'link_id' => !empty($option->link_id)?$option->link_id:'',
+                                            
+                                            'extra_column1' => $item->extra_column1,
+                                            'extra_column2' => $item->extra_column2,
+                                            'extra_column3' => $item->extra_column3,
+                                            'extra_column4' => $item->extra_column4,
+                                            'extra_column5' => $item->extra_column5
                                         ]
                                     );
                                 }
@@ -1605,16 +1744,52 @@ class ItemController extends Controller
                             'item_bar_code' => isset($item->barcode) ? $item->barcode: null,
                             'item_service_name' => '수입풀필먼트'
                         ];
+                        $data_update_create['item_name'] = $data_update_create['item_name'];
+                        $data_update_create['product_id'] = $item->product_id;
+                        $item_no = Item::updateOrCreate(
+                            [
+                                'product_id' => $item->product_id
+                            ],
+                            $data_update_create
+                        );  
+                        
+                        $item_info_no = ItemInfo::updateOrCreate(
+                            [
+                                'item_no' => $item_no->item_no,
+                            ],
+                            [
+                                'product_id' => $item->product_id,
+                                'supply_code' => $item->supply_code,
+                                'trans_fee' => $item->trans_fee,
+                                'img_desc1' => $item->img_desc1,
+                                'img_desc2' => $item->img_desc2,
+                                'img_desc3' => $item->img_desc3,
+                                'img_desc4' => $item->img_desc4,
+                                'img_desc5' => $item->img_desc5,
+                                'product_desc' => $item->product_desc,
+                                'product_desc2' => $item->product_desc2,
+                                'location' => $item->location,
+                                'memo' => $item->memo,
+                                'category' => $item->category,
+                                'maker' => $item->maker,
+                                'md' => $item->md,
+                                'manager1' => $item->manager1,
+                                'manager2' => $item->manager2
+                            ]
+                        );
                         if(!empty($item->options) && is_array($item->options)){
                             foreach($item->options as $option){
-                                $data_update_create['item_name'] = $data_update_create['item_name'] .' '. $option->options;
-                                $data_update_create['product_id'] = $option->product_id;
+                                
+                                $data_update_create['item_option1'] = $option->options;
+
+                                $data_update_create['item_name'] = $data_update_create['item_name'];
                                 $item_no = Item::updateOrCreate(
                                     [
-                                        'product_id' => $item->product_id
+                                        'product_id' => $option->product_id
                                     ],
                                     $data_update_create
                                 );  
+
                                 if ($item_no->item_no) {
                                     $item_info_no = ItemInfo::updateOrCreate(
                                         [
@@ -1664,60 +1839,14 @@ class ItemController extends Controller
                                 }
                             }
                         }else{
+                            $data_update_create['item_option1'] = $item->options;
+
                             $item_no = Item::updateOrCreate(
                                 [
                                     'product_id' => $item->product_id
                                 ],
                                 $data_update_create
                             );  
-                            if ($item_no->item_no) {
-                                $item_info_no = ItemInfo::updateOrCreate(
-                                    [
-                                        'item_no' => $item_no->item_no,
-                                    ],
-                                    [
-                                        'product_id' => $item->product_id,
-                                        'supply_code' => $item->supply_code,
-                                        'trans_fee' => $item->trans_fee,
-                                        'img_desc1' => $item->img_desc1,
-                                        'img_desc2' => $item->img_desc2,
-                                        'img_desc3' => $item->img_desc3,
-                                        'img_desc4' => $item->img_desc4,
-                                        'img_desc5' => $item->img_desc5,
-                                        'product_desc' => $item->product_desc,
-                                        'product_desc2' => $item->product_desc2,
-                                        'location' => $item->location,
-                                        'memo' => $item->memo,
-                                        'category' => $item->category,
-                                        'maker' => $item->maker,
-                                        'md' => $item->md,
-                                        'manager1' => $item->manager1,
-                                        'manager2' => $item->manager2,
-                                        'supply_options' => $item->supply_options,
-                                        'enable_sale' => $item->enable_sale,
-                                        'use_temp_soldout' => $item->use_temp_soldout,
-                                        'stock_alarm1' => $item->stock_alarm1,
-                                        'stock_alarm2' => $item->stock_alarm2,
-                                        'extra_price' => $item->extra_price,
-                                        'extra_shop_price' => $item->extra_shop_price,
-                    
-                                        'extra_column1' => !empty($item->extra_column1)?$item->extra_column1:'',
-                                        'extra_column2' => !empty($item->extra_column2)?$item->extra_column2:'',
-                                        'extra_column3' => !empty($item->extra_column3)?$item->extra_column3:'',
-                                        'extra_column4' => !empty($item->extra_column4)?$item->extra_column4:'',
-                                        'extra_column5' => !empty($item->extra_column5)?$item->extra_column5:'',
-                                        'extra_column6' => $item->extra_column6,
-                                        'extra_column7' => $item->extra_column7,
-                                        'extra_column8' => $item->extra_column8,
-                                        'extra_column9' => $item->extra_column9,
-                                        'extra_column10' => $item->extra_column10,
-                                        'reg_date' => $item->reg_date,
-                                        'last_update_date' => $item->last_update_date,
-                                        'new_link_id' => $item->new_link_id,
-                                        'link_id' => $item->link_id,
-                                    ]
-                                );
-                            }
                         }
                     }
                 }
@@ -1726,7 +1855,8 @@ class ItemController extends Controller
             DB::commit();
             return response()->json([
                 'message' => '완료되었습니다.',
-                'status' => 1
+                'status' => 1,
+                'data' => $data_select
             ], 200);
         } catch (\Exception $e) {
             DB::rollback();
