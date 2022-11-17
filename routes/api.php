@@ -131,6 +131,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/notices', [\App\Http\Controllers\Notice\NoticeController::class, 'create']);
     Route::get('/notices/{id}', [\App\Http\Controllers\Notice\NoticeController::class, 'getNoticeById']);
     Route::patch('/update_notices', [\App\Http\Controllers\Notice\NoticeController::class, 'update']);
+    Route::post('/delete_notices', [App\Http\Controllers\Notice\NoticeController::class, 'deleteNotices'])->name('delete_notices');
     Route::get('/notices', [\App\Http\Controllers\Notice\NoticeController::class,'__invoke']);
     Route::post('/search_notices', [\App\Http\Controllers\Notice\NoticeController::class,'searchNotice']);
     Route::post('/get_notices', [\App\Http\Controllers\Notice\NoticeController::class, 'getNotice']);
