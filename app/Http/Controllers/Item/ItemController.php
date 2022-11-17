@@ -809,9 +809,7 @@ class ItemController extends Controller
                     return $q;
                 })
             );
-
             $data = $custom->merge($item);
-
             return response()->json($data);
         } catch (\Exception $e) {
             Log::error($e);
@@ -901,6 +899,7 @@ class ItemController extends Controller
                 });
             }
             $item2 = $item->get();
+            
             $count_check = 0;
             $item3 = collect($item2)->map(function ($q) {
                 $item4 = Item::with(['item_info'])->where('item_no', $q->item_no)->first();
@@ -1400,9 +1399,10 @@ class ItemController extends Controller
                             if (is_array($item_arr) || is_object($item_arr))
                             {
                                 foreach($item_arr as $option){
+                                    $option_pro_id = $item->product_id . $option->product_id;
                                     $item_no = Item::updateOrCreate(
                                         [
-                                            'product_id' => $item->product_id
+                                            'product_id' => $option_pro_id
                                         ],
                                         [
                                             'mb_no' => Auth::user()->mb_no,
@@ -1604,9 +1604,10 @@ class ItemController extends Controller
                                 if (is_array($item->options) || is_object($item->options))
                                 {
                                     foreach($item->options as $option){
+                                        $option_pro_id = $item->product_id . $option->product_id;
                                         $item_no = Item::updateOrCreate(
                                             [
-                                                'product_id' => $option->product_id
+                                                'product_id' => $option_pro_id
                                             ],
                                             [
                                                 'mb_no' => Auth::user()->mb_no,
@@ -1783,9 +1784,11 @@ class ItemController extends Controller
                                 $data_update_create['item_option1'] = $option->options;
 
                                 $data_update_create['item_name'] = $data_update_create['item_name'];
+                                
+                                $option_pro_id = $item->product_id . $option->product_id;
                                 $item_no = Item::updateOrCreate(
                                     [
-                                        'product_id' => $option->product_id
+                                        'product_id' => $option_pro_id
                                     ],
                                     $data_update_create
                                 );  
