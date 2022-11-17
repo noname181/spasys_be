@@ -463,6 +463,10 @@ class WarehousingController extends Controller
                     });
             }
             $warehousing->whereDoesntHave('rate_data_general');
+            
+            if(isset($validated['connection_number_type'])){
+                $warehousing->whereNull('connection_number');
+            }
 
             if (isset($validated['page_type']) && $validated['page_type'] == "page130") {
                 $warehousing->where('w_type', '=', 'IW')->where('w_category_name', '=', '수입풀필먼트');
@@ -2409,7 +2413,7 @@ class WarehousingController extends Controller
                 $time = str_replace('-', '.', $start_date) . ' ~ ' . str_replace('-', '.', $end_date);
                 $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing'])->where('rgd_no', $rgd_no)->first();
             } else {
-                $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
+                $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing'])->where('rgd_no', $rgd_no)->first();
                 $w_no = $rgd->w_no;
                 $check_cofirm = ReceivingGoodsDelivery::where('rgd_status5', 'confirmed')->where('rgd_bill_type', 'final')->where('w_no', $w_no)->get()->count();
                 $check_paid = ReceivingGoodsDelivery::where('rgd_status5', 'paid')->where('rgd_bill_type', 'additional')->where('w_no', $w_no)->get()->count();
@@ -4087,6 +4091,7 @@ class WarehousingController extends Controller
 
     public function UpdateStatusDelivery(Request $request)
     {
+        //return $request;
         try {
             DB::beginTransaction();
 
@@ -4104,7 +4109,7 @@ class WarehousingController extends Controller
                             'status' => 8,
                         ]);
                 }
-            } else {
+            } else if($request->service == "보세화물") {
                 foreach ($request->datachkbox as $value) {
                     foreach ($value['receiving_goods_delivery'] as $receiving_goods_delivery) {
                         $rgd = ReceivingGoodsDelivery::where('rgd_no', $receiving_goods_delivery['rgd_no'])
@@ -4113,12 +4118,33 @@ class WarehousingController extends Controller
                             ]);
                     }
                 }
+            }else{
+                    foreach ($request->datachkbox as $value) {
+                        if(isset($value['rgd_no'])){
+                            $rgd = ReceivingGoodsDelivery::where('rgd_no', $value['rgd_no'])
+                            ->update([
+                                'rgd_status3' => "배송완료",
+                            ]);
+                        }else if(isset($value['ss_no'])){
+                            $rgd = ScheduleShipment::where('ss_no', $value['ss_no'])
+                            ->update([
+                                'status' => 8,
+                            ]);
+                        }else{
+                            foreach ($value['receiving_goods_delivery'] as $receiving_goods_delivery) {
+                                $rgd = ReceivingGoodsDelivery::where('rgd_no', $receiving_goods_delivery['rgd_no'])
+                                    ->update([
+                                        'rgd_status3' => "배송완료",
+                                    ]);
+                            }
+                        }
+                    }
             }
 
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'rgd' => $rgd,
+                'rgd' => isset($rgd) ? $rgd : '',
             ]);
         } catch (\Exception $e) {
             Log::error($e);

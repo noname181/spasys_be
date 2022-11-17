@@ -126,15 +126,15 @@ class ReceivingGoodsDeliveryController extends Controller
                     Warehousing::where('w_no', $validated['w_no'])->update([
                         'connection_number' => $validated['connection_number']
                     ]);
-                    if($validated['type_w_choose'] == "export"){
+                    if ($validated['type_w_choose'] == "export") {
                         Export::where('te_carry_out_number', $validated['connect_w'])->update([
                             'connection_number' => $validated['connection_number']
                         ]);
-                    }else{    
+                    } else {
                         Warehousing::where('w_no', $validated['connect_w'])->update([
                             'connection_number' => $validated['connection_number']
                         ]);
-                    }    
+                    }
                 }
             }
 
@@ -855,6 +855,50 @@ class ReceivingGoodsDeliveryController extends Controller
             DB::rollback();
             Log::error($e);
 
+            return response()->json(['message' => Messages::MSG_0001], 500);
+        }
+    }
+
+    public function create_warehousing_release_fulfillment(Request $request)
+    {
+        // $validated = $request->validated();
+      
+        try {
+            DB::beginTransaction();
+
+            $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
+            $member = Member::where('mb_id', Auth::user()->mb_id)->first();
+            foreach ($request->location as $location) {
+                    if ($request->ss_no) {
+                       
+                        $rgd_no = ReceivingGoodsDelivery::updateOrCreate([  
+                            'ss_no' => $request->ss_no
+                        ],
+                        [
+                            'ss_no' => $request->ss_no,
+                            'mb_no' => $member->mb_no,
+                            'service_korean_name' => $request->w_category_name,
+                            'rgd_status1' => $location['rgd_status1'],
+                            'rgd_status2' => $location['rgd_status2'],
+                            'rgd_status3' => $location['rgd_status3'],
+                            'rgd_tracking_code' => $location['rgd_tracking_code'],
+                            'rgd_delivery_man' => $location['rgd_delivery_man'],
+                            'rgd_delivery_man_hp' => $location['rgd_delivery_man_hp'],
+                            'rgd_delivery_schedule_day' => $location['rgd_delivery_schedule_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_delivery_schedule_day']) : null,
+                            'rgd_arrive_day' =>  $location['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']) : null,
+                        ]);
+                    }
+            }
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'ss_no' => isset($ss_no) ? $ss_no :  $request->ss_no,
+            ], 201);
+        } catch (\Throwable $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -1614,15 +1658,15 @@ class ReceivingGoodsDeliveryController extends Controller
                     Export::where('te_carry_out_number', $validated['is_no'])->update([
                         'connection_number' => $validated['connection_number']
                     ]);
-                    if($validated['type_w_choose'] == "export"){
+                    if ($validated['type_w_choose'] == "export") {
                         Export::where('te_carry_out_number', $validated['connect_w'])->update([
                             'connection_number' => $validated['connection_number']
                         ]);
-                    }else{    
+                    } else {
                         Warehousing::where('w_no', $validated['connect_w'])->update([
                             'connection_number' => $validated['connection_number']
                         ]);
-                    }    
+                    }
                 }
             }
 
@@ -1865,7 +1909,7 @@ class ReceivingGoodsDeliveryController extends Controller
         try {
             if ($request->bill_type == 'case') {
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
-                
+
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     'rgd_status5' => 'confirmed',
                     'rgd_confirmed_date' => Carbon::now()->toDateTimeString()
@@ -1873,7 +1917,7 @@ class ReceivingGoodsDeliveryController extends Controller
             } else if ($request->bill_type == 'monthly') {
                 foreach ($request->rgds as $rgd) {
                     $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->first();
-                    
+
                     ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                         'rgd_status5' => 'confirmed',
                         'rgd_confirmed_date' => Carbon::now()->toDateTimeString()
@@ -1883,7 +1927,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 foreach ($request->rgds as $rgd) {
                     // if ($rgd['rgd_bill_type'] == 'final') {
                     $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->first();
-                    
+
                     ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                         'rgd_status5' => 'confirmed',
                         'rgd_confirmed_date' => Carbon::now()->toDateTimeString()
@@ -2022,9 +2066,9 @@ class ReceivingGoodsDeliveryController extends Controller
     public function connection(Request $request)
     {
         try {
-            if($request->type == 'export'){
+            if ($request->type == 'export') {
                 $export = Export::where('te_carry_out_number', $request->is_no)->first();
-                $export_connect = Export::where('connection_number', $export->connection_number)->where('te_carry_out_number' , '!=', $request->is_no)->first();
+                $export_connect = Export::where('connection_number', $export->connection_number)->where('te_carry_out_number', '!=', $request->is_no)->first();
                 $warehousing_connect = Warehousing::where('connection_number', $export->connection_number)->first();
 
                 $connection_number =  $export->connection_number;
@@ -2032,10 +2076,10 @@ class ReceivingGoodsDeliveryController extends Controller
                 $connect_w_no = isset($export_connect->te_carry_out_number) ? $export_connect->te_carry_out_number : $warehousing_connect->w_no;
 
                 $type_w_choose = isset($export_connect->te_carry_out_number) ? "export" : "warehousing";
-            }else{
+            } else {
                 $warehousing = Warehousing::where('w_no', $request->w_no)->first();
                 $export_connect = Export::where('connection_number', $warehousing->connection_number)->first();
-                $warehousing_connect = Warehousing::where('connection_number', $warehousing->connection_number)->where('w_no' , '!=', $request->w_no)->first();
+                $warehousing_connect = Warehousing::where('connection_number', $warehousing->connection_number)->where('w_no', '!=', $request->w_no)->first();
 
                 $connection_number = $warehousing->connection_number;
 
@@ -2044,7 +2088,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 $type_w_choose = isset($export_connect->te_carry_out_number) ? "export" : "warehousing";
             }
 
-           
+
 
             return response()->json([
                 'connection_number' => $connection_number,
