@@ -87,6 +87,35 @@ class AlarmController extends Controller
                     return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
                 });
             }
+            if (isset($validated['service'])) {
+                $alarm->whereHas('warehousing', function ($q) use ($validated) {
+                    return $q->where(DB::raw('lower(w_category_name)'), 'like', '%' . strtolower($validated['service']) . '%');
+                });
+            }
+            if (isset($validated['service_name'])) {
+                if($validated['service_name'] == "입고예정번호"){
+                    $alarm->whereHas('warehousing', function ($q) use ($validated) {
+                        return $q->where('w_type','IW')->whereNull('w_schedule_number2');
+                    });
+                }elseif($validated['service_name'] == "입고화물번호"){
+                    $alarm->whereHas('warehousing', function ($q) use ($validated) {
+                        return $q->where('w_type','IW')->whereNotNull('w_schedule_number2');
+                    });
+                }elseif($validated['service_name'] == "출고예정번호"){
+                    $alarm->whereHas('warehousing', function ($q) use ($validated) {
+                        return $q->where('w_type','EW')->whereNull('w_schedule_number2');
+                    });
+                }elseif($validated['service_name'] == "출고화물번호"){
+                    $alarm->whereHas('warehousing', function ($q) use ($validated) {
+                        return $q->where('w_type','EW')->whereNotNull('w_schedule_number2');
+                    });
+                }elseif($validated['service_name'] == "BL번호"){
+                    $alarm->whereHas('warehousing', function ($q) use ($validated) {
+                        return $q->where('w_type','IW')->whereNull('w_schedule_number2');
+                    });
+                }
+                
+            }
             $alarm = $alarm->paginate($per_page, ['*'], 'page', $page);
 
             return response()->json($alarm);

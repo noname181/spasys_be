@@ -51,6 +51,12 @@ class AlarmSearchRequest extends BaseFormRequest
             'w_no' => [
                 'nullable',
             ],
+            'service' => [
+                'nullable',
+            ],
+            'service_name' => [
+                'nullable',
+            ],
         ];
     }
 
