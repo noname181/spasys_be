@@ -115,21 +115,26 @@ class ExportController extends Controller
             }
 
             $items = [];
-
+            
             foreach($warehousing_items as $key =>  $warehousing_item){
                 $item = Item::with(['item_channels','file'])->where('item_no', $warehousing_item->item_no)->first();
+                
                 if($type=='EW'){
-                    $warehousing_items_import = WarehousingItem::with('item_no')->whereHas('item_no',function($q) use ($warehousing){
+                    
+                    $warehousing_items_import = WarehousingItem::with('w_no')->whereHas('w_no',function($q) use ($warehousing){
                         $q->where('w_no', $warehousing->w_import_no);
                     })->where('item_no', $warehousing_item->item_no)->where('wi_type', '=', '입고_spasys')->get();
-                    foreach($warehousing_items_import as $i => $value){
-                        $item->remain = $warehousing_items_import[$i]->wi_number - $warehousing_item->wi_number;
-                    }
-
-                    $item->warehousing_items_import = $warehousing_items_import;
-                    // $warehousing_item->wi_number = $warehousing_items_import[0]->wi_number - $warehousing_item->wi_number;
                     
-                    $warehousing_items_expect = WarehousingItem::with('item_no')->whereHas('item_no',function($q) use ($validated){
+                    
+                    foreach($warehousing_items_import as $i => $value){
+                       
+                        $item->remain = $value->wi_number - $warehousing_item->wi_number;
+                    }
+                    
+                    $item->warehousing_items_import = $warehousing_items_import;
+                    
+                    
+                    $warehousing_items_expect = WarehousingItem::with('w_no')->whereHas('w_no',function($q) use ($validated){
                         $q->where('w_no', $validated['w_no']);
                     })->where('item_no', $warehousing_item->item_no)->where('wi_type', '=', '출고_shipper')->get();
                     foreach($warehousing_items_expect as $i => $value){
