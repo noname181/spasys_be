@@ -7431,7 +7431,7 @@ class RateDataController extends Controller
                     }
                 }else if($request->bill_type == 'case_bill_final_issue'){ //page 264
                     $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-                        'rgd_status5' => 'issued'
+                        'rgd_status5' => 'cancel'
                     ]);
                     $insert_cancel_bill = CancelBillHistory::insertGetId([
                         'mb_no' => Auth::user()->mb_no,
@@ -7525,6 +7525,7 @@ class RateDataController extends Controller
                 ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
                     'rgd_status7' => 'taxed',
                     'rgd_tax_invoice_number' => $tax_number ? $tax_number : NULL,
+                    'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
                 ]);
             }
 

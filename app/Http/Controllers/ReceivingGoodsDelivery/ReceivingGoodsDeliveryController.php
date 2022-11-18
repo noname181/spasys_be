@@ -1971,19 +1971,22 @@ class ReceivingGoodsDeliveryController extends Controller
         try {
             if ($request->bill_type == 'case') {
                 ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-                    'rgd_status5' => 'confirmed'
+                    'rgd_status5' => 'confirmed',
+                    'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
                 ]);
             } else if ($request->bill_type == 'monthly') {
                 foreach ($request->rgds as $rgd) {
                     ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
-                        'rgd_status5' => 'confirmed'
+                        'rgd_status5' => 'confirmed',
+                        'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
                     ]);
                 }
             } else if ($request->bill_type == 'multiple') {
                 foreach ($request->rgds as $rgd) {
 
                     ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
-                        'rgd_status5' => 'confirmed'
+                        'rgd_status5' => 'confirmed',
+                        'rgd_confirmed_date' => Carbon::now()->toDateTimeString()
                     ]);
                 }
             }
