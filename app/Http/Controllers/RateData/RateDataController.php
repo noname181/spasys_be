@@ -1934,6 +1934,7 @@ class RateDataController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'rdg' => $rdg,
+                'rgd' => $rgd,
                 'warehousing' => $warehousing,
                 'ag_name' => $ag_name,
                 'co_no' => $co_no,
@@ -7371,7 +7372,8 @@ class RateDataController extends Controller
                 //month_bill_edit && case_bill_edit && case_bill_final
                 if($request->bill_type == 'case_bill_final' || $request->bill_type == 'case_bill_edit' || $request->bill_type == 'month_bill_edit' ){
                     $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-                        'rgd_status5' => 'cancel'
+                        'rgd_status5' => 'cancel',
+                        'rgd_canceled_date' => Carbon::now()->toDateTimeString()
                     ]);
                     $insert_cancel_bill = CancelBillHistory::insertGetId([
                         'mb_no' => Auth::user()->mb_no,
@@ -7394,7 +7396,8 @@ class RateDataController extends Controller
                     $rgds = ReceivingGoodsDelivery::where('rgd_settlement_number', $settlement_number)->get();
                     foreach($rgds as $rgd){
                         $rgd_update = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
-                            'rgd_status5' => 'cancel'
+                            'rgd_status5' => 'cancel',
+                            'rgd_canceled_date' => Carbon::now()->toDateTimeString()
                         ]);
                         CancelBillHistory::insertGetId([
                             'mb_no' => Auth::user()->mb_no,
@@ -7421,7 +7424,8 @@ class RateDataController extends Controller
                     $rgds = ReceivingGoodsDelivery::where('rgd_settlement_number', $settlement_number)->get();
                     foreach($rgds as $rgd){
                         $rgd_update = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
-                            'rgd_status5' => 'cancel'
+                            'rgd_status5' => 'cancel',
+                            'rgd_canceled_date' => Carbon::now()->toDateTimeString()
                         ]);
                         CancelBillHistory::insertGetId([
                             'mb_no' => Auth::user()->mb_no,
@@ -7431,7 +7435,7 @@ class RateDataController extends Controller
                     }
                 }else if($request->bill_type == 'case_bill_final_issue'){ //page 264
                     $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-                        'rgd_status5' => 'issued'
+                        'rgd_status5' => 'cancel'
                     ]);
                     $insert_cancel_bill = CancelBillHistory::insertGetId([
                         'mb_no' => Auth::user()->mb_no,
@@ -7475,7 +7479,8 @@ class RateDataController extends Controller
                     }
                 }else{ //case_bill,monthly_bill
                     $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-                        'rgd_status5' => 'cancel'
+                        'rgd_status5' => 'cancel',
+                        'rgd_canceled_date' => Carbon::now()->toDateTimeString()
                     ]);
                     $insert_cancel_bill = CancelBillHistory::insertGetId([
                         'mb_no' => Auth::user()->mb_no,
@@ -7525,6 +7530,7 @@ class RateDataController extends Controller
                 ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
                     'rgd_status7' => 'taxed',
                     'rgd_tax_invoice_number' => $tax_number ? $tax_number : NULL,
+                    'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
                 ]);
             }
 
