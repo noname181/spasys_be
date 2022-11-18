@@ -1934,6 +1934,7 @@ class RateDataController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'rdg' => $rdg,
+                'rgd' => $rgd,
                 'warehousing' => $warehousing,
                 'ag_name' => $ag_name,
                 'co_no' => $co_no,
