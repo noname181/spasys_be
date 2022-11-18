@@ -463,7 +463,7 @@ class WarehousingController extends Controller
                     });
             }
             $warehousing->whereDoesntHave('rate_data_general');
-            
+
             if(isset($validated['connection_number_type'])){
                 $warehousing->whereNull('connection_number');
             }
@@ -3387,7 +3387,7 @@ class WarehousingController extends Controller
                     $query->where('w_category_name', '=', '수입풀필먼트');
                 })
                 ->where('rgd_is_show', 'y')
-                ->orderBy('rgd_no', 'DESC');
+                ->orderBy('updated_at', 'DESC');
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
@@ -3671,7 +3671,7 @@ class WarehousingController extends Controller
                     $warehousing->whereNull('rgd_status7');
                 else if($validated['status'] == 'taxed')
                     $warehousing->where('rgd_status7', '=', 'taxed');
-                else 
+                else
                     $warehousing->where('rgd_status7', '=', 'cancelled');
             }
 

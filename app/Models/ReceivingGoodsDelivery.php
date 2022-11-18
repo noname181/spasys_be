@@ -64,6 +64,7 @@ class ReceivingGoodsDelivery extends Model
         'rgd_monthbill_start' => "date: Y.m.d",
         'rgd_monthbill_end' => "date: Y.m.d",
         'rgd_confirmed_date' => "date:Y.m.d H:i",
+        'rgd_issue_date' => "date:Y.m.d H:i",
     ];
 
     public function mb_no()
