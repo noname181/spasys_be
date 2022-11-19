@@ -23,11 +23,16 @@ class SendMailController extends Controller
         try {
             $validated = $request->validated();
             $mb_otp = Str::lower(Str::random(6));
-            $member = Member::where([['mb_email', '=', $validated['mb_email']], ['mb_id', '=', $validated['mb_id']]])->first();
+            $member = Member::where('mb_email', '=', $validated['mb_email'])
+            ->where(function ($query)  use ($validated){
+                $query->where('mb_id', '=', strtoupper($validated['mb_id']))
+                ->orWhere('mb_id', '=', strtolower($validated['mb_id']));
+            })
+            ->first();
     
             if (!empty($member)) {
                 // send otp in the email
-                $mail_details = [
+                $mail_details = [ 
                     'title' => 'Verify email OTP',
                     'body' => 'Your OTP is : ' . $mb_otp,
                 ];
