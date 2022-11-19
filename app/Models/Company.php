@@ -11,6 +11,7 @@ use App\Models\CompanyPayment;
 use App\Models\ScheduleShipmentInfo;
 use App\Models\AdjustmentGroup;
 use App\Models\RateData;
+use App\Models\Member;
 class Company extends Model
 {
     use HasFactory;
@@ -110,6 +111,10 @@ class Company extends Model
     {
         return $this->hasMany(RateData::class, 'rd_co_no', 'co_no')->where('rd_cate_meta1', '보세화물');
 
+    }
+    public function mb_no()
+    {
+        return $this->belongsTo(Member::class, 'mb_no', 'mb_no');
     }
 
 }

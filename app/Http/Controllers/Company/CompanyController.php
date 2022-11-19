@@ -92,7 +92,7 @@ class CompanyController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $companies = Company::with(['contract', 'co_parent','company_settlement','company_payment'])
+            $companies = Company::with(['contract', 'co_parent','company_settlement','company_payment','mb_no'])
                 ->where(function ($q) use ($user) {
                     $q->where('co_no', $user->co_no)
                         ->orWhereHas('co_parent', function ($q) use ($user) {
