@@ -138,7 +138,7 @@ class NoticeController extends Controller
      */
     public function getNoticeById($notice_no)
     {
-        $notice = Notice::find($notice_no);
+        $notice = Notice::with('files')->find($notice_no);
         if (!empty($notice)) {
             return response()->json(
                 ['message' => Messages::MSG_0007,
