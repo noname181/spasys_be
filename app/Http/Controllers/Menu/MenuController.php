@@ -71,7 +71,7 @@ class MenuController extends Controller
                         $service_no_array = explode(" ", $service_no_array);
 
                         return in_array($service->service_no, $service_no_array);
-                    })
+                    })->values()
                 );
 
             }
