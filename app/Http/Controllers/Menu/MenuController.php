@@ -46,13 +46,13 @@ class MenuController extends Controller
 
 
 
-            // if (isset($validated['menu_depth'])) {
-            //     $menu->where('menu_depth', $validated['menu_depth']);
-            // }
+            if (isset($validated['menu_depth'])) {
+                $menu->where('menu_depth', $validated['menu_depth']);
+            }
 
-            // if (isset($validated['menu_device'])) {
-            //     $menu->where(DB::raw('lower(menu_device)'), strtolower($validated['menu_device']));
-            // }
+            if (isset($validated['menu_device'])) {
+                $menu->where(DB::raw('lower(menu_device)'), strtolower($validated['menu_device']));
+            }
 
             if (isset($validated['menu_name'])) {
                 $menu->where(function($query) use ($validated) {
