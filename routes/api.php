@@ -24,6 +24,7 @@ Route::post('/send_email_otp', [\App\Http\Controllers\Api\SendMailController::cl
 Route::post('/validate_otp', [\App\Http\Controllers\Api\SendMailController::class, 'validateOtp']);
 Route::patch('/forgot_password', [\App\Http\Controllers\Api\SendMailController::class, 'sendPassword']);
 Route::get('/find_id', [\App\Http\Controllers\Member\MemberController::class, 'findUserId'])->name('member.findUserId');
+Route::get('/api_item_cron_nologin', [App\Http\Controllers\Item\ItemController::class, 'apiItemCronNoLogin'])->name('api_item_cron_nologin');
 
 Route::middleware('auth')->group(function () {
 

@@ -1871,6 +1871,205 @@ class ItemController extends Controller
         }
     }
 
+    
+    
+    public function apiItemsRawNoLogin($request = null)
+    {
+        try {
+            DB::beginTransaction();
+            $data_select = !empty($request->data)?$request->data:array();
+            foreach ($data_select as $i_item => $item) {
+                $item_no = Item::updateOrCreate(
+                    [
+                        'product_id' => $item->product_id
+                    ],
+                    [
+                        'mb_no' => 0,
+                        'co_no' => 0,
+                        'item_name' => $item->name,
+                        'supply_code' => $item->supply_code,
+                        'item_brand' => $item->brand,
+                        'item_origin' => $item->origin,
+                        'item_weight' => $item->weight,
+                        'item_price1' => $item->org_price,
+                        'item_price2' => $item->shop_price,
+                        'item_price3' => $item->supply_price,
+                        'item_url' => $item->img_500,
+                        'item_service_name' => '수입풀필먼트',
+                    ]
+                );
+                if ($item_no->item_no) {
+                    if(!empty($item->options)){
+                        $item_arr = (array)$item->options;
+                        if (is_array($item_arr) || is_object($item_arr))
+                        {
+                            foreach($item_arr as $option){
+                                $option_pro_id = $item->product_id . $option->product_id;
+                                $item_no = Item::updateOrCreate(
+                                    [
+                                        'product_id' => $option_pro_id
+                                    ],
+                                    [
+                                        'product_id' => $option_pro_id,
+                                        'mb_no' => 0,
+                                        'co_no' => 0,
+                                        'item_name' => $item->name,
+                                        'supply_code' => $item->supply_code,
+                                        'item_brand' => $item->brand,
+                                        'item_origin' => $item->origin,
+                                        'item_weight' => $item->weight,
+                                        'item_price1' => $item->org_price,
+                                        'item_price2' => $item->shop_price,
+                                        'item_price3' => $item->supply_price,
+                                        'item_url' => $item->img_500,
+                                        'item_option1' => $option->options,
+                                        'item_service_name' => '수입풀필먼트'
+                                    ]
+                                );
+                                $item_info_no = ItemInfo::updateOrCreate(
+                                    [
+                                        'item_no' => $item_no->item_no,
+                                    ],
+                                    [
+                                        'item_no' => $item_no->item_no,
+                                        'product_id' => $item->product_id,
+                                        'supply_code' => $item->supply_code,
+                                        'trans_fee' => $item->trans_fee,
+                                        'img_desc1' => $item->img_desc1,
+                                        'img_desc2' => $item->img_desc2,
+                                        'img_desc3' => $item->img_desc3,
+                                        'img_desc4' => $item->img_desc4,
+                                        'img_desc5' => $item->img_desc5,
+                                        'product_desc' => $item->product_desc,
+                                        'product_desc2' => $item->product_desc2,
+                                        'location' => $item->location,
+                                        'memo' => $item->memo,
+                                        'category' => $item->category,
+                                        'maker' => $item->maker,
+                                        'md' => $item->md,
+                                        'manager1' => $item->manager1,
+                                        'manager2' => $item->manager2,
+                                        'supply_options' => !empty($option->supply_options)?$option->supply_options:'',
+                                        'enable_sale' => !empty($option->enable_sale)?$option->enable_sale:1,
+                                        'use_temp_soldout' => !empty($option->use_temp_soldout)?$option->use_temp_soldout:0,
+                                        'stock_alarm1' => !empty($option->stock_alarm1)?$option->stock_alarm1:0,
+                                        'stock_alarm2' => !empty($option->stock_alarm2)?$option->stock_alarm2:0,
+                                        'extra_price' => !empty($option->extra_price)?$option->extra_price:0,
+                                        'extra_shop_price' => !empty($option->extra_shop_price)?$option->extra_shop_price:0,
+                                        'extra_column6' => !empty($option->extra_column6)?$option->extra_column6:'',
+                                        'extra_column7' => !empty($option->extra_column7)?$option->extra_column7:'',
+                                        'extra_column8' => !empty($option->extra_column8)?$option->extra_column8:'',
+                                        'extra_column9' => !empty($option->extra_column9)?$option->extra_column9:'',
+                                        'extra_column10' => !empty($option->extra_column10)?$option->extra_column10:'',
+                                        'reg_date' => !empty($option->reg_date)?$option->reg_date:null,
+                                        'last_update_date' => !empty($option->last_update_date)?$option->last_update_date:null,
+                                        'new_link_id' => !empty($option->new_link_id)?$option->new_link_id:'',
+                                        'link_id' => !empty($option->link_id)?$option->link_id:'',
+                                    ]
+                                );
+                            }
+                        }else{
+                            $item_no = Item::updateOrCreate(
+                                [
+                                    'product_id' => $item->product_id
+                                ],
+                                [
+                                    'product_id' => $item->product_id,
+                                    'mb_no' => 0,
+                                    'co_no' => 0,
+                                    'item_name' => $item->name,
+                                    'supply_code' => $item->supply_code,
+                                    'item_brand' => $item->brand,
+                                    'item_origin' => $item->origin,
+                                    'item_weight' => $item->weight,
+                                    'item_price1' => $item->org_price,
+                                    'item_price2' => $item->shop_price,
+                                    'item_price3' => $item->supply_price,
+                                    'item_url' => $item->img_500,
+                                    'item_option1' => $item->options?$item->options:'',
+                                    'item_service_name' => '수입풀필먼트'
+                                ]
+                            );
+                            
+                            $item_info_no = ItemInfo::updateOrCreate(
+                                [
+                                    'item_no' => $item_no->item_no,
+                                ],
+                                [
+                                    'item_no' => $item_no->item_no,
+                                    'product_id' => $item->product_id,
+                                    'supply_code' => $item->supply_code,
+                                    'trans_fee' => $item->trans_fee,
+                                    'img_desc1' => $item->img_desc1,
+                                    'img_desc2' => $item->img_desc2,
+                                    'img_desc3' => $item->img_desc3,
+                                    'img_desc4' => $item->img_desc4,
+                                    'img_desc5' => $item->img_desc5,
+                                    'product_desc' => $item->product_desc,
+                                    'product_desc2' => $item->product_desc2,
+                                    'location' => $item->location,
+                                    'memo' => $item->memo,
+                                    'category' => $item->category,
+                                    'maker' => $item->maker,
+                                    'md' => $item->md,
+                                    'manager1' => $item->manager1,
+                                    'manager2' => $item->manager2
+                                ]
+                            );
+                        }
+                    }else{
+                        $item_info_no = ItemInfo::updateOrCreate(
+                            [
+                                'item_no' => $item_no->item_no,
+                            ],
+                            [
+                                'item_no' => $item_no->item_no,
+                                'product_id' => $item->product_id,
+                                'supply_code' => $item->supply_code,
+                                'trans_fee' => $item->trans_fee,
+                                'img_desc1' => $item->img_desc1,
+                                'img_desc2' => $item->img_desc2,
+                                'img_desc3' => $item->img_desc3,
+                                'img_desc4' => $item->img_desc4,
+                                'img_desc5' => $item->img_desc5,
+                                'product_desc' => $item->product_desc,
+                                'product_desc2' => $item->product_desc2,
+                                'location' => $item->location,
+                                'memo' => $item->memo,
+                                'category' => $item->category,
+                                'maker' => $item->maker,
+                                'md' => $item->md,
+                                'manager1' => $item->manager1,
+                                'manager2' => $item->manager2,
+                                
+                                'extra_column1' => $item->extra_column1,
+                                'extra_column2' => $item->extra_column2,
+                                'extra_column3' => $item->extra_column3,
+                                'extra_column4' => $item->extra_column4,
+                                'extra_column5' => $item->extra_column5
+                            ]
+                        );
+                    }
+                }
+            }
+        
+
+            DB::commit();
+            return response()->json([
+                'message' => '완료되었습니다.',
+                'status' => 1,
+                'data' => $data_select
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json([
+                'message' => '오류가 발생하였습니다.',
+            ], 500);
+        }
+    }
+
     public function apiItemsCargoList(Request $request){
         
         try {
@@ -2142,6 +2341,49 @@ class ItemController extends Controller
         $api_data = json_decode($response);
         if(!empty($api_data->data)){
             return $this->apiItemsRaw($api_data);
+        }else{
+            return response()->json([
+                'message' => '새로운 데이터가 없습니다.',
+                'status' => 1
+            ], 200);
+        }
+        return $api_data;
+    }
+
+    
+    
+    public function apiItemCronNoLogin(Request $request) {
+        $param_arrays = array(
+            'partner_key' => '50e2331771d085ddccbcd2188a03800c',
+            'domain_key' => '50e2331771d085ddeab1bc2f91a39ae14e1b924b8df05d11ff40eea3aff3d9fb',
+            'action' => 'get_product_info',
+            'date_type' => 'last_update_date',
+            'start_date' => date('Y-m-d'),
+            'end_date' => date('Y-m-d'),
+            'limit' => '',
+            'page' => ''
+        );
+        $filter = array();
+        $url_api = 'https://api2.cloud.ezadmin.co.kr/ezadmin/function.php?';
+        foreach($param_arrays as $key => $param){
+            $filter[$key] = !empty($request[$key])?$request[$key]:$param;
+        }
+        $url_api .= '&partner_key='.$filter['partner_key'];
+        $url_api .= '&domain_key='.$filter['domain_key'];
+        $url_api .= '&action='.$filter['action'];
+        $url_api .= '&date_type='.$filter['date_type'];
+        $url_api .= '&start_date='.$filter['start_date'];
+        $url_api .= '&end_date='.$filter['end_date'];
+        if($filter['limit'] != ''){
+            $url_api .= '&limit='.$filter['limit'];
+        }
+        if($filter['page'] != ''){
+            $url_api .= '&page='.$filter['page'];
+        }
+        $response = file_get_contents($url_api);
+        $api_data = json_decode($response);
+        if(!empty($api_data->data)){
+            return $this->apiItemsRawNoLogin($api_data);
         }else{
             return response()->json([
                 'message' => '새로운 데이터가 없습니다.',
