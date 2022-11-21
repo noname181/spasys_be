@@ -1581,6 +1581,28 @@ class RateDataController extends Controller
                 'contract.c_integrated_calculate_yn as c_integrated_calculate_yn',
                 'contract.c_calculate_deadline_yn as c_calculate_deadline_yn',
             ])->join('contract', 'contract.co_no', 'company.co_no')->with(['co_parent'])->where('co_license', $import->ti_co_license)->first();
+           
+            if($user->mb_type == 'shop'){
+                $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_tracking_code', $is_no)->first();
+
+                $company = Company::select([
+                    'company.co_no',
+                    'company.co_parent_no',
+                    'company.co_address',
+                    'company.co_address_detail',
+                    'company.co_country',
+                    'company.co_service',
+                    'company.co_name',
+                    'company.co_license',
+                    'company.co_close_yn',
+                    'company.co_owner',
+                    'company.co_homepage',
+                    'company.co_email',
+                    'company.co_etc',
+                    'contract.c_integrated_calculate_yn as c_integrated_calculate_yn',
+                    'contract.c_calculate_deadline_yn as c_calculate_deadline_yn',
+                ])->join('contract', 'contract.co_no', 'company.co_no')->with(['co_parent'])->where('company.co_no', $rgd->warehousing->co_no)->first();
+            }
 
             $rate_data = RateData::where('rd_cate_meta1', '보세화물');
 
@@ -1612,6 +1634,7 @@ class RateDataController extends Controller
                 'rate_data' => $rate_data,
                 'export' => $export,
                 'adjustment_group' => $adjustment_group,
+                'rgd' => $rgd->w_no,
             ], 200);
         } catch (\Exception $e) {
             DB::rollback();
