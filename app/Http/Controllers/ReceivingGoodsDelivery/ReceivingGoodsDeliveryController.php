@@ -252,8 +252,8 @@ class ReceivingGoodsDeliveryController extends Controller
                         ItemChannel::insert(
                             [
                                 'item_no' => $item_no_new,
-                                'item_channel_code' => $item_new['item_channel_code'],
-                                'item_channel_name' => $item_new['item_channel_name']
+                                'item_channel_code' => isset($item_new['item_channel_code']) ? $item_new['item_channel_code'] : '',
+                                'item_channel_name' => isset($item_new['item_channel_name']) ? $item_new['item_channel_name'] : '',
                             ]
                         );
                     }
