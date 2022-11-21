@@ -21,7 +21,9 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
-
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 use PhpParser\Node\Stmt\TryCatch;
 
 class MenuController extends Controller
@@ -57,32 +59,42 @@ class MenuController extends Controller
                     $query->where('menu_name', 'like', '%' . $validated['menu_name'] . '%');
                 });
             }
-            $sql = $menu->toSql();
-
-            $menu = $menu->paginate($per_page, ['*'], 'page', $page);
-
-            if (isset($validated['service_no'])) {
-                $service = Service::where('service_no', $validated['service_no'])->first();
 
 
-                $menu->setCollection(
-                    $menu->getCollection()->filter(function ($item) use ($service) {
-                        $service_no_array = $item->service_no_array;
-                        $service_no_array = explode(" ", $service_no_array);
+            if (isset($validated['service_no']) && $validated['service_no'] != '1') {
 
-                        return in_array($service->service_no, $service_no_array);
-                    })->values()
-                );
+                $collection = $menu->get();
 
+                $filtered = $collection->filter(function($item) use($validated){
+                  
+                    $service_no_array = $item->service_no_array;
+                    $service_no_array = explode(" ", $service_no_array);
+                   
+                    return in_array($validated['service_no'], $service_no_array);
+                       
+                });
+
+                $data = $this->paginate($filtered, $validated['per_page'], $validated['page']);
+                return response()->json($data);
+            
             }
+
+            
+
+            $collection = $menu->get();
+
+            $data = $this->paginate($collection, $validated['per_page'], $validated['page']);
+
+            
 
 
             // 'from_date' => date('Y-m-d H:i:s', strtotime($validated['from_date'])),
             // 'to_date' => date('Y-m-d 23:59:00', strtotime($validated['to_date']))
 
-            return response()->json($menu);
+            return response()->json($data);
         } catch (\Exception $e) {
             Log::error($e);
+            return $e;
             //return response()->json(['message' => Messages::MSG_0018], 500);
 
         }
@@ -257,5 +269,12 @@ class MenuController extends Controller
 
             return response()->json(['message' => Messages::MSG_0003], 500);
         }
+    }
+
+    public function paginate($items, $perPage = 15, $page = null, $options = [])
+    {
+        $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
+        $items = $items instanceof Collection ? $items : Collection::make($items);
+        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
     }
 }

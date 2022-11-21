@@ -73,7 +73,7 @@ class QnaController extends Controller
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
             $qna_no = Qna::insertGetId([
                 'mb_no' => $member->mb_no,
-                'qna_status' => 'receipt',
+                'qna_status' => $validated['qna_status'],
                 'mb_no_target' => $validated['mb_no_target'],
                 'qna_title' => $validated['qna_title'],
                 'qna_content' => $validated['qna_content'],
@@ -117,12 +117,14 @@ class QnaController extends Controller
     {
 
         $validated = $request->validated();
-
         try {
             DB::beginTransaction();
             // FIXME hard set mb_no = 1
             $depth_level = Qna::where('qna_no' ,'=' ,$validated['qna_no'])->first()['depth_level'];
             $answer_for = Qna::where('qna_no' ,'=' ,$validated['qna_no'])->first()['answer_for'];
+            $update_status = Qna::where('qna_no', $validated['qna_no'])->update([
+                'qna_status' => $validated['qna_status']
+            ]);
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
             $depth_level = $depth_level + 1;
             $qna_no = Qna::insertGetId([

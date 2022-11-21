@@ -53,6 +53,10 @@ class QnaReplyRequest extends BaseFormRequest
                 'file',
                 'max:5119'
             ],
+            'qna_status' => [
+                'string',
+                'max:255',
+            ]
         ];
     }
 
