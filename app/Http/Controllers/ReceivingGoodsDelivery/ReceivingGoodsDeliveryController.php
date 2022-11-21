@@ -1467,7 +1467,11 @@ class ReceivingGoodsDeliveryController extends Controller
                     foreach ($request->datachkbox as $value) {
                         //return $value['w_no']['w_no'];
                         if ($value['w_no']['w_no']) {
-                            ReceivingGoodsDelivery::where('w_no', $value['w_no']['w_no'])->where('rgd_status1', '!=', '입고')->orWhere('rgd_status2', '!=', '작업완료')->orWhereNull('rgd_status2')->update([
+                            ReceivingGoodsDelivery::where('w_no', $value['w_no']['w_no'])->where('rgd_status1', '!=', '입고')->where(function ($query) {
+                                $query->where('rgd_status2', '!=', '작업완료')
+                                    ->orWhereNull('rgd_status2');
+                            }
+                        )->update([
                                 'rgd_status1' => '입고예정 취소'
                             ]);
 
@@ -1482,7 +1486,11 @@ class ReceivingGoodsDeliveryController extends Controller
                 } else {
                     if ($request->w_no) {
                         ReceivingGoodsDelivery::where('w_no', $request->w_no)
-                            ->where('rgd_status1', '!=', '입고')->orWhere('rgd_status2', '!=', '작업완료')->orWhereNull('rgd_status2')->update([
+                            ->where('rgd_status1', '!=', '입고')->where(function ($query) {
+                                $query->where('rgd_status2', '!=', '작업완료')
+                                    ->orWhereNull('rgd_status2');
+                            }
+                        )->update([
                                 'rgd_status1' => '입고예정 취소'
                             ]);
 
