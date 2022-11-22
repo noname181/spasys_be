@@ -24,8 +24,11 @@ class ManualCreateRequest extends BaseFormRequest
     public function rules()
     {
         return [
+            'data_menu' => [
+                'array'
+            ],
             'man_title' => [
-                'required',
+                
                 'string',
                 'max:255',
             ],
@@ -34,12 +37,16 @@ class ManualCreateRequest extends BaseFormRequest
                 'string'
             ],
             'man_note' => [
-                'required',
+             
                 'string',
                 'max:255',
             ],
-            'file' => [
-                'required',
+            "file" => [
+                'array',
+                'nullable'
+            ],
+            'file.*' => [
+        
                 'file',
                 'max:5000',
                 'mimes:jpg,jpeg,png',
