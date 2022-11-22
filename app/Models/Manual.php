@@ -25,6 +25,7 @@ class Manual extends Model
      */
     protected $fillable = [
         'man_no',
+        'menu_no',
         'mb_no',
         'man_title',
         'man_content',
@@ -45,5 +46,6 @@ class Manual extends Model
     {
         return $this->hasOne(File::class, 'file_table_key', 'man_no')->where('file_table', 'manual');
     }
+    
 
 }
