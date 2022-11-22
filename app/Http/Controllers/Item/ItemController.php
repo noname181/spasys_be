@@ -1705,19 +1705,83 @@ class ItemController extends Controller
                                     'manager2' => $item->manager2
                                 ]
                             );
+                        }else{
+                            $item_no = Item::where('product_id', $item->product_id)
+                                        ->where('co_no', $shop_company->co_no)
+                                        ->update($data_update_create);  
+                            $item_no_update = Item::where('product_id', $item->product_id)->where('co_no', $shop_company->co_no)->first();
+                            if(!empty($item_no_update->item_no)){
+                                ItemInfo::where('item_no', $item_no_update->item_no)->update(
+                                    [
+                                        'product_id' => $item->product_id,
+                                        'supply_code' => $item->supply_code,
+                                        'trans_fee' => $item->trans_fee,
+                                        'img_desc1' => $item->img_desc1,
+                                        'img_desc2' => $item->img_desc2,
+                                        'img_desc3' => $item->img_desc3,
+                                        'img_desc4' => $item->img_desc4,
+                                        'img_desc5' => $item->img_desc5,
+                                        'product_desc' => $item->product_desc,
+                                        'product_desc2' => $item->product_desc2,
+                                        'location' => $item->location,
+                                        'memo' => $item->memo,
+                                        'category' => $item->category,
+                                        'maker' => $item->maker,
+                                        'md' => $item->md,
+                                        'manager1' => $item->manager1,
+                                        'manager2' => $item->manager2
+                                    ]
+                                );
+                            }
                         }
                         if(!empty($item->options) && is_array($item->options)){
                             foreach($item->options as $option){
-                                
                                 $data_update_create['item_option1'] = $option->options;
-
                                 $data_update_create['item_name'] = $data_update_create['item_name'];
-                                
                                 $option_pro_id = $item->product_id . $option->product_id;
-
                                 $check_item = DB::table('item')->where('product_id','=',$option_pro_id)
                                     ->where('co_no','=',$shop_company->co_no)
                                     ->get();
+                                $data_item_info = [
+                                    'product_id' => $option_pro_id,
+                                    'supply_code' => $item->supply_code,
+                                    'trans_fee' => $item->trans_fee,
+                                    'img_desc1' => $item->img_desc1,
+                                    'img_desc2' => $item->img_desc2,
+                                    'img_desc3' => $item->img_desc3,
+                                    'img_desc4' => $item->img_desc4,
+                                    'img_desc5' => $item->img_desc5,
+                                    'product_desc' => $item->product_desc,
+                                    'product_desc2' => $item->product_desc2,
+                                    'location' => $item->location,
+                                    'memo' => $item->memo,
+                                    'category' => $item->category,
+                                    'maker' => $item->maker,
+                                    'md' => $item->md,
+                                    'manager1' => $item->manager1,
+                                    'manager2' => $item->manager2,
+                                    'supply_options' => $option->supply_options,
+                                    'enable_sale' => $option->enable_sale,
+                                    'use_temp_soldout' => $option->use_temp_soldout,
+                                    'stock_alarm1' => $option->stock_alarm1,
+                                    'stock_alarm2' => $option->stock_alarm2,
+                                    'extra_price' => $option->extra_price,
+                                    'extra_shop_price' => $option->extra_shop_price,
+                                    'extra_column1' => !empty($option->extra_column1)?$option->extra_column1:'',
+                                    'extra_column2' => !empty($option->extra_column2)?$option->extra_column2:'',
+                                    'extra_column3' => !empty($option->extra_column3)?$option->extra_column3:'',
+                                    'extra_column4' => !empty($option->extra_column4)?$option->extra_column4:'',
+                                    'extra_column5' => !empty($option->extra_column5)?$option->extra_column5:'',
+                                    'extra_column6' => $option->extra_column6,
+                                    'extra_column7' => $option->extra_column7,
+                                    'extra_column8' => $option->extra_column8,
+                                    'extra_column9' => $option->extra_column9,
+                                    'extra_column10' => $option->extra_column10,
+                                    'reg_date' => $option->reg_date,
+                                    'last_update_date' => $option->last_update_date,
+                                    'new_link_id' => $option->new_link_id,
+                                    'link_id' => $option->link_id,
+                                ];
                                 if(count($check_item) == 0){
                                     $data_update_create['product_id'] = $option_pro_id;
                                     $item_no = Item::updateOrCreate(
@@ -1727,51 +1791,25 @@ class ItemController extends Controller
                                         ],
                                         $data_update_create
                                     );  
-                                    if ($item_no->item_no) {
-                                        $item_info_no = ItemInfo::updateOrCreate(
+                                    if($item_no->item_no) {
+                                        ItemInfo::updateOrCreate(
                                             [
                                                 'item_no' => $item_no->item_no,
                                             ],
-                                            [
-                                                'product_id' => $option_pro_id,
-                                                'supply_code' => $item->supply_code,
-                                                'trans_fee' => $item->trans_fee,
-                                                'img_desc1' => $item->img_desc1,
-                                                'img_desc2' => $item->img_desc2,
-                                                'img_desc3' => $item->img_desc3,
-                                                'img_desc4' => $item->img_desc4,
-                                                'img_desc5' => $item->img_desc5,
-                                                'product_desc' => $item->product_desc,
-                                                'product_desc2' => $item->product_desc2,
-                                                'location' => $item->location,
-                                                'memo' => $item->memo,
-                                                'category' => $item->category,
-                                                'maker' => $item->maker,
-                                                'md' => $item->md,
-                                                'manager1' => $item->manager1,
-                                                'manager2' => $item->manager2,
-                                                'supply_options' => $option->supply_options,
-                                                'enable_sale' => $option->enable_sale,
-                                                'use_temp_soldout' => $option->use_temp_soldout,
-                                                'stock_alarm1' => $option->stock_alarm1,
-                                                'stock_alarm2' => $option->stock_alarm2,
-                                                'extra_price' => $option->extra_price,
-                                                'extra_shop_price' => $option->extra_shop_price,
-                                                'extra_column1' => !empty($option->extra_column1)?$option->extra_column1:'',
-                                                'extra_column2' => !empty($option->extra_column2)?$option->extra_column2:'',
-                                                'extra_column3' => !empty($option->extra_column3)?$option->extra_column3:'',
-                                                'extra_column4' => !empty($option->extra_column4)?$option->extra_column4:'',
-                                                'extra_column5' => !empty($option->extra_column5)?$option->extra_column5:'',
-                                                'extra_column6' => $option->extra_column6,
-                                                'extra_column7' => $option->extra_column7,
-                                                'extra_column8' => $option->extra_column8,
-                                                'extra_column9' => $option->extra_column9,
-                                                'extra_column10' => $option->extra_column10,
-                                                'reg_date' => $option->reg_date,
-                                                'last_update_date' => $option->last_update_date,
-                                                'new_link_id' => $option->new_link_id,
-                                                'link_id' => $option->link_id,
-                                            ]
+                                            $data_item_info
+                                        );
+                                    }
+                                }else{
+                                    $item_no = Item::where('product_id', $option_pro_id)
+                                                ->where('co_no', $shop_company->co_no)
+                                                ->update(
+                                                    $data_update_create
+                                                );  
+                                    $item_no_update = Item::where('product_id', $option_pro_id)
+                                    ->where('co_no', $shop_company->co_no)->first();
+                                    if(!empty($item_no_update->item_no)) {
+                                        ItemInfo::where('item_no', $item_no_update->item_no)->update(
+                                            $data_item_info
                                         );
                                     }
                                 }
@@ -2241,7 +2279,7 @@ class ItemController extends Controller
             'domain_key' => '50e2331771d085ddeab1bc2f91a39ae14e1b924b8df05d11ff40eea3aff3d9fb',
             'action' => 'get_product_info',
             'date_type' => 'last_update_date',
-            'start_date' => '2022-11-21', //date('Y-m-d'),
+            'start_date' => date('Y-m-d'),
             'end_date' => date('Y-m-d'),
             'limit' => 50,
             'page' => ''
