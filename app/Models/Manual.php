@@ -29,7 +29,8 @@ class Manual extends Model
         'mb_no',
         'man_title',
         'man_content',
-        'man_note'
+        'man_note',
+        'man_tab'
     ];
 
     protected $casts = [

@@ -51,7 +51,8 @@ class ManualController extends Controller
                 'man_title' => $val['man_title'],
                 'man_content' => $val['man_content'],
                 'man_note' => $val['man_note'],
-                'menu_no' => $val['menu_no']
+                'menu_no' => $val['menu_no'],
+                'man_tab'=>$val['man_tab']
             ]);
 
             
