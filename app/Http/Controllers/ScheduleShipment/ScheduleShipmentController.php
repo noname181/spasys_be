@@ -178,7 +178,7 @@ class ScheduleShipmentController extends Controller
                         'status' => isset($schedule['status']) ? $schedule['status'] : null,
                         'order_cs' => isset($schedule['order_cs']) ? $schedule['order_cs'] : null,
                         'collect_date' => isset($schedule['collect_date']) ? $schedule['collect_date'] : null,
-                        'order_date' => isset($schedule['order_date']) ? $schedule['order_date'] : null,
+                        'order_date' => isset($schedule['order_date']) ? ($schedule['order_date'] != '0000-00-00 00:00:00' ? $schedule['order_date'] : null) : null,
                         'trans_date' => isset($schedule['trans_date']) ? $schedule['trans_date'] : null,
                         'trans_date_pos' => isset($schedule['trans_date_pos']) ? $schedule['trans_date_pos'] : null,
                         'shopstat_date' => isset($schedule['shopstat_date']) ? $schedule['shopstat_date'] : null,
@@ -239,7 +239,7 @@ class ScheduleShipmentController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            //return $e;
+            return $e;
             return response()->json(['message' => Messages::MSG_0019], 500);
         }
     }
