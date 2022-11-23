@@ -49,6 +49,7 @@ class Company extends Model
         'co_about_us',
         'co_policy',
         'co_help_center',
+        'warehouse_code'
     ];
 
     protected $casts = [

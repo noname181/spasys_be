@@ -310,8 +310,9 @@ class MemberController extends Controller
                 'co_lunch_break' => $validated['co_lunch_break'],
                 'co_email' => $validated['co_email'],
                 'co_about_us' => $validated['co_about_us'],
-                 'co_policy' => isset($validated['co_policy']) ? $validated['co_policy'] : '',
+                'co_policy' => isset($validated['co_policy']) ? $validated['co_policy'] : '',
                 'co_help_center' => $validated['co_help_center'],
+                'warehouse_code' => $validated['warehouse_code'],
             ]);
 
             $validated['co_no'] = $com_no;
@@ -376,6 +377,7 @@ class MemberController extends Controller
                 'co_about_us' => $validated['co_about_us'],
                 'co_help_center' => $validated['co_help_center'],
                 'co_policy' => $validated['co_policy'],
+                'warehouse_code' => $validated['warehouse_code'],
             ]);
 
             DB::commit();
@@ -386,7 +388,7 @@ class MemberController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-
+            //return $e;
             return response()->json(['message' => Messages::MSG_0002], 500);
         }
     }

@@ -57,6 +57,11 @@ class ImportExpected extends Model
         return $this->hasOne(Company::class,'co_license','tie_co_license')->with(['co_parent','rate_data_1']);
     }
 
+    public function company_spasys()
+    {
+        return $this->hasOne(Company::class,'warehouse_code','warehouse_code');
+    }
+
     public function receiving_goods_delivery()
     {
         return $this->hasMany(ReceivingGoodsDelivery::class, 'is_no', 'te_carry_out_number');
