@@ -22,14 +22,15 @@ class ManualController extends Controller
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function getManualById(Manual $manual)
-    {
-        $f = $manual->file()->first();
-        if (isset($f)) {
-            $file = Storage::url($f->file_url);
-            $manual['file'] = $file;
-        }
-        return response()->json($manual);
+    public function getManualById(Request $request)
+    {   
+       $get_manual = Manual::where('menu_no', $request->manual)->get();
+        // $f = $manual->file()->first();
+        // if (isset($f)) {
+        //     $file = Storage::url($f->file_url);
+        //     $manual['file'] = $file;
+        // }
+         return response()->json(['data_menu'=>$get_manual]);
     }
 
     /**
@@ -44,26 +45,32 @@ class ManualController extends Controller
 
         try {
             DB::beginTransaction();
+            foreach ($request->data_menu as $val) {
             $manual_no = Manual::insertGetId([
                 'mb_no' => Auth::user()->mb_no,
-                'man_title' => $validated['man_title'],
-                'man_content' => $validated['man_content'],
-                'man_note' => $validated['man_note'],
+                'man_title' => $val['man_title'],
+                'man_content' => $val['man_content'],
+                'man_note' => $val['man_note'],
+                'menu_no' => $val['menu_no'],
+                'man_tab'=>$val['man_tab']
             ]);
 
+            
+            }
+            foreach ($validated['file'] as $val) {
             $path = join('/', ['files', 'manual', $manual_no]);
-            $url = Storage::disk('public')->put($path, $validated['file']);
-
+            $url = Storage::disk('public')->put($path, $val);
             File::insert([
                 'file_table' => 'manual',
                 'file_table_key' => $manual_no,
-                'file_name_old' => $validated['file']->getClientOriginalName(),
+                'file_name_old' => $val->getClientOriginalName(),
                 'file_name' => basename($url),
-                'file_size' => $validated['file']->getSize(),
-                'file_extension' => $validated['file']->extension(),
+                'file_size' => $val->getSize(),
+                'file_extension' => $val->extension(),
                 'file_position' => 0,
                 'file_url' => $url
             ]);
+            }
 
             DB::commit();
             return response()->json([
@@ -73,6 +80,7 @@ class ManualController extends Controller
         } catch (\Throwable $e) {
             DB::rollback();
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
