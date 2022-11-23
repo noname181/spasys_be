@@ -46,6 +46,9 @@ class QnaRegisterRequest extends BaseFormRequest
                 'string',
                 'min:7',
             ],
+            'qna_status' => [
+
+            ],
             'files' => [
                 'array',
                 // 'required',
