@@ -153,7 +153,7 @@ class ScheduleShipmentController extends Controller
             DB::beginTransaction();
             $user = Auth::user();
                 foreach ($request->data as $i_schedule => $schedule) {
-                    $ss_no = ScheduleShipment::insertGetId([
+                    $data_schedule = [
                         'co_no' => $user->co_no,
                         'seq' => isset($schedule['seq']) ? $schedule['seq'] : null,
                         'pack' => isset($schedule['pack']) ? $schedule['pack'] : null,
@@ -195,7 +195,10 @@ class ScheduleShipmentController extends Controller
                         'deal_no' => isset($schedule['deal_no']) ? $schedule['deal_no'] : null,
                         'sub_domain' => isset($schedule['sub_domain']) ? $schedule['sub_domain'] : null,
                         'sub_domain_seq' => isset($schedule['sub_domain_seq']) ? $schedule['sub_domain_seq'] : null,
-                    ]);
+                    ];
+                    return $data_schedule;
+                    $ss_no = ScheduleShipment::insertGetId($data_schedule);
+                    return $ss_no;
 
                     if(isset($schedule['order_products'])){
                         foreach ($schedule['order_products'] as $ss_info => $schedule_info) {

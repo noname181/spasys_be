@@ -869,9 +869,10 @@ class ReceivingGoodsDeliveryController extends Controller
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
             foreach ($request->location as $location) {
-                    if ($request->ss_no) {
+                if ($request->ss_no) {
 
-                        $rgd_no = ReceivingGoodsDelivery::updateOrCreate([
+                    $rgd_no = ReceivingGoodsDelivery::updateOrCreate(
+                        [
                             'ss_no' => $request->ss_no
                         ],
                         [
@@ -886,8 +887,9 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_delivery_man_hp' => $location['rgd_delivery_man_hp'],
                             'rgd_delivery_schedule_day' => $location['rgd_delivery_schedule_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_delivery_schedule_day']) : null,
                             'rgd_arrive_day' =>  $location['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']) : null,
-                        ]);
-                    }
+                        ]
+                    );
+                }
             }
 
             DB::commit();
@@ -1467,11 +1469,12 @@ class ReceivingGoodsDeliveryController extends Controller
                     foreach ($request->datachkbox as $value) {
                         //return $value['w_no']['w_no'];
                         if ($value['w_no']['w_no']) {
-                            ReceivingGoodsDelivery::where('w_no', $value['w_no']['w_no'])->where('rgd_status1', '!=', '입고')->where(function ($query) {
-                                $query->where('rgd_status2', '!=', '작업완료')
-                                    ->orWhereNull('rgd_status2');
-                            }
-                        )->update([
+                            ReceivingGoodsDelivery::where('w_no', $value['w_no']['w_no'])->where('rgd_status1', '!=', '입고')->where(
+                                function ($query) {
+                                    $query->where('rgd_status2', '!=', '작업완료')
+                                        ->orWhereNull('rgd_status2');
+                                }
+                            )->update([
                                 'rgd_status1' => '입고예정 취소'
                             ]);
 
@@ -1486,11 +1489,12 @@ class ReceivingGoodsDeliveryController extends Controller
                 } else {
                     if ($request->w_no) {
                         ReceivingGoodsDelivery::where('w_no', $request->w_no)
-                            ->where('rgd_status1', '!=', '입고')->where(function ($query) {
-                                $query->where('rgd_status2', '!=', '작업완료')
-                                    ->orWhereNull('rgd_status2');
-                            }
-                        )->update([
+                            ->where('rgd_status1', '!=', '입고')->where(
+                                function ($query) {
+                                    $query->where('rgd_status2', '!=', '작업완료')
+                                        ->orWhereNull('rgd_status2');
+                                }
+                            )->update([
                                 'rgd_status1' => '입고예정 취소'
                             ]);
 
@@ -1681,12 +1685,43 @@ class ReceivingGoodsDeliveryController extends Controller
 
             if (isset($validated['wr_contents'])) {
 
-                WarehousingRequest::insert([
-                    'w_no' => $validated['is_no'],
-                    'wr_type' => "IW",
-                    'mb_no' => $member->mb_no,
-                    'wr_contents' => $validated['wr_contents'],
-                ]);
+                // WarehousingRequest::insert([
+                //     'w_no' => $validated['is_no'],
+                //     'wr_type' => "IW",
+                //     'mb_no' => $member->mb_no,
+                //     'wr_contents' => $validated['wr_contents'],
+                // ]);
+                //return $validated['is_no'];
+                $warehousingrequest = WarehousingRequest::where('w_no', $validated['is_no'])->where('wr_type', 'List')->first();
+
+                if (!is_null($warehousingrequest)) {
+                    $warehousingrequest->update([
+                        'w_no' => $validated['is_no'],
+                        'wr_type' => "IW",
+                        'mb_no' => $member->mb_no,
+                        'wr_contents' => $validated['wr_contents'],
+                    ]);
+                } else {
+                    WarehousingRequest::insert([
+                        'w_no' => $validated['is_no'],
+                        'wr_type' => "IW",
+                        'mb_no' => $member->mb_no,
+                        'wr_contents' => $validated['wr_contents'],
+                    ]);
+                }
+
+                // WarehousingRequest::updateOrNew(
+                //     [
+                //         'w_no' => $validated['is_no'],
+                //         'wr_type' => "List",
+                //     ],
+                //     [
+                //         'wr_type' => "IW",
+                //         'w_no' => $validated['is_no'],
+                //         'mb_no' => $member->mb_no,
+                //         'wr_contents' => $validated['wr_contents'],
+                //     ]
+                // );
             }
 
 
@@ -1749,12 +1784,24 @@ class ReceivingGoodsDeliveryController extends Controller
             }
 
             if ($validated['wr_contents'] && $validated['is_no']) {
-                WarehousingRequest::insert([
-                    'wr_type' => "IW",
-                    'w_no' => $validated['is_no'],
-                    'mb_no' => $member->mb_no,
-                    'wr_contents' => $validated['wr_contents'],
-                ]);
+                // WarehousingRequest::insert([
+                //     'wr_type' => "List",
+                //     'w_no' => $validated['is_no'],
+                //     'mb_no' => $member->mb_no,
+                //     'wr_contents' => $validated['wr_contents'],
+                // ]);
+                WarehousingRequest::updateOrCreate(
+                    [
+                        'w_no' => $validated['is_no'],
+                        'wr_type' => "List",
+                    ],
+                    [
+                        'wr_type' => "List",
+                        'w_no' => $validated['is_no'],
+                        'mb_no' => $member->mb_no,
+                        'wr_contents' => $validated['wr_contents'],
+                    ]
+                );
             }
 
 
@@ -1888,8 +1935,8 @@ class ReceivingGoodsDeliveryController extends Controller
             return response()->json(['message' => Messages::MSG_0007], 201);
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error($e);
-
+            Log::error($e); 
+            //return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -1916,16 +1963,16 @@ class ReceivingGoodsDeliveryController extends Controller
     {
         try {
 
-            $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history','rgd_child'])->where('rgd_no', $request->rgd_no)->first();
+            $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child'])->where('rgd_no', $request->rgd_no)->first();
 
-            if($request->complete_status == '정산완료' && $rgd->rgd_status6 != 'paid'){
+            if ($request->complete_status == '정산완료' && $rgd->rgd_status6 != 'paid') {
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     'rgd_status6' => 'paid',
                     'rgd_paid_date' => Carbon::now()->toDateTimeString()
                 ]);
             }
 
-            $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history','rgd_child'])->where('rgd_no', $request->rgd_no)->first();
+            $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child'])->where('rgd_no', $request->rgd_no)->first();
 
             return response()->json([
                 'message' => 'Success',

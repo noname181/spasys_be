@@ -63,16 +63,37 @@ class WarehousingRequestController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $warehousing = Warehousing::where('w_no', '=', $validated['w_no'])->first();
 
-            $warehousing_request = WarehousingRequest::with(['mb_no','warehousing'])->orderBy('wr_no', 'DESC');
+            $warehousing_request = WarehousingRequest::with(['mb_no','warehousing'])->where('wr_type','<>','List')->orderBy('wr_no', 'DESC');
             if($warehousing){
                 $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no'])->orwhere('w_no', '=', $warehousing->w_import_no);
             }else{
                 $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no']);
             }
 
-            $members = Member::where('mb_no', '!=', 0)->get();
-
             $warehousing_request = $warehousing_request->paginate($per_page, ['*'], 'page', $page);
+
+            return response()->json($warehousing_request);
+        } catch (\Exception $e) {
+            Log::error($e);
+            //return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function getWarehousingRequestList(WarehousingRequestRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+            $warehousing = Warehousing::where('w_no', '=', $validated['w_no'])->first();
+
+            $warehousing_request = WarehousingRequest::with(['mb_no','warehousing'])->where('wr_type','=','List')->orderBy('wr_no', 'DESC');
+            if($warehousing){
+                $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no'])->orwhere('w_no', '=', $warehousing->w_import_no);
+            }else{
+                $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no']);
+            }
+
+            $warehousing_request = $warehousing_request->first();
 
             return response()->json($warehousing_request);
         } catch (\Exception $e) {
