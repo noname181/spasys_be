@@ -108,46 +108,100 @@ class ManualController extends Controller
      * @param  ManualUpdateRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function update(ManualUpdateRequest $request, Manual $manual)
+    public function update(ManualUpdateRequest $request)
     {
         try {
-            $validated = $request->validated();
-            Log::error($validated['man_content']);
-            $manual->man_title = $validated['man_title'];
-            $manual->man_content = $validated['man_content'];
-            $manual->man_note = $validated['man_note'];
-            $manual->save();
+           $validated = $request->validated();
+           foreach ($request->data_menu as $key => $val) {
+                if(isset($val['man_no'])){
+                $manual = Manual::find($val['man_no']); 
+                $manual->man_title = $val['man_title']; 
+                $manual->man_content = $val['man_content']; 
+                $manual->man_note = $val['man_note']; 
+                $manual->man_title = $val['man_title']; 
+                $manual->save();
+                if(isset($validated['file'][$key])){
+                    $file = File::where('file_table_key', $val['man_no'])->where('file_table', 'manual')->first();
+                    $url = Storage::disk('public')->delete($file->file_url);
+                    $file->delete();
+                    
 
-            //FILE PART
+                    $path = join('/', ['files', 'manual', $val['man_no']]);
+                    $url = Storage::disk('public')->put($path, $validated['file'][$key]);
+                    File::insert([
+                        'file_table' => 'manual',
+                        'file_table_key' => $val['man_no'],
+                        'file_name_old' => $validated['file'][$key]->getClientOriginalName(),
+                        'file_name' => basename($url),
+                        'file_size' => $validated['file'][$key]->getSize(),
+                        'file_extension' => $validated['file'][$key]->extension(),
+                        'file_position' => 0,
+                        'file_url' => $url
+                    ]);
+                }
+                } else {
+                    $manual_no = Manual::insertGetId([
+                        'mb_no' => Auth::user()->mb_no,
+                        'man_title' => $val['man_title'],
+                        'man_content' => $val['man_content'],
+                        'man_note' => $val['man_note'],
+                        'menu_no' => $val['menu_no'],
+                        'man_tab'=>$val['man_tab']
+                    ]);
+        
+                    $path = join('/', ['files', 'manual', $manual_no]);
+                    $url = Storage::disk('public')->put($path, $validated['file'][$key]);
+                    File::insert([
+                        'file_table' => 'manual',
+                        'file_table_key' => $manual_no,
+                        'file_name_old' => $validated['file'][$key]->getClientOriginalName(),
+                        'file_name' => basename($url),
+                        'file_size' => $validated['file'][$key]->getSize(),
+                        'file_extension' => $validated['file'][$key]->extension(),
+                        'file_position' => 0,
+                        'file_url' => $url
+                    ]);
+                }
+                
+           
+           }
+        //     Log::error($validated['man_content']);
+        //     $manual->man_title = $validated['man_title'];
+        //     $manual->man_content = $validated['man_content'];
+        //     $manual->man_note = $validated['man_note'];
+        //     $manual->save();
 
-            if (isset($validated['file'])) {
-                $path = join('/', ['files', 'manual']);
+        //     //FILE PART
 
-                // remove old image
-                $file = File::where('file_table_key', $manual->man_no)->where('file_table', 'manual')->first();
-                $url = Storage::disk('public')->delete($file->file_url);
-                $file->delete();
+        //     if (isset($validated['file'])) {
+        //         $path = join('/', ['files', 'manual']);
 
-                $path = join('/', ['files', 'manual', $manual->man_no]);
-                $url = Storage::disk('public')->put($path, $validated['file']);
+        //         // remove old image
+        //         $file = File::where('file_table_key', $manual->man_no)->where('file_table', 'manual')->first();
+        //         $url = Storage::disk('public')->delete($file->file_url);
+        //         $file->delete();
 
-                File::insert([
-                    'file_table' => 'manual',
-                    'file_table_key' => $manual->man_no,
-                    'file_name_old' => $validated['file']->getClientOriginalName(),
-                    'file_name' => basename($url),
-                    'file_size' => $validated['file']->getSize(),
-                    'file_extension' => $validated['file']->extension(),
-                    'file_position' => 0,
-                    'file_url' => $url
-                ]);
-            }
+        //         $path = join('/', ['files', 'manual', $manual->man_no]);
+        //         $url = Storage::disk('public')->put($path, $validated['file']);
 
-            DB::commit();
+        //         File::insert([
+        //             'file_table' => 'manual',
+        //             'file_table_key' => $manual->man_no,
+        //             'file_name_old' => $validated['file']->getClientOriginalName(),
+        //             'file_name' => basename($url),
+        //             'file_size' => $validated['file']->getSize(),
+        //             'file_extension' => $validated['file']->extension(),
+        //             'file_position' => 0,
+        //             'file_url' => $url
+        //         ]);
+        //     }
 
-            return response()->json(['message' => Messages::MSG_0007], 200);
+           DB::commit();
+
+            return response()->json(['12313213' => $validated], 200);
         } catch (\Exception $e) {
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0002], 500);
         }
     }
