@@ -2498,7 +2498,16 @@ class RateDataController extends Controller
                 $rdg2 = RateDataGeneral::where('rgd_no', $rgd2->rgd_no)
                     ->where('rdg_bill_type', 'expectation_monthly')->first();
                 $rdgs2[] = $rdg2;
+
+                $rmd = RateMetaData::where('rgd_no', $rgd2['rgd_parent_no'])->where('set_type', 'work_monthly')->first();
+                if(isset($rmd->rmd_no)){
+                    $work_sum = RateData::where('rmd_no', $rmd->rmd_no)->sum('rd_data4');
+                    $rgd2['work_sum'] = $work_sum;
+                }else {
+                    $rgd2['work_sum'] = 0;
+                }
             }
+
 
             $adjustment_group_choose = [];
 

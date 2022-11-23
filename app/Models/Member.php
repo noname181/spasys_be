@@ -63,7 +63,8 @@ class Member extends Authenticatable
         'mb_push_yn',
         'mb_hp',
         'mb_tel',
-        'mb_note'
+        'mb_note',
+        'warehouse_code'
     ];
 
     protected $casts = [

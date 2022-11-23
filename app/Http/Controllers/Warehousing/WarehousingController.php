@@ -2307,6 +2307,17 @@ class WarehousingController extends Controller
                         $q->where('rgd_status4', '=', '예상경비청구서')->orWhereNull('rgd_status4');
                     })
                     ->get();
+
+                foreach($rgds as $key => $rgd){
+                    $rmd = RateMetaData::where('rgd_no', $rgd['rgd_parent_no'])->where('set_type', 'work_monthly')->first();
+                    if(isset($rmd->rmd_no)){
+                        $work_sum = RateData::where('rmd_no', $rmd->rmd_no)->sum('rd_data4');
+                        $rgd['work_sum'] = $work_sum;
+                    }else {
+                        $rgd['work_sum'] = 0;
+                    }
+                }
+
                 $warehousing = Warehousing::with(['w_ew_many' => function ($q) {
 
                     $q->withCount([
@@ -2347,6 +2358,16 @@ class WarehousingController extends Controller
                     ->where('rgd_settlement_number', $rgd->rgd_settlement_number)
 
                     ->get();
+                
+                foreach($rgds as $key => $rgd){
+                    $rmd = RateMetaData::where('rgd_no', $rgd['rgd_parent_no'])->where('set_type', 'work_monthly')->first();
+                    if(isset($rmd->rmd_no)){
+                        $work_sum = RateData::where('rmd_no', $rmd->rmd_no)->sum('rd_data4');
+                        $rgd['work_sum'] = $work_sum;
+                    }else {
+                        $rgd['work_sum'] = 0;
+                    }
+                }
                 $warehousing = Warehousing::with(['w_ew_many' => function ($q) {
 
                     $q->withCount([
@@ -2389,6 +2410,16 @@ class WarehousingController extends Controller
                     ->where('rgd_status1', '=', '입고')
                     ->where('rgd_settlement_number', $rgd->rgd_settlement_number)
                     ->get();
+
+                foreach($rgds as $key => $rgd){
+                    $rmd = RateMetaData::where('rgd_no', $rgd['rgd_parent_no'])->where('set_type', 'work_monthly')->first();
+                    if(isset($rmd->rmd_no)){
+                        $work_sum = RateData::where('rmd_no', $rmd->rmd_no)->sum('rd_data4');
+                        $rgd['work_sum'] = $work_sum;
+                    }else {
+                        $rgd['work_sum'] = 0;
+                    }
+                }
 
                 $warehousing = Warehousing::with(['w_ew_many' => function ($q) {
 
@@ -2751,7 +2782,7 @@ class WarehousingController extends Controller
                     }
 
 
-                    $item->rate_data = $rate_data->count() == 0 ? 0 : 1;
+                    $item->rate_data = count($rate_data) == 0 ? 0 : 1;
                     $i = 0;
                     $k = 0;
                     $completed_date = null;

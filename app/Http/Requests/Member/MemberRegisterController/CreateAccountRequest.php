@@ -88,6 +88,9 @@ class CreateAccountRequest extends BaseFormRequest
                 //'max:255',
                 //'regex:/^((?:https?\:\/\/|www\.)(?:[-a-z0-9]+\.)*[-a-z0-9]+.*)$/',
             ],
+            'warehouse_code' => [
+                '',
+            ],
 
         ];
     }
