@@ -71,7 +71,6 @@ class QnaController extends Controller
             //DB::beginTransaction();
             // FIXME hard set mb_no = 1
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
-            return $validated;
             $data_qna = [
                 'mb_no' => $member->mb_no,
                 'qna_status' => $validated['qna_status'],
