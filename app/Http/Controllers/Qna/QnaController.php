@@ -71,7 +71,7 @@ class QnaController extends Controller
             //DB::beginTransaction();
             // FIXME hard set mb_no = 1
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
-            $qna_no = Qna::insertGetId([
+            $data_qna = [
                 'mb_no' => $member->mb_no,
                 'qna_status' => $validated['qna_status'],
                 'mb_no_target' => $validated['mb_no_target'],
@@ -80,7 +80,8 @@ class QnaController extends Controller
                 'answer_for' => 0,
                 'depth_path' => '',
                 'depth_level' => 0,
-            ]);
+            ];
+            $qna_no = Qna::insertGetId($data_qna);
 
             $path = join('/', ['files', 'qna', $qna_no]);
 

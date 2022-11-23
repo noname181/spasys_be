@@ -183,6 +183,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/warehousing_request', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class,'__invoke']);
     Route::post('/warehousing_request_paginate', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class,'paginateWarehousingRequest']);
     Route::post('/get_warehousing_request', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class,'getWarehousingRequest']);
+    Route::post('/get_warehousing_request_list', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class,'getWarehousingRequestList']);
+    
     Route::post('/create', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class,'createWarehousingRequest']);
 
     Route::get('receiving_goods_delivery/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'__invoke']);
