@@ -328,6 +328,7 @@ class MemberController extends Controller
                 'role_no' => $validated['role_no'],
                 'mb_language' => $validated['mb_language'],
                 'mb_token' => $validated['mb_token'],
+                'warehouse_code' => $validated['warehouse_code'],
             ]);
 
 
@@ -365,6 +366,7 @@ class MemberController extends Controller
             $memeber->mb_note = $validated['mb_note'];
             $memeber->mb_tel = $validated['mb_tel'];
             $memeber->mb_id = $validated['mb_id'];
+            $memeber->warehouse_code = $validated['warehouse_code'];
             $memeber->save();
 
             Company::where('co_no', $memeber->co_no)->update([
