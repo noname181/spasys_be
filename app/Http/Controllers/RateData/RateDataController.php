@@ -9,6 +9,7 @@ use App\Http\Requests\RateData\RateDataSendMailRequest;
 use App\Models\AdjustmentGroup;
 use App\Models\CancelBillHistory;
 use App\Models\Company;
+use App\Models\Contract;
 use App\Models\Export;
 use App\Models\Import;
 use App\Models\RateData;
@@ -1581,7 +1582,7 @@ class RateDataController extends Controller
                 'contract.c_integrated_calculate_yn as c_integrated_calculate_yn',
                 'contract.c_calculate_deadline_yn as c_calculate_deadline_yn',
             ])->join('contract', 'contract.co_no', 'company.co_no')->with(['co_parent'])->where('co_license', $import->ti_co_license)->first();
-           
+
             if($user->mb_type == 'shop'){
                 $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_tracking_code', $is_no)->first();
 
@@ -1634,7 +1635,6 @@ class RateDataController extends Controller
                 'rate_data' => $rate_data,
                 'export' => $export,
                 'adjustment_group' => $adjustment_group,
-                'rgd' => $rgd->w_no,
             ], 200);
         } catch (\Exception $e) {
             DB::rollback();
@@ -2006,6 +2006,15 @@ class RateDataController extends Controller
                 $rdg = RateDataGeneral::with(['warehousing'])->where('rgd_no', $rgd_no)->where('rdg_bill_type', 'additional')->first();
             }
             $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
+
+            $user = Auth::user();
+
+            $contract = Contract::where('co_no',  $user->co_no)->first();
+            if(isset($contract->c_calculate_deadline_yn)){
+                $rgd['c_calculate_deadline_yn'] = $contract->c_calculate_deadline_yn;
+            }else {
+                $rgd['c_calculate_deadline_yn'] = 'n';
+            }
 
             DB::commit();
             return response()->json([

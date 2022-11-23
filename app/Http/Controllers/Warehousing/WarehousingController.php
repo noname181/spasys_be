@@ -10,6 +10,7 @@ use App\Http\Requests\Warehousing\WarehousingSearchRequest;
 use App\Models\AdjustmentGroup;
 use App\Models\CompanySettlement;
 use App\Models\Company;
+use App\Models\Contract;
 use App\Models\RateData;
 use App\Models\TaxInvoiceDivide;
 use App\Models\ImportExpected;
@@ -2273,8 +2274,15 @@ class WarehousingController extends Controller
         try {
             $check_cofirm = 0;
             $check_paid = 0;
+            $user = Auth::user();
             if ($type == 'monthly') {
                 $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing'])->where('rgd_no', $rgd_no)->first();
+                $contract = Contract::where('co_no',  $user->co_no)->first();
+                if(isset($contract->c_calculate_deadline_yn)){
+                    $rgd['c_calculate_deadline_yn'] = $contract->c_calculate_deadline_yn;
+                }else {
+                    $rgd['c_calculate_deadline_yn'] = 'n';
+                }
                 $w_no = $rgd->w_no;
                 $co_no = $rgd->warehousing->co_no;
                 $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
@@ -2308,15 +2316,15 @@ class WarehousingController extends Controller
                     })
                     ->get();
 
-                foreach($rgds as $key => $rgd){
-                    $rmd = RateMetaData::where('rgd_no', $rgd['rgd_parent_no'])->where('set_type', 'work_monthly')->first();
-                    if(isset($rmd->rmd_no)){
-                        $work_sum = RateData::where('rmd_no', $rmd->rmd_no)->sum('rd_data4');
-                        $rgd['work_sum'] = $work_sum;
-                    }else {
-                        $rgd['work_sum'] = 0;
+                    foreach($rgds as $key => $rgd2){
+                        $rmd = RateMetaData::where('rgd_no', $rgd2['rgd_parent_no'])->where('set_type', 'work_monthly')->first();
+                        if(isset($rmd->rmd_no)){
+                            $work_sum = RateData::where('rmd_no', $rmd->rmd_no)->sum('rd_data4');
+                            $rgd2['work_sum'] = $work_sum;
+                        }else {
+                            $rgd2['work_sum'] = 0;
+                        }
                     }
-                }
 
                 $warehousing = Warehousing::with(['w_ew_many' => function ($q) {
 
@@ -2342,6 +2350,12 @@ class WarehousingController extends Controller
             }
             if ($type == 'monthly_edit') {
                 $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing'])->where('rgd_no', $rgd_no)->first();
+                $contract = Contract::where('co_no',  $user->co_no)->first();
+                if(isset($contract->c_calculate_deadline_yn)){
+                    $rgd['c_calculate_deadline_yn'] = $contract->c_calculate_deadline_yn;
+                }else {
+                    $rgd['c_calculate_deadline_yn'] = 'n';
+                }
                 $w_no = $rgd->w_no;
                 $co_no = $rgd->warehousing->co_no;
                 $created_at = Carbon::createFromFormat('Y.m.d H:i:s', $rgd->created_at->format('Y.m.d H:i:s'));
@@ -2358,14 +2372,14 @@ class WarehousingController extends Controller
                     ->where('rgd_settlement_number', $rgd->rgd_settlement_number)
 
                     ->get();
-                
-                foreach($rgds as $key => $rgd){
-                    $rmd = RateMetaData::where('rgd_no', $rgd['rgd_parent_no'])->where('set_type', 'work_monthly')->first();
+
+                foreach($rgds as $key => $rgd2){
+                    $rmd = RateMetaData::where('rgd_no', $rgd2['rgd_parent_no'])->where('set_type', 'work_monthly')->first();
                     if(isset($rmd->rmd_no)){
                         $work_sum = RateData::where('rmd_no', $rmd->rmd_no)->sum('rd_data4');
-                        $rgd['work_sum'] = $work_sum;
+                        $rgd2['work_sum'] = $work_sum;
                     }else {
-                        $rgd['work_sum'] = 0;
+                        $rgd2['work_sum'] = 0;
                     }
                 }
                 $warehousing = Warehousing::with(['w_ew_many' => function ($q) {
@@ -2392,6 +2406,7 @@ class WarehousingController extends Controller
             } else if ($type == 'additional_monthly') {
                 $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing'])->where('rgd_no', $rgd_no)->first();
                 $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing'])->where('rgd_no', $rgd->rgd_parent_no)->first();
+
                 $w_no = $rgd->w_no;
                 $co_no = $rgd->warehousing->co_no;
                 $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
@@ -2411,15 +2426,15 @@ class WarehousingController extends Controller
                     ->where('rgd_settlement_number', $rgd->rgd_settlement_number)
                     ->get();
 
-                foreach($rgds as $key => $rgd){
-                    $rmd = RateMetaData::where('rgd_no', $rgd['rgd_parent_no'])->where('set_type', 'work_monthly')->first();
-                    if(isset($rmd->rmd_no)){
-                        $work_sum = RateData::where('rmd_no', $rmd->rmd_no)->sum('rd_data4');
-                        $rgd['work_sum'] = $work_sum;
-                    }else {
-                        $rgd['work_sum'] = 0;
+                    foreach($rgds as $key => $rgd2){
+                        $rmd = RateMetaData::where('rgd_no', $rgd2['rgd_parent_no'])->where('set_type', 'work_monthly')->first();
+                        if(isset($rmd->rmd_no)){
+                            $work_sum = RateData::where('rmd_no', $rmd->rmd_no)->sum('rd_data4');
+                            $rgd2['work_sum'] = $work_sum;
+                        }else {
+                            $rgd2['work_sum'] = 0;
+                        }
                     }
-                }
 
                 $warehousing = Warehousing::with(['w_ew_many' => function ($q) {
 
@@ -2443,8 +2458,22 @@ class WarehousingController extends Controller
 
                 $time = str_replace('-', '.', $start_date) . ' ~ ' . str_replace('-', '.', $end_date);
                 $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing'])->where('rgd_no', $rgd_no)->first();
+                $contract = Contract::where('co_no',  $user->co_no)->first();
+                if(isset($contract->c_calculate_deadline_yn)){
+                    $rgd['c_calculate_deadline_yn'] = $contract->c_calculate_deadline_yn;
+                }else {
+                    $rgd['c_calculate_deadline_yn'] = 'n';
+                }
             } else {
                 $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing'])->where('rgd_no', $rgd_no)->first();
+
+                $contract = Contract::where('co_no',  $user->co_no)->first();
+                if(isset($contract->c_calculate_deadline_yn)){
+                    $rgd['c_calculate_deadline_yn'] = $contract->c_calculate_deadline_yn;
+                }else {
+                    $rgd['c_calculate_deadline_yn'] = 'n';
+                }
+
                 $w_no = $rgd->w_no;
                 $check_cofirm = ReceivingGoodsDelivery::where('rgd_status5', 'confirmed')->where('rgd_bill_type', 'final')->where('w_no', $w_no)->get()->count();
                 $check_paid = ReceivingGoodsDelivery::where('rgd_status5', 'paid')->where('rgd_bill_type', 'additional')->where('w_no', $w_no)->get()->count();
@@ -3133,7 +3162,7 @@ class WarehousingController extends Controller
                     }
 
 
-                    $item->rate_data = $rate_data->count() == 0 ? 0 : 1;
+                    $item->rate_data = count($rate_data) == 0 ? 0 : 1;
 
                     $rmd = RateMetaData::where(
                         [
@@ -3360,7 +3389,7 @@ class WarehousingController extends Controller
                     }
 
 
-                    $item->rate_data = $rate_data->count() == 0 ? 0 : 1;
+                    $item->rate_data = count($rate_data) == 0 ? 0 : 1;
 
                     return $item;
                 })
@@ -3369,7 +3398,7 @@ class WarehousingController extends Controller
             return response()->json($warehousing);
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             //return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -3617,13 +3646,29 @@ class WarehousingController extends Controller
             if (isset($validated['service_korean_name'])) {
                 $warehousing->where('service_korean_name', '=', $validated['service_korean_name']);
             }
+
+
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             //return DB::getQueryLog();
+
+
+            $contract = Contract::where('co_no',  $user->co_no)->first();
+
+            $warehousing->setCollection(
+                $warehousing->getCollection()->map(function ($item) use($contract){
+                    if(isset($contract->c_calculate_deadline_yn))
+                        $item->c_calculate_deadline_yn = $contract->c_calculate_deadline_yn;
+                    else
+                        $item->c_calculate_deadline_yn = 'n';
+                    return $item;
+                })
+            );
+
 
             return response()->json($warehousing);
         } catch (\Exception $e) {
             Log::error($e);
-            //
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -3675,12 +3720,16 @@ class WarehousingController extends Controller
                 $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 't_export'])->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
+                    })->whereHas('co_no.contract', function ($q) use ($user) {
+                        $q->where('c_calculate_deadline_yn', 'y');
                     });
                 });
             } else if ($user->mb_type == 'shipper') {
                 $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
+                    })->whereHas('co_no.contract', function ($q) use ($user) {
+                        $q->where('c_calculate_deadline_yn', 'y');
                     });
                 });
             } else if ($user->mb_type == 'spasys') {
@@ -3690,6 +3739,8 @@ class WarehousingController extends Controller
                     })->orWhereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
+                })->whereHas('w_no.co_no.co_parent.contract', function ($q) use ($user) {
+                    $q->where('c_calculate_deadline_yn', 'y');
                 });
             }
             $warehousing->where(function ($q) {
