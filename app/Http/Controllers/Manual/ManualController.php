@@ -14,7 +14,17 @@ use App\Http\Requests\Manual\ManualCreateRequest;
 use App\Http\Requests\Manual\ManualUpdateRequest;
 use App\Http\Requests\Manual\ManualSuneditorRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
+use Illuminate\Support\Facades\Date;
+
+use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Illuminate\Pagination\Paginator;
+
+use Illuminate\Pagination\LengthAwarePaginator;
 class ManualController extends Controller
 {
     /**
@@ -30,6 +40,16 @@ class ManualController extends Controller
         //     $file = Storage::url($f->file_url);
         //     $manual['file'] = $file;
         // }
+       
+           $get_manual = collect($get_manual)->map(function ($item) {
+                $file_img = File::where('file_table_key', $item->man_no)->where('file_table', 'manual')->first();
+                if (isset($file_img)) {
+                    $file = Storage::url($file_img->file_url);
+                    $item->file = $file;
+                }
+                return $item;
+            });
+        
          return response()->json(['data_menu'=>$get_manual]);
     }
 
@@ -45,7 +65,7 @@ class ManualController extends Controller
 
         try {
             DB::beginTransaction();
-            foreach ($request->data_menu as $val) {
+            foreach ($request->data_menu as $key => $val) {
             $manual_no = Manual::insertGetId([
                 'mb_no' => Auth::user()->mb_no,
                 'man_title' => $val['man_title'],
@@ -55,22 +75,20 @@ class ManualController extends Controller
                 'man_tab'=>$val['man_tab']
             ]);
 
-            
-            }
-            foreach ($validated['file'] as $val) {
             $path = join('/', ['files', 'manual', $manual_no]);
-            $url = Storage::disk('public')->put($path, $val);
+            $url = Storage::disk('public')->put($path, $validated['file'][$key]);
             File::insert([
                 'file_table' => 'manual',
                 'file_table_key' => $manual_no,
-                'file_name_old' => $val->getClientOriginalName(),
+                'file_name_old' => $validated['file'][$key]->getClientOriginalName(),
                 'file_name' => basename($url),
-                'file_size' => $val->getSize(),
-                'file_extension' => $val->extension(),
+                'file_size' => $validated['file'][$key]->getSize(),
+                'file_extension' => $validated['file'][$key]->extension(),
                 'file_position' => 0,
                 'file_url' => $url
             ]);
             }
+          
 
             DB::commit();
             return response()->json([
