@@ -25,7 +25,7 @@ class ImportExpected extends Model
         'tie_no',
         'tie_status',
         'tie_status_2',
-        'warehouse_code',
+        'tie_warehouse_code',
         'tie_logistic_manage_number',
         'tie_register_id',
         'tie_is_date',
@@ -60,7 +60,7 @@ class ImportExpected extends Model
 
     public function company_spasys()
     {
-        return $this->hasOne(Company::class,'warehouse_code','warehouse_code');
+        return $this->hasOne(Company::class,'warehouse_code','tie_warehouse_code')->with(['co_parent','rate_data_1']);
     }
 
     public function receiving_goods_delivery()
