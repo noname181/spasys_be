@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Service;
+use App\Models\Manual;
 
 class Menu extends Model
 {
@@ -51,6 +52,11 @@ class Menu extends Model
     public function menu_parent()
     {
         return $this->hasOne(Menu::class, 'menu_no', 'menu_parent_no');
+    }
+
+    public function manual()
+    {
+        return $this->hasMany(Manual::class, 'menu_no', 'menu_no');
     }
 
     public function menu_childs()
