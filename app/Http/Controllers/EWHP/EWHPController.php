@@ -73,7 +73,7 @@ class EWHPController extends Controller
                     "ti_i_weight_unit" => $value['i_weight_unit'],
                     "ti_co_license" => $value['co_license'],
                     "ti_logistic_type" => $value['logistic_type'],
-                    "warehouse_code" => "abc001",
+                    "ti_warehouse_code" => "abc001",
                 ]);
                 if($import >= 1){
                     $count++;
@@ -153,7 +153,7 @@ class EWHPController extends Controller
                     'tie_m_bl' => $value['m_bl'],
                     'tie_h_bl' => $value['h_bl'],
                     'tie_is_name_eng' => $value['is_name_eng'],
-                    "warehouse_code" => "abc001",
+                    'tie_warehouse_code' => "abc001",
                 ]);
                 if($import_expected >= 1){
                     $count++;
