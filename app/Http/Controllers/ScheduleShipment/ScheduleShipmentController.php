@@ -137,7 +137,6 @@ class ScheduleShipmentController extends Controller
             }
 
             $schedule_shipment = $schedule_shipment->paginate($per_page, ['*'], 'page', $page);
-
             return response()->json($schedule_shipment);
         } catch (\Exception $e) {
             Log::error($e);
