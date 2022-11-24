@@ -137,7 +137,6 @@ class ScheduleShipmentController extends Controller
             }
 
             $schedule_shipment = $schedule_shipment->paginate($per_page, ['*'], 'page', $page);
-
             return response()->json($schedule_shipment);
         } catch (\Exception $e) {
             Log::error($e);
@@ -196,9 +195,7 @@ class ScheduleShipmentController extends Controller
                         'sub_domain' => isset($schedule['sub_domain']) ? $schedule['sub_domain'] : null,
                         'sub_domain_seq' => isset($schedule['sub_domain_seq']) ? $schedule['sub_domain_seq'] : null,
                     ];
-                    return $data_schedule;
                     $ss_no = ScheduleShipment::insertGetId($data_schedule);
-                    return $ss_no;
 
                     if(isset($schedule['order_products'])){
                         foreach ($schedule['order_products'] as $ss_info => $schedule_info) {
