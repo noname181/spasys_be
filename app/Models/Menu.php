@@ -56,7 +56,7 @@ class Menu extends Model
 
     public function manual()
     {
-        return $this->hasMany(Manual::class, 'menu_no', 'menu_no');
+        return $this->hasMany(Manual::class, 'menu_no', 'menu_no')->with(['file']);
     }
 
     public function menu_childs()
