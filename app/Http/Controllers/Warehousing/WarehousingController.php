@@ -3662,10 +3662,13 @@ class WarehousingController extends Controller
                         $item->c_calculate_deadline_yn = 'n';
 
                     $rmd = RateMetaData::where('rgd_no', $item->rgd_no)->where('set_type', 'bonded1')->first();
-                    $rate_data = RateData::where('rmd_no', $rmd->rmd_no)->where('rd_cate2', '할인금액')->first();
-
-                    $item->discount_money = isset($rate_data->rd_data4) ? ($rate_data->rd_data4 != "" ? $rate_data->rd_data4 : 0) : 0;
-                    
+                    if(isset($rmd->rmd_no)){
+                        $rate_data = RateData::where('rmd_no', $rmd->rmd_no)->where('rd_cate2', '할인금액')->first();
+                        $item->discount_money = isset($rate_data->rd_data4) ? ($rate_data->rd_data4 != "" ? $rate_data->rd_data4 : 0) : 0;
+                    }else {
+                        $item->discount_money = 0;
+                    }
+                   
 
                     return $item;
                 })
