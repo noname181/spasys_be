@@ -1318,6 +1318,7 @@ class RateDataController extends Controller
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
+                'co_no' => $co_no
             ], 201);
         } catch (\Exception $e) {
             DB::rollback();
@@ -1653,10 +1654,16 @@ class RateDataController extends Controller
         try {
             $rate_data = RateData::where('rd_cate_meta1', $service_korean_name);
 
-            $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->orderBy('rmd_no', 'DESC')->first();
-            $rate_data = $rate_data->where('rd_co_no', $co_no);
-            if (isset($rmd->rmd_no)) {
-                $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+           if ($user->mb_type == 'spasys') {
+                $rate_data = $rate_data->where('co_no', $co_no);
+            } else if ($user->mb_type == 'shop' || $user->mb_type == 'shipper') {
+                $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
+                $rate_data = $rate_data->where('rd_co_no', $co_no);
+                if (isset($rmd->rmd_no)) {
+                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+                }
+            } else {
+                $rate_data = $rate_data->where('co_no', $co_no);
             }
 
             $rate_data = $rate_data->get();
@@ -1736,7 +1743,7 @@ class RateDataController extends Controller
             $rate_data = RateData::where('rd_cate_meta1', $service_korean_name);
 
             if ($user->mb_type == 'spasys') {
-                $co_no = $service == 'distribution' ? $rgd->warehousing->company->co_parent->co_no : $rgd->warehousing->co_no;
+                $co_no = ($service == 'distribution' || $service == 'bonded') ? $rgd->warehousing->company->co_parent->co_no : $rgd->warehousing->co_no;
             } else if ($user->mb_type == 'shop') {
                 $co_no = $rgd->warehousing->company->co_no;
             } else {
