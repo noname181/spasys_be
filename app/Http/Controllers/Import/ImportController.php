@@ -109,16 +109,21 @@ class ImportController extends Controller
 
                 if ($count != 0) {
                     $items->with(['warehousing_item2' => function ($query) use ($validated) {
-                        $query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고_spasys');
-                    }]);
-
-                    $items->whereHas('warehousing_item2', function ($query) use ($validated) {
                         if ($validated['type'] == 'IW') {
                             $query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고_spasys');
                         } else {
                             $query->where('w_no', '=', $validated['w_no']);
                         }
-                    });
+                        //$query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고_spasys');
+                    }]);
+
+                    // $items->whereHas('warehousing_item2', function ($query) use ($validated) {
+                    //     if ($validated['type'] == 'IW') {
+                    //         $query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고_spasys');
+                    //     } else {
+                    //         $query->where('w_no', '=', $validated['w_no']);
+                    //     }
+                    // });
                 }
             }
 
@@ -129,6 +134,8 @@ class ImportController extends Controller
             $items->where('item_service_name', '유통가공');
 
             $items = $items->get();
+
+
             return response()->json(
                 [
                     'message' => Messages::MSG_0007,
@@ -270,11 +277,11 @@ class ImportController extends Controller
     public function save_import_storeday(Request $request)
     {
         try {
-            
+
             DB::beginTransaction();
             Import::where('ti_logistic_manage_number', $request->ti_logistic_manage_number)->update([
-                    'ti_logistic_type' => $request->ti_logistic_type,
-                    'ti_i_storeday' => $request->storagedays,
+                'ti_logistic_type' => $request->ti_logistic_type,
+                'ti_i_storeday' => $request->storagedays,
             ]);
 
             Company::where('co_no', $request->co_no)->update([

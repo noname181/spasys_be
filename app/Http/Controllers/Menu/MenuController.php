@@ -8,6 +8,7 @@ use App\Http\Requests\Menu\MenuUpdateRequest;
 
 use App\Models\Member;
 use App\Models\Menu;
+use App\Models\Manual;
 use App\Models\Service;
 use App\Models\Company;
 
@@ -178,7 +179,18 @@ class MenuController extends Controller
 
         }
     }
+    public function get_menu_by_path($menu_path)
+    {
+        try {
+            $menu = Menu::with('manual')->where('menu_url', $menu_path)->first();
+           
 
+            return response()->json(['menu' => $menu]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0002], 500);
+        }
+    }
     public function get_menu($menu_no)
     {
         try {
