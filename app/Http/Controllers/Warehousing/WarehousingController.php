@@ -4305,7 +4305,6 @@ class WarehousingController extends Controller
         try {
             DB::beginTransaction();
             $user = Auth::user();
-
             if ($user->mb_type == 'shop') {
                 $warehousing2 = Warehousing::join(
                     DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
@@ -4370,7 +4369,7 @@ class WarehousingController extends Controller
                 });
 
                 $warehousing = Warehousing::with('mb_no')
-                    ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent', 'warehousing_child'])->where('w_category_name', '=', '수입풀필먼트')->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')
+                    ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent', 'warehousing_child', 'rate_data_general'])->where('w_category_name', '=', '수입풀필먼트')->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')
                     ->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
@@ -4430,7 +4429,10 @@ class WarehousingController extends Controller
             }
 
             $amount_export = $schedule_shipment->sum('qty');
-
+           //  return $warehousing->get();
+            $first_name_item = $warehousing->get()[0]['warehousing_item'][0]['item']['item_name'];
+            $total_item = $warehousing->get()[0]['warehousing_item']->count();
+            $final_total = (($total_item / 2 )  - 1 );
             $w_no_data = Warehousing::insertGetId([
                 'mb_no' => $user->mb_no,
                 'w_schedule_amount' => $amount,
@@ -4445,7 +4447,6 @@ class WarehousingController extends Controller
             Warehousing::where('w_no', $w_no_data)->update([
                 'w_schedule_number' => $schedule_number
             ]);
-
             //THUONG EDIT TO MAKE SETTLEMENT
             $rgd_no = ReceivingGoodsDelivery::insertGetId([
                 'mb_no' => $user->mb_no,
@@ -4455,6 +4456,7 @@ class WarehousingController extends Controller
                 'rgd_status2' => '작업완료',
                 'rgd_monthbill_start' => Carbon::createFromFormat('Y-m-d', $request->from_date),
                 'rgd_monthbill_end' => Carbon::createFromFormat('Y-m-d', $request->to_date),
+                'rgd_item_first_name' => $first_name_item .'외' . ' ' . $final_total .'건',
             ]);
 
             $rdg_no = RateDataGeneral::insertGetId([

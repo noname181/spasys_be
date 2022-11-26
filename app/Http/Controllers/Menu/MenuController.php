@@ -167,13 +167,11 @@ class MenuController extends Controller
                 'menu_use_yn' => $validated['menu_use_yn'],
                 'service_no_array' => $validated['menu_service_no_array'],
                 ]);
-
-
-
             DB::commit();
             // return $menu_no->toSql();
             return response()->json([
                 'message' => Messages::MSG_0007,
+                'menu_no' => $menu_no
             ], 201);
         } catch (\Throwable $e) {
             DB::rollback();

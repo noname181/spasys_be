@@ -47,4 +47,9 @@ class WarehousingItem extends Model
     {
         return $this->hasOne(Item::class, 'item_no', 'item_no');
     }
+
+    public function item()
+    {
+        return $this->hasOne(Item::class, 'item_no', 'item_no');
+    }
 }

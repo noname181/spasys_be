@@ -1743,7 +1743,7 @@ class RateDataController extends Controller
             $rate_data = RateData::where('rd_cate_meta1', $service_korean_name);
 
             if ($user->mb_type == 'spasys') {
-                $co_no = $service == 'distribution' ? $rgd->warehousing->company->co_parent->co_no : $rgd->warehousing->co_no;
+                $co_no = ($service == 'distribution' || $service == 'bonded') ? $rgd->warehousing->company->co_parent->co_no : $rgd->warehousing->co_no;
             } else if ($user->mb_type == 'shop') {
                 $co_no = $rgd->warehousing->company->co_no;
             } else {

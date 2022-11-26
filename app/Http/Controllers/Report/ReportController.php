@@ -222,7 +222,7 @@ class ReportController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -333,6 +333,8 @@ class ReportController extends Controller
             }else if($user->mb_type == 'spasys'){
                 $reports = Report::with(['files', 'reports_child','warehousing'])->whereHas('warehousing.co_no.co_parent.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
+                })->orWhereHas('warehousing.co_no', function($query) use ($user) {
+                    $query->where('co_no', $user->co_no);
                 })->orderBy('rp_parent_no', 'DESC');
             }
 

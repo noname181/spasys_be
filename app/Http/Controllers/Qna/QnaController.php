@@ -83,7 +83,13 @@ class QnaController extends Controller
             ];
             $qna_no = Qna::insertGetId($data_qna);
 
+            Qna::where('qna_no', $qna_no)->update([
+                'depth_path' => '-'.$qna_no.'-'
+            ]);
+
             $path = join('/', ['files', 'qna', $qna_no]);
+
+
 
             $files = [];
             if(!empty($validated['files'])){
@@ -138,6 +144,18 @@ class QnaController extends Controller
                 'depth_path' => '',
                 'depth_level' => $depth_level,
             ]);
+
+            $qna  = Qna::where('qna_no', $answer_for == 0 ? $validated['qna_no'] : $answer_for)->first();
+            if ($qna && $qna['depth_level'] < 5) {
+                $depth_path = $qna['depth_path'] . $qna_no . '-';
+            } else {
+                $depth_path =  '-' . $qna_no . '-';
+            }
+            
+            Qna::where('qna_no',$qna_no)->update([
+                'depth_path' => $depth_path
+            ]);
+
 
             $path = join('/', ['files', 'qna', $qna_no]);
 

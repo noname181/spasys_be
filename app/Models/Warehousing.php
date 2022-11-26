@@ -75,7 +75,7 @@ class Warehousing extends Model
 
     public function warehousing_item()
     {
-        return $this->hasMany(WarehousingItem::class, 'w_no', 'w_no')->with('item_no');
+        return $this->hasMany(WarehousingItem::class, 'w_no', 'w_no')->with(['item_no', 'item']);
     }
 
     public function warehousing_item_IW_spasys_confirm()
