@@ -336,6 +336,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('scheduleshipment')->name('scheduleshipment.')->group(function () {
         Route::post('/paginate', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'paginateScheduleShipments'])->name('paginate');
         Route::post('/api_schedule_shipments', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'apiScheduleShipments'])->name('api_schedule_shipments');
+        Route::post('/get_schedule_from_api', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'getScheduleFromApi'])->name('get_schedule_from_api');
         Route::get('/{scheduleshipment}', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'getScheduleShipmentById'])->name('get_schedule_shipment_by_id');
         Route::delete('/schedule_shipment_info/{schedule_shipment_info}', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'deleteScheduleShipmentInfo'])->name('delete_schedule_shipment_info');
         Route::delete('/schedule_shipment/{schedule_shipment}', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'deleteScheduleShipment'])->name('delete_schedule_shipment');
