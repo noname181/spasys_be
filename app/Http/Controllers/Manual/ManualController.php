@@ -220,4 +220,17 @@ class ManualController extends Controller
             'url' => Storage::url($url)
         ], 201);;
     }
+
+
+    public function deleteManual($manual){
+        try {
+            $manual_delete = Manual::where('man_no', $manual)->delete();
+
+            return response()->json(['message' => Messages::MSG_0007], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
 }

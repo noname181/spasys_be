@@ -269,7 +269,8 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('manual')->name('manual.')->group(function () {
         Route::post('/', [App\Http\Controllers\Manual\ManualController::class, 'create'])->name('register_manual');
-        Route::get('/{manual}', [App\Http\Controllers\Manual\ManualController::class, 'getManualById'])->name('get_role');
+        Route::get('/{manual}', [App\Http\Controllers\Manual\ManualController::class, 'getManualById'])->name('get_manual');
+        Route::delete('/{manual}', [App\Http\Controllers\Manual\ManualController::class, 'deleteManual'])->name('delete_manual');
         Route::patch('/{manual}', [App\Http\Controllers\Manual\ManualController::class, 'update'])->name('update_manual');
         Route::post('/suneditor', [App\Http\Controllers\Manual\ManualController::class, 'suneditor'])->name('update_manual_suneditor');
     });
