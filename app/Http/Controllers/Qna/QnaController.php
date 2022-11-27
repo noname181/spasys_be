@@ -129,6 +129,7 @@ class QnaController extends Controller
             // FIXME hard set mb_no = 1
             $depth_level = Qna::where('qna_no' ,'=' ,$validated['qna_no'])->first()['depth_level'];
             $answer_for = Qna::where('qna_no' ,'=' ,$validated['qna_no'])->first()['answer_for'];
+            $mb_no_target = Qna::where('qna_no' ,'=' ,$validated['qna_no'])->first()['mb_no'];
             $update_status = Qna::where('qna_no', $validated['qna_no'])->update([
                 'qna_status' => $validated['qna_status']
             ]);
@@ -137,7 +138,7 @@ class QnaController extends Controller
             $qna_no = Qna::insertGetId([
                 'mb_no' => $member->mb_no,
                 'qna_status' => 'receipt',
-                'mb_no_target' => 1,
+                'mb_no_target' => $mb_no_target,
                 'qna_title' => $validated['qna_title'],
                 'qna_content' => $validated['qna_content'],
                 'answer_for' => $answer_for == 0 ? $validated['qna_no'] : $answer_for,
@@ -151,7 +152,7 @@ class QnaController extends Controller
             } else {
                 $depth_path =  '-' . $qna_no . '-';
             }
-            
+
             Qna::where('qna_no',$qna_no)->update([
                 'depth_path' => $depth_path
             ]);
@@ -290,6 +291,85 @@ class QnaController extends Controller
 
             }])
             ->orderBy('qna_no', 'DESC')->where('depth_level', '=', '0');
+
+            if (isset($validated['from_date'])) {
+                $qna->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            }
+
+            if (isset($validated['to_date'])) {
+                $qna->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            }
+
+            if (isset($validated['qna_title'])) {
+                $qna->where('qna_title', 'like', '%' . $validated['qna_title'] . '%');
+            }
+
+            if (isset($validated['qna_content'])) {
+                $qna->where('qna_content', 'like', '%' . $validated['qna_content'] . '%');
+            }
+
+            if (isset($validated['qna_content'])) {
+                $qna->where('qna_content', 'like', '%' . $validated['qna_content'] . '%');
+            }
+
+            if (isset($validated['qna_status1']) || isset($validated['qna_status2']) || isset($validated['qna_status3'])) {
+                $qna->where(function($query) use ($validated) {
+                    $query->orwhere('qna_status', '=', $validated['qna_status1']);
+                    $query->orWhere('qna_status', '=', $validated['qna_status2']);
+                    $query->orWhere('qna_status', '=', $validated['qna_status3']);
+                });
+            }
+
+
+
+            if (isset($validated['search_string'])) {
+                $qna->where(function($query) use ($validated) {
+                    $query->where('qna_title', 'like', '%' . $validated['search_string'] . '%');
+                    $query->orWhere('qna_content', 'like', '%' . $validated['search_string'] . '%');
+                });
+            }
+
+            $members = Member::where('mb_no', '!=', 0)->get();
+
+            $qna = $qna->paginate($per_page, ['*'], 'page', $page);
+
+            return response()->json($qna);
+        } catch (\Exception $e) {
+            Log::error($e);
+
+            //return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function get_qnas_new(QnaSearchRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+
+            // If per_page is null set default data = 15
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+            $qna = Qna::where(function ($query) {
+                $query->where('mb_no_target', '=', Auth::user()->mb_no)
+                      ->orWhere('mb_no', '=', Auth::user()->mb_no);
+            })->with(['mb_no_target'=>function($query){
+                $query->select(['mb_name','mb_no']);
+            }])->with(['mb_no'=>function($query){
+                $query->select(['mb_name','mb_no']);
+            }])->with('files')->with(['childQna'=>function($query){
+
+                $query->with('files')->with(['mb_no_target'=>function($query){
+                    $query->select(['mb_name','mb_no']);
+                }])->with(['mb_no'=>function($query){
+                    $query->select(['mb_name','mb_no']);
+                }]);
+
+            }])->with(['member' => function($query){
+
+            }])
+            ->orderBy('depth_path')
+            ->orderBy('qna_no', 'DESC');
 
             if (isset($validated['from_date'])) {
                 $qna->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));

@@ -118,6 +118,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/reply_qna', [App\Http\Controllers\Qna\QnaController::class, 'reply_qna'])->name('reply_qna');
         Route::patch('/', [App\Http\Controllers\Qna\QnaController::class, 'update'])->name('update_qna');
         Route::post('/get_qnas', [App\Http\Controllers\Qna\QnaController::class, 'getQnA'])->name('get_qna');
+        Route::post('/get_qnas_new', [App\Http\Controllers\Qna\QnaController::class, 'get_qnas_new'])->name('get_qnas_new');
         Route::post('/delete_qna', [App\Http\Controllers\Qna\QnaController::class, 'delete_qna'])->name('delete_qna');
     });
 
@@ -184,7 +185,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/warehousing_request_paginate', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class,'paginateWarehousingRequest']);
     Route::post('/get_warehousing_request', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class,'getWarehousingRequest']);
     Route::post('/get_warehousing_request_list', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class,'getWarehousingRequestList']);
-    
+
     Route::post('/create', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class,'createWarehousingRequest']);
 
     Route::get('receiving_goods_delivery/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'__invoke']);
