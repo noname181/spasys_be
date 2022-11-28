@@ -45,7 +45,7 @@ class RateMetaData extends Model
     //     return $this->hasOne(RateData::class, 'rmd_no', 'rmd_no')->where('set_type','=','work')->sum('rd_data7');
     // }
     public function company() {
-        return $this->hasOne(Company::class, 'co_no', 'co_no')->with(['contract', 'co_parent']);
+        return $this->hasOne(Company::class, 'co_no', 'co_no')->with(['contract', 'co_parent','adjustment_group']);
     }
 
     public function member() {
