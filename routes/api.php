@@ -377,6 +377,8 @@ Route::middleware('auth')->group(function () {
 
             //GET RATE DATA BY RGD_NO
             Route::get('/spasys/{rgd_no}/{service}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByRgd']);
+            //GET RATE DATA BY CO_NO AND SERVICE
+            Route::get('/co_no_service/{co_no}/{service}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByConoService']);
 
             Route::post('/spasys4', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData4'])->name('get_spasys_rate_data4');
         });

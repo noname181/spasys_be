@@ -82,6 +82,7 @@ class RateMetaDataController extends Controller
             ->whereHas('member', function($q) use($user){
                 $q->where('co_no', $user->co_no);
             })
+            ->whereNull('set_type')
             ->orderBy('rmd_no', 'DESC');
             if(isset($validated['from_date'])) {
                 $rmd->where('created_at', '>=' , date('Y-m-d 00:00:00', strtotime($validated['from_date'])));

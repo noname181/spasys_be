@@ -1770,6 +1770,37 @@ class RateDataController extends Controller
         }
     }
 
+    public function getRateDataByConoService($co_no, $service)
+    {
+        $user = Auth::user();
+        try {
+            if($service == 'bonded'){
+                $service = '보세화물';
+            }else if($service == 'fulfillment'){
+                $service = '수입풀필먼트';
+            }else if($service == 'distribution'){
+                $service = '유통가공';
+            }
+            $rate_data = RateData::where('rd_cate_meta1', $service);
+
+
+            $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
+            $rate_data = $rate_data->where('rd_co_no', $co_no);
+            if (isset($rmd->rmd_no)) {
+                $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+            }
+
+
+            $rate_data = $rate_data->get();
+
+            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
     public function getSpasysRateData4(Request $request)
     {
 
