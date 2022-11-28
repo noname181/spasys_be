@@ -230,7 +230,7 @@ class ReportController extends Controller
     public function getReport($rp_no)
     {
         $rp_parent_no = Report::where('rp_no', $rp_no)->first()->rp_parent_no;
-        $report = Report::with('files','warehousing')->where('rp_parent_no', $rp_parent_no)->get();
+        $report = Report::with('files','warehousing','export')->where('rp_parent_no', $rp_parent_no)->get();
 
         return response()->json(['report' => $report]);
 
@@ -245,7 +245,7 @@ class ReportController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $reports = Report::with(['files', 'reports_child_mobi','warehousing'])->whereRaw('rp_no = rp_parent_no')->orderBy('rp_parent_no', 'DESC');
+            $reports = Report::with(['files', 'reports_child_mobi','warehousing','export'])->whereRaw('rp_no = rp_parent_no')->orderBy('rp_parent_no', 'DESC');
 
             if (isset($validated['from_date'])) {
                 $reports->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
@@ -322,6 +322,7 @@ class ReportController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
+           
             if($user->mb_type == 'shop'){
                 $reports = Report::with(['files', 'reports_child','warehousing'])->whereHas('warehousing.co_no.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
@@ -331,10 +332,10 @@ class ReportController extends Controller
                     $q->where('co_no', $user->co_no);
                 })->orderBy('rp_parent_no', 'DESC');
             }else if($user->mb_type == 'spasys'){
-                $reports = Report::with(['files', 'reports_child','warehousing'])->whereHas('warehousing.co_no.co_parent.co_parent',function ($q) use ($user){
+                $reports = Report::with(['files', 'reports_child','warehousing','export'])->whereHas('export.import_expected.company.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
-                })->orWhereHas('warehousing.co_no', function($query) use ($user) {
-                    $query->where('co_no', $user->co_no);
+                })->orwhereHas('warehousing.co_no.co_parent.co_parent',function ($q) use ($user){
+                    $q->where('co_no', $user->co_no);
                 })->orderBy('rp_parent_no', 'DESC');
             }
 

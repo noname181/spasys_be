@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\File;
 use App\Models\Report;
+use App\Models\Export;
 class Report extends Model
 {
     use HasFactory;
@@ -49,4 +50,9 @@ class Report extends Model
     {
         return $this->belongsTo(Warehousing::class, 'w_no', 'w_no')->with(['import_schedule','co_no','warehousing_item','receving_goods_delivery']);
     }
+    public function export()
+    {
+        return $this->belongsTo(Export::class, 'w_no', 'te_carry_out_number')->with(['import_expected']);
+    }
+  
 }
