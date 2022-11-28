@@ -1704,23 +1704,26 @@ class ReceivingGoodsDeliveryController extends Controller
                 //     'wr_contents' => $validated['wr_contents'],
                 // ]);
                 //return $validated['is_no'];
-                $warehousingrequest = WarehousingRequest::where('w_no', $validated['is_no'])->where('wr_type', 'List')->first();
-
-                if (!is_null($warehousingrequest)) {
-                    $warehousingrequest->update([
-                        'w_no' => $validated['is_no'],
-                        'wr_type' => "IW",
-                        'mb_no' => $member->mb_no,
-                        'wr_contents' => $validated['wr_contents'],
-                    ]);
-                } else {
-                    WarehousingRequest::insert([
-                        'w_no' => $validated['is_no'],
-                        'wr_type' => "IW",
-                        'mb_no' => $member->mb_no,
-                        'wr_contents' => $validated['wr_contents'],
-                    ]);
+                if(isset($validated['is_no'])){
+                    $warehousingrequest = WarehousingRequest::where('w_no',$validated['is_no'])->where('wr_type', 'List')->first();
+                    if (!is_null($warehousingrequest)) {
+                        $warehousingrequest->update([
+                            'w_no' => $validated['is_no'],
+                            'wr_type' => "IW",
+                            'mb_no' => $member->mb_no,
+                            'wr_contents' => $validated['wr_contents'],
+                        ]);
+                    } else {
+                        WarehousingRequest::insert([
+                            'w_no' => $validated['is_no'],
+                            'wr_type' => "IW",
+                            'mb_no' => $member->mb_no,
+                            'wr_contents' => $validated['wr_contents'],
+                        ]);
+                    }
                 }
+
+                
 
                 // WarehousingRequest::updateOrNew(
                 //     [

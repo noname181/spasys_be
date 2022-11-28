@@ -21,6 +21,8 @@ class ScheduleShipmentInfo extends Model
      * @var string[]
      */
     protected $fillable = [
+        'ss_no',
+        'co_no',
         'barcode',
         'brand',
         'cancel_date',
@@ -41,8 +43,7 @@ class ScheduleShipmentInfo extends Model
         'shop_price',
         'supply_code',
         'supply_name',
-        'supply_options',
-        'co_no',
+        'supply_options'
     ];
 
     protected $casts = [
