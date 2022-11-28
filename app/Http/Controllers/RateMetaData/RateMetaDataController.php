@@ -123,7 +123,7 @@ class RateMetaDataController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $rmd = RateMetaData::with(['rate_meta', 'member:mb_no,co_no', 'company'])
+            $rmd = RateMetaData::with(['rate_meta', 'member:mb_no,co_no,mb_name', 'company'])
             ->whereNotNull('co_no')->where(function($q){
                 $q->where('set_type','=','estimated_costs')
                 ->orWhere('set_type', 'precalculate');
