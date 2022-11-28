@@ -1335,6 +1335,7 @@ class RateDataController extends Controller
             DB::beginTransaction();
 
             if (isset($request->rmd_no)) {
+                $i = 0;
                 foreach ($request->rate_data as $val) {
                     $update_or_create = null;
                     if (isset($val['rmd_no']) && isset($val['rd_no'])) {
@@ -1342,11 +1343,11 @@ class RateDataController extends Controller
                             $update_or_create = $request->rmd_no;
                         }
                     }
-
+                    $i++;
                     RateData::updateOrCreate(
                         [
                             'rmd_no' => $request->rmd_no,
-                            'rd_no' => $update_or_create,
+                            'rd_no' => $update_or_create ? $val['rd_no'] : null,
                         ],
                         [
 
@@ -1470,6 +1471,8 @@ class RateDataController extends Controller
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
+                '$request->rate_data' => $request->rate_data,
+                'i' => $i,
             ], 201);
         } catch (\Exception $e) {
             //return $e;
@@ -1779,10 +1782,10 @@ class RateDataController extends Controller
                 } else {
                     $rate_data = RateData::where('rd_cate_meta1', '수입풀필먼트');
                     if ($user->mb_type == 'spasys') {
-                        $rate_data = $rate_data->where('co_no', $user->co_no);
+                        $rate_data = $rate_data->where('co_no', $request->co_no);
                     } else if ($user->mb_type == 'shop') {
-                        $rmd = RateMetaData::where('co_no', $user->co_no)->latest('created_at')->first();
-                        $rate_data = $rate_data->where('rd_co_no', $user->co_no);
+                        $rmd = RateMetaData::where('co_no', $request->co_no)->latest('created_at')->first();
+                        $rate_data = $rate_data->where('rd_co_no', $request->co_no);
                         if (isset($rmd->rmd_no)) {
                             $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
                         }
@@ -1795,10 +1798,10 @@ class RateDataController extends Controller
                 } else {
                     $rate_data = RateData::where('rd_cate_meta1', '유통가공');
                     if ($user->mb_type == 'spasys') {
-                        $rate_data = $rate_data->where('co_no', $user->co_no);
+                        $rate_data = $rate_data->where('co_no', $request->co_no);
                     } else if ($user->mb_type == 'shop') {
-                        $rmd = RateMetaData::where('co_no', $user->co_no)->latest('created_at')->first();
-                        $rate_data = $rate_data->where('rd_co_no', $user->co_no);
+                        $rmd = RateMetaData::where('co_no', $request->co_no)->latest('created_at')->first();
+                        $rate_data = $rate_data->where('rd_co_no', $request->co_no);
                         if (isset($rmd->rmd_no)) {
                             $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
                         }

@@ -206,6 +206,15 @@ class QnaController extends Controller
                     'qna_status' => $validated['qna_status']
             ]);
 
+            $qna_parent_no = Qna::where('qna_no', $validated['qna_no'])->first()->answer_for;
+
+            if($qna_parent_no != 0){
+                $qna = Qna::where('qna_no', $qna_parent_no)
+                ->update([
+                    'qna_status' => $validated['qna_status']
+                ]);
+            }
+
             //FILE PART
 
             $path = join('/', ['files', 'qna', $validated['qna_no']]);
@@ -251,7 +260,7 @@ class QnaController extends Controller
 
             DB::commit();
 
-            return response()->json(['message' => Messages::MSG_0007], 200);
+            return response()->json(['message' => Messages::MSG_0007, 'qna' => $qna], 200);
         } catch (\Exception $e) {
             Log::error($e);
             //return response()->json(['message' => Messages::MSG_0005], 500);
@@ -354,7 +363,6 @@ class QnaController extends Controller
                 $query->where('mb_no_target', '=', Auth::user()->mb_no)
                       ->orWhere('mb_no', '=', Auth::user()->mb_no);
             })->with(['mb_no_target'=>function($query){
-                $query->select(['mb_name','mb_no']);
             }])->with(['mb_no'=>function($query){
                 $query->select(['mb_name','mb_no']);
             }])->with('files')->with(['childQna'=>function($query){
