@@ -27,12 +27,10 @@ class ScheduleShipment extends Model
      * @var string[]
      */
     protected $fillable = [
-        'ss_no',
-        'item_no',
         'co_no',
-        'shop_code',
         'seq',
         'pack',
+        'shop_code',
         'shop_name',
         'order_id',
         'order_id_seq',
@@ -70,9 +68,6 @@ class ScheduleShipment extends Model
         'deal_no',
         'sub_domain',
         'sub_domain_seq',
-        'order_products',
-        'shop_name',
-        
     ];
 
     protected $casts = [
