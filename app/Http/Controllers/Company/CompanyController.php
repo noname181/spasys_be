@@ -12,6 +12,7 @@ use App\Models\AdjustmentGroup;
 use App\Models\CoAddress;
 use App\Models\ForwarderInfo;
 use App\Models\CustomsInfo;
+use App\Models\Contract;
 use App\Utils\Messages;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -213,29 +214,57 @@ class CompanyController extends Controller
     public function getCompany($co_no)
     {
         try {
-            $company = Company::select([
-                'company.co_no',
-                'company.mb_no',
-                'company.co_name',
-                'company.co_address',
-                'company.co_zipcode',
-                'company.co_address_detail',
-                'company.co_country',
-                'company.co_service',
-                'company.co_major',
-                'company.co_license',
-                'company.co_close_yn',
-                'company.co_owner',
-                'company.co_homepage',
-                'company.co_email',
-                'company.co_etc',
-                'contract.c_integrated_calculate_yn as c_integrated_calculate_yn',
-                'contract.c_calculate_deadline_yn as c_calculate_deadline_yn',
-                // 'co_address.ca_address_detail as co_address_detail',
-                // ])->join('co_address', 'co_address.co_no', 'company.co_no')
-            ])->join('contract', 'contract.co_no', 'company.co_no')->where('company.co_no', $co_no)
-                // ->where('co_address.co_no', $co_no)
-                ->first();
+            $contract = Contract::where('co_no', $co_no);
+            if(isset($contract->c_no)){
+                return 123;
+                $company = Company::select([
+                    'company.co_no',
+                    'company.mb_no',
+                    'company.co_name',
+                    'company.co_address',
+                    'company.co_zipcode',
+                    'company.co_address_detail',
+                    'company.co_country',
+                    'company.co_service',
+                    'company.co_major',
+                    'company.co_license',
+                    'company.co_close_yn',
+                    'company.co_owner',
+                    'company.co_homepage',
+                    'company.co_email',
+                    'company.co_etc',
+                    'contract.c_integrated_calculate_yn as c_integrated_calculate_yn',
+                    'contract.c_calculate_deadline_yn as c_calculate_deadline_yn',
+                    // 'co_address.ca_address_detail as co_address_detail',
+                    // ])->join('co_address', 'co_address.co_no', 'company.co_no')
+                ])->join('contract', 'contract.co_no', 'company.co_no')->where('company.co_no', $co_no)
+                    // ->where('co_address.co_no', $co_no)
+                    ->first();
+            }else {
+                $company = Company::select([
+                    'company.co_no',
+                    'company.mb_no',
+                    'company.co_name',
+                    'company.co_address',
+                    'company.co_zipcode',
+                    'company.co_address_detail',
+                    'company.co_country',
+                    'company.co_service',
+                    'company.co_major',
+                    'company.co_license',
+                    'company.co_close_yn',
+                    'company.co_owner',
+                    'company.co_homepage',
+                    'company.co_email',
+                    'company.co_etc',
+
+                ])->where('company.co_no', $co_no)
+                    // ->where('co_address.co_no', $co_no)
+                    ->first();
+                $company->c_integrated_calculate_yn = null;
+                $company->c_calculate_deadline_yn = null;
+            }
+
 
             $adjustment_groups = AdjustmentGroup::select(['ag_no', 'co_no', 'ag_name', 'ag_manager', 'ag_hp', 'ag_email'])->where('co_no', $co_no)->get();
             $co_address = CoAddress::select(['ca_is_default','ca_no', 'co_no', 'ca_name', 'ca_manager', 'ca_hp', 'ca_address', 'ca_address_detail'])->where('co_no', $co_no)->get();
@@ -243,7 +272,7 @@ class CompanyController extends Controller
             $customs_info = CustomsInfo::select(['ci_no', 'co_no', 'ci_name', 'ci_manager', 'ci_hp', 'ci_address', 'ci_address_detail'])->where('co_no', $co_no)->get();
             $manager = Manager::where('co_no', $co_no)->first();
             $services = Service::where('service_use_yn', 'y')->where('service_no', '!=', 1)->get();
-            
+
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'company' => $company,
@@ -471,7 +500,7 @@ class CompanyController extends Controller
                  })->orderBy('co_no', 'DESC');
             }
             //$companies = Company::with('contract')->with('warehousing')->where('co_type', 'shipper')->where('co_parent_no', $user->co_no)->orderBy('co_no', 'DESC');
-            
+
 
             // if (isset($validated['w_no'])) {
             //     $companies->whereHas('warehousing', function ($query) use ($validated) {
