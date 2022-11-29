@@ -856,6 +856,23 @@ class ReceivingGoodsDeliveryController extends Controller
                 }
             }
 
+            if (isset($request->connection_number)) {
+                if (isset($request->w_no)) {
+                    Warehousing::where('w_no', $request->w_no)->update([
+                        'connection_number' => $request->connection_number
+                    ]);
+                    if ($request->type_w_choose == "export") {
+                        Export::where('te_carry_out_number', $request->connect_w)->update([
+                            'connection_number' => $request->connection_number
+                        ]);
+                    } else {
+                        Warehousing::where('w_no', $request->connect_w)->update([
+                            'connection_number' => $request->connection_number
+                        ]);
+                    }
+                }
+            }
+
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
