@@ -1974,6 +1974,31 @@ class ReceivingGoodsDeliveryController extends Controller
         }
     }
 
+    public function update_status7(Request $request)
+    {
+        try {
+          
+            ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                'rgd_status7' => NULL,
+                'rgd_tax_invoice_date' => NULL,
+                'rgd_tax_invoice_number' => NULL,
+            ]);
+            
+
+            $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child'])->where('rgd_no', $request->rgd_no)->first();
+
+            return response()->json([
+                'message' => 'Success',
+                'rgd' => $rgd,
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error($e);
+
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+
     public function update_status6(Request $request)
     {
         try {
