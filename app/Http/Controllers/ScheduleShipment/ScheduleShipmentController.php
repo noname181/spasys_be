@@ -275,7 +275,7 @@ class ScheduleShipmentController extends Controller
                         'status' => isset($schedule['status']) ? $schedule['status'] : null,
                         'order_cs' => isset($schedule['order_cs']) ? $schedule['order_cs'] : null,
                         'collect_date' => isset($schedule['collect_date']) ? $schedule['collect_date'] : null,
-                        'order_date' => isset($schedule['order_date']) ? ($schedule['order_date'] != '0000-00-00 00:00:00' ? $schedule['order_date'] : null) : null,
+                        'order_date' => !empty($schedule['order_date']) ? ((int)$schedule['order_date'] > 2022 ? $schedule['order_date'] : null) : null,
                         'trans_date' => !empty($schedule['trans_date']) ? $schedule['trans_date'] : null,
                         'trans_date_pos' => !empty($schedule['trans_date_pos']) ? $schedule['trans_date_pos'] : null,
                         'shopstat_date' => isset($schedule['shopstat_date']) ? $schedule['shopstat_date'] : null,
@@ -566,7 +566,7 @@ class ScheduleShipmentController extends Controller
             'domain_key' => '50e2331771d085ddeab1bc2f91a39ae14e1b924b8df05d11ff40eea3aff3d9fb',
             'action' => 'get_order_info',
             'date_type' => 'collect_date',
-            'start_date' => date('Y-m-d'),
+            'start_date' => '2022-07-15',//date('Y-m-d'),
             'end_date' => date('Y-m-d'),
             'limit' => 50,
             'page' => ''

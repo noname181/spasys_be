@@ -2603,6 +2603,9 @@ class ItemController extends Controller
                         $url_api .= ',';
                     }
                     $url_api .= $item['product_id'];
+                    if($key_item >= 50){
+                        break;
+                    }
                 }
             }
             $url_api .= '&bad='.$bad;
@@ -2611,16 +2614,14 @@ class ItemController extends Controller
             if(!empty($api_data->data)){ 
                 foreach($api_data->data as $item){ 
                     $item = (array)$item;
-                    if($item['stock'] > 0){
-                        $item_info_no = ItemInfo::updateOrCreate([
-                            'product_id' => $item['product_id'],
-                            'stock' => $item['stock']
-                        ],[
-                            'product_id' => $item['product_id'],
-                            'stock' => $item['stock'],
-                            'status' => $item['bad']
-                        ]);
-                    }
+                    $item_info_no = ItemInfo::updateOrCreate([
+                        'product_id' => $item['product_id'],
+                        'stock' => $item['stock']
+                    ],[
+                        'product_id' => $item['product_id'],
+                        'stock' => $item['stock'],
+                        'status' => $item['bad']
+                    ]);
                 }
             }
         }
