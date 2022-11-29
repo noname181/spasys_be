@@ -1911,7 +1911,7 @@ class ItemController extends Controller
                                         'item_price2' => $item->shop_price,
                                         'item_price3' => $item->supply_price,
                                         'item_url' => $item->img_500,
-                                        'item_option1' => $option->options,
+                                        'item_option1' => $option['options'],
                                         'item_service_name' => '수입풀필먼트'
                                     ]
                                 );
@@ -1938,22 +1938,22 @@ class ItemController extends Controller
                                         'md' => $item->md,
                                         'manager1' => $item->manager1,
                                         'manager2' => $item->manager2,
-                                        'supply_options' => !empty($option->supply_options)?$option->supply_options:'',
-                                        'enable_sale' => !empty($option->enable_sale)?$option->enable_sale:1,
-                                        'use_temp_soldout' => !empty($option->use_temp_soldout)?$option->use_temp_soldout:0,
-                                        'stock_alarm1' => !empty($option->stock_alarm1)?$option->stock_alarm1:0,
-                                        'stock_alarm2' => !empty($option->stock_alarm2)?$option->stock_alarm2:0,
-                                        'extra_price' => !empty($option->extra_price)?$option->extra_price:0,
-                                        'extra_shop_price' => !empty($option->extra_shop_price)?$option->extra_shop_price:0,
-                                        'extra_column6' => !empty($option->extra_column6)?$option->extra_column6:'',
-                                        'extra_column7' => !empty($option->extra_column7)?$option->extra_column7:'',
-                                        'extra_column8' => !empty($option->extra_column8)?$option->extra_column8:'',
-                                        'extra_column9' => !empty($option->extra_column9)?$option->extra_column9:'',
-                                        'extra_column10' => !empty($option->extra_column10)?$option->extra_column10:'',
-                                        'reg_date' => !empty($option->reg_date)?$option->reg_date:null,
-                                        'last_update_date' => !empty($option->last_update_date)?$option->last_update_date:null,
-                                        'new_link_id' => !empty($option->new_link_id)?$option->new_link_id:'',
-                                        'link_id' => !empty($option->link_id)?$option->link_id:'',
+                                        'supply_options' => !empty($option['supply_options'])?$option['supply_options']:'',
+                                        'enable_sale' => !empty($option['enable_sale'])?$option['enable_sale']:1,
+                                        'use_temp_soldout' => !empty($option['use_temp_soldout'])?$option['use_temp_soldout']:0,
+                                        'stock_alarm1' => !empty($option['stock_alarm1'])?$option['stock_alarm1']:0,
+                                        'stock_alarm2' => !empty($option['stock_alarm2'])?$option['stock_alarm2']:0,
+                                        'extra_price' => !empty($option['extra_price'])?$option['extra_price']:0,
+                                        'extra_shop_price' => !empty($option['extra_shop_price'])?$option['extra_shop_price']:0,
+                                        'extra_column6' => !empty($option['extra_column6'])?$option['extra_column6']:'',
+                                        'extra_column7' => !empty($option['extra_column7'])?$option['extra_column7']:'',
+                                        'extra_column8' => !empty($option['extra_column8'])?$option['extra_column8']:'',
+                                        'extra_column9' => !empty($option['extra_column9'])?$option['extra_column9']:'',
+                                        'extra_column10' => !empty($option['extra_column10'])?$option['extra_column10']:'',
+                                        'reg_date' => !empty($option['reg_date'])?$option['reg_date']:null,
+                                        'last_update_date' => !empty($option['last_update_date'])?$option['last_update_date']:null,
+                                        'new_link_id' => !empty($option['new_link_id'])?$option['new_link_id']:'',
+                                        'link_id' => !empty($option['link_id'])?$option['link_id']:'',
                                     ]
                                 );
                             }
@@ -2501,9 +2501,9 @@ class ItemController extends Controller
             'domain_key' => '50e2331771d085ddeab1bc2f91a39ae14e1b924b8df05d11ff40eea3aff3d9fb',
             'action' => 'get_product_info',
             'date_type' => 'last_update_date',
-            'start_date' => date('Y-m-d'),
+            'start_date' => '2022-05-05',
             'end_date' => date('Y-m-d'),
-            'limit' => 50,
+            'limit' => 100,
             'page' => ''
         );
         $filter = array();
@@ -2595,6 +2595,7 @@ class ItemController extends Controller
         $url_api .= '&domain_key='.$filter['domain_key'];
         $url_api .= '&action='.$filter['action'];
         $list_items = $this->paginateItemsApiIdRaw();
+        return $list_items;
         for($bad = 0; $bad <= 1; $bad++) {
             if(!empty($list_items)){
                 $url_api .= '&product_id=';
@@ -2609,19 +2610,22 @@ class ItemController extends Controller
                 }
             }
             $url_api .= '&bad='.$bad;
+            return $url_api;
             $response = file_get_contents($url_api);
             $api_data = json_decode($response);
             if(!empty($api_data->data)){ 
                 foreach($api_data->data as $item){ 
                     $item = (array)$item;
-                    $item_info_no = ItemInfo::updateOrCreate([
-                        'product_id' => $item['product_id'],
-                        'stock' => $item['stock']
-                    ],[
-                        'product_id' => $item['product_id'],
-                        'stock' => $item['stock'],
-                        'status' => $item['bad']
-                    ]);
+                    if($item['stock'] > 0){ // Khong thuoc kho nao
+                        $item_info_no = ItemInfo::updateOrCreate([
+                            'product_id' => $item['product_id'],
+                            'stock' => $item['stock']
+                        ],[
+                            'product_id' => $item['product_id'],
+                            'stock' => $item['stock'],
+                            'status' => $item['bad']
+                        ]);
+                    }
                 }
             }
         }
