@@ -46,7 +46,7 @@ class PermissionController extends Controller
             }
 
             $permission = $permission->get();
-            if(isset($validated['service_no']) && $permission->count() > 0){
+            if(isset($validated['service_no']) && $permission->count() > 0 && $validated['service_no'] != 1){
                 $permission = $permission->filter(function ($item) use($validated){
 
                     $menu_no = $item->menu_no;
@@ -61,7 +61,7 @@ class PermissionController extends Controller
                         return false;
                     }
 
-                });
+                })->values();
             }
 
             $array_menu_no = [];
@@ -70,16 +70,18 @@ class PermissionController extends Controller
             }
 
             $menu = Menu::with('menu_parent')->where(function($q) use($validated){
-                $q->where('menu_device', $validated['menu_device'])->orWhere('menu_device', '전체');
+                if($validated['menu_device'] != 'all')
+                    $q->where('menu_device', $validated['menu_device'])->orWhere('menu_device', '전체');
             })->where('menu_depth', '하위')->orderBy('menu_id')->get();
 
-            if (isset($validated['service_no'])) {
-                $menu->filter(function ($item) use ($validated) {
+            if (isset($validated['service_no']) && $validated['service_no'] != 1) {
+                $menu = $menu->filter(function ($item) use ($validated) {
                     $service_no_array = $item->service_no_array;
                     $service_no_array = explode(" ", $service_no_array);
 
+
                     return in_array($validated['service_no'], $service_no_array);
-                });
+                })->values();
             }
 
             return response()->json([
