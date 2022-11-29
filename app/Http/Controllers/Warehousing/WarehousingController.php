@@ -3668,7 +3668,7 @@ class WarehousingController extends Controller
                     }else {
                         $item->discount_money = 0;
                     }
-                   
+
 
                     return $item;
                 })
@@ -3749,9 +3749,15 @@ class WarehousingController extends Controller
                     })->orWhereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
-                })->whereHas('w_no.co_no.co_parent.contract', function ($q) use ($user) {
-                    $q->where('c_calculate_deadline_yn', 'y');
+                })
+                ->whereHas('w_no', function ($query) use ($user) {
+                    $query->whereHas('co_no.co_parent.contract', function ($q) use ($user) {
+                        $q->where('c_calculate_deadline_yn', 'y');
+                    })->orWhereHas('co_no.contract', function ($q) use ($user) {
+                        $q->where('c_calculate_deadline_yn', 'y');
+                    });
                 });
+
             }
             $warehousing->where(function ($q) {
                 $q->where('rgd_status4', '추가청구서')
@@ -4430,9 +4436,12 @@ class WarehousingController extends Controller
 
             $amount_export = $schedule_shipment->sum('qty');
            //  return $warehousing->get();
-            $first_name_item = $warehousing->get()[0]['warehousing_item'][0]['item']['item_name'];
-            $total_item = $warehousing->get()[0]['warehousing_item']->count();
-            $final_total = (($total_item / 2 )  - 1 );
+            if(count($warehousing->get()) > 0){
+                $first_name_item = $warehousing->get()[0]['warehousing_item'][0]['item']['item_name'];
+                $total_item = $warehousing->get()[0]['warehousing_item']->count();
+                $final_total = (($total_item / 2 )  - 1 );
+            }
+
             $w_no_data = Warehousing::insertGetId([
                 'mb_no' => $user->mb_no,
                 'w_schedule_amount' => $amount,
@@ -4456,7 +4465,7 @@ class WarehousingController extends Controller
                 'rgd_status2' => '작업완료',
                 'rgd_monthbill_start' => Carbon::createFromFormat('Y-m-d', $request->from_date),
                 'rgd_monthbill_end' => Carbon::createFromFormat('Y-m-d', $request->to_date),
-                'rgd_item_first_name' => $first_name_item .'외' . ' ' . $final_total .'건',
+                'rgd_item_first_name' => isset($first_name_item) && isset($final_total) ? ($first_name_item .'외' . ' ' . $final_total .'건') : '',
             ]);
 
             $rdg_no = RateDataGeneral::insertGetId([

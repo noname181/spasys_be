@@ -18,14 +18,15 @@ class PushController extends Controller
      */
     public function __invoke(PushRequest $request)
     {
-        $validated = $request->validated();
+        
         try {
+            $validated = $request->validated();
             // If per_page is null set default data = 15
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
 
-            $pushs = Push::orderBy('push_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
+            $pushs = Push::paginate($per_page, ['*'], 'page', $page);
             return response()->json($pushs);
         } catch (\Exception $e) {
             Log::error($e);

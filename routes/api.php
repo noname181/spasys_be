@@ -95,7 +95,7 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::prefix('push')->name('push.')->group(function () {
-        Route::get('/', \App\Http\Controllers\Push\PushController::class)->name('get_pushs');
+        Route::post('/', \App\Http\Controllers\Push\PushController::class)->name('get_pushs');
         Route::post('/getpush', [App\Http\Controllers\Push\PushController::class, 'searchPush'])->name('getPush');
         Route::get('/{push}', [App\Http\Controllers\Push\PushController::class, 'getPushDetail'])->name('get_push_detail');
         Route::post('/create', [App\Http\Controllers\Push\PushController::class, 'createPush'])->name('create');
@@ -192,6 +192,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/get_rgd_package/{co_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'get_rgd_package'])->name('get_rgd_package');
     Route::post('receiving_goods_delivery/update_status5', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_status5']);
     Route::post('receiving_goods_delivery/update_status6', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_status6']);
+    Route::post('receiving_goods_delivery/update_status7', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_status7']);
     Route::post('receiving_goods_delivery/update_status5_fulfillment', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_status5_fulfillment']);
 
     Route::post('receiving_goods_delivery/payment', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'payment']);
@@ -377,6 +378,8 @@ Route::middleware('auth')->group(function () {
 
             //GET RATE DATA BY RGD_NO
             Route::get('/spasys/{rgd_no}/{service}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByRgd']);
+            //GET RATE DATA BY CO_NO AND SERVICE
+            Route::get('/co_no_service/{co_no}/{service}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByConoService']);
 
             Route::post('/spasys4', [App\Http\Controllers\RateData\RateDataController::class, 'getSpasysRateData4'])->name('get_spasys_rate_data4');
         });
