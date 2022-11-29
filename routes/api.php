@@ -25,6 +25,8 @@ Route::post('/validate_otp', [\App\Http\Controllers\Api\SendMailController::clas
 Route::patch('/forgot_password', [\App\Http\Controllers\Api\SendMailController::class, 'sendPassword']);
 Route::get('/find_id', [\App\Http\Controllers\Member\MemberController::class, 'findUserId'])->name('member.findUserId');
 Route::get('/api_item_cron_nologin', [App\Http\Controllers\Item\ItemController::class, 'apiItemCronNoLogin'])->name('api_item_cron_nologin');
+Route::get('/api_schedule_cron_nologin', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'getScheduleFromApiNoLogin'])->name('api_schedule_cron_nologin');
+Route::post('/api_stock_list_nologin', [App\Http\Controllers\Item\ItemController::class, 'updateStockItemsApiNoLogin'])->name('api_stock_list_nologin');
 
 Route::middleware('auth')->group(function () {
 
@@ -333,7 +335,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/api_item_cargo_list', [App\Http\Controllers\Item\ItemController::class, 'apiItemsCargoList'])->name('api_item_cargo_list');
         Route::post('/api_update_stock_items', [App\Http\Controllers\Item\ItemController::class, 'apiupdateStockItems'])->name('api_update_stock_items');
         Route::post('/caculate_total_item', [App\Http\Controllers\Item\ItemController::class, 'caculateItem'])->name('caculate_total_item');
-
+        Route::post('/update_stock_items_api', [App\Http\Controllers\Item\ItemController::class, 'updateStockItemsApi'])->name('update_stock_items_api');
 
     });
     Route::prefix('scheduleshipment')->name('scheduleshipment.')->group(function () {

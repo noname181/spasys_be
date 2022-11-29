@@ -704,6 +704,34 @@ class ItemController extends Controller
         }
     }
 
+    public function paginateItemsApiIdRaw()
+    {
+        try {
+            $user = Auth::user();
+            if ($user->mb_type == 'shop') {
+                $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                })->orderBy('item_no', 'DESC');
+            } else if ($user->mb_type == 'shipper') {
+                $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('ContractWms.company', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                })->orderBy('item_no', 'DESC');
+            } else if ($user->mb_type == 'spasys') {
+                $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                })->orderBy('item_no', 'DESC');
+            }
+
+            $item = $item->get();
+
+            return $item;
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
     public function paginateItemsApi(ItemSearchRequest $request)
     {
         $validated = $request->validated();
@@ -2550,4 +2578,107 @@ class ItemController extends Controller
         }
         return $api_data;
     }
+    
+    public function updateStockItemsApi(Request $request){
+        
+        $param_arrays = array(
+            'partner_key' => '50e2331771d085ddccbcd2188a03800c',
+            'domain_key' => '50e2331771d085ddeab1bc2f91a39ae14e1b924b8df05d11ff40eea3aff3d9fb',
+            'action' => 'get_stock_info'
+        );
+        $filter = array();
+        $url_api = 'https://api2.cloud.ezadmin.co.kr/ezadmin/function.php?';
+        foreach($param_arrays as $key => $param){
+            $filter[$key] = !empty($request[$key])?$request[$key]:$param;
+        }
+        $url_api .= '&partner_key='.$filter['partner_key'];
+        $url_api .= '&domain_key='.$filter['domain_key'];
+        $url_api .= '&action='.$filter['action'];
+        $list_items = $this->paginateItemsApiIdRaw();
+        for($bad = 0; $bad <= 1; $bad++) {
+            if(!empty($list_items)){
+                $url_api .= '&product_id=';
+                foreach($list_items as $key_item => $item){
+                    if($key_item > 0){
+                        $url_api .= ',';
+                    }
+                    $url_api .= $item['product_id'];
+                }
+            }
+            $url_api .= '&bad='.$bad;
+            $response = file_get_contents($url_api);
+            $api_data = json_decode($response);
+            if(!empty($api_data->data)){ 
+                foreach($api_data->data as $item){ 
+                    $item = (array)$item;
+                    if($item['stock'] > 0){
+                        $item_info_no = ItemInfo::updateOrCreate([
+                            'product_id' => $item['product_id'],
+                            'stock' => $item['stock']
+                        ],[
+                            'product_id' => $item['product_id'],
+                            'stock' => $item['stock'],
+                            'status' => $item['bad']
+                        ]);
+                    }
+                }
+            }
+        }
+        return response()->json([
+            'message' => '완료되었습니다.',
+            'status' => 1
+        ], 200);
+    }
+    
+    public function updateStockItemsApiNoLogin(Request $request){
+        
+        $param_arrays = array(
+            'partner_key' => '50e2331771d085ddccbcd2188a03800c',
+            'domain_key' => '50e2331771d085ddeab1bc2f91a39ae14e1b924b8df05d11ff40eea3aff3d9fb',
+            'action' => 'get_stock_info'
+        );
+        $filter = array();
+        $url_api = 'https://api2.cloud.ezadmin.co.kr/ezadmin/function.php?';
+        foreach($param_arrays as $key => $param){
+            $filter[$key] = !empty($request[$key])?$request[$key]:$param;
+        }
+        $url_api .= '&partner_key='.$filter['partner_key'];
+        $url_api .= '&domain_key='.$filter['domain_key'];
+        $url_api .= '&action='.$filter['action'];
+        $list_items = $this->paginateItemsApiIdRaw();
+        for($bad = 0; $bad <= 1; $bad++) {
+            if(!empty($list_items)){
+                $url_api .= '&product_id=';
+                foreach($list_items as $key_item => $item){
+                    if($key_item > 0){
+                        $url_api .= ',';
+                    }
+                    $url_api .= $item['product_id'];
+                }
+            }
+            $url_api .= '&bad='.$bad;
+            $response = file_get_contents($url_api);
+            $api_data = json_decode($response);
+            if(!empty($api_data->data)){ 
+                foreach($api_data->data as $item){ 
+                    $item = (array)$item;
+                    if($item['stock'] > 0){
+                        $item_info_no = ItemInfo::updateOrCreate([
+                            'product_id' => $item['product_id'],
+                            'stock' => $item['stock']
+                        ],[
+                            'product_id' => $item['product_id'],
+                            'stock' => $item['stock'],
+                            'status' => $item['bad']
+                        ]);
+                    }
+                }
+            }
+        }
+        return response()->json([
+            'message' => '완료되었습니다.',
+            'status' => 1
+        ], 200);
+    }
+    
 }
