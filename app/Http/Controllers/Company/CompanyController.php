@@ -261,12 +261,14 @@ class CompanyController extends Controller
                 ])->where('company.co_no', $co_no)
                     // ->where('co_address.co_no', $co_no)
                     ->first();
-                $company->c_integrated_calculate_yn = null;
-                $company->c_calculate_deadline_yn = null;
+                if($company) {
+                    $company->c_integrated_calculate_yn = null;
+                    $company->c_calculate_deadline_yn = null;
+                }
             }
 
 
-            $adjustment_groups = AdjustmentGroup::select(['ag_no', 'co_no', 'ag_name', 'ag_manager', 'ag_hp', 'ag_email'])->where('co_no', $co_no)->get();
+            $adjustment_groups = AdjustmentGroup::select(['ag_no', 'co_no', 'ag_name', 'ag_manager', 'ag_hp', 'ag_email', 'ag_auto_issue'])->where('co_no', $co_no)->get();
             $co_address = CoAddress::select(['ca_is_default','ca_no', 'co_no', 'ca_name', 'ca_manager', 'ca_hp', 'ca_address', 'ca_address_detail'])->where('co_no', $co_no)->get();
             $forwarder_info = ForwarderInfo::select(['fi_no', 'co_no', 'fi_name', 'fi_manager', 'fi_hp', 'fi_address', 'fi_address_detail'])->where('co_no', $co_no)->get();
             $customs_info = CustomsInfo::select(['ci_no', 'co_no', 'ci_name', 'ci_manager', 'ci_hp', 'ci_address', 'ci_address_detail'])->where('co_no', $co_no)->get();

@@ -71,6 +71,7 @@ class AdjustmentGroupController extends Controller
                         'ag_hp' => $value['ag_hp'],
                         'ag_manager' => $value['ag_manager'],
                         'ag_email' => $value['ag_email'],
+                        'ag_auto_issue' => isset($value['ag_auto_issue']) ? $value['ag_auto_issue'] : 'n',
                     ]);
                     $id = $ag->first()->ag_no;
                 }else {
@@ -81,6 +82,7 @@ class AdjustmentGroupController extends Controller
                         'ag_hp' => $value['ag_hp'],
                         'ag_manager' => $value['ag_manager'],
                         'ag_email' => $value['ag_email'],
+                        'ag_auto_issue' => isset($value['ag_auto_issue']) ? $value['ag_auto_issue'] : 'n',
                     ]);
                 }
                 $ids[] = $id;
