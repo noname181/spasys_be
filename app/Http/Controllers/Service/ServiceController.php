@@ -111,7 +111,7 @@ class ServiceController extends Controller
             else if($member->company->co_type == 'spasys'){
                 $services = Service::where('service_use_yn', 'y')->where('service_no', '!=', 1)->get();
             }else {
-                $co_service_array = explode(" ",  $member->company->co_service);
+                $co_service_array = explode(" ",  $member->mb_service_no_array);
                 $services = Service::whereIN("service_name", $co_service_array)->get();
             }
 
