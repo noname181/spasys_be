@@ -28,5 +28,6 @@ class AdjustmentGroup extends Model
         'ag_manager',
         'ag_email',
         'ag_hp',
+        'ag_auto_issue',
     ];
 }

@@ -32,6 +32,8 @@ class AdjustmentGroupCreateRequest extends BaseFormRequest
                 'string',
                 'max:255',
             ],
+            '*.ag_auto_issue' => [
+            ],
             '*.ag_manager' => [
                 'required',
                 'string',
