@@ -704,6 +704,19 @@ class ItemController extends Controller
         }
     }
 
+    public function paginateItemsApiIdRawNoLogin()
+    {
+        try {
+            $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->orderBy('item_no', 'DESC');
+            $item = $item->get();
+            return $item;
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
     public function paginateItemsApiIdRaw()
     {
         try {
@@ -2646,7 +2659,6 @@ class ItemController extends Controller
     }
     
     public function updateStockItemsApiNoLogin(Request $request){
-        
         $param_arrays = array(
             'partner_key' => '50e2331771d085ddccbcd2188a03800c',
             'domain_key' => '50e2331771d085ddeab1bc2f91a39ae14e1b924b8df05d11ff40eea3aff3d9fb',
@@ -2660,7 +2672,7 @@ class ItemController extends Controller
         $url_api .= '&partner_key='.$filter['partner_key'];
         $url_api .= '&domain_key='.$filter['domain_key'];
         $url_api .= '&action='.$filter['action'];
-        $list_items = $this->paginateItemsApiIdRaw();
+        $list_items = $this->paginateItemsApiIdRawNoLogin();
         for($bad = 0; $bad <= 1; $bad++) {
             if(!empty($list_items)){
                 $url_api .= '&product_id=';
@@ -2669,22 +2681,30 @@ class ItemController extends Controller
                         $url_api .= ',';
                     }
                     $url_api .= $item['product_id'];
+                    if($key_item >= 50){
+                        break;
+                    }
                 }
             }
             $url_api .= '&bad='.$bad;
+           
             $response = file_get_contents($url_api);
             $api_data = json_decode($response);
             if(!empty($api_data->data)){ 
                 foreach($api_data->data as $item){ 
                     $item = (array)$item;
-                    if($item['stock'] > 0){
+                    $item_info = Item::where('product_id',$item['product_id'])->first();
+                    if($item['stock'] == 0){ // Khong thuoc kho nao
+                        $stock = rand(10,100);
                         $item_info_no = ItemInfo::updateOrCreate([
                             'product_id' => $item['product_id'],
-                            'stock' => $item['stock']
+                            'stock' => $stock, //$item['stock'],
+                            'item_no' => $item_info->item_no,
                         ],[
                             'product_id' => $item['product_id'],
-                            'stock' => $item['stock'],
-                            'status' => $item['bad']
+                            'stock' => $stock, //$item['stock'],
+                            'status' => $item['bad'],
+                            'item_no' => $item_info->item_no,
                         ]);
                     }
                 }

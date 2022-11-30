@@ -26,7 +26,7 @@ Route::patch('/forgot_password', [\App\Http\Controllers\Api\SendMailController::
 Route::get('/find_id', [\App\Http\Controllers\Member\MemberController::class, 'findUserId'])->name('member.findUserId');
 Route::get('/api_item_cron_nologin', [App\Http\Controllers\Item\ItemController::class, 'apiItemCronNoLogin'])->name('api_item_cron_nologin');
 Route::get('/api_schedule_cron_nologin', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'getScheduleFromApiNoLogin'])->name('api_schedule_cron_nologin');
-Route::post('/api_stock_list_nologin', [App\Http\Controllers\Item\ItemController::class, 'updateStockItemsApiNoLogin'])->name('api_stock_list_nologin');
+Route::get('/api_stock_list_nologin', [App\Http\Controllers\Item\ItemController::class, 'updateStockItemsApiNoLogin'])->name('api_stock_list_nologin');
 
 Route::middleware('auth')->group(function () {
 
