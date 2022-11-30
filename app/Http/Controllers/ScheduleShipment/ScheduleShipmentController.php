@@ -299,7 +299,7 @@ class ScheduleShipmentController extends Controller
                             'amount' => isset($schedule_item['amount']) ? $schedule_item['amount'] : null,
                             'extra_money' => isset($schedule_item['extra_money']) ? $schedule_item['extra_money'] : null,
                             'trans_corp' => isset($schedule_item['trans_corp']) ? $schedule_item['trans_corp'] : null,
-                            'trans_no' => isset($schedule_item['trans_no']) ? '출고' : '출고예정',
+                            'trans_no' => isset($schedule_item['trans_no']) && $schedule_item['trans_no'] != '' ? '출고' : '출고예정',
                             'trans_who' => isset($schedule_item['trans_who']) ? $schedule_item['trans_who'] : null,
                             'prepay_price' => isset($schedule_item['prepay_price']) ? $schedule_item['prepay_price'] : null,
                             'gift' => isset($schedule_item['gift']) ? $schedule_item['gift'] : null,
