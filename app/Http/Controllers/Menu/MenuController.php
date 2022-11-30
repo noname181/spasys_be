@@ -182,8 +182,11 @@ class MenuController extends Controller
     public function get_menu_by_path($menu_path)
     {
         try {
+            if($menu_path != 'dashboard'){
             $menu = Menu::with('manual')->where('menu_url', $menu_path)->first();
-           
+            } else {
+                $menu = Menu::with('manual')->where('menu_url', '대시보드')->first();
+            }
 
             return response()->json(['menu' => $menu]);
         } catch (\Exception $e) {

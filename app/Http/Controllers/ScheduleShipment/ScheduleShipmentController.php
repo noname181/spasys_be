@@ -41,15 +41,15 @@ class ScheduleShipmentController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             if( $request->type == 'page136'){
                 if ($user->mb_type == 'shop') {
-                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->where('trans_no','출고예정')->whereHas('ContractWms.company.co_parent', function ($q) use ($user){
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms','receving_goods_delivery'])->where('trans_no','출고예정')->whereHas('ContractWms.company.co_parent', function ($q) use ($user){
                         // $q->where('co_no', $user->co_no);
                     })->orderBy('ss_no', 'DESC');
                 }else if($user->mb_type == 'shipper'){
-                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->where('trans_no','출고예정')->whereHas('ContractWms.company', function ($q) use ($user){
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms','receving_goods_delivery'])->where('trans_no','출고예정')->whereHas('ContractWms.company', function ($q) use ($user){
                         // $q->where('co_no', $user->co_no);
                     })->orderBy('ss_no', 'DESC');
                 }else if($user->mb_type == 'spasys'){
-                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->where('trans_no','출고예정')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user){
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms','receving_goods_delivery'])->where('trans_no','출고예정')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user){
                         // $q->where('co_no', $user->co_no);
                     })->orderBy('ss_no', 'DESC');
                 }
@@ -134,8 +134,22 @@ class ScheduleShipmentController extends Controller
             if (isset($validated['trans_corp'])) {
                 $schedule_shipment->where(DB::raw('lower(trans_corp)'), 'like', '%' . strtolower($validated['trans_corp']) . '%');
             }
+            
             $schedule_shipment = $schedule_shipment->paginate($per_page, ['*'], 'page', $page);
-            return $schedule_shipment;
+
+            $schedule_shipment->setCollection(
+                $schedule_shipment->getCollection()->map(function ($q) {
+                    $schedule_shipment_item = DB::table('schedule_shipment_info')->where('schedule_shipment_info.ss_no',$q->ss_no)->get();
+                    $count_item = 0;
+                    foreach($schedule_shipment_item as $item){
+                        $q->total_amount += $item->qty;
+                        $count_item++;
+                    }
+                    $q->count_item = $count_item;
+                    return  $q;
+                })
+            ); 
+           
             return response()->json($schedule_shipment);
         } catch (\Exception $e) {
             Log::error($e);
@@ -246,6 +260,7 @@ class ScheduleShipmentController extends Controller
     }
     public function apiScheduleShipmentsRaw($data_schedule = null)
     {
+       
         try {
             DB::beginTransaction();
             $user = Auth::user();
@@ -284,7 +299,7 @@ class ScheduleShipmentController extends Controller
                             'amount' => isset($schedule_item['amount']) ? $schedule_item['amount'] : null,
                             'extra_money' => isset($schedule_item['extra_money']) ? $schedule_item['extra_money'] : null,
                             'trans_corp' => isset($schedule_item['trans_corp']) ? $schedule_item['trans_corp'] : null,
-                            'trans_no' => isset($schedule_item['trans_no']) ? '출고' : '출고예정',
+                            'trans_no' => isset($schedule_item['trans_no']) && $schedule_item['trans_no'] != '' ? '출고' : '출고예정',
                             'trans_who' => isset($schedule_item['trans_who']) ? $schedule_item['trans_who'] : null,
                             'prepay_price' => isset($schedule_item['prepay_price']) ? $schedule_item['prepay_price'] : null,
                             'gift' => isset($schedule_item['gift']) ? $schedule_item['gift'] : null,
@@ -294,7 +309,7 @@ class ScheduleShipmentController extends Controller
                             'sub_domain' => isset($schedule_item['sub_domain']) ? $schedule_item['sub_domain'] : null,
                             'sub_domain_seq' => isset($schedule_item['sub_domain_seq']) ? $schedule_item['sub_domain_seq'] : null,
                         ];
-                        $ss_no = ScheduleShipment::updateOrCreate(['order_id' => $i_schedule],$data_schedule);
+                        if(isset($schedule_item['order_id'])) $ss_no = ScheduleShipment::updateOrCreate(['order_id' => $i_schedule],$data_schedule);
                         if( $ss_no->ss_no && isset($schedule_item['order_products'])){
                             foreach ($schedule_item['order_products'] as $ss_info => $schedule_info) {
                                 if(!empty($ss_no->ss_no) && !empty($schedule_info['barcode'])){
@@ -623,17 +638,21 @@ class ScheduleShipmentController extends Controller
             'page' => '1'
         );
         $base_schedule_datas = $this->requestDataAPI($param_arrays); //Get Data
+       
         $total_data = (isset($base_schedule_datas['total']) && $base_schedule_datas['total'] > 0)?$base_schedule_datas['total']:0;
         $limit_data = (isset($base_schedule_datas['limit']) && $base_schedule_datas['limit'] > 0)?$base_schedule_datas['limit']:0;
         $check_pages = ($total_data > $limit_data) && $limit_data > 0?(int)ceil($total_data / $limit_data):1; // Check total page to foreach
-        
+       
         if(isset($check_pages)&&$check_pages > 1){
             for($page = 1; $page <= $check_pages; $page++){
                 $param_arrays['page'] = $page;
                 $base_schedule_datas = $this->requestDataAPI($param_arrays);
                 $data_schedule = $this->mapDataAPI($base_schedule_datas['data']);
+                
                 if(!empty($data_schedule['data_temp'])){
+                    
                     $this->apiScheduleShipmentsRaw($data_schedule['data_temp']);
+                   
                 }
             }
             return response()->json([
@@ -716,6 +735,7 @@ class ScheduleShipmentController extends Controller
                 $data_temp[$data_item['order_id']] = $data_item;
                 $data_temp[$data_item['order_id']]['order_products'] = $order_products_data;
             }
+           
             return $this->apiScheduleShipmentsRawNoLogin($data_temp);
         }else{
             return response()->json([

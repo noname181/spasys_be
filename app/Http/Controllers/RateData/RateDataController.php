@@ -1784,7 +1784,7 @@ class RateDataController extends Controller
             $rate_data = RateData::where('rd_cate_meta1', $service);
 
 
-            $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
+            $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->orderBy('rmd_no', 'DESC')->first();
             $rate_data = $rate_data->where('rd_co_no', $co_no);
             if (isset($rmd->rmd_no)) {
                 $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
