@@ -2529,6 +2529,7 @@ class ItemController extends Controller
         if($filter['page'] != ''){
             $url_api .= '&page='.$filter['page'];
         }
+        
         $response = file_get_contents($url_api);
         $api_data = json_decode($response);
         if(!empty($api_data->data)){
@@ -2615,6 +2616,7 @@ class ItemController extends Controller
                 }
             }
             $url_api .= '&bad='.$bad;
+           
             $response = file_get_contents($url_api);
             $api_data = json_decode($response);
             if(!empty($api_data->data)){ 

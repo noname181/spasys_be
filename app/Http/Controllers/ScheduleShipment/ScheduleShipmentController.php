@@ -41,15 +41,15 @@ class ScheduleShipmentController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             if( $request->type == 'page136'){
                 if ($user->mb_type == 'shop') {
-                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->where('trans_no','출고예정')->whereHas('ContractWms.company.co_parent', function ($q) use ($user){
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms','receving_goods_delivery'])->where('trans_no','출고예정')->whereHas('ContractWms.company.co_parent', function ($q) use ($user){
                         // $q->where('co_no', $user->co_no);
                     })->orderBy('ss_no', 'DESC');
                 }else if($user->mb_type == 'shipper'){
-                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->where('trans_no','출고예정')->whereHas('ContractWms.company', function ($q) use ($user){
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms','receving_goods_delivery'])->where('trans_no','출고예정')->whereHas('ContractWms.company', function ($q) use ($user){
                         // $q->where('co_no', $user->co_no);
                     })->orderBy('ss_no', 'DESC');
                 }else if($user->mb_type == 'spasys'){
-                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->where('trans_no','출고예정')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user){
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms','receving_goods_delivery'])->where('trans_no','출고예정')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user){
                         // $q->where('co_no', $user->co_no);
                     })->orderBy('ss_no', 'DESC');
                 }
@@ -134,8 +134,20 @@ class ScheduleShipmentController extends Controller
             if (isset($validated['trans_corp'])) {
                 $schedule_shipment->where(DB::raw('lower(trans_corp)'), 'like', '%' . strtolower($validated['trans_corp']) . '%');
             }
+            
             $schedule_shipment = $schedule_shipment->paginate($per_page, ['*'], 'page', $page);
-            return $schedule_shipment;
+
+            $schedule_shipment->setCollection(
+                $schedule_shipment->getCollection()->map(function ($q) {
+                    $schedule_shipment_item = DB::table('schedule_shipment_info')->where('schedule_shipment_info.ss_no',$q->ss_no)->get();
+            
+                    foreach($schedule_shipment_item as $item){
+                        $q->total_amount += $item->qty;
+                    }
+                    return  $q;
+                })
+            ); 
+           
             return response()->json($schedule_shipment);
         } catch (\Exception $e) {
             Log::error($e);
