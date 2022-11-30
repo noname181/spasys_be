@@ -117,8 +117,9 @@ class ExportController extends Controller
             $items = [];
             
             foreach($warehousing_items as $key =>  $warehousing_item){
-                $item = Item::with(['item_channels','file'])->where('item_no', $warehousing_item->item_no)->first();
                 
+                $item = Item::with(['item_channels','file'])->where('item_no', $warehousing_item->item_no)->first();
+                if($item){
                 if($type=='EW'){
                     
                     $warehousing_items_import = WarehousingItem::with('w_no')->whereHas('w_no',function($q) use ($warehousing){
@@ -128,7 +129,7 @@ class ExportController extends Controller
                     
                     foreach($warehousing_items_import as $i => $value){
                        
-                        $item->remain = $value->wi_number - $warehousing_item->wi_number;
+                        $item->remain = $value->wi_number - ($warehousing_item->wi_number ? $warehousing_item->wi_number : 0);
                     }
                     
                     $item->warehousing_items_import = $warehousing_items_import;
@@ -152,6 +153,7 @@ class ExportController extends Controller
                 $item->warehousing_item = [$warehousing_item];
 
                 $items[] = $item;
+                }
             }
 
         }
