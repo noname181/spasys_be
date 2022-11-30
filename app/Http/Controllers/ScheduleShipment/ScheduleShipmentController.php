@@ -140,10 +140,12 @@ class ScheduleShipmentController extends Controller
             $schedule_shipment->setCollection(
                 $schedule_shipment->getCollection()->map(function ($q) {
                     $schedule_shipment_item = DB::table('schedule_shipment_info')->where('schedule_shipment_info.ss_no',$q->ss_no)->get();
-            
+                    $count_item = 0;
                     foreach($schedule_shipment_item as $item){
                         $q->total_amount += $item->qty;
+                        $count_item++;
                     }
+                    $q->count_item = $count_item;
                     return  $q;
                 })
             ); 
