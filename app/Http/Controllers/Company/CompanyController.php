@@ -288,7 +288,7 @@ class CompanyController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-
+            
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
