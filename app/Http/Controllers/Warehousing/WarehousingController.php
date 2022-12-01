@@ -2937,6 +2937,9 @@ class WarehousingController extends Controller
                     return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
                 });
             }
+            if (isset($validated['service'])) {
+                $warehousing->where('service_korean_name', '=', $validated['service']);
+            }
 
 
 
@@ -3018,10 +3021,10 @@ class WarehousingController extends Controller
                         ->orWhere('rgd_status3', '=', $validated['rgd_status3_3'] ? $validated['rgd_status3_3'] : "");
                 });
             }
-            if (isset($validated['service_korean_name'])) {
-                $warehousing_fulfillment->where('service_korean_name', '=', $validated['service_korean_name']);
-            }
 
+            if (isset($validated['service'])) {
+                $warehousing_fulfillment->where('service_korean_name', '=', $validated['service']);
+            }
 
 
 
@@ -3110,13 +3113,16 @@ class WarehousingController extends Controller
                         ->orWhere('rgd_status3', '=', $validated['rgd_status3_3'] ? $validated['rgd_status3_3'] : "");
                 });
             }
-            if (isset($validated['service_korean_name'])) {
-                $warehousing_bonded->where('service_korean_name', '=', $validated['service_korean_name']);
+            if (isset($validated['service'])) {
+                $warehousing_bonded->where('service_korean_name', '=', $validated['service']);
             }
 
 
             $warehousing->union($warehousing_fulfillment)->union($warehousing_bonded)->orderBy('updated_at', 'DESC')
             ->orderBy('rgd_no', 'DESC');
+
+
+
 
 
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
