@@ -2634,7 +2634,7 @@ class ItemController extends Controller
                 foreach($api_data->data as $item){ 
                     $item = (array)$item;
                     $item_info = Item::where('product_id',$item['product_id'])->first();
-                    if($item['stock'] == 0 && $item_info){
+                    if($item['stock'] > 0 && $item_info){
                         $item_info_no = ItemInfo::where('product_id', $item['product_id'])
                         ->where('item_no', $item_info->item_no)
                         ->update([
