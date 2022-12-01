@@ -30,12 +30,10 @@ class BannerRegisterRequest extends BaseFormRequest
                 'max:255',
             ],
             'banner_start' => [
-                'required',
-                'date_format:m/d/Y'
+                '',
             ],
             'banner_end' => [
-                'required',
-                'date_format:m/d/Y'
+                '',
             ],
             'banner_use_yn' => [
                 'required',
@@ -53,14 +51,10 @@ class BannerRegisterRequest extends BaseFormRequest
                 'max:255',
             ],
             'banner_position_detail' => [
-                'required',
-                'string',
-                'max:255',
+                '',
             ],
             'banner_link1' => [
-                'required',
-                'string',
-                'max:255',
+                '',
             ],
             'banner_link2' => [
 
@@ -71,7 +65,7 @@ class BannerRegisterRequest extends BaseFormRequest
                 'max:255',
             ],
             'bannerFiles1' => [
-                'required',
+                '',
             ],
             'bannerFiles1.*' => [
                 'file'
