@@ -2542,7 +2542,6 @@ class ItemController extends Controller
         if($filter['page'] != ''){
             $url_api .= '&page='.$filter['page'];
         }
-        
         $response = file_get_contents($url_api);
         $api_data = json_decode($response);
         if(!empty($api_data->data)){
@@ -2629,24 +2628,20 @@ class ItemController extends Controller
                 }
             }
             $url_api .= '&bad='.$bad;
-           
             $response = file_get_contents($url_api);
             $api_data = json_decode($response);
             if(!empty($api_data->data)){ 
                 foreach($api_data->data as $item){ 
                     $item = (array)$item;
                     $item_info = Item::where('product_id',$item['product_id'])->first();
-                    if($item['stock'] == 0){ // Khong thuoc kho nao
-                        $stock = rand(10,100);
-                        $item_info_no = ItemInfo::updateOrCreate([
+                    if($item['stock'] == 0 && $item_info){
+                        $item_info_no = ItemInfo::where('product_id', $item['product_id'])
+                        ->where('item_no', $item_info->item_no)
+                        ->update([
                             'product_id' => $item['product_id'],
-                            'stock' => $stock, //$item['stock'],
-                            'item_no' => $item_info->item_no,
-                        ],[
-                            'product_id' => $item['product_id'],
-                            'stock' => $stock, //$item['stock'],
+                            'stock' => $item['stock'],
                             'status' => $item['bad'],
-                            'item_no' => $item_info->item_no,
+                            'item_no' => $item_info->item_no
                         ]);
                     }
                 }
