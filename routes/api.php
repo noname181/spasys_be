@@ -489,7 +489,7 @@ Route::middleware('auth')->group(function () {
         //DELETE SET RATE DATA FOR BONDED SERVICE
         Route::delete('/delete_set_rate_data/{rd_no}/',[\App\Http\Controllers\RateData\RateDataController::class, 'deleteSetRateData']);
 
-
+        Route::get('/by_rmd_no/{by_rmd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByRmdNo']);
         Route::get('/by_rm_no/{rm_no}/{rmd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateData'])->name('get_rate_data');
         Route::get('/by_co_no/{rd_co_no}/{rmd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByCono'])->name('get_rate_data_by_co_no');
 

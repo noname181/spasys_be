@@ -1288,6 +1288,34 @@ class RateDataController extends Controller
         }
     }
 
+    public function getRateDataByRmdNo($rmd_no)
+    {
+        $co_no = Auth::user()->co_no;
+        try {
+
+            $co_rate_data1 = RateData::where('rd_cate_meta1', '보세화물')->where('rmd_no', $rmd_no);
+            $co_rate_data2 = RateData::where('rd_cate_meta1', '수입풀필먼트')->where('rmd_no', $rmd_no);
+            $co_rate_data3 = RateData::where('rd_cate_meta1', '유통가공')->where('rmd_no', $rmd_no);
+
+
+            $co_rate_data1 = $co_rate_data1->get();
+            $co_rate_data2 = $co_rate_data2->get();
+            $co_rate_data3 = $co_rate_data3->get();
+
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'co_rate_data1' => $co_rate_data1,
+                'co_rate_data2' => $co_rate_data2,
+                'co_rate_data3' => $co_rate_data3,
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
     public function spasysRegisterRateData(RateDataRequest $request)
     {
         $validated = $request->validated();
