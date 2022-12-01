@@ -159,7 +159,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         'rgd_status2' => isset($rgd['rgd_status2']) ? $rgd['rgd_status2'] : null,
                         'rgd_status3' => isset($rgd['rgd_status3']) ? $rgd['rgd_status3'] : null,
                         'rgd_status4' => isset($rgd['rgd_status4']) ? $rgd['rgd_status4'] : null,
-                        'rgd_delivery_company' => isset($rgd['rgd_delivery_company']) ? $rgd['rgd_delivery_company'] : null,
+                        'rgd_delivery_company' => isset($rgd['rgd_delivery_company']) ? $rgd['rgd_contents'] ? $rgd['rgd_contents'] : $rgd['rgd_delivery_company'] : null,
                         'rgd_tracking_code' => isset($rgd['rgd_tracking_code']) ? $rgd['rgd_tracking_code'] : null,
                         'rgd_delivery_man' => isset($rgd['rgd_delivery_man']) ? $rgd['rgd_delivery_man'] : null,
                         'rgd_delivery_man_hp' => isset($rgd['rgd_delivery_man_hp']) ? $rgd['rgd_delivery_man_hp'] : null,
@@ -190,7 +190,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         'rgd_status2' => $rgd['rgd_status2'],
                         'rgd_status3' => $rgd['rgd_status3'],
                         'rgd_status4' => isset($rgd['rgd_status4']) ? $rgd['rgd_status4'] : null,
-                        'rgd_delivery_company' => $rgd['rgd_delivery_company'],
+                        'rgd_delivery_company' => $rgd['rgd_contents'] ? $rgd['rgd_contents'] : $rgd['rgd_delivery_company'],
                         'rgd_tracking_code' => $rgd['rgd_tracking_code'],
                         'rgd_delivery_man' => $rgd['rgd_delivery_man'],
                         'rgd_delivery_man_hp' => $rgd['rgd_delivery_man_hp'],
@@ -1816,24 +1816,25 @@ class ReceivingGoodsDeliveryController extends Controller
             }
 
             if ($validated['wr_contents'] && $validated['is_no']) {
-                // WarehousingRequest::insert([
-                //     'wr_type' => "List",
-                //     'w_no' => $validated['is_no'],
-                //     'mb_no' => $member->mb_no,
-                //     'wr_contents' => $validated['wr_contents'],
-                // ]);
-                WarehousingRequest::updateOrCreate(
-                    [
-                        'w_no' => $validated['is_no'],
-                        'wr_type' => "List",
-                    ],
-                    [
-                        'wr_type' => "List",
-                        'w_no' => $validated['is_no'],
-                        'mb_no' => $member->mb_no,
-                        'wr_contents' => $validated['wr_contents'],
-                    ]
-                );
+                WarehousingRequest::insert([
+                    'wr_type' => "IW",
+                    'w_no' => $validated['is_no'],
+                    'mb_no' => $member->mb_no,
+                    'wr_contents' => $validated['wr_contents'],
+                ]);
+                // Change wr_type List if need popup function show on textarae
+                // WarehousingRequest::updateOrCreate(
+                //     [
+                //         'w_no' => $validated['is_no'],
+                //         'wr_type' => "IW",
+                //     ],
+                //     [
+                //         'wr_type' => "IW",
+                //         'w_no' => $validated['is_no'],
+                //         'mb_no' => $member->mb_no,
+                //         'wr_contents' => $validated['wr_contents'],
+                //     ]
+                // );
             }
 
 

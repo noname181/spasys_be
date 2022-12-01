@@ -720,21 +720,21 @@ class ItemController extends Controller
     public function paginateItemsApiIdRaw()
     {
         try {
-            $user = Auth::user();
-            if ($user->mb_type == 'shop') {
-                $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
-                    $q->where('co_no', $user->co_no);
-                })->orderBy('item_no', 'DESC');
-            } else if ($user->mb_type == 'shipper') {
-                $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('ContractWms.company', function ($q) use ($user) {
-                    $q->where('co_no', $user->co_no);
-                })->orderBy('item_no', 'DESC');
-            } else if ($user->mb_type == 'spasys') {
-                $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
-                    $q->where('co_no', $user->co_no);
-                })->orderBy('item_no', 'DESC');
-            }
-
+            // $user = Auth::user();
+            // if ($user->mb_type == 'shop') {
+            //     $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
+            //         $q->where('co_no', $user->co_no);
+            //     })->orderBy('item_no', 'DESC');
+            // } else if ($user->mb_type == 'shipper') {
+            //     $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('ContractWms.company', function ($q) use ($user) {
+            //         $q->where('co_no', $user->co_no);
+            //     })->orderBy('item_no', 'DESC');
+            // } else if ($user->mb_type == 'spasys') {
+            //     $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
+            //         $q->where('co_no', $user->co_no);
+            //     })->orderBy('item_no', 'DESC');
+            // }
+            $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->where('item_service_name', '=', '수입풀필먼트');
             $item = $item->get();
 
             return $item;
@@ -2613,36 +2613,40 @@ class ItemController extends Controller
         $url_api .= '&partner_key='.$filter['partner_key'];
         $url_api .= '&domain_key='.$filter['domain_key'];
         $url_api .= '&action='.$filter['action'];
-        $list_items = $this->paginateItemsApiIdRaw();
-        for($bad = 0; $bad <= 1; $bad++) {
-            if(!empty($list_items)){
-                $url_api .= '&product_id=';
-                foreach($list_items as $key_item => $item){
-                    if($key_item > 0){
-                        $url_api .= ',';
-                    }
-                    $url_api .= $item['product_id'];
-                    if($key_item >= 50){
-                        break;
+        $list_items = $this->paginateItemsApiIdRaw()->toArray();
+        $limit_slice = 99;
+        $new_array_items = empty($list_items)?array():((count($list_items) > 99)?array_chunk($list_items, $limit_slice):$list_items);
+        foreach($new_array_items as $list_item){
+            for($bad = 0; $bad <= 1; $bad++) {
+                if(!empty($list_items)){
+                    $url_api .= '&product_id=';
+                    foreach($list_item as $key_item => $item){
+                        if($key_item > 0){
+                            $url_api .= ',';
+                        }
+                        $url_api .= $item['product_id'];
+                        if($key_item >= 50){
+                            break;
+                        }
                     }
                 }
-            }
-            $url_api .= '&bad='.$bad;
-            $response = file_get_contents($url_api);
-            $api_data = json_decode($response);
-            if(!empty($api_data->data)){ 
-                foreach($api_data->data as $item){ 
-                    $item = (array)$item;
-                    $item_info = Item::where('product_id',$item['product_id'])->first();
-                    if($item['stock'] > 0 && $item_info){
-                        $item_info_no = ItemInfo::where('product_id', $item['product_id'])
-                        ->where('item_no', $item_info->item_no)
-                        ->update([
-                            'product_id' => $item['product_id'],
-                            'stock' => $item['stock'],
-                            'status' => $item['bad'],
-                            'item_no' => $item_info->item_no
-                        ]);
+                $url_api .= '&bad='.$bad;
+                $response = file_get_contents($url_api);
+                $api_data = json_decode($response);
+                if(!empty($api_data->data)){ 
+                    foreach($api_data->data as $item){ 
+                        $item = (array)$item;
+                        $item_info = Item::where('product_id',$item['product_id'])->first();
+                        if($item['stock'] > 0 && $item_info){
+                            $item_info_no = ItemInfo::where('product_id', $item['product_id'])
+                            ->where('item_no', $item_info->item_no)
+                            ->update([
+                                'product_id' => $item['product_id'],
+                                'stock' => $item['stock'],
+                                'status' => $item['bad'],
+                                'item_no' => $item_info->item_no
+                            ]);
+                        }
                     }
                 }
             }
