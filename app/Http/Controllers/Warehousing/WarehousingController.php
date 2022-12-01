@@ -2937,7 +2937,7 @@ class WarehousingController extends Controller
                     return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
                 });
             }
-            if (isset($validated['service'])) {
+            if (isset($validated['service']) && $validated['service'] != '전체') {
                 $warehousing->where('service_korean_name', '=', $validated['service']);
             }
 
@@ -2986,7 +2986,7 @@ class WarehousingController extends Controller
             }
 
             if (isset($validated['co_parent_name'])) {
-                $warehousing_fulfillment->whereHas('w_no.co_no.co_parent', function ($query) use ($validated) {
+                $warehousing_fulfillment->whereHas('w_no.co_no', function ($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
                 });
             }
@@ -3022,7 +3022,7 @@ class WarehousingController extends Controller
                 });
             }
 
-            if (isset($validated['service'])) {
+            if (isset($validated['service']) && $validated['service'] != '전체') {
                 $warehousing_fulfillment->where('service_korean_name', '=', $validated['service']);
             }
 
@@ -3113,7 +3113,7 @@ class WarehousingController extends Controller
                         ->orWhere('rgd_status3', '=', $validated['rgd_status3_3'] ? $validated['rgd_status3_3'] : "");
                 });
             }
-            if (isset($validated['service'])) {
+            if (isset($validated['service']) && $validated['service'] != '전체') {
                 $warehousing_bonded->where('service_korean_name', '=', $validated['service']);
             }
 
