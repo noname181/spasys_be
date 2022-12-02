@@ -205,6 +205,26 @@ class WarehousingController extends Controller
             $members = Member::where('mb_no', '!=', 0)->get();
 
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
+            $warehousing->setCollection(
+                $warehousing->getCollection()->map(function ($item) {
+
+                    $item->total_item = WarehousingItem::where('w_no', $item->w_no)->where('wi_type', '입고_spasys')->sum('wi_number');
+                    if($item['warehousing_item'][0]['item']){
+                        $first_name_item = $item['warehousing_item'][0]['item']['item_name'];
+                        $total_item = $item['warehousing_item']->count();
+                        $final_total = (($total_item / 2 )  - 1 );
+                        if($final_total <= 0){
+                            $item->first_item_name_total = $first_name_item .'외';
+                        }else{
+                            $item->first_item_name_total = $first_name_item .'외' . ' ' . $final_total .'건';
+                        }
+                    }else {
+                        $item->first_item_name_total = '';
+                    }
+
+                    return $item;
+                })
+            );
 
             return response()->json($warehousing);
         } catch (\Exception $e) {
@@ -552,7 +572,11 @@ class WarehousingController extends Controller
                         $first_name_item = $item['warehousing_item'][0]['item']['item_name'];
                         $total_item = $item['warehousing_item']->count();
                         $final_total = (($total_item / 2 )  - 1 );
-                        $item->first_item_name_total = $first_name_item .'외' . ' ' . $final_total .'건';
+                        if($final_total <= 0){
+                            $item->first_item_name_total = $first_name_item .'외';
+                        }else{
+                            $item->first_item_name_total = $first_name_item .'외' . ' ' . $final_total .'건';
+                        }
                     }else {
                         $item->first_item_name_total = '';
                     }
