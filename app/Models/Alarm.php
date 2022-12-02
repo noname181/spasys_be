@@ -8,7 +8,7 @@ use App\Models\Item;
 use App\Models\Warehousing;
 use App\Models\WarehousingItem;
 use App\Models\Member;
-
+use App\Models\Export;
 
 class Alarm extends Model
 {
@@ -48,5 +48,9 @@ class Alarm extends Model
     public function member()
     {
         return $this->hasOne(Member::class, 'mb_no', 'mb_no');;
+    }
+    public function export()
+    {
+        return $this->belongsTo(Export::class, 'w_no', 'te_carry_out_number')->with(['import_expected']);
     }
 }

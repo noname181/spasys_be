@@ -26,7 +26,6 @@ class AlarmRequest extends BaseFormRequest
         return [
             'w_no' => [
                 'required',
-                'integer',
             ],
             'alarm_content' => [
                 'required',

@@ -64,7 +64,28 @@ class AlarmController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $alarm = Alarm::with('warehousing','member')->orderBy('alarm_no', 'DESC');
+
+            $user = Auth::user();
+
+            if($user->mb_type == 'shop'){
+                $alarm = Alarm::with('warehousing','member','export')->whereHas('member.company',function($q) use ($user){
+                    $q->where('co_no', $user->company->co_parent->co_no)
+                    ->orWhere('co_no', $user->company->co_parent->co_parent->co_no);
+                })->orderBy('alarm_no', 'DESC');
+            }
+            else if($user->mb_type == 'shipper'){
+                $alarm = Alarm::with('warehousing','member','export')->whereHas('member.company',function($q) use ($user){
+                    $q->where('co_no', $user->company->co_parent->co_no)
+                    ->orWhere('co_no', $user->company->co_parent->co_parent->co_no);
+                })->orderBy('alarm_no', 'DESC');
+               
+            } else if ($user->mb_type == 'spasys'){
+                $alarm = Alarm::with('warehousing','member','export')->whereHas('member',function ($q) use ($user){
+                    $q->where('mb_no',$user->mb_no);
+                })->orderBy('alarm_no', 'DESC');
+            }
+
+            
 
             if (isset($validated['w_no'])) {
                 $alarm->where('w_no', $validated['w_no']);
