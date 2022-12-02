@@ -1164,7 +1164,7 @@ class RateDataController extends Controller
                 $co_rate_data2 = $co_rate_data2->where('co_no', $co_no);
                 $co_rate_data3 = $co_rate_data3->where('co_no', $co_no);
             } else if (Auth::user()->mb_type == 'shop') {
-                $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
+                $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
                 $co_rate_data1 = $co_rate_data1->where('rd_co_no', $co_no);
                 $co_rate_data2 = $co_rate_data2->where('rd_co_no', $co_no);
                 $co_rate_data3 = $co_rate_data3->where('rd_co_no', $co_no);
@@ -1211,7 +1211,7 @@ class RateDataController extends Controller
                 $co_rate_data2 = $co_rate_data2->where('co_no', $co_no);
                 $co_rate_data3 = $co_rate_data3->where('co_no', $co_no);
             } else if (Auth::user()->mb_type == 'shop') {
-                $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
+                $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
                 $co_rate_data1 = $co_rate_data1->where('rd_co_no', $co_no);
                 $co_rate_data2 = $co_rate_data2->where('rd_co_no', $co_no);
                 $co_rate_data3 = $co_rate_data3->where('rd_co_no', $co_no);
@@ -1257,7 +1257,7 @@ class RateDataController extends Controller
                 $co_rate_data2 = $co_rate_data2->where('co_no', $co_no);
                 $co_rate_data3 = $co_rate_data3->where('co_no', $co_no);
             } else if (Auth::user()->mb_type == 'shop') {
-                $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
+                $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
                 $co_rate_data1 = $co_rate_data1->where('rd_co_no', $co_no);
                 $co_rate_data2 = $co_rate_data2->where('rd_co_no', $co_no);
                 $co_rate_data3 = $co_rate_data3->where('rd_co_no', $co_no);
@@ -1522,21 +1522,21 @@ class RateDataController extends Controller
 
             if ($user->mb_type == 'spasys') {
                 $co_no = $company->co_no;
-                $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
+                $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
                 $rate_data = $rate_data->where('rd_co_no', $co_no);
                 if (isset($rmd->rmd_no)) {
                     $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
                 }
             } else if ($user->mb_type == 'shop') {
                 $co_no = $company->co_no;
-                $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
+                $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
                 $rate_data = $rate_data->where('rd_co_no', $co_no);
                 if (isset($rmd->rmd_no)) {
                     $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
                 }
             } else {
                 $co_no = $company->co_no;
-                $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
+                $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
                 $rate_data = $rate_data->where('rd_co_no', $co_no);
                 if (isset($rmd->rmd_no)) {
                     $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
@@ -1688,7 +1688,7 @@ class RateDataController extends Controller
            if ($user->mb_type == 'spasys') {
                 $rate_data = $rate_data->where('co_no', $co_no);
             } else if ($user->mb_type == 'shop' || $user->mb_type == 'shipper') {
-                $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
+                $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
                 $rate_data = $rate_data->where('rd_co_no', $co_no);
                 if (isset($rmd->rmd_no)) {
                     $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
@@ -1781,7 +1781,7 @@ class RateDataController extends Controller
                 $co_no = $user->co_no;
             }
 
-            $rmd = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
+            $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
             $rate_data = $rate_data->where('rd_co_no', $co_no);
             if (isset($rmd->rmd_no)) {
                 $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
