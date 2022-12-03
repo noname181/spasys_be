@@ -418,6 +418,45 @@ class ReceivingGoodsDeliveryController extends Controller
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
+    public function create_item_mobile(ReceivingGoodsDeliveryCreateRequest $request)
+    {
+        $validated = $request->validated();
+
+        try {
+            DB::beginTransaction();
+            $member = Member::where('mb_id', Auth::user()->mb_id)->first();
+            $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
+
+                $item_no_new = Item::insertGetId([
+                    'mb_no' => Auth::user()->mb_no,
+                    'item_brand' => isset($request['item_brand']) ? $request['item_brand'] : null,
+                    'item_service_name' => '유통가공',
+                    'co_no' => $request['co_no'] ? $request['co_no'] : $co_no,
+                    'item_name' => isset($request['item_name']) ? $request['item_name'] : null,
+                    'item_name' => isset($request['item_bar_code']) ? $request['item_bar_code'] : null,
+                    'item_option1' => isset($request['item_option1']) ? $request['item_option1'] : null,
+                    'item_option2' => isset($request['item_option2']) ? $request['item_option2'] : null,
+                    'item_price4' => isset($request['item_price4']) ? $request['item_price4'] : null
+                ]);
+
+                WarehousingItem::insert([
+                    'item_no' => $item_no_new,
+                    'w_no' => $validated['w_no'],
+                    'wi_number' =>  isset($request['item_price4']) ? $request['item_price4'] : null,
+                    'wi_type' => '입고_shipper'
+                ]);
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'w_no' => isset($w_no) ? $w_no :  $validated['w_no'],
+            ], 201);
+        } catch (\Throwable $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0001], 500);
+        }
+    }
 
     public function create_warehousing_release(Request $request)
     {
