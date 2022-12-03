@@ -15,6 +15,7 @@ use App\Models\ReceivingGoodsDelivery;
 use App\Models\WarehousingItem;
 use App\Models\Company;
 use App\Models\Import;
+use App\Models\ImportExpected;
 use App\Utils\Messages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -279,14 +280,18 @@ class ImportController extends Controller
         try {
 
             DB::beginTransaction();
+            $company = Company::where('co_no', $request->co_no)->first();
             Import::where('ti_logistic_manage_number', $request->ti_logistic_manage_number)->update([
                 'ti_logistic_type' => $request->ti_logistic_type,
                 'ti_i_storeday' => $request->storagedays,
             ]);
 
-            Company::where('co_no', $request->co_no)->update([
-                'co_name' => $request->company_name,
+            ImportExpected::where('tie_logistic_manage_number', $request->tie_logistic_manage_number)->update([
+                'tie_co_license' => isset($company->co_license) ? $company->co_license : null,
             ]);
+            // Company::where('co_no', $request->co_no)->update([
+            //     'co_name' => $request->company_name,
+            // ]);
 
             DB::commit();
             return response()->json(['message' => 'ok']);
