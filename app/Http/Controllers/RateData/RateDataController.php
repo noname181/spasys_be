@@ -1087,6 +1087,7 @@ class RateDataController extends Controller
                 ],
                 [
                     'mb_no' => $user->mb_no,
+                    'rmd_number' => isset($request->activeTab2) ? $request->activeTab2 : null,
                 ]
             );
 
@@ -1105,7 +1106,7 @@ class RateDataController extends Controller
                 ]
             );
 
-            return response()->json(['message' => Messages::MSG_0007, 'rmd_no' => $rmd->rmd_no, 'rate_data_general' => $rate_data_general], 200);
+            return response()->json(['message' => Messages::MSG_0007, 'rmd_no' => $rmd->rmd_no, 'rate_data_general' => $rate_data_general , '$request->activeTab2' => $request->activeTab2], 200);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
