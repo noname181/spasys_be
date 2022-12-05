@@ -52,24 +52,28 @@ class ReportController extends Controller
                     $files = [];
                     $path = join('/', ['files', 'report', $report_no]);
                     $index = 0;
-                    foreach ($request->$filename as $file) {
-                        if ($file != 'undefined') {
-                            $url = Storage::disk('public')->put($path, $file);
-                            $files[] = [
-                                'file_table' => 'report',
-                                'file_table_key' => $report_no,
-                                'file_name_old' => $file->getClientOriginalName(),
-                                'file_name' => basename($url),
-                                'file_size' => $file->getSize(),
-                                'file_extension' => $file->extension(),
-                                'file_position' => $index,
-                                'file_url' => $url,
-                            ];
-                            $index++;
-                            File::insert($files);
-                            $files = [];
-                        }
+                    if (isset($request->$filename)) {
+                    if($request->$filename){
+                        foreach ($request->$filename as $file) {
+                            if ($file != 'undefined') {
+                                $url = Storage::disk('public')->put($path, $file);
+                                $files[] = [
+                                    'file_table' => 'report',
+                                    'file_table_key' => $report_no,
+                                    'file_name_old' => $file->getClientOriginalName(),
+                                    'file_name' => basename($url),
+                                    'file_size' => $file->getSize(),
+                                    'file_extension' => $file->extension(),
+                                    'file_position' => $index,
+                                    'file_url' => $url,
+                                ];
+                                $index++;
+                                File::insert($files);
+                                $files = [];
+                            }
 
+                        }
+                    }
                     }
                     $i++;
                 }
