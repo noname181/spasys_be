@@ -1935,6 +1935,7 @@ class RateDataController extends Controller
         try {
             DB::beginTransaction();
             $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+            $ag = AdjustmentGroup::where('ag_no', $request->rdg_set_type)->first();
 
             $rdg = RateDataGeneral::updateOrCreate(
                 [
@@ -1946,7 +1947,8 @@ class RateDataController extends Controller
                     'rgd_no' => isset($rgd->rgd_no) ? $rgd->rgd_no : null,
                     'rdg_bill_type' => $request->bill_type,
                     'mb_no' => Auth::user()->mb_no,
-                    'rdg_set_type' => $request->rdg_set_type,
+                    'rdg_set_type' => $ag->ag_name,
+                    'ag_no' => $ag->ag_no,
                     'rdg_supply_price1' => $request->storageData['supply_price'],
                     'rdg_supply_price2' => $request->workData['supply_price'],
                     'rdg_supply_price3' => $request->domesticData['supply_price'],
@@ -2110,6 +2112,7 @@ class RateDataController extends Controller
             //Get RecevingGoodsDelivery base on rgd_no
             $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
             $w_no = $rgd->w_no;
+            $ag = AdjustmentGroup::where('ag_no', $request->rdg_set_type)->first();
 
             $rdg = RateDataGeneral::updateOrCreate(
                 [
@@ -2122,7 +2125,8 @@ class RateDataController extends Controller
                     'rgd_no_expectation' => $request->type == 'edit_final' ? $is_exist->rgd_no_expectation : (str_contains($request->bill_type, 'final') ? $request->rgd_no : null),
                     'rgd_no_final' => $request->type == 'edit_additional' ? $is_exist->rgd_no_final : (str_contains($request->bill_type, 'additional') ? $request->rgd_no : null),
                     'mb_no' => Auth::user()->mb_no,
-                    'rdg_set_type' => isset($request->rdg_set_type) ? $request->rdg_set_type : '',
+                    'rdg_set_type' => $ag->ag_name,
+                    'ag_no' => $ag->ag_no,
                     'rdg_supply_price1' => isset($request->storageData['supply_price']) ? $request->storageData['supply_price'] : '',
                     'rdg_supply_price2' => isset($request->workData['supply_price']) ? $request->workData['supply_price'] : '',
                     'rdg_supply_price3' => isset($request->domesticData['supply_price']) ? $request->domesticData['supply_price'] : '',
@@ -2228,6 +2232,7 @@ class RateDataController extends Controller
 
             $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
             $w_no = $rgd->w_no;
+            $ag = AdjustmentGroup::where('ag_no', $request->rdg_set_type)->first();
 
             $rdg = RateDataGeneral::updateOrCreate(
                 [
@@ -2239,7 +2244,8 @@ class RateDataController extends Controller
                     'rdg_bill_type' => 'additional',
                     'rgd_no_final' => $request->rgd_no,
                     'mb_no' => Auth::user()->mb_no,
-                    'rdg_set_type' => $request->rdg_set_type,
+                    'rdg_set_type' => $ag->ag_name,
+                    'ag_no' => $ag->ag_no,
                     'rdg_supply_price1' => $request->storageData['supply_price'],
                     'rdg_supply_price2' => $request->workData['supply_price'],
                     'rdg_supply_price3' => $request->domesticData['supply_price'],
@@ -2310,6 +2316,7 @@ class RateDataController extends Controller
 
             $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
             $w_no = $rgd->w_no;
+            $ag = AdjustmentGroup::where('ag_no', $request->rdg_set_type)->first();
 
             $rdg = RateDataGeneral::updateOrCreate(
                 [
@@ -2320,7 +2327,8 @@ class RateDataController extends Controller
                     'w_no' => $w_no,
                     'rdg_bill_type' => 'additional',
                     'mb_no' => Auth::user()->mb_no,
-                    'rdg_set_type' => $request->rdg_set_type,
+                    'rdg_set_type' => $ag->ag_name,
+                    'ag_no' => $ag->ag_no,
                     'rdg_supply_price1' => $request->storageData['supply_price'],
                     'rdg_supply_price2' => $request->workData['supply_price'],
                     'rdg_supply_price3' => $request->domesticData['supply_price'],
@@ -2814,10 +2822,13 @@ class RateDataController extends Controller
                         $final_rgd->rgd_settlement_number = $request->settlement_number;
                         $final_rgd->save();
 
+                        $ag = AdjustmentGroup::where('ag_no', $request->rdg_set_type)->first();
+
                         RateDataGeneral::where('rdg_no', $final_rdg->rdg_no)->update([
                             'rgd_no' => $final_rgd->rgd_no,
                             'rgd_no_expectation' => $expectation_rgd->rgd_no,
-                            'rdg_set_type' => $request->rdg_set_type,
+                            'rdg_set_type' => $ag->ag_name,
+                            'ag_no' => $ag->ag_no,
                         ]);
                         RateMetaData::where('rgd_no', $request->rgd_no)->where(function ($q) {
                             $q->where('set_type', 'storage_monthly_final')
@@ -2904,10 +2915,13 @@ class RateDataController extends Controller
                         $final_rgd->rgd_settlement_number = $request->settlement_number;
                         $final_rgd->save();
 
+                        $ag = AdjustmentGroup::where('ag_no', $request->rdg_set_type)->first();
+
                         RateDataGeneral::where('rdg_no', $final_rdg->rdg_no)->update([
                             'rgd_no' => $final_rgd->rgd_no,
                             'rgd_no_expectation' => $expectation_rgd->rgd_no,
-                            'rdg_set_type' => $request->rdg_set_type,
+                            'rdg_set_type' => $ag->ag_name,
+                            'ag_no' => $ag->ag_no,
                         ]);
                         RateMetaData::where('rgd_no', $request->rgd_no)->where(function ($q) {
                             $q->where('set_type', 'bonded1_final_monthly')
@@ -3036,6 +3050,7 @@ class RateDataController extends Controller
             //Get RecevingGoodsDelivery base on rgd_no
             $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
             $w_no = $rgd->w_no;
+            $ag = AdjustmentGroup::where('ag_no', $request->rdg_set_type)->first();
 
             $rdg = RateDataGeneral::updateOrCreate(
                 [
@@ -3048,7 +3063,8 @@ class RateDataController extends Controller
                     'rgd_no_expectation' => $request->type == 'edit_final' ? $is_exist->rgd_no_expectation : (str_contains($request->bill_type, 'final') ? $request->rgd_no : null),
                     'rgd_no_final' => $request->type == 'edit_additional' ? $is_exist->rgd_no_final : (str_contains($request->bill_type, 'additional') ? $request->rgd_no : null),
                     'mb_no' => Auth::user()->mb_no,
-                    'rdg_set_type' => $request->rdg_set_type,
+                    'rdg_set_type' => $ag->ag_name,
+                    'ag_no' => $ag->ag_no,
                     'rdg_supply_price1' => $request->fulfill1['supply_price'],
                     'rdg_supply_price2' => $request->fulfill2['supply_price'],
                     'rdg_supply_price3' => $request->fulfill3['supply_price'],
@@ -3204,6 +3220,7 @@ class RateDataController extends Controller
             //Get RecevingGoodsDelivery base on rgd_no
             $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
             $w_no = $rgd->w_no;
+            $ag = AdjustmentGroup::where('ag_no', $request->rdg_set_type)->first();
 
             $rdg = RateDataGeneral::updateOrCreate(
                 [
@@ -3216,7 +3233,8 @@ class RateDataController extends Controller
                     'rgd_no_expectation' => $request->type == 'edit_final' ? $is_exist->rgd_no_expectation : (str_contains($request->bill_type, 'final') ? $request->rgd_no : null),
                     'rgd_no_final' => $request->type == 'edit_additional' ? $is_exist->rgd_no_final : (str_contains($request->bill_type, 'additional') ? $request->rgd_no : null),
                     'mb_no' => Auth::user()->mb_no,
-                    'rdg_set_type' => $request->rdg_set_type,
+                    'rdg_set_type' => $ag->ag_name,
+                    'ag_no' => $ag->ag_no,
                     'rdg_supply_price1' => $request->bonded1['supply_price'],
                     'rdg_supply_price2' => $request->bonded2['supply_price'],
                     'rdg_supply_price3' => $request->bonded3['supply_price'],
@@ -3316,6 +3334,7 @@ class RateDataController extends Controller
             //Get RecevingGoodsDelivery base on rgd_no
             $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
             $w_no = $rgd->w_no;
+            $ag = AdjustmentGroup::where('ag_no', $request->rdg_set_type)->first();
 
             $rdg = RateDataGeneral::updateOrCreate(
                 [
@@ -3328,7 +3347,8 @@ class RateDataController extends Controller
                     'rgd_no_expectation' => $request->type == 'edit_final' ? $is_exist->rgd_no_expectation : (str_contains($request->bill_type, 'final') ? $request->rgd_no : null),
                     'rgd_no_final' => $request->type == 'edit_additional' ? $is_exist->rgd_no_final : (str_contains($request->bill_type, 'additional') ? $request->rgd_no : null),
                     'mb_no' => Auth::user()->mb_no,
-                    'rdg_set_type' => $request->rdg_set_type,
+                    'rdg_set_type' => $ag->ag_name,
+                    'ag_no' => $ag->ag_no,
                     'rdg_supply_price1' => $request->bonded1['supply_price'],
                     'rdg_supply_price2' => $request->bonded2['supply_price'],
                     'rdg_supply_price3' => $request->bonded3['supply_price'],
