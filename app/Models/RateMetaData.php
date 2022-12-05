@@ -29,7 +29,8 @@ class RateMetaData extends Model
         'rmd_number',
         'w_no',
         'rgd_no',
-        'co_no'
+        'co_no',
+        'rmd_mail_detail'
     ];
 
     protected $casts = [
