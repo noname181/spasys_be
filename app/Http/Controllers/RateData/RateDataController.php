@@ -20,6 +20,7 @@ use App\Models\ReceivingGoodsDelivery;
 use App\Models\Warehousing;
 use App\Utils\CommonFunc;
 use App\Utils\Messages;
+use App\Models\ImportExpected;
 use Carbon\Carbon;
 use File;
 use Illuminate\Http\Request;
@@ -1612,9 +1613,10 @@ class RateDataController extends Controller
                 'company.co_homepage',
                 'company.co_email',
                 'company.co_etc',
+                'company.co_type',
                 'contract.c_integrated_calculate_yn as c_integrated_calculate_yn',
                 'contract.c_calculate_deadline_yn as c_calculate_deadline_yn',
-            ])->join('contract', 'contract.co_no', 'company.co_no')->with(['co_parent'])->where('co_license', $import->ti_co_license)->first();
+            ])->join('contract', 'contract.co_no', 'company.co_no')->with(['co_parent','co_childen'])->where('co_license', $import->ti_co_license)->where('co_type','shipper')->first();
 
             if($user->mb_type == 'shop'){
                 $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_tracking_code', $is_no)->first();
@@ -3435,9 +3437,21 @@ class RateDataController extends Controller
         try {
             DB::beginTransaction();
             //Check is there already RateDataGeneral with rdg_no yet
-
+            $company = Company::where('co_no', $request->co_no)->first();
             $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                 'rgd_storage_days' => $request->storage_days,
+            ]);
+
+            Import::where('ti_logistic_manage_number', $request->ti_logistic_manage_number)->update([
+                'ti_co_license' => isset($company->co_license) ? $company->co_license : null,
+            ]);
+
+            ImportExpected::where('tie_logistic_manage_number', $request->ti_logistic_manage_number)->update([
+                'tie_co_license' => isset($company->co_license) ? $company->co_license : null,
+            ]);
+
+            Warehousing::where('logistic_manage_number', $request->ti_logistic_manage_number)->update([
+                'co_no' => isset($request->co_no) ? $request->co_no : null,
             ]);
 
             DB::commit();
