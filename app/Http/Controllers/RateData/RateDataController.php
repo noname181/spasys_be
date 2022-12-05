@@ -66,6 +66,8 @@ class RateDataController extends Controller
                 );
             }
 
+           
+
             foreach ($validated['rate_data'] as $val) {
                 Log::error($val);
                 $rd_no = RateData::updateOrCreate(
@@ -88,6 +90,11 @@ class RateDataController extends Controller
 
                     ],
                 );
+            }
+            if(isset($validated['rmd_mail_detail'])){
+                $update_rate_meta_data = RateMetaData::where('rmd_no', $validated['rmd_no'])->update([
+                    'rmd_mail_detail' => $validated['rmd_mail_detail']
+                ]);
             }
             DB::commit();
             return response()->json([
