@@ -30,6 +30,7 @@ class Item extends Model
         'co_no',
         'item_brand',
         'item_name',
+        'option_id',
         'item_option1',
         'item_option2',
         'item_channel',

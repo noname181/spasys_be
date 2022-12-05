@@ -36,6 +36,7 @@ class ScheduleShipment extends Model
         'order_id_seq',
         'order_id_seq2',
         'shop_product_id',
+        'shop_option_id',
         'product_name',
         'options',
         'qty',
