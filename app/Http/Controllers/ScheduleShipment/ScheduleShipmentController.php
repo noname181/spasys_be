@@ -14,6 +14,7 @@ use App\Models\File;
 use App\Models\ItemChannel;
 use App\Utils\Messages;
 use App\Http\Requests\Item\ExcelRequest;
+use App\Models\Item;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -136,7 +137,6 @@ class ScheduleShipmentController extends Controller
             }
             
             $schedule_shipment = $schedule_shipment->paginate($per_page, ['*'], 'page', $page);
-
             $schedule_shipment->setCollection(
                 $schedule_shipment->getCollection()->map(function ($q) {
                     $schedule_shipment_item = DB::table('schedule_shipment_info')->where('schedule_shipment_info.ss_no',$q->ss_no)->get();
@@ -164,7 +164,6 @@ class ScheduleShipmentController extends Controller
         try {
             DB::beginTransaction();
             $user = Auth::user();
-            return $request;
                 foreach ($request->data as $i_schedule => $schedule) {
                     $data_schedule = [
                         'co_no' => $user->co_no,
@@ -260,12 +259,13 @@ class ScheduleShipmentController extends Controller
     }
     public function apiScheduleShipmentsRaw($data_schedule = null)
     {
-       
         try {
             DB::beginTransaction();
             $user = Auth::user();
                 foreach ($data_schedule as $i_schedule => $schedule) {
-                    foreach($schedule as $schedule_item){
+                    foreach($schedule['data_item'] as $schedule_item){
+                        $shop_product_id = isset($schedule_item['order_products'][0]['product_id'])?$schedule_item['order_products'][0]['product_id']:$schedule_item['shop_product_id'];
+                        $shop_option_id = Item::where('product_id',$shop_product_id)->select('option_id')->first();
                         $data_schedule = [
                             'co_no' => $user->co_no,
                             'seq' => isset($schedule_item['seq']) ? $schedule_item['seq'] : null,
@@ -275,7 +275,8 @@ class ScheduleShipmentController extends Controller
                             'order_id' => !empty($schedule_item['order_id']) ? $schedule_item['order_id'] : $i_schedule,
                             'order_id_seq' => isset($schedule_item['order_id_seq']) ? $schedule_item['order_id_seq'] : null,
                             'order_id_seq2' => isset($schedule_item['order_id_seq2']) ? $schedule_item['order_id_seq2'] : null,
-                            'shop_product_id' => isset($schedule_item['shop_product_id']) ? $schedule_item['shop_product_id'] : null,
+                            'shop_product_id' => isset($product_id) ? $product_id : null,
+                            'shop_option_id' => isset($shop_option_id->option_id) ? $shop_option_id->option_id : null,
                             'product_name' => isset($schedule_item['product_name']) ? $schedule_item['product_name'] . '외 ' . (count($schedule_item['order_products']) - 1) .'건' : null,
                             'options' => isset($schedule_item['options']) ? $schedule_item['options'] : null,
                             'qty' => isset($schedule_item['qty']) ? $schedule_item['qty'] : null,
@@ -581,7 +582,7 @@ class ScheduleShipmentController extends Controller
         $url_api .= '&domain_key='.$filter['domain_key'];
         $url_api .= '&action='.$filter['action'];
         $url_api .= '&date_type='.$filter['date_type'];
-        $url_api .= '&start_date=2022-07-01';//.$filter['start_date'];
+        $url_api .= '&start_date='.$filter['start_date'];
         $url_api .= '&end_date='.$filter['end_date'];
         if($filter['limit'] != ''){
             $url_api .= '&limit='.$filter['limit'];
@@ -596,15 +597,18 @@ class ScheduleShipmentController extends Controller
 
     public function mapDataAPI($data_maps = array()){
         $data_temp = array();
+        $product_infos = Item::all()->groupBy('product_id');
         foreach($data_maps as $data_item){
             $order_products_data = array();
             $order_products = array();
             if(!empty($data_item['order_products'])){
                 $total_qty = 0;
+                $option_first_id = '';
                 foreach($data_item['order_products'] as $key => $order){
                     if(!empty($order)){
                         $order_products_data[] = array(
                             'product_id' => $order['product_id'],
+                            'option_id' => isset($product_infos[$order['product_id']][0]['option_id'])?$product_infos[$order['product_id']][0]['option_id']:'',
                             'name' => $order['name'],
                             'options' => $order['options'],
                             'qty' => $order['qty'],
@@ -613,11 +617,15 @@ class ScheduleShipmentController extends Controller
                         );
                         $total_qty += $order['qty'];
                     }
+                    if($option_first_id == '' && isset($product_infos[$order['product_id']][0]['option_id'])){
+                        $option_first_id = $product_infos[$order['product_id']][0]['option_id'];
+                    }
                 }
                 $data_item['qty'] = $total_qty;
+                $data_item['shop_option_id'] = $option_first_id;
             }
             $order_products[] = $data_item['order_products'];
-            $data_temp[$data_item['order_id']][] = $data_item;
+            $data_temp[$data_item['order_id']]['data_item'][] = $data_item;
             $data_temp[$data_item['order_id']]['order_products'][] = $order_products_data;
         }
         return array(
@@ -638,7 +646,6 @@ class ScheduleShipmentController extends Controller
             'page' => '1'
         );
         $base_schedule_datas = $this->requestDataAPI($param_arrays); //Get Data
-       
         $total_data = (isset($base_schedule_datas['total']) && $base_schedule_datas['total'] > 0)?$base_schedule_datas['total']:0;
         $limit_data = (isset($base_schedule_datas['limit']) && $base_schedule_datas['limit'] > 0)?$base_schedule_datas['limit']:0;
         $check_pages = ($total_data > $limit_data) && $limit_data > 0?(int)ceil($total_data / $limit_data):1; // Check total page to foreach
@@ -648,11 +655,8 @@ class ScheduleShipmentController extends Controller
                 $param_arrays['page'] = $page;
                 $base_schedule_datas = $this->requestDataAPI($param_arrays);
                 $data_schedule = $this->mapDataAPI($base_schedule_datas['data']);
-                
                 if(!empty($data_schedule['data_temp'])){
-                    
-                    $this->apiScheduleShipmentsRaw($data_schedule['data_temp']);
-                   
+                   $this->apiScheduleShipmentsRaw($data_schedule['data_temp']);
                 }
             }
             return response()->json([
@@ -663,7 +667,7 @@ class ScheduleShipmentController extends Controller
             if(!empty($base_schedule_datas['data'])){
                 $data_schedule = $this->mapDataAPI($base_schedule_datas['data']);
                 if(!empty($data_schedule['data_temp'])){
-                    return $this->apiScheduleShipmentsRaw($data_schedule['data_temp']);
+                    $this->apiScheduleShipmentsRaw($data_schedule['data_temp']);
                 }
                 return response()->json([
                     'message' => '새로운 데이터가 없습니다.',
