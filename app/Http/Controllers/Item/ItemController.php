@@ -1910,14 +1910,15 @@ class ItemController extends Controller
                         {
                             foreach($item_arr as $option){
                                 if (is_array($option) || is_object($option)){ 
-                                 $option = (array)$option;
-                                    $option_pro_id = $item->product_id . $option['product_id'];
+                                    $option = (array)$option;
                                     $item_no = Item::updateOrCreate(
                                         [
-                                            'product_id' => $option_pro_id
+                                            'product_id' => $item->product_id,
+                                            'option_id' => $option['product_id'],
                                         ],
                                         [
-                                            'product_id' => $option_pro_id,
+                                            'product_id' => $item->product_id,
+                                            'option_id' => $option['product_id'],
                                             'mb_no' => 0,
                                             'co_no' => 0,
                                             'item_name' => $item->name,
@@ -2066,7 +2067,6 @@ class ItemController extends Controller
             return response()->json([
                 'message' => '완료되었습니다.',
                 'status' => 1,
-                'data' => $data_select
             ], 200);
         } catch (\Exception $e) {
             DB::rollback();
