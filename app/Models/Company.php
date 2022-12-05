@@ -66,6 +66,10 @@ class Company extends Model
     {
         return $this->belongsTo(Company::class, 'co_parent_no', 'co_no')->with(['co_parent', 'contract']);
     }
+    public function co_childen()
+    {
+        return $this->belongsTo(Company::class, 'co_no', 'co_parent_no');
+    }
     public function import_schedule()
     {
         return $this->hasMany(ImportSchedule::class, 'co_license', 'co_license');
