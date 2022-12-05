@@ -51,6 +51,7 @@ class RateDataController extends Controller
                         'mb_no' => Auth::user()->mb_no,
                         'rm_no' => $validated['rm_no'],
                         'rmd_number' => CommonFunc::generate_rmd_number($validated['rm_no'], $index),
+                        'rmd_mail_detail' => $validated['rmd_mail_detail'],
                     ]
                 );
             } else if (!isset($validated['rmd_no']) && isset($validated['co_no'])) {
@@ -60,6 +61,7 @@ class RateDataController extends Controller
                         'mb_no' => Auth::user()->mb_no,
                         'co_no' => $validated['co_no'],
                         'rmd_number' => CommonFunc::generate_rmd_number($validated['co_no'], $index),
+                        'rmd_mail_detail' => $validated['rmd_mail_detail'],
                     ]
                 );
             }
@@ -95,6 +97,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
+            //return $e;
 
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
@@ -1272,6 +1275,8 @@ class RateDataController extends Controller
             $co_rate_data2 = $co_rate_data2->get();
             $co_rate_data3 = $co_rate_data3->get();
 
+            $rate_meta_data = RateMetaData::where('rmd_no', $rmd_no)->first();
+
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'rate_data1' => $rate_data1,
@@ -1280,6 +1285,7 @@ class RateDataController extends Controller
                 'co_rate_data1' => $co_rate_data1,
                 'co_rate_data2' => $co_rate_data2,
                 'co_rate_data3' => $co_rate_data3,
+                'rate_meta_data' => $rate_meta_data,
             ], 200);
         } catch (\Exception $e) {
             DB::rollback();

@@ -128,6 +128,9 @@ class RateDataRequest extends BaseFormRequest
             'rate_data.*.rd_data7' => [
                 'nullable'
             ],
+            'rmd_mail_detail' => [
+                ''
+            ],
         ];
     }
 
