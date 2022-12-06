@@ -52,7 +52,7 @@ class RateDataController extends Controller
                         'mb_no' => Auth::user()->mb_no,
                         'rm_no' => $validated['rm_no'],
                         'rmd_number' => CommonFunc::generate_rmd_number($validated['rm_no'], $index),
-                        'rmd_mail_detail' => $validated['rmd_mail_detail'],
+                        'rmd_mail_detail' => isset($validated['rmd_mail_detail']) ? $validated['rmd_mail_detail'] : '',
                     ]
                 );
             } else if (!isset($validated['rmd_no']) && isset($validated['co_no'])) {
@@ -62,7 +62,7 @@ class RateDataController extends Controller
                         'mb_no' => Auth::user()->mb_no,
                         'co_no' => $validated['co_no'],
                         'rmd_number' => CommonFunc::generate_rmd_number($validated['co_no'], $index),
-                        'rmd_mail_detail' => $validated['rmd_mail_detail'],
+                        'rmd_mail_detail' => isset($validated['rmd_mail_detail']) ? $validated['rmd_mail_detail'] : '',
                     ]
                 );
             }
