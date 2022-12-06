@@ -1302,23 +1302,6 @@ class RateDataController extends Controller
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
-    public function getRateMetaDataByCono()
-    {
-        $co_no = Auth::user()->co_no;
-        try {
-            $rate_meta_data = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
-
-            return response()->json([
-                'message' => Messages::MSG_0007,
-                'rate_meta_data' => $rate_meta_data,
-            ], 200);
-        } catch (\Exception $e) {
-            DB::rollback();
-            Log::error($e);
-
-            return response()->json(['message' => Messages::MSG_0020], 500);
-        }
-    }
 
     public function getRateDataByRmdNo($rmd_no)
     {
@@ -1729,10 +1712,17 @@ class RateDataController extends Controller
             } else {
                 $rate_data = $rate_data->where('co_no', $co_no);
             }
-
+            
             $rate_data = $rate_data->get();
+            $rate_meta_data = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
 
-            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data, 'co_no' => $co_no], 200);
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'rate_data' => $rate_data,
+                'co_no' => $co_no,
+                'rate_meta_data' => $rate_meta_data
+                
+                ], 200);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
