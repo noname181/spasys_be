@@ -4,7 +4,7 @@ namespace App\Utils;
 
 class Messages
 {
-    const MSG_0001 = "Registration failed";
+    const MSG_0001 = "등록이 실패되었습니다.";
     const MSG_0002 = "Update failed";
     const MSG_0003 = "Delete failed";
     const MSG_0004 = "Registration successful";

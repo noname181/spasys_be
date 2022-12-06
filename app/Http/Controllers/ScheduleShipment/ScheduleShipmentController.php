@@ -640,7 +640,7 @@ class ScheduleShipmentController extends Controller
             'domain_key' => '50e2331771d085ddeab1bc2f91a39ae14e1b924b8df05d11ff40eea3aff3d9fb',
             'action' => 'get_order_info',
             'date_type' => 'collect_date',
-            'start_date' => '2021-07-01',
+            'start_date' => date('Y-m-d'),
             'end_date' => date('Y-m-d'),
             'limit' => 100,
             'page' => '1'
@@ -649,11 +649,9 @@ class ScheduleShipmentController extends Controller
         $total_data = (isset($base_schedule_datas['total']) && $base_schedule_datas['total'] > 0)?$base_schedule_datas['total']:0;
         $limit_data = (isset($base_schedule_datas['limit']) && $base_schedule_datas['limit'] > 0)?$base_schedule_datas['limit']:0;
         $check_pages = ($total_data > $limit_data) && $limit_data > 0?(int)ceil($total_data / $limit_data):1; // Check total page to foreach
-       
         if(isset($check_pages)&&$check_pages > 1){
             for($page = 1; $page <= $check_pages; $page++){
                 $param_arrays['page'] = $page;
-                $base_schedule_datas = $this->requestDataAPI($param_arrays);
                 $data_schedule = $this->mapDataAPI($base_schedule_datas['data']);
                 if(!empty($data_schedule['data_temp'])){
                    $this->apiScheduleShipmentsRaw($data_schedule['data_temp']);
@@ -670,14 +668,14 @@ class ScheduleShipmentController extends Controller
                     $this->apiScheduleShipmentsRaw($data_schedule['data_temp']);
                 }
                 return response()->json([
-                    'message' => '새로운 데이터가 없습니다.',
-                    'status' => 0
+                    'message' => '완료되었습니다.',
+                    'status' => 1
                 ], 200);
             }else{
                 return response()->json([
                     'message' => '새로운 데이터가 없습니다.',
                     'status' => 0
-                ], 200);
+                ], 500);
             }
         }
     }
