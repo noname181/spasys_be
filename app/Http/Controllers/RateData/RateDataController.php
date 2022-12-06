@@ -92,7 +92,7 @@ class RateDataController extends Controller
                     ],
                 );
             }
-            if(isset($validated['rmd_mail_detail'])){
+            if(isset($validated['rmd_mail_detail']) && isset($validated['rmd_no'])){
                 $update_rate_meta_data = RateMetaData::where('rmd_no', $validated['rmd_no'])->update([
                     'rmd_mail_detail' => $validated['rmd_mail_detail']
                 ]);
@@ -105,7 +105,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            //return $e;
+            return $e;
 
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
