@@ -66,7 +66,6 @@ class ReceivingGoodsDeliveryController extends Controller
     public function create_warehousing(ReceivingGoodsDeliveryCreateRequest $request)
     {
         $validated = $request->validated();
-
         try {
             DB::beginTransaction();
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
@@ -142,9 +141,7 @@ class ReceivingGoodsDeliveryController extends Controller
             $status1 = "";
             $status2 = "";
             foreach ($validated['location'] as $rgd) {
-
                 if (!isset($rgd['rgd_no'])) {
-
                     $rgd_no = ReceivingGoodsDelivery::insertGetId([
                         'mb_no' => $member->mb_no,
                         'w_no' => $w_no,
@@ -159,14 +156,13 @@ class ReceivingGoodsDeliveryController extends Controller
                         'rgd_status2' => isset($rgd['rgd_status2']) ? $rgd['rgd_status2'] : null,
                         'rgd_status3' => isset($rgd['rgd_status3']) ? $rgd['rgd_status3'] : null,
                         'rgd_status4' => isset($rgd['rgd_status4']) ? $rgd['rgd_status4'] : null,
-                        'rgd_delivery_company' => isset($rgd['rgd_delivery_company']) ? $rgd['rgd_contents'] ? $rgd['rgd_contents'] : $rgd['rgd_delivery_company'] : null,
+                        'rgd_delivery_company' => isset($rgd['rgd_delivery_company']) ? ($rgd['rgd_contents'] ? $rgd['rgd_contents'] : $rgd['rgd_delivery_company']) : null,
                         'rgd_tracking_code' => isset($rgd['rgd_tracking_code']) ? $rgd['rgd_tracking_code'] : null,
                         'rgd_delivery_man' => isset($rgd['rgd_delivery_man']) ? $rgd['rgd_delivery_man'] : null,
                         'rgd_delivery_man_hp' => isset($rgd['rgd_delivery_man_hp']) ? $rgd['rgd_delivery_man_hp'] : null,
                         'rgd_delivery_schedule_day' => isset($rgd['rgd_delivery_schedule_day']) ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_delivery_schedule_day']) : null,
                         'rgd_arrive_day' => isset($rgd['rgd_arrive_day']) ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']) : null,
                     ]);
-
                     $warehousing_status =  isset($rgd['rgd_status1']) ? $rgd['rgd_status1'] : null;
                 } else {
 

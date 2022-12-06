@@ -406,36 +406,53 @@ class ScheduleShipmentController extends Controller
                     ];
                     $ss_no = ScheduleShipment::updateOrCreate(['order_id' => $schedule['order_id']],$data_schedule);
                     if( $ss_no->ss_no && isset($schedule['order_products'])){
-                        foreach ($schedule['order_products'] as $ss_info => $schedule_info) {
-                            if(!empty($ss_no->ss_no) && !empty($schedule_info['barcode'])){
-                                $ss_info_no = ScheduleShipmentInfo::updateOrCreate([
-                                    'ss_no' => $ss_no->ss_no,
-                                    'barcode' => $schedule_info['barcode']
-                                ],[
-                                    'ss_no' => $ss_no->ss_no,
-                                    'co_no' => 136,
-                                    'barcode' => isset($schedule_info['barcode']) ? $schedule_info['barcode'] : null,
-                                    'brand' => isset($schedule_info['brand']) ? $schedule_info['brand'] : null,
-                                    'cancel_date' =>!empty( $schedule_info['cancel_date']) ? $schedule_info['cancel_date'] : null,
-                                    'change_date' => !empty($schedule_info['change_date']) ? $schedule_info['change_date'] : null,
-                                    'enable_sale' => isset($schedule_info['enable_sale']) ? $schedule_info['enable_sale'] : null,
-                                    'extra_money' => isset($schedule_info['extra_money']) ? $schedule_info['extra_money'] : null,
-                                    'is_gift' => isset($schedule_info['is_gift']) ? $schedule_info['is_gift'] : null,
-                                    'link_id' => isset($schedule_info['link_id']) ? $schedule_info['link_id'] : null,
-                                    'name' => isset($schedule_info['name']) ? $schedule_info['name'] : null,
-                                    'new_link_id' => isset($schedule_info['new_link_id']) ? $schedule_info['new_link_id'] : null,
-                                    'options' => isset($schedule_info['options']) ? $schedule_info['options'] : null,
-                                    'order_cs' => isset($schedule_info['order_cs']) ? $schedule_info['order_cs'] : null,
-                                    'prd_amount' => isset($schedule_info['prd_amount']) ? $schedule_info['prd_amount'] : null,
-                                    'prd_seq' => isset($schedule_info['prd_seq']) ? $schedule_info['prd_seq'] : null,
-                                    'prd_supply_price' => isset($schedule_info['prd_supply_price']) ? $schedule_info['prd_supply_price'] : null,
-                                    'product_id' => isset($schedule_info['product_id']) ? $schedule_info['product_id'] : null,
-                                    'qty' => isset($schedule_info['qty']) ? $schedule_info['qty'] : null,
-                                    'shop_price' => isset($schedule_info['shop_price']) ? $schedule_info['shop_price'] : null,
-                                    'supply_code' =>isset( $schedule_info['supply_code']) ? $schedule_info['supply_code'] : null,
-                                    'supply_name' => isset($schedule_info['supply_name']) ? $schedule_info['supply_name'] : null,
-                                    'supply_options' => isset($schedule_info['supply_options']) ? $schedule_info['supply_options'] : null,
-                                ]);
+                        $i_temp = 0;
+                        if(isset($schedule['order_products'])){
+                            foreach ($schedule['order_products'] as $ss_info => $schedule_info) {
+                                if($i_temp == 0 && isset($schedule_info['product_id'])){
+                                    if (str_contains($schedule_info['product_id'], 'S')) { 
+                                        $shop_option_id = $schedule_info['product_id'];
+                                        $shop_product_id = Item::where('option_id',$shop_option_id)->select('product_id')->first()->product_id;
+                                    }else{
+                                        $shop_product_id = $schedule_info['product_id'];
+                                        $shop_option_id = Item::where('product_id',$shop_product_id)->select('product_id')->first()->product_id;
+                                    }
+                                    ScheduleShipment::where(['ss_no' => $ss_no->ss_no])->update([
+                                        'shop_product_id' => $shop_product_id,
+                                        'shop_option_id' => $shop_option_id
+                                    ]);
+                                    $i_temp = 1;
+                                }
+                                if(!empty($ss_no->ss_no) && !empty($schedule_info['barcode'])){
+                                    $ss_info_no = ScheduleShipmentInfo::updateOrCreate([
+                                        'ss_no' => $ss_no->ss_no,
+                                        'barcode' => $schedule_info['barcode']
+                                    ],[
+                                        'ss_no' => $ss_no->ss_no,
+                                        'co_no' => null,
+                                        'barcode' => isset($schedule_info['barcode']) ? $schedule_info['barcode'] : null,
+                                        'brand' => isset($schedule_info['brand']) ? $schedule_info['brand'] : null,
+                                        'cancel_date' =>!empty( $schedule_info['cancel_date']) ? $schedule_info['cancel_date'] : null,
+                                        'change_date' => !empty($schedule_info['change_date']) ? $schedule_info['change_date'] : null,
+                                        'enable_sale' => isset($schedule_info['enable_sale']) ? $schedule_info['enable_sale'] : null,
+                                        'extra_money' => isset($schedule_info['extra_money']) ? $schedule_info['extra_money'] : null,
+                                        'is_gift' => isset($schedule_info['is_gift']) ? $schedule_info['is_gift'] : null,
+                                        'link_id' => isset($schedule_info['link_id']) ? $schedule_info['link_id'] : null,
+                                        'name' => isset($schedule_info['name']) ? $schedule_info['name'] : null,
+                                        'new_link_id' => isset($schedule_info['new_link_id']) ? $schedule_info['new_link_id'] : null,
+                                        'options' => isset($schedule_info['options']) ? $schedule_info['options'] : null,
+                                        'order_cs' => isset($schedule_info['order_cs']) ? $schedule_info['order_cs'] : null,
+                                        'prd_amount' => isset($schedule_info['prd_amount']) ? $schedule_info['prd_amount'] : null,
+                                        'prd_seq' => isset($schedule_info['prd_seq']) ? $schedule_info['prd_seq'] : null,
+                                        'prd_supply_price' => isset($schedule_info['prd_supply_price']) ? $schedule_info['prd_supply_price'] : null,
+                                        'product_id' => isset($schedule_info['product_id']) ? $schedule_info['product_id'] : null,
+                                        'qty' => isset($schedule_info['qty']) ? $schedule_info['qty'] : null,
+                                        'shop_price' => isset($schedule_info['shop_price']) ? $schedule_info['shop_price'] : null,
+                                        'supply_code' =>isset( $schedule_info['supply_code']) ? $schedule_info['supply_code'] : null,
+                                        'supply_name' => isset($schedule_info['supply_name']) ? $schedule_info['supply_name'] : null,
+                                        'supply_options' => isset($schedule_info['supply_options']) ? $schedule_info['supply_options'] : null,
+                                    ]);
+                                }
                             }
                         }
                     }
@@ -686,9 +703,9 @@ class ScheduleShipmentController extends Controller
             'domain_key' => '50e2331771d085ddeab1bc2f91a39ae14e1b924b8df05d11ff40eea3aff3d9fb',
             'action' => 'get_order_info',
             'date_type' => 'collect_date',
-            'start_date' => date('Y-m-d'),
+            'start_date' => date('Y-m-d'), 
             'end_date' => date('Y-m-d'),
-            'limit' => 50,
+            'limit' => 100,
             'page' => ''
         );
         $filter = array();
@@ -705,41 +722,76 @@ class ScheduleShipmentController extends Controller
         if($filter['limit'] != ''){
             $url_api .= '&limit='.$filter['limit'];
         }
-        if($filter['page'] != ''){
-            $url_api .= '&page='.$filter['page'];
-        }
-        $response = file_get_contents($url_api);
-        $api_data = json_decode($response,1);
-        return $api_data;
+        $total_schedule = isset($response['total'])?$response['total']:0;
+        $pages = ($total_schedule > $filter['limit']) ? ceil($total_schedule / $filter['limit']) : 1;
         $data_temp = array();
-        if(!empty($api_data['data'])){
-            $order_products = array();
-            foreach($api_data['data'] as $data_item){
-                $order_products_data = array();
-                if(!empty($data_item['order_products'])){
-                    $total_qty = 0;
-                    foreach($data_item['order_products'] as $key => $order){
-                        if(!empty($order)){
-                            $order_products_data[] = array(
-                                'product_id' => $order['product_id'],
-                                'name' => $order['name'],
-                                'options' => $order['options'],
-                                'qty' => $order['qty'],
-                                'brand' => $order['brand'],
-                                'barcode' => $order['barcode']
-                            );
-                            $total_qty += $order['qty'];
+        if($pages > 1){
+            for($page = 1; $page <= $pages; $page++){
+                $url_api .= '&page='.$page;
+                $response = file_get_contents($url_api);
+                $api_data = json_decode($response,1);
+                if(!empty($api_data['data'])){
+                    $order_products = array();
+                    foreach($api_data['data'] as $data_item){
+                        $order_products_data = array();
+                        if(!empty($data_item['order_products'])){
+                            $total_qty = 0;
+                            foreach($data_item['order_products'] as $key => $order){
+                                if(!empty($order)){
+                                    $order_products_data[] = array(
+                                        'product_id' => $order['product_id'],
+                                        'name' => $order['name'],
+                                        'options' => $order['options'],
+                                        'qty' => $order['qty'],
+                                        'brand' => $order['brand'],
+                                        'barcode' => $order['barcode']
+                                    );
+                                    $total_qty += $order['qty'];
+                                }
+                            }
+                            $data_item['qty'] = $total_qty;
                         }
+                        $order_products[] = $data_item['order_products'];
+                        $data_temp[$data_item['order_id']] = $data_item;
+                        $data_temp[$data_item['order_id']]['order_products'] = $order_products_data;
                     }
-                    $data_item['qty'] = $total_qty;
+                   
+                    return $this->apiScheduleShipmentsRawNoLogin($data_temp);
                 }
-                $order_products[] = $data_item['order_products'];
-                $data_temp[$data_item['order_id']] = $data_item;
-                $data_temp[$data_item['order_id']]['order_products'] = $order_products_data;
             }
-           
-            return $this->apiScheduleShipmentsRawNoLogin($data_temp);
         }else{
+            $url_api .= '&page=1';
+            $response = file_get_contents($url_api);
+            $api_data = json_decode($response,1);
+            if(!empty($api_data['data'])){
+                $order_products = array();
+                foreach($api_data['data'] as $data_item){
+                    $order_products_data = array();
+                    if(!empty($data_item['order_products'])){
+                        $total_qty = 0;
+                        foreach($data_item['order_products'] as $key => $order){
+                            if(!empty($order)){
+                                $order_products_data[] = array(
+                                    'product_id' => $order['product_id'],
+                                    'name' => $order['name'],
+                                    'options' => $order['options'],
+                                    'qty' => $order['qty'],
+                                    'brand' => $order['brand'],
+                                    'barcode' => $order['barcode']
+                                );
+                                $total_qty += $order['qty'];
+                            }
+                        }
+                        $data_item['qty'] = $total_qty;
+                    }
+                    $order_products[] = $data_item['order_products'];
+                    $data_temp[$data_item['order_id']] = $data_item;
+                    $data_temp[$data_item['order_id']]['order_products'] = $order_products_data;
+                }
+                return $this->apiScheduleShipmentsRawNoLogin($data_temp);
+            }
+        }
+        if(empty($api_data['data'])){
             return response()->json([
                 'message' => '새로운 데이터가 없습니다.',
                 'status' => 0
