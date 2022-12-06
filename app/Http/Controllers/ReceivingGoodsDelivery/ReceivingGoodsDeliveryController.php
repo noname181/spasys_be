@@ -948,11 +948,14 @@ class ReceivingGoodsDeliveryController extends Controller
                             'mb_no' => $member->mb_no,
                             'service_korean_name' => $request->w_category_name,
                             'rgd_status1' => $location['rgd_status1'],
-                            'rgd_status2' => $location['rgd_status2'],
-                            'rgd_status3' => $location['rgd_status3'],
-                            'rgd_tracking_code' => $location['rgd_tracking_code'],
+                            'rgd_status2' => isset($location['rgd_status2']) ? $location['rgd_status2'] : null,
+                            'rgd_status3' => isset($location['rgd_status3']) ? $location['rgd_status3'] : null,
+                            
+                            'rgd_delivery_company' => isset($location['rgd_delivery_company']) ? $location['rgd_delivery_company'] : null,
+                            'rgd_tracking_code' => isset($location['rgd_tracking_code']) ? $location['rgd_tracking_code'] : null,
                             'rgd_delivery_man' => $location['rgd_delivery_man'],
                             'rgd_delivery_man_hp' => $location['rgd_delivery_man_hp'],
+                            
                             'rgd_delivery_schedule_day' => $location['rgd_delivery_schedule_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_delivery_schedule_day']) : null,
                             'rgd_arrive_day' =>  $location['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']) : null,
                         ]
