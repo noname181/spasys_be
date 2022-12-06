@@ -1732,7 +1732,7 @@ class RateDataController extends Controller
             if ($user->mb_type == 'spasys') {
                 $rate_data = $rate_data->where('co_no', $user->co_no);
             } else if ($user->mb_type == 'shop' || $user->mb_type == 'shipper') {
-                $rmd = RateMetaData::where('co_no', $user->co_no)->latest('created_at')->first();
+                $rmd = RateMetaData::where('co_no', $user->co_no)->whereNull('set_type')->latest('created_at')->first();
                 $rate_data = $rate_data->where('rd_co_no', $user->co_no);
                 if (isset($rmd->rmd_no)) {
                     $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
@@ -1743,7 +1743,7 @@ class RateDataController extends Controller
 
             $rate_data = $rate_data->get();
 
-            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data], 200);
+            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data, 'co_no' => $user->co_no], 200);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
@@ -1760,7 +1760,7 @@ class RateDataController extends Controller
             if ($user->mb_type == 'spasys') {
                 $rate_data = $rate_data->where('co_no', $user->co_no);
             } else if ($user->mb_type == 'shop' || $user->mb_type == 'shipper') {
-                $rmd = RateMetaData::where('co_no', $user->co_no)->latest('created_at')->first();
+                $rmd = RateMetaData::where('co_no', $user->co_no)->whereNull('set_type')->latest('created_at')->first();
                 $rate_data = $rate_data->where('rd_co_no', $user->co_no);
                 if (isset($rmd->rmd_no)) {
                     $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
