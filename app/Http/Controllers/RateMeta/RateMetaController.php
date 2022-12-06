@@ -35,7 +35,7 @@ class RateMetaController extends Controller
                 'rm_biz_email' => $validated['rm_biz_email'],
                 'rm_name' => $validated['rm_name'],
                 'rm_hp' => $validated['rm_hp'],
-                'rm_mail_detail' => $validated['rm_mail_detail'],
+                'rm_mail_detail' => isset($validated['rm_mail_detail']) ? $validated['rm_mail_detail'] : '',
             ]);
             return response()->json(['message' => Messages::MSG_0007, 'rm_no' => $rm_no], 201);
         } catch (\Exception $e) {

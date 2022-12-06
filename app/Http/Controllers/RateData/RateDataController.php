@@ -52,7 +52,7 @@ class RateDataController extends Controller
                         'mb_no' => Auth::user()->mb_no,
                         'rm_no' => $validated['rm_no'],
                         'rmd_number' => CommonFunc::generate_rmd_number($validated['rm_no'], $index),
-                        'rmd_mail_detail' => $validated['rmd_mail_detail'],
+                        'rmd_mail_detail' => isset($validated['rmd_mail_detail']) ? $validated['rmd_mail_detail'] : '',
                     ]
                 );
             } else if (!isset($validated['rmd_no']) && isset($validated['co_no'])) {
@@ -62,7 +62,7 @@ class RateDataController extends Controller
                         'mb_no' => Auth::user()->mb_no,
                         'co_no' => $validated['co_no'],
                         'rmd_number' => CommonFunc::generate_rmd_number($validated['co_no'], $index),
-                        'rmd_mail_detail' => $validated['rmd_mail_detail'],
+                        'rmd_mail_detail' => isset($validated['rmd_mail_detail']) ? $validated['rmd_mail_detail'] : '',
                     ]
                 );
             }
@@ -1712,10 +1712,17 @@ class RateDataController extends Controller
             } else {
                 $rate_data = $rate_data->where('co_no', $co_no);
             }
-
+            
             $rate_data = $rate_data->get();
+            $rate_meta_data = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
 
-            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data, 'co_no' => $co_no], 200);
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'rate_data' => $rate_data,
+                'co_no' => $co_no,
+                'rate_meta_data' => $rate_meta_data
+                
+                ], 200);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
@@ -1732,7 +1739,7 @@ class RateDataController extends Controller
             if ($user->mb_type == 'spasys') {
                 $rate_data = $rate_data->where('co_no', $user->co_no);
             } else if ($user->mb_type == 'shop' || $user->mb_type == 'shipper') {
-                $rmd = RateMetaData::where('co_no', $user->co_no)->latest('created_at')->first();
+                $rmd = RateMetaData::where('co_no', $user->co_no)->whereNull('set_type')->latest('created_at')->first();
                 $rate_data = $rate_data->where('rd_co_no', $user->co_no);
                 if (isset($rmd->rmd_no)) {
                     $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
@@ -1743,7 +1750,7 @@ class RateDataController extends Controller
 
             $rate_data = $rate_data->get();
 
-            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data], 200);
+            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data, 'co_no' => $user->co_no], 200);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
@@ -1760,7 +1767,7 @@ class RateDataController extends Controller
             if ($user->mb_type == 'spasys') {
                 $rate_data = $rate_data->where('co_no', $user->co_no);
             } else if ($user->mb_type == 'shop' || $user->mb_type == 'shipper') {
-                $rmd = RateMetaData::where('co_no', $user->co_no)->latest('created_at')->first();
+                $rmd = RateMetaData::where('co_no', $user->co_no)->whereNull('set_type')->latest('created_at')->first();
                 $rate_data = $rate_data->where('rd_co_no', $user->co_no);
                 if (isset($rmd->rmd_no)) {
                     $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
@@ -3248,8 +3255,8 @@ class RateDataController extends Controller
                     'rgd_no_expectation' => $request->type == 'edit_final' ? $is_exist->rgd_no_expectation : (str_contains($request->bill_type, 'final') ? $request->rgd_no : null),
                     'rgd_no_final' => $request->type == 'edit_additional' ? $is_exist->rgd_no_final : (str_contains($request->bill_type, 'additional') ? $request->rgd_no : null),
                     'mb_no' => Auth::user()->mb_no,
-                    'rdg_set_type' => $ag->ag_name,
-                    'ag_no' => $ag->ag_no,
+                    'rdg_set_type' => isset($ag->ag_name) ? $ag->ag_name : NULL,
+                    'ag_no' => isset($ag->ag_no) ? $ag->ag_no : NULL,
                     'rdg_supply_price1' => $request->bonded1['supply_price'],
                     'rdg_supply_price2' => $request->bonded2['supply_price'],
                     'rdg_supply_price3' => $request->bonded3['supply_price'],

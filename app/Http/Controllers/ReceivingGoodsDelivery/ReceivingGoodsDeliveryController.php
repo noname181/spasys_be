@@ -10,6 +10,7 @@ use App\Models\WarehousingStatus;
 use App\Models\ReceivingGoodsDelivery;
 use App\Models\RateDataGeneral;
 use App\Models\WarehousingItem;
+use App\Models\AdjustmentGroup;
 use App\Models\Package;
 use App\Models\ItemChannel;
 use App\Utils\Messages;
@@ -944,11 +945,14 @@ class ReceivingGoodsDeliveryController extends Controller
                             'mb_no' => $member->mb_no,
                             'service_korean_name' => $request->w_category_name,
                             'rgd_status1' => $location['rgd_status1'],
-                            'rgd_status2' => $location['rgd_status2'],
-                            'rgd_status3' => $location['rgd_status3'],
-                            'rgd_tracking_code' => $location['rgd_tracking_code'],
+                            'rgd_status2' => isset($location['rgd_status2']) ? $location['rgd_status2'] : null,
+                            'rgd_status3' => isset($location['rgd_status3']) ? $location['rgd_status3'] : null,
+                            
+                            'rgd_delivery_company' => isset($location['rgd_delivery_company']) ? $location['rgd_delivery_company'] : null,
+                            'rgd_tracking_code' => isset($location['rgd_tracking_code']) ? $location['rgd_tracking_code'] : null,
                             'rgd_delivery_man' => $location['rgd_delivery_man'],
                             'rgd_delivery_man_hp' => $location['rgd_delivery_man_hp'],
+                            
                             'rgd_delivery_schedule_day' => $location['rgd_delivery_schedule_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_delivery_schedule_day']) : null,
                             'rgd_arrive_day' =>  $location['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']) : null,
                         ]
@@ -2114,28 +2118,68 @@ class ReceivingGoodsDeliveryController extends Controller
             if ($request->bill_type == 'case') {
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
 
-                ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
-                    'rgd_status5' => 'confirmed',
-                    'rgd_confirmed_date' => Carbon::now()->toDateTimeString()
-                ]);
+                $rate_data_general = RateDataGeneral::where('rgd_no', $request->rgd_no)->first();
+
+                if(isset($rate_data_general->ag_no)){
+                    $ag = AdjustmentGroup::where('ag_no', $rate_data_general->ag_no)->first();
+
+                    ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                        'rgd_status5' => 'confirmed',
+                        'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
+                        'rgd_status7' => $ag->ag_auto_issue == 'y' ? 'taxed' : NULL,
+                        'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
+                    ]);
+                }else {
+                    ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                        'rgd_status5' => 'confirmed',
+                        'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
+                    ]);
+                }
+
             } else if ($request->bill_type == 'monthly') {
                 foreach ($request->rgds as $rgd) {
                     $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->first();
 
-                    ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
-                        'rgd_status5' => 'confirmed',
-                        'rgd_confirmed_date' => Carbon::now()->toDateTimeString()
-                    ]);
+                    $rate_data_general = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->first();
+
+                    if(isset($rate_data_general->ag_no)){
+                        $ag = AdjustmentGroup::where('ag_no', $rate_data_general->ag_no)->first();
+                        
+                        ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                            'rgd_status5' => 'confirmed',
+                            'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
+                            'rgd_status7' => $ag->ag_auto_issue == 'y' ? 'taxed' : NULL,
+                            'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
+                        ]);
+                    }else {
+                        ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                            'rgd_status5' => 'confirmed',
+                            'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
+                        ]);
+                    }
                 }
             } else if ($request->bill_type == 'multiple') {
                 foreach ($request->rgds as $rgd) {
                     // if ($rgd['rgd_bill_type'] == 'final') {
                     $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->first();
 
-                    ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
-                        'rgd_status5' => 'confirmed',
-                        'rgd_confirmed_date' => Carbon::now()->toDateTimeString()
-                    ]);
+                    $rate_data_general = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->first();
+
+                    if(isset($rate_data_general->ag_no)){
+                        $ag = AdjustmentGroup::where('ag_no', $rate_data_general->ag_no)->first();
+                        
+                        ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                            'rgd_status5' => 'confirmed',
+                            'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
+                            'rgd_status7' => $ag->ag_auto_issue == 'y' ? 'taxed' : NULL,
+                            'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
+                        ]);
+                    }else {
+                        ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                            'rgd_status5' => 'confirmed',
+                            'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
+                        ]);
+                    }
                     // } else if ($rgd['rgd_bill_type'] == 'final_monthly') {
                     //     $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd['rgd_no'])->first();
                     //     $co_no = $rgd->warehousing->co_no;
@@ -2174,24 +2218,70 @@ class ReceivingGoodsDeliveryController extends Controller
     {
         try {
             if ($request->bill_type == 'case') {
-                ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-                    'rgd_status5' => 'confirmed',
-                    'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
-                ]);
-            } else if ($request->bill_type == 'monthly') {
-                foreach ($request->rgds as $rgd) {
-                    ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
+                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+
+                $rate_data_general = RateDataGeneral::where('rgd_no', $request->rgd_no)->first();
+
+                if(isset($rate_data_general->ag_no)){
+                    $ag = AdjustmentGroup::where('ag_no', $rate_data_general->ag_no)->first();
+
+                    ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                        'rgd_status5' => 'confirmed',
+                        'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
+                        'rgd_status7' => $ag->ag_auto_issue == 'y' ? 'taxed' : NULL,
+                        'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
+                    ]);
+                }else {
+                    ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                         'rgd_status5' => 'confirmed',
                         'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
                     ]);
                 }
+
+            } else if ($request->bill_type == 'monthly') {
+                foreach ($request->rgds as $rgd) {
+                    $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->first();
+
+                    $rate_data_general = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->first();
+
+                    if(isset($rate_data_general->ag_no)){
+                        $ag = AdjustmentGroup::where('ag_no', $rate_data_general->ag_no)->first();
+                        
+                        ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                            'rgd_status5' => 'confirmed',
+                            'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
+                            'rgd_status7' => $ag->ag_auto_issue == 'y' ? 'taxed' : NULL,
+                            'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
+                        ]);
+                    }else {
+                        ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                            'rgd_status5' => 'confirmed',
+                            'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
+                        ]);
+                    }
+                }
             } else if ($request->bill_type == 'multiple') {
                 foreach ($request->rgds as $rgd) {
+                    // if ($rgd['rgd_bill_type'] == 'final') {
+                    $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->first();
 
-                    ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
-                        'rgd_status5' => 'confirmed',
-                        'rgd_confirmed_date' => Carbon::now()->toDateTimeString()
-                    ]);
+                    $rate_data_general = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->first();
+
+                    if(isset($rate_data_general->ag_no)){
+                        $ag = AdjustmentGroup::where('ag_no', $rate_data_general->ag_no)->first();
+                        
+                        ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                            'rgd_status5' => 'confirmed',
+                            'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
+                            'rgd_status7' => $ag->ag_auto_issue == 'y' ? 'taxed' : NULL,
+                            'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
+                        ]);
+                    }else {
+                        ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                            'rgd_status5' => 'confirmed',
+                            'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
+                        ]);
+                    }
                 }
             }
 
@@ -2200,9 +2290,10 @@ class ReceivingGoodsDeliveryController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
+      
     }
 
     public function cancel_settlement(Request $request)
