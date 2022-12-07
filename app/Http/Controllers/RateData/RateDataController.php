@@ -68,15 +68,19 @@ class RateDataController extends Controller
                 );
             } else if (isset($validated['rmd_no']) && isset($validated['rm_no'])) {
                 $rmd = RateMetaData::where('rmd_no', $validated['rmd_no'])->first();
-
+                $index = RateMetaData::where('rm_no', $validated['rm_no'])->get()->count() + 1;
                 $rmd_no = RateMetaData::insertGetId(
                     [
                         'mb_no' => Auth::user()->mb_no,
                         'rm_no' => $validated['rm_no'],
-                        'rmd_number' =>  $rmd->rmd_number,
+                        'rmd_number' => CommonFunc::generate_rmd_number($validated['rm_no'], $index),
+                        'rmd_parent_no'=> $rmd->rmd_parent_no ? $rmd->rmd_parent_no : $validated['rmd_no'],
                         'rmd_mail_detail' => isset($validated['rmd_mail_detail']) ? $validated['rmd_mail_detail'] : '',
                     ]
                 );
+
+                $rmd_no_new = $rmd_no;
+                $rmd_arr = RateMetaData::where('rmd_number', $rmd->rmd_number)->orderBy('rmd_no', 'DESC')->get();
             }
 
            
@@ -85,7 +89,7 @@ class RateDataController extends Controller
                 Log::error($val);
                 $rd_no = RateData::updateOrCreate(
                     [
-                        'rd_no' => $val['rd_no'],
+                        'rd_no' => isset($rmd_no_new) ? null : $val['rd_no'],
                         'rmd_no' => isset($rmd_no) ? $rmd_no : $validated['rmd_no'],
 
                     ],
@@ -113,6 +117,7 @@ class RateDataController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'rmd_no' => isset($rmd_no) ? $rmd_no : $validated['rmd_no'],
+                'rmd_arr' => isset($rmd_arr) ? $rmd_arr : null
             ], 201);
         } catch (\Exception $e) {
             DB::rollback();
@@ -1202,6 +1207,18 @@ class RateDataController extends Controller
             $co_rate_data2 = $co_rate_data2->get();
             $co_rate_data3 = $co_rate_data3->get();
 
+            if($rmd_no){
+                $rmd = RateMetaData::where('rmd_no', $rmd_no)->first();
+                if(isset($rmd->rmd_parent_no)){
+                    $rmd_arr = RateMetaData::where('rmd_no', $rmd->rmd_parent_no)->orWhere('rmd_parent_no', $rmd->rmd_parent_no)->orderBy('rmd_no', 'DESC')->get();
+                }else {
+                    $rmd_arr = RateMetaData::where('rmd_no', $rmd_no)->orWhere('rmd_parent_no', $rmd_no)->orderBy('rmd_no', 'DESC')->get();
+                }
+            }
+          
+
+            
+
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'rate_data1' => $rate_data1,
@@ -1210,11 +1227,13 @@ class RateDataController extends Controller
                 'co_rate_data1' => $co_rate_data1,
                 'co_rate_data2' => $co_rate_data2,
                 'co_rate_data3' => $co_rate_data3,
+                'rmd_arr' => isset($rmd_arr) ? $rmd_arr : null
             ], 200);
 
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
+            // return $e;
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }

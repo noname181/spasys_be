@@ -214,9 +214,8 @@ class CompanyController extends Controller
     public function getCompany($co_no)
     {
         try {
-            $contract = Contract::where('co_no', $co_no);
+            $contract = Contract::where('co_no', $co_no)->first();
             if(isset($contract->c_no)){
-                return 123;
                 $company = Company::select([
                     'company.co_no',
                     'company.mb_no',
