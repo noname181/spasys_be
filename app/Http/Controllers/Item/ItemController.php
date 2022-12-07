@@ -2524,7 +2524,7 @@ class ItemController extends Controller
             'start_date' => '2022-05-05',
             'end_date' => date('Y-m-d'),
             'limit' => 100,
-            'page' => ''
+            'page' => 1
         );
         $filter = array();
         $url_api = 'https://api2.cloud.ezadmin.co.kr/ezadmin/function.php?';
@@ -2545,15 +2545,28 @@ class ItemController extends Controller
         }
         $response = file_get_contents($url_api);
         $api_data = json_decode($response);
-        if(!empty($api_data->data)){
-            return $this->apiItemsRaw($api_data);
+        $total_data = 0;
+        $pages = 0;
+        if(isset($api_data->api_data) && $api_data->api_data > 100){
+            $total_data = $api_data->api_data;
+            $pages = ceil( $total_data / 100);
+            for($i = 1; $i <= $pages; $i++){
+                $this->apiItemsRaw($api_data);
+            }
         }else{
-            return response()->json([
-                'message' => '새로운 데이터가 없습니다.',
-                'status' => 1
-            ], 200);
+            if(!empty($api_data->data)){
+                return $this->apiItemsRaw($api_data);
+            }else{
+                return response()->json([
+                    'message' => '새로운 데이터가 없습니다.',
+                    'status' => 1
+                ], 200);
+            }
         }
-        return $api_data;
+        return response()->json([
+            'message' => '새로운 데이터가 없습니다.',
+            'status' => 1
+        ], 200);
     }
 
     

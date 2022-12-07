@@ -263,10 +263,7 @@ class ScheduleShipmentController extends Controller
             DB::beginTransaction();
             $user = Auth::user();
                 foreach ($data_schedule as $i_schedule => $schedule) {
-                    $pro_key = 0;
                     foreach($schedule['data_item'] as $schedule_item){
-                        $shop_product_id = isset($schedule_item['order_products'][$pro_key]['product_id'])?$schedule_item['order_products'][$pro_key]['product_id']:$schedule_item['shop_product_id'];
-                        $shop_option_id = Item::where('product_id',$shop_product_id)->select('option_id')->first();
                         $data_schedule = [
                             'co_no' => $user->co_no,
                             'seq' => isset($schedule_item['seq']) ? $schedule_item['seq'] : null,
@@ -276,8 +273,8 @@ class ScheduleShipmentController extends Controller
                             'order_id' => !empty($schedule_item['order_id']) ? $schedule_item['order_id'] : $i_schedule,
                             'order_id_seq' => isset($schedule_item['order_id_seq']) ? $schedule_item['order_id_seq'] : null,
                             'order_id_seq2' => isset($schedule_item['order_id_seq2']) ? $schedule_item['order_id_seq2'] : null,
-                            'shop_product_id' => isset($product_id) ? $product_id : null,
-                            'shop_option_id' => isset($shop_option_id->option_id) ? $shop_option_id->option_id : null,
+                            'shop_product_id' => null,
+                            'shop_option_id' => null,
                             'product_name' => isset($schedule_item['product_name']) ? $schedule_item['product_name'] . '외 ' . (count($schedule_item['order_products']) - 1) .'건' : null,
                             'options' => isset($schedule_item['options']) ? $schedule_item['options'] : null,
                             'qty' => isset($schedule_item['qty']) ? $schedule_item['qty'] : null,
@@ -344,26 +341,31 @@ class ScheduleShipmentController extends Controller
                                         'supply_name' => isset($schedule_info['supply_name']) ? $schedule_info['supply_name'] : null,
                                         'supply_options' => isset($schedule_info['supply_options']) ? $schedule_info['supply_options'] : null,
                                     ]);
-                                    if($check_fisrt == 0 && $schedule_info['product_id']){
+                                    if($schedule_info['product_id']){
                                         if (str_contains($schedule_info['product_id'], 'S')) { 
                                             $shop_option_id = $schedule_info['product_id'];
                                             $shop_product_id = Item::where('option_id',$shop_option_id)->select('product_id')->first();
                                             $shop_product_id = isset($shop_product_id->product_id)?$shop_product_id->product_id:'';
                                         }else{
                                             $shop_product_id = $schedule_info['product_id'];
-                                            $shop_option_id = Item::where('product_id',$shop_product_id)->select('option_id')->first();
-                                            $shop_option_id = isset($shop_option_id->option_id)?$shop_option_id->option_id:'';
+                                            $shop_option_id = '';
                                         }
-                                        $check = ScheduleShipment::where(['ss_no' => $ss_no->ss_no])->update([
-                                            'shop_product_id' => isset($shop_product_id)?$shop_product_id:'',
-                                            'shop_option_id' => isset($shop_option_id)?$shop_option_id:''
-                                        ]);
+                                        if($check_fisrt == 0){
+                                            $dt_update = [
+                                                'shop_product_id' => isset($shop_product_id)?$shop_product_id:'',
+                                                'shop_option_id' => isset($shop_option_id)?$shop_option_id:''
+                                            ];
+                                        }else{
+                                            $dt_update = [
+                                                'shop_product_id' => isset($shop_product_id)?$shop_product_id:'',
+                                            ];
+                                        }
+                                        ScheduleShipment::where(['ss_no' => $ss_no->ss_no])->update($dt_update);
                                         $check_fisrt = 1;
                                     }
                                 }
                             }
                         }
-                        $pro_key++;
                     }
                 }
             DB::commit();
@@ -426,19 +428,15 @@ class ScheduleShipmentController extends Controller
                     if( $ss_no->ss_no && isset($schedule['order_products'])){
                         $i_temp = 0;
                         if(isset($schedule['order_products'])){
+                            $check_fisrt = 0;
                             foreach ($schedule['order_products'] as $ss_info => $schedule_info) {
                                 if($i_temp == 0 && isset($schedule_info['product_id'])){
                                     if (str_contains($schedule_info['product_id'], 'S')) { 
                                         $shop_option_id = $schedule_info['product_id'];
-                                        $shop_product_id = Item::where('option_id',$shop_option_id)->select('product_id')->first()->product_id;
-                                    }else{
-                                        $shop_product_id = $schedule_info['product_id'];
-                                        $shop_option_id = Item::where('product_id',$shop_product_id)->select('product_id')->first()->product_id;
+                                        ScheduleShipment::where(['ss_no' => $ss_no->ss_no])->update([
+                                            'shop_option_id' => $shop_option_id
+                                        ]);
                                     }
-                                    ScheduleShipment::where(['ss_no' => $ss_no->ss_no])->update([
-                                        'shop_product_id' => $shop_product_id,
-                                        'shop_option_id' => $shop_option_id
-                                    ]);
                                     $i_temp = 1;
                                 }
                                 if(!empty($ss_no->ss_no) && !empty($schedule_info['barcode'])){
@@ -470,6 +468,21 @@ class ScheduleShipmentController extends Controller
                                         'supply_name' => isset($schedule_info['supply_name']) ? $schedule_info['supply_name'] : null,
                                         'supply_options' => isset($schedule_info['supply_options']) ? $schedule_info['supply_options'] : null,
                                     ]);
+                                    if($check_fisrt == 0 && $schedule_info['product_id']){
+                                        if (str_contains($schedule_info['product_id'], 'S')) { 
+                                            $shop_option_id = $schedule_info['product_id'];
+                                            $shop_product_id = Item::where('option_id',$shop_option_id)->select('product_id')->first();
+                                            $shop_product_id = isset($shop_product_id->product_id)?$shop_product_id->product_id:'';
+                                        }else{
+                                            $shop_product_id = $schedule_info['product_id'];
+                                            $shop_option_id = '';
+                                        }
+                                        $check = ScheduleShipment::where(['ss_no' => $ss_no->ss_no])->update([
+                                            'shop_product_id' => isset($shop_product_id)?$shop_product_id:'',
+                                            'shop_option_id' => isset($shop_option_id)?$shop_option_id:''
+                                        ]);
+                                        $check_fisrt = 1;
+                                    }
                                 }
                             }
                         }
@@ -675,7 +688,7 @@ class ScheduleShipmentController extends Controller
             'domain_key' => '50e2331771d085ddeab1bc2f91a39ae14e1b924b8df05d11ff40eea3aff3d9fb',
             'action' => 'get_order_info',
             'date_type' => 'collect_date',
-            'start_date' => date('Y-m-d'),
+            'start_date' => '2022-05-01', //date('Y-m-d')
             'end_date' => date('Y-m-d'),
             'limit' => 100,
             'page' => '1'
