@@ -46,6 +46,7 @@ class RateDataController extends Controller
             DB::beginTransaction();
 
             if (!isset($validated['rmd_no']) && isset($validated['rm_no'])) {
+
                 $index = RateMetaData::where('rm_no', $validated['rm_no'])->get()->count() + 1;
                 $rmd_no = RateMetaData::insertGetId(
                     [
@@ -62,6 +63,17 @@ class RateDataController extends Controller
                         'mb_no' => Auth::user()->mb_no,
                         'co_no' => $validated['co_no'],
                         'rmd_number' => CommonFunc::generate_rmd_number($validated['co_no'], $index),
+                        'rmd_mail_detail' => isset($validated['rmd_mail_detail']) ? $validated['rmd_mail_detail'] : '',
+                    ]
+                );
+            } else if (isset($validated['rmd_no']) && isset($validated['rm_no'])) {
+                $rmd = RateMetaData::where('rmd_no', $validated['rmd_no'])->first();
+
+                $rmd_no = RateMetaData::insertGetId(
+                    [
+                        'mb_no' => Auth::user()->mb_no,
+                        'rm_no' => $validated['rm_no'],
+                        'rmd_number' =>  $rmd->rmd_number,
                         'rmd_mail_detail' => isset($validated['rmd_mail_detail']) ? $validated['rmd_mail_detail'] : '',
                     ]
                 );
@@ -1394,7 +1406,7 @@ class RateDataController extends Controller
                         ],
                         [
 
-                            'co_no' => $request->co_no,
+                            'rd_co_no' => $request->co_no,
                             'rd_cate_meta1' => $val['rd_cate_meta1'],
                             'rd_cate_meta2' => $val['rd_cate_meta2'],
                             'rd_cate1' => $val['rd_cate1'],
@@ -1460,7 +1472,7 @@ class RateDataController extends Controller
                     RateData::insertGetId(
                         [
                             'rmd_no' => $rmd_no,
-                            'co_no' => $request->co_no,
+                            'rd_co_no' => $request->co_no,
                             'rd_cate_meta1' => $val['rd_cate_meta1'],
                             'rd_cate_meta2' => $val['rd_cate_meta2'],
                             'rd_cate1' => $val['rd_cate1'],
