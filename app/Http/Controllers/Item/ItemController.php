@@ -2109,13 +2109,14 @@ class ItemController extends Controller
                         if (is_array($item_arr) || is_object($item_arr))
                         {
                             foreach($item_arr as $option){
-                                $option_pro_id = $item->product_id . $option->product_id;
                                 $item_no = Item::updateOrCreate(
                                     [
-                                        'product_id' => $option_pro_id
+                                        'product_id' => $item->product_id,
+                                        'option_id' => isset($option->product_id)?$option->product_id:''
                                     ],
                                     [
-                                        'product_id' => $option_pro_id,
+                                        'product_id' => $item->product_id,
+                                        'option_id' => isset($option->product_id)?$option->product_id:'',
                                         'mb_no' => 0,
                                         'co_no' => 0,
                                         'item_name' => $item->name,
@@ -2127,7 +2128,7 @@ class ItemController extends Controller
                                         'item_price2' => $item->shop_price,
                                         'item_price3' => $item->supply_price,
                                         'item_url' => $item->img_500,
-                                        'item_option1' => $option->options,
+                                        'item_option1' => isset($option->options)?$option->options:'',
                                         'item_service_name' => '수입풀필먼트'
                                     ]
                                 );
