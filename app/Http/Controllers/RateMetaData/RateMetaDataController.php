@@ -32,6 +32,7 @@ class RateMetaDataController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $rmd = RateMetaData::with(['rate_meta', 'member:mb_no,mb_type,co_no'])
             ->whereNotNull('rm_no')
+            ->whereNull('rmd_parent_no')
             ->whereHas('member', function($q) use($user){
                 $q->where('co_no', $user->co_no);
             })

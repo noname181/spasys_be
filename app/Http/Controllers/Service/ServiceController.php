@@ -60,8 +60,8 @@ class ServiceController extends Controller
     public function getServices()
     {
         try {
-            $services = Service::all();
-            $menu_main = Menu::select(['menu_no', 'menu_name', 'service_no_array'])->where('menu_depth', '상위')->get();
+            $services = Service::where('service_use_yn', 'y')->where('service_no', '!=' , 1)->get();
+            $menu_main = Menu::select(['menu_no', 'menu_name', 'service_no_array'])->where('menu_depth','상위')->get();
 
             DB::commit();
             return response()->json([
@@ -72,6 +72,7 @@ class ServiceController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }

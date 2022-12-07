@@ -1067,7 +1067,11 @@ class WarehousingController extends Controller
                         return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
                     });
                 }
-
+                if (isset($validated['w_schedule_number'])) {
+                    $warehousing->whereHas('w_no', function ($q) use ($validated) {
+                        return $q->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number'] . '%');
+                    });
+                }
                 if (isset($validated['order_id'])) {
                     $warehousing->whereHas('w_no', function ($q) use ($validated) {
                         return $q->where('w_schedule_number', 'like', '%' . $validated['order_id'] . '%');
@@ -1165,7 +1169,9 @@ class WarehousingController extends Controller
                         return $q->where(DB::raw('lower(item_name)'), 'like', '%' . strtolower($validated['item_name']) . '%');
                     });
                 }
-
+                if (isset($validated['w_schedule_number'])) {
+                    $schedule_shipment->where('ss_no', 'like', '%' . $validated['w_schedule_number'] . '%');
+                }
                 if (isset($validated['status'])) {
                     if ($validated['status'] == "배송준비") {
                         $schedule_shipment->where('status', '=', 1);
@@ -1335,6 +1341,9 @@ class WarehousingController extends Controller
                 if (isset($validated['logistic_manage_number'])) {
                     $import_schedule->where('logistic_manage_number', 'like', '%' . $validated['logistic_manage_number'] . '%');
                 }
+                if (isset($validated['w_schedule_number'])) {
+                    $import_schedule->where(DB::raw('te_carry_out_number'), 'like', '%' . strtolower($validated['w_schedule_number']) . '%');
+                }
                 if (isset($validated['tie_status'])) {
                     $import_schedule->where('tie_status', '=', $validated['tie_status']);
                 }
@@ -1435,6 +1444,12 @@ class WarehousingController extends Controller
                     });
                 }
 
+                if (isset($validated['w_schedule_number'])) {
+                    $warehousing->whereHas('w_no', function ($q) use ($validated) {
+                        return $q->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number'] . '%');
+                    });
+                }
+
                 if (isset($validated['status'])) {
                     $warehousing->where('rgd_status3', '=', $validated['status']);
                 }
@@ -1467,15 +1482,15 @@ class WarehousingController extends Controller
                 }
 
                 if ($user->mb_type == 'shop') {
-                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->whereNotNull('trans_no')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms','receving_goods_delivery'])->whereNotNull('trans_no')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     })->orderBy('ss_no', 'DESC');
                 } else if ($user->mb_type == 'shipper') {
-                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->whereNotNull('trans_no')->where('status', '!=', '8')->whereHas('ContractWms.company', function ($q) use ($user) {
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms','receving_goods_delivery'])->whereNotNull('trans_no')->where('status', '!=', '8')->whereHas('ContractWms.company', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     })->orderBy('ss_no', 'DESC');
                 } else if ($user->mb_type == 'spasys') {
-                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->whereNotNull('trans_no')->where('status', '!=', '8')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms','receving_goods_delivery'])->whereNotNull('trans_no')->where('status', '!=', '8')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     })->orderBy('ss_no', 'DESC');
                 }
@@ -1517,7 +1532,9 @@ class WarehousingController extends Controller
                         return $q->where(DB::raw('lower(item_name)'), 'like', '%' . strtolower($validated['item_name']) . '%');
                     });
                 }
-
+                if (isset($validated['w_schedule_number'])) {
+                    $schedule_shipment->where('ss_no', 'like', '%' . $validated['w_schedule_number'] . '%');
+                }
                 if (isset($validated['status'])) {
                     if ($validated['status'] == "배송준비") {
                         $schedule_shipment->where('status', '=', 1);
@@ -1656,7 +1673,9 @@ class WarehousingController extends Controller
                 if (isset($validated['h_bl'])) {
                     $import_schedule->where(DB::raw('tie_h_bl'), 'like', '%' . strtolower($validated['h_bl']) . '%');
                 }
-
+                if (isset($validated['w_schedule_number'])) {
+                    $import_schedule->where(DB::raw('te_carry_out_number'), 'like', '%' . strtolower($validated['w_schedule_number']) . '%');
+                }
                 if (isset($validated['logistic_manage_number'])) {
                     $import_schedule->where('logistic_manage_number', 'like', '%' . $validated['logistic_manage_number'] . '%');
                 }

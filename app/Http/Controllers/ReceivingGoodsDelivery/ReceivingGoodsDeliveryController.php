@@ -436,12 +436,12 @@ class ReceivingGoodsDeliveryController extends Controller
                     'item_price4' => isset($request['item_price4']) ? $request['item_price4'] : null
                 ]);
 
-                WarehousingItem::insert([
-                    'item_no' => $item_no_new,
-                    'w_no' => $validated['w_no'],
-                    'wi_number' =>  isset($request['item_price4']) ? $request['item_price4'] : null,
-                    'wi_type' => '입고_shipper'
-                ]);
+                // WarehousingItem::insert([
+                //     'item_no' => $item_no_new,
+                //     'w_no' => $validated['w_no'],
+                //     'wi_number' =>  isset($request['item_price4']) ? $request['item_price4'] : null,
+                //     'wi_type' => '입고_shipper'
+                // ]);
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
