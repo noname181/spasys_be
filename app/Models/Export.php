@@ -76,4 +76,9 @@ class Export extends Model
 
     }
 
+    public function receiving_goods_delivery()
+    {
+        return $this->hasMany(ReceivingGoodsDelivery::class, 'is_no', 'te_carry_out_number');
+    }
+
 }
