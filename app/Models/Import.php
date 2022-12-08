@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Export;
+use App\Models\ExportConfirm;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 

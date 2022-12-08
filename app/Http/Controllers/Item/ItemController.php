@@ -20,6 +20,7 @@ use App\Models\ExportConfirm;
 
 use App\Utils\Messages;
 use App\Http\Requests\Item\ExcelRequest;
+use App\Models\StockStatusBad;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -975,7 +976,6 @@ class ItemController extends Controller
             );
 
             $data = $custom->merge($item);
-
             return response()->json($data);
         } catch (\Exception $e) {
             Log::error($e);
@@ -1911,70 +1911,72 @@ class ItemController extends Controller
                             foreach($item_arr as $option){
                                 if (is_array($option) || is_object($option)){ 
                                     $option = (array)$option;
-                                    $item_no = Item::updateOrCreate(
-                                        [
-                                            'product_id' => $item->product_id,
-                                            'option_id' => $option['product_id'],
-                                        ],
-                                        [
-                                            'product_id' => $item->product_id,
-                                            'option_id' => $option['product_id'],
-                                            'mb_no' => 0,
-                                            'co_no' => 0,
-                                            'item_name' => $item->name,
-                                            'supply_code' => $item->supply_code,
-                                            'item_brand' => $item->brand,
-                                            'item_origin' => $item->origin,
-                                            'item_weight' => $item->weight,
-                                            'item_price1' => $item->org_price,
-                                            'item_price2' => $item->shop_price,
-                                            'item_price3' => $item->supply_price,
-                                            'item_url' => $item->img_500,
-                                            'item_option1' => $option['options'],
-                                            'item_service_name' => '수입풀필먼트'
-                                        ]
-                                    );
-                                    $item_info_no = ItemInfo::updateOrCreate(
-                                        [
-                                            'item_no' => $item_no->item_no,
-                                        ],
-                                        [
-                                            'item_no' => $item_no->item_no,
-                                            'product_id' => $item->product_id,
-                                            'supply_code' => $item->supply_code,
-                                            'trans_fee' => $item->trans_fee,
-                                            'img_desc1' => $item->img_desc1,
-                                            'img_desc2' => $item->img_desc2,
-                                            'img_desc3' => $item->img_desc3,
-                                            'img_desc4' => $item->img_desc4,
-                                            'img_desc5' => $item->img_desc5,
-                                            'product_desc' => $item->product_desc,
-                                            'product_desc2' => $item->product_desc2,
-                                            'location' => $item->location,
-                                            'memo' => $item->memo,
-                                            'category' => $item->category,
-                                            'maker' => $item->maker,
-                                            'md' => $item->md,
-                                            'manager1' => $item->manager1,
-                                            'manager2' => $item->manager2,
-                                            'supply_options' => !empty($option['supply_options'])?$option['supply_options']:'',
-                                            'enable_sale' => !empty($option['enable_sale'])?$option['enable_sale']:1,
-                                            'use_temp_soldout' => !empty($option['use_temp_soldout'])?$option['use_temp_soldout']:0,
-                                            'stock_alarm1' => !empty($option['stock_alarm1'])?$option['stock_alarm1']:0,
-                                            'stock_alarm2' => !empty($option['stock_alarm2'])?$option['stock_alarm2']:0,
-                                            'extra_price' => !empty($option['extra_price'])?$option['extra_price']:0,
-                                            'extra_shop_price' => !empty($option['extra_shop_price'])?$option['extra_shop_price']:0,
-                                            'extra_column6' => !empty($option['extra_column6'])?$option['extra_column6']:'',
-                                            'extra_column7' => !empty($option['extra_column7'])?$option['extra_column7']:'',
-                                            'extra_column8' => !empty($option['extra_column8'])?$option['extra_column8']:'',
-                                            'extra_column9' => !empty($option['extra_column9'])?$option['extra_column9']:'',
-                                            'extra_column10' => !empty($option['extra_column10'])?$option['extra_column10']:'',
-                                            'reg_date' => !empty($option['reg_date'])?$option['reg_date']:null,
-                                            'last_update_date' => !empty($option['last_update_date'])?$option['last_update_date']:null,
-                                            'new_link_id' => !empty($option['new_link_id'])?$option['new_link_id']:'',
-                                            'link_id' => !empty($option['link_id'])?$option['link_id']:'',
-                                        ]
-                                    );   
+                                    if(!empty($option['product_id'])){
+                                        $item_no = Item::updateOrCreate(
+                                            [
+                                                'product_id' => $item->product_id,
+                                                'option_id' => $option['product_id'],
+                                            ],
+                                            [
+                                                'product_id' => $item->product_id,
+                                                'option_id' => $option['product_id'],
+                                                'mb_no' => 0,
+                                                'co_no' => 0,
+                                                'item_name' => $item->name,
+                                                'supply_code' => $item->supply_code,
+                                                'item_brand' => $item->brand,
+                                                'item_origin' => $item->origin,
+                                                'item_weight' => $item->weight,
+                                                'item_price1' => $item->org_price,
+                                                'item_price2' => $item->shop_price,
+                                                'item_price3' => $item->supply_price,
+                                                'item_url' => $item->img_500,
+                                                'item_option1' => $option['options'],
+                                                'item_service_name' => '수입풀필먼트'
+                                            ]
+                                        );
+                                        $item_info_no = ItemInfo::updateOrCreate(
+                                            [
+                                                'item_no' => $item_no->item_no,
+                                            ],
+                                            [
+                                                'item_no' => $item_no->item_no,
+                                                'product_id' => $item->product_id,
+                                                'supply_code' => $item->supply_code,
+                                                'trans_fee' => $item->trans_fee,
+                                                'img_desc1' => $item->img_desc1,
+                                                'img_desc2' => $item->img_desc2,
+                                                'img_desc3' => $item->img_desc3,
+                                                'img_desc4' => $item->img_desc4,
+                                                'img_desc5' => $item->img_desc5,
+                                                'product_desc' => $item->product_desc,
+                                                'product_desc2' => $item->product_desc2,
+                                                'location' => $item->location,
+                                                'memo' => $item->memo,
+                                                'category' => $item->category,
+                                                'maker' => $item->maker,
+                                                'md' => $item->md,
+                                                'manager1' => $item->manager1,
+                                                'manager2' => $item->manager2,
+                                                'supply_options' => !empty($option['supply_options'])?$option['supply_options']:'',
+                                                'enable_sale' => !empty($option['enable_sale'])?$option['enable_sale']:1,
+                                                'use_temp_soldout' => !empty($option['use_temp_soldout'])?$option['use_temp_soldout']:0,
+                                                'stock_alarm1' => !empty($option['stock_alarm1'])?$option['stock_alarm1']:0,
+                                                'stock_alarm2' => !empty($option['stock_alarm2'])?$option['stock_alarm2']:0,
+                                                'extra_price' => !empty($option['extra_price'])?$option['extra_price']:0,
+                                                'extra_shop_price' => !empty($option['extra_shop_price'])?$option['extra_shop_price']:0,
+                                                'extra_column6' => !empty($option['extra_column6'])?$option['extra_column6']:'',
+                                                'extra_column7' => !empty($option['extra_column7'])?$option['extra_column7']:'',
+                                                'extra_column8' => !empty($option['extra_column8'])?$option['extra_column8']:'',
+                                                'extra_column9' => !empty($option['extra_column9'])?$option['extra_column9']:'',
+                                                'extra_column10' => !empty($option['extra_column10'])?$option['extra_column10']:'',
+                                                'reg_date' => !empty($option['reg_date'])?$option['reg_date']:null,
+                                                'last_update_date' => !empty($option['last_update_date'])?$option['last_update_date']:null,
+                                                'new_link_id' => !empty($option['new_link_id'])?$option['new_link_id']:'',
+                                                'link_id' => !empty($option['link_id'])?$option['link_id']:'',
+                                            ]
+                                        );   
+                                    }
                                 }
                             }
                         }else{
@@ -2627,48 +2629,70 @@ class ItemController extends Controller
         $url_api .= '&partner_key='.$filter['partner_key'];
         $url_api .= '&domain_key='.$filter['domain_key'];
         $url_api .= '&action='.$filter['action'];
+        $params = array();
         $list_items = $this->paginateItemsApiIdRaw()->toArray();
-        $limit_slice = 99;
-        $new_array_items = empty($list_items)?array():((count($list_items) > 99)?array_chunk($list_items, $limit_slice):$list_items);
-        foreach($new_array_items as $list_item){
-            for($bad = 0; $bad <= 1; $bad++) {
-                if(!empty($list_items)){
-                    $url_api .= '&product_id=';
-                    foreach($list_item as $key_item => $item){
-                        if($key_item > 0){
-                            $url_api .= ',';
-                        }
-                        $url_api .= $item['product_id'];
-                        if($key_item >= 50){
-                            break;
-                        }
+        foreach($list_items as $item){
+            if(!empty($item)){
+                if(!empty($item['option_id'])){
+                    $params[] = $item['option_id'];
+                }else{
+                    $params[] = $item['product_id'];
+                }
+            }
+        }
+        
+        for($bad_status = 0; $bad_status <= 1; $bad_status++) {
+            $url_api .= '&bad='.$bad_status;
+            $url_api .= '&product_id=';
+            if(!empty($params)){
+                $unique_params = array_unique($params);
+                if(count($unique_params) > 100){
+                    $chunk_params = array_chunk($unique_params,100);
+                    foreach($chunk_params as $param){
+                        $link_params = implode(',', $param);
+                        $url_api .= $link_params;
+                        $this->updateStockStatus($url_api);
                     }
                 }
-                $url_api .= '&bad='.$bad;
-                $response = file_get_contents($url_api);
-                $api_data = json_decode($response);
-                if(!empty($api_data->data)){ 
-                    foreach($api_data->data as $item){ 
-                        $item = (array)$item;
-                        $item_info = Item::where('product_id',$item['product_id'])->first();
-                        if($item['stock'] > 0 && $item_info){
-                            $item_info_no = ItemInfo::where('product_id', $item['product_id'])
-                            ->where('item_no', $item_info->item_no)
-                            ->update([
-                                'product_id' => $item['product_id'],
-                                'stock' => $item['stock'],
-                                'status' => $item['bad'],
-                                'item_no' => $item_info->item_no
-                            ]);
-                        }
-                    }
-                }
+            }else{
+                $this->updateStockStatus($url_api);
             }
         }
         return response()->json([
             'message' => '완료되었습니다.',
             'status' => 1
         ], 200);
+    }
+
+    public function updateStockStatus($url_api){
+        $response = file_get_contents($url_api);
+        $api_data = json_decode($response);
+        if(!empty($api_data->data)){ 
+            foreach($api_data->data as $item){ 
+                $item = (array)$item;
+                $item_info = Item::where('product_id',$item['product_id'])->first();
+                if($item['stock'] > 0 && $item_info){
+                    $item_info_no = ItemInfo::where('product_id', $item['product_id'])
+                    ->where('item_no', $item_info->item_no)
+                    ->update([
+                        'product_id' => $item['product_id'],
+                        'stock' => $item['stock'],
+                        'status' => $item['bad'],
+                        'item_no' => $item_info->item_no
+                    ]);
+                    
+                    StockStatusBad::updateOrCreate([
+                        'product_id' => $item['product_id'],
+                        'status' => $item['bad'],
+                    ],[
+                        'product_id' => $item['product_id'],
+                        'stock' => $item['stock'],
+                        'status' => $item['bad'],
+                        'item_no' => $item_info->item_no
+                    ]);
+                }
+            }
+        }
     }
     
     public function updateStockItemsApiNoLogin(Request $request){

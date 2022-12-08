@@ -264,6 +264,14 @@ class ScheduleShipmentController extends Controller
             $user = Auth::user();
                 foreach ($data_schedule as $i_schedule => $schedule) {
                     foreach($schedule['data_item'] as $schedule_item){
+                        if (str_contains($schedule_item['shop_product_id'], 'S')) { 
+                            $shop_option_id = $schedule_item['shop_product_id'];
+                            $shop_product_id = Item::where('option_id',$shop_option_id)->select('product_id')->first();
+                            $shop_product_id = !empty($shop_product_id->product_id)?$shop_product_id->product_id:'';
+                        }else{
+                            $shop_option_id = '';
+                            $shop_product_id = !empty($schedule_item['shop_product_id'])?$schedule_item['shop_product_id']:'';
+                        }
                         $data_schedule = [
                             'co_no' => $user->co_no,
                             'seq' => isset($schedule_item['seq']) ? $schedule_item['seq'] : null,
@@ -273,8 +281,8 @@ class ScheduleShipmentController extends Controller
                             'order_id' => !empty($schedule_item['order_id']) ? $schedule_item['order_id'] : $i_schedule,
                             'order_id_seq' => isset($schedule_item['order_id_seq']) ? $schedule_item['order_id_seq'] : null,
                             'order_id_seq2' => isset($schedule_item['order_id_seq2']) ? $schedule_item['order_id_seq2'] : null,
-                            'shop_product_id' => null,
-                            'shop_option_id' => null,
+                            'shop_product_id' => $shop_option_id,
+                            'shop_option_id' => $shop_option_id,
                             'product_name' => isset($schedule_item['product_name']) ? $schedule_item['product_name'] . '외 ' . (count($schedule_item['order_products']) - 1) .'건' : null,
                             'options' => isset($schedule_item['options']) ? $schedule_item['options'] : null,
                             'qty' => isset($schedule_item['qty']) ? $schedule_item['qty'] : null,
@@ -312,7 +320,7 @@ class ScheduleShipmentController extends Controller
                         if( $ss_no->ss_no && isset($schedule_item['order_products'])){
                             $check_fisrt = 0;
                             foreach ($schedule_item['order_products'] as $ss_info => $schedule_info) {
-                                if(!empty($ss_no->ss_no) && !empty($schedule_info['barcode'])){
+                                if(!empty($ss_no->ss_no)){
                                     $ss_info_no = ScheduleShipmentInfo::updateOrCreate([
                                         'ss_no' => $ss_no->ss_no,
                                         'barcode' => $schedule_info['barcode']
@@ -351,14 +359,12 @@ class ScheduleShipmentController extends Controller
                                             $shop_option_id = '';
                                         }
                                         if($check_fisrt == 0){
-                                            $dt_update = [
-                                                'shop_product_id' => isset($shop_product_id)?$shop_product_id:'',
-                                                'shop_option_id' => isset($shop_option_id)?$shop_option_id:''
-                                            ];
-                                        }else{
-                                            $dt_update = [
-                                                'shop_product_id' => isset($shop_product_id)?$shop_product_id:'',
-                                            ];
+                                            if(!empty($shop_product_id)){
+                                                $dt_update['shop_product_id'] = $shop_product_id;
+                                            }
+                                            if(!empty($shop_option_id)){
+                                                $dt_update['shop_option_id'] = $shop_option_id;
+                                            }
                                         }
                                         ScheduleShipment::where(['ss_no' => $ss_no->ss_no])->update($dt_update);
                                         $check_fisrt = 1;
@@ -666,7 +672,7 @@ class ScheduleShipmentController extends Controller
                         $total_qty += $order['qty'];
                     }
                     if($option_first_id == '' && isset($product_infos[$order['product_id']][0]['option_id'])){
-                        $option_first_id = $product_infos[$order['product_id']][0]['option_id'];
+                        $option_first_id = isset($product_infos[$order['product_id']][0]['option_id'])?$product_infos[$order['product_id']][0]['option_id']:'';
                     }
                 }
                 $data_item['qty'] = $total_qty;
@@ -674,7 +680,7 @@ class ScheduleShipmentController extends Controller
             }
             $order_products[] = $data_item['order_products'];
             $data_temp[$data_item['order_id']]['data_item'][] = $data_item;
-            $data_temp[$data_item['order_id']]['order_products'][] = $order_products_data;
+            $data_temp[$data_item['order_id']]['order_products'] = $order_products_data;
         }
         return array(
             'order_products' => $order_products,
@@ -700,9 +706,10 @@ class ScheduleShipmentController extends Controller
         if(isset($check_pages)&&$check_pages > 1){
             for($page = 1; $page <= $check_pages; $page++){
                 $param_arrays['page'] = $page;
+                $base_schedule_datas = $this->requestDataAPI($param_arrays); //Get Data
                 $data_schedule = $this->mapDataAPI($base_schedule_datas['data']);
                 if(!empty($data_schedule['data_temp'])){
-                  return $this->apiScheduleShipmentsRaw($data_schedule['data_temp']);
+                    $this->apiScheduleShipmentsRaw($data_schedule['data_temp']);
                 }
             }
             return response()->json([

@@ -40,4 +40,8 @@ class ExportConfirm extends Model
         'tec_ec_date' => "date:Y.m.d",
     ];
 
+    public function export()
+    {
+        return $this->hasOne(Export::class, 'te_logistic_manage_number', 'tie_logistic_manage_number');
+    }
 }

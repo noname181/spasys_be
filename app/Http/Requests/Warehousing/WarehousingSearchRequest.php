@@ -168,6 +168,9 @@ class WarehousingSearchRequest extends BaseFormRequest
             'w_schedule_number2' => [
                 '',
             ],
+            'carrier' => [
+                '',
+            ],
         ];
     }
 

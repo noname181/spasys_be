@@ -2,6 +2,7 @@
 
 namespace App\Models;
 use App\Models\Import;
+use App\Models\Export;
 use App\Models\Company;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -50,7 +51,7 @@ class ImportExpected extends Model
 
     public function import()
     {
-        return $this->hasOne(Import::class,'ti_logistic_manage_number','tie_logistic_manage_number');
+        return $this->hasOne(Import::class,'ti_logistic_manage_number','tie_logistic_manage_number')->with('import_expect');
     }
 
     public function company()
@@ -61,6 +62,11 @@ class ImportExpected extends Model
     public function company_spasys()
     {
         return $this->hasOne(Company::class,'warehouse_code','tie_warehouse_code')->with(['co_parent','rate_data_1']);
+    }
+    
+    public function export()
+    {
+        return $this->hasOne(Export::class, 'te_logistic_manage_number', 'tie_logistic_manage_number')->with('receiving_goods_delivery');
     }
 
     public function receiving_goods_delivery()
