@@ -150,6 +150,9 @@ class CoAddressController extends Controller
             //DB::beginTransaction();
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
             $validated = $request->validated();
+            if($validated['ca_is_default'] == 'true'){
+                $coAddress2 = CoAddress::where('co_no', $validated['co_no'])->update(['ca_is_default'=>'n']);
+             }
 			$CoAddress = CoAddress::insertGetId([
 				'mb_no' => $member->mb_no,
 				'co_no' => $co_no,
@@ -158,6 +161,7 @@ class CoAddressController extends Controller
 				'ca_manager' => $validated['ca_manager'],
 				'ca_address' => $validated['ca_address'],
 				'ca_address_detail' => $validated['ca_address_detail'],
+                'ca_is_default'=>$validated['ca_is_default'] == 'true' ? 'y' : 'n'
 			]);
 
             DB::commit();
@@ -203,15 +207,18 @@ class CoAddressController extends Controller
     {
         try {
             $validated = $request->validated();
+            if($validated['ca_is_default'] == 'true'){
+               $coAddress2 = CoAddress::where('co_no', $validated['co_no'])->update(['ca_is_default'=>'n']);
+            }
             $coAddress = CoAddress::where('ca_no', $validated['ca_no'])->where('mb_no', Auth::user()->mb_no)->update([
                 'ca_name' => $validated['ca_name'],
                 'ca_hp' => $validated['ca_hp'],
                 'ca_manager' => $validated['ca_manager'],
 				'ca_address' => $validated['ca_address'],
 				'ca_address_detail' => $validated['ca_address_detail'],
-                'ca_is_default'=>$validated['ca_is_default'] == true ? 'y' : 'n'
+                'ca_is_default'=>$validated['ca_is_default'] == 'true' ? 'y' : 'n'
             ]);
-            return response()->json(['message' => Messages::MSG_0007], 200);
+            return response()->json(['message' => Messages::MSG_0007,'validated'=>$validated], 200);
         } catch (\Exception $e) {
             Log::error($e);
 

@@ -207,7 +207,7 @@ class AdjustmentGroupController extends Controller
                 'ag_manager' => $validated['ag_manager'],
                 'ag_email' => $validated['ag_email'],
             ]);
-            return response()->json(['message' => Messages::MSG_0007], 200);
+            return response()->json(['message' => Messages::MSG_0007,'user'=>Auth::user()->mb_no], 200);
         } catch (\Exception $e) {
             Log::error($e);
             //
