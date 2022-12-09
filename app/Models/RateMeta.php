@@ -31,7 +31,9 @@ class RateMeta extends Model
         'rm_biz_address_detail',
         'rm_name',
         'rm_hp',
-        'rm_mail_detail'
+        'rm_mail_detail',
+        'rm_mail_detail2',
+        'rm_mail_detail3'
     ];
 
     protected $casts = [
