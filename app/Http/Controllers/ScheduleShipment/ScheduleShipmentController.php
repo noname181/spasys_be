@@ -42,29 +42,29 @@ class ScheduleShipmentController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             if( $request->type == 'page136'){
                 if ($user->mb_type == 'shop') {
-                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms','receving_goods_delivery'])->where('trans_no','출고예정')->whereHas('ContractWms.company.co_parent', function ($q) use ($user){
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms','receving_goods_delivery'])->whereNull('trans_no')->whereHas('ContractWms.company.co_parent', function ($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     })->orderBy('ss_no', 'DESC');
                 }else if($user->mb_type == 'shipper'){
-                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms','receving_goods_delivery'])->where('trans_no','출고예정')->whereHas('ContractWms.company', function ($q) use ($user){
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms','receving_goods_delivery'])->whereNull('trans_no')->whereHas('ContractWms.company', function ($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     })->orderBy('ss_no', 'DESC');
                 }else if($user->mb_type == 'spasys'){
-                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms','receving_goods_delivery'])->where('trans_no','출고예정')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user){
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms','receving_goods_delivery'])->whereNull('trans_no')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     })->orderBy('ss_no', 'DESC');
                 }
             }else{
                 if ($user->mb_type == 'shop') {
-                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms','receving_goods_delivery'])->where('trans_no','출고')->whereHas('ContractWms.company.co_parent', function ($q) use ($user){
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms','receving_goods_delivery'])->whereNotNull('trans_no')->whereHas('ContractWms.company.co_parent', function ($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     })->orderBy('ss_no', 'DESC');
                 }else if($user->mb_type == 'shipper'){
-                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms','receving_goods_delivery'])->where('trans_no','출고')->whereHas('ContractWms.company', function ($q) use ($user){
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms','receving_goods_delivery'])->whereNotNull('trans_no')->whereHas('ContractWms.company', function ($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     })->orderBy('ss_no', 'DESC');
                 }else if($user->mb_type == 'spasys'){
-                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms','receving_goods_delivery'])->where('trans_no','출고')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user){
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms','receving_goods_delivery'])->whereNotNull('trans_no')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     })->orderBy('ss_no', 'DESC');
                 }
@@ -295,7 +295,7 @@ class ScheduleShipmentController extends Controller
                             'recv_address' => isset($schedule_item['recv_address']) ? $schedule_item['recv_address'] : null,
                             'recv_zip' => isset($schedule_item['recv_zip']) ? $schedule_item['recv_zip'] : null,
                             'memo' => isset($schedule_item['memo']) ? $schedule_item['memo'] : null,
-                            'status' => isset($schedule_item['status']) ? $schedule_item['status'] : null,
+                            'status' => isset($schedule_item['trans_no']) && $schedule_item['trans_no'] != '' ? '출고' : '출고예정',
                             'order_cs' => isset($schedule_item['order_cs']) ? $schedule_item['order_cs'] : null,
                             'collect_date' => isset($schedule_item['collect_date']) ? $schedule_item['collect_date'] : null,
                             'order_date' => !empty($schedule_item['order_date']) ? ((int)$schedule_item['order_date'] > 2022 ? $schedule_item['order_date'] : null) : null,
@@ -306,7 +306,7 @@ class ScheduleShipmentController extends Controller
                             'amount' => isset($schedule_item['amount']) ? $schedule_item['amount'] : null,
                             'extra_money' => isset($schedule_item['extra_money']) ? $schedule_item['extra_money'] : null,
                             'trans_corp' => isset($schedule_item['trans_corp']) ? $schedule_item['trans_corp'] : null,
-                            'trans_no' => isset($schedule_item['trans_no']) && $schedule_item['trans_no'] != '' ? '출고' : '출고예정',
+                            'trans_no' => isset($schedule_item['trans_no']) && $schedule_item['trans_no'] != '' ? $schedule_item['trans_no'] : null,
                             'trans_who' => isset($schedule_item['trans_who']) ? $schedule_item['trans_who'] : null,
                             'prepay_price' => isset($schedule_item['prepay_price']) ? $schedule_item['prepay_price'] : null,
                             'gift' => isset($schedule_item['gift']) ? $schedule_item['gift'] : null,
