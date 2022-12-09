@@ -872,25 +872,31 @@ class ItemController extends Controller
             DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
             if ($user->mb_type == 'shop') {
                 $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])
-                ->leftjoin(DB::raw('stock_status_bad '), function ($leftJoin) {
+                ->leftjoin(DB::raw('stock_status_bad'), function ($leftJoin) {
                     $leftJoin->on('item.product_id', '=', 'stock_status_bad.product_id');
                 })
                 ->where('item_service_name', '=', '수입풀필먼트')->whereHas('item_info', function ($e) {
                     $e->whereNotNull('stock');
+                })->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
                 })->orderBy('item.item_no', 'DESC');
             } else if ($user->mb_type == 'shipper') {
                 $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])
-                ->leftjoin(DB::raw('stock_status_bad '), function ($leftJoin) {
+                ->leftjoin(DB::raw('stock_status_bad'), function ($leftJoin) {
                     $leftJoin->on('item.product_id', '=', 'stock_status_bad.product_id');
                 })->where('item_service_name', '=', '수입풀필먼트')->whereHas('item_info', function ($e) {
                     $e->whereNotNull('stock');
+                })->whereHas('ContractWms.company', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
                 })->orderBy('item.item_no', 'DESC');
             } else if ($user->mb_type == 'spasys') {
                 $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])
-                ->leftjoin(DB::raw('stock_status_bad '), function ($leftJoin) {
+                ->leftjoin(DB::raw('stock_status_bad'), function ($leftJoin) {
                     $leftJoin->on('item.product_id', '=', 'stock_status_bad.product_id');
                 })->where('item_service_name', '=', '수입풀필먼트')->whereHas('item_info', function ($e) {
                     $e->whereNotNull('stock');
+                })->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
                 })->orderBy('item.item_no', 'DESC');
             }
             if (isset($validated['from_date'])) {
