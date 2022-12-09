@@ -94,4 +94,8 @@ class Item extends Model
         return $this->hasOne(ContractWms::class, 'cw_code', 'supply_code')->where('cw_tab','=','공급처')->with('company');
 
     }
+    public function item_status_bad()
+    {
+        return $this->hasMany(StockStatusBad::class, 'product_id', 'product_id');
+    }
 }
