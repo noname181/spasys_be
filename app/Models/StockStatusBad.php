@@ -22,6 +22,7 @@ class StockStatusBad extends Model
     protected $fillable = [
         'id',
         'product_id',
+        'option_id',
         'stock',
         'status',
         'item_no'
