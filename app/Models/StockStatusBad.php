@@ -22,10 +22,17 @@ class StockStatusBad extends Model
     protected $fillable = [
         'id',
         'product_id',
+        'option_id',
         'stock',
         'status',
         'item_no'
     ];
+
+    protected $casts = [
+        'created_at' => "date:Y.m.d H:i",
+        'updated_at' => "date:Y.m.d H:i",
+    ];
+    
     public function item_status_bad()
     {
         return $this->belongsTo(Item::class, 'product_id', 'product_id');
