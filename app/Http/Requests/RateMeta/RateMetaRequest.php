@@ -69,6 +69,12 @@ class RateMetaRequest extends BaseFormRequest
             'rm_mail_detail' => [
                 '',
             ],
+            'rm_mail_detail2' => [
+                '',
+            ],
+            'rm_mail_detail3' => [
+                '',
+            ],
         ];
     }
 

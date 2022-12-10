@@ -36,6 +36,9 @@ class RateMetaController extends Controller
                 'rm_name' => $validated['rm_name'],
                 'rm_hp' => $validated['rm_hp'],
                 'rm_mail_detail' => isset($validated['rm_mail_detail']) ? $validated['rm_mail_detail'] : '',
+                'rm_mail_detail2' => isset($validated['rm_mail_detail2']) ? $validated['rm_mail_detail2'] : '',
+                'rm_mail_detail3' => isset($validated['rm_mail_detail3']) ? $validated['rm_mail_detail3'] : '',
+
             ]);
             return response()->json(['message' => Messages::MSG_0007, 'rm_no' => $rm_no], 201);
         } catch (\Exception $e) {
@@ -58,7 +61,9 @@ class RateMetaController extends Controller
                 'rm_name',
                 'rm_hp',
                 'rm_no',
-                'rm_mail_detail'
+                'rm_mail_detail',
+                'rm_mail_detail2',
+                'rm_mail_detail3'
             ])->with(['send_email'])->where('rm_no', $rm_no)->first();
             return response()->json(['message' => Messages::MSG_0007, 'rate_data_send_meta' => $rate_data_send_meta], 200);
         } catch (\Exception $e) {
@@ -82,6 +87,9 @@ class RateMetaController extends Controller
                 'rm_name' => $validated['rm_name'],
                 'rm_hp' => $validated['rm_hp'],
                 'rm_mail_detail' => $validated['rm_mail_detail'],
+                'rm_mail_detail2' => $validated['rm_mail_detail2'],
+                'rm_mail_detail3' => $validated['rm_mail_detail3'],
+
             ];
             $rate_data_send_meta = RateMeta::where(['rm_no' => $rm->rm_no])
                 ->update($update);
