@@ -833,7 +833,7 @@ class WarehousingController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
             if ($user->mb_type == 'shop') {
-                $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing = ReceivingGoodsDelivery::with(['w_no','warehousing'])->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
                     $query->where('w_type', '=', 'IW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
                         $q->where('rgd_status1', '!=', '입고')->orWhereNull('rgd_status1');
                     })->whereHas('co_no.co_parent', function ($q) use ($user) {
@@ -841,7 +841,7 @@ class WarehousingController extends Controller
                     });
                 })->orderBy('rgd_no', 'DESC');
             } else if ($user->mb_type == 'shipper') {
-                $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing = ReceivingGoodsDelivery::with(['w_no','warehousing'])->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
                     $query->where('w_type', '=', 'IW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
                         $q->where('rgd_status1', '!=', '입고')->orWhereNull('rgd_status1');
                     })->whereHas('co_no', function ($q) use ($user) {
@@ -849,7 +849,7 @@ class WarehousingController extends Controller
                     });
                 })->orderBy('rgd_no', 'DESC');
             } else if ($user->mb_type == 'spasys') {
-                $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing = ReceivingGoodsDelivery::with(['w_no','warehousing'])->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
                     $query->where('w_type', '=', 'IW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
                         $q->where('rgd_status1', '!=', '입고')->orWhereNull('rgd_status1');
                     })->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
@@ -917,12 +917,32 @@ class WarehousingController extends Controller
             }
 
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
+            $warehousing->setCollection(
+                $warehousing->getCollection()->map(function ($item) {
+
+                    $item->total_item = WarehousingItem::where('w_no', $item->w_no)->where('wi_type', '입고_shipper')->sum('wi_number');
+                    if (    !empty($item['warehousing']['warehousing_item'][0]) && isset($item['warehousing']['warehousing_item'][0]['item']) ) {
+                        $first_name_item = $item['warehousing']['warehousing_item'][0]['item']['item_name'];
+                        $total_item = $item['warehousing']['warehousing_item']->count();
+                        $final_total = ($total_item   - 1);
+                        if ($final_total <= 0) {
+                            $item->first_item_name_total = $first_name_item . '외';
+                        } else {
+                            $item->first_item_name_total = $first_name_item . '외' . ' ' . $final_total . '건';
+                        }
+                    } else {
+                        $item->first_item_name_total = '';
+                    }
+
+                    return $item;
+                })
+            );
             //return DB::getQueryLog();
 
             return response()->json($warehousing);
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             //return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }

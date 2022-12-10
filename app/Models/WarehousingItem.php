@@ -42,6 +42,10 @@ class WarehousingItem extends Model
     {
         return $this->belongsTo(Warehousing::class, 'w_no', 'w_no');
     }
+    public function warehousing()
+    {
+        return $this->belongsTo(Warehousing::class, 'w_no', 'w_no');
+    }
 
     public function item_no()
     {
