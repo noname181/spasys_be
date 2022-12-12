@@ -15,3 +15,4 @@ yarn-error.log
 /.vscode
 *.css
 *.Xlsx
+app/Http/Controllers/Item/ItemController_bk.php

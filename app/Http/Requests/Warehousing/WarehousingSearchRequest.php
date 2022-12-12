@@ -171,6 +171,9 @@ class WarehousingSearchRequest extends BaseFormRequest
             'carrier' => [
                 '',
             ],
+            'rgd_status5' => [
+                '',
+            ],
         ];
     }
 

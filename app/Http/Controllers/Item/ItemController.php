@@ -871,7 +871,7 @@ class ItemController extends Controller
             $user = Auth::user();
             DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
             if ($user->mb_type == 'shop') {
-                $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])
+                $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->select('item.*','stock_status_bad.stock')
                     ->leftjoin(DB::raw('stock_status_bad'), function ($leftJoin) {
                         $leftJoin->on('item.product_id', '=', 'stock_status_bad.product_id');
                         $leftJoin->on('item.option_id', '=', 'stock_status_bad.option_id');
@@ -882,7 +882,7 @@ class ItemController extends Controller
                         $q->where('co_no', $user->co_no);
                     })->orderBy('item.item_no', 'DESC');
             } else if ($user->mb_type == 'shipper') {
-                $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])
+                $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->select('item.*','stock_status_bad.stock')
                     ->leftjoin(DB::raw('stock_status_bad'), function ($leftJoin) {
                         $leftJoin->on('item.product_id', '=', 'stock_status_bad.product_id');
                         $leftJoin->on('item.option_id', '=', 'stock_status_bad.option_id');
@@ -892,7 +892,7 @@ class ItemController extends Controller
                         $q->where('co_no', $user->co_no);
                     })->orderBy('item.item_no', 'DESC');
             } else if ($user->mb_type == 'spasys') {
-                $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])
+                $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->select('item.*','stock_status_bad.stock')
                     ->leftjoin(DB::raw('stock_status_bad'), function ($leftJoin) {
                         $leftJoin->on('item.product_id', '=', 'stock_status_bad.product_id');
                         $leftJoin->on('item.option_id', '=', 'stock_status_bad.option_id');
@@ -1893,7 +1893,7 @@ class ItemController extends Controller
     //     }
     // }
 
-    public function apiItemsRaw($request = null)
+    public function apiItemsRaw($request = null,$url_api = null)
     {
         try {
             DB::beginTransaction();
@@ -1920,7 +1920,7 @@ class ItemController extends Controller
                 );
                 if ($item_no->item_no) {
                     if (!empty($item->options)) {
-                        $item_arr = (array)$item->options;
+                        $item_arr = $item->options;
                         if (is_array($item_arr) || is_object($item_arr)) {
                             foreach ($item_arr as $option) {
                                 if (is_array($option) || is_object($option)) {
@@ -2081,6 +2081,7 @@ class ItemController extends Controller
 
             DB::commit();
             return response()->json([
+                'param' => $url_api,
                 'message' => '완료되었습니다.',
                 'status' => 1,
             ], 200);
@@ -2568,19 +2569,21 @@ class ItemController extends Controller
             $total_data = $api_data->api_data;
             $pages = ceil($total_data / 100);
             for ($i = 1; $i <= $pages; $i++) {
-                $this->apiItemsRaw($api_data);
+                $this->apiItemsRaw($api_data,$url_api);
             }
         } else {
             if (!empty($api_data->data)) {
-                return $this->apiItemsRaw($api_data);
+                return $this->apiItemsRaw($api_data,$url_api);
             } else {
                 return response()->json([
+                    'param' => $url_api,
                     'message' => '새로운 데이터가 없습니다.',
                     'status' => 1
                 ], 200);
             }
         }
         return response()->json([
+            'param' => $url_api,
             'message' => '새로운 데이터가 없습니다.',
             'status' => 1
         ], 200);
@@ -2681,6 +2684,7 @@ class ItemController extends Controller
                 }
             }
             return response()->json([
+                'param' => $url_api,
                 'message' => '완료되었습니다.',
                 'status' => 1
             ], 200);
