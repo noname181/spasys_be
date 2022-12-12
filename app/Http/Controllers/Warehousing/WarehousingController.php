@@ -3153,7 +3153,13 @@ class WarehousingController extends Controller
             if (isset($validated['service']) && $validated['service'] != '전체') {
                 $warehousing->where('service_korean_name', '=', $validated['service']);
             }
-
+            if (isset($validated['rgd_status5'])) {
+                if($validated['rgd_status5'] == '청구서 취소'){
+                    $warehousing->where('rgd_status5', '=', 'cancel');
+                }else if($validated['rgd_status5'] == '발행'){
+                    $warehousing->where('rgd_status5', '!=', 'cancel');
+                }
+            }
 
 
             if ($user->mb_type == 'shop' && $request->type == 'view_list') {
