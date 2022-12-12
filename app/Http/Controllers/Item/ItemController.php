@@ -924,6 +924,11 @@ class ItemController extends Controller
                     $query->where(DB::raw('lower(item_name)'), 'like', '%' . strtolower($validated['item_name']) . '%');
                 });
             }
+            if (isset($validated['product_id'])) {
+                $item->where(function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(item.product_id)'), 'like', '%' . strtolower($validated['product_id']) . '%');
+                });
+            }
             if (isset($validated['item_cargo_bar_code'])) {
                 $item->where(function ($query) use ($validated) {
                     $query->where(DB::raw('lower(item_cargo_bar_code)'), 'like', '%' . strtolower($validated['item_cargo_bar_code']) . '%');
