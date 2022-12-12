@@ -434,7 +434,7 @@ class CompanyController extends Controller
 
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : '';
 
-            $companies = Company::with(['contract', 'co_parent'])->where('co_type', 'shop')->orderBy('co_no', 'DESC');
+            $companies = Company::with(['contract', 'co_parent','adjustment_group'])->where('co_type', 'shop')->orderBy('co_no', 'DESC');
 
 
             $companies->whereHas('co_parent', function ($query) use ($co_no) {
