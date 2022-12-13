@@ -109,8 +109,19 @@ class ScheduleShipmentController extends Controller
             }
 
             if (isset($validated['status'])) {
-                if($validated['status'] > 0){
-                    $schedule_shipment->where('status', '=', $validated['status']);
+                if($validated['status'] == '배송준비'){
+                    $schedule_shipment->whereDoesntHave('receving_goods_delivery', function($q) use($validated) {
+                        $q->where(DB::raw('lower(rgd_status3)'), 'like', '%' . strtolower($validated['status']) . '%');
+                        $q->orWhere('rgd_status3','!=','배송준비');
+                    });
+                }elseif($validated['status'] == '배송중'){
+                    $schedule_shipment->whereHas('receving_goods_delivery', function($q) use($validated) {
+                        $q->where(DB::raw('lower(rgd_status3)'), 'like', '%' . strtolower($validated['status']) . '%');
+                    });
+                }elseif($validated['status'] == '배송완료'){
+                    $schedule_shipment->whereHas('receving_goods_delivery', function($q) use($validated) {
+                        $q->where(DB::raw('lower(rgd_status3)'), 'like', '%' . strtolower($validated['status']) . '%');
+                    });
                 }
             }
 
@@ -660,7 +671,7 @@ class ScheduleShipmentController extends Controller
         if($filter['page'] != ''){
             $url_api .= '&page='.$filter['page'];
         }
-        return $url_api;
+       
         $response = file_get_contents($url_api);
         $api_data = json_decode($response,1);
         return $api_data;
@@ -748,7 +759,7 @@ class ScheduleShipmentController extends Controller
             }else{
                 return response()->json([
                     'param' => $base_schedule_datas,
-                    'message' => '새로운 데이터가 없습니다.',
+                    'message' => '완료되었습니다.',
                     'status' => 0
                 ], 200);
             }
@@ -852,7 +863,7 @@ class ScheduleShipmentController extends Controller
         if(empty($api_data['data'])){
             return response()->json([
                 'param' => $url_api,
-                'message' => '새로운 데이터가 없습니다.',
+                'message' => '완료되었습니다.',
                 'status' => 0
             ], 200);
         }

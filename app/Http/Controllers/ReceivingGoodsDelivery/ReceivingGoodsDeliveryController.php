@@ -13,6 +13,7 @@ use App\Models\WarehousingItem;
 use App\Models\AdjustmentGroup;
 use App\Models\Package;
 use App\Models\ItemChannel;
+use App\Models\TaxInvoiceDivide;
 use App\Utils\Messages;
 use App\Utils\CommonFunc;
 use Illuminate\Http\Request;
@@ -2065,14 +2066,30 @@ class ReceivingGoodsDeliveryController extends Controller
     {
         try {
 
-            ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-                'rgd_status7' => NULL,
-                'rgd_tax_invoice_date' => NULL,
-                'rgd_tax_invoice_number' => NULL,
-            ]);
+            if($request->type == 'add_all'){
+                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+                TaxInvoiceDivide::where('tid_no', $rgd->tid_no)->delete();
+                ReceivingGoodsDelivery::where('tid_no', $rgd->tid_no)->update([
+                    'rgd_status7' => NULL,
+                    'rgd_tax_invoice_date' => NULL,
+                    'rgd_tax_invoice_number' => NULL,
+                    'tid_no' => NULL,
+                ]);
+            }else {
+                ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                    'rgd_status7' => NULL,
+                    'rgd_tax_invoice_date' => NULL,
+                    'rgd_tax_invoice_number' => NULL,
+                    'tid_no' => NULL,
+                ]);
+            }
+
+           
 
 
             $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child'])->where('rgd_no', $request->rgd_no)->first();
+
+            TaxInvoiceDivide::where('rgd_no', $request->rgd_no)->delete();
 
             return response()->json([
                 'message' => 'Success',

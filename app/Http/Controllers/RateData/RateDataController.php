@@ -20,6 +20,7 @@ use App\Models\ReceivingGoodsDelivery;
 use App\Models\Warehousing;
 use App\Utils\CommonFunc;
 use App\Utils\Messages;
+use App\Models\TaxInvoiceDivide;
 use App\Models\ImportExpected;
 use Carbon\Carbon;
 use File;
@@ -7746,7 +7747,7 @@ class RateDataController extends Controller
     {
         try {
             DB::beginTransaction();
-
+            $user = Auth::user();
             foreach ($request->rgds as $rgd) {
                 $tax_number = CommonFunc::generate_tax_number($request->rgds[0]['rgd_no']);
                 ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
@@ -7754,7 +7755,17 @@ class RateDataController extends Controller
                     'rgd_tax_invoice_number' => $tax_number ? $tax_number : null,
                     'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
                 ]);
+
+                $id = TaxInvoiceDivide::insertGetId([
+                    'tid_supply_price' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
+                    'tid_vat' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
+                    'tid_sum' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
+                    'rgd_no' => $rgd['rgd_no'],
+                    'mb_no' => $user->mb_no,
+                ]);
             }
+
+           
 
             DB::commit();
             return response()->json([
