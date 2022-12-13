@@ -4459,7 +4459,6 @@ class WarehousingController extends Controller
                     $rgd_ = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
                         'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
                         'rgd_status7' => 'taxed',
-                        'tid_no' => $id
                     ]);
                 }
                 DB::commit();
