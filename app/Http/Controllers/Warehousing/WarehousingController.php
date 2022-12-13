@@ -4378,29 +4378,101 @@ class WarehousingController extends Controller
     public function create_tid(Request $request) //page277
     {
         try {
-            $user = Auth::user();
-            DB::enableQueryLog();
-            $tid = TaxInvoiceDivide::insertGetId([
-                'rgd_no' => $request->rgd_no,
-                'tid_number' => $request->tid_number,
-                'tid_price' => $request->tid_price,
-                'tid_price_left' => $request->tid_price_left,
-                'mb_no' => $user->mb_no,
-
-            ]);
-
-            if ($request->tid_price_left == 0) {
-                ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+            DB::beginTransaction();
+            if($request->type == 'option'){
+                $user = Auth::user();
+                foreach($request->tid_list as $tid){
+                    if(isset($value['tid_no'])){
+                        $tid_ = TaxInvoiceDivide::where('tid_no', $value['tid_no']);
+                        $tid_->update([
+                            'tid_supply_price' => $tid['tid_supply_price'],
+                            'tid_vat' => $tid['tid_vat'],
+                            'tid_sum' => $tid['tid_sum'],
+                            'rgd_no' => isset($tid['rgd_no']) ? $tid['rgd_no'] : $request->rgd_no,
+                            'tid_number' => isset($tid['tid_number']) ? $tid['tid_number'] : null,
+                            'mb_no' => $user->mb_no,
+                        ]);
+                        $id = $tid_->first()->tid_no;
+                    }else {
+                        $id = TaxInvoiceDivide::insertGetId([
+                            'tid_supply_price' => $tid['tid_supply_price'],
+                            'tid_vat' => $tid['tid_vat'],
+                            'tid_sum' => $tid['tid_sum'],
+                            'rgd_no' => isset($tid['rgd_no']) ? $tid['rgd_no'] : $request->rgd_no,
+                            'tid_number' => isset($tid['tid_number']) ? $tid['tid_number'] : null,
+                            'mb_no' => $user->mb_no,
+                        ]);
+                    }
+                    $ids[] = $id;
+                }
+    
+              
+    
+                TaxInvoiceDivide::where('rgd_no', $request->rgd_no)
+                ->whereNotIn('tid_no', $ids)->delete();
+                $tids = TaxInvoiceDivide::where('rgd_no', $request->rgd_no)->get();
+    
+                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                    'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
                     'rgd_status7' => 'taxed',
                 ]);
+    
+                DB::commit();
+                return response()->json([
+                    'message' => Messages::MSG_0007,
+                    'tid_list' => $tids,
+                ]);
+            }else if($request->type == 'add_all'){
+                $user = Auth::user();
+
+                $id = TaxInvoiceDivide::insertGetId([
+                    'tid_supply_price' => $request->supply_price,
+                    'tid_vat' => $request->vat,
+                    'tid_sum' => $request->sum,
+                    'tid_number' => $request->tid_number,
+                    'mb_no' => $user->mb_no,
+                ]);
+
+                foreach($request->rgds as $rgd){
+                    $rgd_ = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
+                        'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
+                        'rgd_status7' => 'taxed',
+                        'tid_no' => $id
+                    ]);
+                }
+                DB::commit();
+                return response()->json([
+                    'message' => Messages::MSG_0007,
+                ]);
+            }else if($request->type == 'separate'){
+                $user = Auth::user();
+
+                foreach($request->rgds as $rgd){
+                    $id = TaxInvoiceDivide::insertGetId([
+                        'tid_supply_price' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
+                        'tid_vat' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_vat7'] : $rgd['rate_data_general']['rdg_vat4'],
+                        'tid_sum' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_sum7'] : $rgd['rate_data_general']['rdg_sum4'],
+                        'rgd_no' => $rgd['rgd_no'],
+                        'mb_no' => $user->mb_no,
+                    ]);
+
+                    $rgd_ = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
+                        'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
+                        'rgd_status7' => 'taxed',
+                        'tid_no' => $id
+                    ]);
+                }
+                DB::commit();
+                return response()->json([
+                    'message' => Messages::MSG_0007,
+                ]);
             }
-
-
-            return response()->json($tid);
+            
         } catch (\Exception $e) {
+            DB::rollback();
             Log::error($e);
             return $e;
-            return response()->json(['message' => Messages::MSG_0018], 500);
+            return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
 
