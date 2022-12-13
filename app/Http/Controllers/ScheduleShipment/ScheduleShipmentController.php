@@ -526,7 +526,7 @@ class ScheduleShipmentController extends Controller
     }
     public function getScheduleShipmentById($ss_no)
     {
-        $schedule_shipment_item = DB::table('schedule_shipment_info')->where('schedule_shipment_info.ss_no',$ss_no)->get();
+        $schedule_shipment_item = DB::table('schedule_shipment_info')->select('schedule_shipment_info.*','item.product_id as product_id','schedule_shipment_info.product_id as option_id')->leftjoin('item', 'schedule_shipment_info.product_id', '=', 'item.option_id')->where('schedule_shipment_info.ss_no',$ss_no)->get();
         $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info','receving_goods_delivery'])->where('ss_no',$ss_no)->get();
         $collect_test = array();
         if(!empty($schedule_shipment) && !empty($schedule_shipment_item)){
@@ -660,6 +660,7 @@ class ScheduleShipmentController extends Controller
         if($filter['page'] != ''){
             $url_api .= '&page='.$filter['page'];
         }
+        return $url_api;
         $response = file_get_contents($url_api);
         $api_data = json_decode($response,1);
         return $api_data;
@@ -729,6 +730,7 @@ class ScheduleShipmentController extends Controller
                 }
             }
             return response()->json([
+                'param' => $base_schedule_datas,
                 'message' => '완료되었습니다.',
                 'status' => 1
             ], 200);
@@ -739,11 +741,13 @@ class ScheduleShipmentController extends Controller
                     $this->apiScheduleShipmentsRaw($data_schedule['data_temp']);
                 }
                 return response()->json([
+                    'param' => $base_schedule_datas,
                     'message' => '완료되었습니다.',
                     'status' => 1
                 ], 200);
             }else{
                 return response()->json([
+                    'param' => $base_schedule_datas,
                     'message' => '새로운 데이터가 없습니다.',
                     'status' => 0
                 ], 200);
@@ -847,6 +851,7 @@ class ScheduleShipmentController extends Controller
         }
         if(empty($api_data['data'])){
             return response()->json([
+                'param' => $url_api,
                 'message' => '새로운 데이터가 없습니다.',
                 'status' => 0
             ], 200);

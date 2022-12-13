@@ -69,6 +69,7 @@ class RateMetaController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
