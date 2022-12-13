@@ -98,4 +98,8 @@ class Item extends Model
     {
         return $this->hasMany(StockStatusBad::class, 'product_id', 'product_id');
     }
+    public function item_status_bad2()
+    {
+        return $this->hasMany(StockStatusBad::class, 'option_id', 'option_id');
+    }
 }

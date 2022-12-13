@@ -35,6 +35,6 @@ class StockStatusBad extends Model
     
     public function item_status_bad()
     {
-        return $this->belongsTo(Item::class, 'product_id', 'product_id');
+        return $this->belongsTo(Item::class, 'product_id', 'product_id')->with(['file', 'company', 'item_channels', 'item_info', 'ContractWms']);
     }
 }

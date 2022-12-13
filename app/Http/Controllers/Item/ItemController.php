@@ -791,6 +791,16 @@ class ItemController extends Controller
                     $query->where(DB::raw('lower(item_name)'), 'like', '%' . strtolower($validated['item_name']) . '%');
                 });
             }
+            if (isset($validated['product_id'])) {
+                $item->where(function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(product_id)'), 'like', '%' . strtolower($validated['product_id']) . '%');
+                });
+            }
+            if (isset($validated['option_id'])) {
+                $item->where(function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(option_id)'), 'like', '%' . strtolower($validated['option_id']) . '%');
+                });
+            }
             if (isset($validated['item_cargo_bar_code'])) {
                 $item->where(function ($query) use ($validated) {
                     $query->where(DB::raw('lower(item_cargo_bar_code)'), 'like', '%' . strtolower($validated['item_cargo_bar_code']) . '%');
@@ -871,86 +881,131 @@ class ItemController extends Controller
             $user = Auth::user();
             DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
             if ($user->mb_type == 'shop') {
-                $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->select('item.*','stock_status_bad.stock')
-                    ->leftjoin(DB::raw('stock_status_bad'), function ($leftJoin) {
-                        $leftJoin->on('item.product_id', '=', 'stock_status_bad.product_id');
-                        $leftJoin->on('item.option_id', '=', 'stock_status_bad.option_id');
-                    })
-                    ->where('item_service_name', '=', '수입풀필먼트')->whereHas('item_info', function ($e) {
-                        $e->whereNotNull('stock');
-                    })->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
-                        $q->where('co_no', $user->co_no);
-                    })->orderBy('item.item_no', 'DESC');
+                // $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->select('item.*', 'stock_status_bad.stock')
+                //     ->leftjoin(DB::raw('stock_status_bad'), function ($leftJoin) {
+                //         $leftJoin->on('item.product_id', '=', 'stock_status_bad.product_id');
+                //         $leftJoin->on('item.option_id', '=', 'stock_status_bad.option_id');
+                //     })
+                //     ->where('item_service_name', '=', '수입풀필먼트')->whereHas('item_info', function ($e) {
+                //         $e->whereNotNull('stock');
+                //     })->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
+                //         $q->where('co_no', $user->co_no);
+                //     })->orderBy('item.item_no', 'DESC');
+                $item = StockStatusBad::with(['item_status_bad'])->whereHas('item_status_bad', function ($q) use ($user) {
+                    //    $q->where('item_service_name', '=', '수입풀필먼트');
+                    //    $q->whereHas('item_info', function ($e) {
+                    //             $e->whereNotNull('stock');
+                    //     });
+                    $q->whereHas('ContractWms.company.co_parent', function ($k) use ($user) {
+                        $k->where('co_no', $user->co_no);
+                    });
+                })->whereNotNull('stock')->orderBy('product_id', 'DESC');
             } else if ($user->mb_type == 'shipper') {
-                $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->select('item.*','stock_status_bad.stock')
-                    ->leftjoin(DB::raw('stock_status_bad'), function ($leftJoin) {
-                        $leftJoin->on('item.product_id', '=', 'stock_status_bad.product_id');
-                        $leftJoin->on('item.option_id', '=', 'stock_status_bad.option_id');
-                    })->where('item_service_name', '=', '수입풀필먼트')->whereHas('item_info', function ($e) {
-                        $e->whereNotNull('stock');
-                    })->whereHas('ContractWms.company', function ($q) use ($user) {
-                        $q->where('co_no', $user->co_no);
-                    })->orderBy('item.item_no', 'DESC');
+                // $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->select('item.*', 'stock_status_bad.stock')
+                //     ->leftjoin(DB::raw('stock_status_bad'), function ($leftJoin) {
+                //         $leftJoin->on('item.product_id', '=', 'stock_status_bad.product_id');
+                //         $leftJoin->on('item.option_id', '=', 'stock_status_bad.option_id');
+                //     })->where('item_service_name', '=', '수입풀필먼트')->whereHas('item_info', function ($e) {
+                //         $e->whereNotNull('stock');
+                //     })->whereHas('ContractWms.company', function ($q) use ($user) {
+                //         $q->where('co_no', $user->co_no);
+                //     })->orderBy('item.item_no', 'DESC');
+                $item = StockStatusBad::with(['item_status_bad'])->whereHas('item_status_bad', function ($q) use ($user) {
+                    //    $q->where('item_service_name', '=', '수입풀필먼트');
+                    //    $q->whereHas('item_info', function ($e) {
+                    //             $e->whereNotNull('stock');
+                    //     });
+                    $q->whereHas('ContractWms.company', function ($k) use ($user) {
+                        $k->where('co_no', $user->co_no);
+                    });
+                })->whereNotNull('stock')->orderBy('product_id', 'DESC');
             } else if ($user->mb_type == 'spasys') {
-                $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->select('item.*','stock_status_bad.stock')
-                    ->leftjoin(DB::raw('stock_status_bad'), function ($leftJoin) {
-                        $leftJoin->on('item.product_id', '=', 'stock_status_bad.product_id');
-                        $leftJoin->on('item.option_id', '=', 'stock_status_bad.option_id');
-                    })->where('item_service_name', '=', '수입풀필먼트')->whereHas('item_info', function ($e) {
-                        $e->whereNotNull('stock');
-                    })->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
-                        $q->where('co_no', $user->co_no);
-                    })->orderBy('item.item_no', 'DESC');
+                // $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->select('item.*', 'stock_status_bad.stock')
+                //     ->leftjoin(DB::raw('stock_status_bad'), function ($leftJoin) {
+                //         $leftJoin->on('item.product_id', '=', 'stock_status_bad.product_id');
+                //         //$leftJoin->on('item.option_id', '=', 'stock_status_bad.option_id');
+                //     })->where('item_service_name', '=', '수입풀필먼트')->whereHas('item_info', function ($e) {
+                //         $e->whereNotNull('stock');
+                //     })->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
+                //         $q->where('co_no', $user->co_no);
+                //     })->orderBy('item.item_no', 'DESC');
+                $item = StockStatusBad::with(['item_status_bad'])->whereHas('item_status_bad', function ($q) use ($user) {
+                    //    $q->where('item_service_name', '=', '수입풀필먼트');
+                    //    $q->whereHas('item_info', function ($e) {
+                    //             $e->whereNotNull('stock');
+                    //     });
+                    $q->whereHas('ContractWms.company.co_parent.co_parent', function ($k) use ($user) {
+                        $k->where('co_no', $user->co_no);
+                    });
+                })->whereNotNull('stock')->orderBy('product_id', 'DESC');
             }
             if (isset($validated['from_date'])) {
-                $item->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                $item->whereHas('item_status_bad', function ($q) use ($validated) {
+                    $q->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                });
             }
 
             if (isset($validated['to_date'])) {
-                $item->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                $item->whereHas('item_status_bad', function ($q) use ($validated) {
+                    $q->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                });
+            }
+            if (isset($validated['status'])) {
+                if($validated['status'] == '하'){
+                    $status = 1;
+                }else{
+                    $status = 0;
+                }
+                $item->where(DB::raw('status'), '=', $status);
+                
             }
             if (isset($validated['co_name_shop'])) {
-                $item->whereHas('ContractWms.company.co_parent', function ($query) use ($validated) {
+                $item->whereHas('item_status_bad.ContractWms.company.co_parent', function ($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name_shop']) . '%');
                 });
             }
+            if (isset($validated['product_id'])) {
+                $item->whereHas('item_status_bad', function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(product_id)'), 'like', '%' . strtolower($validated['product_id']) . '%');
+                });
+            }
             if (isset($validated['co_name_agency'])) {
-                $item->whereHas('ContractWms.company', function ($query) use ($validated) {
+                $item->whereHas('item_status_bad.ContractWms.company', function ($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name_agency']) . '%', 'and', 'co_type', '=', 'shipper');
                 });
             }
             if (isset($validated['item_name'])) {
-                $item->where(function ($query) use ($validated) {
-                    $query->where(DB::raw('lower(item_name)'), 'like', '%' . strtolower($validated['item_name']) . '%');
+                $item->whereHas('item_status_bad', function ($q) use ($validated) {
+                    $q->where(DB::raw('lower(item_name)'), 'like', '%' . strtolower($validated['item_name']) . '%');
                 });
             }
             if (isset($validated['item_cargo_bar_code'])) {
-                $item->where(function ($query) use ($validated) {
-                    $query->where(DB::raw('lower(item_cargo_bar_code)'), 'like', '%' . strtolower($validated['item_cargo_bar_code']) . '%');
+                $item->whereHas('item_status_bad', function ($q) use ($validated) {
+                    $q->where(DB::raw('lower(item_cargo_bar_code)'), 'like', '%' . strtolower($validated['item_cargo_bar_code']) . '%');
                 });
             }
             if (isset($validated['item_channel_code'])) {
-                $item->whereHas('item_channels', function ($query) use ($validated) {
+                $item->whereHas('item_status_bad.item_channels', function ($query) use ($validated) {
                     $query->where(DB::raw('lower(item_channel_name)'), 'like', '%' . strtolower($validated['item_channel_name']) . '%');
                 });
             }
             if (isset($validated['item_bar_code'])) {
-                $item->where(function ($query) use ($validated) {
+                $item->whereHas('item_status_bad', function ($query) use ($validated) {
                     $query->where(DB::raw('lower(item_bar_code)'), 'like', '%' . strtolower($validated['item_bar_code']) . '%');
                 });
             }
             if (isset($validated['item_upc_code'])) {
-                $item->where(function ($query) use ($validated) {
+                $item->whereHas('item_status_bad', function ($query) use ($validated) {
                     $query->where(DB::raw('lower(item_upc_code)'), 'like', '%' . strtolower($validated['item_upc_code']) . '%');
                 });
             }
             if (isset($validated['item_channel_name'])) {
-                $item->whereHas('item_channels', function ($query) use ($validated) {
+                $item->whereHas('item_status_bad.item_channels', function ($query) use ($validated) {
                     $query->where(DB::raw('lower(item_channel_name)'), 'like', '%' . strtolower($validated['item_channel_name']) . '%');
                 });
             }
             if (isset($validated['item_brand'])) {
-                $item->where(function ($query) use ($validated) {
+                $item->whereHas('item_status_bad', function ($query) use ($validated) {
                     $query->where(DB::raw('lower(item_brand)'), 'like', '%' . strtolower($validated['item_brand']) . '%');
                 });
             }
@@ -1893,7 +1948,7 @@ class ItemController extends Controller
     //     }
     // }
 
-    public function apiItemsRaw($request = null,$url_api = null)
+    public function apiItemsRaw($request = null, $url_api = null)
     {
         try {
             DB::beginTransaction();
@@ -2569,22 +2624,22 @@ class ItemController extends Controller
             $total_data = $api_data->api_data;
             $pages = ceil($total_data / 100);
             for ($i = 1; $i <= $pages; $i++) {
-                $this->apiItemsRaw($api_data,$url_api);
+                $this->apiItemsRaw($api_data, $url_api);
             }
         } else {
             if (!empty($api_data->data)) {
-                return $this->apiItemsRaw($api_data,$url_api);
+                return $this->apiItemsRaw($api_data, $url_api);
             } else {
                 return response()->json([
                     'param' => $url_api,
-                    'message' => '새로운 데이터가 없습니다.',
+                    'message' => '완료되었습니다.',
                     'status' => 1
                 ], 200);
             }
         }
         return response()->json([
             'param' => $url_api,
-            'message' => '새로운 데이터가 없습니다.',
+            'message' => '완료되었습니다.',
             'status' => 1
         ], 200);
     }
@@ -2626,7 +2681,7 @@ class ItemController extends Controller
             return $this->apiItemsRawNoLogin($api_data);
         } else {
             return response()->json([
-                'message' => '새로운 데이터가 없습니다.',
+                'message' => '완료되었습니다.',
                 'status' => 1
             ], 200);
         }
