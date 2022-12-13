@@ -27,6 +27,9 @@ class TaxInvoiceDivide extends Model
         'tid_price',
         'tid_price_left',
         'tid_index',
+        'tid_supply_price',
+        'tid_vat',
+        'tid_sum',
     ];
 
     protected $casts = [
