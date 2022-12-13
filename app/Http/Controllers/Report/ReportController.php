@@ -367,7 +367,7 @@ class ReportController extends Controller
             }
             if (isset($validated['w_schedule_number'])) {
                 $reports->whereHas('warehousing', function($q) use($validated) {
-                    return $q->where(DB::raw('lower(w_schedule_number)'), 'like', '%' . strtolower($validated['w_schedule_number']) . '%');
+                    return $q->where(DB::raw('lower(w_schedule_number2)'), 'like', '%' . strtolower($validated['w_schedule_number']) . '%');
                 });
             }
             if (isset($validated['logistic_manage_number'])) {
