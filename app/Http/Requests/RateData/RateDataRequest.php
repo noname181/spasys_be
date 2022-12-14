@@ -131,6 +131,9 @@ class RateDataRequest extends BaseFormRequest
             'rmd_mail_detail' => [
                 ''
             ],
+            'create_new' => [
+                ''
+            ],
         ];
     }
 
