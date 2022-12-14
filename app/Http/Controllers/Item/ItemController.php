@@ -951,13 +951,12 @@ class ItemController extends Controller
                 });
             }
             if (isset($validated['status'])) {
-                if($validated['status'] == '하'){
+                if ($validated['status'] == '하') {
                     $status = 1;
-                }else{
+                } else {
                     $status = 0;
                 }
                 $item->where(DB::raw('status'), '=', $status);
-                
             }
             if (isset($validated['co_name_shop'])) {
                 $item->whereHas('item_status_bad.ContractWms.company.co_parent', function ($query) use ($validated) {
@@ -1953,8 +1952,9 @@ class ItemController extends Controller
         try {
             DB::beginTransaction();
             $data_select = !empty($request->data) ? $request->data : array();
+            //return $data_select;
             foreach ($data_select as $i_item => $item) {
-                $item_no = Item::updateOrCreate(
+                $item_no_all = Item::updateOrCreate(
                     [
                         'product_id' => $item->product_id
                     ],
@@ -1973,7 +1973,8 @@ class ItemController extends Controller
                         'item_service_name' => '수입풀필먼트',
                     ]
                 );
-                if ($item_no->item_no) {
+
+                if ($item_no_all->item_no) {
                     if (!empty($item->options)) {
                         $item_arr = $item->options;
                         if (is_array($item_arr) || is_object($item_arr)) {
@@ -2071,6 +2072,8 @@ class ItemController extends Controller
                                 ]
                             );
 
+                           
+
                             $item_info_no = ItemInfo::updateOrCreate(
                                 [
                                     'item_no' => $item_no->item_no,
@@ -2097,39 +2100,39 @@ class ItemController extends Controller
                                 ]
                             );
                         }
-                    } else {
-                        $item_info_no = ItemInfo::updateOrCreate(
-                            [
-                                'item_no' => $item_no->item_no,
-                            ],
-                            [
-                                'item_no' => $item_no->item_no,
-                                'product_id' => $item->product_id,
-                                'supply_code' => $item->supply_code,
-                                'trans_fee' => $item->trans_fee,
-                                'img_desc1' => $item->img_desc1,
-                                'img_desc2' => $item->img_desc2,
-                                'img_desc3' => $item->img_desc3,
-                                'img_desc4' => $item->img_desc4,
-                                'img_desc5' => $item->img_desc5,
-                                'product_desc' => $item->product_desc,
-                                'product_desc2' => $item->product_desc2,
-                                'location' => $item->location,
-                                'memo' => $item->memo,
-                                'category' => $item->category,
-                                'maker' => $item->maker,
-                                'md' => $item->md,
-                                'manager1' => $item->manager1,
-                                'manager2' => $item->manager2,
-
-                                'extra_column1' => $item->extra_column1,
-                                'extra_column2' => $item->extra_column2,
-                                'extra_column3' => $item->extra_column3,
-                                'extra_column4' => $item->extra_column4,
-                                'extra_column5' => $item->extra_column5
-                            ]
-                        );
                     }
+
+                  
+                    $item_info_no = ItemInfo::updateOrCreate(
+                        [
+                            'item_no' => $item_no_all->item_no,
+                        ],
+                        [
+                            'item_no' => $item_no_all->item_no,
+                            'product_id' => isset($item->product_id) ? $item->product_id : null,
+                            'supply_code' => isset($item->supply_code) ? $item->supply_code : null,
+                            'trans_fee' => isset($item->trans_fee) ? $item->trans_fee : null,
+                            'img_desc1' => isset($item->img_desc1) ? $item->img_desc1 : null,
+                            'img_desc2' => isset($item->img_desc2) ? $item->img_desc2 : null,
+                            'img_desc3' => isset($item->img_desc3) ? $item->img_desc3 : null,
+                            'img_desc4' => isset($item->img_desc4) ? $item->img_desc4 : null,
+                            'img_desc5' => isset($item->img_desc5) ? $item->img_desc5 : null,
+                            'product_desc' => isset($item->product_desc) ? $item->product_desc : null,
+                            'product_desc2' => isset($item->product_desc2) ? $item->product_desc2 : null,
+                            'location' => isset($item->location) ? $item->location : null,
+                            'memo' => isset($item->memo) ? $item->memo : null,
+                            'category' => isset($item->category) ? $item->category : null,
+                            'maker' => isset($item->maker) ? $item->maker : null,
+                            'md' => isset($item->md) ? $item->md : null,
+                            'manager1' => isset($item->manager1) ? $item->manager1 : null,
+                            'manager2' => isset($item->manager2) ? $item->manager2 : null,
+                            'extra_column1' => isset($item->extra_column1) ? $item->extra_column1 : null,
+                            'extra_column2' => isset($item->extra_column2) ? $item->extra_column2 : null,
+                            'extra_column3' => isset($item->extra_column3) ? $item->extra_column3 : null,
+                            'extra_column4' => isset($item->extra_column4) ? $item->extra_column4 : null,
+                            'extra_column5' => isset($item->extra_column5) ? $item->extra_column5 : null
+                        ]
+                    );
                 }
             }
 
