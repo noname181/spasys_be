@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Filesystem\Filesystem;
 use App\Models\File;
 use App\Models\Item;
+use App\Models\Payment;
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryRequest;
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryCreateRequest;
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryCreateApiRequest;
@@ -2543,10 +2544,20 @@ class ReceivingGoodsDeliveryController extends Controller
     public function payment(Request $request)
     {
         try {
+
             ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                 'rgd_status6' => 'paid',
                 'rgd_paid_date' =>  Carbon::now()
             ]);
+            Payment::insertGetId(
+                [
+                    'mb_no' => Auth::user()->mb_no,
+                    'rgd_no' => $request->rgd_no,
+                    'p_price' => $request->sumprice,
+                    'p_method' => $request->p_method,
+                    'p_success_yn' => 'y',
+                ]
+            );
 
             return response()->json([
                 'message' => 'Success'
