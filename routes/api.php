@@ -511,6 +511,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/', \App\Http\Controllers\Alarm\AlarmController::class)->name('registe_or_update_alarm');
         Route::get('/{alarm}', [App\Http\Controllers\Alarm\AlarmController::class, 'getAlarmById'])->name('get_alarm_by_id');
         Route::post('/search', [App\Http\Controllers\Alarm\AlarmController::class, 'searchAlarms'])->name('search');
+        Route::post('/search_send', [App\Http\Controllers\Alarm\AlarmController::class, 'searchAlarms_send'])->name('search_send');
         Route::post('/search_mobile', [App\Http\Controllers\Alarm\AlarmController::class, 'searchAlarmsMobile'])->name('searchmobile');
     });
 
