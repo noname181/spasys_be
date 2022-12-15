@@ -69,6 +69,9 @@ class ImportScheduleSearchRequest extends BaseFormRequest
             'ti_status' => [
                 'nullable',
             ],
+            'status' => [
+                '',
+            ],
         ];
     }
 

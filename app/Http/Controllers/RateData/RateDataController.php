@@ -61,6 +61,9 @@ class RateDataController extends Controller
                         'rm_no' => $validated['rm_no'],
                         'rmd_number' => CommonFunc::generate_rmd_number($validated['rm_no'], $index),
                         'rmd_mail_detail' => isset($validated['rmd_mail_detail']) ? $validated['rmd_mail_detail'] : '',
+                        'rmd_mail_detail2' => isset($validated['rmd_mail_detail2']) ? $validated['rmd_mail_detail2'] : '',
+                        'rmd_mail_detail3' => isset($validated['rmd_mail_detail3']) ? $validated['rmd_mail_detail3'] : '',
+
                     ]
                 );
             } else if (!isset($validated['rmd_no']) && isset($validated['co_no'])) {
@@ -71,6 +74,8 @@ class RateDataController extends Controller
                         'co_no' => $validated['co_no'],
                         'rmd_number' => CommonFunc::generate_rmd_number($validated['co_no'], $index),
                         'rmd_mail_detail' => isset($validated['rmd_mail_detail']) ? $validated['rmd_mail_detail'] : '',
+                        'rmd_mail_detail2' => isset($validated['rmd_mail_detail2']) ? $validated['rmd_mail_detail2'] : '',
+                        'rmd_mail_detail3' => isset($validated['rmd_mail_detail3']) ? $validated['rmd_mail_detail3'] : '',
                     ]
                 );
             } else if (isset($validated['rmd_no']) && isset($validated['rm_no'])) {
@@ -83,6 +88,8 @@ class RateDataController extends Controller
                         'rmd_number' => CommonFunc::generate_rmd_number($validated['rm_no'], $index),
                         'rmd_parent_no'=> $rmd->rmd_parent_no ? $rmd->rmd_parent_no : $validated['rmd_no'],
                         'rmd_mail_detail' => isset($validated['rmd_mail_detail']) ? $validated['rmd_mail_detail'] : '',
+                        'rmd_mail_detail2' => isset($validated['rmd_mail_detail2']) ? $validated['rmd_mail_detail2'] : '',
+                        'rmd_mail_detail3' => isset($validated['rmd_mail_detail3']) ? $validated['rmd_mail_detail3'] : '',
                     ]
                 );
 
@@ -98,6 +105,8 @@ class RateDataController extends Controller
                         'rmd_number' => CommonFunc::generate_rmd_number($validated['co_no'], $index),
                         'rmd_parent_no'=> $rmd->rmd_parent_no ? $rmd->rmd_parent_no : $validated['rmd_no'],
                         'rmd_mail_detail' => isset($validated['rmd_mail_detail']) ? $validated['rmd_mail_detail'] : '',
+                        'rmd_mail_detail2' => isset($validated['rmd_mail_detail2']) ? $validated['rmd_mail_detail2'] : '',
+                        'rmd_mail_detail3' => isset($validated['rmd_mail_detail3']) ? $validated['rmd_mail_detail3'] : '',
                     ]
                 );
 
@@ -130,16 +139,18 @@ class RateDataController extends Controller
                     ],
                 );
             }
-            if(isset($validated['rmd_mail_detail']) && isset($validated['rmd_no'])){
-                $update_rate_meta_data = RateMetaData::where('rmd_no', $validated['rmd_no'])->update([
-                    'rmd_mail_detail' => $validated['rmd_mail_detail']
-                ]);
-            }
+          
+            $update_rate_meta_data = RateMetaData::where('rmd_no', isset($rmd_no) ? $rmd_no : $validated['rmd_no'])->update([
+                'rmd_mail_detail' => isset($validated['rmd_mail_detail']) ? $validated['rmd_mail_detail'] : '',
+                'rmd_mail_detail2' => isset($validated['rmd_mail_detail2']) ? $validated['rmd_mail_detail2'] : '',
+                'rmd_mail_detail3' => isset($validated['rmd_mail_detail3']) ? $validated['rmd_mail_detail3'] : '',
+            ]);
+        
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'rmd_no' => isset($rmd_no) ? $rmd_no : $validated['rmd_no'],
-                'rmd_arr' => isset($rmd_arr) ? $rmd_arr : null
+                'rmd_arr' => isset($rmd_arr) ? $rmd_arr : null,
             ], 201);
         } catch (\Exception $e) {
             DB::rollback();
