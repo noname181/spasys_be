@@ -426,24 +426,24 @@ class ReceivingGoodsDeliveryController extends Controller
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
 
-                $item_no_new = Item::insertGetId([
-                    'mb_no' => Auth::user()->mb_no,
-                    'item_brand' => isset($request['item_brand']) ? $request['item_brand'] : null,
-                    'item_service_name' => '유통가공',
-                    'co_no' => $request['co_no'] ? $request['co_no'] : $co_no,
-                    'item_name' => isset($request['item_name']) ? $request['item_name'] : null,
-                    'item_name' => isset($request['item_bar_code']) ? $request['item_bar_code'] : null,
-                    'item_option1' => isset($request['item_option1']) ? $request['item_option1'] : null,
-                    'item_option2' => isset($request['item_option2']) ? $request['item_option2'] : null,
-                    'item_price4' => isset($request['item_price4']) ? $request['item_price4'] : null
-                ]);
+            $item_no_new = Item::insertGetId([
+                'mb_no' => Auth::user()->mb_no,
+                'item_brand' => isset($request['item_brand']) ? $request['item_brand'] : null,
+                'item_service_name' => '유통가공',
+                'co_no' => $request['co_no'] ? $request['co_no'] : $co_no,
+                'item_name' => isset($request['item_name']) ? $request['item_name'] : null,
+                'item_name' => isset($request['item_bar_code']) ? $request['item_bar_code'] : null,
+                'item_option1' => isset($request['item_option1']) ? $request['item_option1'] : null,
+                'item_option2' => isset($request['item_option2']) ? $request['item_option2'] : null,
+                'item_price4' => isset($request['item_price4']) ? $request['item_price4'] : null
+            ]);
 
-                // WarehousingItem::insert([
-                //     'item_no' => $item_no_new,
-                //     'w_no' => $validated['w_no'],
-                //     'wi_number' =>  isset($request['item_price4']) ? $request['item_price4'] : null,
-                //     'wi_type' => '입고_shipper'
-                // ]);
+            // WarehousingItem::insert([
+            //     'item_no' => $item_no_new,
+            //     'w_no' => $validated['w_no'],
+            //     'wi_number' =>  isset($request['item_price4']) ? $request['item_price4'] : null,
+            //     'wi_type' => '입고_shipper'
+            // ]);
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -949,12 +949,12 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_status1' => $location['rgd_status1'],
                             'rgd_status2' => isset($location['rgd_status2']) ? $location['rgd_status2'] : null,
                             'rgd_status3' => isset($location['rgd_status3']) ? $location['rgd_status3'] : null,
-                            
+
                             'rgd_delivery_company' => isset($location['rgd_delivery_company']) ? $location['rgd_delivery_company'] : null,
                             'rgd_tracking_code' => isset($location['rgd_tracking_code']) ? $location['rgd_tracking_code'] : null,
                             'rgd_delivery_man' => $location['rgd_delivery_man'],
                             'rgd_delivery_man_hp' => $location['rgd_delivery_man_hp'],
-                            
+
                             'rgd_delivery_schedule_day' => $location['rgd_delivery_schedule_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_delivery_schedule_day']) : null,
                             'rgd_arrive_day' =>  $location['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']) : null,
                         ]
@@ -1709,91 +1709,32 @@ class ReceivingGoodsDeliveryController extends Controller
     {
 
         try {
-
+            DB::beginTransaction();
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
-            if ($request->page_type == 'IW') {
-                if ($request->datachkbox) {
+            if (isset($request->w_no)) {
+                $check = ReceivingGoodsDelivery::where('w_no', $request->w_no)->where('rgd_status1', '=', '입고')->where('rgd_status2', '!=', '작업완료')->first();
+              
+                if (isset($check->rgd_no)) {
+                    Warehousing::where('w_no', $request->w_no)->update([
+                        'w_schedule_number2' => null,
+                        'w_completed_day' => null,
+                        'w_amount' => 0
+                    ]);
 
-                    foreach ($request->datachkbox as $value) {
-                        //return $value['w_no']['w_no'];
-                        if ($value['w_no']['w_no']) {
-                            ReceivingGoodsDelivery::where('w_no', $value['w_no']['w_no'])->where('rgd_status1', '!=', '입고')->where(
-                                function ($query) {
-                                    $query->where('rgd_status2', '!=', '작업완료')
-                                        ->orWhereNull('rgd_status2');
-                                }
-                            )->update([
-                                'rgd_status1' => '입고예정 취소'
-                            ]);
+                    WarehousingItem::where('w_no', $request->w_no)->where('wi_type', '=', '입고_spasys')->delete();
 
-                            WarehousingStatus::insert([
-                                'w_no' => $value['w_no']['w_no'],
-                                'mb_no' => $member->mb_no,
-                                'status' => '입고예정 취소',
-                                'w_category_name' => '유통가공',
-                            ]);
-                        }
-                    }
-                } else {
-                    if ($request->w_no) {
-                        ReceivingGoodsDelivery::where('w_no', $request->w_no)
-                            ->where('rgd_status1', '!=', '입고')->where(
-                                function ($query) {
-                                    $query->where('rgd_status2', '!=', '작업완료')
-                                        ->orWhereNull('rgd_status2');
-                                }
-                            )->update([
-                                'rgd_status1' => '입고예정 취소'
-                            ]);
-
-                        WarehousingStatus::insert([
-                            'w_no' => $request->w_no,
-                            'mb_no' => $member->mb_no,
-                            'status' => '입고예정 취소',
-                            'w_category_name' => '유통가공',
-                        ]);
-                    }
-                }
-            } else {
-                if ($request->datachkbox) {
-
-                    foreach ($request->datachkbox as $value) {
-                        //return $value['w_no']['w_no'];
-                        if ($value['w_no']['w_no']) {
-                            ReceivingGoodsDelivery::where('w_no', $value['w_no']['w_no'])->where('rgd_status1', '!=', '출고')->update([
-                                'rgd_status1' => '출고예정 취소'
-                            ]);
-
-                            WarehousingStatus::insert([
-                                'w_no' => $value['w_no']['w_no'],
-                                'mb_no' => $member->mb_no,
-                                'status' => '출고예정 취소',
-                                'w_category_name' => '유통가공',
-                            ]);
-                        }
-                    }
-                } else {
-                    if ($request->w_no) {
-                        ReceivingGoodsDelivery::where('w_no', $request->w_no)->where('rgd_status1', '!=', '출고')->update([
-                            'rgd_status1' => '출고예정 취소'
-                        ]);
-
-                        WarehousingStatus::insert([
-                            'w_no' => $request->w_no,
-                            'mb_no' => $member->mb_no,
-                            'status' => '출고예정 취소',
-                            'w_category_name' => '유통가공',
-                        ]);
-                    }
+                    ReceivingGoodsDelivery::where('w_no', $request->w_no)->update([
+                        'rgd_status1' => '입고예정',
+                        'rgd_status2' => null
+                    ]);
                 }
             }
 
-
-
+            DB::commit();
             return response()->json(['message' => 'ok']);
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -1868,7 +1809,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                 if (!isset($rgd['rgd_no'])) {
                     $warehousing_status =  isset($rgd['rgd_status3']) ? $rgd['rgd_status3'] : null;
-                  
+
                     $rgd_no = ReceivingGoodsDelivery::insertGetId([
                         'mb_no' => $member->mb_no,
                         'is_no' => $rgd['is_no'],
@@ -1924,7 +1865,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         'rgd_delivery_schedule_day' => isset($rgd['rgd_delivery_schedule_day']) ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_delivery_schedule_day']) : null,
                         'rgd_arrive_day' => isset($rgd['rgd_arrive_day']) ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']) : null,
                     ]);
-                    
+
                     if ($warehousing_status) {
                         WarehousingStatus::insert([
                             'w_no' => $rgd['is_no'],
@@ -1936,7 +1877,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 }
             }
 
-           
+
 
 
 
@@ -2246,7 +2187,7 @@ class ReceivingGoodsDeliveryController extends Controller
     {
         try {
 
-            if($request->type == 'add_all'){
+            if ($request->type == 'add_all') {
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
                 TaxInvoiceDivide::where('tid_no', $rgd->tid_no)->delete();
                 ReceivingGoodsDelivery::where('tid_no', $rgd->tid_no)->update([
@@ -2255,7 +2196,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'rgd_tax_invoice_number' => NULL,
                     'tid_no' => NULL,
                 ]);
-            }else {
+            } else {
                 ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_status7' => NULL,
                     'rgd_tax_invoice_date' => NULL,
@@ -2264,7 +2205,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 ]);
             }
 
-           
+
 
 
             $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child'])->where('rgd_no', $request->rgd_no)->first();
@@ -2317,7 +2258,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                 $rate_data_general = RateDataGeneral::where('rgd_no', $request->rgd_no)->first();
 
-                if(isset($rate_data_general->ag_no)){
+                if (isset($rate_data_general->ag_no)) {
                     $ag = AdjustmentGroup::where('ag_no', $rate_data_general->ag_no)->first();
 
                     ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
@@ -2326,29 +2267,28 @@ class ReceivingGoodsDeliveryController extends Controller
                         'rgd_status7' => $ag->ag_auto_issue == 'y' ? 'taxed' : NULL,
                         'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
                     ]);
-                }else {
+                } else {
                     ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                         'rgd_status5' => 'confirmed',
                         'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
                     ]);
                 }
-
             } else if ($request->bill_type == 'monthly') {
                 foreach ($request->rgds as $rgd) {
                     $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->first();
 
                     $rate_data_general = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->first();
 
-                    if(isset($rate_data_general->ag_no)){
+                    if (isset($rate_data_general->ag_no)) {
                         $ag = AdjustmentGroup::where('ag_no', $rate_data_general->ag_no)->first();
-                        
+
                         ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                             'rgd_status5' => 'confirmed',
                             'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
                             'rgd_status7' => $ag->ag_auto_issue == 'y' ? 'taxed' : NULL,
                             'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
                         ]);
-                    }else {
+                    } else {
                         ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                             'rgd_status5' => 'confirmed',
                             'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
@@ -2362,16 +2302,16 @@ class ReceivingGoodsDeliveryController extends Controller
 
                     $rate_data_general = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->first();
 
-                    if(isset($rate_data_general->ag_no)){
+                    if (isset($rate_data_general->ag_no)) {
                         $ag = AdjustmentGroup::where('ag_no', $rate_data_general->ag_no)->first();
-                        
+
                         ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                             'rgd_status5' => 'confirmed',
                             'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
                             'rgd_status7' => $ag->ag_auto_issue == 'y' ? 'taxed' : NULL,
                             'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
                         ]);
-                    }else {
+                    } else {
                         ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                             'rgd_status5' => 'confirmed',
                             'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
@@ -2419,7 +2359,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                 $rate_data_general = RateDataGeneral::where('rgd_no', $request->rgd_no)->first();
 
-                if(isset($rate_data_general->ag_no)){
+                if (isset($rate_data_general->ag_no)) {
                     $ag = AdjustmentGroup::where('ag_no', $rate_data_general->ag_no)->first();
 
                     ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
@@ -2428,29 +2368,28 @@ class ReceivingGoodsDeliveryController extends Controller
                         'rgd_status7' => $ag->ag_auto_issue == 'y' ? 'taxed' : NULL,
                         'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
                     ]);
-                }else {
+                } else {
                     ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                         'rgd_status5' => 'confirmed',
                         'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
                     ]);
                 }
-
             } else if ($request->bill_type == 'monthly') {
                 foreach ($request->rgds as $rgd) {
                     $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->first();
 
                     $rate_data_general = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->first();
 
-                    if(isset($rate_data_general->ag_no)){
+                    if (isset($rate_data_general->ag_no)) {
                         $ag = AdjustmentGroup::where('ag_no', $rate_data_general->ag_no)->first();
-                        
+
                         ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                             'rgd_status5' => 'confirmed',
                             'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
                             'rgd_status7' => $ag->ag_auto_issue == 'y' ? 'taxed' : NULL,
                             'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
                         ]);
-                    }else {
+                    } else {
                         ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                             'rgd_status5' => 'confirmed',
                             'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
@@ -2464,16 +2403,16 @@ class ReceivingGoodsDeliveryController extends Controller
 
                     $rate_data_general = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->first();
 
-                    if(isset($rate_data_general->ag_no)){
+                    if (isset($rate_data_general->ag_no)) {
                         $ag = AdjustmentGroup::where('ag_no', $rate_data_general->ag_no)->first();
-                        
+
                         ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                             'rgd_status5' => 'confirmed',
                             'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
                             'rgd_status7' => $ag->ag_auto_issue == 'y' ? 'taxed' : NULL,
                             'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
                         ]);
-                    }else {
+                    } else {
                         ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                             'rgd_status5' => 'confirmed',
                             'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
@@ -2490,7 +2429,6 @@ class ReceivingGoodsDeliveryController extends Controller
 
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
-      
     }
 
     public function cancel_settlement(Request $request)
