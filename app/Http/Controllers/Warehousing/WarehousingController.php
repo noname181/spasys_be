@@ -544,6 +544,11 @@ class WarehousingController extends Controller
                     $query->where('rgd_status1', '=', $validated['rgd_status1']);
                 });
             }
+            if (isset($validated['status'])) {
+                $warehousing->whereHas('receving_goods_delivery', function ($query) use ($validated) {
+                    $query->where('rgd_status1', '=', $validated['status']);
+                });
+            }
             if (isset($validated['rgd_status2'])) {
                 $warehousing->whereHas('receving_goods_delivery', function ($query) use ($validated) {
                     $query->where('rgd_status2', '=', $validated['rgd_status2']);
@@ -983,7 +988,9 @@ class WarehousingController extends Controller
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
-
+            if (isset($validated['status'])) {
+                $warehousing->where('rgd_status1', '=', $validated['status']);
+            }
             if (isset($validated['to_date'])) {
                 $warehousing->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
             }
