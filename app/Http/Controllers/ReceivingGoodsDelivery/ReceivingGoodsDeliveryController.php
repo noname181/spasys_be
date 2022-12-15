@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Filesystem\Filesystem;
 use App\Models\File;
 use App\Models\Item;
+use App\Models\Payment;
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryRequest;
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryCreateRequest;
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryCreateApiRequest;
@@ -1618,6 +1619,185 @@ class ReceivingGoodsDeliveryController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
+
+    public function update_rdc_api_cancel(Request $request)
+    {
+
+        try {
+
+            $member = Member::where('mb_id', Auth::user()->mb_id)->first();
+            if ($request->page_type == 'IW') {
+                //Service 2 change
+                if ($request->datachkbox) {
+
+                    foreach ($request->datachkbox as $value) {
+                        //return $value['w_no']['w_no'];
+                        if ($value['w_no']['w_no']) {
+                            ReceivingGoodsDelivery::where('w_no', $value['w_no']['w_no'])->update([
+                                'rgd_status1' => '입고 취소'
+                            ]);
+
+                            WarehousingStatus::insert([
+                                'w_no' => $value['w_no']['w_no'],
+                                'mb_no' => $member->mb_no,
+                                'status' => '입고 취소',
+                                'w_category_name' => '수입풀필먼트',
+                            ]);
+                        }
+                    }
+                } else {
+                    //Service 2 change
+                    if ($request->w_no) {
+                        ReceivingGoodsDelivery::where('w_no', $request->w_no)
+                            ->update([
+                                'rgd_status1' => '입고 취소'
+                            ]);
+
+                        WarehousingStatus::insert([
+                            'w_no' => $request->w_no,
+                            'mb_no' => $member->mb_no,
+                            'status' => '입고 취소',
+                            'w_category_name' => '수입풀필먼트',
+                        ]);
+                    }
+                }
+            } else {
+                if ($request->datachkbox) {
+
+                    foreach ($request->datachkbox as $value) {
+                        //return $value['w_no']['w_no'];
+                        if ($value['w_no']['w_no']) {
+                            ReceivingGoodsDelivery::where('w_no', $value['w_no']['w_no'])->where('rgd_status1', '!=', '출고')->update([
+                                'rgd_status1' => '출고예정 취소'
+                            ]);
+
+                            WarehousingStatus::insert([
+                                'w_no' => $value['w_no']['w_no'],
+                                'mb_no' => $member->mb_no,
+                                'status' => '출고예정 취소',
+                                'w_category_name' => '수입풀필먼트',
+                            ]);
+                        }
+                    }
+                } else {
+                    if ($request->w_no) {
+                        ReceivingGoodsDelivery::where('w_no', $request->w_no)->where('rgd_status1', '!=', '출고')->update([
+                            'rgd_status1' => '출고예정 취소'
+                        ]);
+
+                        WarehousingStatus::insert([
+                            'w_no' => $request->w_no,
+                            'mb_no' => $member->mb_no,
+                            'status' => '출고예정 취소',
+                            'w_category_name' => '수입풀필먼트',
+                        ]);
+                    }
+                }
+            }
+
+
+
+            return response()->json(['message' => 'ok']);
+        } catch (\Exception $e) {
+            Log::error($e);
+
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function update_rdc_cancel_warehousing(Request $request)
+    {
+
+        try {
+
+            $member = Member::where('mb_id', Auth::user()->mb_id)->first();
+            if ($request->page_type == 'IW') {
+                if ($request->datachkbox) {
+
+                    foreach ($request->datachkbox as $value) {
+                        //return $value['w_no']['w_no'];
+                        if ($value['w_no']['w_no']) {
+                            ReceivingGoodsDelivery::where('w_no', $value['w_no']['w_no'])->where('rgd_status1', '!=', '입고')->where(
+                                function ($query) {
+                                    $query->where('rgd_status2', '!=', '작업완료')
+                                        ->orWhereNull('rgd_status2');
+                                }
+                            )->update([
+                                'rgd_status1' => '입고예정 취소'
+                            ]);
+
+                            WarehousingStatus::insert([
+                                'w_no' => $value['w_no']['w_no'],
+                                'mb_no' => $member->mb_no,
+                                'status' => '입고예정 취소',
+                                'w_category_name' => '유통가공',
+                            ]);
+                        }
+                    }
+                } else {
+                    if ($request->w_no) {
+                        ReceivingGoodsDelivery::where('w_no', $request->w_no)
+                            ->where('rgd_status1', '!=', '입고')->where(
+                                function ($query) {
+                                    $query->where('rgd_status2', '!=', '작업완료')
+                                        ->orWhereNull('rgd_status2');
+                                }
+                            )->update([
+                                'rgd_status1' => '입고예정 취소'
+                            ]);
+
+                        WarehousingStatus::insert([
+                            'w_no' => $request->w_no,
+                            'mb_no' => $member->mb_no,
+                            'status' => '입고예정 취소',
+                            'w_category_name' => '유통가공',
+                        ]);
+                    }
+                }
+            } else {
+                if ($request->datachkbox) {
+
+                    foreach ($request->datachkbox as $value) {
+                        //return $value['w_no']['w_no'];
+                        if ($value['w_no']['w_no']) {
+                            ReceivingGoodsDelivery::where('w_no', $value['w_no']['w_no'])->where('rgd_status1', '!=', '출고')->update([
+                                'rgd_status1' => '출고예정 취소'
+                            ]);
+
+                            WarehousingStatus::insert([
+                                'w_no' => $value['w_no']['w_no'],
+                                'mb_no' => $member->mb_no,
+                                'status' => '출고예정 취소',
+                                'w_category_name' => '유통가공',
+                            ]);
+                        }
+                    }
+                } else {
+                    if ($request->w_no) {
+                        ReceivingGoodsDelivery::where('w_no', $request->w_no)->where('rgd_status1', '!=', '출고')->update([
+                            'rgd_status1' => '출고예정 취소'
+                        ]);
+
+                        WarehousingStatus::insert([
+                            'w_no' => $request->w_no,
+                            'mb_no' => $member->mb_no,
+                            'status' => '출고예정 취소',
+                            'w_category_name' => '유통가공',
+                        ]);
+                    }
+                }
+            }
+
+
+
+            return response()->json(['message' => 'ok']);
+        } catch (\Exception $e) {
+            Log::error($e);
+
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
     public function update_ReceivingGoodsDelivery_cancel($rgd_no)
     {
 
@@ -2364,10 +2544,20 @@ class ReceivingGoodsDeliveryController extends Controller
     public function payment(Request $request)
     {
         try {
+
             ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                 'rgd_status6' => 'paid',
                 'rgd_paid_date' =>  Carbon::now()
             ]);
+            Payment::insertGetId(
+                [
+                    'mb_no' => Auth::user()->mb_no,
+                    'rgd_no' => $request->rgd_no,
+                    'p_price' => $request->sumprice,
+                    'p_method' => $request->p_method,
+                    'p_success_yn' => 'y',
+                ]
+            );
 
             return response()->json([
                 'message' => 'Success'
