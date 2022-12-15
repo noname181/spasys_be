@@ -139,21 +139,18 @@ class RateDataController extends Controller
                     ],
                 );
             }
-            if((isset($validated['rmd_mail_detail']) && isset($validated['rmd_no'])) ||
-               (isset($validated['rmd_mail_detail2']) && isset($validated['rmd_no'])) ||
-               (isset($validated['rmd_mail_detail3']) && isset($validated['rmd_no']))
-               ){
-                $update_rate_meta_data = RateMetaData::where('rmd_no', $validated['rmd_no'])->update([
-                    'rmd_mail_detail' => isset($validated['rmd_mail_detail']) ? $validated['rmd_mail_detail'] : '',
-                    'rmd_mail_detail2' => isset($validated['rmd_mail_detail2']) ? $validated['rmd_mail_detail2'] : '',
-                    'rmd_mail_detail3' => isset($validated['rmd_mail_detail3']) ? $validated['rmd_mail_detail3'] : '',
-                ]);
-            }
+          
+            $update_rate_meta_data = RateMetaData::where('rmd_no', isset($rmd_no) ? $rmd_no : $validated['rmd_no'])->update([
+                'rmd_mail_detail' => isset($validated['rmd_mail_detail']) ? $validated['rmd_mail_detail'] : '',
+                'rmd_mail_detail2' => isset($validated['rmd_mail_detail2']) ? $validated['rmd_mail_detail2'] : '',
+                'rmd_mail_detail3' => isset($validated['rmd_mail_detail3']) ? $validated['rmd_mail_detail3'] : '',
+            ]);
+        
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'rmd_no' => isset($rmd_no) ? $rmd_no : $validated['rmd_no'],
-                'rmd_arr' => isset($rmd_arr) ? $rmd_arr : null
+                'rmd_arr' => isset($rmd_arr) ? $rmd_arr : null,
             ], 201);
         } catch (\Exception $e) {
             DB::rollback();
