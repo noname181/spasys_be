@@ -41,12 +41,30 @@ class MemberController extends Controller
                 $validated['mb_type'] = Member::SPASYS;
                 $validated['mb_parent'] = Member::ADMIN;
             } else if ($roleNoOfUserLogin == Member::ROLE_SPASYS_ADMIN) {
-                $validated['mb_type'] = Member::SHOP;
-                $validated['mb_parent'] = Member::SPASYS;
+                if(empty($validated['co_no'])){
+                    $validated['mb_type'] = Member::SPASYS;
+                    $validated['mb_parent'] = null;
+                }else {
+                    $company = Company::where('co_no', $validated['co_no'])->first();
+                    if($company->co_type == 'shop'){
+                        $validated['mb_type'] = Member::SHOP;
+                        $validated['mb_parent'] = Member::SPASYS;
+                    }else if($company->co_type == 'shipper'){
+                        $validated['mb_type'] = Member::SHIPPER;
+                        $validated['mb_parent'] = Member::SHOP;
+                    }
+                }
+              
 
             } else if ($roleNoOfUserLogin == Member::ROLE_SHOP_MANAGER) {
-                $validated['mb_type'] = Member::SHIPPER;
-                $validated['mb_parent'] = Member::SHOP;
+                if(empty($validated['co_no'])){
+                    $validated['mb_type'] = Member::SHOP;
+                    $validated['mb_parent'] = Member::SPASYS;
+                }else {
+                   
+                    $validated['mb_type'] = Member::SHIPPER;
+                    $validated['mb_parent'] = Member::SHOP;
+                }
             }
 
             $validated['mb_token'] = '';

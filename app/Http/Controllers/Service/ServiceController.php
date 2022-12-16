@@ -148,7 +148,20 @@ class ServiceController extends Controller
     public function getActiveServices()
     {
         try {
-            $services = Service::where('service_use_yn', 'y')->where('service_no', '!=', 1)->get();
+            $user = Auth::user();
+
+            if($user->mb_type == 'spasys'){
+                $services = Service::where('service_use_yn', 'y')->where('service_no', '!=', 1)->get();
+            }else if($user->mb_type == 'shop'){
+
+                $services =  explode(" ", $user->mb_service_no_array);
+                $service_no = [];
+                foreach($services as $service){
+                    $ser = Service::where('service_name', $service)->first();
+                    $service_no[] = $ser->service_no;
+                }
+                $services = Service::where('service_use_yn', 'y')->where('service_no', '!=', 1)->whereIn('service_no', $service_no)->get();
+            }
 
             return response()->json([
                 'message' => Messages::MSG_0007,
