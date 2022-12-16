@@ -2529,6 +2529,62 @@ class ReceivingGoodsDeliveryController extends Controller
         }
     }
 
+    public function check_settlement_number(Request $request)
+    {
+        try {
+            $bill_type = $request->bill_type;
+
+            if($bill_type == 'MF' || $bill_type == 'CF' || $bill_type == 'CA' || $bill_type == 'MA'){
+                $settlement_number = ReceivingGoodsDelivery::select(DB::raw('receiving_goods_delivery.*'))
+                ->whereNotNull('rgd_settlement_number')
+                ->whereMonth('created_at' , Carbon::today()->month)
+                ->whereYear('created_at' , Carbon::today()->year)
+                ->where(\DB::raw('substr(rgd_settlement_number, -2)'), '=' , $bill_type)->get();
+            }else if($bill_type == 'C' || $bill_type == 'M'){
+                $settlement_number = ReceivingGoodsDelivery::select(DB::raw('receiving_goods_delivery.*'))
+                ->whereNotNull('rgd_settlement_number')
+                ->whereMonth('created_at' , Carbon::today()->month)
+                ->whereYear('created_at' , Carbon::today()->year)
+                ->where(\DB::raw('substr(rgd_settlement_number, -1)'), '=' , $bill_type)->get();
+            }
+            
+            
+            $data = [];
+            $number = [];
+            foreach ($settlement_number  as $i => $rgd_settlement_number) {
+                $number[$i] = substr($rgd_settlement_number->rgd_settlement_number,7,5);
+                // $bigest_number =  substr($rgd_settlement_number->rgd_settlement_number,7,5);
+                // $last_bill_type = substr($rgd_settlement_number->rgd_settlement_number, -2);
+            }
+            if(!empty($number)){
+                $max_number = max($number);
+                $data_key = array_search($max_number,$number);
+                $data = $settlement_number[$data_key];
+            } 
+           
+
+            // $settlement_number->setCollection(
+            //     $settlement_number->getCollection()->map(function ($item){
+
+            //         $bigest_number =  substr($item->rgd_settlement_number,7,5);
+
+            //         return $item;
+            //     })
+            // );
+
+            return response()->json([
+                'message' => 'Success',
+                'settlement_number' => $settlement_number,
+                'data' => $data
+                //'last_bill_type' => $last_bill_type
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
     public function connection(Request $request)
     {
         try {
