@@ -267,7 +267,7 @@ class AlarmController extends Controller
 
     public function getAlarmById($alarm_no)
     {
-        $alarm = Alarm::with('warehousing')->where('alarm_no', $alarm_no )->first();
+        $alarm = Alarm::with('warehousing','export')->where('alarm_no', $alarm_no )->first();
         return response()->json(['alarm' => $alarm]);
     }
 }
