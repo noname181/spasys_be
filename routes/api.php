@@ -351,6 +351,8 @@ Route::middleware('auth')->group(function () {
         Route::delete('/schedule_shipment/{schedule_shipment}', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'deleteScheduleShipment'])->name('delete_schedule_shipment');
         Route::post('/create_or_update', [\App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'CreateOrUpdateByCoPu'])->name('create_or_update');
         Route::get('/get_schedule_shipment_info_by_co_no/{co_no}', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'getScheduleShipmentInfoByCono'])->name('get_schedule_shipment_info_by_co_no');
+        Route::post('/stock_history', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'stock_history'])->name('stock_history');
+
     });
     Route::prefix('contractwms')->name('contractwms.')->group(function () {
         Route::delete('/contractwms/{contract_wms}', [App\Http\Controllers\ContractWms\ContractwmsController::class, 'deleteContractWms'])->name('delete_contract_wms');

@@ -9,11 +9,13 @@ use App\Models\Warehousing;
 use App\Models\WarehousingItem;
 use App\Models\ScheduleShipment;
 use App\Models\ScheduleShipmentInfo;
+use App\Models\StockStatusBad;
 use App\Models\Company;
 use App\Models\File;
 use App\Models\ItemChannel;
 use App\Utils\Messages;
 use App\Http\Requests\Item\ExcelRequest;
+use App\Models\ContractWms;
 use App\Models\Item;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Http\Request;
@@ -868,6 +870,34 @@ class ScheduleShipmentController extends Controller
             ], 200);
         }
         return $api_data;
+    }
+    public function stock_history(Request $request)
+    {
+        try {
+            $contract_wms = ContractWms::where('cw_tab', '공급처')->get();
+
+            $data_item = array();
+            $data_stock = array();
+            foreach($contract_wms as $contractWms){
+                $data_item[] = Item::where('supply_code',$contractWms->cw_code)->where('item_service_name','수입풀필먼트')->get();
+                foreach($data_item as $item ){
+                   foreach($item as $item_){
+                    $stock_status_bad = StockStatusBad::where('product_id',$item_->product_id)->where('status','1')->get();
+                   }
+                }
+            }
+
+
+            return response()->json([
+                'contract_wms' =>  $contract_wms,
+                'item' => $data_item,
+                'stock_status_bad' => $stock_status_bad,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
     }
 
 
