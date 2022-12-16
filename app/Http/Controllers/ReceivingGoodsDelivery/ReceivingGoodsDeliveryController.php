@@ -1711,25 +1711,48 @@ class ReceivingGoodsDeliveryController extends Controller
         try {
             DB::beginTransaction();
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
-            if (isset($request->w_no)) {
-                $check = ReceivingGoodsDelivery::where('w_no', $request->w_no)->where('rgd_status1', '=', '입고')->where('rgd_status2', '!=', '작업완료')->first();
-              
-                if (isset($check->rgd_no)) {
-                    Warehousing::where('w_no', $request->w_no)->update([
-                        'w_schedule_number2' => null,
-                        'w_completed_day' => null,
-                        'w_amount' => 0
-                    ]);
+            if ($request->page_type == 'IW') {
+                if (isset($request->w_no)) {
+                    $check = ReceivingGoodsDelivery::where('w_no', $request->w_no)->where('rgd_status2', '!=', '작업완료')->orwherenull('rgd_status2')->where('w_no', $request->w_no)->first();
 
-                    WarehousingItem::where('w_no', $request->w_no)->where('wi_type', '=', '입고_spasys')->delete();
+                    if (isset($check->rgd_no)) {
+                        Warehousing::where('w_no', $request->w_no)->update([
+                            'w_schedule_number2' => null,
+                            'w_completed_day' => null,
+                            'w_amount' => 0
+                        ]);
 
-                    ReceivingGoodsDelivery::where('w_no', $request->w_no)->update([
-                        'rgd_status1' => '입고예정',
-                        'rgd_status2' => null
-                    ]);
+                        WarehousingItem::where('w_no', $request->w_no)->where('wi_type', '=', '입고_spasys')->delete();
+
+                        ReceivingGoodsDelivery::where('w_no', $request->w_no)->update([
+                            'rgd_status1' => '입고예정',
+                            'rgd_status2' => null
+                        ]);
+                    }
+                }
+            }else{
+                if (isset($request->w_no)) {
+                    $check = ReceivingGoodsDelivery::where('w_no', $request->w_no)->where('rgd_status3', '!=', '배송완료')->orwherenull('rgd_status3')->where('w_no', $request->w_no)->first();
+                    //return $check;
+                    if (isset($check->rgd_no)) {
+                        Warehousing::where('w_no', $request->w_no)->update([
+                            'w_schedule_number2' => null,
+                            'w_completed_day' => null,
+                            'w_amount' => null
+                        ]);
+
+                        WarehousingItem::where('w_no', $request->w_no)->where('wi_type', '=', '출고_spasys')->delete();
+
+                        Package::where('w_no', $request->w_no)->delete();
+
+                        ReceivingGoodsDelivery::where('w_no', $request->w_no)->update([
+                            'rgd_status1' => '출고예정',
+                            'rgd_status2' => '작업완료',
+                            'rgd_status3' => null
+                        ]);
+                    }
                 }
             }
-
             DB::commit();
             return response()->json(['message' => 'ok']);
         } catch (\Exception $e) {
