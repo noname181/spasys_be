@@ -360,6 +360,8 @@ class ItemController extends Controller
 
             if (isset($validated['co_no']) && Auth::user()->mb_type == "shop") {
                 $items->where('co_no', $validated['co_no']);
+            }elseif(Auth::user()->mb_type == "spasys"){
+                $items->where('co_no', $validated['co_no']);
             }
 
             if (isset($validated['w_no'])) {
@@ -381,23 +383,23 @@ class ItemController extends Controller
                 }
             }
 
-            if (Auth::user()->mb_type == "shop") {
-                $items->whereHas('company.co_parent', function ($query) use ($co_no) {
-                    $query->where(DB::raw('co_no'), '=', $co_no);
-                });
-            } elseif (Auth::user()->mb_type == "shipper") {
-                $items->where('co_no', $co_no);
-            } else {
-                $co_child = Company::where('co_parent_no', $co_no)->get();
-                $co_no = array();
-                foreach ($co_child as $o) {
-                    $co_no[] = $o->co_no;
-                }
+            // if (Auth::user()->mb_type == "shop") {
+            //     $items->whereHas('company.co_parent', function ($query) use ($co_no) {
+            //         $query->where(DB::raw('co_no'), '=', $co_no);
+            //     });
+            // } elseif (Auth::user()->mb_type == "shipper") {
+            //     $items->where('co_no', $co_no);
+            // } else {
+            //     $co_child = Company::where('co_parent_no', $co_no)->get();
+            //     $co_no = array();
+            //     foreach ($co_child as $o) {
+            //         $co_no[] = $o->co_no;
+            //     }
 
-                $items->whereHas('company.co_parent', function ($query) use ($co_no) {
-                    $query->whereIn(DB::raw('co_no'), $co_no);
-                });
-            }
+            //     $items->whereHas('company.co_parent', function ($query) use ($co_no) {
+            //         $query->whereIn(DB::raw('co_no'), $co_no);
+            //     });
+            // }
 
 
 
