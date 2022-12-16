@@ -1711,25 +1711,48 @@ class ReceivingGoodsDeliveryController extends Controller
         try {
             DB::beginTransaction();
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
-            if (isset($request->w_no)) {
-                $check = ReceivingGoodsDelivery::where('w_no', $request->w_no)->where('rgd_status1', '=', '입고')->where('rgd_status2', '!=', '작업완료')->first();
-              
-                if (isset($check->rgd_no)) {
-                    Warehousing::where('w_no', $request->w_no)->update([
-                        'w_schedule_number2' => null,
-                        'w_completed_day' => null,
-                        'w_amount' => 0
-                    ]);
+            if ($request->page_type == 'IW') {
+                if (isset($request->w_no)) {
+                    $check = ReceivingGoodsDelivery::where('w_no', $request->w_no)->where('rgd_status2', '!=', '작업완료')->orwherenull('rgd_status2')->where('w_no', $request->w_no)->first();
 
-                    WarehousingItem::where('w_no', $request->w_no)->where('wi_type', '=', '입고_spasys')->delete();
+                    if (isset($check->rgd_no)) {
+                        Warehousing::where('w_no', $request->w_no)->update([
+                            'w_schedule_number2' => null,
+                            'w_completed_day' => null,
+                            'w_amount' => 0
+                        ]);
 
-                    ReceivingGoodsDelivery::where('w_no', $request->w_no)->update([
-                        'rgd_status1' => '입고예정',
-                        'rgd_status2' => null
-                    ]);
+                        WarehousingItem::where('w_no', $request->w_no)->where('wi_type', '=', '입고_spasys')->delete();
+
+                        ReceivingGoodsDelivery::where('w_no', $request->w_no)->update([
+                            'rgd_status1' => '입고예정',
+                            'rgd_status2' => null
+                        ]);
+                    }
+                }
+            }else{
+                if (isset($request->w_no)) {
+                    $check = ReceivingGoodsDelivery::where('w_no', $request->w_no)->where('rgd_status3', '!=', '배송완료')->orwherenull('rgd_status3')->where('w_no', $request->w_no)->first();
+                    //return $check;
+                    if (isset($check->rgd_no)) {
+                        Warehousing::where('w_no', $request->w_no)->update([
+                            'w_schedule_number2' => null,
+                            'w_completed_day' => null,
+                            'w_amount' => null
+                        ]);
+
+                        WarehousingItem::where('w_no', $request->w_no)->where('wi_type', '=', '출고_spasys')->delete();
+
+                        Package::where('w_no', $request->w_no)->delete();
+
+                        ReceivingGoodsDelivery::where('w_no', $request->w_no)->update([
+                            'rgd_status1' => '출고예정',
+                            'rgd_status2' => '작업완료',
+                            'rgd_status3' => null
+                        ]);
+                    }
                 }
             }
-
             DB::commit();
             return response()->json(['message' => 'ok']);
         } catch (\Exception $e) {
@@ -2502,6 +2525,62 @@ class ReceivingGoodsDeliveryController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function check_settlement_number(Request $request)
+    {
+        try {
+            $bill_type = $request->bill_type;
+
+            if($bill_type == 'MF' || $bill_type == 'CF' || $bill_type == 'CA' || $bill_type == 'MA'){
+                $settlement_number = ReceivingGoodsDelivery::select(DB::raw('receiving_goods_delivery.*'))
+                ->whereNotNull('rgd_settlement_number')
+                ->whereMonth('created_at' , Carbon::today()->month)
+                ->whereYear('created_at' , Carbon::today()->year)
+                ->where(\DB::raw('substr(rgd_settlement_number, -2)'), '=' , $bill_type)->get();
+            }else if($bill_type == 'C' || $bill_type == 'M'){
+                $settlement_number = ReceivingGoodsDelivery::select(DB::raw('receiving_goods_delivery.*'))
+                ->whereNotNull('rgd_settlement_number')
+                ->whereMonth('created_at' , Carbon::today()->month)
+                ->whereYear('created_at' , Carbon::today()->year)
+                ->where(\DB::raw('substr(rgd_settlement_number, -1)'), '=' , $bill_type)->get();
+            }
+            
+            
+            $data = [];
+            $number = [];
+            foreach ($settlement_number  as $i => $rgd_settlement_number) {
+                $number[$i] = substr($rgd_settlement_number->rgd_settlement_number,7,5);
+                // $bigest_number =  substr($rgd_settlement_number->rgd_settlement_number,7,5);
+                // $last_bill_type = substr($rgd_settlement_number->rgd_settlement_number, -2);
+            }
+            if(!empty($number)){
+                $max_number = max($number);
+                $data_key = array_search($max_number,$number);
+                $data = $settlement_number[$data_key];
+            } 
+           
+
+            // $settlement_number->setCollection(
+            //     $settlement_number->getCollection()->map(function ($item){
+
+            //         $bigest_number =  substr($item->rgd_settlement_number,7,5);
+
+            //         return $item;
+            //     })
+            // );
+
+            return response()->json([
+                'message' => 'Success',
+                'settlement_number' => $settlement_number,
+                'data' => $data
+                //'last_bill_type' => $last_bill_type
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
