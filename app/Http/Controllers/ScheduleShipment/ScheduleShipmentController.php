@@ -13,6 +13,7 @@ use App\Models\StockStatusBad;
 use App\Models\Company;
 use App\Models\File;
 use App\Models\ItemChannel;
+use App\Models\StockHistory;
 use App\Utils\Messages;
 use App\Http\Requests\Item\ExcelRequest;
 use App\Models\ContractWms;
@@ -25,6 +26,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Utils\CommonFunc;
+use \Carbon\Carbon;
 
 class ScheduleShipmentController extends Controller
 {
@@ -871,33 +873,35 @@ class ScheduleShipmentController extends Controller
         }
         return $api_data;
     }
-    public function stock_history(Request $request)
+
+    public function stock_history()
     {
-        try {
-            $contract_wms = ContractWms::where('cw_tab', '공급처')->get();
-
-            $data_item = array();
+            $contract_wms = ContractWms::with(['company','item'])->where('cw_tab', '공급처')->get();
             $data_stock = array();
+            $data_company = array();
+            
             foreach($contract_wms as $contractWms){
-                $data_item[] = Item::where('supply_code',$contractWms->cw_code)->where('item_service_name','수입풀필먼트')->get();
-                foreach($data_item as $item ){
-                   foreach($item as $item_){
-                    $stock_status_bad = StockStatusBad::where('product_id',$item_->product_id)->where('status','1')->get();
-                   }
+                $data_company[] = $contractWms->company;
+                $total = 0;
+                foreach($contractWms->item as $item){
+                    $stock  = StockStatusBad::where('product_id',$item->product_id)->where('item_no',$item->item_no)->where('status','0')->first();
+                    $total = $total + ($stock != null ? $stock->stock : 0);
                 }
+                $data_stock[] =  $total;
+                //$stock_check = StockHistory::where('mb_no',$contractWms->company->member->mb_no)->first();
+
+                //if($stock_check->sh_date){
+                    StockHistory::insertGetId([
+                        'mb_no' => $contractWms->company->member->mb_no,
+                        'sh_date' => Carbon::now()->toDateTimeString(),
+                        'sh_left_stock' => $total,
+                    ]);
+               // }
             }
-
-
             return response()->json([
-                'contract_wms' =>  $contract_wms,
-                'item' => $data_item,
-                'stock_status_bad' => $stock_status_bad,
-            ]);
-        } catch (\Exception $e) {
-            Log::error($e);
-            return $e;
-            return response()->json(['message' => Messages::MSG_0018], 500);
-        }
+                'message' => '완료되었습니다.',
+                'status' => 1
+            ], 200);
     }
 
 
