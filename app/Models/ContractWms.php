@@ -42,6 +42,11 @@ class ContractWms extends Model
 
     public function company()
     {
-        return $this->belongsTo(Company::class, 'co_no', 'co_no')->with('co_parent');
+        return $this->belongsTo(Company::class, 'co_no', 'co_no')->with('co_parent','member');
+    }
+
+    public function item()
+    {
+        return $this->hasMany(Item::class, 'supply_code', 'cw_code');
     }
 }
