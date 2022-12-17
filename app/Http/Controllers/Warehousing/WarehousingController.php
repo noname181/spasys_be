@@ -3801,7 +3801,7 @@ class WarehousingController extends Controller
 
                     //CHECK SHIPPER COMPANY IS SENT RATE DATA YET
 
-                    $rate_data = RateData::where('rd_cate_meta1', '유통가공');
+                    $rate_data = RateData::where('rd_cate_meta1', '보세화물');
 
                     $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
                     $rate_data = $rate_data->where('rd_co_no', $co_no);
