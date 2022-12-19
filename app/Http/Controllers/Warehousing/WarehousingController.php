@@ -3605,6 +3605,7 @@ class WarehousingController extends Controller
                         $pcs = 0;
                         $box = 0;
                         $caton = 0;
+                        $returns = 0;
 
                         foreach ($rate_data as $rate) {
                             if ($rate['rd_data1'] == 'PCS' && $rate['rd_cate1'] == '출고') {
@@ -3614,11 +3615,15 @@ class WarehousingController extends Controller
                             } else if ($rate['rd_data1'] == 'CATON' && $rate['rd_cate1'] == '출고') {
                                 $caton += intval($rate['rd_data4']);
                             }
+                            if ($rate['rd_cate1'] == '입고' && $rate['rd_cate2'] == '반품입고') {
+                                $returns = intval($rate['rd_data4']);
+                            }
                         }
-
+                        
                         $item->pcs = $pcs;
                         $item->box = $box;
                         $item->caton = $caton;
+                        $item->returns = $returns;
                     } else {
                         $item->pcs = 0;
                         $item->box = 0;
