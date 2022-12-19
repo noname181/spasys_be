@@ -884,7 +884,7 @@ class ScheduleShipmentController extends Controller
                 $data_company[] = $contractWms->company;
                 $total = 0;
                 foreach($contractWms->item as $item){
-                    $stock  = StockStatusBad::where('product_id',$item->product_id)->where('item_no',$item->item_no)->where('status','0')->first();
+                    $stock  = StockStatusBad::where('product_id',$item->product_id)->where('item_no',$item->item_no)->where('status','0')->where(DB::raw("(DATE_FORMAT(created_at,'%Y-%m-%d'))"), "=", Carbon::now()->format('Y-m-d'))->first();
                     $total = $total + ($stock != null ? $stock->stock : 0);
                 }
                 $data_stock[] =  $total;
@@ -893,7 +893,7 @@ class ScheduleShipmentController extends Controller
                 //if($stock_check->sh_date){
                     StockHistory::insertGetId([
                         'mb_no' => $contractWms->company->member->mb_no,
-                        'sh_date' => Carbon::now()->toDateTimeString(),
+                        'sh_date' => Carbon::now()->format('Y-m-d'),
                         'sh_left_stock' => $total,
                     ]);
                // }
