@@ -7,6 +7,7 @@ use App\Http\Requests\Warehousing\WarehousingDataValidate;
 use App\Http\Requests\Warehousing\WarehousingItemValidate;
 use App\Http\Requests\Warehousing\WarehousingRequest;
 use App\Http\Requests\Warehousing\WarehousingSearchRequest;
+use App\Models\StockHistory;
 use App\Models\AdjustmentGroup;
 use App\Models\CompanySettlement;
 use App\Models\Company;
@@ -3577,6 +3578,30 @@ class WarehousingController extends Controller
                         $co_no = $item->warehousing->co_no;
                     } else {
                         $co_no = $user->co_no;
+                    }
+
+                    $company = Company::where('co_no', $co_no)->first();
+                    if($company->co_type == 'shipper'){
+                        $sh = StockHistory::whereHas('member', function($q) use($co_no) {
+                            $q->where('co_no', $co_no);
+                        })->where('sh_date', $item->rgd_monthbill_start->format('Y-m-d'))->first();
+                        $item->start_stock = isset($sh->sh_left_stock)? $sh->sh_left_stock : 0;
+
+                        $sh = StockHistory::whereHas('member', function($q) use($co_no) {
+                            $q->where('co_no', $co_no);
+                        })->where('sh_date', $item->rgd_monthbill_end->format('Y-m-d'))->first();
+                        $item->end_stock = isset($sh->sh_left_stock)? $sh->sh_left_stock : 0;
+
+                    }else if($company->co_type == 'shop'){
+                        $sh = StockHistory::whereHas('member.company.co_parent', function($q) use($co_no) {
+                            $q->where('co_no', $co_no);
+                        })->where('sh_date', $item->rgd_monthbill_start->format('Y-m-d'));
+                        $item->start_stock = !empty($sh)? $sh->sum('sh_left_stock') : 0;
+
+                        $sh = StockHistory::whereHas('member.company.co_parent', function($q) use($co_no) {
+                            $q->where('co_no', $co_no);
+                        })->where('sh_date', $item->rgd_monthbill_end->format('Y-m-d'));
+                        $item->end_stock = !empty($sh)? $sh->sum('sh_left_stock') : 0;
                     }
 
                     $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
