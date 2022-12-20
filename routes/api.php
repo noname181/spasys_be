@@ -153,6 +153,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/get_warehousing_from_rgd/{rgd_no}/{type}', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingByRgd']);
     Route::get('/get_warehousing_from_rgd_fulfillment/{rgd_no}/{type}', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingByRgdFulfillment']);
 
+    Route::post('/import_excel_fulfillment_processing', [\App\Http\Controllers\Warehousing\WarehousingController::class,'importExcelFulfillmentProcessing']);//page 7102
     Route::post('/get_warehousing', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousing']);
     Route::post('/get_warehousing_api', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingApi']);
     Route::post('/get_warehousing2', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousing2']);
@@ -182,6 +183,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/get_tax_invoice_list', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getTaxInvoiceList']); //page 277
     Route::post('/get_tax_invoice_completed_list', [\App\Http\Controllers\Warehousing\WarehousingController::class,'get_tax_invoice_completed_list']); //page 282
     Route::post('/get_tid_list', [\App\Http\Controllers\Warehousing\WarehousingController::class,'get_tid_list']); //page 277
+    Route::post('/get_cr_list', [\App\Http\Controllers\Warehousing\WarehousingController::class,'get_cr_list']); //page 277
     Route::post('/create_tid', [\App\Http\Controllers\Warehousing\WarehousingController::class,'create_tid']); //page 277
 
     Route::get('/warehousing_request', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class,'__invoke']);

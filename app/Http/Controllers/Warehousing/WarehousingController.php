@@ -14,6 +14,7 @@ use App\Models\Company;
 use App\Models\Contract;
 use App\Models\RateData;
 use App\Models\TaxInvoiceDivide;
+use App\Models\CashReceipt;
 use App\Models\ImportExpected;
 use App\Models\Member;
 use App\Models\RateDataGeneral;
@@ -4407,7 +4408,20 @@ class WarehousingController extends Controller
             return response()->json($tid);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function get_cr_list(Request $request) //page277
+    {
+        try {
+            DB::enableQueryLog();
+            $tid = CashReceipt::where('rgd_no', $request->rgd_no)->get();
+
+
+            return response()->json($tid);
+        } catch (\Exception $e) {
+            Log::error($e);
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -4458,6 +4472,49 @@ class WarehousingController extends Controller
                 return response()->json([
                     'message' => Messages::MSG_0007,
                     'tid_list' => $tids,
+                ]);
+            } if($request->type == 'receipt'){
+                $user = Auth::user();
+                foreach($request->tid_list as $tid){
+                    if(isset($value['cr_no'])){
+                        $tid_ = CashReceipt::where('cr_no', $value['cr_no']);
+                        $tid_->update([
+                            'cr_supply_price' => $tid['cr_supply_price'],
+                            'cr_vat' => $tid['cr_vat'],
+                            'cr_sum' => $tid['cr_sum'],
+                            'rgd_no' => isset($tid['rgd_no']) ? $tid['rgd_no'] : $request->rgd_no,
+                            'cr_number' => isset($tid['cr_number']) ? $tid['cr_number'] : null,
+                            'mb_no' => $user->mb_no,
+                        ]);
+                        $id = $tid_->first()->tid_no;
+                    }else {
+                        $id = CashReceipt::insertGetId([
+                            'cr_supply_price' => $tid['cr_supply_price'],
+                            'cr_vat' => $tid['cr_vat'],
+                            'cr_sum' => $tid['cr_sum'],
+                            'rgd_no' => isset($tid['rgd_no']) ? $tid['rgd_no'] : $request->rgd_no,
+                            'cr_number' => isset($tid['cr_number']) ? $tid['cr_number'] : null,
+                            'mb_no' => $user->mb_no,
+                        ]);
+                    }
+                    $ids[] = $id;
+                }
+    
+              
+    
+                CashReceipt::where('rgd_no', $request->rgd_no)
+                ->whereNotIn('cr_no', $ids)->delete();
+                $tids = CashReceipt::where('rgd_no', $request->rgd_no)->get();
+    
+                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                    'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
+                    'rgd_status7' => 'taxed',
+                ]);
+    
+                DB::commit();
+                return response()->json([
+                    'message' => Messages::MSG_0007,
+                    'cr_list' => $tids,
                 ]);
             }else if($request->type == 'add_all'){
                 $user = Auth::user();
@@ -4995,5 +5052,121 @@ class WarehousingController extends Controller
         $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
         $items = $items instanceof Collection ? $items : Collection::make($items);
         return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
+    }
+
+    public function importExcelFulfillmentProcessing(Request $request)
+    {
+        // try {
+        DB::beginTransaction();
+        $f = Storage::disk('public')->put('files/tmp', $request['file']);
+
+        $path = storage_path('app/public') . '/' . $f;
+        $reader = IOFactory::createReaderForFile($path);
+        $reader->setReadDataOnly(true);
+        $spreadsheet = $reader->load($path);
+
+        $sheet = $spreadsheet->getSheet(0);
+        $datas = $sheet->toArray(null, true, true, true);
+
+        $sheet2 = $spreadsheet->getSheet(1);
+        $data_channels = $sheet2->toArray(null, true, true, true);
+
+        $results[$sheet->getTitle()] = [];
+        $errors[$sheet->getTitle()] = [];
+
+        $data_item_count = 0;
+        $data_channel_count = 0;
+
+        $check_error = false;
+        foreach ($datas as $key => $d) {
+            if ($key <= 2) {
+                continue;
+            }
+
+            $validator = Validator::make($d, ExcelRequest::rules());
+            if ($validator->fails()) {
+                $data_item_count =  $data_item_count - 1;
+                $errors[$sheet->getTitle()][] = $validator->errors();
+                $check_error = true;
+            } else {
+                $data_item_count =  $data_item_count + 1;
+                $item_no = Item::insertGetId([
+                    'item_service_name' => '유통가공',
+                    'mb_no' => Auth::user()->mb_no,
+                    'co_no' => Auth::user()->co_no,
+                    'item_brand' => $d['B'],
+                    'item_name' => $d['C'],
+                    'item_option1' => $d['D'],
+                    'item_option2' => $d['E'],
+                    'item_cargo_bar_code' => $d['F'],
+                    'item_upc_code' => $d['G'],
+                    'item_bar_code' => $d['H'],
+                    'item_weight' => $d['I'],
+                    'item_url' => $d['J'],
+                    'item_price1' => $d['K'],
+                    'item_price2' => $d['L'],
+                    'item_price3' => $d['M'],
+                    'item_price4' => $d['N'],
+                    'item_cate1' => $d['O'],
+                    'item_cate2' => $d['P'],
+                    'item_cate3' => $d['Q'],
+                    'item_origin' => $d['R'],
+                    'item_manufacturer' => $d['S']
+                ]);
+
+                // Check validator item_channel
+                if ($data_channels) {
+                    $validator = [];
+                    foreach ($data_channels as $key2 => $channel) {
+                        if ($key2 == 1) {
+                            continue;
+                        }
+                        $validator = Validator::make($channel, ChannelRequest::rules());
+                        if ($d['A'] === $channel['A']) {
+                            $data_channel_count = $data_channel_count + 1;
+                            ItemChannel::insert([
+                                'item_no' => $item_no,
+                                'item_channel_code' => $channel['C'],
+                                'item_channel_name' => $channel['D']
+                            ]);
+                        }
+                    }
+                    if ($validator->fails()) {
+                        DB::rollback();
+                        $data_channel_count =   $data_channel_count - 1;
+                        $errors[$sheet->getTitle()][] = $validator->errors();
+                        return $errors;
+                        $check_error = true;
+                    }
+                }
+            }
+        }
+
+        Storage::disk('public')->delete($f);
+        if ($check_error == true) {
+            DB::rollback();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'status' => 2,
+                'errors' => $errors,
+                'data_item_count' => $data_item_count,
+                'data_channel_count' => $data_channel_count
+            ], 201);
+        } else {
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'errors' => $errors,
+                'status' => 1,
+                'data_item_count' => $data_item_count,
+                'data_channel_count' => $data_channel_count
+            ], 201);
+        }
+
+        // } catch (\Exception $e) {
+
+        //     Log::error($e);
+        //     return response()->json(['message' => Messages::MSG_0004], 500);
+        // }
     }
 }
