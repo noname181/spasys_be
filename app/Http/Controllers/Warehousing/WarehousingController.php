@@ -14,6 +14,7 @@ use App\Models\Company;
 use App\Models\Contract;
 use App\Models\RateData;
 use App\Models\TaxInvoiceDivide;
+use App\Models\CashReceipt;
 use App\Models\ImportExpected;
 use App\Models\Member;
 use App\Models\RateDataGeneral;
@@ -4407,7 +4408,20 @@ class WarehousingController extends Controller
             return response()->json($tid);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function get_cr_list(Request $request) //page277
+    {
+        try {
+            DB::enableQueryLog();
+            $tid = CashReceipt::where('rgd_no', $request->rgd_no)->get();
+
+
+            return response()->json($tid);
+        } catch (\Exception $e) {
+            Log::error($e);
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -4458,6 +4472,49 @@ class WarehousingController extends Controller
                 return response()->json([
                     'message' => Messages::MSG_0007,
                     'tid_list' => $tids,
+                ]);
+            } if($request->type == 'receipt'){
+                $user = Auth::user();
+                foreach($request->tid_list as $tid){
+                    if(isset($value['cr_no'])){
+                        $tid_ = CashReceipt::where('cr_no', $value['cr_no']);
+                        $tid_->update([
+                            'cr_supply_price' => $tid['cr_supply_price'],
+                            'cr_vat' => $tid['cr_vat'],
+                            'cr_sum' => $tid['cr_sum'],
+                            'rgd_no' => isset($tid['rgd_no']) ? $tid['rgd_no'] : $request->rgd_no,
+                            'cr_number' => isset($tid['cr_number']) ? $tid['cr_number'] : null,
+                            'mb_no' => $user->mb_no,
+                        ]);
+                        $id = $tid_->first()->tid_no;
+                    }else {
+                        $id = CashReceipt::insertGetId([
+                            'cr_supply_price' => $tid['cr_supply_price'],
+                            'cr_vat' => $tid['cr_vat'],
+                            'cr_sum' => $tid['cr_sum'],
+                            'rgd_no' => isset($tid['rgd_no']) ? $tid['rgd_no'] : $request->rgd_no,
+                            'cr_number' => isset($tid['cr_number']) ? $tid['cr_number'] : null,
+                            'mb_no' => $user->mb_no,
+                        ]);
+                    }
+                    $ids[] = $id;
+                }
+    
+              
+    
+                CashReceipt::where('rgd_no', $request->rgd_no)
+                ->whereNotIn('cr_no', $ids)->delete();
+                $tids = CashReceipt::where('rgd_no', $request->rgd_no)->get();
+    
+                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                    'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
+                    'rgd_status7' => 'taxed',
+                ]);
+    
+                DB::commit();
+                return response()->json([
+                    'message' => Messages::MSG_0007,
+                    'cr_list' => $tids,
                 ]);
             }else if($request->type == 'add_all'){
                 $user = Auth::user();
