@@ -153,6 +153,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/get_warehousing_from_rgd/{rgd_no}/{type}', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingByRgd']);
     Route::get('/get_warehousing_from_rgd_fulfillment/{rgd_no}/{type}', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingByRgdFulfillment']);
 
+    Route::post('/import_excel_fulfillment_processing', [\App\Http\Controllers\Warehousing\WarehousingController::class,'importExcelFulfillmentProcessing']);//page 7102
     Route::post('/get_warehousing', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousing']);
     Route::post('/get_warehousing_api', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingApi']);
     Route::post('/get_warehousing2', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousing2']);
