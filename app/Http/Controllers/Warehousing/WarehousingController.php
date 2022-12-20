@@ -14,6 +14,7 @@ use App\Models\Company;
 use App\Models\Contract;
 use App\Models\RateData;
 use App\Models\TaxInvoiceDivide;
+use App\Models\CashReceipt;
 use App\Models\ImportExpected;
 use App\Models\Member;
 use App\Models\RateDataGeneral;
@@ -40,6 +41,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use App\Http\Requests\Warehousing\ExcelRequest;
 
 class WarehousingController extends Controller
 {
@@ -3350,11 +3352,17 @@ class WarehousingController extends Controller
 
 
 
-
+            $contract = Contract::where('co_no',  $user->co_no)->first();
 
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             $warehousing->setCollection(
-                $warehousing->getCollection()->map(function ($item) {
+                $warehousing->getCollection()->map(function ($item) use ($contract) {
+                    if (isset($contract->c_calculate_deadline_yn))
+                        $item->c_calculate_deadline_yn = $contract->c_calculate_deadline_yn;
+                    else
+                        $item->c_calculate_deadline_yn = 'n';
+
+
                     $service_name = $item->service_korean_name;
                     $w_no = $item->w_no;
                     $co_no = Warehousing::where('w_no', $w_no)->first()->co_no;
@@ -4407,7 +4415,20 @@ class WarehousingController extends Controller
             return response()->json($tid);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function get_cr_list(Request $request) //page277
+    {
+        try {
+            DB::enableQueryLog();
+            $tid = CashReceipt::where('rgd_no', $request->rgd_no)->get();
+
+
+            return response()->json($tid);
+        } catch (\Exception $e) {
+            Log::error($e);
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -4458,6 +4479,49 @@ class WarehousingController extends Controller
                 return response()->json([
                     'message' => Messages::MSG_0007,
                     'tid_list' => $tids,
+                ]);
+            } if($request->type == 'receipt'){
+                $user = Auth::user();
+                foreach($request->tid_list as $tid){
+                    if(isset($value['cr_no'])){
+                        $tid_ = CashReceipt::where('cr_no', $value['cr_no']);
+                        $tid_->update([
+                            'cr_supply_price' => $tid['cr_supply_price'],
+                            'cr_vat' => $tid['cr_vat'],
+                            'cr_sum' => $tid['cr_sum'],
+                            'rgd_no' => isset($tid['rgd_no']) ? $tid['rgd_no'] : $request->rgd_no,
+                            'cr_number' => isset($tid['cr_number']) ? $tid['cr_number'] : null,
+                            'mb_no' => $user->mb_no,
+                        ]);
+                        $id = $tid_->first()->tid_no;
+                    }else {
+                        $id = CashReceipt::insertGetId([
+                            'cr_supply_price' => $tid['cr_supply_price'],
+                            'cr_vat' => $tid['cr_vat'],
+                            'cr_sum' => $tid['cr_sum'],
+                            'rgd_no' => isset($tid['rgd_no']) ? $tid['rgd_no'] : $request->rgd_no,
+                            'cr_number' => isset($tid['cr_number']) ? $tid['cr_number'] : null,
+                            'mb_no' => $user->mb_no,
+                        ]);
+                    }
+                    $ids[] = $id;
+                }
+    
+              
+    
+                CashReceipt::where('rgd_no', $request->rgd_no)
+                ->whereNotIn('cr_no', $ids)->delete();
+                $tids = CashReceipt::where('rgd_no', $request->rgd_no)->get();
+    
+                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                    'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
+                    'rgd_status7' => 'receipted',
+                ]);
+    
+                DB::commit();
+                return response()->json([
+                    'message' => Messages::MSG_0007,
+                    'cr_list' => $tids,
                 ]);
             }else if($request->type == 'add_all'){
                 $user = Auth::user();
@@ -4995,5 +5059,76 @@ class WarehousingController extends Controller
         $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
         $items = $items instanceof Collection ? $items : Collection::make($items);
         return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
+    }
+
+    public function importExcelFulfillmentProcessing(Request $request)
+    {
+        // try {
+        DB::beginTransaction();
+        
+        $f = Storage::disk('public')->put('files/tmp', $request['file']);
+
+        $path = storage_path('app/public') . '/' . $f;
+        $reader = IOFactory::createReaderForFile($path);
+        $reader->setReadDataOnly(true);
+        $spreadsheet = $reader->load($path);
+       
+        $sheet = $spreadsheet->getSheet(0);
+        $datas = $sheet->toArray(null, true, true, true);
+
+        // $sheet2 = $spreadsheet->getSheet(1);
+        // $data_channels = $sheet2->toArray(null, true, true, true);
+
+        //return $datas;
+
+        $results[$sheet->getTitle()] = [];
+        $errors[$sheet->getTitle()] = [];
+
+        $data_item_count = 0;
+        $data_channel_count = 0;
+
+        $check_error = false;
+        foreach ($datas as $key => $d) {
+            if ($key <= 2) {
+                continue;
+            }
+
+            $validator = Validator::make($d, ExcelRequest::rules());
+            if ($validator->fails()) {
+                $data_item_count =  $data_item_count - 1;
+                $errors[$sheet->getTitle()][] = $validator->errors();
+                $check_error = true;
+            } else {
+                $data_item_count =  $data_item_count + 1;
+                return $d['A'];
+            }
+        }
+
+        Storage::disk('public')->delete($f);
+        if ($check_error == true) {
+            DB::rollback();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'status' => 2,
+                'errors' => $errors,
+                'data_item_count' => $data_item_count,
+               
+            ], 201);
+        } else {
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'errors' => $errors,
+                'status' => 1,
+                'data_item_count' => $data_item_count,
+                
+            ], 201);
+        }
+
+        // } catch (\Exception $e) {
+
+        //     Log::error($e);
+        //     return response()->json(['message' => Messages::MSG_0004], 500);
+        // }
     }
 }
