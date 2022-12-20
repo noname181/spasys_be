@@ -239,7 +239,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             'item_name' => $item_new['item_name'],
                             'item_option1' => $item_new['item_option1'],
                             'item_option2' => $item_new['item_option2'],
-                            'item_price3' => $item_new['item_price3'],
+                            'item_price3' => isset($item_new['item_price3']) ? $item_new['item_price3'] : 0,
                             'item_price4' => $item_new['item_price4']
                         ]);
 
@@ -322,16 +322,19 @@ class ReceivingGoodsDeliveryController extends Controller
                 }
                 //}
             } else {
-                foreach ($validated['items'] as $warehousing_item) {
-                    if (isset($warehousing_item['item_no']) && $warehousing_item['item_no']) {
-                        WarehousingItem::insert([
-                            'item_no' => $warehousing_item['item_no'],
-                            'w_no' => $w_no,
-                            'wi_number' => isset($warehousing_item['warehousing_item'][0]['wi_number']) ? $warehousing_item['warehousing_item'][0]['wi_number'] : null,
-                            'wi_type' => '입고_shipper'
-                        ]);
+                if(isset($validated['items'])){
+                    foreach ($validated['items'] as $warehousing_item) {
+                        if (isset($warehousing_item['item_no']) && $warehousing_item['item_no']) {
+                            WarehousingItem::insert([
+                                'item_no' => $warehousing_item['item_no'],
+                                'w_no' => $w_no,
+                                'wi_number' => isset($warehousing_item['warehousing_item'][0]['wi_number']) ? $warehousing_item['warehousing_item'][0]['wi_number'] : null,
+                                'wi_type' => '입고_shipper'
+                            ]);
+                        }
                     }
                 }
+                
             }
 
             //Create 출고예정 after 입고 is done.

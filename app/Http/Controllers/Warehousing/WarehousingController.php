@@ -3352,11 +3352,17 @@ class WarehousingController extends Controller
 
 
 
-
+            $contract = Contract::where('co_no',  $user->co_no)->first();
 
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             $warehousing->setCollection(
-                $warehousing->getCollection()->map(function ($item) {
+                $warehousing->getCollection()->map(function ($item) use ($contract) {
+                    if (isset($contract->c_calculate_deadline_yn))
+                        $item->c_calculate_deadline_yn = $contract->c_calculate_deadline_yn;
+                    else
+                        $item->c_calculate_deadline_yn = 'n';
+
+
                     $service_name = $item->service_korean_name;
                     $w_no = $item->w_no;
                     $co_no = Warehousing::where('w_no', $w_no)->first()->co_no;
@@ -4509,7 +4515,7 @@ class WarehousingController extends Controller
     
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
-                    'rgd_status7' => 'taxed',
+                    'rgd_status7' => 'receipted',
                 ]);
     
                 DB::commit();
