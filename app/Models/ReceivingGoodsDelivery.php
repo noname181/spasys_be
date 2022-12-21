@@ -50,6 +50,7 @@ class ReceivingGoodsDelivery extends Model
         'service_korean_name',
         'rgd_paid_date',
         'rgd_tax_invoice_number',
+        'rgd_integrated_calculate_yn',
         'created_at',
         'updated_at',
     ];
@@ -108,5 +109,6 @@ class ReceivingGoodsDelivery extends Model
     public function t_import(){
         return $this->belongsTo(Import::class, 'rgd_tracking_code', 'ti_logistic_manage_number');
     }
+
 
 }

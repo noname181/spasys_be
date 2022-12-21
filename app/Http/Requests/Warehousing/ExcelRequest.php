@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Item;
+namespace App\Http\Requests\Warehousing;
 
 use App\Http\Requests\BaseFormRequest;
 
@@ -25,15 +25,35 @@ class ExcelRequest extends BaseFormRequest
     {
         return [
             'A' => [
-                'required',
+                '',
                 'max:255',
             ],
             'B' => [
-                'required',
+                '',
                 'max:255',
             ],
             'C' => [
-                'required',
+                '',
+                'max:255',
+            ],
+            'D' => [
+                '',
+                'max:255',
+            ],
+            'E' => [
+                '',
+                'max:255',
+            ],
+            'F' => [
+                '',
+                'max:255',
+            ],
+            'G' => [
+                '',
+                'max:255',
+            ],
+            'H' => [
+                '',
                 'max:255',
             ]
         ];

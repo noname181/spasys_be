@@ -24,6 +24,7 @@ use App\Models\ScheduleShipment;
 use App\Models\Service;
 use App\Models\Warehousing;
 use App\Models\WarehousingItem;
+use App\Models\Item;
 use App\Utils\CommonFunc;
 use App\Utils\Messages;
 use Carbon\Carbon;
@@ -4409,10 +4410,21 @@ class WarehousingController extends Controller
     {
         try {
             DB::enableQueryLog();
+            $user = Auth::user();
             $tid = TaxInvoiceDivide::where('rgd_no', $request->rgd_no)->get();
 
+            $rgd = ReceivingGoodsDelivery::with('warehousing')->where('rgd_no', $request->rgd_no)->first();
 
-            return response()->json($tid);
+            if($user->mb_type == 'spasys' && $rgd->service_korean_name == '수입풀필먼트'){
+                $company = Company::with('co_parent')->where('co_no', $rgd['warehousing']['co_no'])->first();
+            }else {
+                $company = Company::with('co_parent')->where('co_no', $rgd['warehousing']['company']['co_parent']['co_no'])->first();
+            }
+
+            return response()->json([
+                'tid' => $tid,
+                'company' => $company
+            ]);
         } catch (\Exception $e) {
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0018], 500);
@@ -4423,10 +4435,22 @@ class WarehousingController extends Controller
     {
         try {
             DB::enableQueryLog();
+            $user = Auth::user();
             $tid = CashReceipt::where('rgd_no', $request->rgd_no)->get();
 
+            $rgd = ReceivingGoodsDelivery::with('warehousing')->where('rgd_no', $request->rgd_no)->first();
 
-            return response()->json($tid);
+            if($user->mb_type == 'spasys' && $rgd->service_korean_name == '수입풀필먼트'){
+                $company = Company::with('co_parent')->where('co_no', $rgd['warehousing']['co_no'])->first();
+            }else {
+                $company = Company::with('co_parent')->where('co_no', $rgd['warehousing']['company']['co_parent']['co_no'])->first();
+            }
+
+            return response()->json([
+                'tid' => $tid,
+                'company' => $company
+            ]);
+
         } catch (\Exception $e) {
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0018], 500);
@@ -4439,8 +4463,19 @@ class WarehousingController extends Controller
             DB::beginTransaction();
             if($request->type == 'option'){
                 $user = Auth::user();
+
+                $tids = TaxInvoiceDivide::where('rgd_no', $request->rgd_no)->get();
+                $tax_number = CommonFunc::generate_tax_number($request->rgd_no);
+    
+                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                    'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
+                    'rgd_tax_invoice_number' => $tax_number ? $tax_number : null,
+                    'rgd_status7' => 'receipted',
+                ]);
+                
                 foreach($request->tid_list as $tid){
                     if(isset($value['tid_no'])){
+                    // if(false){
                         $tid_ = TaxInvoiceDivide::where('tid_no', $value['tid_no']);
                         $tid_->update([
                             'tid_supply_price' => $tid['tid_supply_price'],
@@ -4448,6 +4483,12 @@ class WarehousingController extends Controller
                             'tid_sum' => $tid['tid_sum'],
                             'rgd_no' => isset($tid['rgd_no']) ? $tid['rgd_no'] : $request->rgd_no,
                             'tid_number' => isset($tid['tid_number']) ? $tid['tid_number'] : null,
+                            'co_license' => $request['company']['co_license'],
+                            'co_owner' => $request['company']['co_owner'],
+                            'co_name' => $request['company']['co_name'],
+                            'co_major' => $request['company']['co_major'],
+                            'co_address' => $request['company']['co_address'],
+                            'rgd_number' => $tax_number ? $tax_number : null,
                             'mb_no' => $user->mb_no,
                         ]);
                         $id = $tid_->first()->tid_no;
@@ -4458,22 +4499,19 @@ class WarehousingController extends Controller
                             'tid_sum' => $tid['tid_sum'],
                             'rgd_no' => isset($tid['rgd_no']) ? $tid['rgd_no'] : $request->rgd_no,
                             'tid_number' => isset($tid['tid_number']) ? $tid['tid_number'] : null,
+                            'co_license' => $request['company']['co_license'],
+                            'co_owner' => $request['company']['co_owner'],
+                            'co_name' => $request['company']['co_name'],
+                            'co_major' => $request['company']['co_major'],
+                            'co_address' => $request['company']['co_address'],
+                            'rgd_number' => $tax_number ? $tax_number : null,
                             'mb_no' => $user->mb_no,
                         ]);
                     }
                     $ids[] = $id;
                 }
-    
-              
-    
                 TaxInvoiceDivide::where('rgd_no', $request->rgd_no)
                 ->whereNotIn('tid_no', $ids)->delete();
-                $tids = TaxInvoiceDivide::where('rgd_no', $request->rgd_no)->get();
-    
-                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-                    'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
-                    'rgd_status7' => 'taxed',
-                ]);
     
                 DB::commit();
                 return response()->json([
@@ -4482,41 +4520,55 @@ class WarehousingController extends Controller
                 ]);
             } if($request->type == 'receipt'){
                 $user = Auth::user();
+
+                $tids = CashReceipt::where('rgd_no', $request->rgd_no)->get();
+                $tax_number = CommonFunc::generate_tax_number($request->rgd_no);
+    
+                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                    'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
+                    'rgd_tax_invoice_number' => $tax_number ? $tax_number : null,
+                    'rgd_status7' => 'receipted',
+                ]);
+
                 foreach($request->tid_list as $tid){
                     if(isset($value['cr_no'])){
+                    // if(false){
                         $tid_ = CashReceipt::where('cr_no', $value['cr_no']);
                         $tid_->update([
-                            'cr_supply_price' => $tid['cr_supply_price'],
-                            'cr_vat' => $tid['cr_vat'],
-                            'cr_sum' => $tid['cr_sum'],
+                            'cr_supply_price' => $tid['tid_supply_price'],
+                            'cr_vat' => $tid['tid_vat'],
+                            'cr_sum' => $tid['tid_sum'],
                             'rgd_no' => isset($tid['rgd_no']) ? $tid['rgd_no'] : $request->rgd_no,
-                            'cr_number' => isset($tid['cr_number']) ? $tid['cr_number'] : null,
+                            'cr_number' => isset($tid['tid_number']) ? $tid['tid_number'] : null,
+                            'co_license' => $request['company']['co_license'],
+                            'co_owner' => $request['company']['co_owner'],
+                            'co_name' => $request['company']['co_name'],
+                            'co_major' => $request['company']['co_major'],
+                            'co_address' => $request['company']['co_address'],
+                            'rgd_number' => $tax_number ? $tax_number : null,
                             'mb_no' => $user->mb_no,
                         ]);
                         $id = $tid_->first()->tid_no;
                     }else {
                         $id = CashReceipt::insertGetId([
-                            'cr_supply_price' => $tid['cr_supply_price'],
-                            'cr_vat' => $tid['cr_vat'],
-                            'cr_sum' => $tid['cr_sum'],
+                            'cr_supply_price' => $tid['tid_supply_price'],
+                            'cr_vat' => $tid['tid_vat'],
+                            'cr_sum' => $tid['tid_sum'],
                             'rgd_no' => isset($tid['rgd_no']) ? $tid['rgd_no'] : $request->rgd_no,
-                            'cr_number' => isset($tid['cr_number']) ? $tid['cr_number'] : null,
+                            'cr_number' => isset($tid['tid_number']) ? $tid['tid_number'] : null,
+                            'co_license' => $request['company']['co_license'],
+                            'co_owner' => $request['company']['co_owner'],
+                            'co_name' => $request['company']['co_name'],
+                            'co_major' => $request['company']['co_major'],
+                            'co_address' => $request['company']['co_address'],
+                            'rgd_number' => $tax_number ? $tax_number : null,
                             'mb_no' => $user->mb_no,
                         ]);
                     }
                     $ids[] = $id;
                 }
-    
-              
-    
                 CashReceipt::where('rgd_no', $request->rgd_no)
                 ->whereNotIn('cr_no', $ids)->delete();
-                $tids = CashReceipt::where('rgd_no', $request->rgd_no)->get();
-    
-                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-                    'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
-                    'rgd_status7' => 'receipted',
-                ]);
     
                 DB::commit();
                 return response()->json([
@@ -5089,7 +5141,7 @@ class WarehousingController extends Controller
 
         $check_error = false;
         foreach ($datas as $key => $d) {
-            if ($key <= 2) {
+            if ($key > 0) {
                 continue;
             }
 
@@ -5100,7 +5152,52 @@ class WarehousingController extends Controller
                 $check_error = true;
             } else {
                 $data_item_count =  $data_item_count + 1;
-                return $d['A'];
+                $member = Member::where('mb_id', Auth::user()->mb_id)->first();
+                $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
+
+            //     $w_no_data = Warehousing::insertGetId([
+            //         'mb_no' => $member->mb_no,
+            //         'w_type' => 'IW',
+            //         'w_category_name' => "수입풀필먼트",
+            //         'co_no' => isset($validated['co_no']) ? $validated['co_no'] : $co_no,
+            //     ]);
+
+                
+            //    ReceivingGoodsDelivery::insertGetId([
+            //         'mb_no' => $member->mb_no,
+            //         'w_no' => $w_no_data,
+            //         'service_korean_name' => "수입풀필먼트",
+            //         'rgd_status1' => '입고',
+            //         'rgd_status2' => '작업완료',
+            //     ]);
+
+            //     $w_no = isset($validated['w_no']) ? $validated['w_no'] : $w_no_data;
+
+            //     if (isset($w_no)) {
+            //         $w_schedule_number = (new CommonFunc)->generate_w_schedule_number($w_no, 'IW');
+            //     }
+    
+            //     Warehousing::where('w_no', $w_no)->update([
+            //         'w_schedule_number' =>  $w_schedule_number
+            //     ]);
+
+                $item = Item::where('product_id',$d['A'])->first();
+
+                // WarehousingItem::insert([
+                //     'item_no' => $warehousing_item['item_no'],
+                //     'w_no' => $w_no,
+                //     'wi_number' => isset($warehousing_item['warehousing_item'][0]['wi_number']) ? $warehousing_item['warehousing_item'][0]['wi_number'] : null,
+                //     'wi_type' => '입고_shipper'
+                // ]);
+
+                // WarehousingItem::insert([
+                //     'item_no' => $warehousing_item['item_no'],
+                //     'w_no' => $w_no,
+                //     'wi_number' => isset($warehousing_item['warehousing_item2'][0]['wi_number']) ? $warehousing_item['warehousing_item2'][0]['wi_number'] : null,
+                //     'wi_type' => '입고_spasys'
+                // ]);
+
+                return $item;
             }
         }
 

@@ -71,14 +71,14 @@ class ContractUpdateRequest extends BaseFormRequest
                 'max:1'
             ],
             'c_integrated_calculate_yn' => [
-                'required',
-                'string',
-                'max:1'
+                // 'nullable',
+                // 'string',
+                // 'max:1'
             ],
             'cp_method' => [
-                'required',
-                'string',
-                'max:255'
+                // 'nullable',
+                // 'string',
+                // 'max:255'
             ],
             'c_deposit_day' => [
             ],

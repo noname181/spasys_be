@@ -1749,12 +1749,13 @@ class RateDataController extends Controller
 
                 ];
             }
-
+            $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_tracking_code', $is_no)->first();
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'company' => $company,
                 'adjustment_group_all' => $adjustment_group_all,
                 'rate_data' => $rate_data,
+                'rgd'=>$rgd,
                 'export' => $export,
                 'adjustment_group' => $adjustment_group,
             ], 200);
@@ -3321,7 +3322,7 @@ class RateDataController extends Controller
             $rdg = RateDataGeneral::updateOrCreate(
                 [
                     'rdg_no' => isset($is_exist->rdg_no) ? $is_exist->rdg_no : null,
-                    'rdg_bill_type' => $request->bill_type,
+                    'rdg_bill_type' => $request->bill_type,         
                 ],
                 [
                     'w_no' => $w_no,
@@ -3369,6 +3370,7 @@ class RateDataController extends Controller
                     'rgd_bill_type' => $request->bill_type,
                     'rgd_storage_days' => $request->storage_days,
                     'rgd_settlement_number' => $request->rgd_settlement_number,
+                    'rgd_integrated_calculate_yn'=> $request->rgd_integrated_calculate_yn,
                     'mb_no' => Auth::user()->mb_no,
                 ]);
             }
@@ -3402,6 +3404,7 @@ class RateDataController extends Controller
             } else {
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
                     'rgd_no' => $is_exist ? $is_exist->rgd_no : $rgd->rgd_no,
+
                 ]);
             }
 
