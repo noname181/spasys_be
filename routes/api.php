@@ -201,6 +201,8 @@ Route::middleware('auth')->group(function () {
     Route::post('receiving_goods_delivery/update_status5_fulfillment', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_status5_fulfillment']);
 
     Route::post('receiving_goods_delivery/payment', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'payment']);
+    Route::post('receiving_goods_delivery/cancel_payment', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'cancel_payment']);
+
 
     Route::post('receiving_goods_delivery/connection', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'connection']);
 
@@ -476,6 +478,8 @@ Route::middleware('auth')->group(function () {
         //GET GENERAL BILL FOR CREATE ADDITIONAL CASE BILL PAGE 268 POPUP
         Route::get('/general_additional3/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_additional3'])->name('get_rate_data_general_additional3');
 
+        //payment
+        Route::get('/get_rate_data_by_rgd/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_info_by_rgd'])->name('get_rate_data_by_rgd');
 
         Route::post('/', \App\Http\Controllers\RateData\RateDataController::class)->name('registe_rate_data');
         //REGISTER RATE DATA
@@ -509,6 +513,7 @@ Route::middleware('auth')->group(function () {
         //cancel_bill
         Route::post('/cancel_bill', [\App\Http\Controllers\RateData\RateDataController::class,'cancel_bill'])->name('cancel_bill');
         Route::post('/get_list_cancel_bill', [\App\Http\Controllers\RateData\RateDataController::class,'get_list_cancel_bill'])->name('get_list_cancel_bill');
+
 
     });
 

@@ -14,6 +14,7 @@ use App\Models\AdjustmentGroup;
 use App\Models\Package;
 use App\Models\ItemChannel;
 use App\Models\TaxInvoiceDivide;
+use App\Models\CancelBillHistory;
 use App\Utils\Messages;
 use App\Utils\CommonFunc;
 use Illuminate\Http\Request;
@@ -2509,25 +2510,90 @@ class ReceivingGoodsDeliveryController extends Controller
     {
         try {
 
-            ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-                'rgd_status6' => 'paid',
-                'rgd_paid_date' =>  Carbon::now()
-            ]);
-            Payment::insertGetId(
-                [
-                    'mb_no' => Auth::user()->mb_no,
-                    'rgd_no' => $request->rgd_no,
+            $check_payment = Payment::where('rgd_no',$request->rgd_no)->where('p_cancel_yn','y')->first();
+            if(isset($check_payment)){
+                Payment::where('rgd_no', $check_payment->rgd_no)->update([
                     'p_price' => $request->sumprice,
                     'p_method' => $request->p_method,
                     'p_success_yn' => 'y',
-                ]
-            );
+                    'p_cancel_yn' => null,
+                    'p_cancel_time' => null,
+                ]);
+
+                ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                    'rgd_status6' => 'paid',
+                    'rgd_paid_date' =>  Carbon::now(),
+                    'rgd_canceled_date' => null
+                ]);
+
+            }else{
+                Payment::insertGetId(
+                    [
+                        'mb_no' => Auth::user()->mb_no,
+                        'rgd_no' => $request->rgd_no,
+                        'p_price' => $request->sumprice,
+                        'p_method' => $request->p_method,
+                        'p_success_yn' => 'y',
+                    ]
+                );
+                ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                    'rgd_status6' => 'paid',
+                    'rgd_paid_date' =>  Carbon::now(),
+                ]);
+            }
+
+            CancelBillHistory::insertGetId([
+                'mb_no' => Auth::user()->mb_no,
+                'rgd_no' => $request->rgd_no,
+                'cbh_status_after' => 'payment_bill',
+            ]);
+
+            return response()->json([
+                'message' => 'Success',
+                //'check_payment' =>$check_payment->rgd_no
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function cancel_payment(Request $request)
+    {
+        try {
+            $check_payment = Payment::where('rgd_no',$request->rgd_no)->where('p_success_yn','y')->first();
+            if(isset($check_payment)){
+                Payment::where('rgd_no', $check_payment->rgd_no)->update([
+                    // 'p_price' => $request->sumprice,
+                    // 'p_method' => $request->p_method,
+                    'p_success_yn' => null,
+                    'p_cancel_yn' => 'y',
+                    'p_cancel_time' => Carbon::now(),
+                ]);
+
+                ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                    'rgd_status6' => 'cancel',
+                    'rgd_paid_date' => null,
+                    'rgd_canceled_date' =>  Carbon::now(),
+                ]);
+
+                CancelBillHistory::insertGetId([
+                    'mb_no' => Auth::user()->mb_no,
+                    'rgd_no' => $request->rgd_no,
+                    'cbh_status_after' => 'cancel_payment_bill',
+                ]);
+
+            }
+
+            
 
             return response()->json([
                 'message' => 'Success'
             ]);
         } catch (\Exception $e) {
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }

@@ -7848,4 +7848,24 @@ class RateDataController extends Controller
         }
     }
 
+    public function get_rate_data_info_by_rgd($rgd_no)
+    {
+        try {
+            DB::beginTransaction();
+            $rate_data_general = RateDataGeneral::where('rgd_no', $rgd_no)->first();
+
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'rate_data_general' => $rate_data_general,
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
 }
