@@ -71,14 +71,14 @@ class ContractRegisterRequest extends BaseFormRequest
                 'max:1'
             ],
             'c_integrated_calculate_yn' => [
-                'required',
-                'string',
-                'max:1'
+                // 'required',
+                // 'string',
+                // 'max:1'
             ],
             'cp_method' => [
-                'required',
-                'string',
-                'max:255'
+                // 'required',
+                // 'string',
+                // 'max:255'
             ],
             // 'c_card_number' => [
             //     'required',
