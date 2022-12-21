@@ -110,4 +110,5 @@ class ReceivingGoodsDelivery extends Model
         return $this->belongsTo(Import::class, 'rgd_tracking_code', 'ti_logistic_manage_number');
     }
 
+
 }
