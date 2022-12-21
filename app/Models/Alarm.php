@@ -43,7 +43,7 @@ class Alarm extends Model
     // }
     public function warehousing()
     {
-        return $this->belongsTo(Warehousing::class, 'w_no', 'w_no')->with(['warehousing_item']);;
+        return $this->belongsTo(Warehousing::class, 'w_no', 'w_no')->with(['warehousing_item','company']);;
     }
     public function member()
     {
