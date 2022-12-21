@@ -22,6 +22,7 @@ class TaxInvoiceDivide extends Model
     protected $fillable = [
         'tid_no',
         'rgd_no',
+        'rgd_number',
         'mb_no',
         'tid_number',
         'tid_price',

@@ -22,6 +22,7 @@ class CashReceipt extends Model
     protected $fillable = [
         'cr_no',
         'rgd_no',
+        'rgd_number',
         'mb_no',
         'cr_supply_price',
         'cr_vat',
