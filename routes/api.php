@@ -202,6 +202,7 @@ Route::middleware('auth')->group(function () {
 
     Route::post('receiving_goods_delivery/payment', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'payment']);
     Route::post('receiving_goods_delivery/cancel_payment', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'cancel_payment']);
+    Route::post('receiving_goods_delivery/load_payment', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'load_payment']);
 
 
     Route::post('receiving_goods_delivery/connection', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'connection']);
@@ -513,6 +514,8 @@ Route::middleware('auth')->group(function () {
         //cancel_bill
         Route::post('/cancel_bill', [\App\Http\Controllers\RateData\RateDataController::class,'cancel_bill'])->name('cancel_bill');
         Route::post('/get_list_cancel_bill', [\App\Http\Controllers\RateData\RateDataController::class,'get_list_cancel_bill'])->name('get_list_cancel_bill');
+        Route::post('/get_list_payment_history', [\App\Http\Controllers\RateData\RateDataController::class,'get_list_payment_history'])->name('get_list_payment_history');
+
 
 
     });

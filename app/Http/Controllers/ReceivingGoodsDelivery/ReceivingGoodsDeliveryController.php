@@ -2597,7 +2597,23 @@ class ReceivingGoodsDeliveryController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
-
+    public function load_payment(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+            $data = Payment::where('rgd_no', '=', $request->rgd_no)->first();
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'data' => $data,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
     public function check_settlement_number(Request $request)
     {
         try {
