@@ -54,12 +54,12 @@ class BannerUpdateRequest extends BaseFormRequest
                 'max:255',
             ],
             'banner_start' => [
-                'required',
-                'date_format:m/d/Y'
+                'string',
+                'date_format:Y-m-d',
             ],
             'banner_end' => [
-                'required',
-                'date_format:m/d/Y'
+                'string',
+                'date_format:Y-m-d',
             ],
             'banner_use_yn' => [
                 'required',

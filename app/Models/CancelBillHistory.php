@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Member;
 
 class CancelBillHistory extends Model
 {
@@ -32,4 +33,8 @@ class CancelBillHistory extends Model
         //'created_at' => "date:Y.m.d H:i",
         'updated_at' => "date:Y.m.d H:i",
     ];
+    public function member()
+    {
+        return $this->belongsTo(Member::class, 'mb_no', 'mb_no')->with('company');
+    }
 }
