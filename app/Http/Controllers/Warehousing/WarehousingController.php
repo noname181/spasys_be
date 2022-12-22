@@ -5115,7 +5115,33 @@ class WarehousingController extends Controller
     {
         // try {
         DB::beginTransaction();
+        $member = Member::where('mb_id', Auth::user()->mb_id)->first();
+        $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
+        $user = Auth::user();
 
+        if ($user->mb_type == "spasys") {
+            $companies_shop = Company::where('co_parent_no', $user->co_no)->where('co_type', 'shop')->orderBy('co_no', 'DESC')->get();
+
+            $companies_shipper = Company::with(['contract', 'co_parent'])->with('warehousing')->where('co_type', 'shipper')->whereIn('co_parent_no', function ($query) use ($user) {
+                $query->select('co_no')
+                    ->from(with(new Company)->getTable())
+                    ->where('co_type', 'shop')
+                    ->where('co_parent_no', $user->co_no);
+            })->orderBy('co_no', 'DESC')->get();
+
+            $co_no_shop = [];
+            foreach ($companies_shop as $value) {
+                $co_no_shop[] = $value->co_no;
+            }
+
+            $co_no_shipper = [];
+            foreach ($companies_shipper as $value) {
+                $co_no_shipper[] = $value->co_no;
+            }
+            $co_no_in = array_merge($co_no_shop, $co_no_shipper);
+            array_push($co_no_in, $co_no);
+        }
+        //return $co_no_in;
         $f = Storage::disk('public')->put('files/tmp', $request['file']);
 
         $path = storage_path('app/public') . '/' . $f;
@@ -5138,12 +5164,15 @@ class WarehousingController extends Controller
         $data_channel_count = 0;
 
         $check_error = false;
+        $out = [];
         $test = [];
+        $test_i = [];
+        $test_date = '';
         foreach ($datas as $key => $d) {
             if ($key <= 1) {
                 continue;
             }
-            
+
             $validator = Validator::make($d, ExcelRequest::rules());
             if ($validator->fails()) {
                 $data_item_count =  $data_item_count - 1;
@@ -5151,69 +5180,105 @@ class WarehousingController extends Controller
                 $check_error = true;
             } else {
                 $contains = Str::contains($d['D'], 'S');
+
                 if ($contains) {
-                    $item = Item::where('option_id', $d['D'])->where('product_id', $d['C'])->first();
+                    $item = Item::with(['company','ContractWms'])->where('item_service_name', '수입풀필먼트')->where('option_id', $d['D'])->where('product_id', $d['C']);
+                    $item->whereHas('ContractWms.company', function ($q) use ($co_no_in) {
+                        $q->whereIn('co_no', $co_no_in);
+                    })->first();
                 } else {
-                    $item = Item::where('product_id', $d['D'])->first();
+                    $item = Item::with(['company','ContractWms'])->where('item_service_name', '수입풀필먼트')->where('product_id', $d['D']);
+                    $item->whereHas('ContractWms.company', function ($q) use ($co_no_in) {
+                        $q->whereIn('co_no', $co_no_in);
+                    })->first();
                 }
 
+                $item = $item->first();
+                $custom = collect(['wi_number' => $d['G']]);
 
-                $test[] = $item;
+                $item = $custom->merge($item);
+                //$test[] = $item;
                 if (!isset($item)) {
                     $data_item_count =  $data_item_count - 1;
                     $errors[$sheet->getTitle()][] = $validator->errors();
                     $check_error = true;
                 } else {
                     $data_item_count =  $data_item_count + 1;
-                    $member = Member::where('mb_id', Auth::user()->mb_id)->first();
-                    $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
+                    $index = $d['A'] . ',' . $d['H'];
+                    // if (array_key_exists($index, $out)){
+                    //     $out[$index] = $d['A'];
+                    // }
+                    $test[$index] = $d['A'];
+
+                    if (isset($test_i[$index])) {
+                        $tmp = $test_i[$index];
+                        $tmp[] = $item;
+                        $test_i[$index] = $tmp;
+                    } else {
+                        $tmp = [];
+                        $tmp[] = $item;
+                        $test_i[$index] = $tmp;
+                    }
                 }
             }
         }
+        
+        foreach ($test_i as $key => $value) {
+            $strArray = explode(',',$key);
+            $w_no_data = Warehousing::insertGetId([
+                'mb_no' => $member->mb_no,
+                'w_type' => 'IW',
+                'w_category_name' => "수입풀필먼트",
+                'co_no' => isset($validated['co_no']) ? $validated['co_no'] : $value[0]['contract_wms']['co_no'],
+                'w_schedule_day' => $strArray[1]
+            ]);
 
-        //     $w_no_data = Warehousing::insertGetId([
-        //         'mb_no' => $member->mb_no,
-        //         'w_type' => 'IW',
-        //         'w_category_name' => "수입풀필먼트",
-        //         'co_no' => isset($validated['co_no']) ? $validated['co_no'] : $co_no,
-        //     ]);
+            ReceivingGoodsDelivery::insertGetId([
+                'mb_no' => $member->mb_no,
+                'w_no' => $w_no_data,
+                'service_korean_name' => "수입풀필먼트",
+                'rgd_status1' => '입고',
+                'rgd_status2' => '작업완료',
+                //'rgd_delivery_schedule_day' => $strArray[1]
+            ]);
+
+            $w_no = isset($validated['w_no']) ? $validated['w_no'] : $w_no_data;
+
+            if (isset($w_no)) {
+                $w_schedule_number = (new CommonFunc)->generate_w_schedule_number($w_no, 'IW');
+            }
+
+            Warehousing::where('w_no', $w_no)->update([
+                'w_schedule_number' =>  $w_schedule_number
+            ]);
+
+            $w_amount = 0;
+            foreach ($value as $warehousing_item) {
+                WarehousingItem::insert([
+                    'item_no' => $warehousing_item['item_no'],
+                    'w_no' => $w_no,
+                    'wi_number' => null,
+                    'wi_type' => '입고_shipper'
+                ]);
+
+                WarehousingItem::insert([
+                    'item_no' => $warehousing_item['item_no'],
+                    'w_no' => $w_no,
+                    'wi_number' => isset($warehousing_item['wi_number']) ? $warehousing_item['wi_number'] : null,
+                    'wi_type' => '입고_spasys'
+                ]);
+                $w_amount += $warehousing_item['wi_number'];
+            }
+
+            Warehousing::Where('w_no', $w_no_data)->update([
+                'w_amount' =>  $w_amount,
+                
+            ]);
+        }
 
 
-        //    ReceivingGoodsDelivery::insertGetId([
-        //         'mb_no' => $member->mb_no,
-        //         'w_no' => $w_no_data,
-        //         'service_korean_name' => "수입풀필먼트",
-        //         'rgd_status1' => '입고',
-        //         'rgd_status2' => '작업완료',
-        //     ]);
-
-        //     $w_no = isset($validated['w_no']) ? $validated['w_no'] : $w_no_data;
-
-        //     if (isset($w_no)) {
-        //         $w_schedule_number = (new CommonFunc)->generate_w_schedule_number($w_no, 'IW');
-        //     }
-
-        //     Warehousing::where('w_no', $w_no)->update([
-        //         'w_schedule_number' =>  $w_schedule_number
-        //     ]);
-
-
-
-        // WarehousingItem::insert([
-        //     'item_no' => $warehousing_item['item_no'],
-        //     'w_no' => $w_no,
-        //     'wi_number' => isset($warehousing_item['warehousing_item'][0]['wi_number']) ? $warehousing_item['warehousing_item'][0]['wi_number'] : null,
-        //     'wi_type' => '입고_shipper'
-        // ]);
-
-        // WarehousingItem::insert([
-        //     'item_no' => $warehousing_item['item_no'],
-        //     'w_no' => $w_no,
-        //     'wi_number' => isset($warehousing_item['warehousing_item2'][0]['wi_number']) ? $warehousing_item['warehousing_item2'][0]['wi_number'] : null,
-        //     'wi_type' => '입고_spasys'
-        // ]);
-        return $test;
         Storage::disk('public')->delete($f);
+        //return $test_i;
         if ($check_error == true) {
             DB::rollback();
             return response()->json([
@@ -5221,7 +5286,6 @@ class WarehousingController extends Controller
                 'status' => 2,
                 'errors' => $errors,
                 'data_item_count' => $data_item_count,
-
             ], 201);
         } else {
             DB::commit();
@@ -5230,7 +5294,6 @@ class WarehousingController extends Controller
                 'errors' => $errors,
                 'status' => 1,
                 'data_item_count' => $data_item_count,
-
             ], 201);
         }
 
