@@ -113,6 +113,15 @@ class ManualController extends Controller
     {
         try {
            $validated = $request->validated();
+           if(isset($validated['delete_image'])){
+            foreach ($request->delete_image as $key => $val) {
+                $file = File::where('file_table_key', $val)->where('file_table', 'manual')->first();
+                if($file){
+                    $url = Storage::disk('public')->delete($file->file_url);
+                    $file->delete();
+                }
+            }
+           }
            foreach ($request->data_menu as $key => $val) {
                 if(isset($val['man_no'])){
                 $manual = Manual::find($val['man_no']); 

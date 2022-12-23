@@ -41,7 +41,7 @@ class ManualUpdateRequest extends BaseFormRequest
                 'string',
                 'max:255',
             ],
-            "file" => [
+            "delete_image" => [
                 'array',
                 'nullable'
             ],
