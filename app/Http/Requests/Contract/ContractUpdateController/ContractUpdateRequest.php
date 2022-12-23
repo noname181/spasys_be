@@ -96,6 +96,8 @@ class ContractUpdateRequest extends BaseFormRequest
             ],
             'cp_card_cvc' => [
             ],
+            'cp_valid_period' => [
+            ],
             'c_account_number' => [
                 'max:255'
             ],
