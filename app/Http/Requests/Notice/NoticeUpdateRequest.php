@@ -29,13 +29,10 @@ class NoticeUpdateRequest extends BaseFormRequest
                 'integer',
             ],
             'notice_title' => [
-                'required',
-                'string',
-                'max:255',
+                '',
             ],
             'notice_content' => [
-                'required',
-                'string',
+                '',
             ],
             'notice_target' => [
                 'required',

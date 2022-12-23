@@ -105,6 +105,8 @@ class ContractController extends Controller
                     'cp_card_name' => isset($validated['cp_card_name']) ? $validated['cp_card_name'] : null,
                     'cp_card_number' => isset($validated['cp_card_number']) ? $validated['cp_card_number'] : null,
                     'cp_card_cvc' => isset($validated['cp_card_cvc']) ? $validated['cp_card_cvc'] : null,
+                    'cp_valid_period' => isset($validated['cp_valid_period']) ? $validated['cp_valid_period'] : null,
+                    'cp_cvc' => isset($validated['cp_cvc']) ? $validated['cp_cvc'] : null,
                 ]
             );
 
@@ -116,7 +118,7 @@ class ContractController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -240,6 +242,8 @@ class ContractController extends Controller
                     'cp_card_name' => isset($validated['cp_card_name']) ? $validated['cp_card_name'] : null,
                     'cp_card_number' => isset($validated['cp_card_number']) ? $validated['cp_card_number'] : null,
                     'cp_card_cvc' => isset($validated['cp_card_cvc']) ? $validated['cp_card_cvc'] : null,
+                    'cp_valid_period' => isset($validated['cp_valid_period']) ? $validated['cp_valid_period'] : null,
+                    'cp_cvc' => isset($validated['cp_cvc']) ? $validated['cp_cvc'] : null,
                 ]
             );
 
