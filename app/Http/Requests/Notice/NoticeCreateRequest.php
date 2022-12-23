@@ -25,14 +25,10 @@ class NoticeCreateRequest extends BaseFormRequest
     {
         return [
             'notice_title' => [
-                'required',
-                'string',
-                'max:255',
+                '',
             ],
             'notice_content' => [
-                'required',
-                'string',
-                'max:255',
+                '',
             ],
             'notice_target' => [
                 'required',

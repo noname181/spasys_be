@@ -101,6 +101,8 @@ class ContractRegisterRequest extends BaseFormRequest
             ],
             'cp_card_cvc' => [
             ],
+            'cp_valid_period' => [
+            ],
             // 'c_account_number' => [
             //     'required',
             //     'string',
