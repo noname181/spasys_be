@@ -401,7 +401,7 @@ class ImportScheduleController extends Controller
                     })->orderBy('te_carry_out_number', 'DESC');
 
                 //FIX NOT WORK 'with'
-                // $sub = ImportExpected::with(['company', 'receiving_goods_delivery', 'export'])->where('tie_is_date', '>=', '2022-01-04')
+                // $sub = ImportExpected::where('tie_is_date', '>=', '2022-01-04')
                 //     ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                 //     ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 

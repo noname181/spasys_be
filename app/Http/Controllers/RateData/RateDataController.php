@@ -114,7 +114,7 @@ class RateDataController extends Controller
                 $rmd_arr = RateMetaData::where('rmd_number', $rmd->rmd_number)->orderBy('rmd_no', 'DESC')->get();
             }
 
-           
+
 
             foreach ($validated['rate_data'] as $val) {
                 Log::error($val);
@@ -145,7 +145,7 @@ class RateDataController extends Controller
                 'rmd_mail_detail2' => isset($validated['rmd_mail_detail2']) ? $validated['rmd_mail_detail2'] : '',
                 'rmd_mail_detail3' => isset($validated['rmd_mail_detail3']) ? $validated['rmd_mail_detail3'] : '',
             ]);
-        
+
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -1163,6 +1163,18 @@ class RateDataController extends Controller
                     'rdg_sum3' => $request->data3,
                     'rdg_sum4' => $request->data4,
                     'rdg_sum5' => $request->data5,
+
+                    'rdg_supply_price1' => $request->data6,
+                    'rdg_supply_price2' => $request->data7,
+                    'rdg_supply_price3' => $request->data8,
+                    'rdg_supply_price4' => $request->data9,
+                    'rdg_supply_price5' => $request->data10,
+
+                    'rdg_vat1' => $request->data11,
+                    'rdg_vat2' => $request->data12,
+                    'rdg_vat3' => $request->data13,
+                    'rdg_vat4' => $request->data14,
+                    'rdg_vat5' => $request->data15,
                     'mb_no' => $user->mb_no,
                 ]
             );
@@ -1248,9 +1260,9 @@ class RateDataController extends Controller
                     $rmd_arr = RateMetaData::where('rmd_no', $rmd_no)->orWhere('rmd_parent_no', $rmd_no)->orderBy('rmd_no', 'DESC')->get();
                 }
             }
-          
 
-            
+
+
 
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -1787,7 +1799,7 @@ class RateDataController extends Controller
             } else {
                 $rate_data = $rate_data->where('co_no', $co_no);
             }
-            
+
             $rate_data = $rate_data->get();
             $rate_meta_data = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
 
@@ -1796,7 +1808,7 @@ class RateDataController extends Controller
                 'rate_data' => $rate_data,
                 'co_no' => $co_no,
                 'rate_meta_data' => $rate_meta_data
-                
+
                 ], 200);
         } catch (\Exception $e) {
             DB::rollback();
@@ -3322,7 +3334,7 @@ class RateDataController extends Controller
             $rdg = RateDataGeneral::updateOrCreate(
                 [
                     'rdg_no' => isset($is_exist->rdg_no) ? $is_exist->rdg_no : null,
-                    'rdg_bill_type' => $request->bill_type,         
+                    'rdg_bill_type' => $request->bill_type,
                 ],
                 [
                     'w_no' => $w_no,
@@ -7801,7 +7813,7 @@ class RateDataController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $list = CancelBillHistory::with('member')->where('rgd_no', '=', $request->rgd_no)->whereIn('cbh_status_after', ['payment_bill', 'cancel_payment_bill'])->orderBy('cbh_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
-            
+
             return response()->json($list);
         } catch (\Exception $e) {
             return $e;
@@ -7832,7 +7844,7 @@ class RateDataController extends Controller
                 ]);
             }
 
-           
+
 
             DB::commit();
             return response()->json([

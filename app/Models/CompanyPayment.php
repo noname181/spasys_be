@@ -31,6 +31,8 @@ class CompanyPayment extends Model
         'cp_card_number',
         'cp_card_cvc',
         'cp_virtual_account',
+        'cp_cvc',
+        'cp_valid_period'
     ];
 
     protected $casts = [
