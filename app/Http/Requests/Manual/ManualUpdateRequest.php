@@ -46,7 +46,7 @@ class ManualUpdateRequest extends BaseFormRequest
                 'nullable'
             ],
             'file.*' => [
-        
+                'nullable',
                 'file',
                 'max:5000',
                 'mimes:jpg,jpeg,png',

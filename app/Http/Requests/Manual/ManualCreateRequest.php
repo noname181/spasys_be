@@ -46,10 +46,8 @@ class ManualCreateRequest extends BaseFormRequest
                 'nullable'
             ],
             'file.*' => [
-        
-                'file',
-                'max:5000',
-                'mimes:jpg,jpeg,png',
+                'nullable',
+                
             ],
         ];
     }

@@ -74,7 +74,7 @@ class ManualController extends Controller
                 'menu_no' => $val['menu_no'],
                 'man_tab'=>$val['man_tab']
             ]);
-
+            if(isset($validated['file'][$key]) && $validated['file'][$key] != 'undefined'){
             $path = join('/', ['files', 'manual', $manual_no]);
             $url = Storage::disk('public')->put($path, $validated['file'][$key]);
             File::insert([
@@ -87,6 +87,7 @@ class ManualController extends Controller
                 'file_position' => 0,
                 'file_url' => $url
             ]);
+            }
             }
           
 
@@ -120,10 +121,12 @@ class ManualController extends Controller
                 $manual->man_note = $val['man_note']; 
                 $manual->man_title = $val['man_title']; 
                 $manual->save();
-                if(isset($validated['file'][$key])){
+                if(isset($validated['file'][$key]) && $validated['file'][$key] != 'undefined' ){
                     $file = File::where('file_table_key', $val['man_no'])->where('file_table', 'manual')->first();
+                    if($file){
                     $url = Storage::disk('public')->delete($file->file_url);
                     $file->delete();
+                    }
                     
 
                     $path = join('/', ['files', 'manual', $val['man_no']]);
@@ -148,7 +151,7 @@ class ManualController extends Controller
                         'menu_no' => $val['menu_no'],
                         'man_tab'=>$val['man_tab']
                     ]);
-        
+                    if(isset($validated['file'][$key]) && $validated['file'][$key] != 'undefined' ){
                     $path = join('/', ['files', 'manual', $manual_no]);
                     $url = Storage::disk('public')->put($path, $validated['file'][$key]);
                     File::insert([
@@ -161,6 +164,7 @@ class ManualController extends Controller
                         'file_position' => 0,
                         'file_url' => $url
                     ]);
+                    }
                 }
                 
            
