@@ -28,6 +28,7 @@ class ExportConfirm extends Model
          "tec_ec_confirm_number",
          "tec_ec_type",
          "tec_ec_date",
+         "tec_ec_number",
          "tec_register_id",
          "tec_number",
          'created_at',

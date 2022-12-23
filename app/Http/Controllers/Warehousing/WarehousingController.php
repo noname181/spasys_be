@@ -5194,9 +5194,7 @@ class WarehousingController extends Controller
                 }
 
                 $item = $item->first();
-                $custom = collect(['wi_number' => $d['G']]);
-
-                $item = $custom->merge($item);
+                
                 //$test[] = $item;
                 if (!isset($item)) {
                     $data_item_count =  $data_item_count - 1;
@@ -5204,6 +5202,11 @@ class WarehousingController extends Controller
                     $check_error = true;
                 } else {
                     $data_item_count =  $data_item_count + 1;
+
+                    $custom = collect(['wi_number' => $d['G']]);
+
+                    $item = $custom->merge($item);
+
                     $index = $d['A'] . ',' . $d['H'];
                     // if (array_key_exists($index, $out)){
                     //     $out[$index] = $d['A'];
