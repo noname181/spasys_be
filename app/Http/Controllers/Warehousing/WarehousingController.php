@@ -13,6 +13,7 @@ use App\Models\CompanySettlement;
 use App\Models\Company;
 use App\Models\Contract;
 use App\Models\RateData;
+use App\Models\CancelBillHistory;
 use App\Models\TaxInvoiceDivide;
 use App\Models\CashReceipt;
 use App\Models\ImportExpected;
@@ -4276,6 +4277,23 @@ class WarehousingController extends Controller
         }
     }
 
+    public function get_tax_history(Request $request) //page277
+
+    {
+        try {
+            $per_page = isset($$request['per_page']) ? $$request['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($$request['page']) ? $$request['page'] : 1;
+            $th = CancelBillHistory::with('member')->where('rgd_no', $request->rgd_no)->where('cbh_type', 'tax')->orderby('cbh_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
+
+            return response()->json($th);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
     public function get_tax_invoice_completed_list(WarehousingSearchRequest $request) //page277
 
     {
@@ -4468,13 +4486,13 @@ class WarehousingController extends Controller
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
                     'rgd_tax_invoice_number' => $tax_number ? $tax_number : null,
-                    'rgd_status7' => 'receipted',
+                    'rgd_status7' => 'taxed',
                 ]);
 
                 foreach ($request->tid_list as $tid) {
-                    if (isset($value['tid_no'])) {
+                    if (isset($tid['tid_no'])) {
                         // if(false){
-                        $tid_ = TaxInvoiceDivide::where('tid_no', $value['tid_no']);
+                        $tid_ = TaxInvoiceDivide::where('tid_no', $tid['tid_no']);
                         $tid_->update([
                             'tid_supply_price' => $tid['tid_supply_price'],
                             'tid_vat' => $tid['tid_vat'],
@@ -4490,6 +4508,14 @@ class WarehousingController extends Controller
                             'mb_no' => $user->mb_no,
                         ]);
                         $id = $tid_->first()->tid_no;
+
+                        $cbh = CancelBillHistory::insertGetId([
+                            'rgd_no' => $request->rgd_no,
+                            'mb_no' => $user->mb_no,
+                            'cbh_type' => 'tax',
+                            'cbh_status_after' => 'edited'
+                        ]);
+
                     } else {
                         $id = TaxInvoiceDivide::insertGetId([
                             'tid_supply_price' => $tid['tid_supply_price'],
@@ -4505,6 +4531,13 @@ class WarehousingController extends Controller
                             'rgd_number' => $tax_number ? $tax_number : null,
                             'mb_no' => $user->mb_no,
                         ]);
+
+                        $cbh = CancelBillHistory::insertGetId([
+                            'rgd_no' => $request->rgd_no,
+                            'mb_no' => $user->mb_no,
+                            'cbh_type' => 'tax',
+                            'cbh_status_after' => 'issued'
+                        ]);
                     }
                     $ids[] = $id;
                 }
@@ -4516,8 +4549,7 @@ class WarehousingController extends Controller
                     'message' => Messages::MSG_0007,
                     'tid_list' => $tids,
                 ]);
-            }
-            if ($request->type == 'receipt') {
+            } else if ($request->type == 'receipt') {
                 $user = Auth::user();
 
                 $tids = CashReceipt::where('rgd_no', $request->rgd_no)->get();
@@ -4530,9 +4562,9 @@ class WarehousingController extends Controller
                 ]);
 
                 foreach ($request->tid_list as $tid) {
-                    if (isset($value['cr_no'])) {
+                    if (isset($tid['cr_no'])) {
                         // if(false){
-                        $tid_ = CashReceipt::where('cr_no', $value['cr_no']);
+                        $tid_ = CashReceipt::where('cr_no', $tid['cr_no']);
                         $tid_->update([
                             'cr_supply_price' => $tid['tid_supply_price'],
                             'cr_vat' => $tid['tid_vat'],
@@ -4548,6 +4580,13 @@ class WarehousingController extends Controller
                             'mb_no' => $user->mb_no,
                         ]);
                         $id = $tid_->first()->tid_no;
+
+                        $cbh = CancelBillHistory::insertGetId([
+                            'rgd_no' => $request->rgd_no,
+                            'mb_no' => $user->mb_no,
+                            'cbh_type' => 'tax',
+                            'cbh_status_after' => 'edited'
+                        ]);
                     } else {
                         $id = CashReceipt::insertGetId([
                             'cr_supply_price' => $tid['tid_supply_price'],
@@ -4562,6 +4601,13 @@ class WarehousingController extends Controller
                             'co_address' => $request['company']['co_address'],
                             'rgd_number' => $tax_number ? $tax_number : null,
                             'mb_no' => $user->mb_no,
+                        ]);
+
+                        $cbh = CancelBillHistory::insertGetId([
+                            'rgd_no' => $request->rgd_no,
+                            'mb_no' => $user->mb_no,
+                            'cbh_type' => 'tax',
+                            'cbh_status_after' => 'issued'
                         ]);
                     }
                     $ids[] = $id;
@@ -4591,6 +4637,13 @@ class WarehousingController extends Controller
                         'rgd_status7' => 'taxed',
                         'tid_no' => $id
                     ]);
+
+                    $cbh = CancelBillHistory::insertGetId([
+                        'rgd_no' => $rgd['rgd_no'],
+                        'mb_no' => $user->mb_no,
+                        'cbh_type' => 'tax',
+                        'cbh_status_after' => 'issued'
+                    ]);
                 }
                 DB::commit();
                 return response()->json([
@@ -4612,6 +4665,14 @@ class WarehousingController extends Controller
                         'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
                         'rgd_status7' => 'taxed',
                     ]);
+
+                    $cbh = CancelBillHistory::insertGetId([
+                        'rgd_no' => $rgd['rgd_no'],
+                        'mb_no' => $user->mb_no,
+                        'cbh_type' => 'tax',
+                        'cbh_status_after' => 'issued'
+                    ]);
+
                 }
                 DB::commit();
                 return response()->json([

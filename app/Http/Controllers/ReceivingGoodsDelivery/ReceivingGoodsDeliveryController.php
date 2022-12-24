@@ -2213,7 +2213,7 @@ class ReceivingGoodsDeliveryController extends Controller
     public function update_status7(Request $request)
     {
         try {
-
+            $user = Auth::user();
             if ($request->type == 'add_all') {
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
                 TaxInvoiceDivide::where('tid_no', $rgd->tid_no)->delete();
@@ -2223,12 +2223,28 @@ class ReceivingGoodsDeliveryController extends Controller
                     'rgd_tax_invoice_number' => NULL,
                     'tid_no' => NULL,
                 ]);
+
+                
+                $cbh = CancelBillHistory::insertGetId([
+                    'rgd_no' => $request->rgd_no,
+                    'mb_no' => $user->mb_no,
+                    'cbh_type' => 'tax',
+                    'cbh_status_after' => 'cancelled'
+                ]);
             } else {
                 ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_status7' => NULL,
                     'rgd_tax_invoice_date' => NULL,
                     'rgd_tax_invoice_number' => NULL,
                     'tid_no' => NULL,
+                ]);
+
+                
+                $cbh = CancelBillHistory::insertGetId([
+                    'rgd_no' => $request->rgd_no,
+                    'mb_no' => $user->mb_no,
+                    'cbh_type' => 'tax',
+                    'cbh_status_after' => 'cancelled'
                 ]);
             }
 
@@ -2245,7 +2261,7 @@ class ReceivingGoodsDeliveryController extends Controller
             ], 201);
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
