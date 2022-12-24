@@ -4632,8 +4632,11 @@ class WarehousingController extends Controller
                 ]);
 
                 foreach ($request->rgds as $rgd) {
+                    $tax_number = CommonFunc::generate_tax_number($rgd['rgd_no']);
+
                     $rgd_ = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
                         'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
+                        'rgd_tax_invoice_number' => $tax_number ? $tax_number : null,
                         'rgd_status7' => 'taxed',
                         'tid_no' => $id
                     ]);
@@ -4661,9 +4664,12 @@ class WarehousingController extends Controller
                         'mb_no' => $user->mb_no,
                     ]);
 
+                    $tax_number = CommonFunc::generate_tax_number($rgd['rgd_no']);
+                    
                     $rgd_ = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
                         'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
                         'rgd_status7' => 'taxed',
+                        'rgd_tax_invoice_number' => $tax_number ? $tax_number : null,
                     ]);
 
                     $cbh = CancelBillHistory::insertGetId([
