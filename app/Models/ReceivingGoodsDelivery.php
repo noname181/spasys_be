@@ -51,6 +51,7 @@ class ReceivingGoodsDelivery extends Model
         'rgd_paid_date',
         'rgd_tax_invoice_number',
         'rgd_integrated_calculate_yn',
+        'rgd_calculate_deadline_yn',
         'created_at',
         'updated_at',
     ];

@@ -2315,6 +2315,7 @@ class RateDataController extends Controller
                     'rgd_issue_date' => Carbon::now()->toDateTimeString(),
                     'rgd_bill_type' => $request->bill_type,
                     'rgd_settlement_number' => $request->settlement_number ? $request->settlement_number : $rgd->rgd_settlement_number,
+                    'rgd_calculate_deadline_yn' => $request->rgd_calculate_deadline_yn ? $request->rgd_calculate_deadline_yn : '',
                 ]);
             }
 
