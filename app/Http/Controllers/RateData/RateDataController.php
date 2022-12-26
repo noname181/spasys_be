@@ -7812,7 +7812,7 @@ class RateDataController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $list = CancelBillHistory::with('member')->where('rgd_no', '=', $request->rgd_no)->whereIn('cbh_status_after', ['payment_bill', 'cancel_payment_bill'])->orderBy('cbh_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
+            $list = CancelBillHistory::with('member')->where('rgd_no', '=', $request->rgd_no)->where('cbh_type', '=', 'payment')->whereIn('cbh_status_after', ['payment_bill', 'cancel_payment_bill'])->orderBy('cbh_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
 
             return response()->json($list);
         } catch (\Exception $e) {
