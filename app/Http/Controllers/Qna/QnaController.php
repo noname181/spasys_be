@@ -299,7 +299,7 @@ class QnaController extends Controller
             }])->with(['member' => function($query){
 
             }])
-            ->orderBy('qna_no', 'DESC')->where('depth_level', '=', '0');
+            ->orderBy('qna_no', 'DESC')->where('depth_level', '=', '0')->where('qna_status','!=','삭제');
 
             if (isset($validated['from_date'])) {
                 $qna->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
