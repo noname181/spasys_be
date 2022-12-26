@@ -2562,6 +2562,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 'mb_no' => Auth::user()->mb_no,
                 'rgd_no' => $request->rgd_no,
                 'cbh_status_after' => 'payment_bill',
+                'cbh_type' => 'payment',
             ]);
 
             return response()->json([
@@ -2598,6 +2599,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'mb_no' => Auth::user()->mb_no,
                     'rgd_no' => $request->rgd_no,
                     'cbh_status_after' => 'cancel_payment_bill',
+                    'cbh_type' => 'payment',
                 ]);
 
             }
