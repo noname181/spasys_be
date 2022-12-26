@@ -5300,7 +5300,8 @@ class WarehousingController extends Controller
                 'w_type' => 'IW',
                 'w_category_name' => "수입풀필먼트",
                 'co_no' => isset($validated['co_no']) ? $validated['co_no'] : $value[0]['contract_wms']['co_no'],
-                'w_schedule_day' => $strArray[1]
+                'w_schedule_day' => $strArray[1],
+                'w_completed_day' => Carbon::now()->toDateTimeString()
             ]);
 
             ReceivingGoodsDelivery::insertGetId([

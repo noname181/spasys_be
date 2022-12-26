@@ -360,7 +360,7 @@ class ItemController extends Controller
 
             if (isset($validated['co_no']) && Auth::user()->mb_type == "shop") {
                 $items->where('co_no', $validated['co_no']);
-            }elseif(Auth::user()->mb_type == "spasys"){
+            } elseif (Auth::user()->mb_type == "spasys") {
                 $items->where('co_no', $validated['co_no']);
             }
 
@@ -939,7 +939,7 @@ class ItemController extends Controller
                     $q->whereHas('ContractWms.company.co_parent.co_parent', function ($k) use ($user) {
                         $k->where('co_no', $user->co_no);
                     });
-                })->whereNotNull('stock')->orderBy('product_id', 'DESC');
+                })->whereNotNull('stock')->groupby('product_id')->groupby('option_id')->orderBy('product_id', 'DESC');
             }
             if (isset($validated['from_date'])) {
                 $item->whereHas('item_status_bad', function ($q) use ($validated) {
@@ -1038,6 +1038,31 @@ class ItemController extends Controller
                     if (isset($item['item_info']['stock'])) {
                         $q->total_price_row = $item->item_price2 * $item['item_info']['stock'];
                     }
+                    if (isset($q->option_id)) {
+                        $status_0 = StockStatusBad::where('product_id', $q->product_id)->where('option_id', $q->option_id)->where('status', 0)->first();
+                    } else {
+                        $status_0 = StockStatusBad::where('product_id', $q->product_id)->where('status', 0)->first();
+                    }
+                    if (isset($status_0->stock)) {
+                        $q->stock_0 = $status_0->stock;
+                    }
+
+                    if (isset($q->option_id)) {
+                        $status_1 = StockStatusBad::where('product_id', $q->product_id)->where('option_id', $q->option_id)->where('status', 1)->first();
+                    } else {
+                        $status_1 = StockStatusBad::where('product_id', $q->product_id)->where('status', 1)->first();
+                    }
+                    if (isset($status_1->stock)) {
+                        $q->stock_1 = $status_1->stock;
+                    }
+
+                    if (isset($status_0->stock) || isset($status_1->stock)) {
+                        $stock0 = isset($status_0->stock) ? $status_0->stock : 0;
+                        $stock1 = isset($status_1->stock) ? $status_1->stock : 0;
+                        $q->stock_total = $stock1 + $stock0; 
+                    }
+                    
+
                     return $q;
                 })
             );
@@ -2074,7 +2099,7 @@ class ItemController extends Controller
                                 ]
                             );
 
-                           
+
 
                             $item_info_no = ItemInfo::updateOrCreate(
                                 [
@@ -2104,7 +2129,7 @@ class ItemController extends Controller
                         }
                     }
 
-                  
+
                     $item_info_no = ItemInfo::updateOrCreate(
                         [
                             'item_no' => $item_no_all->item_no,

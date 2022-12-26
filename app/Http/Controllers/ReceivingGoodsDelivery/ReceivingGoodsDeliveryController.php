@@ -1367,6 +1367,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'w_amount' => $validated['w_amount'],
                     'w_type' => 'IW',
                     'w_category_name' => $request->w_category_name,
+                    'w_completed_day' => Carbon::now()->toDateTimeString()
                 ]);
             } else {
                 $w_no_data = Warehousing::insertGetId([
@@ -1377,6 +1378,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'w_type' => 'IW',
                     'w_category_name' => $request->w_category_name,
                     'co_no' => isset($validated['co_no']) ? $validated['co_no'] : $co_no,
+                    'w_completed_day' => Carbon::now()->toDateTimeString()
                 ]);
 
                 //THUONG EDIT TO MAKE SETTLEMENT
