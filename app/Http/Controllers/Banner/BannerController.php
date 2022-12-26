@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Member;
+use Carbon\Carbon;
 
 class BannerController extends Controller
 {
@@ -240,6 +241,30 @@ class BannerController extends Controller
             return response()->json($data);
         } catch (\Exception $e) {
             Log::error($e);
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function banner_load()
+    {
+        try {
+            $today = Carbon::now()->format('Y-m-d');
+
+            $banner_login_left = Banner::with('files')
+            ->where('banner_position','=','로그인')
+            ->where('banner_position_detail','=','왼쪽')
+            ->where('banner_use_yn','=','1')
+            ->where('banner_start', '<=', $today)
+            ->where('banner_end', '>=', $today)->latest('created_at')
+            ->first();
+
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'banner_login_left' => $banner_login_left,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }

@@ -299,7 +299,7 @@ class QnaController extends Controller
             }])->with(['member' => function($query){
 
             }])
-            ->orderBy('qna_no', 'DESC')->where('depth_level', '=', '0');
+            ->orderBy('qna_no', 'DESC')->where('depth_level', '=', '0')->where('qna_status','!=','삭제');
 
             if (isset($validated['from_date'])) {
                 $qna->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
@@ -359,7 +359,7 @@ class QnaController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $qna = Qna::where(function ($query) {
+            $qna = Qna::where('qna_status','!=','삭제')->where(function ($query) {
                 $query->where('mb_no_target', '=', Auth::user()->mb_no)
                       ->orWhere('mb_no', '=', Auth::user()->mb_no);
             })->with(['mb_no_target'=>function($query){
