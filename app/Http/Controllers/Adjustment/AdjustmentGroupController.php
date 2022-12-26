@@ -123,6 +123,7 @@ class AdjustmentGroupController extends Controller
                     'ag_hp' => $value['ag_hp'],
                     'ag_manager' => $value['ag_manager'],
                     'ag_email' => $value['ag_email'],
+                    'ag_auto_issue' => $value['ag_auto_issue'],
                 ]);
 
 
