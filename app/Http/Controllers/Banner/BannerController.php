@@ -274,11 +274,29 @@ class BannerController extends Controller
             ->where('banner_end', '>=', $today)->latest('created_at')
             ->first();
 
+            $banner_index_top = Banner::with('files')
+            ->where('banner_position','=','메인')
+            ->where('banner_position_detail','=','상단')
+            ->where('banner_use_yn','=','1')
+            ->where('banner_start', '<=', $today)
+            ->where('banner_end', '>=', $today)->latest('created_at')
+            ->first();
+
+            $banner_index_bottom = Banner::with('files')
+            ->where('banner_position','=','메인')
+            ->where('banner_position_detail','=','하단')
+            ->where('banner_use_yn','=','1')
+            ->where('banner_start', '<=', $today)
+            ->where('banner_end', '>=', $today)->latest('created_at')
+            ->first();
+
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'banner_login_left' => $banner_login_left,
                 'banner_login_right_top' => $banner_login_right_top,
                 'banner_login_right_bottom' => $banner_login_right_bottom,
+                'banner_index_top' => $banner_index_top,
+                'banner_index_bottom' => $banner_index_bottom,
             ]);
         } catch (\Exception $e) {
             Log::error($e);
