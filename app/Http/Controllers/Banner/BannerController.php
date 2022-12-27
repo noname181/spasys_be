@@ -131,7 +131,72 @@ class BannerController extends Controller
             $validated = $request->validated();
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
 
-            $banner = Banner::where('banner_no', $validated['banner_no'])->update([
+           
+             //FILE PART
+
+             $path = join('/', ['files', 'banner', $validated['banner_no']]);
+
+             // remove old image
+
+            //  if($request->remove_files){
+            //      foreach($request->remove_files as $key => $file_no) {
+            //          $file = File::where('file_no', $file_no)->get()->first();
+            //          $url = Storage::disk('public')->delete($path. '/' . $file->file_name);
+            //          $file->delete();
+            //      }
+            //  }
+            if(isset($validated['bannerFiles1'])){
+                $banner = Banner::where('banner_no',$validated['banner_no'])->first();
+                $file_delete = File::where('file_table', 'banner')
+                ->where('file_table_key', $validated['banner_no'])->where('file_name_old',$banner->banner_link1)->first();
+                if(isset($file_delete)){
+                    $url = Storage::disk('public')->delete($path. '/' . $file_delete->file_name);
+                    $file_delete->delete();
+                }
+            }
+            if(isset($validated['bannerFiles2'])){
+                $banner2 = Banner::where('banner_no',$validated['banner_no'])->first();
+                $file_delete2 = File::where('file_table', 'banner')
+                ->where('file_table_key', $validated['banner_no'])->where('file_name_old',$banner2->banner_link2)->first();
+                if(isset($file_delete2)){
+                    $url = Storage::disk('public')->delete($path. '/' . $file_delete2->file_name);
+                    $file_delete2->delete();
+                }
+            }
+            if(isset($validated['bannerFiles3'])){
+                $banner3 = Banner::where('banner_no',$validated['banner_no'])->first();
+                $file_delete3 = File::where('file_table', 'banner')
+                ->where('file_table_key', $validated['banner_no'])->where('file_name_old',$banner3->banner_link3)->first();
+                if(isset($file_delete3)){
+                    $url = Storage::disk('public')->delete($path. '/' . $file_delete3->file_name);
+                    $file_delete3->delete();
+                }
+            }
+            
+
+             $files = [];
+             for($i = 1;$i <= 3;$i++){
+                 $file =  isset($validated['bannerFiles'.$i.'']) ? $validated['bannerFiles'.$i.'']:'';
+                 
+                
+                   
+                
+                 if(!empty($file)){
+                     $url = Storage::disk('public')->put($path, $file);
+                     $files[] = [
+                         'file_table' => 'banner',
+                         'file_table_key' => $validated['banner_no'],
+                         'file_name' => basename($url),
+                         'file_name_old' => $file->getClientOriginalName(),
+                         'file_size' => $file->getSize(),
+                         'file_extension' => $file->extension(),
+                         'file_position' => $i,
+                         'file_url' => $url
+                     ];
+                 }
+             }
+             File::insert($files);
+             $banner = Banner::where('banner_no', $validated['banner_no'])->update([
                 'banner_title' => $validated['banner_title'],
                 'banner_lat' => '',
                 'banner_lng' => '',
@@ -146,47 +211,34 @@ class BannerController extends Controller
                 'banner_link3' => $validated['banner_link3'] ? $validated['banner_link3'] : '',
                 'mb_no' => $member->mb_no,
             ]);
-             //FILE PART
+             DB::commit();
+            //  if($request->hasFile('files')){
+            //      $files = [];
 
-             $path = join('/', ['files', 'banner', $validated['banner_no']]);
+            //      $max_position_file = File::where('file_table', 'banner')->where('file_table_key', $validated['banner_no'])->orderBy('file_position', 'DESC')->get()->first();
+            //      if($max_position_file)
+            //          $i = $max_position_file->file_position + 1;
+            //      else
+            //          $i = 0;
 
-             // remove old image
+            //      foreach($validated['files'] as $key => $file) {
+            //          $url = Storage::disk('public')->put($path, $file);
+            //          $files[] = [
+            //              'file_table' => 'banner',
+            //              'file_table_key' => $validated['banner_no'],
+            //              'file_name_old' => $file->getClientOriginalName(),
+            //              'file_name' => basename($url),
+            //              'file_size' => $file->getSize(),
+            //              'file_extension' => $file->extension(),
+            //              'file_position' => $i,
+            //              'file_url' => $url
+            //          ];
+            //          $i++;
+            //      }
 
-             if($request->remove_files){
-                 foreach($request->remove_files as $key => $file_no) {
-                     $file = File::where('file_no', $file_no)->get()->first();
-                     $url = Storage::disk('public')->delete($path. '/' . $file->file_name);
-                     $file->delete();
-                 }
-             }
+            //     File::insert($files);
 
-             if($request->hasFile('files')){
-                 $files = [];
-
-                 $max_position_file = File::where('file_table', 'banner')->where('file_table_key', $validated['banner_no'])->orderBy('file_position', 'DESC')->get()->first();
-                 if($max_position_file)
-                     $i = $max_position_file->file_position + 1;
-                 else
-                     $i = 0;
-
-                 foreach($validated['files'] as $key => $file) {
-                     $url = Storage::disk('public')->put($path, $file);
-                     $files[] = [
-                         'file_table' => 'banner',
-                         'file_table_key' => $validated['banner_no'],
-                         'file_name_old' => $file->getClientOriginalName(),
-                         'file_name' => basename($url),
-                         'file_size' => $file->getSize(),
-                         'file_extension' => $file->extension(),
-                         'file_position' => $i,
-                         'file_url' => $url
-                     ];
-                     $i++;
-                 }
-
-                File::insert($files);
-
-             }
+            //  }
 
             return response()->json(['message' => Messages::MSG_0007], 200);
         } catch (\Exception $e) {
