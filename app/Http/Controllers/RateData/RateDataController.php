@@ -2315,6 +2315,7 @@ class RateDataController extends Controller
                     'rgd_issue_date' => Carbon::now()->toDateTimeString(),
                     'rgd_bill_type' => $request->bill_type,
                     'rgd_settlement_number' => $request->settlement_number ? $request->settlement_number : $rgd->rgd_settlement_number,
+                    'rgd_calculate_deadline_yn' => $request->rgd_calculate_deadline_yn ? $request->rgd_calculate_deadline_yn : '',
                 ]);
             }
 
@@ -3242,6 +3243,7 @@ class RateDataController extends Controller
                     'rgd_issue_date' => Carbon::now()->toDateTimeString(),
                     'rgd_bill_type' => $request->bill_type,
                     'rgd_settlement_number' => $request->settlement_number,
+                    'rgd_calculate_deadline_yn' => $request->rgd_calculate_deadline_yn ? $request->rgd_calculate_deadline_yn : '',
                 ]);
             } else if ($request->bill_type == 'additional' && $request->type != 'edit_additional') {
                 $previous_rgd->rgd_status5 = 'issued';
@@ -3383,6 +3385,7 @@ class RateDataController extends Controller
                     'rgd_storage_days' => $request->storage_days,
                     'rgd_settlement_number' => $request->rgd_settlement_number,
                     'rgd_integrated_calculate_yn'=> $request->rgd_integrated_calculate_yn,
+                    'rgd_calculate_deadline_yn'=> $request->rgd_calculate_deadline_yn,
                     'mb_no' => Auth::user()->mb_no,
                 ]);
             }

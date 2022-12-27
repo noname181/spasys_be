@@ -49,9 +49,7 @@ class BannerUpdateRequest extends BaseFormRequest
                 'max:255',
             ],
             'banner_position_detail' => [
-                'required',
-                'string',
-                'max:255',
+                '',
             ],
             'banner_start' => [
                 'string',
@@ -83,6 +81,24 @@ class BannerUpdateRequest extends BaseFormRequest
             'banner_link3' => [
 
                 'max:255',
+            ],
+            'bannerFiles1' => [
+                '',
+            ],
+            'bannerFiles1.*' => [
+                'file'
+            ],
+            'bannerFiles2' => [
+                '',
+            ],
+            'bannerFiles2.*' => [
+                'file'
+            ],
+            'bannerFiles3' => [
+                '',
+            ],
+            'bannerFiles3.*' => [
+                'file'
             ],
         ];
     }
