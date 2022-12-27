@@ -2901,6 +2901,58 @@ class RateDataController extends Controller
             } else {
                 $i = 0;
                 $final_rgds = [];
+
+                $rdg_supply_price1 = 0;
+                $rdg_supply_price2 = 0;
+                $rdg_supply_price3 = 0;
+                $rdg_supply_price4 = 0;
+                $rdg_supply_price5 = 0;
+                $rdg_supply_price6 = 0;
+                $rdg_supply_price7 = 0;
+
+                $rdg_vat1 = 0;
+                $rdg_vat2 = 0;
+                $rdg_vat3 = 0;
+                $rdg_vat4 = 0;
+                $rdg_vat5 = 0;
+                $rdg_vat6 = 0;
+                $rdg_vat7 = 0;
+                
+                $rdg_sum1 = 0;
+                $rdg_sum2 = 0;
+                $rdg_sum3 = 0;
+                $rdg_sum4 = 0;
+                $rdg_sum5 = 0;
+                $rdg_sum6 = 0;
+                $rdg_sum7 = 0;
+
+                foreach ($request->rgds as $key => $rgd) {
+                    $is_exist = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', 'expectation_monthly')->first();
+                    $rdg_supply_price1 = $rdg_supply_price1 + $is_exist['rdg_supply_price1'];
+                    $rdg_supply_price2 = $rdg_supply_price2 + $is_exist['rdg_supply_price2'];
+                    $rdg_supply_price3 = $rdg_supply_price3 + $is_exist['rdg_supply_price3'];
+                    $rdg_supply_price4 = $rdg_supply_price4 + $is_exist['rdg_supply_price4'];
+                    $rdg_supply_price5 = $rdg_supply_price5 + $is_exist['rdg_supply_price5'];
+                    $rdg_supply_price6 = $rdg_supply_price6 + $is_exist['rdg_supply_price6'];
+                    $rdg_supply_price7 = $rdg_supply_price7 + $is_exist['rdg_supply_price7'];
+    
+                    $rdg_vat1 = $rdg_vat1 + $is_exist['rdg_vat1'];
+                    $rdg_vat2 = $rdg_vat2 + $is_exist['rdg_vat2'];
+                    $rdg_vat3 = $rdg_vat3 + $is_exist['rdg_vat3'];
+                    $rdg_vat4 = $rdg_vat4 + $is_exist['rdg_vat4'];
+                    $rdg_vat5 = $rdg_vat5 + $is_exist['rdg_vat5'];
+                    $rdg_vat6 = $rdg_vat6 + $is_exist['rdg_vat6'];
+                    $rdg_vat7 = $rdg_vat7 + $is_exist['rdg_vat7'];
+                    
+                    $rdg_sum1 = $rdg_sum1 + $is_exist['rdg_sum1'];
+                    $rdg_sum2 = $rdg_sum2 + $is_exist['rdg_sum2'];
+                    $rdg_sum3 = $rdg_sum3 + $is_exist['rdg_sum3'];
+                    $rdg_sum4 = $rdg_sum4 + $is_exist['rdg_sum4'];
+                    $rdg_sum5 = $rdg_sum5 + $is_exist['rdg_sum5'];
+                    $rdg_sum6 = $rdg_sum6 + $is_exist['rdg_sum6'];
+                    $rdg_sum7 = $rdg_sum7 + $is_exist['rdg_sum7'];
+                }
+
                 foreach ($request->rgds as $key => $rgd) {
                     $is_exist = RateDataGeneral::where('rgd_no_expectation', $rgd['rgd_no'])->where('rdg_bill_type', 'final_monthly')->first();
                     if (!$is_exist) {
@@ -2908,6 +2960,31 @@ class RateDataController extends Controller
 
                         $final_rdg = $is_exist->replicate();
                         $final_rdg->rdg_bill_type = $request->bill_type; // the new project_id
+
+                        $final_rdg->rdg_supply_price1 = $rdg_supply_price1;
+                        $final_rdg->rdg_supply_price2 = $rdg_supply_price2;
+                        $final_rdg->rdg_supply_price3 = $rdg_supply_price3;
+                        $final_rdg->rdg_supply_price4 = $rdg_supply_price4;
+                        $final_rdg->rdg_supply_price5 = $rdg_supply_price5;
+                        $final_rdg->rdg_supply_price6 = $rdg_supply_price6;
+                        $final_rdg->rdg_supply_price7 = $rdg_supply_price7;
+                        
+                        $final_rdg->rdg_vat1 = $rdg_vat1;
+                        $final_rdg->rdg_vat2 = $rdg_vat2;
+                        $final_rdg->rdg_vat3 = $rdg_vat3;
+                        $final_rdg->rdg_vat4 = $rdg_vat4;
+                        $final_rdg->rdg_vat5 = $rdg_vat5;
+                        $final_rdg->rdg_vat6 = $rdg_vat6;
+                        $final_rdg->rdg_vat7 = $rdg_vat7;
+
+                        $final_rdg->rdg_sum1 = $rdg_sum1;
+                        $final_rdg->rdg_sum2 = $rdg_sum2;
+                        $final_rdg->rdg_sum3 = $rdg_sum3;
+                        $final_rdg->rdg_sum4 = $rdg_sum4;
+                        $final_rdg->rdg_sum5 = $rdg_sum5;
+                        $final_rdg->rdg_sum6 = $rdg_sum6;
+                        $final_rdg->rdg_sum7 = $rdg_sum7;
+
                         $final_rdg->save();
                     } else {
                         $final_rdg = $is_exist;
@@ -2992,6 +3069,34 @@ class RateDataController extends Controller
             } else {
                 $i = 0;
                 $final_rgds = [];
+
+                foreach ($request->rgds as $key => $rgd) {
+                    $is_exist = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', 'expectation_monthly')->first();
+                    $rdg_supply_price1 = $rdg_supply_price1 + $is_exist['rdg_supply_price1'];
+                    $rdg_supply_price2 = $rdg_supply_price2 + $is_exist['rdg_supply_price2'];
+                    $rdg_supply_price3 = $rdg_supply_price3 + $is_exist['rdg_supply_price3'];
+                    $rdg_supply_price4 = $rdg_supply_price4 + $is_exist['rdg_supply_price4'];
+                    $rdg_supply_price5 = $rdg_supply_price5 + $is_exist['rdg_supply_price5'];
+                    $rdg_supply_price6 = $rdg_supply_price6 + $is_exist['rdg_supply_price6'];
+                    $rdg_supply_price7 = $rdg_supply_price7 + $is_exist['rdg_supply_price7'];
+    
+                    $rdg_vat1 = $rdg_vat1 + $is_exist['rdg_vat1'];
+                    $rdg_vat2 = $rdg_vat2 + $is_exist['rdg_vat2'];
+                    $rdg_vat3 = $rdg_vat3 + $is_exist['rdg_vat3'];
+                    $rdg_vat4 = $rdg_vat4 + $is_exist['rdg_vat4'];
+                    $rdg_vat5 = $rdg_vat5 + $is_exist['rdg_vat5'];
+                    $rdg_vat6 = $rdg_vat6 + $is_exist['rdg_vat6'];
+                    $rdg_vat7 = $rdg_vat7 + $is_exist['rdg_vat7'];
+                    
+                    $rdg_sum1 = $rdg_sum1 + $is_exist['rdg_sum1'];
+                    $rdg_sum2 = $rdg_sum2 + $is_exist['rdg_sum2'];
+                    $rdg_sum3 = $rdg_sum3 + $is_exist['rdg_sum3'];
+                    $rdg_sum4 = $rdg_sum4 + $is_exist['rdg_sum4'];
+                    $rdg_sum5 = $rdg_sum5 + $is_exist['rdg_sum5'];
+                    $rdg_sum6 = $rdg_sum6 + $is_exist['rdg_sum6'];
+                    $rdg_sum7 = $rdg_sum7 + $is_exist['rdg_sum7'];
+                }
+
                 foreach ($request->rgds as $key => $rgd) {
                     $is_exist = RateDataGeneral::where('rgd_no_expectation', $rgd['rgd_no'])->where('rdg_bill_type', 'final_monthly')->first();
                     if (!$is_exist) {
@@ -2999,6 +3104,31 @@ class RateDataController extends Controller
 
                         $final_rdg = $is_exist->replicate();
                         $final_rdg->rdg_bill_type = $request->bill_type; // the new project_id
+
+                        $final_rdg->rdg_supply_price1 = $rdg_supply_price1;
+                        $final_rdg->rdg_supply_price2 = $rdg_supply_price2;
+                        $final_rdg->rdg_supply_price3 = $rdg_supply_price3;
+                        $final_rdg->rdg_supply_price4 = $rdg_supply_price4;
+                        $final_rdg->rdg_supply_price5 = $rdg_supply_price5;
+                        $final_rdg->rdg_supply_price6 = $rdg_supply_price6;
+                        $final_rdg->rdg_supply_price7 = $rdg_supply_price7;
+                        
+                        $final_rdg->rdg_vat1 = $rdg_vat1;
+                        $final_rdg->rdg_vat2 = $rdg_vat2;
+                        $final_rdg->rdg_vat3 = $rdg_vat3;
+                        $final_rdg->rdg_vat4 = $rdg_vat4;
+                        $final_rdg->rdg_vat5 = $rdg_vat5;
+                        $final_rdg->rdg_vat6 = $rdg_vat6;
+                        $final_rdg->rdg_vat7 = $rdg_vat7;
+
+                        $final_rdg->rdg_sum1 = $rdg_sum1;
+                        $final_rdg->rdg_sum2 = $rdg_sum2;
+                        $final_rdg->rdg_sum3 = $rdg_sum3;
+                        $final_rdg->rdg_sum4 = $rdg_sum4;
+                        $final_rdg->rdg_sum5 = $rdg_sum5;
+                        $final_rdg->rdg_sum6 = $rdg_sum6;
+                        $final_rdg->rdg_sum7 = $rdg_sum7;
+                        
                         $final_rdg->save();
                     } else {
                         $final_rdg = $is_exist;
