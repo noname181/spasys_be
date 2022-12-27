@@ -289,10 +289,12 @@ class ScheduleShipmentController extends Controller
         }
     }   
     public function apiScheduleShipmentsRaw($data_schedule = null)
-    {
+    {   
+        //return $data_schedule;
         try {
             DB::beginTransaction();
             $user = Auth::user();
+           
                 foreach ($data_schedule as $i_schedule => $schedule) {
                     foreach($schedule['data_item'] as $schedule_item){
                         if (str_contains($schedule_item['shop_product_id'], 'S')) { 
@@ -329,10 +331,10 @@ class ScheduleShipmentController extends Controller
                             'status' => isset($schedule_item['trans_no']) && $schedule_item['trans_no'] != '' ? '출고' : '출고예정',
                             'order_cs' => isset($schedule_item['order_cs']) ? $schedule_item['order_cs'] : null,
                             'collect_date' => isset($schedule_item['collect_date']) ? $schedule_item['collect_date'] : null,
-                            'order_date' => !empty($schedule_item['order_date']) ? ((int)$schedule_item['order_date'] > 2022 ? $schedule_item['order_date'] : null) : null,
-                            'trans_date' => !empty($schedule_item['trans_date']) ? $schedule_item['trans_date'] : null,
-                            'trans_date_pos' => !empty($schedule_item['trans_date_pos']) ? $schedule_item['trans_date_pos'] : null,
-                            'shopstat_date' => isset($schedule_item['shopstat_date']) ? $schedule_item['shopstat_date'] : null,
+                            'order_date' => isset($schedule_item['order_date']) ? ((int)$schedule_item['order_date'] > 2022 ? $schedule_item['order_date'] : null) : null,
+                            'trans_date' => isset($schedule_item['trans_date']) && $schedule_item['trans_date'] != '0000-00-00 00:00:00' && $schedule_item['trans_date'] != '' ? $schedule_item['trans_date'] : null,
+                            'trans_date_pos' => isset($schedule_item['trans_date_pos']) && $schedule_item['trans_date_pos'] != '0000-00-00 00:00:00' && $schedule_item['trans_date_pos'] != '' ? $schedule_item['trans_date_pos'] : null,
+                            'shopstat_date' => isset($schedule_item['shopstat_date']) && $schedule_item['shopstat_date'] != '' ? $schedule_item['shopstat_date'] : null,
                             'supply_price' => isset($schedule_item['supply_price']) ? $schedule_item['supply_price'] : null,
                             'amount' => isset($schedule_item['amount']) ? $schedule_item['amount'] : null,
                             'extra_money' => isset($schedule_item['extra_money']) ? $schedule_item['extra_money'] : null,
@@ -347,6 +349,9 @@ class ScheduleShipmentController extends Controller
                             'sub_domain' => isset($schedule_item['sub_domain']) ? $schedule_item['sub_domain'] : null,
                             'sub_domain_seq' => isset($schedule_item['sub_domain_seq']) ? $schedule_item['sub_domain_seq'] : null,
                         ];
+                        // if($i_schedule == "100001"){
+                        //     return $schedule_item['order_id'];
+                        // }
                         if(isset($schedule_item['order_id'])) $ss_no = ScheduleShipment::updateOrCreate(['order_id' => $i_schedule],$data_schedule);
                         if( $ss_no->ss_no && isset($schedule_item['order_products'])){
                             $check_fisrt = 0;
@@ -675,7 +680,7 @@ class ScheduleShipmentController extends Controller
         if($filter['page'] != ''){
             $url_api .= '&page='.$filter['page'];
         }
-       
+        
         $response = file_get_contents($url_api);
         $api_data = json_decode($response,1);
         return $api_data;
@@ -732,20 +737,27 @@ class ScheduleShipmentController extends Controller
             'page' => '1'
         );
         $base_schedule_datas = $this->requestDataAPI($param_arrays); //Get Data
+       
         $total_data = (isset($base_schedule_datas['total']) && $base_schedule_datas['total'] > 0)?$base_schedule_datas['total']:0;
         $limit_data = (isset($base_schedule_datas['limit']) && $base_schedule_datas['limit'] > 0)?$base_schedule_datas['limit']:0;
         $check_pages = ($total_data > $limit_data) && $limit_data > 0?(int)ceil($total_data / $limit_data):1; // Check total page to foreach;
+        
+        $test = [];
         if(isset($check_pages)&&$check_pages > 1){
             for($page = 1; $page <= $check_pages; $page++){
                 $param_arrays['page'] = $page;
                 $base_schedule_datas = $this->requestDataAPI($param_arrays); //Get Data
+                $test[] = $base_schedule_datas;
                 $data_schedule = $this->mapDataAPI($base_schedule_datas['data']);
                 if(!empty($data_schedule['data_temp'])){
+                    
                     $this->apiScheduleShipmentsRaw($data_schedule['data_temp']);
+                    
+                
                 }
             }
             return response()->json([
-                'param' => $base_schedule_datas,
+                'param' => $test,
                 'message' => '완료되었습니다.',
                 'status' => 1
             ], 200);
