@@ -46,7 +46,7 @@ class Banner extends Model
 
     public function files()
     {
-        return $this->hasMany(File::class, 'file_table_key', 'banner_no')->where('file_table', 'banner');
+        return $this->hasMany(File::class, 'file_table_key', 'banner_no')->where('file_table', 'banner')->orderBy('file_position');
     }
 
     public function mb_no()
