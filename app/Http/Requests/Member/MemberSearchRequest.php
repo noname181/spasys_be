@@ -56,6 +56,9 @@ class MemberSearchRequest extends BaseFormRequest
                 'nullable',
                 'int',
             ],
+            'co_parent_name' => [
+                '',
+            ],
         ];
     }
 
