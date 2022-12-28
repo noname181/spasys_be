@@ -451,7 +451,11 @@ class ItemController extends Controller
                     $items->where(function ($query) use ($validated) {
                         $query->where(DB::raw('lower(' . $validated['type'] . ')'), 'like', '%' . strtolower($validated['keyword']) . '%');
                     });
-                } else {
+                } else if( $validated['type'] == 'item_channel_code' ) {
+                    $items->where(function ($query) use ($validated) {
+                        $query->where(DB::raw('lower(product_id)'), 'like', '%' . strtolower($validated['keyword']) . '%');
+                    });
+                } else  {
                     $items->whereHas('item_channels', function ($query) use ($validated) {
                         $query->where(DB::raw('lower(' . $validated['type'] . ')'), 'like', '%' . strtolower($validated['keyword']) . '%');
                     });
