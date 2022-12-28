@@ -20,7 +20,11 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Service;
 use App\Models\CompanySettlement;
 use App\Models\Export;
+use App\Models\Import;
+use App\Models\ImportExpected;
+use App\Models\ExportConfirm;
 use Illuminate\Http\Request;
+
 class CompanyController extends Controller
 {
     /**
@@ -93,7 +97,7 @@ class CompanyController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $companies = Company::with(['contract', 'co_parent','company_settlement','company_payment','mb_no'])
+            $companies = Company::with(['contract', 'co_parent', 'company_settlement', 'company_payment', 'mb_no'])
                 ->where(function ($q) use ($user) {
                     $q->where('co_no', $user->co_no)
                         ->orWhereHas('co_parent', function ($q) use ($user) {
@@ -177,20 +181,20 @@ class CompanyController extends Controller
             $companies = $companies->paginate($per_page, ['*'], 'page', $page);
 
             $companies->setCollection(
-                $companies->getCollection()->map(function ($item){
-                    $service_names = explode(" ",$item->co_service);
+                $companies->getCollection()->map(function ($item) {
+                    $service_names = explode(" ", $item->co_service);
                     $co_no = $item->co_no;
 
                     $settlement_cycle = [];
 
-                    foreach($service_names as $service_name){
+                    foreach ($service_names as $service_name) {
                         $service = Service::where('service_name', $service_name)->first();
-                        if(isset($service->service_no)){
+                        if (isset($service->service_no)) {
                             $company_settlement = CompanySettlement::where([
                                 'co_no' => $co_no,
                                 'service_no' => $service->service_no
                             ])->first();
-                            if($company_settlement){
+                            if ($company_settlement) {
                                 $settlement_cycle[] = $company_settlement->cs_payment_cycle;
                             }
                         }
@@ -215,7 +219,7 @@ class CompanyController extends Controller
     {
         try {
             $contract = Contract::where('co_no', $co_no)->first();
-            if(isset($contract->c_no)){
+            if (isset($contract->c_no)) {
                 $company = Company::select([
                     'company.co_no',
                     'company.mb_no',
@@ -239,7 +243,7 @@ class CompanyController extends Controller
                 ])->join('contract', 'contract.co_no', 'company.co_no')->where('company.co_no', $co_no)
                     // ->where('co_address.co_no', $co_no)
                     ->first();
-            }else {
+            } else {
                 $company = Company::select([
                     'company.co_no',
                     'company.mb_no',
@@ -260,7 +264,7 @@ class CompanyController extends Controller
                 ])->where('company.co_no', $co_no)
                     // ->where('co_address.co_no', $co_no)
                     ->first();
-                if($company) {
+                if ($company) {
                     $company->c_integrated_calculate_yn = null;
                     $company->c_calculate_deadline_yn = null;
                 }
@@ -268,7 +272,7 @@ class CompanyController extends Controller
 
 
             $adjustment_groups = AdjustmentGroup::select(['ag_no', 'co_no', 'ag_name', 'ag_manager', 'ag_hp', 'ag_email', 'ag_auto_issue'])->where('co_no', $co_no)->get();
-            $co_address = CoAddress::select(['ca_is_default','ca_no', 'co_no', 'ca_name', 'ca_manager', 'ca_hp', 'ca_address', 'ca_address_detail'])->where('co_no', $co_no)->get();
+            $co_address = CoAddress::select(['ca_is_default', 'ca_no', 'co_no', 'ca_name', 'ca_manager', 'ca_hp', 'ca_address', 'ca_address_detail'])->where('co_no', $co_no)->get();
             $forwarder_info = ForwarderInfo::select(['fi_no', 'co_no', 'fi_name', 'fi_manager', 'fi_hp', 'fi_address', 'fi_address_detail'])->where('co_no', $co_no)->get();
             $customs_info = CustomsInfo::select(['ci_no', 'co_no', 'ci_name', 'ci_manager', 'ci_hp', 'ci_address', 'ci_address_detail'])->where('co_no', $co_no)->get();
             $manager = Manager::where('co_no', $co_no)->first();
@@ -287,7 +291,7 @@ class CompanyController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            
+
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -349,14 +353,14 @@ class CompanyController extends Controller
             //     ->update([
             //         'co_license' => $request->co_license,
             //     ]);
-                $update = Company::updateOrCreate(
-                    [
-                        'co_no' =>  $company->co_no
-                    ],
-                    [
-                        'co_license' => $request->co_license,
-                    ]
-                );
+            $update = Company::updateOrCreate(
+                [
+                    'co_no' =>  $company->co_no
+                ],
+                [
+                    'co_license' => $request->co_license,
+                ]
+            );
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -421,10 +425,27 @@ class CompanyController extends Controller
     }
     public function getCompanyFromtcon($tcon)
     {
-        $export = Export::with(['import','import_expected','t_export_confirm'])->where('te_carry_out_number', $tcon)->first();
-        $company = Company::where('co_license',$export->import_expected->tie_co_license)->first();
-        $adjustment_group = AdjustmentGroup::where('co_no','=',$company->co_no)->first();
-        return response()->json(['export'=>$export,'company'=>$company,'adjustment_group'=>$adjustment_group]);
+
+        $export = Export::with(['import', 'import_expected', 't_export_confirm'])->where('te_carry_out_number', $tcon)->first();
+        if (isset($export)) {
+            $company = Company::where('co_license', $export->import_expected->tie_co_license)->first();
+            $adjustment_group = AdjustmentGroup::where('co_no', '=', $company->co_no)->first();
+        } else {
+            $export = [];
+            $import = Import::with(['import_expect', 'export_confirm'])->where('ti_carry_in_number', $tcon)->first();
+            if (isset($import)) {
+                $export['import'] = $import;
+                $company = Company::where('co_license', $import->import_expect->tie_co_license)->first();
+                $adjustment_group = AdjustmentGroup::where('co_no', '=', $company->co_no)->first();
+            } else {
+                $import_expected = ImportExpected::where('tie_logistic_manage_number', $tcon)->first();
+                $export['import_expected'] = $import_expected;
+                $company = Company::where('co_license', $import_expected->tie_co_license)->first();
+                $adjustment_group = AdjustmentGroup::where('co_no', '=', $company->co_no)->first();
+            }
+        }
+
+        return response()->json(['export' => $export, 'company' => $company, 'adjustment_group' => $adjustment_group]);
     }
     public function  getShopCompaniesMobile(CompanySearchRequest $request)
     {
@@ -434,7 +455,7 @@ class CompanyController extends Controller
 
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : '';
 
-            $companies = Company::with(['contract', 'co_parent','adjustment_group'])->where('co_type', 'shop')->orderBy('co_no', 'DESC');
+            $companies = Company::with(['contract', 'co_parent', 'adjustment_group'])->where('co_type', 'shop')->orderBy('co_no', 'DESC');
 
 
             $companies->whereHas('co_parent', function ($query) use ($co_no) {
@@ -484,21 +505,20 @@ class CompanyController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : '';
             $user = Auth::user();
-            if($user->mb_type == "shop"){
-                $companies = Company::with(['contract', 'co_parent','warehousing'])->where('co_type', 'shipper')->orderBy('co_no', 'DESC');
+            if ($user->mb_type == "shop") {
+                $companies = Company::with(['contract', 'co_parent', 'warehousing'])->where('co_type', 'shipper')->orderBy('co_no', 'DESC');
 
 
                 $companies->whereHas('co_parent', function ($query) use ($user) {
                     $query->where('co_no', '=',  $user->co_no);
                 });
-            }else{
-                $companies = Company::with(['contract','co_parent'])->with('warehousing')->where('co_type', 'shipper')->
-                whereIn('co_parent_no', function($query) use ($user){
-                    $query->select('co_no')
-                      ->from(with(new Company)->getTable())
-                      ->where('co_type', 'shop')
-                      ->where('co_parent_no', $user->co_no);
-                 })->orderBy('co_no', 'DESC');
+            } else {
+                $companies = Company::with(['contract', 'co_parent'])->with('warehousing')->where('co_type', 'shipper')->whereIn('co_parent_no', function ($query) use ($user) {
+                        $query->select('co_no')
+                            ->from(with(new Company)->getTable())
+                            ->where('co_type', 'shop')
+                            ->where('co_parent_no', $user->co_no);
+                    })->orderBy('co_no', 'DESC');
             }
             //$companies = Company::with('contract')->with('warehousing')->where('co_type', 'shipper')->where('co_parent_no', $user->co_no)->orderBy('co_no', 'DESC');
 
@@ -551,24 +571,23 @@ class CompanyController extends Controller
             $user = Auth::user();
             $page = isset($validated['page']) ? $validated['page'] : 1;
 
-            if($validated['type'] == "shop"){
+            if ($validated['type'] == "shop") {
                 $companies = Company::with(['contract', 'co_parent'])->where('co_type', 'shop')->orderBy('co_no', 'DESC');
 
 
                 $companies->whereHas('co_parent', function ($query) use ($co_no) {
                     $query->where('co_no', '=',  $co_no);
                 });
-            }else{
+            } else {
                 // $companies_shop_id = Company::with('contract')->with('warehousing')->where('co_type', 'shop')
                 // ->where('co_parent_no', $user->co_no)->orderBy('co_no', 'DESC')->pluck('co_no')->toArray();
 
-                $companies = Company::with(['contract','co_parent'])->with('warehousing')->where('co_type', 'shipper')->
-                whereIn('co_parent_no', function($query) use ($user){
-                    $query->select('co_no')
-                      ->from(with(new Company)->getTable())
-                      ->where('co_type', 'shop')
-                      ->where('co_parent_no', $user->co_no);
-                 })->orderBy('co_no', 'DESC');
+                $companies = Company::with(['contract', 'co_parent'])->with('warehousing')->where('co_type', 'shipper')->whereIn('co_parent_no', function ($query) use ($user) {
+                        $query->select('co_no')
+                            ->from(with(new Company)->getTable())
+                            ->where('co_type', 'shop')
+                            ->where('co_parent_no', $user->co_no);
+                    })->orderBy('co_no', 'DESC');
             }
 
             if (isset($validated['from_date'])) {
@@ -614,21 +633,20 @@ class CompanyController extends Controller
             $user = Auth::user();
             //$companies = Company::with('contract')->with('warehousing')->where('co_type', 'shipper')->where('co_parent_no', $user->co_no)->orderBy('co_no', 'DESC');
 
-            if($user->mb_type == "shop"){
-                $companies = Company::with(['contract', 'co_parent','warehousing'])->where('co_type', 'shipper')->orderBy('co_no', 'DESC');
+            if ($user->mb_type == "shop") {
+                $companies = Company::with(['contract', 'co_parent', 'warehousing'])->where('co_type', 'shipper')->orderBy('co_no', 'DESC');
 
 
                 $companies->whereHas('co_parent', function ($query) use ($user) {
                     $query->where('co_no', '=',  $user->co_no);
                 });
-            }else{
-                $companies = Company::with(['contract','co_parent'])->with('warehousing')->where('co_type', 'shipper')->
-                whereIn('co_parent_no', function($query) use ($user){
-                    $query->select('co_no')
-                      ->from(with(new Company)->getTable())
-                      ->where('co_type', 'shop')
-                      ->where('co_parent_no', $user->co_no);
-                 })->orderBy('co_no', 'DESC');
+            } else {
+                $companies = Company::with(['contract', 'co_parent'])->with('warehousing')->where('co_type', 'shipper')->whereIn('co_parent_no', function ($query) use ($user) {
+                        $query->select('co_no')
+                            ->from(with(new Company)->getTable())
+                            ->where('co_type', 'shop')
+                            ->where('co_parent_no', $user->co_no);
+                    })->orderBy('co_no', 'DESC');
             }
 
             // if (isset($validated['w_no'])) {
@@ -676,7 +694,7 @@ class CompanyController extends Controller
             $user = Auth::user();
             $companies2 = "";
 
-            if($validated['type'] == 'shop'){
+            if ($validated['type'] == 'shop') {
                 $companies = Company::with('contract')->with('warehousing')->where('co_type', 'shipper')->where('co_parent_no', $user->co_no)->orderBy('co_no', 'DESC');
 
                 if (isset($validated['w_no'])) {
@@ -686,7 +704,7 @@ class CompanyController extends Controller
                     });
                     $companies2 = $companies2->first();
                 }
-            }else{
+            } else {
                 $companies = Company::with('contract')->with('warehousing')->where('co_type', 'shipper')->orderBy('co_no', 'DESC');
 
                 if (isset($validated['w_no'])) {
@@ -702,7 +720,7 @@ class CompanyController extends Controller
 
             $companies = $companies->get();
 
-            return response()->json(['data' => $companies,'selected' => $companies2 ]);
+            return response()->json(['data' => $companies, 'selected' => $companies2]);
         } catch (\Exception $e) {
             Log::error($e);
 
@@ -756,23 +774,24 @@ class CompanyController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
-    public function getCustomerCenterInformation(){
-        try{
+    public function getCustomerCenterInformation()
+    {
+        try {
             $co_no = Auth::user()->co_no;
             $company = Company::where('co_no', $co_no)->first();
             $company->co_parent;
-            $co_type = Auth::user()->mb_type ;
-            if($co_type == 'shipper'){
-               $infomation = $company->co_parent->co_parent;
+            $co_type = Auth::user()->mb_type;
+            if ($co_type == 'shipper') {
+                $infomation = $company->co_parent->co_parent;
             }
-            if($co_type == 'shop'){
+            if ($co_type == 'shop') {
                 $infomation = $company->co_parent;
-             }
-             if($co_type == 'spasys'){
+            }
+            if ($co_type == 'spasys') {
                 $infomation = $company;
-             }
-           return response()->json($infomation);
-        }catch(\Exception $e) {
+            }
+            return response()->json($infomation);
+        } catch (\Exception $e) {
             Log::error($e);
 
             return response()->json(['message' => Messages::MSG_0018], 500);
