@@ -74,13 +74,20 @@ class PermissionController extends Controller
                     $q->where('menu_device', $validated['menu_device'])->orWhere('menu_device', '전체');
             })->where('menu_depth', '하위')->where('menu_use_yn', 'y')->orderBy('menu_id')->get();
 
-            if (isset($validated['service_no']) && $validated['service_no'] != 1) {
+            if (isset($validated['service_no']) && $validated['service_no'] != 1 && $validated['service_no'] != 0) {
                 $menu = $menu->filter(function ($item) use ($validated) {
                     $service_no_array = $item->service_no_array;
                     $service_no_array = explode(" ", $service_no_array);
 
 
                     return in_array($validated['service_no'], $service_no_array);
+                })->values();
+            }
+
+            if (isset($validated['service_no']) && $validated['service_no'] == 0) {
+                $menu = $menu->filter(function ($item) use ($validated) {
+
+                    return $item->service_no_array == '2 3 4';
                 })->values();
             }
 
