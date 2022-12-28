@@ -130,8 +130,10 @@ class CompanyController extends Controller
 
             if (isset($validated['co_parent_name'])) {
                 $companies->whereHas('co_parent', function ($query) use ($validated) {
-                    $query->where(DB::raw('lower(company.co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                    $query->where('co_name', 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                    $query->orWhere('company.co_name', 'like', '%' . strtolower($validated['co_parent_name']) . '%');
                 });
+                
             }
 
             if (isset($validated['co_name'])) {
