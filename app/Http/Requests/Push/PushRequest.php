@@ -56,6 +56,9 @@ class PushRequest extends BaseFormRequest
                 'nullable',
                 'int',
             ],
+            'push_category' => [
+                '',
+            ],
         ];
     }
 
