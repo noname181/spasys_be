@@ -180,13 +180,18 @@ class AlarmController extends Controller
             if (isset($validated['to_date'])) {
                 $alarm->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
             }
+            // if (isset($validated['co_parent_name'])) {
+            //     $alarm->whereHas('member.company.co_parent', function ($query) use ($validated) {
+            //         $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+            //     });
+            // }
             if (isset($validated['co_parent_name'])) {
-                $alarm->whereHas('member.company.co_parent', function ($query) use ($validated) {
-                    $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                $alarm->whereHas('warehousing.co_no.co_parent',function($query) use ($validated) {
+                    $query->where(DB::raw('lower(co_name)'), 'like','%'. strtolower($validated['co_parent_name']) .'%');
                 });
             }
             if (isset($validated['co_name'])) {
-                $alarm->whereHas('member.company', function ($q) use ($validated) {
+                $alarm->whereHas('warehousing.co_no', function ($q) use ($validated) {
                     return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
                 });
             }
