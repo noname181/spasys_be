@@ -93,6 +93,9 @@ class CompanySearchRequest extends BaseFormRequest
             'c_calculate_deadline_yn' => [
                 '',
             ],
+            'c_integrated_calculate_yn' => [
+                '',
+            ],
         ];
     }
 

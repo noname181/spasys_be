@@ -134,8 +134,10 @@ class CompanyController extends Controller
 
             if (isset($validated['co_parent_name'])) {
                 $companies->whereHas('co_parent', function ($query) use ($validated) {
-                    $query->where(DB::raw('lower(company.co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                    $query->where('co_name', 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                    $query->orWhere('company.co_name', 'like', '%' . strtolower($validated['co_parent_name']) . '%');
                 });
+                
             }
 
             if (isset($validated['co_name'])) {
@@ -175,6 +177,12 @@ class CompanyController extends Controller
             if (isset($validated['c_calculate_deadline_yn'])) {
                 $companies->whereHas('contract', function ($query) use ($validated) {
                     $query->where('c_calculate_deadline_yn', '=', $validated['c_calculate_deadline_yn']);
+                });
+            }
+
+            if (isset($validated['c_integrated_calculate_yn'])) {
+                $companies->whereHas('contract', function ($query) use ($validated) {
+                    $query->where('c_integrated_calculate_yn', '=', $validated['c_integrated_calculate_yn']);
                 });
             }
 
