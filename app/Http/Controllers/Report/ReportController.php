@@ -386,6 +386,12 @@ class ReportController extends Controller
                 });
             }
 
+            if (isset($validated['service_name'])) {
+                $reports->whereHas('warehousing', function($q) use($validated) {
+                    return $q->where('w_category_name', '=', $validated['service_name']);
+                });
+            }
+
             $reports = $reports->paginate($per_page, ['*'], 'page', $page);
 
             $data = new Collection();
