@@ -1618,7 +1618,18 @@ class RateDataController extends Controller
             $user = Auth::user();
 
             $export = Export::with(['import', 'import_expected'])->where('te_carry_out_number', $is_no)->first();
-            $company = Company::with(['co_parent'])->where('co_license', $export->import_expected->tie_co_license)->first();
+            if (isset($export)) {
+                $company = Company::with(['co_parent'])->where('co_license', $export->import_expected->tie_co_license)->first();
+            } else {
+                $import = Import::with(['import_expect', 'export_confirm'])->where('ti_carry_in_number', $is_no)->first();
+                if (isset($import)) {
+                    $company = Company::with(['co_parent'])->where('co_license', $import->import_expect->tie_co_license)->first();        
+                } else {
+                    $import_expected = ImportExpected::where('tie_logistic_manage_number', $is_no)->first();
+                    $company = Company::with(['co_parent'])->where('co_license', $import_expected->tie_co_license)->first();
+                }
+            }
+            //$company = Company::with(['co_parent'])->where('co_license', $export->import_expected->tie_co_license)->first();
             $rate_data = RateData::where('rd_cate_meta1', '보세화물');
 
             if ($user->mb_type == 'spasys') {
