@@ -219,6 +219,13 @@ class MemberController extends Controller
                 $members->where('updated_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
             }
 
+            if (isset($validated['co_parent_name'])) {
+                $members->whereHas('company', function ($q) use ($validated) {
+                    $q->where('co_name', 'like', '%' . $validated['co_parent_name'] . '%');
+                    $q->orWhere('company.co_name', 'like', '%' . $validated['co_parent_name'] . '%');
+                });
+            }
+
             if (isset($validated['co_name'])) {
                 $members->whereHas('company', function ($q) use ($validated) {
                     return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
@@ -242,7 +249,7 @@ class MemberController extends Controller
             return response()->json($members);
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
