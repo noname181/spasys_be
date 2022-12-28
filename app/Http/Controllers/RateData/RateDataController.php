@@ -3070,6 +3070,30 @@ class RateDataController extends Controller
                 $i = 0;
                 $final_rgds = [];
 
+                $rdg_supply_price1 = 0;
+                $rdg_supply_price2 = 0;
+                $rdg_supply_price3 = 0;
+                $rdg_supply_price4 = 0;
+                $rdg_supply_price5 = 0;
+                $rdg_supply_price6 = 0;
+                $rdg_supply_price7 = 0;
+
+                $rdg_vat1 = 0;
+                $rdg_vat2 = 0;
+                $rdg_vat3 = 0;
+                $rdg_vat4 = 0;
+                $rdg_vat5 = 0;
+                $rdg_vat6 = 0;
+                $rdg_vat7 = 0;
+                
+                $rdg_sum1 = 0;
+                $rdg_sum2 = 0;
+                $rdg_sum3 = 0;
+                $rdg_sum4 = 0;
+                $rdg_sum5 = 0;
+                $rdg_sum6 = 0;
+                $rdg_sum7 = 0;
+
                 foreach ($request->rgds as $key => $rgd) {
                     $is_exist = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', 'expectation_monthly')->first();
                     $rdg_supply_price1 = $rdg_supply_price1 + $is_exist['rdg_supply_price1'];
