@@ -176,6 +176,12 @@ class CompanyController extends Controller
                 });
             }
 
+            if (isset($validated['c_integrated_calculate_yn'])) {
+                $companies->whereHas('contract', function ($query) use ($validated) {
+                    $query->where('c_integrated_calculate_yn', '=', $validated['c_integrated_calculate_yn']);
+                });
+            }
+
             $companies = $companies->paginate($per_page, ['*'], 'page', $page);
 
             $companies->setCollection(
