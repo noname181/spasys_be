@@ -322,9 +322,14 @@ class WarehousingController extends Controller
                             $query->select(DB::raw('SUM(wi_number)'))->where('wi_type', '출고_spasys');
                         },
                     ])->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')->where('w_category_name', '=', '유통가공')
-                    ->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
-                        $q->where('co_no', $user->co_no);
-                    })->orWhereIn('w_no', $w_no_in)->orderBy('w_no', 'DESC');
+                    ->where(function ($query) use ($user,$w_no_in){
+                        $query->whereHas('co_no.co_parent.co_parent', function ($q) use ($user,$w_no_in){
+                            $q->where('co_no', $user->co_no)->orWhereIn('w_no', $w_no_in)->orderBy('w_no', 'DESC');
+                        });
+                    });
+                    // ->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
+                    //     $q->where('co_no', $user->co_no);
+                    // })->orWhereIn('w_no', $w_no_in)->orderBy('w_no', 'DESC');
             }
 
             if (isset($validated['page_type']) && $validated['page_type'] == "page130") {
@@ -360,8 +365,8 @@ class WarehousingController extends Controller
             }
             if (isset($validated['w_schedule_number_iw'])) {
                 $warehousing->whereHas('w_import_parent', function ($q) use ($validated) {
-                    return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number_iw'] . '%', 'and', 'w_type', '=', 'IW');
-                });
+                    $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number_iw'] . '%', 'and', 'w_type', '=', 'EW');
+                })->orWhere('w_schedule_number', 'like', '%' . $validated['w_schedule_number_iw'] . '%', 'and', 'w_type', '=', 'IW');
             }
             if (isset($validated['w_schedule_number_ew'])) {
                 $warehousing->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number_ew'] . '%', 'and', 'w_type', '=', 'EW');
