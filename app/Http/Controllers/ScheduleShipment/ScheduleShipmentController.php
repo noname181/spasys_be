@@ -294,7 +294,7 @@ class ScheduleShipmentController extends Controller
         try {
             DB::beginTransaction();
             $user = Auth::user();
-           
+
                 foreach ($data_schedule as $i_schedule => $schedule) {
                     foreach($schedule['data_item'] as $schedule_item){
                         if (str_contains($schedule_item['shop_product_id'], 'S')) { 
@@ -349,9 +349,7 @@ class ScheduleShipmentController extends Controller
                             'sub_domain' => isset($schedule_item['sub_domain']) ? $schedule_item['sub_domain'] : null,
                             'sub_domain_seq' => isset($schedule_item['sub_domain_seq']) ? $schedule_item['sub_domain_seq'] : null,
                         ];
-                        // if($i_schedule == "100001"){
-                        //     return $schedule_item['order_id'];
-                        // }
+                       
                         if(isset($schedule_item['order_id'])) $ss_no = ScheduleShipment::updateOrCreate(['order_id' => $i_schedule],$data_schedule);
                         if( $ss_no->ss_no && isset($schedule_item['order_products'])){
                             $check_fisrt = 0;
@@ -385,6 +383,7 @@ class ScheduleShipmentController extends Controller
                                         'supply_name' => isset($schedule_info['supply_name']) ? $schedule_info['supply_name'] : null,
                                         'supply_options' => isset($schedule_info['supply_options']) ? $schedule_info['supply_options'] : null,
                                     ]);
+                                    $dt_update = [];
                                     if($schedule_info['product_id']){
                                         if (str_contains($schedule_info['product_id'], 'S')) { 
                                             $shop_option_id = $schedule_info['product_id'];
@@ -394,6 +393,7 @@ class ScheduleShipmentController extends Controller
                                             $shop_product_id = $schedule_info['product_id'];
                                             $shop_option_id = '';
                                         }
+                                        
                                         if($check_fisrt == 0){
                                             if(!empty($shop_product_id)){
                                                 $dt_update['shop_product_id'] = $shop_product_id;
@@ -402,6 +402,9 @@ class ScheduleShipmentController extends Controller
                                                 $dt_update['shop_option_id'] = $shop_option_id;
                                             }
                                         }
+                                        // if($i_schedule == "C7171717"){
+                                        //     return $dt_update;
+                                        // }
                                         ScheduleShipment::where(['ss_no' => $ss_no->ss_no])->update($dt_update);
                                         $check_fisrt = 1;
                                     }
@@ -751,7 +754,10 @@ class ScheduleShipmentController extends Controller
                 $data_schedule = $this->mapDataAPI($base_schedule_datas['data']);
                 if(!empty($data_schedule['data_temp'])){
                     
-                    $this->apiScheduleShipmentsRaw($data_schedule['data_temp']);
+                        $this->apiScheduleShipmentsRaw($data_schedule['data_temp']);
+                        
+                    
+                    
                     
                 
                 }
