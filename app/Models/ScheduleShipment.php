@@ -15,7 +15,7 @@ use App\Models\ReceivingGoodsDelivery;
 class ScheduleShipment extends Model
 {
     use HasFactory;
-
+    use \Awobaz\Compoships\Compoships;
     protected $table = "schedule_shipment";
 
     protected $primaryKey = 'ss_no';
@@ -88,7 +88,7 @@ class ScheduleShipment extends Model
     }
     public function schedule_shipment_info()
     {
-        return $this->belongsTo(ScheduleShipmentInfo::class, 'ss_no', 'ss_no')->with('item');
+        return $this->hasMany(ScheduleShipmentInfo::class, 'ss_no', 'ss_no')->with('item');
     }
 
     public function ContractWms()

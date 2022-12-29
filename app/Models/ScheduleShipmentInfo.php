@@ -9,7 +9,7 @@ use App\Models\Item;
 class ScheduleShipmentInfo extends Model
 {
     use HasFactory;
-
+    use \Awobaz\Compoships\Compoships;
     protected $table = "schedule_shipment_info";
 
     protected $primaryKey = 'ssi_no';
