@@ -179,15 +179,10 @@ class MemberController extends Controller
 
             if ($user->mb_type == 'spasys') {
                 $members = Member::with('company')->whereHas('company', function($q) use($user){
-                    $q->where('co_no', $user->company->co_no);
-                })
-                ->orWhereHas('company', function($q) use($user){
-                    $q->whereHas('co_parent', function($q) use($user){
+                    $q->where('co_no', $user->company->co_no)
+                    ->orWhereHas('co_parent', function($q) use($user){
                         $q->where('co_no', $user->company->co_no);
-                    });
-                })
-                ->orWhereHas('company', function($q) use($user){
-                    $q->whereHas('co_parent', function($q) use($user){
+                    })->orWhereHas('co_parent', function($q) use($user){
                         $q->whereHas('co_parent', function($q) use($user){
                             $q->where('co_no', $user->company->co_no);
                         });
@@ -196,10 +191,8 @@ class MemberController extends Controller
                 ->orderBy('mb_no', 'DESC');
             }else if($user->mb_type == 'shop'){
                 $members = Member::with('company')->whereHas('company', function($q) use($user){
-                    $q->where('co_no', $user->company->co_no);
-                })
-                ->orWhereHas('company', function($q) use($user){
-                    $q->whereHas('co_parent', function($q) use($user){
+                    $q->where('co_no', $user->company->co_no)
+                    ->orWhereHas('co_parent', function($q) use($user){
                         $q->where('co_no', $user->company->co_no);
                     });
                 });
@@ -221,14 +214,20 @@ class MemberController extends Controller
 
             if (isset($validated['co_parent_name'])) {
                 $members->whereHas('company', function ($q) use ($validated) {
-                    $q->where('co_name', 'like', '%' . $validated['co_parent_name'] . '%')->where('co_type','=','shop');
-                    $q->orWhere('company.co_name', 'like', '%' . $validated['co_parent_name'] . '%')->where('co_type','=','shipper');
+                    $q->where(function ($q) use ($validated) {
+                        $q->where('co_name', 'like', '%' . $validated['co_parent_name'] . '%')->where('co_type','=','shop');
+                    })
+                    ->orwhereHas('co_parent', function ($q) use ($validated) {
+                        $q->where('co_name', 'like', '%' . $validated['co_parent_name'] . '%')->where('co_type','=','shop');
+                    });
                 });
             }
 
             if (isset($validated['co_name'])) {
                 $members->whereHas('company', function ($q) use ($validated) {
-                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                 
+                    $q->where('co_name', 'like', '%' . $validated['co_name'] . '%')->where('co_type','=','shipper');
+          
                 });
             }
 
