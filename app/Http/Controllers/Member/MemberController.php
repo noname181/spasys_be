@@ -221,8 +221,8 @@ class MemberController extends Controller
 
             if (isset($validated['co_parent_name'])) {
                 $members->whereHas('company', function ($q) use ($validated) {
-                    $q->where('co_name', 'like', '%' . $validated['co_parent_name'] . '%');
-                    $q->orWhere('company.co_name', 'like', '%' . $validated['co_parent_name'] . '%');
+                    $q->where('co_name', 'like', '%' . $validated['co_parent_name'] . '%')->where('co_type','=','shop');
+                    $q->orWhere('company.co_name', 'like', '%' . $validated['co_parent_name'] . '%')->where('co_type','=','shipper');
                 });
             }
 
