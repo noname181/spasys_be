@@ -146,6 +146,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/import_schedule', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'__invoke']);
     Route::post('/get_import_schedule', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'getImportSchedule']);
     Route::post('/get_import_api', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'getImportAPI']);
+    Route::post('/get_import_api_popup', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'getImportAPIPOPUP']);
 
     Route::get('/warehousing', [\App\Http\Controllers\Warehousing\WarehousingController::class,'__invoke']);
     Route::post('/warehousing_import', [\App\Http\Controllers\Warehousing\WarehousingController::class,'warehousingImport']);
@@ -157,10 +158,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/import_excel_fulfillment_processing', [\App\Http\Controllers\Warehousing\WarehousingController::class,'importExcelFulfillmentProcessing']);//page 7102
     Route::post('/get_warehousing', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousing']);
     Route::post('/get_warehousing_api', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingApi']);
+    Route::post('/get_warehousing_api_popup', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingApiPOPUP']);
     Route::post('/get_warehousing2', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousing2']);
     Route::post('/get_warehousing_export', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingExport']);
     Route::post('/get_warehousing_import', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingImport']); //page 129
     Route::post('/get_warehousing_import_status1', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingImportStatus1']); //page 134
+    Route::post('/get_warehousing_import_status1_popup', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingImportStatus1POPUP']);
     Route::post('/get_warehousing_delivery', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingDelivery']); //page 715
     Route::post('/get_warehousing_delivery_3', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingDelivery3']); //page 715_3
     Route::post('/get_warehousing_delivery_2', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingDelivery2']); //page 715_2
