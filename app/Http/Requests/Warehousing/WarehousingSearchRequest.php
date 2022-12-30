@@ -66,8 +66,7 @@ class WarehousingSearchRequest extends BaseFormRequest
                 'string',
             ],
             'w_schedule_number' => [
-                'nullable',
-                'string',
+                '',
             ],
             'w_schedule_number_iw' => [
                 '',
@@ -172,6 +171,12 @@ class WarehousingSearchRequest extends BaseFormRequest
                 '',
             ],
             'rgd_status5' => [
+                '',
+            ],
+            'rgd_receiver' => [
+                '',
+            ],
+            'rgd_contents' => [
                 '',
             ],
         ];

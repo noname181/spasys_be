@@ -595,17 +595,17 @@ class ItemController extends Controller
             }
             if (isset($validated['item_name'])) {
                 $item->where(function ($query) use ($validated) {
-                    $query->where(DB::raw('lower(item_name)'), 'like', '%' . strtolower($validated['item_name']) . '%');
+                    $query->where(DB::raw('lower(item_name)'), 'like', '%' . $validated['item_name'] . '%');
                 });
             }
             if (isset($validated['item_cargo_bar_code'])) {
                 $item->where(function ($query) use ($validated) {
-                    $query->where(DB::raw('lower(item_cargo_bar_code)'), 'like', '%' . strtolower($validated['item_cargo_bar_code']) . '%');
+                    $query->where(DB::raw('lower(item_cargo_bar_code)'), 'like', '%' . $validated['item_cargo_bar_code'] . '%');
                 });
             }
             if (isset($validated['item_channel_code'])) {
                 $item->whereHas('item_channels', function ($query) use ($validated) {
-                    $query->where(DB::raw('lower(item_channel_name)'), 'like', '%' . strtolower($validated['item_channel_name']) . '%');
+                    $query->where(DB::raw('lower(item_channel_code)'), 'like', '%' . strtolower($validated['item_channel_code']) . '%');
                 });
             }
             if (isset($validated['item_bar_code'])) {
@@ -620,10 +620,14 @@ class ItemController extends Controller
             }
             if (isset($validated['item_channel_name'])) {
                 $item->whereHas('item_channels', function ($query) use ($validated) {
-                    $query->where(DB::raw('lower(item_channel_name)'), 'like', '%' . strtolower($validated['item_channel_name']) . '%');
+                    $query->where(DB::raw('lower(item_channel_name)'), 'like', '%' . $validated['item_channel_name'] . '%');
                 });
             }
-
+            if (isset($validated['item_brand'])) {
+                $item->where(function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_brand)'), 'like', '%' . $validated['item_brand'] . '%');
+                });
+            }
             $item2 = $item->get();
 
             // $item3 = collect($item2)->map(function ($q){

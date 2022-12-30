@@ -1080,7 +1080,12 @@ class WarehousingController extends Controller
 
             if (isset($validated['w_schedule_number_iw'])) {
                 $warehousing->whereHas('w_no', function ($q) use ($validated) {
-                    return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number_iw'] . '%');
+                    return $q->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number_iw'] . '%');
+                });
+            }
+            if (isset($validated['connection_number'])) {
+                $warehousing->whereHas('w_no', function ($q) use ($validated) {
+                    return $q->where('connection_number', 'like', '%' . $validated['connection_number'] . '%');
                 });
             }
             if (isset($validated['w_schedule_number_ew'])) {
@@ -2453,11 +2458,30 @@ class WarehousingController extends Controller
                     return $q->where('w_type', 'like', '%' . $validated['w_type'] . '%');
                 });
             }
-            if (isset($validated['w_schedule_number'])) {
+            if (isset($validated['connection_number'])) {
                 $warehousing->whereHas('w_no', function ($q) use ($validated) {
-                    return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
+                    $q->where('connection_number', 'like', '%' . $validated['connection_number'] . '%');
                 });
             }
+
+            if (isset($validated['w_schedule_number'])) {
+                $warehousing->whereHas('w_no', function ($q) use ($validated) {
+                    $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%' ,'and', 'w_type' ,'!=', 'IW');
+                });
+            }
+
+            if (isset($validated['w_schedule_number2'])) {
+                
+                $warehousing->where(function($q) use($validated) {
+                    $q->whereHas('w_no', function ($q1) use ($validated) {
+                        $q1->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%', 'and', 'w_type', '=', 'IW');
+                    })->orWhereHas('w_no.w_import_parent',function ($q2) use ($validated){
+                        $q2->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%');
+                    });
+                }); 
+            }
+            // $warehousing->get();
+            // return DB::getQueryLog();
             if (isset($validated['rgd_status1'])) {
                 $warehousing->where('rgd_status1', '=', $validated['rgd_status1']);
             }
@@ -2484,7 +2508,7 @@ class WarehousingController extends Controller
             }
 
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
-            //return DB::getQueryLog();
+           
             $warehousing->setCollection(
                 $warehousing->getCollection()->map(function ($item) {
                     $item->total_wi_number = WarehousingItem::where('w_no', $item->w_no)->sum('wi_number');
@@ -2509,7 +2533,7 @@ class WarehousingController extends Controller
             return response()->json($warehousing);
         } catch (\Exception $e) {
             Log::error($e);
-
+           // return $e;
             //return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -2598,7 +2622,7 @@ class WarehousingController extends Controller
             }
             if (isset($validated['w_schedule_number'])) {
                 $warehousing->whereHas('w_no', function ($q) use ($validated) {
-                    return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
+                    return $q->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number'] . '%');
                 });
             }
             if (isset($validated['rgd_status1'])) {
@@ -2637,7 +2661,28 @@ class WarehousingController extends Controller
                         ->orWhere('rgd_status3', '=', $validated['rgd_status3_3'] ? $validated['rgd_status3_3'] : "");
                 });
             }
+            if (isset($validated['w_schedule_number2'])) {
+                
+                $warehousing->where(function($q) use($validated) {
+                    $q->whereHas('w_no', function ($q1) use ($validated) {
+                        $q1->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%', 'and', 'w_type', '=', 'IW');
+                    })->orWhereHas('w_no.w_import_parent',function ($q2) use ($validated){
+                        $q2->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%');
+                    });
+                }); 
+            }
+            if (isset($validated['connection_number'])) {
+                $warehousing->whereHas('w_no', function ($q) use ($validated) {
+                    $q->where('connection_number', 'like', '%' . $validated['connection_number'] . '%');
+                });
+            }
+            if (isset($validated['rgd_receiver'])) {
+                $warehousing->where('rgd_receiver', 'like', '%' . $validated['rgd_receiver'] . '%');
 
+            }
+            if (isset($validated['rgd_contents'])) {
+                $warehousing->where('rgd_contents', '=', $validated['rgd_contents']);
+            }
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
 
             $warehousing->setCollection(
