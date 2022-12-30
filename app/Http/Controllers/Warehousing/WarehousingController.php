@@ -4724,10 +4724,42 @@ class WarehousingController extends Controller
             if (isset($validated['service_korean_name'])) {
                 $warehousing->where('service_korean_name', '=', $validated['service_korean_name']);
             }
+
+            $warehousing_data = $warehousing->get();
+
+            $arr_data = collect($warehousing_data)->map(function ($item) {
+              
+                return [
+                    'sum_supply_price' => $item['service_korean_name'] == '유통가공' ? $item['rate_data_general']['rdg_supply_price4'] : ($item['service_korean_name'] == '수입풀필먼트' ? $item['rate_data_general']['rdg_supply_price6'] : $item['rate_data_general']['rdg_supply_price7']),
+                  
+                    'sum_vat' => $item['service_korean_name'] == '유통가공' ? $item['rate_data_general']['rdg_vat4'] : ($item['service_korean_name'] == '수입풀필먼트' ? $item['rate_data_general']['rdg_vat6'] : $item['rate_data_general']['rdg_vat7']),
+                
+                    'sum_sum' => $item['service_korean_name'] == '유통가공' ? $item['rate_data_general']['rdg_sum4'] : ($item['service_korean_name'] == '수입풀필먼트' ? $item['rate_data_general']['rdg_sum6'] : $item['rate_data_general']['rdg_sum7']),
+                  
+                ];
+
+            });
+
+            $sum_supply_price = $arr_data->sum('sum_supply_price');
+
+            $sum_vat = $arr_data->sum('sum_vat');
+
+            $sum_sum = $arr_data->sum('sum_sum');
+
+
+            $custom = collect([
+                'sum_supply_price' => $sum_supply_price,
+                'sum_vat' => $sum_vat,
+                'sum_sum' => $sum_sum,
+            ]);
+
+
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             //return DB::getQueryLog();
 
-            return response()->json($warehousing);
+            $data = $custom->merge($warehousing);
+
+            return response()->json($data);
         } catch (\Exception $e) {
             Log::error($e);
             return $e;
