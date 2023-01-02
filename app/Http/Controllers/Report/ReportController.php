@@ -328,15 +328,15 @@ class ReportController extends Controller
             $user = Auth::user();
            
             if($user->mb_type == 'shop'){
-                $reports = Report::with(['files', 'reports_child','warehousing'])->whereHas('warehousing.co_no.co_parent',function ($q) use ($user){
+                $reports = Report::with(['files', 'reports_child','warehousing','export','member'])->whereHas('warehousing.co_no.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->orderBy('rp_parent_no', 'DESC');
             }else if($user->mb_type == 'shipper'){
-                $reports = Report::with(['files', 'reports_child','warehousing'])->whereHas('warehousing.co_no',function ($q) use ($user){
+                $reports = Report::with(['files', 'reports_child','warehousing','export','member'])->whereHas('warehousing.co_no',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->orderBy('rp_parent_no', 'DESC');
             }else if($user->mb_type == 'spasys'){
-                $reports = Report::with(['files', 'reports_child','warehousing','export'])->whereHas('export.import_expected.company.co_parent',function ($q) use ($user){
+                $reports = Report::with(['files', 'reports_child','warehousing','export','member'])->whereHas('export.import_expected.company.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->orwhereHas('warehousing.co_no.co_parent.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
@@ -366,8 +366,15 @@ class ReportController extends Controller
                 });
             }
             if (isset($validated['w_schedule_number'])) {
-                $reports->whereHas('warehousing', function($q) use($validated) {
-                    return $q->where(DB::raw('lower(w_schedule_number2)'), 'like', '%' . strtolower($validated['w_schedule_number']) . '%');
+                // $reports->whereHas('warehousing', function($q) use($validated) {
+                //     return $q->where(DB::raw('lower(w_schedule_number)'), 'like', '%' . strtolower($validated['w_schedule_number']) . '%');
+                // });
+                $reports->where(function($q) use($validated) {
+                    $q->whereHas('warehousing', function ($q) use ($validated) {
+                        return $q->where(DB::raw('lower(w_schedule_number)'), 'like', '%' . strtolower($validated['w_schedule_number']) . '%');
+                    })->orWhereHas('export.import_expected', function ($q2) use ($validated){
+                        $q2->where('tie_h_bl', 'like', '%' . $validated['w_schedule_number'] . '%');
+                    });
                 });
             }
             if (isset($validated['logistic_manage_number'])) {

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\File;
 use App\Models\Report;
 use App\Models\Export;
+use App\Models\Member;
 class Report extends Model
 {
     use HasFactory;
@@ -53,6 +54,10 @@ class Report extends Model
     public function export()
     {
         return $this->belongsTo(Export::class, 'w_no', 'te_carry_out_number')->with(['import_expected']);
+    }
+    public function member()
+    {
+        return $this->belongsTo(Member::class, 'mb_no', 'mb_no')->with('company');
     }
   
 }

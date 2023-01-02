@@ -73,19 +73,15 @@ class ItemRequest extends BaseFormRequest
                 'nullable',
             ],
             'item_price1' => [
-                'integer',
                 'nullable',
             ],
             'item_price2' => [
-                'integer',
                 'nullable',
             ],
             'item_price3' => [
-                'integer',
                 'nullable',
             ],
             'item_price4' => [
-                'integer',
                 'nullable',
             ],
             'item_cate1' => [
