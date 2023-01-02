@@ -2267,7 +2267,7 @@ class RateDataController extends Controller
                 ]
             );
 
-            $previous_rgd = ReceivingGoodsDelivery::where('w_no', $w_no)->where('rgd_bill_type', '=', $request->previous_bill_type)->first();
+            $previous_rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
 
             if (!isset($is_exist->rdg_no) && isset($request->previous_bill_type)) {
                 if ($rgd->rgd_bill_type != 'expectation_monthly') {
@@ -2288,6 +2288,8 @@ class RateDataController extends Controller
                 $final_rgd->rgd_paid_date = null;
                 $final_rgd->rgd_tax_invoice_date = null;
                 $final_rgd->rgd_tax_invoice_number = null;
+                $final_rgd->rgd_calculate_deadline_yn = $request->rgd_calculate_deadline_yn ? $request->rgd_calculate_deadline_yn : null;
+                $final_rgd->rgd_settlement_number = $request->settlement_number ? $request->settlement_number : $rgd->rgd_settlement_number;
                 $final_rgd->mb_no = Auth::user()->mb_no;
                 $final_rgd->save();
 
@@ -2318,17 +2320,17 @@ class RateDataController extends Controller
                 ]);
             }
 
-            if ($request->bill_type == 'expectation' || $request->bill_type == 'expectation_monthly') {
+            // if ($request->bill_type == 'expectation' || $request->bill_type == 'expectation_monthly') {
 
-                ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-                    'mb_no' => Auth::user()->mb_no,
-                    'rgd_status4' => $request->status,
-                    'rgd_issue_date' => Carbon::now()->toDateTimeString(),
-                    'rgd_bill_type' => $request->bill_type,
-                    'rgd_settlement_number' => $request->settlement_number ? $request->settlement_number : $rgd->rgd_settlement_number,
-                    'rgd_calculate_deadline_yn' => $request->rgd_calculate_deadline_yn ? $request->rgd_calculate_deadline_yn : '',
-                ]);
-            }
+            //     ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+            //         'mb_no' => Auth::user()->mb_no,
+            //         'rgd_status4' => $request->status,
+            //         'rgd_issue_date' => Carbon::now()->toDateTimeString(),
+            //         'rgd_bill_type' => $request->bill_type,
+            //         'rgd_settlement_number' => $request->settlement_number ? $request->settlement_number : $rgd->rgd_settlement_number,
+            //         'rgd_calculate_deadline_yn' => $request->rgd_calculate_deadline_yn ? $request->rgd_calculate_deadline_yn : '',
+            //     ]);
+            // }
 
             DB::commit();
             return response()->json([
