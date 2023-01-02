@@ -384,7 +384,7 @@ class WarehousingController extends Controller
                     ->where(function ($query) use ($user, $w_no_in){
                         $query->whereHas('co_no.co_parent.co_parent', function ($q) use ($user,$w_no_in){
                             $q->where('co_no', $user->co_no);
-                        })->orderBy('w_no', 'DESC');
+                        });
                     });
                     // ->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                     //     $q->where('co_no', $user->co_no);
@@ -465,7 +465,7 @@ class WarehousingController extends Controller
             // }
 
             $members = Member::where('mb_no', '!=', 0)->get();
-                $warehousing->orWhereIn('w_no', $w_no_in);
+                $warehousing->orWhereIn('w_no', $w_no_in)->orderBy('w_no', 'DESC');
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
 
             return response()->json($warehousing);
