@@ -57,10 +57,10 @@ class ItemController extends Controller
                     'item_upc_code' => $validated['item_upc_code'],
                     'item_bar_code' => $validated['item_bar_code'],
                     'item_weight' => $validated['item_weight'],
-                    'item_price1' => $validated['item_price1'],
-                    'item_price2' => $validated['item_price2'],
-                    'item_price3' => $validated['item_price3'],
-                    'item_price4' => $validated['item_price4'],
+                    'item_price1' => isset($validated['item_price1']) ? $validated['item_price1'] : 0,
+                    'item_price2' => isset($validated['item_price2']) ? $validated['item_price2'] : 0,
+                    'item_price3' => isset($validated['item_price3']) ? $validated['item_price3'] : 0,
+                    'item_price4' => isset($validated['item_price4']) ? $validated['item_price4'] : 0,
                     'item_cate1' => $validated['item_cate1'],
                     'item_cate2' => $validated['item_cate2'],
                     'item_cate3' => $validated['item_cate3'],
@@ -161,7 +161,6 @@ class ItemController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-
             return response()->json(['message' => Messages::MSG_0019], 500);
         }
     }
@@ -800,7 +799,7 @@ class ItemController extends Controller
             }
             if (isset($validated['item_name'])) {
                 $item->where(function ($query) use ($validated) {
-                    $query->where(DB::raw('lower(item_name)'), 'like', '%' . strtolower($validated['item_name']) . '%');
+                    $query->where(DB::raw('lower(item_name)'), 'like', '%' . $validated['item_name'] . '%');
                 });
             }
             if (isset($validated['product_id'])) {
