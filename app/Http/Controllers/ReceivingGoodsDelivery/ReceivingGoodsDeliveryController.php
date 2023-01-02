@@ -1734,6 +1734,13 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_status1' => '입고예정',
                             'rgd_status2' => null
                         ]);
+
+                        WarehousingStatus::insert([
+                            'w_no' => $request->w_no,
+                            'mb_no' => $member->mb_no,
+                            'status' => '입고취소',
+                            'w_category_name' => "유통가공",
+                        ]);
                     }
                 }
             }else{
@@ -1756,6 +1763,8 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_status2' => '작업완료',
                             'rgd_status3' => null
                         ]);
+
+                        
                     }
                 }
             }
@@ -2162,25 +2171,30 @@ class ReceivingGoodsDeliveryController extends Controller
             if ($request->remove_files) {
                 foreach ($request->remove_files as $key => $file_no) {
                     $file = File::where('file_no', $file_no)->get()->first();
-                    $url = Storage::disk('public')->delete($path . '/' . $file->file_name);
-                    $file->delete();
+                    if(isset($file->file_name)){
+                        $url = Storage::disk('public')->delete($path . '/' . $file->file_name);
+                        $file->delete();
+                    }
                 }
             }
 
             $files = [];
-            foreach ($validated['files'] as $key => $file) {
-                $url = Storage::disk('public')->put($path, $file);
-                $files[] = [
-                    'file_table' => 'import_schedule',
-                    'file_table_key' => $validated['is_no'],
-                    'file_name' => basename($url),
-                    'file_name_old' => $file->getClientOriginalName(),
-                    'file_size' => $file->getSize(),
-                    'file_extension' => $file->extension(),
-                    'file_position' => $key,
-                    'file_url' => $url
-                ];
+            if(isset($validated['files'])){
+                foreach ($validated['files'] as $key => $file) {
+                    $url = Storage::disk('public')->put($path, $file);
+                    $files[] = [
+                        'file_table' => 'import_schedule',
+                        'file_table_key' => $validated['is_no'],
+                        'file_name' => basename($url),
+                        'file_name_old' => $file->getClientOriginalName(),
+                        'file_size' => $file->getSize(),
+                        'file_extension' => $file->extension(),
+                        'file_position' => $key,
+                        'file_url' => $url
+                    ];
+                }
             }
+            
 
             File::insert($files);
 
@@ -2189,7 +2203,7 @@ class ReceivingGoodsDeliveryController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            //return $e;
+            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }

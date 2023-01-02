@@ -65,7 +65,7 @@ class WarehousingStatusController extends Controller
 
             $warehousing_status = WarehousingStatus::with(['mb_no','warehousing'])->orderBy('ws_no', 'DESC');
             if($warehousing){
-                $warehousing_status = $warehousing_status->where('w_no', '=', $validated['w_no'])->orwhere('w_no', '=', $warehousing->w_import_no);
+                $warehousing_status = $warehousing_status->where('w_no', '=', $validated['w_no']);
             }else{
                 $warehousing_status = $warehousing_status->where('w_no', '=', $validated['w_no']);
             }
