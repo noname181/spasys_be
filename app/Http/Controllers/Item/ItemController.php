@@ -800,7 +800,7 @@ class ItemController extends Controller
             }
             if (isset($validated['item_name'])) {
                 $item->where(function ($query) use ($validated) {
-                    $query->where(DB::raw('lower(item_name)'), 'like', '%' . strtolower($validated['item_name']) . '%');
+                    $query->where(DB::raw('lower(item_name)'), 'like', '%' . $validated['item_name'] . '%');
                 });
             }
             if (isset($validated['product_id'])) {

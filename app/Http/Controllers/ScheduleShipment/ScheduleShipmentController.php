@@ -140,7 +140,7 @@ class ScheduleShipmentController extends Controller
             }
             if (isset($validated['name'])) {
                 $schedule_shipment->whereHas('schedule_shipment_info', function ($q) use ($validated) {
-                    return $q->where(DB::raw('lower(name)'), 'like', '%' . strtolower($validated['name']) . '%');
+                    $q->where('name', 'like', '%' . $validated['name'] . '%');
                 });
             }
             if (isset($validated['qty'])) {
