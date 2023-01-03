@@ -305,7 +305,7 @@ class WarehousingController extends Controller
                 //     '=',
                 //     'warehousing.w_no'
                 // )
-              
+
                 $warehousing2 = Warehousing::with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent', 'warehousing_child'])->where('warehousing.w_type', '=', 'EW')->where('warehousing.w_category_name', '=', '유통가공')->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
@@ -313,7 +313,7 @@ class WarehousingController extends Controller
                 if (isset($validated['from_date'])) {
                     $warehousing2->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
                 }
-    
+
                 if (isset($validated['to_date'])) {
                     $warehousing2->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
                 }
@@ -335,7 +335,7 @@ class WarehousingController extends Controller
                         $q->whereHas('w_import_parent', function ($q) use ($validated) {
                             $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number_iw'] . '%', 'and', 'w_type', '=', 'EW');
                         })->orWhere('w_schedule_number', 'like', '%' . $validated['w_schedule_number_iw'] . '%', 'and', 'w_type', '=', 'IW');
-                    }); 
+                    });
                 }
                 if (isset($validated['rgd_status1'])) {
                     $warehousing2->whereHas('receving_goods_delivery', function ($query) use ($validated) {
@@ -427,7 +427,7 @@ class WarehousingController extends Controller
                     $q->whereHas('w_import_parent', function ($q) use ($validated) {
                         $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number_iw'] . '%', 'and', 'w_type', '=', 'EW');
                     })->orWhere('w_schedule_number', 'like', '%' . $validated['w_schedule_number_iw'] . '%', 'and', 'w_type', '=', 'IW');
-                }); 
+                });
             }
             if (isset($validated['w_schedule_number_ew'])) {
                 $warehousing->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number_ew'] . '%', 'and', 'w_type', '=', 'EW');
@@ -756,7 +756,7 @@ class WarehousingController extends Controller
                     });
             }
             $warehousing->whereDoesntHave('rate_data_general');
-            
+
             if (isset($validated['connection_number_type'])) {
                 $warehousing->whereNull('connection_number');
             }
@@ -2767,14 +2767,14 @@ class WarehousingController extends Controller
             }
 
             if (isset($validated['w_schedule_number2'])) {
-                
+
                 $warehousing->where(function($q) use($validated) {
                     $q->whereHas('w_no', function ($q1) use ($validated) {
                         $q1->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%', 'and', 'w_type', '=', 'IW');
                     })->orWhereHas('w_no.w_import_parent',function ($q2) use ($validated){
                         $q2->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%');
                     });
-                }); 
+                });
             }
             // $warehousing->get();
             // return DB::getQueryLog();
@@ -2804,7 +2804,7 @@ class WarehousingController extends Controller
             }
 
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
-           
+
             $warehousing->setCollection(
                 $warehousing->getCollection()->map(function ($item) {
                     $item->total_wi_number = WarehousingItem::where('w_no', $item->w_no)->sum('wi_number');
@@ -2958,14 +2958,14 @@ class WarehousingController extends Controller
                 });
             }
             if (isset($validated['w_schedule_number2'])) {
-                
+
                 $warehousing->where(function($q) use($validated) {
                     $q->whereHas('w_no', function ($q1) use ($validated) {
                         $q1->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%', 'and', 'w_type', '=', 'IW');
                     })->orWhereHas('w_no.w_import_parent',function ($q2) use ($validated){
                         $q2->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%');
                     });
-                }); 
+                });
             }
             if (isset($validated['connection_number'])) {
                 $warehousing->whereHas('w_no', function ($q) use ($validated) {
@@ -3440,7 +3440,7 @@ class WarehousingController extends Controller
                     $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
-                });
+                })->whereNull('rgd_status4');
             } else if ($user->mb_type == 'shipper') {
                 $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 'rate_meta_data'])->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no', function ($q) use ($user) {
@@ -3466,7 +3466,7 @@ class WarehousingController extends Controller
                     $query->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
-                });
+                })->whereNull('rgd_status5');
             }
             $warehousing->where('rgd_status1', '=', '입고')
                 ->whereNull('rgd_parent_no')
@@ -4773,14 +4773,14 @@ class WarehousingController extends Controller
             $warehousing_data = $warehousing->get();
 
             $arr_data = collect($warehousing_data)->map(function ($item) {
-              
+
                 return [
                     'sum_supply_price' => $item['service_korean_name'] == '유통가공' ? $item['rate_data_general']['rdg_supply_price4'] : ($item['service_korean_name'] == '수입풀필먼트' ? $item['rate_data_general']['rdg_supply_price6'] : $item['rate_data_general']['rdg_supply_price7']),
-                  
+
                     'sum_vat' => $item['service_korean_name'] == '유통가공' ? $item['rate_data_general']['rdg_vat4'] : ($item['service_korean_name'] == '수입풀필먼트' ? $item['rate_data_general']['rdg_vat6'] : $item['rate_data_general']['rdg_vat7']),
-                
+
                     'sum_sum' => $item['service_korean_name'] == '유통가공' ? $item['rate_data_general']['rdg_sum4'] : ($item['service_korean_name'] == '수입풀필먼트' ? $item['rate_data_general']['rdg_sum6'] : $item['rate_data_general']['rdg_sum7']),
-                  
+
                 ];
 
             });
@@ -5938,7 +5938,7 @@ class WarehousingController extends Controller
             $user = Auth::user();
             DB::enableQueryLog();
             if ($user->mb_type == 'shop') {
-                
+
                 $sub = ImportExpected::select('company.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
                     ->leftjoin('company', function ($join) {
                         $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
@@ -5972,7 +5972,7 @@ class WarehousingController extends Controller
                     $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
                 })->orderBy('te_carry_out_number', 'DESC');
             } else if ($user->mb_type == 'shipper') {
-                
+
                 $sub = ImportExpected::select('company.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
                     ->leftjoin('company', function ($join) {
                         $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
@@ -6006,7 +6006,7 @@ class WarehousingController extends Controller
                     $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
                 })->orderBy('te_carry_out_number', 'DESC');
             } else if ($user->mb_type == 'spasys') {
-                
+
 
                 //FIX NOT WORK 'with'
                 $sub = ImportExpected::select('company.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
@@ -6041,13 +6041,13 @@ class WarehousingController extends Controller
                     $leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
                     $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
                 })->orderBy('te_carry_out_number', 'DESC');
-               
+
 
 
             }
-           
+
             if (isset($validated['status'])) {
-              
+
 
                 $import_schedule->where('aaa.rgd_status1', '=', $validated['status']);
             }
@@ -6096,9 +6096,9 @@ class WarehousingController extends Controller
             }
 
 
-            
 
-            
+
+
             //get_warehousing_api
 
             $user = Auth::user();
@@ -6250,8 +6250,8 @@ class WarehousingController extends Controller
 
             $warehousing = $warehousing->orWhereIn('w_no', $w_no_in)->orderBy('w_no', 'DESC');
             $members = Member::where('mb_no', '!=', 0)->get();
-            
-            
+
+
             //get_warehousing2
 
             $user = Auth::user();
@@ -6345,7 +6345,7 @@ class WarehousingController extends Controller
             $members = Member::where('mb_no', '!=', 0)->get();
 
            // $warehousing2 = $warehousing2->paginate($per_page, ['*'], 'page', $page);
-            
+
             //    $warehousing2->setCollection(
             //     $warehousing2->getCollection()->map(function ($item) {
 
@@ -6378,7 +6378,7 @@ class WarehousingController extends Controller
 
                 return $q;
             });
-            
+
             $final = collect($import_schedule)->map(function ($q) {
 
                 return $q;
@@ -6392,7 +6392,7 @@ class WarehousingController extends Controller
             $final4 = $final2->merge($final)->merge($final3);
 
             $data = $this->paginate($final4, $validated['per_page'], $validated['page']);
-            
+
             // $status = DB::table('t_import_expected')
             //     ->select('tie_status_2')
             //     ->groupBy('tie_status_2')
@@ -6402,7 +6402,7 @@ class WarehousingController extends Controller
 
             DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
 
-            return $data;   
+            return $data;
 
 
         } catch (\Exception $e) {

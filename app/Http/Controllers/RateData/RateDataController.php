@@ -2236,6 +2236,7 @@ class RateDataController extends Controller
     {
         try {
             DB::beginTransaction();
+            $user = Auth::user();
             //Check is there already RateDataGeneral with rdg_no yet
             $is_exist = RateDataGeneral::where('rdg_no', $request->rdg_no)->where('rdg_bill_type', $request->bill_type)->first();
 
@@ -2281,7 +2282,8 @@ class RateDataController extends Controller
 
             if (!isset($is_exist->rdg_no) && isset($request->previous_bill_type)) {
                 if ($rgd->rgd_bill_type != 'expectation_monthly') {
-                    $previous_rgd->rgd_status5 = 'issued';
+                    $previous_rgd->rgd_status4 = $user->mb_type == 'shop' ? 'issued' : NULL;
+                    $previous_rgd->rgd_status5 = $user->mb_type == 'spasys' ? 'issued' : NULL;
                     $previous_rgd->save();
                 }
 
@@ -3502,6 +3504,7 @@ class RateDataController extends Controller
     {
         try {
             DB::beginTransaction();
+            $user = Auth::user();
             //Check is there already RateDataGeneral with rdg_no yet
             $is_exist = RateDataGeneral::where('rgd_no', $request->rgd_no)->where('rdg_bill_type', $request->bill_type)->first();
 
@@ -3558,6 +3561,8 @@ class RateDataController extends Controller
                 $previous_rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
 
                 $previous_rgd->rgd_status5 = 'issued';
+                $previous_rgd->rgd_status4 = $user->mb_type == 'shop' ? 'issued' : NULL;
+                $previous_rgd->rgd_status5 = $user->mb_type == 'spasys' ? 'issued' : NULL;
                 $previous_rgd->save();
 
                 $final_rgd = $previous_rgd->replicate();
