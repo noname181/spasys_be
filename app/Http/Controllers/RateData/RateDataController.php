@@ -337,10 +337,18 @@ class RateDataController extends Controller
 
         $rmd = RateMetaData::where(
             [
-                'rgd_no' => $rgd_no,
+                'rgd_no' => $rgd->rgd_parent_no,
                 'set_type' => $set_type,
             ]
         )->first();
+        if (!isset($rmd->rmd_no)){
+            $rmd = RateMetaData::where(
+                [
+                    'rgd_no' => $rgd_no,
+                    'set_type' => $set_type,
+                ]
+            )->first();
+        }
 
         if (!isset($rmd->rmd_no) && $set_type == 'work_final') {
             if (empty($rmd)) {
@@ -3547,21 +3555,48 @@ class RateDataController extends Controller
             );
 
             if ($request->type == 'create_expectation' || $request->type == 'create_expectation_monthly') {
-                ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-                    'rgd_status4' => '예상경비청구서',
-                    'rgd_issue_date' => Carbon::now()->toDateTimeString(),
-                    'rgd_bill_type' => $request->bill_type,
-                    'rgd_storage_days' => $request->storage_days,
-                    'rgd_settlement_number' => $request->rgd_settlement_number,
-                    'rgd_integrated_calculate_yn'=> $request->rgd_integrated_calculate_yn,
-                    'rgd_calculate_deadline_yn'=> $request->rgd_calculate_deadline_yn,
-                    'mb_no' => Auth::user()->mb_no,
+                $previous_rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+
+                $previous_rgd->rgd_status5 = 'issued';
+                $previous_rgd->save();
+
+                $final_rgd = $previous_rgd->replicate();
+                $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
+                $final_rgd->rgd_status3 = null;
+                $final_rgd->rgd_status4 = $request->status;
+                $final_rgd->rgd_issue_date = Carbon::now()->toDateTimeString();
+                $final_rgd->rgd_settlement_number = $request->rgd_settlement_number;
+                $final_rgd->rgd_status5 = null;
+                $final_rgd->rgd_status6 = null;
+                $final_rgd->rgd_status7 = null;
+                $final_rgd->rgd_confirmed_date = null;
+                $final_rgd->rgd_paid_date = null;
+                $final_rgd->rgd_tax_invoice_date = null;
+                $final_rgd->rgd_tax_invoice_number = null;
+                $final_rgd->mb_no = Auth::user()->mb_no;
+                $final_rgd->rgd_parent_no = $previous_rgd->rgd_no;
+                $final_rgd->rgd_storage_days = $request->storage_days;
+                $final_rgd->rgd_integrated_calculate_yn = $request->rgd_integrated_calculate_yn;
+                $final_rgd->rgd_calculate_deadline_yn =  $request->rgd_calculate_deadline_yn;
+                $final_rgd->save();
+
+                RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
+                    'rgd_no' => $final_rgd->rgd_no,
                 ]);
-            }
 
-            $previous_rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->where('rgd_bill_type', '=', $request->previous_bill_type)->first();
+                // ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                //     'rgd_status4' => '예상경비청구서',
+                //     'rgd_issue_date' => Carbon::now()->toDateTimeString(),
+                //     'rgd_bill_type' => $request->bill_type,
+                //     'rgd_storage_days' => $request->storage_days,
+                //     'rgd_settlement_number' => $request->rgd_settlement_number,
+                //     'rgd_integrated_calculate_yn'=> $request->rgd_integrated_calculate_yn,
+                //     'rgd_calculate_deadline_yn'=> $request->rgd_calculate_deadline_yn,
+                //     'mb_no' => Auth::user()->mb_no,
+                // ]);
+            } else if (!isset($is_exist->rdg_no) && isset($request->previous_bill_type) && !empty($previous_rgd)) {
+                $previous_rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->where('rgd_bill_type', '=', $request->previous_bill_type)->first();
 
-            if (!isset($is_exist->rdg_no) && isset($request->previous_bill_type) && !empty($previous_rgd)) {
                 $previous_rgd->rgd_status5 = 'issued';
                 $previous_rgd->save();
 
@@ -3584,11 +3619,6 @@ class RateDataController extends Controller
 
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
                     'rgd_no' => $final_rgd->rgd_no,
-                ]);
-            } else {
-                RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
-                    'rgd_no' => $is_exist ? $is_exist->rgd_no : $rgd->rgd_no,
-
                 ]);
             }
 
