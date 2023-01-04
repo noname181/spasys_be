@@ -2724,6 +2724,7 @@ class RateDataController extends Controller
     {
         try {
             DB::beginTransaction();
+            $user = Auth::user();
             $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd_no)->first();
             $co_no = $rgd->warehousing->co_no;
             $adjustmentgroupall = AdjustmentGroup::where('co_no', $co_no)->get();
@@ -2741,7 +2742,6 @@ class RateDataController extends Controller
                 ->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
                 ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
                 ->where('rgd_status1', '=', '입고')
-                ->where('rgd_bill_type', $bill_type)
                 ->where('rgd_settlement_number', $rgd->rgd_settlement_number)
                 ->get();
 
@@ -2956,6 +2956,7 @@ class RateDataController extends Controller
     {
         try {
             DB::beginTransaction();
+            $user = Auth::user();
             if ($request->is_edit == 'edit') {
                 $i = 0;
                 foreach ($request->rgds as $key => $rgd) {
@@ -2990,7 +2991,7 @@ class RateDataController extends Controller
                 $rdg_sum7 = 0;
 
                 foreach ($request->rgds as $key => $rgd) {
-                    $is_exist = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', 'expectation_monthly')->first();
+                    $is_exist = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
                     $rdg_supply_price1 = $rdg_supply_price1 + $is_exist['rdg_supply_price1'];
                     $rdg_supply_price2 = $rdg_supply_price2 + $is_exist['rdg_supply_price2'];
                     $rdg_supply_price3 = $rdg_supply_price3 + $is_exist['rdg_supply_price3'];
@@ -3019,7 +3020,7 @@ class RateDataController extends Controller
                 foreach ($request->rgds as $key => $rgd) {
                     $is_exist = RateDataGeneral::where('rgd_no_expectation', $rgd['rgd_no'])->where('rdg_bill_type', 'final_monthly')->first();
                     if (!$is_exist) {
-                        $is_exist = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', 'expectation_monthly')->first();
+                        $is_exist = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
 
                         $final_rdg = $is_exist->replicate();
                         $final_rdg->rdg_bill_type = $request->bill_type; // the new project_id
@@ -3053,7 +3054,7 @@ class RateDataController extends Controller
                         $final_rdg = $is_exist;
                     }
 
-                    $expectation_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->where('rgd_bill_type', 'expectation_monthly')->first();
+                    $expectation_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->where('rgd_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
                     $final_rgd = ReceivingGoodsDelivery::where('rgd_parent_no', $rgd['rgd_no'])->where('rgd_bill_type', 'final_monthly')->first();
 
                     if (!$final_rgd) {
@@ -3116,6 +3117,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
