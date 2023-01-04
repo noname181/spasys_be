@@ -10,6 +10,7 @@ use App\Models\WarehousingStatus;
 use App\Models\ReceivingGoodsDelivery;
 use App\Models\RateDataGeneral;
 use App\Models\WarehousingItem;
+use App\Models\WarehousingSettlement;
 use App\Models\AdjustmentGroup;
 use App\Models\Package;
 use App\Models\ItemChannel;
@@ -1643,6 +1644,18 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'rgd_status1' => '입고 취소'
                             ]);
 
+                            //THUONG 
+                            $warehousing_settlement = WarehousingSettlement::where('w_no', $value['w_no']['w_no'])->get();
+                            foreach($warehousing_settlement as $ws){
+                                $warehousing =  Warehousing::where(['w_no' => $ws['w_no_settlement']])->first();
+                                Warehousing::where([
+                                    'w_no' => $ws['w_no_settlement'],
+                                ])->update([
+                                    'w_amount' => $warehousing->w_amount - $ws['w_amount']
+                                ]);
+                            }
+                            //THUONG 
+
                             WarehousingStatus::insert([
                                 'w_no' => $value['w_no']['w_no'],
                                 'mb_no' => $member->mb_no,
@@ -1658,6 +1671,18 @@ class ReceivingGoodsDeliveryController extends Controller
                             ->update([
                                 'rgd_status1' => '입고 취소'
                             ]);
+
+                        //THUONG 
+                        $warehousing_settlement = WarehousingSettlement::where('w_no', $request->w_no)->get();
+                        foreach($warehousing_settlement as $ws){
+                            $warehousing =  Warehousing::where(['w_no' => $ws['w_no_settlement']])->first();
+                            Warehousing::where([
+                                'w_no' => $ws['w_no_settlement'],
+                            ])->update([
+                                'w_amount' => $warehousing->w_amount - $ws['w_amount']
+                            ]);
+                        }
+                        //THUONG 
 
                         WarehousingStatus::insert([
                             'w_no' => $request->w_no,
