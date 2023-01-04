@@ -4007,7 +4007,7 @@ class WarehousingController extends Controller
                         ->where('w_category_name', '=', '수입풀필먼트')->where('w_type', '=', 'IW');
                 });
 
-            $warehousing->whereHas('rate_data_general');
+            $warehousing->whereNull('rgd_status4')->whereNull('rgd_status5')->whereHas('rate_data_general');
 
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
