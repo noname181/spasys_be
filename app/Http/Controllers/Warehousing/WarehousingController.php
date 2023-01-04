@@ -1537,14 +1537,29 @@ class WarehousingController extends Controller
                 if ($user->mb_type == 'shop') {
                     $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->whereNotNull('trans_no')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
+                    })->where(function ($q) {
+                        $q->whereHas('receving_goods_delivery', function ($q1) {
+                            $q1->where('rgd_status3', '!=',"배송완료");
+                            $q1->orwhereNull('rgd_status3');
+                        })->orwheredoesnthave('receving_goods_delivery');
                     })->orderBy('ss_no', 'DESC');
                 } else if ($user->mb_type == 'shipper') {
-                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->whereNotNull('trans_no')->where('status', '!=', '8')->whereHas('ContractWms.company', function ($q) use ($user) {
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->whereNotNull('trans_no')->whereHas('ContractWms.company', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
+                    })->where(function ($q) {
+                        $q->whereHas('receving_goods_delivery', function ($q1) {
+                            $q1->where('rgd_status3', '!=',"배송완료");
+                            $q1->orwhereNull('rgd_status3');
+                        })->orwheredoesnthave('receving_goods_delivery');
                     })->orderBy('ss_no', 'DESC');
                 } else if ($user->mb_type == 'spasys') {
-                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->whereNotNull('trans_no')->where('status', '!=', '8')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->whereNotNull('trans_no')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
+                    })->where(function ($q) {
+                        $q->whereHas('receving_goods_delivery', function ($q1) {
+                            $q1->where('rgd_status3', '!=',"배송완료");
+                            $q1->orwhereNull('rgd_status3');
+                        })->orwheredoesnthave('receving_goods_delivery');
                     })->orderBy('ss_no', 'DESC');
                 }
 
@@ -2048,14 +2063,29 @@ class WarehousingController extends Controller
                 if ($user->mb_type == 'shop') {
                     $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->whereNotNull('trans_no')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
+                    })->where(function ($q) {
+                        $q->whereHas('receving_goods_delivery', function ($q1) {
+                            $q1->where('rgd_status3', '!=',"배송완료");
+                            $q1->orwhereNull('rgd_status3');
+                        })->orwheredoesnthave('receving_goods_delivery');
                     })->orderBy('ss_no', 'DESC');
                 } else if ($user->mb_type == 'shipper') {
-                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->whereNotNull('trans_no')->where('status', '!=', '8')->whereHas('ContractWms.company', function ($q) use ($user) {
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->whereNotNull('trans_no')->whereHas('ContractWms.company', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
+                    })->where(function ($q) {
+                        $q->whereHas('receving_goods_delivery', function ($q1) {
+                            $q1->where('rgd_status3', '!=',"배송완료");
+                            $q1->orwhereNull('rgd_status3');
+                        })->orwheredoesnthave('receving_goods_delivery');
                     })->orderBy('ss_no', 'DESC');
                 } else if ($user->mb_type == 'spasys') {
-                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->whereNotNull('trans_no')->where('status', '!=', '8')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->whereNotNull('trans_no')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
+                    })->where(function ($q) {
+                        $q->whereHas('receving_goods_delivery', function ($q1) {
+                            $q1->where('rgd_status3', '!=',"배송완료");
+                            $q1->orwhereNull('rgd_status3');
+                        })->orwheredoesnthave('receving_goods_delivery');
                     })->orderBy('ss_no', 'DESC');
                 }
 
@@ -5415,10 +5445,21 @@ class WarehousingController extends Controller
                 }
             } elseif ($request->service == "수입풀필먼트") {
                 foreach ($request->datachkbox as $value) {
-                    $rgd = ScheduleShipment::where('ss_no', $value['ss_no'])
-                        ->update([
-                            'status' => 8,
-                        ]);
+                    // $rgd = ReceivingGoodsDelivery::where('ss_no', $value['ss_no'])
+                    //     ->update([
+                    //         'rgd_status3' => "배송완료",
+                    //     ]);
+                    $rgd = ReceivingGoodsDelivery::updateOrCreate(
+                        [
+                            'ss_no' =>  $value['ss_no']
+                        ],
+                        [
+                            'mb_no' => Auth::user()->mb_no,
+                            'service_korean_name' => '수입풀필먼트',
+                            'rgd_status1' => "출고",
+                            'rgd_status3' => "배송완료",
+                        ]
+                    );
                 }
             } else if ($request->service == "보세화물") {
                 foreach ($request->datachkbox as $value) {
@@ -5437,10 +5478,21 @@ class WarehousingController extends Controller
                                 'rgd_status3' => "배송완료",
                             ]);
                     } else if (isset($value['ss_no'])) {
-                        $rgd = ScheduleShipment::where('ss_no', $value['ss_no'])
-                            ->update([
-                                'status' => 8,
-                            ]);
+                        // $rgd = ReceivingGoodsDelivery::where('ss_no', $value['ss_no'])
+                        // ->update([
+                        //     'rgd_status3' => "배송완료",
+                        // ]);
+                        $rgd = ReceivingGoodsDelivery::updateOrCreate(
+                            [
+                                'ss_no' =>  $value['ss_no']
+                            ],
+                            [
+                                'mb_no' => Auth::user()->mb_no,
+                                'service_korean_name' => '수입풀필먼트',
+                                'rgd_status1' => "출고",
+                                'rgd_status3' => "배송완료",
+                            ]
+                        );
                     } else {
                         foreach ($value['receiving_goods_delivery'] as $receiving_goods_delivery) {
                             $rgd = ReceivingGoodsDelivery::where('rgd_no', $receiving_goods_delivery['rgd_no'])
