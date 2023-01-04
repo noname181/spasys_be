@@ -91,7 +91,7 @@ class NoticeController extends Controller
             $notice_no = Notice::insertGetId([
                 'mb_no' => $member->mb_no,
                 'notice_title' => $validated['notice_title'] == 'undefined' ? '' : $validated['notice_title'],
-                'notice_content' => $validated['notice_content'] == 'undefined' ? '' : $validated['notice_title'],
+                'notice_content' => $validated['notice_content'] == 'undefined' ? '' : $validated['notice_content'],
                 'notice_target' => $validated['notice_target'],
             ]);
 
