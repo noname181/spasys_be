@@ -1636,7 +1636,10 @@ class WarehousingController extends Controller
                     //     });
                     // }
                     $schedule_shipment->whereHas('receving_goods_delivery', function ($q) use ($validated) {
-                        $q->where('rgd_status3', '=', $validated['carrier']);
+                        //$q->where('rgd_status3', '=', $validated['carrier']);
+                        return $q->where(DB::raw('lower(rgd_status3)'), 'like', '%' . $validated['carrier'] . '%');
+
+                        
                     });
                 }
                 $schedule_shipment = $schedule_shipment->paginate($per_page, ['*'], 'page', $page);
@@ -1929,7 +1932,9 @@ class WarehousingController extends Controller
 
                 if (isset($validated['carrier'])) {
                     $import_schedule->whereHas('export.receiving_goods_delivery', function ($q) use ($validated) {
-                        return $q->where('rgd_delivery_company', '=', $validated['carrier']);
+                        //return $q->where('rgd_delivery_company', '=', $validated['carrier']);
+                        return $q->where(DB::raw('lower(rgd_delivery_company)'), 'like', '%' . $validated['carrier'] . '%');
+
                     });
                 }
                 $import_schedule = $import_schedule->paginate($per_page, ['*'], 'page', $page);
@@ -2135,7 +2140,8 @@ class WarehousingController extends Controller
                     //     });
                     // }
                     $schedule_shipment->whereHas('receving_goods_delivery', function ($q) use ($validated) {
-                        $q->where('rgd_status3', '=', $validated['carrier']);
+                       // $q->where('rgd_status3', '=', $validated['carrier']);
+                        return $q->where(DB::raw('lower(rgd_status3)'), 'like', '%' . $validated['carrier'] . '%');
                     });
                 }
 
@@ -2297,7 +2303,8 @@ class WarehousingController extends Controller
                 }
                 if (isset($validated['carrier'])) {
                     $import_schedule->whereHas('export.receiving_goods_delivery', function ($q) use ($validated) {
-                        return $q->where('rgd_delivery_company', '=', $validated['carrier']);
+                       // return $q->where('rgd_delivery_company', '=', $validated['carrier']);
+                        return $q->where(DB::raw('lower(rgd_delivery_company)'), 'like', '%' . $validated['carrier'] . '%');
                     });
                 }
 
