@@ -54,7 +54,7 @@ class MemberUpdateByIdRequest extends BaseFormRequest
             'mb_tel' => [
                 'string',
                 'max:255',
-                'regex:/^\(\+[0-9]{2}\) [0-9]{2}-[0-9]{4}-[0-9]{4}$/'
+                //'regex:/^\(\+[0-9]{2}\) [0-9]{2}-[0-9]{4}-[0-9]{4}$/'
             ],
             'mb_hp' => [
                 'required',
