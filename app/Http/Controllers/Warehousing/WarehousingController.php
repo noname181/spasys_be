@@ -1654,7 +1654,7 @@ class WarehousingController extends Controller
                         //$q->where('rgd_status3', '=', $validated['carrier']);
                         return $q->where(DB::raw('lower(rgd_status3)'), 'like', '%' . $validated['carrier'] . '%');
 
-                        
+
                     });
                 }
                 $schedule_shipment = $schedule_shipment->paginate($per_page, ['*'], 'page', $page);
@@ -4242,7 +4242,7 @@ class WarehousingController extends Controller
                     $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
-                });
+                })->whereNull('rgd_status4');
             } else if ($user->mb_type == 'shipper') {
                 $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 't_import', 'rate_meta_data' => function ($q) {
 
@@ -4270,7 +4270,7 @@ class WarehousingController extends Controller
                     $query->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
-                });
+                })->whereNull('rgd_status5');
             }
             $warehousing->where('rgd_status1', '=', '입고')
                 ->where(function ($q) {
