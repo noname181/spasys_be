@@ -2315,10 +2315,7 @@ class RateDataController extends Controller
             $previous_rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
 
             if (!isset($is_exist->rdg_no) && isset($request->previous_bill_type)) {
-                if ($rgd->rgd_bill_type == 'expectation_monthly_spasys' || 
-                    $rgd->rgd_bill_type == 'expectation_monthly_shop' || 
-                    $rgd->rgd_bill_type == 'expectation_spasys' || 
-                    $rgd->rgd_bill_type == 'expectation_shop') {
+                if ($rgd->rgd_bill_type == null) {
                     $previous_rgd->rgd_status4 = $user->mb_type == 'shop' ? 'issued' : NULL;
                     $previous_rgd->rgd_status5 = $user->mb_type == 'spasys' ? 'issued' : NULL;
                     $previous_rgd->save();
