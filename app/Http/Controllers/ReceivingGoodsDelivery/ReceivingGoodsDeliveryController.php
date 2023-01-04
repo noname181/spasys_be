@@ -98,6 +98,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'w_category_name' => $request->w_category_name,
                     'co_no' => isset($validated['co_no']) ? $validated['co_no'] : $co_no,
                 ]);
+               
             }
 
             $w_no = isset($validated['w_no']) ? $validated['w_no'] : $w_no_data;
@@ -137,6 +138,19 @@ class ReceivingGoodsDeliveryController extends Controller
                     } else {
                         Warehousing::where('w_no', $validated['connect_w'])->update([
                             'connection_number' => $validated['connection_number']
+                        ]);
+                    }
+                }else{
+                    Warehousing::where('w_no', $w_no_data )->update([
+                        'connection_number' => $validated['connection_number'].$w_no_data
+                    ]);
+                    if ($validated['type_w_choose'] == "export") {
+                        Export::where('te_carry_out_number', $validated['connect_w'])->update([
+                            'connection_number' => $validated['connection_number'].$w_no_data
+                        ]);
+                    } else {
+                        Warehousing::where('w_no', $validated['connect_w'])->update([
+                            'connection_number' => $validated['connection_number'].$w_no_data
                         ]);
                     }
                 }
