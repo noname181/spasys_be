@@ -134,4 +134,9 @@ class Warehousing extends Model
     {
         return $this->belongsTo(ImportExpected::class, 'tie_no', 'tie_no')->with(['import']);
     }
+
+    public function warehousing_status()
+    {
+        return $this->hasOne(WarehousingStatus::class, 'w_no', 'w_no');
+    }
 }
