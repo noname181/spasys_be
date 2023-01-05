@@ -958,10 +958,11 @@ class ReceivingGoodsDeliveryController extends Controller
         } catch (\Throwable $e) {
             DB::rollback();
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
+
     public function create_warehousing_release_mobile(Request $request)
     {
         // $validated = $request->validated();

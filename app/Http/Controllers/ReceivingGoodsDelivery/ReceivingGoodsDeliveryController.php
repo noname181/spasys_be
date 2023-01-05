@@ -940,7 +940,7 @@ class ReceivingGoodsDeliveryController extends Controller
         } catch (\Throwable $e) {
             DB::rollback();
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -1798,6 +1798,12 @@ class ReceivingGoodsDeliveryController extends Controller
                         Package::where('w_no', $request->w_no)->delete();
 
                         ReceivingGoodsDelivery::where('w_no', $request->w_no)->update([
+                            'rgd_delivery_company' => null,
+                            'rgd_tracking_code' => null,
+                            'rgd_delivery_man' => null,
+                            'rgd_delivery_man_hp' => null,
+                            'rgd_delivery_schedule_day' => null,
+                            'rgd_arrive_day' => null,
                             'rgd_status1' => '출고예정',
                             'rgd_status2' => '작업완료',
                             'rgd_status3' => null
