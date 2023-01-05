@@ -1524,7 +1524,9 @@ class WarehousingController extends Controller
                             ->orWhere('rgd_status1', '=', $validated['rgd_status1_3'] ? $validated['rgd_status1_3'] : "");
                     });
                 }
-
+                if (isset($validated['carrier'])) {
+                    $warehousing->where(DB::raw('lower(rgd_delivery_company)'), 'like', '%' . $validated['carrier'] . '%');
+                }
                 $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
                 return response()->json($warehousing);
             } else if ($validated['service'] == "수입풀필먼트") {
@@ -1650,12 +1652,22 @@ class WarehousingController extends Controller
                     //         $q->where('rgd_status3', '=', '배송완료');
                     //     });
                     // }
-                    $schedule_shipment->whereHas('receving_goods_delivery', function ($q) use ($validated) {
-                        //$q->where('rgd_status3', '=', $validated['carrier']);
-                        return $q->where(DB::raw('lower(rgd_status3)'), 'like', '%' . $validated['carrier'] . '%');
-
-
-                    });
+                    if($validated['carrier'] == '택배'){
+                        $schedule_shipment->where(function ($q) use ($validated) {
+                            $q->whereHas('receving_goods_delivery', function ($q) use ($validated) {
+                                //$q->where('rgd_status3', '=', $validated['carrier']);
+                                return $q->where(DB::raw('lower(rgd_delivery_company)'), 'like', '%' . $validated['carrier'] . '%');
+                            })->orwheredoesnthave('receving_goods_delivery');
+                        });
+                        } else {
+                            $schedule_shipment->where(function ($q) use ($validated) {
+                                $q->whereHas('receving_goods_delivery', function ($q) use ($validated) {
+                                    //$q->where('rgd_status3', '=', $validated['carrier']);
+                                    return $q->where(DB::raw('lower(rgd_delivery_company)'), 'like', '%' . $validated['carrier'] . '%');
+                                });
+                            });
+                        }
+                    
                 }
                 $schedule_shipment = $schedule_shipment->paginate($per_page, ['*'], 'page', $page);
 
@@ -2059,6 +2071,9 @@ class WarehousingController extends Controller
                             ->orWhere('rgd_status1', '=', $validated['rgd_status1_3'] ? $validated['rgd_status1_3'] : "");
                     });
                 }
+                if (isset($validated['carrier'])) {
+                    $warehousing->where(DB::raw('lower(rgd_delivery_company)'), 'like', '%' . $validated['carrier'] . '%'); 
+                }
 
                 if ($user->mb_type == 'shop') {
                     $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->whereNotNull('trans_no')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
@@ -2169,10 +2184,21 @@ class WarehousingController extends Controller
                     //         $q->where('rgd_status3', '=', '배송완료');
                     //     });
                     // }
-                    $schedule_shipment->whereHas('receving_goods_delivery', function ($q) use ($validated) {
-                       // $q->where('rgd_status3', '=', $validated['carrier']);
-                        return $q->where(DB::raw('lower(rgd_status3)'), 'like', '%' . $validated['carrier'] . '%');
-                    });
+                    if($validated['carrier'] == '택배'){
+                        $schedule_shipment->where(function ($q) use ($validated) {
+                            $q->whereHas('receving_goods_delivery', function ($q) use ($validated) {
+                                //$q->where('rgd_status3', '=', $validated['carrier']);
+                                return $q->where(DB::raw('lower(rgd_delivery_company)'), 'like', '%' . $validated['carrier'] . '%');
+                            })->orwheredoesnthave('receving_goods_delivery');
+                        });
+                        } else {
+                            $schedule_shipment->where(function ($q) use ($validated) {
+                                $q->whereHas('receving_goods_delivery', function ($q) use ($validated) {
+                                    //$q->where('rgd_status3', '=', $validated['carrier']);
+                                    return $q->where(DB::raw('lower(rgd_delivery_company)'), 'like', '%' . $validated['carrier'] . '%');
+                                });
+                            });
+                        }
                 }
 
                 DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
@@ -2337,6 +2363,7 @@ class WarehousingController extends Controller
                         return $q->where(DB::raw('lower(rgd_delivery_company)'), 'like', '%' . $validated['carrier'] . '%');
                     });
                 }
+                
 
 
                 $warehousing = $warehousing->get();
