@@ -357,16 +357,14 @@ class RateDataController extends Controller
                         'rgd_no' => $rgd->rgd_parent_no,
                         'set_type' => 'work_spasys',
                     ]
-                )->first();
-            }
-            if (empty($rmd)) {
-                $rmd = RateMetaData::where(
+                )->orWhere([
                     [
                         'rgd_no' => $rgd->rgd_parent_no,
                         'set_type' => 'work_shop',
                     ]
-                )->first();
+                ])->first();
             }
+          
             if (empty($rmd) && !empty($rdg)) {
                 $rmd = RateMetaData::where(
                     [
@@ -379,9 +377,14 @@ class RateDataController extends Controller
                 $rmd = RateMetaData::where(
                     [
                         'rgd_no' => $rdg->rgd_no_expectation,
-                        'set_type' => 'work',
+                        'set_type' => 'work_spasys',
                     ]
-                )->first();
+                )->orWhere([
+                    [
+                        'rgd_no' => $rdg->rgd_no_expectation,
+                        'set_type' => 'work_shop',
+                    ]
+                ])->first();
             }
         } else if (!isset($rmd->rmd_no) && $set_type == 'storage_final') {
             if (empty($rmd)) {
@@ -390,16 +393,14 @@ class RateDataController extends Controller
                         'rgd_no' => $rgd->rgd_parent_no,
                         'set_type' => 'storage_spasys',
                     ]
-                )->first();
-            }
-            if (empty($rmd)) {
-                $rmd = RateMetaData::where(
+                )->orWhere(
                     [
                         'rgd_no' => $rgd->rgd_parent_no,
                         'set_type' => 'storage_shop',
                     ]
                 )->first();
             }
+         
             if (empty($rmd) && !empty($rdg)) {
                 $rmd = RateMetaData::where(
                     [
@@ -412,7 +413,12 @@ class RateDataController extends Controller
                 $rmd = RateMetaData::where(
                     [
                         'rgd_no' => $rdg->rgd_no_expectation,
-                        'set_type' => 'storage',
+                        'set_type' => 'storage_spasys',
+                    ]
+                )->orWhere(
+                    [
+                        'rgd_no' => $rdg->rgd_no_expectation,
+                        'set_type' => 'storage_shop',
                     ]
                 )->first();
             }
@@ -423,16 +429,14 @@ class RateDataController extends Controller
                         'rgd_no' => $rgd->rgd_parent_no,
                         'set_type' => 'domestic_spasys',
                     ]
-                )->first();
-            }
-            if (empty($rmd)) {
-                $rmd = RateMetaData::where(
+                )->orWhere(
                     [
                         'rgd_no' => $rgd->rgd_parent_no,
-                        'set_type' => 'domestic_shop',
+                        'set_type' => 'domestice_shop',
                     ]
                 )->first();
             }
+           
             if (empty($rmd) && !empty($rdg)) {
                 $rmd = RateMetaData::where(
                     [
@@ -445,7 +449,12 @@ class RateDataController extends Controller
                 $rmd = RateMetaData::where(
                     [
                         'rgd_no' => $rdg->rgd_no_expectation,
-                        'set_type' => 'domestic',
+                        'set_type' => 'domestic_spasys',
+                    ]
+                )->orWhere(
+                    [
+                        'rgd_no' => $rdg->rgd_no_expectation,
+                        'set_type' => 'domestice_shop',
                     ]
                 )->first();
             }
