@@ -3542,7 +3542,7 @@ class RateDataController extends Controller
                 $final_rgd->save();
 
                 $settlement_number = explode('_', $final_rgd->rgd_settlement_number);
-                $settlement_number[2] = str_replace("M", "MA", $settlement_number[2]);
+                $settlement_number[2] = str_replace("MF", "MA", $settlement_number[2]);
                 $final_rgd->rgd_settlement_number = implode("_", $settlement_number);
                 $final_rgd->save();
 
