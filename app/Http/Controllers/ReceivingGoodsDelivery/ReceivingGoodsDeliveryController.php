@@ -2051,7 +2051,7 @@ class ReceivingGoodsDeliveryController extends Controller
             foreach ($validated['location'] as $rgd) {
 
                 if (!isset($rgd['rgd_no'])) {
-                    if ($rgd['is_no']) {
+                    if (isset($rgd['is_no'])) {
                         $rgd_no = ReceivingGoodsDelivery::insertGetId([
                             'mb_no' => $member->mb_no,
                             'is_no' => $rgd['is_no'],
