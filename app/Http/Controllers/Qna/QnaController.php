@@ -376,7 +376,8 @@ class QnaController extends Controller
             }])->with(['member' => function($query){
 
             }])
-            ->orderBy('depth_path')
+            ->orderBy('answer_for')
+            ->orderBy('depth_path','DESC')
             ->orderBy('qna_no', 'DESC');
 
             if (isset($validated['from_date'])) {
