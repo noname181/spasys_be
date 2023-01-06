@@ -1758,7 +1758,7 @@ class ReceivingGoodsDeliveryController extends Controller
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
             if ($request->page_type == 'IW') {
                 if (isset($request->w_no)) {
-                    $check = ReceivingGoodsDelivery::where('w_no', $request->w_no)->where('rgd_status2', '!=', '작업완료')->orwherenull('rgd_status2')->where('w_no', $request->w_no)->first();
+                    $check = ReceivingGoodsDelivery::where('w_no', $request->w_no)->where('rgd_status2', '!=', '작업완료')->orwherenull('rgd_status2')->first();
 
                     if (isset($check->rgd_no)) {
                         Warehousing::where('w_no', $request->w_no)->update([
@@ -1771,7 +1771,9 @@ class ReceivingGoodsDeliveryController extends Controller
 
                         ReceivingGoodsDelivery::where('w_no', $request->w_no)->update([
                             'rgd_status1' => '입고예정',
-                            'rgd_status2' => null
+                            'rgd_status2' => null,
+                            'rgd_delivery_schedule_day' => null,
+                            'rgd_arrive_day' => null
                         ]);
 
                         WarehousingStatus::insert([
