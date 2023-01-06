@@ -2379,7 +2379,10 @@ class ReceivingGoodsDeliveryController extends Controller
                 }
             } else if ($request->bill_type == 'monthly') {
                 foreach ($request->rgds as $rgd) {
-                    $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->first();
+                    $rgd = ReceivingGoodsDelivery::where('rgd_parent_no', $rgd['rgd_no'])->where(function($q) {
+                        $q->where('rgd_status5', '!=', 'cancel')
+                        ->orwhereNull('rgd_status5');
+                    })->first();
 
                     $rate_data_general = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->first();
 
@@ -2450,7 +2453,7 @@ class ReceivingGoodsDeliveryController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
