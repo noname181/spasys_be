@@ -48,7 +48,7 @@ class ManagerUpdateRequest extends BaseFormRequest
                 'required',
                 'string',
                 'max:255',
-                'regex:/[0-9]{3}-[0-9]{4}-[0-9]{4}$/',
+                //'regex:/[0-9]{3}-[0-9]{4}-[0-9]{4}$/',
             ],
             'm_etc' => [
                 'string',
