@@ -197,7 +197,7 @@ class MenuController extends Controller
     public function get_menu($menu_no)
     {
         try {
-            $menu = Menu::where('menu_no', $menu_no)->first();
+            $menu = Menu::with(['menu_childs'])->where('menu_no', $menu_no)->first();
             $menu_main = Menu::select(['menu_no', 'menu_name', 'service_no_array'])->where('menu_depth', '상위')->get();
             $services = Service::select(['service_no', 'service_name'])->where('service_use_yn', 'y')->get();
 
@@ -264,7 +264,20 @@ class MenuController extends Controller
             $validated = $request->validated();
             $menu = Menu::where('menu_no', $validated['menu_no'])
                 ->update($validated);
-
+            if($validated['menu_depth'] == '상위'){
+                $update_sub_menu = Menu::where('menu_parent_no',$validated['menu_no']) ->update([
+                    'menu_device' => $validated['menu_device'],
+                    'service_no_array' => $validated['service_no_array'],
+                ]);
+                if($validated['menu_use_yn'] == 'n'){
+                    $update_sub_menu2 = Menu::where('menu_parent_no',$validated['menu_no']) ->update([
+                        'menu_use_yn' => 'n',
+                    ]);
+                }
+                
+            }
+            
+            
             return response()->json(['message' => Messages::MSG_0007], 200);
         } catch (\Exception $e) {
             Log::error($e);
