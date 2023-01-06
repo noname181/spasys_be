@@ -2381,7 +2381,10 @@ class ReceivingGoodsDeliveryController extends Controller
                 }
             } else if ($request->bill_type == 'monthly') {
                 foreach ($request->rgds as $rgd) {
-                    $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->first();
+                    $rgd = ReceivingGoodsDelivery::where('rgd_parent_no', $rgd['rgd_no'])->where(function($q) {
+                        $q->where('rgd_status5', '!=', 'cancel')
+                        ->orwhereNull('rgd_status5');
+                    })->first();
 
                     $rate_data_general = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->first();
 
@@ -2452,7 +2455,7 @@ class ReceivingGoodsDeliveryController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -2599,7 +2602,8 @@ class ReceivingGoodsDeliveryController extends Controller
                     'p_cancel_time' => null,
                 ]);
 
-                ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+                ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     'rgd_status6' => 'paid',
                     'rgd_paid_date' =>  Carbon::now(),
                     'rgd_canceled_date' => null
@@ -2615,7 +2619,8 @@ class ReceivingGoodsDeliveryController extends Controller
                         'p_success_yn' => 'y',
                     ]
                 );
-                ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+                ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     'rgd_status6' => 'paid',
                     'rgd_paid_date' =>  Carbon::now(),
                 ]);

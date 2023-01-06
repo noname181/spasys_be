@@ -85,7 +85,7 @@ class ReceivingGoodsDelivery extends Model
     }
     public function rgd_child()
     {
-        return $this->hasOne(ReceivingGoodsDelivery::class, 'rgd_parent_no', 'rgd_no');
+        return $this->hasOne(ReceivingGoodsDelivery::class, 'rgd_parent_no', 'rgd_no')->where('rgd_status5', '!=', 'cancel');
     }
 
     public function rate_data_general(){
