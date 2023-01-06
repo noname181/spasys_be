@@ -2600,7 +2600,8 @@ class ReceivingGoodsDeliveryController extends Controller
                     'p_cancel_time' => null,
                 ]);
 
-                ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+                ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     'rgd_status6' => 'paid',
                     'rgd_paid_date' =>  Carbon::now(),
                     'rgd_canceled_date' => null
@@ -2616,7 +2617,8 @@ class ReceivingGoodsDeliveryController extends Controller
                         'p_success_yn' => 'y',
                     ]
                 );
-                ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+                ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     'rgd_status6' => 'paid',
                     'rgd_paid_date' =>  Carbon::now(),
                 ]);
