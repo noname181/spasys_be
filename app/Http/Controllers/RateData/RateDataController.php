@@ -331,8 +331,10 @@ class RateDataController extends Controller
             ], 200);
         }
 
+        $user = Auth::user();
         $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
         $previous_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
+
         $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
 
         $rmd = RateMetaData::where(
@@ -355,14 +357,9 @@ class RateDataController extends Controller
                 $rmd = RateMetaData::where(
                     [
                         'rgd_no' => $rgd->rgd_parent_no,
-                        'set_type' => 'work_spasys',
+                        'set_type' => $user->mb_type == 'spasys' ? 'work_spasys' : 'work_shop',
                     ]
-                )->orWhere([
-                    [
-                        'rgd_no' => $rgd->rgd_parent_no,
-                        'set_type' => 'work_shop',
-                    ]
-                ])->first();
+                )->first();
             }
           
             if (empty($rmd) && !empty($rdg)) {
@@ -377,30 +374,36 @@ class RateDataController extends Controller
                 $rmd = RateMetaData::where(
                     [
                         'rgd_no' => $rdg->rgd_no_expectation,
-                        'set_type' => 'work_spasys',
+                        'set_type' => $user->mb_type == 'spasys' ? 'work_spasys' : 'work_shop',
                     ]
-                )->orWhere([
+                )->first();
+            }
+            if (empty($rmd) && !empty($previous_rgd_parent)) {
+                $rmd = RateMetaData::where(
                     [
                         'rgd_no' => $rdg->rgd_no_expectation,
-                        'set_type' => 'work_shop',
+                        'set_type' => $user->mb_type == 'spasys' ? 'work_spasys' : 'work_shop',
                     ]
-                ])->first();
+                )->first();
+            }
+            if (empty($rmd) && !empty($previous_rgd)) {
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $previous_rgd->rgd_parent_no,
+                        'set_type' => $user->mb_type == 'spasys' ? 'work_spasys' : 'work_shop',
+                    ]
+                )->first();
             }
         } else if (!isset($rmd->rmd_no) && $set_type == 'storage_final') {
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
                     [
                         'rgd_no' => $rgd->rgd_parent_no,
-                        'set_type' => 'storage_spasys',
-                    ]
-                )->orWhere(
-                    [
-                        'rgd_no' => $rgd->rgd_parent_no,
-                        'set_type' => 'storage_shop',
+                        'set_type' => $user->mb_type == 'spasys' ? 'storage_spasys' : 'storage_shop',
                     ]
                 )->first();
             }
-         
+          
             if (empty($rmd) && !empty($rdg)) {
                 $rmd = RateMetaData::where(
                     [
@@ -413,26 +416,25 @@ class RateDataController extends Controller
                 $rmd = RateMetaData::where(
                     [
                         'rgd_no' => $rdg->rgd_no_expectation,
-                        'set_type' => 'storage_spasys',
-                    ]
-                )->orWhere(
-                    [
-                        'rgd_no' => $rdg->rgd_no_expectation,
-                        'set_type' => 'storage_shop',
+                        'set_type' => $user->mb_type == 'spasys' ? 'storage_spasys' : 'storage_shop',
                     ]
                 )->first();
             }
+            if (empty($rmd) && !empty($previous_rgd)) {
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $previous_rgd->rgd_parent_no,
+                        'set_type' => $user->mb_type == 'spasys' ? 'storage_spasys' : 'storage_shop',
+                    ]
+                )->first();
+            }
+           
         } else if (!isset($rmd->rmd_no) && $set_type == 'domestic_final') {
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
                     [
                         'rgd_no' => $rgd->rgd_parent_no,
-                        'set_type' => 'domestic_spasys',
-                    ]
-                )->orWhere(
-                    [
-                        'rgd_no' => $rgd->rgd_parent_no,
-                        'set_type' => 'domestice_shop',
+                        'set_type' => $user->mb_type == 'spasys' ? 'domestic_spasys' : 'domestic_shop',
                     ]
                 )->first();
             }
@@ -449,12 +451,16 @@ class RateDataController extends Controller
                 $rmd = RateMetaData::where(
                     [
                         'rgd_no' => $rdg->rgd_no_expectation,
-                        'set_type' => 'domestic_spasys',
+                        'set_type' => $user->mb_type == 'spasys' ? 'domestic_spasys' : 'domestic_shop',
                     ]
-                )->orWhere(
+                )->first();
+            }
+
+            if (empty($rmd) && !empty($previous_rgd)) {
+                $rmd = RateMetaData::where(
                     [
-                        'rgd_no' => $rdg->rgd_no_expectation,
-                        'set_type' => 'domestice_shop',
+                        'rgd_no' => $previous_rgd->rgd_parent_no,
+                        'set_type' => $user->mb_type == 'spasys' ? 'domestic_spasys' : 'domestic_shop',
                     ]
                 )->first();
             }
@@ -2297,6 +2303,8 @@ class RateDataController extends Controller
         try {
             DB::beginTransaction();
             $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
+
+            $rdg = RateDataGeneral::with(['warehousing'])->where('rgd_no', $rgd_no)->where('rdg_bill_type', 'final')->first();
             $rdg = RateDataGeneral::with(['warehousing'])->where('rgd_no', $rgd_no)->where(function($q){
                 $q->where('rdg_bill_type', 'final_spasys')
                 ->orWhere('rdg_bill_type', 'final_shop');
@@ -2341,7 +2349,7 @@ class RateDataController extends Controller
             DB::beginTransaction();
             $user = Auth::user();
             //Check is there already RateDataGeneral with rdg_no yet
-            $is_exist = RateDataGeneral::where('rdg_no', $request->rdg_no)->where('rdg_bill_type', $request->bill_type)->first();
+            $is_exist = RateDataGeneral::where('rgd_no', $request->rgd_no)->where('rdg_bill_type', $request->bill_type)->first();
 
             //Get RecevingGoodsDelivery base on rgd_no
             $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
@@ -2385,8 +2393,8 @@ class RateDataController extends Controller
 
             if (!isset($is_exist->rdg_no) && isset($request->previous_bill_type)) {
                 if ($rgd->rgd_bill_type == null) {
-                    $previous_rgd->rgd_status4 = $user->mb_type == 'shop' ? 'issued' : NULL;
-                    $previous_rgd->rgd_status5 = $user->mb_type == 'spasys' ? 'issued' : NULL;
+                    $previous_rgd->rgd_status4 = $user->mb_type == 'shop' ? 'issued' : $previous_rgd->rgd_status4;
+                    $previous_rgd->rgd_status5 = $user->mb_type == 'spasys' ? 'issued' : $previous_rgd->rgd_status5;
                     $previous_rgd->save();
                 }else if ($rgd->rgd_bill_type != 'expectation_monthly') {
                     $previous_rgd->rgd_status5 = 'issued';
@@ -3500,8 +3508,8 @@ class RateDataController extends Controller
             if ($request->bill_type == 'final_spasys' || $request->bill_type == 'final_shop') {
                 $previous_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_no)->first();
 
-                $previous_rgd->rgd_status4 = $user->mb_type == 'shop' ? 'issued' : NULL;
-                $previous_rgd->rgd_status5 = $user->mb_type == 'spasys' ? 'issued' : NULL;
+                $previous_rgd->rgd_status4 = $user->mb_type == 'shop' ? 'issued' : $previous_rgd->rgd_status4;
+                $previous_rgd->rgd_status5 = $user->mb_type == 'spasys' ? 'issued' : $previous_rgd->rgd_status5;
                 $previous_rgd->save();
 
                 $final_rgd = $previous_rgd->replicate();
@@ -3669,8 +3677,8 @@ class RateDataController extends Controller
             if ($request->type == 'create_expectation' || $request->type == 'create_expectation_monthly') {
                 $previous_rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
 
-                $previous_rgd->rgd_status4 = $user->mb_type == 'shop' ? 'issued' : NULL;
-                $previous_rgd->rgd_status5 = $user->mb_type == 'spasys' ? 'issued' : NULL;
+                $previous_rgd->rgd_status4 = $user->mb_type == 'shop' ? 'issued' : $previous_rgd->rgd_status4;
+                $previous_rgd->rgd_status5 = $user->mb_type == 'spasys' ? 'issued' : $previous_rgd->rgd_status5;
                 $previous_rgd->save();
 
                 $final_rgd = $previous_rgd->replicate();
