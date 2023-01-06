@@ -3099,30 +3099,33 @@ class WarehousingController extends Controller
                 $start_date = $created_at->startOfMonth()->toDateString();
                 $end_date = $created_at->endOfMonth()->toDateString();
 
-                $rgds = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])
-                    ->whereHas('w_no', function ($q) use ($co_no) {
-                        $q->where('co_no', $co_no)
-                            ->where('w_category_name', '유통가공');
-                    })
-                    ->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
-                    ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
-                    ->where('rgd_status1', '=', '입고')
-                    ->where('rgd_bill_type', 'expectation_monthly')
-                    ->where(function ($q) {
-                        $q->whereDoesntHave('rgd_child')
-                            ->orWhere('rgd_status5', '!=', 'issued')
-                            ->orWhereNull('rgd_status5');
-                    })->whereHas('mb_no', function ($q) {
-                        if (Auth::user()->mb_type == 'spasys') {
-                            $q->where('mb_type', 'spasys');
-                        } else if (Auth::user()->mb_type == 'shop') {
-                            $q->where('mb_type', 'shop');
-                        }
-                    })
-                    ->where(function ($q) {
-                        $q->where('rgd_status4', '=', '예상경비청구서')->orWhereNull('rgd_status4');
-                    })
-                    ->get();
+                $rgds = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent'])
+                ->whereHas('w_no', function ($q) use ($co_no) {
+                    $q->where('co_no', $co_no)
+                        ->where('w_category_name', '유통가공');
+                })->whereHas('mb_no', function ($q) {
+                if (Auth::user()->mb_type == 'spasys') {
+                    $q->where('mb_type', 'spasys');
+                } else if (Auth::user()->mb_type == 'shop') {
+                    $q->where('mb_type', 'shop');
+                }
+
+            })
+            // ->doesntHave('rgd_child')
+                ->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
+                ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
+                ->where('rgd_status1', '=', '입고')
+                
+                ->where('rgd_bill_type', $user->mb_type =='spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')
+                ->where(function ($q) {
+                    $q->whereDoesntHave('rgd_child')
+                        ->orWhere(function ($q) {
+                            $q->where('rgd_status5', '!=', 'cancel')
+                                ->where('rgd_status5', '!=', 'issued');
+                        })
+                        ->orWhereNull('rgd_status5');
+                })
+                ->get();
 
                 foreach ($rgds as $key => $rgd2) {
                     $rmd = RateMetaData::where('rgd_no', $rgd2['rgd_parent_no'])->where('set_type', 'work_monthly')->first();

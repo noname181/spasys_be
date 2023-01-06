@@ -2305,10 +2305,12 @@ class RateDataController extends Controller
             $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
 
             $rdg = RateDataGeneral::with(['warehousing'])->where('rgd_no', $rgd_no)->where('rdg_bill_type', 'final')->first();
-            $rdg = RateDataGeneral::with(['warehousing'])->where('rgd_no', $rgd_no)->where(function($q){
-                $q->where('rdg_bill_type', 'final_spasys')
-                ->orWhere('rdg_bill_type', 'final_shop');
-            })->first();
+            if (empty($rdg)) {
+                $rdg = RateDataGeneral::with(['warehousing'])->where('rgd_no', $rgd_no)->where(function($q){
+                    $q->where('rdg_bill_type', 'final_spasys')
+                    ->orWhere('rdg_bill_type', 'final_shop');
+                })->first();
+            }
             if (empty($rdg)) {
                 $rdg = RateDataGeneral::with(['warehousing'])->where('rgd_no_expectation', $rgd->rgd_parent_no)->where(function($q){
                     $q->where('rdg_bill_type', 'final_spasys')
@@ -2369,23 +2371,23 @@ class RateDataController extends Controller
                     'mb_no' => Auth::user()->mb_no,
                     'rdg_set_type' => isset($ag->ag_name) ? $ag->ag_name : null,
                     'ag_no' => isset($ag->ag_no) ? $ag->ag_no : null,
-                    'rdg_supply_price1' => isset($request->storageData['supply_price']) ? $request->storageData['supply_price'] : '',
-                    'rdg_supply_price2' => isset($request->workData['supply_price']) ? $request->workData['supply_price'] : '',
-                    'rdg_supply_price3' => isset($request->domesticData['supply_price']) ? $request->domesticData['supply_price'] : '',
-                    'rdg_supply_price4' => isset($request->total['supply_price']) ? $request->total['supply_price'] : '',
-                    'rdg_vat1' => isset($request->storageData['taxes']) ? $request->storageData['taxes'] : '',
-                    'rdg_vat2' => isset($request->workData['taxes']) ? $request->workData['taxes'] : '',
-                    'rdg_vat3' => isset($request->domesticData['taxes']) ? $request->domesticData['taxes'] : '',
-                    'rdg_vat4' => isset($request->total['taxes']) ? $request->total['taxes'] : '',
-                    'rdg_sum1' => isset($request->storageData['sum']) ? $request->storageData['sum'] : '',
-                    'rdg_sum2' => isset($request->workData['sum']) ? $request->workData['sum'] : '',
-                    'rdg_sum3' => isset($request->domesticData['sum']) ? $request->domesticData['sum'] : '',
-                    'rdg_sum4' => isset($request->total['sum']) ? $request->total['sum'] : '',
-                    'rdg_etc1' => isset($request->storageData['etc']) ? $request->storageData['etc'] : '',
-                    'rdg_etc2' => isset($request->workData['etc']) ? $request->workData['etc'] : '',
-                    'rdg_etc3' => isset($request->domesticData['etc']) ? $request->domesticData['etc'] : '',
-                    'rdg_etc4' => isset($request->total['etc']) ? $request->total['etc'] : '',
-
+                    'rdg_supply_price1' => isset($request->storageData['supply_price']) ? $request->storageData['supply_price'] : 0,
+                    'rdg_supply_price2' => isset($request->workData['supply_price']) ? $request->workData['supply_price'] : 0,
+                    'rdg_supply_price3' => isset($request->domesticData['supply_price']) ? $request->domesticData['supply_price'] : 0,
+                    'rdg_supply_price4' => isset($request->total['supply_price']) ? $request->total['supply_price'] : 0,
+                    'rdg_vat1' => isset($request->storageData['taxes']) ? $request->storageData['taxes'] : 0,
+                    'rdg_vat2' => isset($request->workData['taxes']) ? $request->workData['taxes'] : 0,
+                    'rdg_vat3' => isset($request->domesticData['taxes']) ? $request->domesticData['taxes'] : 0,
+                    'rdg_vat4' => isset($request->total['taxes']) ? $request->total['taxes'] : 0,
+                    'rdg_sum1' => isset($request->storageData['sum']) ? $request->storageData['sum'] : 0,
+                    'rdg_sum2' => isset($request->workData['sum']) ? $request->workData['sum'] : 0,
+                    'rdg_sum3' => isset($request->domesticData['sum']) ? $request->domesticData['sum'] : 0,
+                    'rdg_sum4' => isset($request->total['sum']) ? $request->total['sum'] : 0,
+                    'rdg_etc1' => isset($request->storageData['etc']) ? $request->storageData['etc'] : 0,
+                    'rdg_etc2' => isset($request->workData['etc']) ? $request->workData['etc'] : 0,
+                    'rdg_etc3' => isset($request->domesticData['etc']) ? $request->domesticData['etc'] : 0,
+                    'rdg_etc4' => isset($request->total['etc']) ? $request->total['etc'] : 0,
+                    'rdg_count_work' => isset($request->workData['count_work']) ? $request->workData['count_work'] : 0,
                 ]
             );
 
@@ -2733,10 +2735,18 @@ class RateDataController extends Controller
                 ->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
                 ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
                 ->where('rgd_status1', '=', '입고')
+                
                 ->where('rgd_bill_type', $bill_type)
                 ->where(function ($q) {
+                    $q->where('rgd_status5', '!=', 'cancel')
+                        ->orWhereNull('rgd_status5');
+                })
+                ->where(function ($q) {
+                    $q->where('rgd_status5', '!=', 'issued')
+                        ->orWhereNull('rgd_status5');
+                })
+                ->where(function ($q) {
                     $q->whereDoesntHave('rgd_child')
-                        ->orWhere('rgd_status5', '!=', 'issued')
                         ->orWhereNull('rgd_status5');
                 })
                 ->get();
@@ -3099,6 +3109,7 @@ class RateDataController extends Controller
 
                 foreach ($request->rgds as $key => $rgd) {
                     $is_exist = RateDataGeneral::where('rgd_no_expectation', $rgd['rgd_no'])->where('rdg_bill_type', 'final_monthly')->first();
+
                     if (!$is_exist) {
                         $is_exist = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
 
@@ -3131,11 +3142,44 @@ class RateDataController extends Controller
 
                         $final_rdg->save();
                     } else {
-                        $final_rdg = $is_exist;
+                        $final_rgd = ReceivingGoodsDelivery::where('rgd_no', $is_exist['rgd_no'])->first();
+                        if($final_rgd->rgd_status5 == 'cancel') {
+                            $is_exist = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
+
+                            $final_rdg = $is_exist->replicate();
+                            $final_rdg->rdg_bill_type = $request->bill_type; // the new project_id
+    
+                            $final_rdg->rdg_supply_price1 = $rdg_supply_price1;
+                            $final_rdg->rdg_supply_price2 = $rdg_supply_price2;
+                            $final_rdg->rdg_supply_price3 = $rdg_supply_price3;
+                            $final_rdg->rdg_supply_price4 = $rdg_supply_price4;
+                            $final_rdg->rdg_supply_price5 = $rdg_supply_price5;
+                            $final_rdg->rdg_supply_price6 = $rdg_supply_price6;
+                            $final_rdg->rdg_supply_price7 = $rdg_supply_price7;
+    
+                            $final_rdg->rdg_vat1 = $rdg_vat1;
+                            $final_rdg->rdg_vat2 = $rdg_vat2;
+                            $final_rdg->rdg_vat3 = $rdg_vat3;
+                            $final_rdg->rdg_vat4 = $rdg_vat4;
+                            $final_rdg->rdg_vat5 = $rdg_vat5;
+                            $final_rdg->rdg_vat6 = $rdg_vat6;
+                            $final_rdg->rdg_vat7 = $rdg_vat7;
+    
+                            $final_rdg->rdg_sum1 = $rdg_sum1;
+                            $final_rdg->rdg_sum2 = $rdg_sum2;
+                            $final_rdg->rdg_sum3 = $rdg_sum3;
+                            $final_rdg->rdg_sum4 = $rdg_sum4;
+                            $final_rdg->rdg_sum5 = $rdg_sum5;
+                            $final_rdg->rdg_sum6 = $rdg_sum6;
+                            $final_rdg->rdg_sum7 = $rdg_sum7;
+    
+                            $final_rdg->save();  
+                        }else 
+                            $final_rdg = $is_exist;
                     }
 
                     $expectation_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->where('rgd_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
-                    $final_rgd = ReceivingGoodsDelivery::where('rgd_parent_no', $rgd['rgd_no'])->where('rgd_bill_type', 'final_monthly')->first();
+                    $final_rgd = ReceivingGoodsDelivery::where('rgd_parent_no', $rgd['rgd_no'])->where('rgd_bill_type', 'final_monthly')->where('rgd_status5', '!=', 'cancel')->first();
 
                     if (!$final_rgd) {
                         $expectation_rgd->rgd_status5 = 'issued';
@@ -8010,10 +8054,12 @@ class RateDataController extends Controller
                     'mb_no' => Auth::user()->mb_no,
                     'rgd_no' => $request->rgd_no,
                 ]);
-                $rgd_parent_no = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
-                if ($rgd_parent_no->rgd_status5 == 'issued') {
-                    ReceivingGoodsDelivery::where('rgd_no', $rgd_parent_no)->update([
-                        'rgd_status5' => ($rgd_parent_no->rgd_status4 == '확정청구서' ? 'confirmed' : null),
+                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+                $rgd_parent = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
+
+                if ($rgd_parent->rgd_status5 == 'issued') {
+                    ReceivingGoodsDelivery::where('rgd_no', $rgd_parent->rgd_no)->update([
+                        'rgd_status5' => ($rgd_parent->rgd_status4 == '확정청구서' ? 'confirmed' : null),
                         'rgd_issued_date' => NULL,   
                     ]);
                 }
@@ -8035,15 +8081,16 @@ class RateDataController extends Controller
                         'rgd_no' => $rgd['rgd_no'],
                         'cbh_status_after' => 'cancel',
                     ]);
-                    $rgd_parent_no = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
-                    $rgd_update_parent = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_parent_no'])->update([
-                        'rgd_status5' => ($rgd_parent_no->rgd_status4 == '확정청구서' ? 'confirmed' : null),
+                    $rgd_parent = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_parent_no'])->first();
+
+                    ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_parent_no'])->update([
+                        'rgd_status5' => ($rgd_parent['rgd_status4'] == '확정청구서' ? 'confirmed' : null),
                         'rgd_issued_date' => NULL,   
                     ]);
                     CancelBillHistory::insertGetId([
                         'mb_no' => Auth::user()->mb_no,
                         'rgd_no' => $rgd['rgd_parent_no'],
-                        'cbh_status_after' => 'cancel',
+                        'cbh_status_after' => 'revert',
 
                     ]);
                 }
