@@ -302,7 +302,7 @@ class ScheduleShipmentController extends Controller
     }
     public function apiScheduleShipmentsRaw($data_schedule = null)
     {
-        return $data_schedule;
+        //return $data_schedule;
         try {
             DB::beginTransaction();
             $user = Auth::user();
@@ -563,13 +563,14 @@ class ScheduleShipmentController extends Controller
         $collect_test = array();
         if (!empty($schedule_shipment) && !empty($schedule_shipment_item)) {
             $collect_test = collect($schedule_shipment)->map(function ($item) use ($schedule_shipment_item) {
-                $item->schedule_shipment_info->item2 = isset($schedule_shipment_item) ? $schedule_shipment_item : array();
+                $item->item2 = isset($schedule_shipment_item) ? $schedule_shipment_item : array();
                 return $item;
             });
             return response()->json(
                 [
                     'message' => Messages::MSG_0007,
-                    'data' => $collect_test
+                    'data' => $collect_test,
+                    'schedule_shipment_item' => $schedule_shipment_item
                 ],
                 200
             );
@@ -697,6 +698,7 @@ class ScheduleShipmentController extends Controller
         }
 
         $response = file_get_contents($url_api);
+        //return $url_api;
         $api_data = json_decode($response, 1);
         return $api_data;
     }
@@ -767,13 +769,13 @@ class ScheduleShipmentController extends Controller
                 $test[] = $base_schedule_datas;
                 $data_schedule = $this->mapDataAPI($base_schedule_datas['data']);
                 if (!empty($data_schedule['data_temp'])) {
-                    if($page == 3)
-                      return  $this->apiScheduleShipmentsRaw($data_schedule['data_temp']);
+                    //if($page == 3)
+                      $this->apiScheduleShipmentsRaw($data_schedule['data_temp']);
                     
                 }
             }
             return response()->json([
-                'param' => $param_arrays,
+                'param' => $test,
                 'message' => '완료되었습니다.',
                 'status' => 1
             ], 200);
@@ -784,13 +786,13 @@ class ScheduleShipmentController extends Controller
                     $this->apiScheduleShipmentsRaw($data_schedule['data_temp']);
                 }
                 return response()->json([
-                    'param' => $param_arrays,
+                    'param' => $test,
                     'message' => '완료되었습니다.',
                     'status' => 1
                 ], 200);
             } else {
                 return response()->json([
-                    'param' => $param_arrays,
+                    'param' => $test,
                     'message' => '완료되었습니다.',
                     'status' => 0
                 ], 200);
