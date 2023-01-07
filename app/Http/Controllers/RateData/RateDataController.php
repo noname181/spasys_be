@@ -2747,10 +2747,7 @@ class RateDataController extends Controller
                     $q->where('rgd_status5', '!=', 'issued')
                         ->orWhereNull('rgd_status5');
                 })
-                ->where(function ($q) {
-                    $q->whereDoesntHave('rgd_child')
-                        ->orWhereNull('rgd_status5');
-                })
+                ->whereDoesntHave('rgd_child')
                 ->get();
 
             $rdgs = [];
