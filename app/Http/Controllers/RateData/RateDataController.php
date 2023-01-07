@@ -1831,6 +1831,7 @@ class RateDataController extends Controller
                 'company.co_email',
                 'company.co_etc',
                 'company.co_type',
+                'company.co_tel',
                 'contract.c_integrated_calculate_yn as c_integrated_calculate_yn',
                 'contract.c_calculate_deadline_yn as c_calculate_deadline_yn',
             ])->join('contract', 'contract.co_no', 'company.co_no')->with(['co_parent','co_childen'])->where('co_license', $import->ti_co_license)->where('co_type','shipper')->first();
@@ -1852,6 +1853,7 @@ class RateDataController extends Controller
                     'company.co_homepage',
                     'company.co_email',
                     'company.co_etc',
+                    'company.co_tel',
                     'contract.c_integrated_calculate_yn as c_integrated_calculate_yn',
                     'contract.c_calculate_deadline_yn as c_calculate_deadline_yn',
                 ])->join('contract', 'contract.co_no', 'company.co_no')->with(['co_parent'])->where('company.co_no', $rgd->warehousing->co_no)->first();

@@ -61,6 +61,7 @@ class CompanyController extends Controller
                 'co_etc' => $validated['co_etc'],
                 'co_type' => $co_type,
                 'co_close_yn' => $validated['co_close_yn'],
+                'co_tel' => $validated['co_tel'],
             ]);
 
             $company = Company::where('co_no', $co_no)->first();
@@ -246,6 +247,7 @@ class CompanyController extends Controller
                     'company.co_etc',
                     'contract.c_integrated_calculate_yn as c_integrated_calculate_yn',
                     'contract.c_calculate_deadline_yn as c_calculate_deadline_yn',
+                    'company.co_tel',
                     // 'co_address.ca_address_detail as co_address_detail',
                     // ])->join('co_address', 'co_address.co_no', 'company.co_no')
                 ])->join('contract', 'contract.co_no', 'company.co_no')->where('company.co_no', $co_no)
@@ -268,6 +270,7 @@ class CompanyController extends Controller
                     'company.co_homepage',
                     'company.co_email',
                     'company.co_etc',
+                    'company.co_tel',
 
                 ])->where('company.co_no', $co_no)
                     // ->where('co_address.co_no', $co_no)
@@ -330,6 +333,7 @@ class CompanyController extends Controller
                     'co_email' => $validated['co_email'],
                     'co_etc' => $validated['co_etc'],
                     'co_close_yn' => $validated['co_close_yn'],
+                    'co_tel' => $validated['co_tel'],
                 ]);
 
 
