@@ -302,7 +302,7 @@ class ScheduleShipmentController extends Controller
     }
     public function apiScheduleShipmentsRaw($data_schedule = null)
     {
-        //return $data_schedule;
+        return $data_schedule;
         try {
             DB::beginTransaction();
             $user = Auth::user();
@@ -754,7 +754,7 @@ class ScheduleShipmentController extends Controller
             'page' => '1'
         );
         $base_schedule_datas = $this->requestDataAPI($param_arrays); //Get Data
-
+        
         $total_data = (isset($base_schedule_datas['total']) && $base_schedule_datas['total'] > 0) ? $base_schedule_datas['total'] : 0;
         $limit_data = (isset($base_schedule_datas['limit']) && $base_schedule_datas['limit'] > 0) ? $base_schedule_datas['limit'] : 0;
         $check_pages = ($total_data > $limit_data) && $limit_data > 0 ? (int)ceil($total_data / $limit_data) : 1; // Check total page to foreach;
@@ -767,13 +767,13 @@ class ScheduleShipmentController extends Controller
                 $test[] = $base_schedule_datas;
                 $data_schedule = $this->mapDataAPI($base_schedule_datas['data']);
                 if (!empty($data_schedule['data_temp'])) {
-                    
-                        $this->apiScheduleShipmentsRaw($data_schedule['data_temp']);
+                    if($page == 3)
+                      return  $this->apiScheduleShipmentsRaw($data_schedule['data_temp']);
                     
                 }
             }
             return response()->json([
-                'param' => $test,
+                'param' => $param_arrays,
                 'message' => '완료되었습니다.',
                 'status' => 1
             ], 200);
@@ -784,13 +784,13 @@ class ScheduleShipmentController extends Controller
                     $this->apiScheduleShipmentsRaw($data_schedule['data_temp']);
                 }
                 return response()->json([
-                    'param' => $base_schedule_datas,
+                    'param' => $param_arrays,
                     'message' => '완료되었습니다.',
                     'status' => 1
                 ], 200);
             } else {
                 return response()->json([
-                    'param' => $base_schedule_datas,
+                    'param' => $param_arrays,
                     'message' => '완료되었습니다.',
                     'status' => 0
                 ], 200);
