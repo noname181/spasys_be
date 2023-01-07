@@ -49,6 +49,7 @@ class PackageController extends Controller
                 'company.co_homepage',
                 'company.co_email',
                 'company.co_etc',
+                'company.co_tel',
                 // 'co_address.ca_address as co_address',
                 // 'co_address.ca_address_detail as co_address_detail',
                 // ])->join('co_address', 'co_address.co_no', 'company.co_no')

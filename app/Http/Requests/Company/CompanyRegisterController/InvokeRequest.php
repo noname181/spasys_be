@@ -95,7 +95,10 @@ class InvokeRequest extends BaseFormRequest
                 'required',
                 'string',
                 'max:255',
-            ]
+            ],
+            'co_tel' => [
+                '',
+            ],
         ];
     }
 

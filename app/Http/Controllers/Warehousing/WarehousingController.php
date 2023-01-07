@@ -3118,13 +3118,14 @@ class WarehousingController extends Controller
                 
                 ->where('rgd_bill_type', $user->mb_type =='spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')
                 ->where(function ($q) {
-                    $q->whereDoesntHave('rgd_child')
-                        ->orWhere(function ($q) {
-                            $q->where('rgd_status5', '!=', 'cancel')
-                                ->where('rgd_status5', '!=', 'issued');
-                        })
+                    $q->where('rgd_status5', '!=', 'cancel')
                         ->orWhereNull('rgd_status5');
                 })
+                ->where(function ($q) {
+                    $q->where('rgd_status5', '!=', 'issued')
+                        ->orWhereNull('rgd_status5');
+                })
+                ->whereDoesntHave('rgd_child')
                 ->get();
 
                 foreach ($rgds as $key => $rgd2) {
