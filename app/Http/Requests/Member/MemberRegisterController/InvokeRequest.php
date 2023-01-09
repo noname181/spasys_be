@@ -77,7 +77,7 @@ class InvokeRequest extends BaseFormRequest
                 'required',
                 'string',
                 'max:255',
-                'regex:/[0-9]{3}-[0-9]{4}-[0-9]{4}$/',
+                // 'regex:/[0-9]{3}-[0-9]{4}-[0-9]{4}$/',
                 // 'unique:member,mb_hp'
             ],
             'mb_use_yn' => [

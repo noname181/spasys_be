@@ -28,7 +28,6 @@ class InvokeRequest extends BaseFormRequest
                 'required',
                 'string',
                 'max:255',
-                'min:3'
             ],
             'co_address' => [
                 'required',
