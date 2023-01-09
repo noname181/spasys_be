@@ -340,7 +340,8 @@ class ScheduleShipmentController extends Controller
                         'recv_address' => isset($schedule_item['recv_address']) ? $schedule_item['recv_address'] : null,
                         'recv_zip' => isset($schedule_item['recv_zip']) ? $schedule_item['recv_zip'] : null,
                         'memo' => isset($schedule_item['memo']) ? $schedule_item['memo'] : null,
-                        'status' => isset($schedule_item['trans_no']) && $schedule_item['trans_no'] != '' ? '출고' : '출고예정',
+                        //'status' => isset($schedule_item['trans_no']) && $schedule_item['trans_no'] != '' ? '출고' : '출고예정',
+                        'status' => isset($schedule_item['status']) && $schedule_item['status'] == 8 ? '출고' : '출고예정',
                         'order_cs' => isset($schedule_item['order_cs']) ? $schedule_item['order_cs'] : null,
                         'collect_date' => isset($schedule_item['collect_date']) ? $schedule_item['collect_date'] : null,
                         'order_date' => isset($schedule_item['order_date']) ? ((int)$schedule_item['order_date'] > 2022 ? $schedule_item['order_date'] : null) : null,
@@ -369,7 +370,7 @@ class ScheduleShipmentController extends Controller
                             if (!empty($ss_no->ss_no)) {
                                 $ss_info_no = ScheduleShipmentInfo::updateOrCreate([
                                     'ss_no' => $ss_no->ss_no,
-                                    'barcode' => $schedule_info['barcode']
+                                    'prd_seq' => $schedule_info['prd_seq']
                                 ], [
                                     'ss_no' => $ss_no->ss_no,
                                     'co_no' => $user->co_no,
@@ -768,9 +769,11 @@ class ScheduleShipmentController extends Controller
                 $base_schedule_datas = $this->requestDataAPI($param_arrays); //Get Data
                 $test[] = $base_schedule_datas;
                 $data_schedule = $this->mapDataAPI($base_schedule_datas['data']);
+                // if($page == 3)
+                //     return $data_schedule['data_temp'];
                 if (!empty($data_schedule['data_temp'])) {
-                    //if($page == 3)
-                      $this->apiScheduleShipmentsRaw($data_schedule['data_temp']);
+                    // if($page == 3)
+                     $this->apiScheduleShipmentsRaw($data_schedule['data_temp']);
                     
                 }
             }
