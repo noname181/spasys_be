@@ -267,13 +267,13 @@ class MenuController extends Controller
             if($validated['menu_depth'] == '상위'){
                 $update_sub_menu = Menu::where('menu_parent_no',$validated['menu_no']) ->update([
                     'menu_device' => $validated['menu_device'],
-                    'service_no_array' => $validated['service_no_array'],
+                    // 'service_no_array' => $validated['service_no_array'],
                 ]);
-                if($validated['menu_use_yn'] == 'n'){
-                    $update_sub_menu2 = Menu::where('menu_parent_no',$validated['menu_no']) ->update([
-                        'menu_use_yn' => 'n',
-                    ]);
-                }
+                // if($validated['menu_use_yn'] == 'n'){
+                //     $update_sub_menu2 = Menu::where('menu_parent_no',$validated['menu_no']) ->update([
+                //         'menu_use_yn' => 'n',
+                //     ]);
+                // }
                 
             }
             
