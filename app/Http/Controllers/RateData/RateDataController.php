@@ -1341,23 +1341,24 @@ class RateDataController extends Controller
             $co_rate_data3 = RateData::where('rd_cate_meta1', '유통가공');
 
             if (Auth::user()->mb_type == 'spasys') {
-                $co_rate_data1 = $co_rate_data1->where('co_no', $co_no);
-                $co_rate_data2 = $co_rate_data2->where('co_no', $co_no);
-                $co_rate_data3 = $co_rate_data3->where('co_no', $co_no);
+                $co_rate_data1 = $co_rate_data1->where('co_no', $co_no)->get();
+                $co_rate_data2 = $co_rate_data2->where('co_no', $co_no)->get();
+                $co_rate_data3 = $co_rate_data3->where('co_no', $co_no)->get();
             } else if (Auth::user()->mb_type == 'shop') {
                 $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
                 $co_rate_data1 = $co_rate_data1->where('rd_co_no', $co_no);
                 $co_rate_data2 = $co_rate_data2->where('rd_co_no', $co_no);
                 $co_rate_data3 = $co_rate_data3->where('rd_co_no', $co_no);
                 if (isset($rmd->rmd_no)) {
-                    $co_rate_data1 = $co_rate_data1->where('rmd_no', $rmd->rmd_no);
-                    $co_rate_data2 = $co_rate_data2->where('rmd_no', $rmd->rmd_no);
-                    $co_rate_data3 = $co_rate_data3->where('rmd_no', $rmd->rmd_no);
+                    $co_rate_data1 = $co_rate_data1->where('rmd_no', $rmd->rmd_no)->get();
+                    $co_rate_data2 = $co_rate_data2->where('rmd_no', $rmd->rmd_no)->get();
+                    $co_rate_data3 = $co_rate_data3->where('rmd_no', $rmd->rmd_no)->get();
+                }else {
+                    $co_rate_data1 = [];
+                    $co_rate_data2 = [];
+                    $co_rate_data3 = [];
                 }
             }
-            $co_rate_data1 = $co_rate_data1->get();
-            $co_rate_data2 = $co_rate_data2->get();
-            $co_rate_data3 = $co_rate_data3->get();
 
             if($rmd_no){
                 $rmd = RateMetaData::where('rmd_no', $rmd_no)->first();
@@ -1402,23 +1403,24 @@ class RateDataController extends Controller
             $co_rate_data3 = RateData::where('rd_cate_meta1', '유통가공');
 
             if (Auth::user()->mb_type == 'spasys') {
-                $co_rate_data1 = $co_rate_data1->where('co_no', $co_no);
-                $co_rate_data2 = $co_rate_data2->where('co_no', $co_no);
-                $co_rate_data3 = $co_rate_data3->where('co_no', $co_no);
+                $co_rate_data1 = $co_rate_data1->where('co_no', $co_no)->get();
+                $co_rate_data2 = $co_rate_data2->where('co_no', $co_no)->get();
+                $co_rate_data3 = $co_rate_data3->where('co_no', $co_no)->get();
             } else if (Auth::user()->mb_type == 'shop') {
                 $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
                 $co_rate_data1 = $co_rate_data1->where('rd_co_no', $co_no);
                 $co_rate_data2 = $co_rate_data2->where('rd_co_no', $co_no);
                 $co_rate_data3 = $co_rate_data3->where('rd_co_no', $co_no);
                 if (isset($rmd->rmd_no)) {
-                    $co_rate_data1 = $co_rate_data1->where('rmd_no', $rmd->rmd_no);
-                    $co_rate_data2 = $co_rate_data2->where('rmd_no', $rmd->rmd_no);
-                    $co_rate_data3 = $co_rate_data3->where('rmd_no', $rmd->rmd_no);
+                    $co_rate_data1 = $co_rate_data1->where('rmd_no', $rmd->rmd_no)->get();
+                    $co_rate_data2 = $co_rate_data2->where('rmd_no', $rmd->rmd_no)->get();
+                    $co_rate_data3 = $co_rate_data3->where('rmd_no', $rmd->rmd_no)->get();
+                }else {
+                    $co_rate_data1 = [];
+                    $co_rate_data2 = [];
+                    $co_rate_data3 = [];
                 }
             }
-            $co_rate_data1 = $co_rate_data1->get();
-            $co_rate_data2 = $co_rate_data2->get();
-            $co_rate_data3 = $co_rate_data3->get();
 
             return [
                 'message' => Messages::MSG_0007,
@@ -1448,24 +1450,25 @@ class RateDataController extends Controller
             $co_rate_data3 = RateData::where('rd_cate_meta1', '유통가공');
 
             if (Auth::user()->mb_type == 'spasys') {
-                $co_rate_data1 = $co_rate_data1->where('co_no', $co_no);
-                $co_rate_data2 = $co_rate_data2->where('co_no', $co_no);
-                $co_rate_data3 = $co_rate_data3->where('co_no', $co_no);
+                $co_rate_data1 = $co_rate_data1->where('co_no', $co_no)->get();
+                $co_rate_data2 = $co_rate_data2->where('co_no', $co_no)->get();
+                $co_rate_data3 = $co_rate_data3->where('co_no', $co_no)->get();
             } else if (Auth::user()->mb_type == 'shop') {
                 $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
                 $co_rate_data1 = $co_rate_data1->where('rd_co_no', $co_no);
                 $co_rate_data2 = $co_rate_data2->where('rd_co_no', $co_no);
                 $co_rate_data3 = $co_rate_data3->where('rd_co_no', $co_no);
                 if (isset($rmd->rmd_no)) {
-                    $co_rate_data1 = $co_rate_data1->where('rmd_no', $rmd->rmd_no);
-                    $co_rate_data2 = $co_rate_data2->where('rmd_no', $rmd->rmd_no);
-                    $co_rate_data3 = $co_rate_data3->where('rmd_no', $rmd->rmd_no);
+                    $co_rate_data1 = $co_rate_data1->where('rmd_no', $rmd->rmd_no)->get();
+                    $co_rate_data2 = $co_rate_data2->where('rmd_no', $rmd->rmd_no)->get();
+                    $co_rate_data3 = $co_rate_data3->where('rmd_no', $rmd->rmd_no)->get();
+                }else {
+                    $co_rate_data1 = [];
+                    $co_rate_data2 = [];
+                    $co_rate_data3 = [];
                 }
             }
-            $co_rate_data1 = $co_rate_data1->get();
-            $co_rate_data2 = $co_rate_data2->get();
-            $co_rate_data3 = $co_rate_data3->get();
-
+          
             $rate_meta_data = RateMetaData::where('rmd_no', $rmd_no)->first();
 
             if($rmd_no){
@@ -1744,27 +1747,32 @@ class RateDataController extends Controller
                 $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
                 $rate_data = $rate_data->where('rd_co_no', $co_no);
                 if (isset($rmd->rmd_no)) {
-                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no)->get();
+                }else {
+                    $rate_data = [];
                 }
             } else if ($user->mb_type == 'shop') {
                 $co_no = $company->co_no;
                 $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
                 $rate_data = $rate_data->where('rd_co_no', $co_no);
                 if (isset($rmd->rmd_no)) {
-                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no)->get();
+                }else {
+                    $rate_data = [];
                 }
             } else {
                 $co_no = $company->co_no;
                 $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
                 $rate_data = $rate_data->where('rd_co_no', $co_no);
                 if (isset($rmd->rmd_no)) {
-                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no)->get();
+                }else {
+                    $rate_data = [];
                 }
             }
 
             $adjustment_group = AdjustmentGroup::where('co_no', $co_no)->first();
 
-            $rate_data = $rate_data->get();
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'company' => $company,
@@ -1914,13 +1922,14 @@ class RateDataController extends Controller
                 $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
                 $rate_data = $rate_data->where('rd_co_no', $co_no);
                 if (isset($rmd->rmd_no)) {
-                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no)->get();
+                }else {
+                    $rate_data = [];
                 }
             } else {
                 $rate_data = $rate_data->where('co_no', $co_no);
             }
 
-            $rate_data = $rate_data->get();
             $rate_meta_data = RateMetaData::where('co_no', $co_no)->latest('created_at')->first();
 
             return response()->json([
@@ -2014,10 +2023,10 @@ class RateDataController extends Controller
             $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
             $rate_data = $rate_data->where('rd_co_no', $co_no);
             if (isset($rmd->rmd_no)) {
-                $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+                $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no)->get();
+            }else {
+                $rate_data = [];
             }
-
-            $rate_data = $rate_data->get();
 
             return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data, 'co_no' => $co_no], 200);
         } catch (\Exception $e) {
@@ -2045,11 +2054,10 @@ class RateDataController extends Controller
             $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->orderBy('rmd_no', 'DESC')->first();
             $rate_data = $rate_data->where('rd_co_no', $co_no);
             if (isset($rmd->rmd_no)) {
-                $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+                $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no)->get();
+            }else {
+                $rate_data = [];
             }
-
-
-            $rate_data = $rate_data->get();
 
             return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data], 200);
         } catch (\Exception $e) {
