@@ -63,27 +63,33 @@ class ScheduleShipmentController extends Controller
                 if ($user->mb_type == 'shop') {
                     $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->whereNotNull('trans_no')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    })->where(function ($q) {
-                        $q->whereHas('receving_goods_delivery', function ($q1) {
-                            $q1->where('rgd_status3', '=',"배송완료");
-                        });
-                    })->orderBy('ss_no', 'DESC');
+                    })
+                    // ->where(function ($q) {
+                    //     $q->whereHas('receving_goods_delivery', function ($q1) {
+                    //         $q1->where('rgd_status3', '=',"배송완료");
+                    //     });
+                    // })
+                    ->orderBy('ss_no', 'DESC');
                 } else if ($user->mb_type == 'shipper') {
                     $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->whereNotNull('trans_no')->whereHas('ContractWms.company', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    })->where(function ($q) {
-                        $q->whereHas('receving_goods_delivery', function ($q1) {
-                            $q1->where('rgd_status3', '=',"배송완료");
-                        });
-                    })->orderBy('ss_no', 'DESC');
+                    })
+                    // ->where(function ($q) {
+                    //     $q->whereHas('receving_goods_delivery', function ($q1) {
+                    //         $q1->where('rgd_status3', '=',"배송완료");
+                    //     });
+                    // })
+                    ->orderBy('ss_no', 'DESC');
                 } else if ($user->mb_type == 'spasys') {
                     $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->whereNotNull('trans_no')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    })->where(function ($q) {
-                        $q->whereHas('receving_goods_delivery', function ($q1) {
-                            $q1->where('rgd_status3', '=',"배송완료");
-                        });
-                    })->orderBy('ss_no', 'DESC');
+                    })
+                    // ->where(function ($q) {
+                    //     $q->whereHas('receving_goods_delivery', function ($q1) {
+                    //         $q1->where('rgd_status3', '=',"배송완료");
+                    //     });
+                    // })
+                    ->orderBy('ss_no', 'DESC');
                 }
             }
             //return DB::getQueryLog();
