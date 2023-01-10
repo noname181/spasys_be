@@ -63,27 +63,33 @@ class ScheduleShipmentController extends Controller
                 if ($user->mb_type == 'shop') {
                     $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->whereNotNull('trans_no')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    })->where(function ($q) {
-                        $q->whereHas('receving_goods_delivery', function ($q1) {
-                            $q1->where('rgd_status3', '=',"배송완료");
-                        });
-                    })->orderBy('ss_no', 'DESC');
+                    })
+                    // ->where(function ($q) {
+                    //     $q->whereHas('receving_goods_delivery', function ($q1) {
+                    //         $q1->where('rgd_status3', '=',"배송완료");
+                    //     });
+                    // })
+                    ->orderBy('ss_no', 'DESC');
                 } else if ($user->mb_type == 'shipper') {
                     $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->whereNotNull('trans_no')->whereHas('ContractWms.company', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    })->where(function ($q) {
-                        $q->whereHas('receving_goods_delivery', function ($q1) {
-                            $q1->where('rgd_status3', '=',"배송완료");
-                        });
-                    })->orderBy('ss_no', 'DESC');
+                    })
+                    // ->where(function ($q) {
+                    //     $q->whereHas('receving_goods_delivery', function ($q1) {
+                    //         $q1->where('rgd_status3', '=',"배송완료");
+                    //     });
+                    // })
+                    ->orderBy('ss_no', 'DESC');
                 } else if ($user->mb_type == 'spasys') {
                     $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->whereNotNull('trans_no')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    })->where(function ($q) {
-                        $q->whereHas('receving_goods_delivery', function ($q1) {
-                            $q1->where('rgd_status3', '=',"배송완료");
-                        });
-                    })->orderBy('ss_no', 'DESC');
+                    })
+                    // ->where(function ($q) {
+                    //     $q->whereHas('receving_goods_delivery', function ($q1) {
+                    //         $q1->where('rgd_status3', '=',"배송완료");
+                    //     });
+                    // })
+                    ->orderBy('ss_no', 'DESC');
                 }
             }
             //return DB::getQueryLog();
@@ -302,7 +308,7 @@ class ScheduleShipmentController extends Controller
     }
     public function apiScheduleShipmentsRaw($data_schedule = null)
     {
-        //return $data_schedule;
+        
         try {
             DB::beginTransaction();
             $user = Auth::user();
@@ -362,7 +368,10 @@ class ScheduleShipmentController extends Controller
                         'sub_domain' => isset($schedule_item['sub_domain']) ? $schedule_item['sub_domain'] : null,
                         'sub_domain_seq' => isset($schedule_item['sub_domain_seq']) ? $schedule_item['sub_domain_seq'] : null,
                     ];
-                   
+                    // if($i_schedule == "610001"){
+                    //     return $data_schedule;
+                    // }
+                    
                     if (isset($schedule_item['order_id'])) $ss_no = ScheduleShipment::updateOrCreate(['order_id' => $i_schedule], $data_schedule);
                     if ($ss_no->ss_no && isset($schedule_item['order_products'])) {
                         $check_fisrt = 0;
@@ -772,8 +781,8 @@ class ScheduleShipmentController extends Controller
                 // if($page == 3)
                 //     return $data_schedule['data_temp'];
                 if (!empty($data_schedule['data_temp'])) {
-                    // if($page == 3)
-                     $this->apiScheduleShipmentsRaw($data_schedule['data_temp']);
+                    //if($page == 7)
+                    $this->apiScheduleShipmentsRaw($data_schedule['data_temp']);
                     
                 }
             }
