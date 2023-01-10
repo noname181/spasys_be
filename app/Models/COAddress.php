@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Company;
 
 class COAddress extends Model
 {
@@ -29,4 +30,12 @@ class COAddress extends Model
         'ca_name',
         'ca_tel'
     ];
+    protected $casts = [
+        'created_at' => "date:Y.m.d",
+        'updated_at' => "date:Y.m.d",
+    ];
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'co_no', 'co_no')->with('co_parent');
+    }
 }

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Company;
 
 use App\Http\Requests\Company\CompanyRegisterController\InvokeRequest;
-use App\Http\Requests\Company\CompanyRequest;
+use App\Http\Requests\Company\CompaniesRequest;
 use App\Http\Requests\Company\CompanySearchRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
@@ -304,6 +304,29 @@ class CompanyController extends Controller
             Log::error($e);
 
             return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+    public function getCoAddressList(CompanySearchRequest $request)
+    {
+        try {
+            DB::enableQueryLog();
+            $validated = $request->validated();
+            // If per_page is null set default data = 15
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+
+            $user = Auth::user();
+            $co_address = CoAddress::with(['company'])->where('co_no', $request->co_no);
+
+            
+            $co_address = $co_address->paginate($per_page, ['*'], 'page', $page);
+
+            return response()->json($co_address);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
 

@@ -45,8 +45,7 @@ class InvokeRequest extends BaseFormRequest
                 'max:255',
             ],
             'co_country' => [
-                'string',
-                'max:255'
+                '',
             ],
             'co_major' => [
                 'required',
