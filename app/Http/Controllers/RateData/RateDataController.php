@@ -1645,9 +1645,11 @@ class RateDataController extends Controller
                 );
             } else {
                 if (isset($request->co_no)) {
+                    $index = RateMetaData::where('rm_no', $request['co_no'])->get()->count() + 1;
                     $rmd_no = RateMetaData::insertGetId([
                         'co_no' => $request->co_no,
                         'mb_no' => Auth::user()->mb_no,
+                        'rmd_number' => CommonFunc::generate_rmd_number($request['co_no'], $index),
                         'set_type' => 'estimated_costs',
                     ]);
                 }
@@ -1711,6 +1713,7 @@ class RateDataController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007,
                 '$request->rate_data' => $request->rate_data,
+                'rmd_no' => isset($request->rmd_no) ? $request->rmd_no : $rmd_no,
                 'i' => $i,
             ], 201);
         } catch (\Exception $e) {
