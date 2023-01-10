@@ -308,7 +308,7 @@ class ScheduleShipmentController extends Controller
     }
     public function apiScheduleShipmentsRaw($data_schedule = null)
     {
-        //return $data_schedule;
+        
         try {
             DB::beginTransaction();
             $user = Auth::user();
@@ -368,7 +368,10 @@ class ScheduleShipmentController extends Controller
                         'sub_domain' => isset($schedule_item['sub_domain']) ? $schedule_item['sub_domain'] : null,
                         'sub_domain_seq' => isset($schedule_item['sub_domain_seq']) ? $schedule_item['sub_domain_seq'] : null,
                     ];
-                   
+                    // if($i_schedule == "610001"){
+                    //     return $data_schedule;
+                    // }
+                    
                     if (isset($schedule_item['order_id'])) $ss_no = ScheduleShipment::updateOrCreate(['order_id' => $i_schedule], $data_schedule);
                     if ($ss_no->ss_no && isset($schedule_item['order_products'])) {
                         $check_fisrt = 0;
@@ -778,8 +781,8 @@ class ScheduleShipmentController extends Controller
                 // if($page == 3)
                 //     return $data_schedule['data_temp'];
                 if (!empty($data_schedule['data_temp'])) {
-                    // if($page == 3)
-                     $this->apiScheduleShipmentsRaw($data_schedule['data_temp']);
+                    //if($page == 7)
+                    $this->apiScheduleShipmentsRaw($data_schedule['data_temp']);
                     
                 }
             }
