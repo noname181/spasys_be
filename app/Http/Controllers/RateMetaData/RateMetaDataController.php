@@ -30,7 +30,7 @@ class RateMetaDataController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $rmd = RateMetaData::with(['rate_meta', 'member:mb_no,mb_type,co_no'])
+            $rmd = RateMetaData::with(['rate_meta', 'member:mb_no,mb_type,co_no' , 'rate_data_one'])
             ->whereNotNull('rm_no')
             ->whereNull('rmd_parent_no')
             ->whereHas('member', function($q) use($user){
