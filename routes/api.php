@@ -64,6 +64,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/register_company', \App\Http\Controllers\Company\CompanyController::class)->name('register_company');
     });
     Route::post('/get_co_address/{co_no}', [App\Http\Controllers\Company\CompanyController::class, 'getCoAddressList'])->name('get_co_address');
+    Route::post('/get_co_address_default/{co_no}', [App\Http\Controllers\Company\CompanyController::class, 'getCoAddressDefault'])->name('get_co_address_default');
     Route::post('/get_companies', [App\Http\Controllers\Company\CompanyController::class, 'getCompanies'])->name('get_companies');
 
     Route::get('/get_company/{co_no}', [App\Http\Controllers\Company\CompanyController::class, 'getCompany'])->name('get_company');
