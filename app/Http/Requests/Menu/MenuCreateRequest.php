@@ -39,9 +39,7 @@ class MenuCreateRequest extends BaseFormRequest
                 'integer',
             ],
             'menu_url' => [
-                'required',
-                'string',
-                'max:255',
+                '',
             ],
             'menu_device' => [
                 'required',

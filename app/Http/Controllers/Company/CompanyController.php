@@ -329,6 +329,20 @@ class CompanyController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
+    public function getCoAddressDefault(CompanySearchRequest $request)
+    {
+        try {
+            DB::enableQueryLog();
+    
+            $co_address_default = CoAddress::with(['company'])->where('ca_is_default','y')->where('co_no', $request->co_no)->first();
+            
+            return response()->json(['data' => $co_address_default]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
 
     /**
      * Register company

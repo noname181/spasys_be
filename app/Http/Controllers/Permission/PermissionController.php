@@ -91,12 +91,18 @@ class PermissionController extends Controller
                 })->values();
             }
 
+            $menu_selected = [];
+            foreach($menu as $key=>$per){
+                if(in_array($per['menu_no'] , $array_menu_no)){
+                    $menu_selected[] = $key;
+                }
+            }
+
             return response()->json([
                 'menu' => $menu,
                 'roles' => $roles,
                 'services' => $services,
-                'array_menu_no' => $array_menu_no,
-                'permission' => $permission
+                'menu_selected' => $menu_selected,
             ]);
         }catch (\Exception $e) {
             DB::rollback();
