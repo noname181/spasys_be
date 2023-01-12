@@ -130,11 +130,33 @@ class ContractController extends Controller
             $co_service = $company->co_service;
             $contract = Contract::where(['co_no' => $co_no])->first();
             $co_payment = CompanyPayment::where(['co_no' => $co_no])->first();
+           
+
+            $services = Service::where('service_use_yn', 'y')->where('service_no', '!=', 1)->get();
+
+            foreach($services as $service){
+                $cs = CompanySettleMent::where('service_no', $service['service_no'])->where('co_no', $co_no)->first();
+
+                if(empty($cs)){
+                    CompanySettlement::updateOrCreate(
+                        [
+                            'co_no' => $co_no,
+                            'service_no' => $service['service_no'],
+                        ],
+                        [
+                            'cs_payment_cycle' => '건별',
+                            'cs_money_type' => 'KRW',
+                            'cs_payment_group' => 'y',
+                            'cs_system' => 'BLP시스템',
+                        ]
+                    );
+                }
+            }
+
             $company_settlement = CompanySettleMent::where(['co_no' => $co_no])
             ->leftJoin('service', 'service.service_no', '=', 'company_settlement.service_no')
             ->get();
-
-            $services = Service::where('service_use_yn', 'y')->where('service_no', '!=', 1)->get();
+            
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'contract' => $contract,
