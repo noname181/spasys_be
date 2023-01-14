@@ -98,7 +98,6 @@ class ReceivingGoodsDeliveryController extends Controller
                     'w_category_name' => $request->w_category_name,
                     'co_no' => isset($validated['co_no']) ? $validated['co_no'] : $co_no,
                 ]);
-               
             }
 
             $w_no = isset($validated['w_no']) ? $validated['w_no'] : $w_no_data;
@@ -140,17 +139,17 @@ class ReceivingGoodsDeliveryController extends Controller
                             'connection_number' => $validated['connection_number']
                         ]);
                     }
-                }else{
-                    Warehousing::where('w_no', $w_no_data )->update([
-                        'connection_number' => $validated['connection_number'].$w_no_data
+                } else {
+                    Warehousing::where('w_no', $w_no_data)->update([
+                        'connection_number' => $validated['connection_number'] . $w_no_data
                     ]);
                     if ($validated['type_w_choose'] == "export") {
                         Export::where('te_carry_out_number', $validated['connect_w'])->update([
-                            'connection_number' => $validated['connection_number'].$w_no_data
+                            'connection_number' => $validated['connection_number'] . $w_no_data
                         ]);
                     } else {
                         Warehousing::where('w_no', $validated['connect_w'])->update([
-                            'connection_number' => $validated['connection_number'].$w_no_data
+                            'connection_number' => $validated['connection_number'] . $w_no_data
                         ]);
                     }
                 }
@@ -338,7 +337,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 }
                 //}
             } else {
-                if(isset($validated['items'])){
+                if (isset($validated['items'])) {
                     foreach ($validated['items'] as $warehousing_item) {
                         if (isset($warehousing_item['item_no']) && $warehousing_item['item_no']) {
                             WarehousingItem::insert([
@@ -350,7 +349,6 @@ class ReceivingGoodsDeliveryController extends Controller
                         }
                     }
                 }
-                
             }
 
             //Create 출고예정 after 입고 is done.
@@ -489,174 +487,176 @@ class ReceivingGoodsDeliveryController extends Controller
             //Page130146 spasys
             if ($request->page_type == 'Page130146') {
                 $warehousing_data = Warehousing::where('w_no', $request->w_no)->first();
-                foreach ($request->data as $data) {
-                    Warehousing::where('w_no', $request->w_no)->update([
-                        'w_schedule_amount' => $data['w_schedule_amount'],
-                        'w_schedule_day' => $request->w_schedule_day,
-                        'w_import_no' => $warehousing_data->w_import_no,
-                        'w_amount' => $data['w_amount'],
-                        'w_type' => 'EW',
-                        'w_category_name' => $request->w_category_name,
-                    ]);
-
-                    $w_schedule_number = CommonFunc::generate_w_schedule_number($request->w_no, 'EW');
-                    Warehousing::where('w_no', $request->w_no)->update([
-                        'w_schedule_number' =>   CommonFunc::generate_w_schedule_number($request->w_no, 'EW')
-                    ]);
-
-                    if (isset($request->page_type) && $request->page_type == 'Page130146') {
-                        $w_schedule_number2 = CommonFunc::generate_w_schedule_number($request->w_no, 'EWC');
-
+                if(isset($request->data)){
+                    foreach ($request->data as $data) {
                         Warehousing::where('w_no', $request->w_no)->update([
-                            'w_schedule_number2' =>  CommonFunc::generate_w_schedule_number($request->w_no, 'EWC'),
-                            'w_completed_day' => Carbon::now()->toDateTimeString()
-                        ]);
-                    }
-
-                    if ($request->wr_contents) {
-                        // WarehousingRequest::where('w_no', $request->w_no)->update([
-                        //     'mb_no' => $member->mb_no,
-                        //     'wr_contents' => $request->wr_contents,
-                        //     'wr_type' => 'EW',
-                        // ]);
-
-                        if ($request->wr_contents) {
-                            WarehousingRequest::insert([
-                                'w_no' => $request->w_no,
-                                'mb_no' => $member->mb_no,
-                                'wr_contents' => $request->wr_contents,
-                                'wr_type' => 'EW',
-                            ]);
-                        }
-                    }
-                    $package = $request->package;
-
-                    if (isset($package)) {
-                        //foreach ($data['package'] as $package) {
-                        if (isset($package['p_no'])) {
-                            Package::where('p_no', $package['p_no'])->update([
-                                'w_no' => $request->w_no,
-                                'note' => $package['note'],
-                                'order_number' => $package['order_number'],
-                                'pack_type' => $package['pack_type'],
-                                'quantity' => $package['quantity'],
-                                'reciever' => $package['reciever'],
-                                'reciever_address' => $package['reciever_address'],
-                                'reciever_contract' => $package['reciever_contract'],
-                                'reciever_detail_address' => $package['reciever_detail_address'],
-                                'sender' => $package['sender'],
-                                'sender_address' => $package['sender_address'],
-                                'sender_contract' => $package['sender_contract'],
-                                'sender_detail_address' => $package['sender_detail_address']
-                            ]);
-                        } else {
-                            Package::insert([
-                                'w_no' => $request->w_no,
-                                'note' => $package['note'],
-                                'order_number' => $package['order_number'],
-                                'pack_type' => $package['pack_type'],
-                                'quantity' => $package['quantity'],
-                                'reciever' => $package['reciever'],
-                                'reciever_address' => $package['reciever_address'],
-                                'reciever_contract' => $package['reciever_contract'],
-                                'reciever_detail_address' => $package['reciever_detail_address'],
-                                'sender' => $package['sender'],
-                                'sender_address' => $package['sender_address'],
-                                'sender_contract' => $package['sender_contract'],
-                                'sender_detail_address' => $package['sender_detail_address']
-                            ]);
-                        }
-                        //}
-                    }
-
-                    foreach ($data['remove_items'] as $remove) {
-                        WarehousingItem::where('item_no', $remove['item_no'])->where('w_no', $request->w_no)->delete();
-                    }
-
-                    //WarehousingItem::where('w_no', $request->w_no)->where('wi_type','=','출고')->delete();
-
-                    foreach ($data['items'] as $item) {
-
-
-                        // if(isset($item['warehousing_item'][0]['wi_type']) && $item['warehousing_item'][0]['wi_type'] == "출고_spasys"){
-                        //     WarehousingItem::where('wi_no', $item['warehousing_item'][0]['wi_no'])->update([
-                        //         'item_no' => $item['item_no'],
-                        //         'w_no' => $request->w_no,
-                        //         'wi_number' => $item['schedule_wi_number'],
-                        //        //'wi_number_received' =>  $item['warehousing_item']['wi_number_received'],
-                        //         'wi_type' => '출고_spasys'
-                        //     ]);
-
-                        // }else{
-                        //     WarehousingItem::insert([
-                        //         'item_no' => $item['item_no'],
-                        //         'w_no' => $request->w_no,
-                        //         'wi_number' => $item['schedule_wi_number'],
-                        //         //'wi_number_received' =>  $item['warehousing_item']['wi_number_received'],
-                        //         'wi_type' => '출고_spasys'
-                        //     ]);
-                        // }
-
-                        WarehousingItem::updateOrCreate(
-                            [
-                                'item_no' => $item['item_no'],
-                                'w_no' => $request->w_no,
-                                'wi_type' => '출고_spasys'
-                            ],
-                            [
-                                'item_no' => $item['item_no'],
-                                'w_no' => $request->w_no,
-                                'wi_number' => $item['schedule_wi_number'],
-                                //'wi_number_received' =>  $item['warehousing_item']['wi_number_received'],
-                                'wi_type' => '출고_spasys',
-                            ]
-                        );
-                    }
-
-
-
-                    foreach ($data['location'] as $location) {
-
-                        $warehousing_status = isset($location['rgd_status1']) ? $location['rgd_status1'] : null;
-                        $rgd_data = ReceivingGoodsDelivery::where('w_no', $request->w_no)->first();
-
-                        if ($warehousing_status != $rgd_data->rgd_status1) {
-                            $warehousing_status = isset($location['rgd_status1']) ? $location['rgd_status1'] : null;
-                        } else {
-                            $warehousing_status = null;
-                        }
-
-                        $rgd_no = ReceivingGoodsDelivery::where('w_no', $request->w_no)->update([
-                            'mb_no' => $member->mb_no,
-                            'w_no' => $request->w_no,
-                            'service_korean_name' => $request->w_category_name,
-                            'rgd_contents' => $location['rgd_contents'],
-                            'rgd_address' => $location['rgd_address'],
-                            'rgd_address_detail' => $location['rgd_address_detail'],
-                            'rgd_receiver' => $location['rgd_receiver'],
-                            'rgd_hp' => $location['rgd_hp'],
-                            'rgd_memo' => $location['rgd_memo'],
-                            'rgd_status1' => $location['rgd_status1'],
-                            'rgd_status2' => $location['rgd_status2'],
-                            'rgd_status3' => $location['rgd_status3'],
-                            'rgd_status4' => isset($location['rgd_status4']) ? $location['rgd_status4'] : null,
-                            'rgd_delivery_company' => $location['rgd_delivery_company'],
-                            'rgd_tracking_code' => $location['rgd_tracking_code'],
-                            'rgd_delivery_man' => $location['rgd_delivery_man'],
-                            'rgd_delivery_man_hp' => $location['rgd_delivery_man_hp'],
-                            'rgd_delivery_schedule_day' => $location['rgd_delivery_schedule_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_delivery_schedule_day']) : null,
-                            'rgd_arrive_day' =>  $location['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']) : null,
-                        ]);
-                    }
-
-                    if ($warehousing_status) {
-                        WarehousingStatus::insert([
-                            'w_no' => $request->w_no,
-                            'mb_no' => $member->mb_no,
-                            'status' => $warehousing_status,
+                            'w_schedule_amount' => $data['w_schedule_amount'],
+                            'w_schedule_day' => $request->w_schedule_day,
+                            'w_import_no' => $warehousing_data->w_import_no,
+                            'w_amount' => $data['w_amount'],
+                            'w_type' => 'EW',
                             'w_category_name' => $request->w_category_name,
                         ]);
+    
+                        $w_schedule_number = CommonFunc::generate_w_schedule_number($request->w_no, 'EW');
+                        Warehousing::where('w_no', $request->w_no)->update([
+                            'w_schedule_number' =>   CommonFunc::generate_w_schedule_number($request->w_no, 'EW')
+                        ]);
+    
+                        if (isset($request->page_type) && $request->page_type == 'Page130146') {
+                            $w_schedule_number2 = CommonFunc::generate_w_schedule_number($request->w_no, 'EWC');
+    
+                            Warehousing::where('w_no', $request->w_no)->update([
+                                'w_schedule_number2' =>  CommonFunc::generate_w_schedule_number($request->w_no, 'EWC'),
+                                'w_completed_day' => Carbon::now()->toDateTimeString()
+                            ]);
+                        }
+    
+                        if ($request->wr_contents) {
+                            // WarehousingRequest::where('w_no', $request->w_no)->update([
+                            //     'mb_no' => $member->mb_no,
+                            //     'wr_contents' => $request->wr_contents,
+                            //     'wr_type' => 'EW',
+                            // ]);
+    
+                            if ($request->wr_contents) {
+                                WarehousingRequest::insert([
+                                    'w_no' => $request->w_no,
+                                    'mb_no' => $member->mb_no,
+                                    'wr_contents' => $request->wr_contents,
+                                    'wr_type' => 'EW',
+                                ]);
+                            }
+                        }
+                       
+    
+                        foreach ($data['remove_items'] as $remove) {
+                            WarehousingItem::where('item_no', $remove['item_no'])->where('w_no', $request->w_no)->delete();
+                        }
+    
+                        //WarehousingItem::where('w_no', $request->w_no)->where('wi_type','=','출고')->delete();
+    
+                        foreach ($data['items'] as $item) {
+    
+    
+                            // if(isset($item['warehousing_item'][0]['wi_type']) && $item['warehousing_item'][0]['wi_type'] == "출고_spasys"){
+                            //     WarehousingItem::where('wi_no', $item['warehousing_item'][0]['wi_no'])->update([
+                            //         'item_no' => $item['item_no'],
+                            //         'w_no' => $request->w_no,
+                            //         'wi_number' => $item['schedule_wi_number'],
+                            //        //'wi_number_received' =>  $item['warehousing_item']['wi_number_received'],
+                            //         'wi_type' => '출고_spasys'
+                            //     ]);
+    
+                            // }else{
+                            //     WarehousingItem::insert([
+                            //         'item_no' => $item['item_no'],
+                            //         'w_no' => $request->w_no,
+                            //         'wi_number' => $item['schedule_wi_number'],
+                            //         //'wi_number_received' =>  $item['warehousing_item']['wi_number_received'],
+                            //         'wi_type' => '출고_spasys'
+                            //     ]);
+                            // }
+    
+                            WarehousingItem::updateOrCreate(
+                                [
+                                    'item_no' => $item['item_no'],
+                                    'w_no' => $request->w_no,
+                                    'wi_type' => '출고_spasys'
+                                ],
+                                [
+                                    'item_no' => $item['item_no'],
+                                    'w_no' => $request->w_no,
+                                    'wi_number' => $item['schedule_wi_number'],
+                                    //'wi_number_received' =>  $item['warehousing_item']['wi_number_received'],
+                                    'wi_type' => '출고_spasys',
+                                ]
+                            );
+                        }
+    
+                        foreach ($data['location'] as $location) {
+    
+                            $warehousing_status = isset($location['rgd_status1']) ? $location['rgd_status1'] : null;
+                            $rgd_data = ReceivingGoodsDelivery::where('w_no', $request->w_no)->first();
+    
+                            if ($warehousing_status != $rgd_data->rgd_status1) {
+                                $warehousing_status = isset($location['rgd_status1']) ? $location['rgd_status1'] : null;
+                            } else {
+                                $warehousing_status = null;
+                            }
+    
+                            $rgd_no = ReceivingGoodsDelivery::where('w_no', $request->w_no)->update([
+                                'mb_no' => $member->mb_no,
+                                'w_no' => $request->w_no,
+                                'service_korean_name' => $request->w_category_name,
+                                'rgd_contents' => $location['rgd_contents'],
+                                'rgd_address' => $location['rgd_address'],
+                                'rgd_address_detail' => $location['rgd_address_detail'],
+                                'rgd_receiver' => $location['rgd_receiver'],
+                                'rgd_hp' => $location['rgd_hp'],
+                                'rgd_memo' => $location['rgd_memo'],
+                                'rgd_status1' => $location['rgd_status1'],
+                                'rgd_status2' => $location['rgd_status2'],
+                                'rgd_status3' => $location['rgd_status3'],
+                                'rgd_status4' => isset($location['rgd_status4']) ? $location['rgd_status4'] : null,
+                                'rgd_delivery_company' => $location['rgd_delivery_company'],
+                                'rgd_tracking_code' => $location['rgd_tracking_code'],
+                                'rgd_delivery_man' => $location['rgd_delivery_man'],
+                                'rgd_delivery_man_hp' => $location['rgd_delivery_man_hp'],
+                                'rgd_delivery_schedule_day' => $location['rgd_delivery_schedule_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_delivery_schedule_day']) : null,
+                                'rgd_arrive_day' =>  $location['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']) : null,
+                            ]);
+                        }
+    
+                        if ($warehousing_status) {
+                            WarehousingStatus::insert([
+                                'w_no' => $request->w_no,
+                                'mb_no' => $member->mb_no,
+                                'status' => $warehousing_status,
+                                'w_category_name' => $request->w_category_name,
+                            ]);
+                        }
                     }
+                }
+            
+                $package = $request->package;
+
+                if (isset($package)) {
+                    //foreach ($data['package'] as $package) {
+                    if (isset($package['p_no'])) {
+                        Package::where('p_no', $package['p_no'])->update([
+                            'w_no' => $request->w_no,
+                            'note' => $package['note'],
+                            'order_number' => $package['order_number'],
+                            'pack_type' => $package['pack_type'],
+                            'quantity' => $package['quantity'],
+                            'reciever' => $package['reciever'],
+                            'reciever_address' => $package['reciever_address'],
+                            'reciever_contract' => $package['reciever_contract'],
+                            'reciever_detail_address' => $package['reciever_detail_address'],
+                            'sender' => $package['sender'],
+                            'sender_address' => $package['sender_address'],
+                            'sender_contract' => $package['sender_contract'],
+                            'sender_detail_address' => $package['sender_detail_address']
+                        ]);
+                    } else {
+                        Package::insert([
+                            'w_no' => $request->w_no,
+                            'note' => $package['note'],
+                            'order_number' => $package['order_number'],
+                            'pack_type' => $package['pack_type'],
+                            'quantity' => $package['quantity'],
+                            'reciever' => $package['reciever'],
+                            'reciever_address' => $package['reciever_address'],
+                            'reciever_contract' => $package['reciever_contract'],
+                            'reciever_detail_address' => $package['reciever_detail_address'],
+                            'sender' => $package['sender'],
+                            'sender_address' => $package['sender_address'],
+                            'sender_contract' => $package['sender_contract'],
+                            'sender_detail_address' => $package['sender_detail_address']
+                        ]);
+                    }
+                    //}
                 }
             } else {
                 //Page141
@@ -743,170 +743,172 @@ class ReceivingGoodsDeliveryController extends Controller
                         }
                     }
                 } else {
-                    foreach ($request->data as $key => $data) {
-                        if ($data['w_no'] != "") {
-                            $w_no = Warehousing::where('w_no', $request->w_no)->update([
-                                'w_schedule_amount' => $data['w_schedule_amount'],
-                                'w_schedule_day' => $request->w_schedule_day,
-                                'w_import_no' => $warehousing_data->w_import_no,
-                                'w_amount' => $data['w_amount'],
-                                'w_type' => 'EW',
-                                'w_category_name' => $request->w_category_name,
-                            ]);
-                            Warehousing::where('w_no', $warehousing_data->w_import_no)->update([
-                                'w_children_yn' => "y"
-                            ]);
-                            $w_schedule_number = CommonFunc::generate_w_schedule_number($request->w_no, 'EW', $key);
-                            Warehousing::where('w_no', $request->w_no)->update([
-                                'w_schedule_number' =>   CommonFunc::generate_w_schedule_number($request->w_no, 'EW', $key)
-                            ]);
-                            if (isset($request->page_type) && $request->page_type == 'Page130146') {
-                                $w_schedule_number2 = CommonFunc::generate_w_schedule_number($request->w_no, 'EWC', $key);
-                                Warehousing::where('w_no', $request->w_no)->update([
-                                    'w_schedule_number2' =>   CommonFunc::generate_w_schedule_number($request->w_no, 'EWC', $key),
-                                    'w_completed_day' => Carbon::now()->toDateTimeString()
+                    if (isset($request->data)) {
+                        foreach ($request->data as $key => $data) {
+                            if ($data['w_no'] != "") {
+                                $w_no = Warehousing::where('w_no', $request->w_no)->update([
+                                    'w_schedule_amount' => $data['w_schedule_amount'],
+                                    'w_schedule_day' => $request->w_schedule_day,
+                                    'w_import_no' => $warehousing_data->w_import_no,
+                                    'w_amount' => $data['w_amount'],
+                                    'w_type' => 'EW',
+                                    'w_category_name' => $request->w_category_name,
                                 ]);
-                            }
-                            if ($request->wr_contents) {
+                                Warehousing::where('w_no', $warehousing_data->w_import_no)->update([
+                                    'w_children_yn' => "y"
+                                ]);
+                                $w_schedule_number = CommonFunc::generate_w_schedule_number($request->w_no, 'EW', $key);
+                                Warehousing::where('w_no', $request->w_no)->update([
+                                    'w_schedule_number' =>   CommonFunc::generate_w_schedule_number($request->w_no, 'EW', $key)
+                                ]);
+                                if (isset($request->page_type) && $request->page_type == 'Page130146') {
+                                    $w_schedule_number2 = CommonFunc::generate_w_schedule_number($request->w_no, 'EWC', $key);
+                                    Warehousing::where('w_no', $request->w_no)->update([
+                                        'w_schedule_number2' =>   CommonFunc::generate_w_schedule_number($request->w_no, 'EWC', $key),
+                                        'w_completed_day' => Carbon::now()->toDateTimeString()
+                                    ]);
+                                }
+                                if ($request->wr_contents) {
+                                    if ($request->wr_contents) {
+                                        WarehousingRequest::insert([
+                                            'w_no' => $request->w_no,
+                                            'mb_no' => $member->mb_no,
+                                            'wr_contents' => $request->wr_contents,
+                                            'wr_type' => 'EW',
+                                        ]);
+                                    }
+                                }
+
+                                foreach ($data['remove_items'] as $remove) {
+                                    WarehousingItem::where('item_no', $remove['item_no'])->where('w_no', $request->w_no)->delete();
+                                }
+
+                                foreach ($data['items'] as $item) {
+                                    WarehousingItem::where('w_no', $request->w_no)->where('item_no', $item['item_no'])->update([
+                                        'item_no' => $item['item_no'],
+                                        'w_no' => $request->w_no,
+                                        'wi_number' => $item['schedule_wi_number'],
+                                        'wi_type' => '출고_shipper'
+                                    ]);
+                                }
+
+                                foreach ($data['location'] as $location) {
+                                    $warehousing_status = isset($location['rgd_status1']) ? $location['rgd_status1'] : null;
+                                    $rgd_data = ReceivingGoodsDelivery::where('w_no', $request->w_no)->first();
+
+                                    if ($warehousing_status != $rgd_data->rgd_status1) {
+                                        $warehousing_status = isset($location['rgd_status1']) ? $location['rgd_status1'] : null;
+                                    } else {
+                                        $warehousing_status = null;
+                                    }
+
+                                    $rgd_no = ReceivingGoodsDelivery::where('w_no', $request->w_no)->update([
+                                        'mb_no' => $member->mb_no,
+                                        'w_no' => $request->w_no,
+                                        'service_korean_name' => $request->w_category_name,
+                                        'rgd_contents' => $location['rgd_contents'],
+                                        'rgd_address' => $location['rgd_address'],
+                                        'rgd_address_detail' => $location['rgd_address_detail'],
+                                        'rgd_receiver' => $location['rgd_receiver'],
+                                        'rgd_hp' => $location['rgd_hp'],
+                                        'rgd_memo' => $location['rgd_memo'],
+                                        'rgd_status1' => $location['rgd_status1'],
+                                        'rgd_status2' => $location['rgd_status2'],
+                                        'rgd_status3' => $location['rgd_status3'],
+                                        'rgd_status4' => isset($location['rgd_status4']) ? $location['rgd_status4'] : null,
+                                        'rgd_delivery_company' => $location['rgd_delivery_company'],
+                                        'rgd_tracking_code' => $location['rgd_tracking_code'],
+                                        'rgd_delivery_man' => $location['rgd_delivery_man'],
+                                        'rgd_delivery_man_hp' => $location['rgd_delivery_man_hp'],
+                                        'rgd_delivery_schedule_day' => $location['rgd_delivery_schedule_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_delivery_schedule_day']) : null,
+                                        'rgd_arrive_day' => $location['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']) : null,
+                                    ]);
+                                }
+
+                                if ($warehousing_status) {
+                                    WarehousingStatus::insert([
+                                        'w_no' => $w_no,
+                                        'mb_no' => $member->mb_no,
+                                        'status' => $warehousing_status,
+                                        'w_category_name' => $request->w_category_name,
+                                    ]);
+                                }
+                            } else {
+                                $w_no = Warehousing::insertGetId([
+                                    'mb_no' => $member->mb_no,
+                                    'w_schedule_amount' => $data['w_schedule_amount'],
+                                    'w_schedule_day' => $request->w_schedule_day,
+                                    'w_import_no' => $data['w_import_no'],
+                                    'w_amount' => $data['w_amount'],
+                                    'w_type' => 'EW',
+                                    'w_category_name' => $request->w_category_name,
+                                    'co_no' => $request->co_no ? $request->co_no : $co_no
+                                ]);
+                                $w_schedule_number = CommonFunc::generate_w_schedule_number($w_no, 'EW');
+                                Warehousing::where('w_no', $w_no)->update([
+                                    'w_schedule_number' =>   CommonFunc::generate_w_schedule_number($w_no, 'EW')
+                                ]);
+
+                                if (isset($request->page_type) && $request->page_type == 'Page130146') {
+                                    $w_schedule_number2 = CommonFunc::generate_w_schedule_number($w_no, 'EWC');
+                                    Warehousing::where('w_no', $w_no)->update([
+                                        'w_schedule_number2' =>   CommonFunc::generate_w_schedule_number($w_no, 'EWC'),
+                                        'w_completed_day' => Carbon::now()->toDateTimeString()
+                                    ]);
+                                }
+
                                 if ($request->wr_contents) {
                                     WarehousingRequest::insert([
-                                        'w_no' => $request->w_no,
+                                        'w_no' => $w_no,
                                         'mb_no' => $member->mb_no,
                                         'wr_contents' => $request->wr_contents,
                                         'wr_type' => 'EW',
                                     ]);
                                 }
-                            }
 
-                            foreach ($data['remove_items'] as $remove) {
-                                WarehousingItem::where('item_no', $remove['item_no'])->where('w_no', $request->w_no)->delete();
-                            }
-
-                            foreach ($data['items'] as $item) {
-                                WarehousingItem::where('w_no', $request->w_no)->where('item_no', $item['item_no'])->update([
-                                    'item_no' => $item['item_no'],
-                                    'w_no' => $request->w_no,
-                                    'wi_number' => $item['schedule_wi_number'],
-                                    'wi_type' => '출고_shipper'
-                                ]);
-                            }
-
-                            foreach ($data['location'] as $location) {
-                                $warehousing_status = isset($location['rgd_status1']) ? $location['rgd_status1'] : null;
-                                $rgd_data = ReceivingGoodsDelivery::where('w_no', $request->w_no)->first();
-
-                                if ($warehousing_status != $rgd_data->rgd_status1) {
-                                    $warehousing_status = isset($location['rgd_status1']) ? $location['rgd_status1'] : null;
-                                } else {
-                                    $warehousing_status = null;
+                                foreach ($data['items'] as $item) {
+                                    WarehousingItem::insert([
+                                        'item_no' => $item['item_no'],
+                                        'w_no' => $w_no,
+                                        'wi_number' => $item['schedule_wi_number'],
+                                        'wi_type' => '출고_shipper'
+                                    ]);
                                 }
 
-                                $rgd_no = ReceivingGoodsDelivery::where('w_no', $request->w_no)->update([
-                                    'mb_no' => $member->mb_no,
-                                    'w_no' => $request->w_no,
-                                    'service_korean_name' => $request->w_category_name,
-                                    'rgd_contents' => $location['rgd_contents'],
-                                    'rgd_address' => $location['rgd_address'],
-                                    'rgd_address_detail' => $location['rgd_address_detail'],
-                                    'rgd_receiver' => $location['rgd_receiver'],
-                                    'rgd_hp' => $location['rgd_hp'],
-                                    'rgd_memo' => $location['rgd_memo'],
-                                    'rgd_status1' => $location['rgd_status1'],
-                                    'rgd_status2' => $location['rgd_status2'],
-                                    'rgd_status3' => $location['rgd_status3'],
-                                    'rgd_status4' => isset($location['rgd_status4']) ? $location['rgd_status4'] : null,
-                                    'rgd_delivery_company' => $location['rgd_delivery_company'],
-                                    'rgd_tracking_code' => $location['rgd_tracking_code'],
-                                    'rgd_delivery_man' => $location['rgd_delivery_man'],
-                                    'rgd_delivery_man_hp' => $location['rgd_delivery_man_hp'],
-                                    'rgd_delivery_schedule_day' => $location['rgd_delivery_schedule_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_delivery_schedule_day']) : null,
-                                    'rgd_arrive_day' => $location['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']) : null,
-                                ]);
-                            }
+                                foreach ($data['location'] as $location) {
+                                    $warehousing_status =  isset($location['rgd_status1']) ? $location['rgd_status1'] : null;
 
-                            if ($warehousing_status) {
-                                WarehousingStatus::insert([
-                                    'w_no' => $w_no,
-                                    'mb_no' => $member->mb_no,
-                                    'status' => $warehousing_status,
-                                    'w_category_name' => $request->w_category_name,
-                                ]);
-                            }
-                        } else {
-                            $w_no = Warehousing::insertGetId([
-                                'mb_no' => $member->mb_no,
-                                'w_schedule_amount' => $data['w_schedule_amount'],
-                                'w_schedule_day' => $request->w_schedule_day,
-                                'w_import_no' => $data['w_import_no'],
-                                'w_amount' => $data['w_amount'],
-                                'w_type' => 'EW',
-                                'w_category_name' => $request->w_category_name,
-                                'co_no' => $request->co_no ? $request->co_no : $co_no
-                            ]);
-                            $w_schedule_number = CommonFunc::generate_w_schedule_number($w_no, 'EW');
-                            Warehousing::where('w_no', $w_no)->update([
-                                'w_schedule_number' =>   CommonFunc::generate_w_schedule_number($w_no, 'EW')
-                            ]);
+                                    $rgd_no = ReceivingGoodsDelivery::insertGetId([
+                                        'mb_no' => $member->mb_no,
+                                        'w_no' => $w_no,
+                                        'service_korean_name' => $request->w_category_name,
+                                        'rgd_contents' => $location['rgd_contents'],
+                                        'rgd_address' => $location['rgd_address'],
+                                        'rgd_address_detail' => $location['rgd_address_detail'],
+                                        'rgd_receiver' => $location['rgd_receiver'],
+                                        'rgd_hp' => $location['rgd_hp'],
+                                        'rgd_memo' => $location['rgd_memo'],
+                                        'rgd_status1' => $location['rgd_status1'],
+                                        'rgd_status2' => $location['rgd_status2'],
+                                        'rgd_status3' => $location['rgd_status3'],
+                                        'rgd_status4' => isset($location['rgd_status4']) ? $location['rgd_status4'] : null,
+                                        'rgd_delivery_company' => $location['rgd_delivery_company'],
+                                        'rgd_tracking_code' => $location['rgd_tracking_code'],
+                                        'rgd_delivery_man' => $location['rgd_delivery_man'],
+                                        'rgd_delivery_man_hp' => $location['rgd_delivery_man_hp'],
+                                        'rgd_delivery_schedule_day' => $location['rgd_delivery_schedule_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_delivery_schedule_day']) : null,
+                                        'rgd_arrive_day' => $location['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']) : null,
+                                    ]);
+                                }
 
-                            if (isset($request->page_type) && $request->page_type == 'Page130146') {
-                                $w_schedule_number2 = CommonFunc::generate_w_schedule_number($w_no, 'EWC');
-                                Warehousing::where('w_no', $w_no)->update([
-                                    'w_schedule_number2' =>   CommonFunc::generate_w_schedule_number($w_no, 'EWC'),
-                                    'w_completed_day' => Carbon::now()->toDateTimeString()
-                                ]);
-                            }
-
-                            if ($request->wr_contents) {
-                                WarehousingRequest::insert([
-                                    'w_no' => $w_no,
-                                    'mb_no' => $member->mb_no,
-                                    'wr_contents' => $request->wr_contents,
-                                    'wr_type' => 'EW',
-                                ]);
-                            }
-
-                            foreach ($data['items'] as $item) {
-                                WarehousingItem::insert([
-                                    'item_no' => $item['item_no'],
-                                    'w_no' => $w_no,
-                                    'wi_number' => $item['schedule_wi_number'],
-                                    'wi_type' => '출고_shipper'
-                                ]);
-                            }
-
-                            foreach ($data['location'] as $location) {
-                                $warehousing_status =  isset($location['rgd_status1']) ? $location['rgd_status1'] : null;
-
-                                $rgd_no = ReceivingGoodsDelivery::insertGetId([
-                                    'mb_no' => $member->mb_no,
-                                    'w_no' => $w_no,
-                                    'service_korean_name' => $request->w_category_name,
-                                    'rgd_contents' => $location['rgd_contents'],
-                                    'rgd_address' => $location['rgd_address'],
-                                    'rgd_address_detail' => $location['rgd_address_detail'],
-                                    'rgd_receiver' => $location['rgd_receiver'],
-                                    'rgd_hp' => $location['rgd_hp'],
-                                    'rgd_memo' => $location['rgd_memo'],
-                                    'rgd_status1' => $location['rgd_status1'],
-                                    'rgd_status2' => $location['rgd_status2'],
-                                    'rgd_status3' => $location['rgd_status3'],
-                                    'rgd_status4' => isset($location['rgd_status4']) ? $location['rgd_status4'] : null,
-                                    'rgd_delivery_company' => $location['rgd_delivery_company'],
-                                    'rgd_tracking_code' => $location['rgd_tracking_code'],
-                                    'rgd_delivery_man' => $location['rgd_delivery_man'],
-                                    'rgd_delivery_man_hp' => $location['rgd_delivery_man_hp'],
-                                    'rgd_delivery_schedule_day' => $location['rgd_delivery_schedule_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_delivery_schedule_day']) : null,
-                                    'rgd_arrive_day' => $location['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']) : null,
-                                ]);
-                            }
-
-                            if ($warehousing_status) {
-                                WarehousingStatus::insert([
-                                    'w_no' => $w_no,
-                                    'mb_no' => $member->mb_no,
-                                    'status' => $warehousing_status,
-                                    'w_category_name' => $request->w_category_name,
-                                ]);
+                                if ($warehousing_status) {
+                                    WarehousingStatus::insert([
+                                        'w_no' => $w_no,
+                                        'mb_no' => $member->mb_no,
+                                        'status' => $warehousing_status,
+                                        'w_category_name' => $request->w_category_name,
+                                    ]);
+                                }
                             }
                         }
                     }
@@ -933,7 +935,7 @@ class ReceivingGoodsDeliveryController extends Controller
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'w_schedule_number' =>  $w_schedule_number,
+                'w_schedule_number' =>  isset($w_schedule_number) ? $w_schedule_number : '',
                 'w_schedule_number2' => isset($w_schedule_number2) ? $w_schedule_number2 : '',
                 'w_no' => isset($w_no) ? $w_no :  $request->w_no,
             ], 201);
@@ -1660,7 +1662,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                             //THUONG 
                             $warehousing_settlement = WarehousingSettlement::where('w_no', $value['w_no']['w_no'])->get();
-                            foreach($warehousing_settlement as $ws){
+                            foreach ($warehousing_settlement as $ws) {
                                 $warehousing =  Warehousing::where(['w_no' => $ws['w_no_settlement']])->first();
                                 Warehousing::where([
                                     'w_no' => $ws['w_no_settlement'],
@@ -1688,7 +1690,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                         //THUONG 
                         $warehousing_settlement = WarehousingSettlement::where('w_no', $request->w_no)->get();
-                        foreach($warehousing_settlement as $ws){
+                        foreach ($warehousing_settlement as $ws) {
                             $warehousing =  Warehousing::where(['w_no' => $ws['w_no_settlement']])->first();
                             Warehousing::where([
                                 'w_no' => $ws['w_no_settlement'],
@@ -1784,7 +1786,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         ]);
                     }
                 }
-            }else{
+            } else {
                 if (isset($request->w_no)) {
                     $check = ReceivingGoodsDelivery::where('w_no', $request->w_no)->where('rgd_status3', '!=', '배송완료')->orwherenull('rgd_status3')->where('w_no', $request->w_no)->first();
                     //return $check;
@@ -1810,8 +1812,6 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_status2' => '작업완료',
                             'rgd_status3' => null
                         ]);
-
-                        
                     }
                 }
             }
@@ -2218,7 +2218,7 @@ class ReceivingGoodsDeliveryController extends Controller
             if ($request->remove_files) {
                 foreach ($request->remove_files as $key => $file_no) {
                     $file = File::where('file_no', $file_no)->get()->first();
-                    if(isset($file->file_name)){
+                    if (isset($file->file_name)) {
                         $url = Storage::disk('public')->delete($path . '/' . $file->file_name);
                         $file->delete();
                     }
@@ -2226,7 +2226,7 @@ class ReceivingGoodsDeliveryController extends Controller
             }
 
             $files = [];
-            if(isset($validated['files'])){
+            if (isset($validated['files'])) {
                 foreach ($validated['files'] as $key => $file) {
                     $url = Storage::disk('public')->put($path, $file);
                     $files[] = [
@@ -2241,7 +2241,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     ];
                 }
             }
-            
+
 
             File::insert($files);
 
@@ -2287,7 +2287,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'tid_no' => NULL,
                 ]);
 
-                
+
                 $cbh = CancelBillHistory::insertGetId([
                     'rgd_no' => $request->rgd_no,
                     'mb_no' => $user->mb_no,
@@ -2302,7 +2302,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'tid_no' => NULL,
                 ]);
 
-                
+
                 $cbh = CancelBillHistory::insertGetId([
                     'rgd_no' => $request->rgd_no,
                     'mb_no' => $user->mb_no,
@@ -2381,9 +2381,9 @@ class ReceivingGoodsDeliveryController extends Controller
                 }
             } else if ($request->bill_type == 'monthly') {
                 foreach ($request->rgds as $rgd) {
-                    $rgd = ReceivingGoodsDelivery::where('rgd_parent_no', $rgd['rgd_no'])->where(function($q) {
+                    $rgd = ReceivingGoodsDelivery::where('rgd_parent_no', $rgd['rgd_no'])->where(function ($q) {
                         $q->where('rgd_status5', '!=', 'cancel')
-                        ->orwhereNull('rgd_status5');
+                            ->orwhereNull('rgd_status5');
                     })->first();
 
                     $rate_data_general = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->first();
@@ -2592,8 +2592,8 @@ class ReceivingGoodsDeliveryController extends Controller
     {
         try {
 
-            $check_payment = Payment::where('rgd_no',$request->rgd_no)->where('p_cancel_yn','y')->first();
-            if(isset($check_payment)){
+            $check_payment = Payment::where('rgd_no', $request->rgd_no)->where('p_cancel_yn', 'y')->first();
+            if (isset($check_payment)) {
                 Payment::where('rgd_no', $check_payment->rgd_no)->update([
                     'p_price' => $request->sumprice,
                     'p_method' => $request->p_method,
@@ -2608,8 +2608,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'rgd_paid_date' =>  Carbon::now(),
                     'rgd_canceled_date' => null
                 ]);
-
-            }else{
+            } else {
                 Payment::insertGetId(
                     [
                         'mb_no' => Auth::user()->mb_no,
@@ -2647,8 +2646,8 @@ class ReceivingGoodsDeliveryController extends Controller
     public function cancel_payment(Request $request)
     {
         try {
-            $check_payment = Payment::where('rgd_no',$request->rgd_no)->where('p_success_yn','y')->first();
-            if(isset($check_payment)){
+            $check_payment = Payment::where('rgd_no', $request->rgd_no)->where('p_success_yn', 'y')->first();
+            if (isset($check_payment)) {
                 Payment::where('rgd_no', $check_payment->rgd_no)->update([
                     // 'p_price' => $request->sumprice,
                     // 'p_method' => $request->p_method,
@@ -2669,10 +2668,9 @@ class ReceivingGoodsDeliveryController extends Controller
                     'cbh_status_after' => 'cancel_payment_bill',
                     'cbh_type' => 'payment',
                 ]);
-
             }
 
-            
+
 
             return response()->json([
                 'message' => 'Success'
@@ -2705,34 +2703,34 @@ class ReceivingGoodsDeliveryController extends Controller
         try {
             $bill_type = $request->bill_type;
 
-            if($bill_type == 'MF' || $bill_type == 'CF' || $bill_type == 'CA' || $bill_type == 'MA'){
+            if ($bill_type == 'MF' || $bill_type == 'CF' || $bill_type == 'CA' || $bill_type == 'MA') {
                 $settlement_number = ReceivingGoodsDelivery::select(DB::raw('receiving_goods_delivery.*'))
-                ->whereNotNull('rgd_settlement_number')
-                ->whereMonth('created_at' , Carbon::today()->month)
-                ->whereYear('created_at' , Carbon::today()->year)
-                ->where(\DB::raw('substr(rgd_settlement_number, -2)'), '=' , $bill_type)->get();
-            }else if($bill_type == 'C' || $bill_type == 'M'){
+                    ->whereNotNull('rgd_settlement_number')
+                    ->whereMonth('created_at', Carbon::today()->month)
+                    ->whereYear('created_at', Carbon::today()->year)
+                    ->where(\DB::raw('substr(rgd_settlement_number, -2)'), '=', $bill_type)->get();
+            } else if ($bill_type == 'C' || $bill_type == 'M') {
                 $settlement_number = ReceivingGoodsDelivery::select(DB::raw('receiving_goods_delivery.*'))
-                ->whereNotNull('rgd_settlement_number')
-                ->whereMonth('created_at' , Carbon::today()->month)
-                ->whereYear('created_at' , Carbon::today()->year)
-                ->where(\DB::raw('substr(rgd_settlement_number, -1)'), '=' , $bill_type)->get();
+                    ->whereNotNull('rgd_settlement_number')
+                    ->whereMonth('created_at', Carbon::today()->month)
+                    ->whereYear('created_at', Carbon::today()->year)
+                    ->where(\DB::raw('substr(rgd_settlement_number, -1)'), '=', $bill_type)->get();
             }
-            
-            
+
+
             $data = [];
             $number = [];
             foreach ($settlement_number  as $i => $rgd_settlement_number) {
-                $number[$i] = substr($rgd_settlement_number->rgd_settlement_number,7,5);
+                $number[$i] = substr($rgd_settlement_number->rgd_settlement_number, 7, 5);
                 // $bigest_number =  substr($rgd_settlement_number->rgd_settlement_number,7,5);
                 // $last_bill_type = substr($rgd_settlement_number->rgd_settlement_number, -2);
             }
-            if(!empty($number)){
+            if (!empty($number)) {
                 $max_number = max($number);
-                $data_key = array_search($max_number,$number);
+                $data_key = array_search($max_number, $number);
                 $data = $settlement_number[$data_key];
-            } 
-           
+            }
+
 
             // $settlement_number->setCollection(
             //     $settlement_number->getCollection()->map(function ($item){
