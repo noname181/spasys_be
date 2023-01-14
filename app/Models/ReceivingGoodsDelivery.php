@@ -85,7 +85,7 @@ class ReceivingGoodsDelivery extends Model
     }
     public function rgd_child()
     {
-        return $this->hasOne(ReceivingGoodsDelivery::class, 'rgd_parent_no', 'rgd_no')->where('rgd_status5', '!=', 'cancel')->orwherenull('rgd_status5')->select(['rgd_status5', 'rgd_status4', 'rgd_status6', 'rgd_no', 'rgd_parent_no']);
+        return $this->hasOne(ReceivingGoodsDelivery::class, 'rgd_parent_no', 'rgd_no')->where('rgd_status5', '!=', 'cancel')->select(['rgd_status5', 'rgd_status4', 'rgd_status6', 'rgd_no', 'rgd_parent_no']);
     }
 
     public function rgd_parent()
