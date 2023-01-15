@@ -1667,7 +1667,7 @@ class WarehousingController extends Controller
                                 });
                             });
                         }
-                    
+
                 }
                 $schedule_shipment = $schedule_shipment->paginate($per_page, ['*'], 'page', $page);
 
@@ -2072,7 +2072,7 @@ class WarehousingController extends Controller
                     });
                 }
                 if (isset($validated['carrier'])) {
-                    $warehousing->where(DB::raw('lower(rgd_delivery_company)'), 'like', '%' . $validated['carrier'] . '%'); 
+                    $warehousing->where(DB::raw('lower(rgd_delivery_company)'), 'like', '%' . $validated['carrier'] . '%');
                 }
 
                 if ($user->mb_type == 'shop') {
@@ -2363,7 +2363,7 @@ class WarehousingController extends Controller
                         return $q->where(DB::raw('lower(rgd_delivery_company)'), 'like', '%' . $validated['carrier'] . '%');
                     });
                 }
-                
+
 
 
                 $warehousing = $warehousing->get();
@@ -3115,7 +3115,7 @@ class WarehousingController extends Controller
                 ->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
                 ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
                 ->where('rgd_status1', '=', '입고')
-                
+
                 ->where('rgd_bill_type', $user->mb_type =='spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')
                 ->where(function ($q) {
                     $q->where('rgd_status5', '!=', 'cancel')
@@ -3840,7 +3840,13 @@ class WarehousingController extends Controller
                     $q->where('mb_type', 'shop');
                 });
             } else if ($user->mb_type == 'shop' && $request->type == 'check_list') {
-                $warehousing_bonded = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 't_export']);
+                $warehousing_bonded = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 't_export'])->whereHas('w_no', function ($query) use ($user) {
+                    $query->whereHas('co_no.co_parent', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
+                    });
+                })->whereHas('mb_no', function ($q) use ($user) {
+                    $q->where('mb_type', 'spasys');
+                });
             } else if ($user->mb_type == 'shipper') {
                 $warehousing_bonded = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 't_export'])->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no', function ($q) use ($user) {
