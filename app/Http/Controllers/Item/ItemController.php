@@ -359,9 +359,9 @@ class ItemController extends Controller
 
             if (isset($validated['co_no']) && Auth::user()->mb_type == "shop") {
                 $items->where('co_no', $validated['co_no']);
-            } else if (Auth::user()->mb_type == "spasys") {
+            } else if (isset($validated['co_no']) && Auth::user()->mb_type == "spasys") {
                 $items->where('co_no', $validated['co_no']);
-            } else if (Auth::user()->mb_type == "shipper") {
+            } else if (isset($validated['co_no']) && Auth::user()->mb_type == "shipper") {
                 $items->where('co_no', $validated['co_no']);
             }
 
