@@ -476,8 +476,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
     public function create_warehousing_release(Request $request)
     {
-        // $validated = $request->validated();
-        //return $request;
+       
         try {
             DB::beginTransaction();
 
@@ -949,8 +948,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
     public function create_warehousing_release_fulfillment(Request $request)
     {
-        // $validated = $request->validated();
-
+       
         try {
             DB::beginTransaction();
 
@@ -997,8 +995,7 @@ class ReceivingGoodsDeliveryController extends Controller
     }
     public function create_warehousing_release_mobile(Request $request)
     {
-        // $validated = $request->validated();
-        //return $request;
+        
         try {
             DB::beginTransaction();
 
