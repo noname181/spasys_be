@@ -149,27 +149,30 @@ class ServiceController extends Controller
     {
         try {
             $user = Auth::user();
-
+            $service_all = Service::where('service_no', '=', 1)->first();
+            $service_no_array = $service_all->service_name . " " . $user->mb_service_no_array;
             if($user->mb_type == 'spasys'){
-                $services = Service::where('service_use_yn', 'y')->where('service_no', '!=', 1)->get();
+                $services = Service::where('service_use_yn', 'y')->get();
             }else if($user->mb_type == 'shop'){
 
-                $services =  explode(" ", $user->mb_service_no_array);
+                $services =  explode(" ", $service_no_array);
                 $service_no = [];
                 foreach($services as $service){
                     $ser = Service::where('service_name', $service)->first();
                     $service_no[] = $ser->service_no;
                 }
-                $services = Service::where('service_use_yn', 'y')->where('service_no', '!=', 1)->whereIn('service_no', $service_no)->get();
+                $services = Service::where('service_use_yn', 'y')->whereIn('service_no', $service_no)->get();
             }
 
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'services' => $services,
+                //'test' => $service_all
             ]);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
+           // return $e;
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
