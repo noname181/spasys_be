@@ -399,6 +399,7 @@ class ImportScheduleController extends Controller
 
             DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
             $user = Auth::user();
+
             DB::enableQueryLog();
             if ($user->mb_type == 'shop') {
                 // $import_schedule = ImportExpected::with(['company', 'receiving_goods_delivery', 'export'])->whereHas('company.co_parent', function ($q) use ($user) {
@@ -570,14 +571,17 @@ class ImportScheduleController extends Controller
                 //     })->orderBy('te_carry_out_number', 'DESC');
 
                 //FIX NOT WORK 'with'
-                $sub = ImportExpected::select('company.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
-                    ->leftjoin('company', function ($join) {
-                        $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
-                    })->leftjoin('company as parent_shop', function ($join) {
-                        $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
-                    })->leftjoin('company as parent_spasys', function ($join) {
-                        $join->on('parent_shop.co_parent_no', '=', 'parent_spasys.co_no');
-                    })->where('parent_spasys.co_no', $user->co_no)->where('tie_is_date', '>=', '2022-01-04')
+                $sub = ImportExpected::select('parent_spasys.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 't_import_expected.*')
+                    ->leftjoin('company as parent_spasys', function ($join) {
+                        $join->on('parent_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
+                    })
+                    // ->leftjoin('company as parent_shop', function ($join) {
+                    //     $join->on('parent_spasys.co_no', '=', 'parent_shop.co_parent_no');
+                    // })->leftjoin('company', function ($join) {
+                    //     $join->on('company.co_no', '=', 'parent_shop.co_no');
+                    // })
+                    //->where('parent_spasys.warehouse_code', $user->company['warehouse_code'])
+                    ->where('tie_is_date', '>=', '2022-01-04')
                     ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                     ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
@@ -875,7 +879,9 @@ class ImportScheduleController extends Controller
                         $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
                     })->leftjoin('company as parent_spasys', function ($join) {
                         $join->on('parent_shop.co_parent_no', '=', 'parent_spasys.co_no');
-                    })->where('company.co_no', $user->co_no)->where('tie_is_date', '>=', '2022-01-04')
+                    })
+                    ->where('company.co_no', $user->co_no)
+                    ->where('tie_is_date', '>=', '2022-01-04')
                     ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                     ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
@@ -966,7 +972,8 @@ class ImportScheduleController extends Controller
                         $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
                     })->leftjoin('company as parent_spasys', function ($join) {
                         $join->on('parent_shop.co_parent_no', '=', 'parent_spasys.co_no');
-                    })->where('parent_spasys.co_no', $user->co_no)->where('tie_is_date', '>=', '2022-01-04')
+                    })->where('parent_spasys.co_no', $user->co_no)
+                    ->where('tie_is_date', '>=', '2022-01-04')
                     ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                     ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 

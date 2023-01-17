@@ -29,7 +29,6 @@ Route::get('/api_schedule_cron_nologin', [App\Http\Controllers\ScheduleShipment\
 Route::get('/api_stock_list_nologin', [App\Http\Controllers\Item\ItemController::class, 'updateStockItemsApiNoLogin'])->name('api_stock_list_nologin');
 Route::get('/stock_history', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'stock_history'])->name('stock_history');
 Route::post('/banner_load', [App\Http\Controllers\Banner\BannerController::class, 'banner_load'])->name('banner_load');
-Route::post('/banner_count', [App\Http\Controllers\Banner\BannerController::class, 'banner_count'])->name('banner_count');
 
 Route::middleware('auth')->group(function () {
 
@@ -135,6 +134,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/', [App\Http\Controllers\Banner\BannerController::class, 'register'])->name('register_banner');
         Route::patch('{banner}', [App\Http\Controllers\Banner\BannerController::class, 'update'])->name('update_banner');
         Route::post('/get_banners', [App\Http\Controllers\Banner\BannerController::class, 'getBanner'])->name('get_banners');
+        Route::post('/banner_count', [App\Http\Controllers\Banner\BannerController::class, 'banner_count'])->name('banner_count');
     });
 
     Route::post('/notices', [\App\Http\Controllers\Notice\NoticeController::class, 'create']);
