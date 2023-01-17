@@ -364,7 +364,7 @@ class BannerController extends Controller
 
     public function banner_count()
     {
-        return "dsada";
+        //return "dsada";
         try {
             DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
             $user = Auth::user();
@@ -396,7 +396,27 @@ class BannerController extends Controller
                     ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
 
 
-                $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+                $import_schedule_a = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+                    $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
+                })->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
+                    $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
+                })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+
+                    $leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
+                    $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+                })->orderBy('te_carry_out_number', 'DESC');
+
+                $import_schedule_b = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+                    $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
+                })->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
+                    $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
+                })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+
+                    $leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
+                    $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+                })->orderBy('te_carry_out_number', 'DESC');
+
+                $import_schedule_d = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
                     $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
                 })->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
                     $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
@@ -432,7 +452,27 @@ class BannerController extends Controller
                     ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
 
 
-                $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+                $import_schedule_a = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+                    $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
+                })->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
+                    $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
+                })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+
+                    $leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
+                    $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+                })->orderBy('te_carry_out_number', 'DESC');
+
+                $import_schedule_b = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+                    $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
+                })->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
+                    $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
+                })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+
+                    $leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
+                    $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+                })->orderBy('te_carry_out_number', 'DESC');
+
+                $import_schedule_d = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
                     $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
                 })->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
                     $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
@@ -471,7 +511,27 @@ class BannerController extends Controller
                     ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
 
 
-                $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+                $import_schedule_a = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+                    $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
+                })->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
+                    $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
+                })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+
+                    $leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
+                    $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+                })->orderBy('te_carry_out_number', 'DESC');
+
+                $import_schedule_b = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+                    $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
+                })->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
+                    $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
+                })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+
+                    $leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
+                    $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+                })->orderBy('te_carry_out_number', 'DESC');
+
+                $import_schedule_d = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
                     $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
                 })->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
                     $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
@@ -482,14 +542,17 @@ class BannerController extends Controller
                 })->orderBy('te_carry_out_number', 'DESC');
                 
             }
-            $import_schedule->get()->count();
+
+            $import_schedule_a = $import_schedule_a->whereNotNull('aaa.tie_logistic_manage_number')->whereNull('bbb.ti_logistic_manage_number')->whereNull('ccc.tec_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->get()->count();
+            $import_schedule_b = $import_schedule_b->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ccc.tec_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->get()->count();
+            $import_schedule_d = $import_schedule_d->whereNotNull('ddd.te_logistic_manage_number')->get()->count();
+
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'data' => $import_schedule,
-                // 'banner_login_right_top' => $banner_login_right_top,
-                // 'banner_login_right_bottom' => $banner_login_right_bottom,
-                // 'banner_index_top' => $banner_index_top,
-                // 'banner_index_bottom' => $banner_index_bottom,
+                'total_a' => $import_schedule_a,
+                'total_b' => $import_schedule_b,
+                'total_c' => ($import_schedule_b - $import_schedule_a),
+                'total_d' => $import_schedule_d,
             ]);
         } catch (\Exception $e) {
             Log::error($e);
