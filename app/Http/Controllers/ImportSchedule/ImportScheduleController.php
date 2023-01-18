@@ -729,19 +729,20 @@ class ImportScheduleController extends Controller
             //$members = Member::where('mb_no', '!=', 0)->get();
 
             foreach ($import_schedule->get() as $item) {
-                if (!empty($item->tie_no) && isset($item->co_no)) {
+                if (isset($item->co_no)) {
                     $warehousing = Warehousing::updateOrCreate(
                         [
                             'w_category_name' => '보세화물',
-                            'tie_no' => $item->tie_no,
+                            'logistic_manage_number' => $item->tie_logistic_manage_number ? $item->tie_logistic_manage_number : 
+                            ($item->ti_logistic_manage_number ? $item->ti_logistic_manage_number : 
+                            ($item->te_logistic_manage_number ? $item->te_logistic_manage_number : $item->tec_logistic_manage_number)),
+                            
                         ],
                         [
                             'mb_no' => $user->mb_no,
                             // 'w_completed_day' => $item['import']['ti_i_date'] ? $item['import']['ti_i_date'] : NULL,
                             // 'w_schedule_day' => $item['tie_is_date'] ? $item['tie_is_date'] : NULL,
-                            'logistic_manage_number' => $item->tie_logistic_manage_number ? $item->tie_logistic_manage_number : 
-                            ($item->ti_logistic_manage_number ? $item->ti_logistic_manage_number : 
-                            ($item->te_logistic_manage_number ? $item->te_logistic_manage_number : $item->tec_logistic_manage_number)),
+                            'tie_no' => $item->tie_no,
                             'w_schedule_amount' => $item->tie_is_number,
                             'w_amount' => $item->ti_i_number,
                             'w_type' => 'IW',
@@ -750,19 +751,22 @@ class ImportScheduleController extends Controller
                     );
 
                     //THUONG EDIT TO MAKE SETTLEMENT
-                    $rgd_no = ReceivingGoodsDelivery::updateOrCreate(
-                        [
-                            'w_no' => $warehousing->w_no,
-                        ],
-                        [
-                            'mb_no' => $user->mb_no,
-                            'service_korean_name' => '보세화물',
-                            'rgd_status1' => '입고',
-                            'rgd_tracking_code' => $item->tie_logistic_manage_number ? $item->tie_logistic_manage_number : 
-                            ($item->ti_logistic_manage_number ? $item->ti_logistic_manage_number : 
-                            ($item->te_logistic_manage_number ? $item->te_logistic_manage_number : $item->tec_logistic_manage_number)),
-                        ]
-                    );
+                    if(isset($warehousing->w_no)){
+                        $rgd_no = ReceivingGoodsDelivery::updateOrCreate(
+                            [
+                                'w_no' => $warehousing->w_no,
+                            ],
+                            [
+                                'mb_no' => $user->mb_no,
+                                'service_korean_name' => '보세화물',
+                                'rgd_status1' => '입고',
+                                'rgd_tracking_code' => $item->tie_logistic_manage_number ? $item->tie_logistic_manage_number : 
+                                ($item->ti_logistic_manage_number ? $item->ti_logistic_manage_number : 
+                                ($item->te_logistic_manage_number ? $item->te_logistic_manage_number : $item->tec_logistic_manage_number)),
+                            ]
+                        );
+                    }
+                   
                 }
             }
 
