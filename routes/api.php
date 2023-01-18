@@ -205,6 +205,7 @@ Route::middleware('auth')->group(function () {
     Route::get('receiving_goods_delivery/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'__invoke']);
     Route::get('/get_rgd_package/{co_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'get_rgd_package'])->name('get_rgd_package');
     Route::post('receiving_goods_delivery/update_status5', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_status5']);
+    Route::post('receiving_goods_delivery/update_request', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_request']);
     Route::post('receiving_goods_delivery/update_status6', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_status6']);
     Route::post('receiving_goods_delivery/update_status7', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_status7']);
     Route::post('receiving_goods_delivery/update_status5_fulfillment', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_status5_fulfillment']);

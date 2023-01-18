@@ -2353,6 +2353,24 @@ class ReceivingGoodsDeliveryController extends Controller
         }
     }
 
+    public function update_request(Request $request)
+    {
+        try {
+           
+            $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                'rgd_settlement_request' => $request->warehousing_request,
+            ]);
+
+            return response()->json([
+                'message' => 'Success'
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
     public function update_status5(Request $request)
     {
         try {
