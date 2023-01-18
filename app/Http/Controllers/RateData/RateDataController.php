@@ -1563,7 +1563,25 @@ class RateDataController extends Controller
                     ],
                 );
             }
+            $index = RateMetaData::where('co_no', $co_no)->get()->count() + 1;
 
+            if(isset($validated['rmd_mail_detail1a']) || isset($validated['rmd_mail_detail2a']) || isset($validated['rmd_mail_detail3a'])){
+                RateMetaData::updateOrCreate(
+                    [
+                        'co_no' => $co_no,
+                        'mb_no' => Auth::user()->mb_no,
+                    ],
+                    [         
+                        'rmd_number' => CommonFunc::generate_rmd_number($co_no, $index),
+                        'rmd_mail_detail1a' => isset($validated['rmd_mail_detail1a']) ? $validated['rmd_mail_detail1a'] : '',
+                        'rmd_mail_detail1b' => isset($validated['rmd_mail_detail1b']) ? $validated['rmd_mail_detail1b'] : '',
+                        'rmd_mail_detail1c' => isset($validated['rmd_mail_detail1c']) ? $validated['rmd_mail_detail1c'] : '',
+                        'rmd_mail_detail2' => isset($validated['rmd_mail_detail2']) ? $validated['rmd_mail_detail2'] : '',
+                        'rmd_mail_detail3' => isset($validated['rmd_mail_detail3']) ? $validated['rmd_mail_detail3'] : '',
+                    ]
+                );
+            }
+            
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
