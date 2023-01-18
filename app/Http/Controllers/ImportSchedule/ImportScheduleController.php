@@ -580,7 +580,7 @@ class ImportScheduleController extends Controller
                     // })->leftjoin('company', function ($join) {
                     //     $join->on('company.co_no', '=', 'parent_shop.co_no');
                     // })
-                    //->where('parent_spasys.warehouse_code', $user->company['warehouse_code'])
+                    ->where('parent_spasys.warehouse_code', $user->company['warehouse_code'])
                     ->where('tie_is_date', '>=', '2022-01-04')
                     ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                     ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);

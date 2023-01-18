@@ -2535,17 +2535,21 @@ class ItemController extends Controller
                 //             ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number'])->orderBy('te_carry_out_number', 'DESC');
 
                 $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number')
-                    ->leftjoin('company', function ($join) {
-                        $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
-                    })->leftjoin('company as parent_shop', function ($join) {
-                        $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
-                    })->leftjoin('company as parent_spasys', function ($join) {
-                        $join->on('parent_shop.co_parent_no', '=', 'parent_spasys.co_no');
-                    })->where('parent_spasys.co_no', $user->co_no)->where('tie_is_date', '>=', '2022-01-04')
+                    // ->leftjoin('company', function ($join) {
+                    //     $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
+                    // })->leftjoin('company as parent_shop', function ($join) {
+                    //     $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
+                    // })->leftjoin('company as parent_spasys', function ($join) {
+                    //     $join->on('parent_shop.co_parent_no', '=', 'parent_spasys.co_no');
+                    // })->where('parent_spasys.co_no', $user->co_no)
+                    ->leftjoin('company as parent_spasys', function ($join) {
+                        $join->on('parent_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
+                    })
+                    ->where('tie_is_date', '>=', '2022-01-04')
                     ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                     ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-                $sub_2 = Import::select('ti_logistic_manage_number','ti_carry_in_number','ti_i_confirm_number')
+                $sub_2 = Import::select('ti_logistic_manage_number', 'ti_carry_in_number', 'ti_i_confirm_number')
                     ->leftjoin('receiving_goods_delivery', function ($join) {
                         $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
                     })
@@ -2554,7 +2558,7 @@ class ItemController extends Controller
                 $sub_3 = ExportConfirm::select('tec_logistic_manage_number')
                     ->groupBy(['tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number']);
 
-                $sub_4 = Export::select('te_logistic_manage_number','te_carry_in_number','te_carry_out_number')
+                $sub_4 = Export::select('te_logistic_manage_number', 'te_carry_in_number', 'te_carry_out_number')
                     // ->leftjoin('receiving_goods_delivery', function ($join) {
                     //     $join->on('t_export.te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
                     // })
@@ -2635,22 +2639,26 @@ class ItemController extends Controller
                                     break;
                             }
 
+                            if (isset($value->tie_logistic_manage_number)) {
+                                $import_expected = ImportExpected::where('tie_logistic_manage_number', $value->tie_logistic_manage_number)
+                                    ->update([
+                                        'tie_status_2' => $status1
+                                    ]);
+                            }
 
-                            $import_expected = ImportExpected::where('tie_logistic_manage_number', $value->tie_logistic_manage_number)
-                                ->update([
-                                    'tie_status_2' => $status1
-                                ]);
+                            if (isset($value->ti_i_confirm_number) && isset($value->ti_i_confirm_number)) {
+                                $import = Import::where('ti_logistic_manage_number', $value->ti_logistic_manage_number)->where('ti_i_confirm_number', $value->ti_i_confirm_number)
+                                    ->update([
+                                        'ti_status_2' => $status1
+                                    ]);
+                            }
 
-                            $import = Import::where('ti_logistic_manage_number', $value->ti_logistic_manage_number)->where('ti_i_confirm_number', $value->ti_i_confirm_number)
-                                ->update([
-                                    'ti_status_2' => $status1
-                                ]);
-
-                            $export = Export::where('te_logistic_manage_number', $value->te_logistic_manage_number)->where('te_carry_out_number', $value->te_carry_out_number)
-                                ->update([
-                                    'te_status_2' => $status1
-                                ]);
-
+                            if (isset($value->te_logistic_manage_number) && isset($value->te_carry_out_number)) {
+                                $export = Export::where('te_logistic_manage_number', $value->te_logistic_manage_number)->where('te_carry_out_number', $value->te_carry_out_number)
+                                    ->update([
+                                        'te_status_2' => $status1
+                                    ]);
+                            }
                             // $export_confirm = ExportConfirm::where('te_logistic_manage_number', $value['te_logistic_manage_number'])
                             // ->update([
                             //     'te_status_2' => $status
