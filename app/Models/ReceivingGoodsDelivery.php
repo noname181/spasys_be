@@ -109,7 +109,7 @@ class ReceivingGoodsDelivery extends Model
         return $this->hasMany(ReceivingGoodsDelivery::class, 'rgd_settlement_number', 'rgd_settlement_number')->with(['rate_data_general']);
     }
     public function cancel_bill_history(){
-        return $this->hasOne(CancelBillHistory::class, 'rgd_no', 'rgd_no');
+        return $this->hasOne(CancelBillHistory::class, 'rgd_no', 'rgd_no')->where('cbh_type', 'cancel');
     }
 
     public function t_import(){
