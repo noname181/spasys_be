@@ -1563,7 +1563,25 @@ class RateDataController extends Controller
                     ],
                 );
             }
+            $index = RateMetaData::where('co_no', $co_no)->get()->count() + 1;
 
+            if(isset($validated['rmd_mail_detail1a']) || isset($validated['rmd_mail_detail2a']) || isset($validated['rmd_mail_detail3a'])){
+                RateMetaData::updateOrCreate(
+                    [
+                        'co_no' => $co_no,
+                        'mb_no' => Auth::user()->mb_no,
+                    ],
+                    [         
+                        'rmd_number' => CommonFunc::generate_rmd_number($co_no, $index),
+                        'rmd_mail_detail1a' => isset($validated['rmd_mail_detail1a']) ? $validated['rmd_mail_detail1a'] : '',
+                        'rmd_mail_detail1b' => isset($validated['rmd_mail_detail1b']) ? $validated['rmd_mail_detail1b'] : '',
+                        'rmd_mail_detail1c' => isset($validated['rmd_mail_detail1c']) ? $validated['rmd_mail_detail1c'] : '',
+                        'rmd_mail_detail2' => isset($validated['rmd_mail_detail2']) ? $validated['rmd_mail_detail2'] : '',
+                        'rmd_mail_detail3' => isset($validated['rmd_mail_detail3']) ? $validated['rmd_mail_detail3'] : '',
+                    ]
+                );
+            }
+            
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -8140,26 +8158,19 @@ class RateDataController extends Controller
                         'cbh_type' => 'cancel',
                     ]);
                 }
-            } else if ($request->bill_type == 'case_bill_final_issue') { //page 264
+            } else if ($request->bill_type == 'case_bill_final_issue') { 
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-                    'rgd_status5' => 'cancel',
+                    'rgd_status5' => NULL,
+                    'rgd_confirmed_date' => NULL
                 ]);
                 $insert_cancel_bill = CancelBillHistory::insertGetId([
                     'mb_no' => Auth::user()->mb_no,
                     'rgd_no' => $request->rgd_no,
-                    'cbh_status_before' => 'confirmed',
-                    'cbh_status_after' => 'issued',
-                ]);
-                $rgd_parent_no = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
-                RateMetaData::where('rgd_no', $request->rgd_no)->update([
-                    'rgd_no' => $rgd['rgd_no'],   
+                    'cbh_status_before' => 'issued',
+                    'cbh_status_after' =>  NULL,
+                    'cbh_type' => 'revert',
                 ]);
 
-                if ($rgd_parent_no->rgd_status5 == 'confirmed') {
-                    ReceivingGoodsDelivery::where('rgd_no', $rgd_parent_no)->update([
-                        'rgd_status5' => 'issued',
-                    ]);
-                }
             } else if ($request->bill_type == 'month_bill_final_issue') { //page 264
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
 
