@@ -2535,16 +2535,15 @@ class ItemController extends Controller
                 //             ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number'])->orderBy('te_carry_out_number', 'DESC');
 
                 $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number')
-                    // ->leftjoin('company', function ($join) {
-                    //     $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
-                    // })->leftjoin('company as parent_shop', function ($join) {
-                    //     $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
-                    // })->leftjoin('company as parent_spasys', function ($join) {
-                    //     $join->on('parent_shop.co_parent_no', '=', 'parent_spasys.co_no');
-                    // })->where('parent_spasys.co_no', $user->co_no)
                     ->leftjoin('company as parent_spasys', function ($join) {
                         $join->on('parent_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
                     })
+                    ->leftjoin('company', function ($join) {
+                        $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
+                    })->leftjoin('company as parent_shop', function ($join) {
+                        $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
+                    })
+                    ->where('parent_spasys.warehouse_code', $user->company['warehouse_code'])
                     ->where('tie_is_date', '>=', '2022-01-04')
                     ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                     ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
@@ -2577,7 +2576,7 @@ class ItemController extends Controller
             }
             $import_schedule = $import_schedule->get();
 
-            //return $import_schedule;
+            return $import_schedule;
             DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
 
             foreach ($import_schedule as $value) {

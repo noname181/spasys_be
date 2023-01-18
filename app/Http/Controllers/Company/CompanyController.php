@@ -138,7 +138,6 @@ class CompanyController extends Controller
                     $query->where('co_name', 'like', '%' . strtolower($validated['co_parent_name']) . '%');
                     $query->orWhere('company.co_name', 'like', '%' . strtolower($validated['co_parent_name']) . '%');
                 });
-                
             }
 
             if (isset($validated['co_name'])) {
@@ -319,7 +318,7 @@ class CompanyController extends Controller
             $user = Auth::user();
             $co_address = CoAddress::with(['company'])->where('co_no', $request->co_no);
 
-            
+
             $co_address = $co_address->paginate($per_page, ['*'], 'page', $page);
 
             return response()->json($co_address);
@@ -333,9 +332,9 @@ class CompanyController extends Controller
     {
         try {
             DB::enableQueryLog();
-    
-            $co_address_default = CoAddress::with(['company'])->where('ca_is_default','y')->where('co_no', $request->co_no)->first();
-            
+
+            $co_address_default = CoAddress::with(['company'])->where('ca_is_default', 'y')->where('co_no', $request->co_no)->first();
+
             return response()->json(['data' => $co_address_default]);
         } catch (\Exception $e) {
             Log::error($e);
@@ -476,22 +475,34 @@ class CompanyController extends Controller
     {
 
         $export = Export::with(['import', 'import_expected', 't_export_confirm'])->where('te_carry_out_number', $tcon)->first();
-        
+
         if (isset($export)) {
             $company = Company::where('co_license', $export->import_expected->tie_co_license)->first();
-            $adjustment_group = AdjustmentGroup::where('co_no', '=', $company->co_no)->first();
+            if (isset($company->co_no)) {
+                $adjustment_group = AdjustmentGroup::where('co_no', '=', $company->co_no)->first();
+            } else {
+                $adjustment_group = "";
+            }
         } else {
             $export = [];
             $import = Import::with(['import_expect', 'export_confirm'])->where('ti_carry_in_number', $tcon)->first();
             if (isset($import)) {
                 $export['import'] = $import;
                 $company = Company::where('co_license', $import->import_expect->tie_co_license)->first();
-                $adjustment_group = AdjustmentGroup::where('co_no', '=', $company->co_no)->first();
+                if (isset($company->co_no)) {
+                    $adjustment_group = AdjustmentGroup::where('co_no', '=', $company->co_no)->first();
+                } else {
+                    $adjustment_group = "";
+                }
             } else {
                 $import_expected = ImportExpected::where('tie_logistic_manage_number', $tcon)->first();
                 $export['import_expected'] = $import_expected;
                 $company = Company::where('co_license', $import_expected->tie_co_license)->first();
-                $adjustment_group = AdjustmentGroup::where('co_no', '=', $company->co_no)->first();
+                if (isset($company->co_no)) {
+                    $adjustment_group = AdjustmentGroup::where('co_no', '=', $company->co_no)->first();
+                } else {
+                    $adjustment_group = "";
+                }
             }
         }
 
@@ -564,11 +575,11 @@ class CompanyController extends Controller
                 });
             } else {
                 $companies = Company::with(['contract', 'co_parent'])->with('warehousing')->where('co_type', 'shipper')->whereIn('co_parent_no', function ($query) use ($user) {
-                        $query->select('co_no')
-                            ->from(with(new Company)->getTable())
-                            ->where('co_type', 'shop')
-                            ->where('co_parent_no', $user->co_no);
-                    })->orderBy('co_no', 'DESC');
+                    $query->select('co_no')
+                        ->from(with(new Company)->getTable())
+                        ->where('co_type', 'shop')
+                        ->where('co_parent_no', $user->co_no);
+                })->orderBy('co_no', 'DESC');
             }
             //$companies = Company::with('contract')->with('warehousing')->where('co_type', 'shipper')->where('co_parent_no', $user->co_no)->orderBy('co_no', 'DESC');
 
@@ -633,11 +644,11 @@ class CompanyController extends Controller
                 // ->where('co_parent_no', $user->co_no)->orderBy('co_no', 'DESC')->pluck('co_no')->toArray();
 
                 $companies = Company::with(['contract', 'co_parent'])->with('warehousing')->where('co_type', 'shipper')->whereIn('co_parent_no', function ($query) use ($user) {
-                        $query->select('co_no')
-                            ->from(with(new Company)->getTable())
-                            ->where('co_type', 'shop')
-                            ->where('co_parent_no', $user->co_no);
-                    })->orderBy('co_no', 'DESC');
+                    $query->select('co_no')
+                        ->from(with(new Company)->getTable())
+                        ->where('co_type', 'shop')
+                        ->where('co_parent_no', $user->co_no);
+                })->orderBy('co_no', 'DESC');
             }
 
             if (isset($validated['from_date'])) {
@@ -692,11 +703,11 @@ class CompanyController extends Controller
                 });
             } else {
                 $companies = Company::with(['contract', 'co_parent'])->with('warehousing')->where('co_type', 'shipper')->whereIn('co_parent_no', function ($query) use ($user) {
-                        $query->select('co_no')
-                            ->from(with(new Company)->getTable())
-                            ->where('co_type', 'shop')
-                            ->where('co_parent_no', $user->co_no);
-                    })->orderBy('co_no', 'DESC');
+                    $query->select('co_no')
+                        ->from(with(new Company)->getTable())
+                        ->where('co_type', 'shop')
+                        ->where('co_parent_no', $user->co_no);
+                })->orderBy('co_no', 'DESC');
             }
 
             // if (isset($validated['w_no'])) {
