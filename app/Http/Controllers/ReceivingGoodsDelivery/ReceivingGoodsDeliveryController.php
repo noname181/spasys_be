@@ -307,7 +307,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                 WarehousingItem::insert([
                                     'item_no' => $item_no,
                                     'w_no' => $w_no,
-                                    'wi_number' => 0,
+                                    'wi_number' => $warehousing_item['warehousing_item'][0]['wi_number'],
                                     'wi_type' => '입고_shipper'
                                 ]);
                             } else {
