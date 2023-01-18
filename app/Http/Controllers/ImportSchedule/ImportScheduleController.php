@@ -303,40 +303,6 @@ class ImportScheduleController extends Controller
                 }
             }
 
-            foreach ($import_schedule->get() as $item) {
-                if (!empty($item['import']['ti_no']) && !empty($item['ti_logistic_manage_number']) && empty($item['te_logistic_manage_number']) && empty($item['tec_logistic_manage_number'])) {
-                    $warehousing = Warehousing::updateOrCreate(
-                        [
-                            'w_category_name' => '보세화물',
-                            'tie_no' => $item['tie_no'],
-                        ],
-                        [
-                            'mb_no' => $user->mb_no,
-                            'logistic_manage_number' => $item['tie_logistic_manage_number'],
-                            'w_schedule_amount' => $item['tie_is_number'],
-                            'w_amount' => $item['import']['ti_i_number'],
-                            'w_type' => 'IW',
-                            'co_no' => $item['company']['co_no'],
-                        ]
-                    );
-
-                    //THUONG EDIT TO MAKE SETTLEMENT
-                    $rgd_no = ReceivingGoodsDelivery::updateOrCreate(
-                        [
-                            'w_no' => $warehousing->w_no,
-                        ],
-                        [
-                            'mb_no' => $user->mb_no,
-                            'service_korean_name' => '보세화물',
-                            'rgd_status1' => '입고',
-                            'rgd_tracking_code' => $item['ti_logistic_manage_number']
-                        ]
-                    );
-                }
-            }
-
-
-
             $import_schedule = $import_schedule->paginate($per_page, ['*'], 'page', $page);
 
             $import_schedule->setCollection(
@@ -582,7 +548,7 @@ class ImportScheduleController extends Controller
                     })
                     // ->leftjoin('company', function ($join) {
                     //     $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
-                        
+
                     // })->leftjoin('company as parent_shop', function ($join) {
                     //     $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
                     // })->leftjoin('company as parent_spasys', function ($join) {
@@ -590,7 +556,7 @@ class ImportScheduleController extends Controller
                     //     $join->on('parent_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
                     // })
                     //->where('parent_spasys.co_no', $user->co_no)
-                    
+
                     ->where('parent_spasys.warehouse_code', $user->company['warehouse_code'])
                     ->where('tie_is_date', '>=', '2022-01-04')
                     ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
@@ -727,48 +693,6 @@ class ImportScheduleController extends Controller
             // }
 
             //$members = Member::where('mb_no', '!=', 0)->get();
-
-            foreach ($import_schedule->get() as $item) {
-                if (isset($item->co_no)) {
-                    $warehousing = Warehousing::updateOrCreate(
-                        [
-                            'w_category_name' => '보세화물',
-                            'logistic_manage_number' => $item->tie_logistic_manage_number ? $item->tie_logistic_manage_number : 
-                            ($item->ti_logistic_manage_number ? $item->ti_logistic_manage_number : 
-                            ($item->te_logistic_manage_number ? $item->te_logistic_manage_number : $item->tec_logistic_manage_number)),
-                            
-                        ],
-                        [
-                            'mb_no' => $user->mb_no,
-                            // 'w_completed_day' => $item['import']['ti_i_date'] ? $item['import']['ti_i_date'] : NULL,
-                            // 'w_schedule_day' => $item['tie_is_date'] ? $item['tie_is_date'] : NULL,
-                            'tie_no' => $item->tie_no,
-                            'w_schedule_amount' => $item->tie_is_number,
-                            'w_amount' => $item->ti_i_number,
-                            'w_type' => 'IW',
-                            'co_no' => isset($item->co_no) ? $item->co_no : $item->co_no,
-                        ]
-                    );
-
-                    //THUONG EDIT TO MAKE SETTLEMENT
-                    if(isset($warehousing->w_no)){
-                        $rgd_no = ReceivingGoodsDelivery::updateOrCreate(
-                            [
-                                'w_no' => $warehousing->w_no,
-                            ],
-                            [
-                                'mb_no' => $user->mb_no,
-                                'service_korean_name' => '보세화물',
-                                'rgd_status1' => '입고',
-                                'rgd_tracking_code' => $item->tie_logistic_manage_number ? $item->tie_logistic_manage_number : 
-                                ($item->ti_logistic_manage_number ? $item->ti_logistic_manage_number : 
-                                ($item->te_logistic_manage_number ? $item->te_logistic_manage_number : $item->tec_logistic_manage_number)),
-                            ]
-                        );
-                    }
-                   
-                }
-            }
 
             $import_schedule = $import_schedule->paginate($per_page, ['*'], 'page', $page);
 
