@@ -2574,10 +2574,11 @@ class ItemController extends Controller
                     $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
                 })->orderBy('te_carry_out_number', 'DESC');
             }
+            $import_schedule->whereNull('ddd.te_logistic_manage_number');
             $import_schedule = $import_schedule->get();
             $this->createBondedSettlement();
 
-            return $import_schedule;
+            //return $import_schedule;
             DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
 
 
@@ -2586,14 +2587,10 @@ class ItemController extends Controller
                 if (isset($value->tie_logistic_manage_number)) {
                     $logistic_manage_number = $value->tie_logistic_manage_number;
                     $logistic_manage_number = str_replace('-', '', $logistic_manage_number);
-
-
                     $xmlString = simplexml_load_file("https://unipass.customs.go.kr:38010/ext/rest/cargCsclPrgsInfoQry/retrieveCargCsclPrgsInfo?crkyCn=s230z262h044b104n070k070a3&cargMtNo=" . $logistic_manage_number . "") or die("Error: Cannot create object");
                     $json = json_encode($xmlString);
                     $array = json_decode($json, TRUE);
-                    //return $array;
-
-
+                    
                     if (isset($array['cargCsclPrgsInfoDtlQryVo']) && $array['cargCsclPrgsInfoDtlQryVo']) {
                         $data_apis = $array['cargCsclPrgsInfoDtlQryVo'];
                         foreach ($data_apis as $data) {
@@ -2640,7 +2637,7 @@ class ItemController extends Controller
                                     $status1 = null;
                                     break;
                             }
-
+                            //return $value->tie_logistic_manage_number;
                             if (isset($value->tie_logistic_manage_number)) {
                                 $import_expected = ImportExpected::where('tie_logistic_manage_number', $value->tie_logistic_manage_number)
                                     ->update([
