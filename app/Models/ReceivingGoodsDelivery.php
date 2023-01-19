@@ -76,7 +76,7 @@ class ReceivingGoodsDelivery extends Model
 
     public function w_no()
     {
-        return $this->hasOne(Warehousing::class, 'w_no', 'w_no')->with(['co_no', 'warehousing_item','w_import_parent','warehousing_child', 'warehousing_request', 'import_expect','w_ew'])->withSum('warehousing_item_IW_spasys_confirm', 'wi_number');
+        return $this->hasOne(Warehousing::class, 'w_no', 'w_no')->with(['co_no', 'warehousing_item','w_import_parent','warehousing_child', 'warehousing_request','w_ew'])->withSum('warehousing_item_IW_spasys_confirm', 'wi_number');
     }
 
     public function warehousing()
@@ -103,7 +103,7 @@ class ReceivingGoodsDelivery extends Model
         return $this->hasMany(RateMetaData::class, 'rgd_no', 'rgd_parent_no')->with(['rate_data']);
     }
     public function t_export(){
-        return $this->belongsTo(Export::class, 'rgd_tracking_code', 'te_logistic_manage_number')->with(['import','import_expected']);
+        return $this->belongsTo(Export::class, 'rgd_tracking_code', 'te_logistic_manage_number');
     }
     public function settlement_number(){
         return $this->hasMany(ReceivingGoodsDelivery::class, 'rgd_settlement_number', 'rgd_settlement_number')->with(['rate_data_general']);
