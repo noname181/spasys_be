@@ -1565,7 +1565,8 @@ class RateDataController extends Controller
             }
             $index = RateMetaData::where('co_no', $co_no)->get()->count() + 1;
 
-            if(isset($validated['rmd_mail_detail1a']) || isset($validated['rmd_mail_detail2a']) || isset($validated['rmd_mail_detail3a'])){
+            if(isset($validated['rmd_mail_detail1a']) || isset($validated['rmd_mail_detail1b']) || isset($validated['rmd_mail_detail1c']) || isset($validated['rmd_mail_detail2']) || isset($validated['rmd_mail_detail3'])){
+                $rmd = RateMetaData::where('co_no', $co_no)->first();
                 RateMetaData::updateOrCreate(
                     [
                         'co_no' => $co_no,
@@ -1573,11 +1574,11 @@ class RateDataController extends Controller
                     ],
                     [         
                         'rmd_number' => CommonFunc::generate_rmd_number($co_no, $index),
-                        'rmd_mail_detail1a' => isset($validated['rmd_mail_detail1a']) ? $validated['rmd_mail_detail1a'] : '',
-                        'rmd_mail_detail1b' => isset($validated['rmd_mail_detail1b']) ? $validated['rmd_mail_detail1b'] : '',
-                        'rmd_mail_detail1c' => isset($validated['rmd_mail_detail1c']) ? $validated['rmd_mail_detail1c'] : '',
-                        'rmd_mail_detail2' => isset($validated['rmd_mail_detail2']) ? $validated['rmd_mail_detail2'] : '',
-                        'rmd_mail_detail3' => isset($validated['rmd_mail_detail3']) ? $validated['rmd_mail_detail3'] : '',
+                        'rmd_mail_detail1a' => isset($validated['rmd_mail_detail1a']) ? $validated['rmd_mail_detail1a'] : ($rmd ? $rmd->rmd_mail_detail1a : ''),
+                        'rmd_mail_detail1b' => isset($validated['rmd_mail_detail1b']) ? $validated['rmd_mail_detail1b'] : ($rmd ? $rmd->rmd_mail_detail1b : ''),
+                        'rmd_mail_detail1c' => isset($validated['rmd_mail_detail1c']) ? $validated['rmd_mail_detail1c'] : ($rmd ? $rmd->rmd_mail_detail1c : ''),
+                        'rmd_mail_detail2' => isset($validated['rmd_mail_detail2']) ? $validated['rmd_mail_detail2'] : ($rmd ? $rmd->rmd_mail_detail2 : ''),
+                        'rmd_mail_detail3' => isset($validated['rmd_mail_detail3']) ? $validated['rmd_mail_detail3'] : ($rmd ? $rmd->rmd_mail_detail3 : ''),
                     ]
                 );
             }
@@ -1590,6 +1591,7 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -1995,9 +1997,11 @@ class RateDataController extends Controller
                 $rate_data = $rate_data->where('co_no', $user->co_no);
             }
 
+            $rate_meta_data = RateMetaData::where('co_no', $user->co_no)->latest('created_at')->first();
+
             $rate_data = $rate_data->get();
 
-            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data, 'co_no' => $user->co_no], 200);
+            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data, 'co_no' => $user->co_no, 'rate_meta_data' => $rate_meta_data], 200);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
@@ -2025,7 +2029,9 @@ class RateDataController extends Controller
 
             $rate_data = $rate_data->get();
 
-            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data], 200);
+            $rate_meta_data = RateMetaData::where('co_no', $user->co_no)->latest('created_at')->first();
+
+            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data, 'rate_meta_data' => $rate_meta_data], 200);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
