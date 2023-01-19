@@ -395,7 +395,7 @@ class MemberController extends Controller
             $memeber->save();
 
             Company::where('co_no', $memeber->co_no)->update([
-                'co_operating_time' => $validated['mb_name'],
+                'co_operating_time' => $validated['co_operating_time'],
                 'co_lunch_break' => $validated['co_lunch_break'],
                 'co_email' => $validated['co_email'],
                 'co_about_us' => $validated['co_about_us'],
