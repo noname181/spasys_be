@@ -3975,7 +3975,7 @@ class RateDataController extends Controller
 
             Import::where('ti_logistic_manage_number', $request->ti_logistic_manage_number)->update([
                 'ti_co_license' => isset($company->co_license) ? $company->co_license : null,
-                'ti_logistic_type' => $request->ti_logistic_type,
+                'ti_logistic_type' => isset($request->te_e_price) ? $request->ti_logistic_type : null,
                 'ti_i_storeday' => $request->storage_days ? $request->storage_days : $request->storagedays,
             ]);
 
