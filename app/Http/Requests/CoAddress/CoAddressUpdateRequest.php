@@ -28,12 +28,12 @@ class CoAddressUpdateRequest extends BaseFormRequest
                 'integer',
             ],
             '*.ca_name' => [
-                'required',
+                //'required',
                 'string',
                 'max:255',
             ],
             '*.ca_manager' => [
-                'required',
+                //'required',
                 'string',
                 'max:255',
             ],
@@ -43,12 +43,12 @@ class CoAddressUpdateRequest extends BaseFormRequest
                 'max:255',
             ],
             '*.ca_address' => [
-                'required',
+                //'required',
                 'string',
                 'max:255',
             ],
             '*.ca_address_detail' => [
-                'required',
+                //'required',
                 'string',
                 'max:255',
             ],

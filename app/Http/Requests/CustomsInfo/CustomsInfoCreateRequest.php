@@ -28,29 +28,19 @@ class CustomsInfoCreateRequest extends BaseFormRequest
                 'integer',
             ],
             '*.ci_name' => [
-                'required',
-                'string',
-                'max:255',
+                '',
             ],
             '*.ci_manager' => [
-                'required',
-                'string',
-                'max:255',
+                '',
             ],
             '*.ci_hp' => [
-                'required',
-                'string',
-                'max:255',
+                '',
             ],
             '*.ci_address' => [
-                'required',
-                'string',
-                'max:255',
+                '',
             ],
             '*.ci_address_detail' => [
-                'required',
-                'string',
-                'max:255',
+                '',
             ],
             '*.ci_no' => [
                 'integer',

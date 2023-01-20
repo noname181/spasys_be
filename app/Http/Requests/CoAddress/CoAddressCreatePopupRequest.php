@@ -28,32 +28,32 @@ class CoAddressCreatePopupRequest extends BaseFormRequest
                 'integer',
             ],
             'ca_name' => [
-                'required',
-                'string',
+                //'required',
+                //'string',
                 'max:255',
             ],
             'ca_manager' => [
-                'required',
-                'string',
+                //'required',
+                //'string',
                 'max:255',
             ],
             'ca_hp' => [
-                'required',
-                'string',
+                //'required',
+                //'string',
                 'max:255',
             ],
             'ca_address' => [
-                'required',
-                'string',
+                //'required',
+                //'string',
                 'max:255',
             ],
             'ca_address_detail' => [
-                'required',
-                'string',
+                //'required',
+                //'string',
                 'max:255',
             ],
             'ca_is_default' => [
-                'required',
+                //'required',
             ],
 
         ];

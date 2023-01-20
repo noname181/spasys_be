@@ -30,7 +30,7 @@ class InvokeRequest extends BaseFormRequest
                 'max:255',
             ],
             'co_address' => [
-                'required',
+                //'required',
                 'string',
                 'max:255',
             ],
@@ -40,7 +40,7 @@ class InvokeRequest extends BaseFormRequest
                 'max:255',
             ],
             'co_address_detail' => [
-                'required',
+                //'required',
                 'string',
                 'max:255',
             ],
@@ -69,28 +69,24 @@ class InvokeRequest extends BaseFormRequest
                 'max:1'
             ],
             'co_homepage' => [
-                'required',
-                'string',
+                //'required',
+                //'string',
                 'max:255'
             ],
             'co_email' => [
-                'required',
-                'string',
-                'max:255',
-                'email',
+                ''
             ],
             'co_etc' => [
-                'required',
-                'string',
+                '',
             ],
             'co_address' => [
-                'required',
-                'string',
+                //'required',
+                //'string',
                 'max:255',
             ],
             'co_address_detail' => [
-                'required',
-                'string',
+                //'required',
+                //'string',
                 'max:255',
             ],
             'co_tel' => [

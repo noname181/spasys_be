@@ -135,6 +135,8 @@ Route::middleware('auth')->group(function () {
         Route::patch('{banner}', [App\Http\Controllers\Banner\BannerController::class, 'update'])->name('update_banner');
         Route::post('/get_banners', [App\Http\Controllers\Banner\BannerController::class, 'getBanner'])->name('get_banners');
         Route::post('/banner_count', [App\Http\Controllers\Banner\BannerController::class, 'banner_count'])->name('banner_count');
+        Route::post('/banner_load2', [App\Http\Controllers\Banner\BannerController::class, 'banner_load2'])->name('banner_load2');
+
     });
 
     Route::post('/notices', [\App\Http\Controllers\Notice\NoticeController::class, 'create']);

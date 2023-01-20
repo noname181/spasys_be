@@ -28,29 +28,19 @@ class ForwarderInfoUpdatePopupRequest extends BaseFormRequest
             'integer',
         ],*/
         'fi_name' => [
-            'required',
-            'string',
-            'max:255',
+            '',
         ],
         'fi_manager' => [
-            'required',
-            'string',
-            'max:255',
+            '',
         ],
         'fi_hp' => [
-            'required',
-            'string',
-            'max:255',
+            '',
         ],
         'fi_address' => [
-            'required',
-            'string',
-            'max:255',
+            '',
         ],
         'fi_address_detail' => [
-            'required',
-            'string',
-            'max:255',
+            '',
         ],
         'fi_no' => [
             'integer',

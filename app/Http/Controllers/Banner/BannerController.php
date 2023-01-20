@@ -262,7 +262,10 @@ class BannerController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $banner = Banner::with('mb_no')->with('files')->orderBy('banner_no', 'DESC');
+            $user = Auth::user();
+
+            
+            $banner = Banner::with('mb_no')->with('files')->where('mb_no',$user->mb_no)->orderBy('banner_no', 'DESC');
 
             if (isset($validated['from_date'])) {
                 $banner->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
@@ -306,7 +309,6 @@ class BannerController extends Controller
     {
         try {
             $today = Carbon::now()->format('Y-m-d');
-
             $banner_login_left = Banner::with('files')
             ->where('banner_position','=','로그인')
             ->where('banner_position_detail','=','왼쪽')
@@ -354,6 +356,43 @@ class BannerController extends Controller
                 'banner_login_right_bottom' => $banner_login_right_bottom,
                 'banner_index_top' => $banner_index_top,
                 'banner_index_bottom' => $banner_index_bottom,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+    public function banner_load2() //index page
+    {
+        try {
+            $user = Auth::user();
+            DB::enableQueryLog();
+            $today = Carbon::now()->format('Y-m-d');
+
+            $banner_index_top = Banner::with('files')
+            ->where('mb_no',$user->mb_no)
+            ->where('banner_position','=','메인')
+            ->where('banner_position_detail','=','상단')
+            ->where('banner_use_yn','=','1')
+            ->where('banner_start', '<=', $today)
+            ->where('banner_end', '>=', $today)->latest('created_at')
+            ->first();
+
+            $banner_index_bottom = Banner::with('files')
+            ->where('mb_no',$user->mb_no)
+            ->where('banner_position','=','메인')
+            ->where('banner_position_detail','=','하단')
+            ->where('banner_use_yn','=','1')
+            ->where('banner_start', '<=', $today)
+            ->where('banner_end', '>=', $today)->latest('created_at')
+            ->first();
+
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'banner_index_top' => $banner_index_top,
+                'banner_index_bottom' => $banner_index_bottom,
+                'mb_no' => $user->mb_no
             ]);
         } catch (\Exception $e) {
             Log::error($e);
