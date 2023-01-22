@@ -60,8 +60,8 @@ class ManagerController extends Controller
                         'm_position' => $value['m_position'],
                         'co_no' => $value['co_no'],
                         'm_name' => $value['m_name'],
-                        'm_duty1' => $value['m_duty1'],
-                        'm_duty2' => $value['m_duty2'],
+                        'm_duty1' => isset($value['m_duty1']) ? $value['m_duty1'] : null ,
+                        'm_duty2' => isset($value['m_duty2']) ? $value['m_duty2'] : null,
                         'm_hp' => $value['m_hp'],
                         'm_email' => $value['m_email'],
                         'm_etc' => $value['m_etc'],
@@ -90,6 +90,7 @@ class ManagerController extends Controller
         } catch (\Throwable $e) {
             DB::rollback();
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }

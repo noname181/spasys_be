@@ -35,14 +35,10 @@ class ManagerUpdateRequest extends BaseFormRequest
                 'max:255',
             ],
             'm_duty1' => [
-                'required',
-                'string',
-                'max:255',
+                '',
             ],
             'm_duty2' => [
-                'required',
-                'string',
-                'max:255',
+                '',
             ],            
             'm_hp' => [
                 'required',
