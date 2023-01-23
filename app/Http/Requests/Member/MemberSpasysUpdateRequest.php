@@ -26,11 +26,11 @@ class MemberSpasysUpdateRequest extends BaseFormRequest
     {
         return [
             'mb_id' => [
-                'required',
-                'string',
-                'max:20',
-                'min:4',
-                'regex:/^[a-zA-Z]{1,}([0-9]*)?$/'
+                '',
+                // 'string',
+                // 'max:20',
+                // 'min:4',
+                // 'regex:/^[a-zA-Z]{1,}([0-9]*)?$/'
             ],
             'mb_name' => [
                 'required',
@@ -39,8 +39,7 @@ class MemberSpasysUpdateRequest extends BaseFormRequest
                 'min:4',
             ],
             'mb_pw' => [
-                'string',
-                'min:4',
+                '',
             ],
             'mb_note' => [
                 'required',

@@ -25,12 +25,12 @@ class InvokeRequest extends BaseFormRequest
     {
         return [
             'mb_id' => [
-                'required',
-                'string',
-                'max:20',
-                'min:4',
-                'regex:/^[a-zA-Z]{1,}([0-9]*)?$/',
-                'unique:member,mb_id'
+                '',
+                // 'string',
+                // 'max:20',
+                // 'min:4',
+                // 'regex:/^[a-zA-Z]{1,}([0-9]*)?$/',
+                // 'unique:member,mb_id'
             ],
             'co_no' => [
             ],
@@ -63,9 +63,7 @@ class InvokeRequest extends BaseFormRequest
                 //'regex:/^\(\+[0-9]{2}\) [0-9]{2}-[0-9]{4}-[0-9]{4}$/'
             ],
             'mb_pw' => [
-                'required',
-                'string',
-                'min:4',
+                '',
             ],
             // FIXME hard set mb_language = ko
             // 'mb_language' => [
