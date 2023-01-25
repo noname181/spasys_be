@@ -366,7 +366,7 @@ class ImportScheduleController extends Controller
             DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
             $user = Auth::user();
 
-            DB::enableQueryLog();
+            //DB::enableQueryLog();
             if ($user->mb_type == 'shop') {
                 // $import_schedule = ImportExpected::with(['company', 'receiving_goods_delivery', 'export'])->whereHas('company.co_parent', function ($q) use ($user) {
                 //     $q->where('co_no', $user->co_no);
@@ -621,6 +621,10 @@ class ImportScheduleController extends Controller
             //$sql2 = DB::table('t_export')->select('te_logistic_manage_number','te_carry_out_number')->groupBy('te_logistic_manage_number','te_carry_out_number')->get();
 
             //$import_schedule = ImportExpected::with(['import','company'])->orderBy('tie_no', 'DESC');
+            // if (isset($validated['connection'])) {
+             
+            //     $import_schedule->wherenull('ddd.connection_number');
+            // }
             if (isset($validated['status'])) {
                 // $import_schedule->whereHas('export.receiving_goods_delivery', function ($query) use ($validated) {
                 //     $query->where('rgd_status1', '=', $validated['status']);

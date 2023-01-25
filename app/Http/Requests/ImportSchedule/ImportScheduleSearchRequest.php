@@ -72,6 +72,9 @@ class ImportScheduleSearchRequest extends BaseFormRequest
             'status' => [
                 '',
             ],
+            'connection' => [
+                ''
+            ]
         ];
     }
 

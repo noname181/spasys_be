@@ -131,10 +131,23 @@ class ReceivingGoodsDeliveryController extends Controller
                         'connection_number' => $validated['connection_number']
                     ]);
                     if ($validated['type_w_choose'] == "export") {
+                        $connection_number_old = Export::where('te_carry_out_number', $validated['connect_w'])->first();
+                       
+                        if(isset($connection_number_old->connection_number)){
+                            Warehousing::where('connection_number', $connection_number_old->connection_number)->update([
+                                'connection_number' => null
+                            ]);
+                        }
                         Export::where('te_carry_out_number', $validated['connect_w'])->update([
                             'connection_number' => $validated['connection_number']
                         ]);
                     } else {
+                        $connection_number_old =  Warehousing::where('w_no', $validated['connect_w'])->first();
+                        if(isset($connection_number_old->connection_number)){
+                            Warehousing::where('connection_number', $connection_number_old->connection_number)->update([
+                                'connection_number' => null
+                            ]);
+                        }
                         Warehousing::where('w_no', $validated['connect_w'])->update([
                             'connection_number' => $validated['connection_number']
                         ]);
@@ -144,10 +157,22 @@ class ReceivingGoodsDeliveryController extends Controller
                         'connection_number' => $validated['connection_number'] . $w_no_data
                     ]);
                     if ($validated['type_w_choose'] == "export") {
+                        $connection_number_old = Export::where('te_carry_out_number', $validated['connect_w'])->first();
+                        if(isset($connection_number_old->connection_number)){
+                            Warehousing::where('connection_number', $connection_number_old->connection_number)->update([
+                                'connection_number' => null
+                            ]);
+                        }
                         Export::where('te_carry_out_number', $validated['connect_w'])->update([
                             'connection_number' => $validated['connection_number'] . $w_no_data
                         ]);
                     } else {
+                        $connection_number_old =  Warehousing::where('w_no', $validated['connect_w'])->first();
+                        if(isset($connection_number_old->connection_number)){
+                            Warehousing::where('connection_number', $connection_number_old->connection_number)->update([
+                                'connection_number' => null
+                            ]);
+                        }
                         Warehousing::where('w_no', $validated['connect_w'])->update([
                             'connection_number' => $validated['connection_number'] . $w_no_data
                         ]);
@@ -920,10 +945,24 @@ class ReceivingGoodsDeliveryController extends Controller
                         'connection_number' => $request->connection_number
                     ]);
                     if ($request->type_w_choose == "export") {
+                         $connection_number_old = Export::where('te_carry_out_number',  $request->connect_w)->first();
+                       
+                        if(isset($connection_number_old->connection_number)){
+                            Warehousing::where('connection_number', $connection_number_old->connection_number)->update([
+                                'connection_number' => null
+                            ]);
+                        }
                         Export::where('te_carry_out_number', $request->connect_w)->update([
                             'connection_number' => $request->connection_number
                         ]);
                     } else {
+                        $connection_number_old = Warehousing::where('w_no', $request->connect_w)->first();
+                       
+                        if(isset($connection_number_old->connection_number)){
+                            Warehousing::where('connection_number', $connection_number_old->connection_number)->update([
+                                'connection_number' => null
+                            ]);
+                        }
                         Warehousing::where('w_no', $request->connect_w)->update([
                             'connection_number' => $request->connection_number
                         ]);
