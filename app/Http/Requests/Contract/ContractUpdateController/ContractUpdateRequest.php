@@ -104,8 +104,7 @@ class ContractUpdateRequest extends BaseFormRequest
             'c_deposit_price' => [
             ],
             'c_deposit_date' => [
-                'required',
-                'date'
+                '',
             ],
             'c_file_insulance' => [
                 'max:2048',
@@ -127,16 +126,13 @@ class ContractUpdateRequest extends BaseFormRequest
                 ''
             ],
             'c_deposit_return_date' => [
-                'required',
-                'date_format:Y-m-d'
+                ''
             ],
             'c_deposit_return_reg_date' => [
-                'required',
-                'date_format:Y-m-d'
+                ''
             ],
             'c_deposit_return_expiry_date' => [
-                'required',
-                'date_format:Y-m-d'
+                ''
             ],
         ];
     }

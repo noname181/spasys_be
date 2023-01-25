@@ -60,15 +60,15 @@ class ContractController extends Controller
                 'c_deposit_day' => ($validated['c_deposit_day'] && $validated['c_deposit_day'] !='null') ? $validated['c_deposit_day']  : null,
                 // 'c_account_number' => $validated['c_account_number'],
                 'c_deposit_price' => ($validated['c_deposit_price'] && $validated['c_deposit_price'] !='null') ? $validated['c_deposit_price']  : null,
-                'c_deposit_date' => DateTime::createFromFormat('Y-m-d', $validated['c_deposit_date']),
+                'c_deposit_date' => $validated['c_deposit_date'] ? DateTime::createFromFormat('Y-m-d', $validated['c_deposit_date']) : null,
                 'c_file_insulance' => isset($inl) ? $inl : null,
                 'c_file_license' => isset($lic) ? $lic : null,
                 'c_file_contract' => isset($con) ? $con : null,
                 'c_file_bank_account' => isset($bc) ? $bc : null,
                 'c_deposit_return_price' => ($validated['c_deposit_return_price'] && $validated['c_deposit_return_price'] !='null') ? $validated['c_deposit_return_price']  : null,
-                'c_deposit_return_date' => DateTime::createFromFormat('Y-m-d', $validated['c_deposit_return_date']),
-                'c_deposit_return_reg_date' => DateTime::createFromFormat('Y-m-d', $validated['c_deposit_return_reg_date']),
-                'c_deposit_return_expiry_date' => DateTime::createFromFormat('Y-m-d', $validated['c_deposit_return_expiry_date']),
+                'c_deposit_return_date' => $validated['c_deposit_return_date'] ? DateTime::createFromFormat('Y-m-d', $validated['c_deposit_return_date']) : null,
+                'c_deposit_return_reg_date' => $validated['c_deposit_return_reg_date'] ? DateTime::createFromFormat('Y-m-d', $validated['c_deposit_return_reg_date']) : null,
+                'c_deposit_return_expiry_date' =>  $validated['c_deposit_return_expiry_date'] ? DateTime::createFromFormat('Y-m-d', $validated['c_deposit_return_expiry_date']) : null,
             ]);
             $company = Company::where('co_no', $co_no)->update([
                 'co_service' => $validated['co_service'],
@@ -218,11 +218,11 @@ class ContractController extends Controller
                 'c_deposit_day' => $validated['c_deposit_day'] ? $validated['c_deposit_day'] : "",
                 'c_account_number' => $validated['c_account_number'],
                 'c_deposit_price' => ($validated['c_deposit_price'] && $validated['c_deposit_price'] !='null') ? $validated['c_deposit_price']  : null,
-                'c_deposit_date' =>  DateTime::createFromFormat('Y-m-d', $validated['c_deposit_date']),
+                'c_deposit_date' =>  isset($validated['c_deposit_date']) && $validated['c_deposit_date'] != 'null'  ? DateTime::createFromFormat('Y-m-d', $validated['c_deposit_date']) : null,
                 'c_deposit_return_price' => ($validated['c_deposit_return_price'] && $validated['c_deposit_return_price'] !='null') ? $validated['c_deposit_return_price']  : null,
-                'c_deposit_return_date' => DateTime::createFromFormat('Y-m-d', $validated['c_deposit_return_date']),
-                'c_deposit_return_reg_date' =>  DateTime::createFromFormat('Y-m-d', $validated['c_deposit_return_reg_date']),
-                'c_deposit_return_expiry_date' => DateTime::createFromFormat('Y-m-d', $validated['c_deposit_return_expiry_date']),
+                'c_deposit_return_date' => isset($validated['c_deposit_return_date']) && $validated['c_deposit_return_date'] != 'null' ? DateTime::createFromFormat('Y-m-d', $validated['c_deposit_return_date']) : null,
+                'c_deposit_return_reg_date' =>  isset($validated['c_deposit_return_reg_date'])  && $validated['c_deposit_return_reg_date'] != 'null' ? DateTime::createFromFormat('Y-m-d', $validated['c_deposit_return_reg_date']) : null,
+                'c_deposit_return_expiry_date' => isset($validated['c_deposit_return_expiry_date'])  && $validated['c_deposit_return_expiry_date'] != 'null' ? DateTime::createFromFormat('Y-m-d', $validated['c_deposit_return_expiry_date']) : null,
             ];
 
             $update = array_merge($update, $files);
@@ -277,7 +277,7 @@ class ContractController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-
+           // return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
