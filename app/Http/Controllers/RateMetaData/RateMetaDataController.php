@@ -109,6 +109,21 @@ class RateMetaDataController extends Controller
             }
 
             $rmd = $rmd->paginate($per_page, ['*'], 'page', $page);
+
+            $rmd->setCollection(
+                $rmd->getCollection()->map(function ($item) {
+                    $rmd = RateMetaData::where('rmd_no', $item['rmd_no'])->first();
+                    if(isset($rmd->rmd_parent_no)){
+                        $lastest = RateMetaData::where('rmd_no', $rmd->rmd_parent_no)->orWhere('rmd_parent_no', $rmd->rmd_parent_no)->orderBy('rmd_no', 'DESC')->first();
+                    }else {
+                        $lastest = RateMetaData::where('rmd_no', '!=', $item['rmd_no'])->where('rmd_parent_no', $item['rmd_no'])->orderBy('rmd_no', 'DESC')->first();
+                    }
+
+                    $item->lastest = $lastest;
+                    return $item;
+                })
+            );
+
             return response()->json($rmd);
         } catch (\Exception $e) {
             Log::error($e);
