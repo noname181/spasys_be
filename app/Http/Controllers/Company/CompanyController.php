@@ -471,38 +471,35 @@ class CompanyController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
-    public function getCompanyFromtcon($tcon)
+    public function getCompanyFromtcon(Request $request)
     {
-
-        $export = Export::with(['import', 'import_expected', 't_export_confirm'])->where('te_carry_out_number', $tcon)->first();
-
-        if (isset($export)) {
+        if($request->type_page == "te_carry_out_number"){
+            $export = Export::with(['import', 'import_expected', 't_export_confirm'])->where('te_carry_out_number', $request->is_no)->first();
             $company = Company::where('co_license', $export->import_expected->tie_co_license)->first();
             if (isset($company->co_no)) {
                 $adjustment_group = AdjustmentGroup::where('co_no', '=', $company->co_no)->first();
             } else {
                 $adjustment_group = "";
             }
-        } else {
+        }else if($request->type_page == "ti_carry_in_number") {
             $export = [];
-            $import = Import::with(['import_expect', 'export_confirm'])->where('ti_carry_in_number', $tcon)->first();
-            if (isset($import)) {
-                $export['import'] = $import;
-                $company = Company::where('co_license', $import->import_expect->tie_co_license)->first();
-                if (isset($company->co_no)) {
-                    $adjustment_group = AdjustmentGroup::where('co_no', '=', $company->co_no)->first();
-                } else {
-                    $adjustment_group = "";
-                }
+            $import = Import::with(['import_expected', 'export_confirm'])->where('ti_carry_in_number', $request->is_no)->first();
+            $export['import'] = $import;
+            $export['import_expected'] = $import->import_expected;
+            $company = Company::where('co_license', $import->import_expect->tie_co_license)->first();
+            if (isset($company->co_no)) {
+                $adjustment_group = AdjustmentGroup::where('co_no', '=', $company->co_no)->first();
             } else {
-                $import_expected = ImportExpected::where('tie_logistic_manage_number', $tcon)->first();
-                $export['import_expected'] = $import_expected;
-                $company = Company::where('co_license', $import_expected->tie_co_license)->first();
-                if (isset($company->co_no)) {
-                    $adjustment_group = AdjustmentGroup::where('co_no', '=', $company->co_no)->first();
-                } else {
-                    $adjustment_group = "";
-                }
+                $adjustment_group = "";
+            }
+        }else{
+            $import_expected = ImportExpected::where('tie_logistic_manage_number', $request->is_no)->first();
+            $export['import_expected'] = $import_expected;
+            $company = Company::where('co_license', $import_expected->tie_co_license)->first();
+            if (isset($company->co_no)) {
+                $adjustment_group = AdjustmentGroup::where('co_no', '=', $company->co_no)->first();
+            } else {
+                $adjustment_group = "";
             }
         }
 
