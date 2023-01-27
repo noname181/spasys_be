@@ -474,6 +474,118 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
+        } else if (!isset($rmd->rmd_no) && $set_type == 'work_final_check') {
+            if (empty($rmd)) {
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => $user->mb_type == 'shop' ? 'work_spasys' : 'work_shop',
+                    ]
+                )->first();
+            }
+          
+            if (empty($rmd) && !empty($rdg)) {
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rdg->rgd_no_expectation,
+                        'set_type' => 'work_final',
+                    ]
+                )->first();
+            }
+            if (empty($rmd) && !empty($rdg)) {
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rdg->rgd_no_expectation,
+                        'set_type' => $user->mb_type == 'shop' ? 'work_spasys' : 'work_shop',
+                    ]
+                )->first();
+            }
+            if (empty($rmd) && !empty($previous_rgd_parent)) {
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rdg->rgd_no_expectation,
+                        'set_type' => $user->mb_type == 'shop' ? 'work_spasys' : 'work_shop',
+                    ]
+                )->first();
+            }
+            if (empty($rmd) && !empty($previous_rgd)) {
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $previous_rgd->rgd_parent_no,
+                        'set_type' => $user->mb_type == 'shop' ? 'work_spasys' : 'work_shop',
+                    ]
+                )->first();
+            }
+        } else if (!isset($rmd->rmd_no) && $set_type == 'storage_final_check') {
+            if (empty($rmd)) {
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => $user->mb_type == 'shop' ? 'storage_spasys' : 'storage_shop',
+                    ]
+                )->first();
+            }
+          
+            if (empty($rmd) && !empty($rdg)) {
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rdg->rgd_no_expectation,
+                        'set_type' => 'storage_final',
+                    ]
+                )->first();
+            }
+            if (empty($rmd) && !empty($rdg)) {
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rdg->rgd_no_expectation,
+                        'set_type' => $user->mb_type == 'shop' ? 'storage_spasys' : 'storage_shop',
+                    ]
+                )->first();
+            }
+            if (empty($rmd) && !empty($previous_rgd)) {
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $previous_rgd->rgd_parent_no,
+                        'set_type' => $user->mb_type == 'shop' ? 'storage_spasys' : 'storage_shop',
+                    ]
+                )->first();
+            }
+           
+        } else if (!isset($rmd->rmd_no) && $set_type == 'domestic_final_check') {
+            if (empty($rmd)) {
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => $user->mb_type == 'shop' ? 'domestic_spasys' : 'domestic_shop',
+                    ]
+                )->first();
+            }
+           
+            if (empty($rmd) && !empty($rdg)) {
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rdg->rgd_no_expectation,
+                        'set_type' => 'domestic_final',
+                    ]
+                )->first();
+            }
+            if (empty($rmd) && !empty($rdg)) {
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rdg->rgd_no_expectation,
+                        'set_type' => $user->mb_type == 'shop' ? 'domestic_spasys' : 'domestic_shop',
+                    ]
+                )->first();
+            }
+
+            if (empty($rmd) && !empty($previous_rgd)) {
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $previous_rgd->rgd_parent_no,
+                        'set_type' => $user->mb_type == 'shop' ? 'domestic_spasys' : 'domestic_shop',
+                    ]
+                )->first();
+            }
         } else if (!isset($rmd->rmd_no) && $set_type == 'work_additional') {
             $rmd = RateMetaData::where(
                 [

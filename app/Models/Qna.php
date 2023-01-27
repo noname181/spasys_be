@@ -32,6 +32,7 @@ class Qna extends Model
         'answer_for',
         'depth_path',
         'depth_level',
+        'spasys_no',
         'created_at',
         'updated_at',
     ];
