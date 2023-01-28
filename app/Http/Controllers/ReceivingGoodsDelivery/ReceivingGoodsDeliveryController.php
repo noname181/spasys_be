@@ -581,7 +581,16 @@ class ReceivingGoodsDeliveryController extends Controller
                             //         'wi_type' => '출고_spasys'
                             //     ]);
                             // }
-    
+                            $checkexit = WarehousingItem::where('item_no', $item['item_no'])->where('w_no',$request->w_no)->where('wi_type', '출고_shipper')->first();
+                            if (!isset($checkexit->wi_no)) {
+                                WarehousingItem::insert([
+                                    'item_no' => $item['item_no'],
+                                    'w_no' => $request->w_no,
+                                    'wi_number' => $item['schedule_wi_number'],
+                                    'wi_type' => '출고_shipper'
+                                ]);
+                            }
+                            
                             WarehousingItem::updateOrCreate(
                                 [
                                     'item_no' => $item['item_no'],

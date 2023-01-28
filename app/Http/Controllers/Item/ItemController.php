@@ -2396,8 +2396,8 @@ class ItemController extends Controller
             DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
             $user = Auth::user();
             if ($user->mb_type == 'shop') {
-               
-                $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number','t_import_expected.update_api_time','t_import_expected.tie_h_bl')
+
+                $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number', 't_import_expected.update_api_time', 't_import_expected.tie_h_bl')
                     ->leftjoin('company', function ($join) {
                         $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
                     })->leftjoin('company as parent_shop', function ($join) {
@@ -2434,9 +2434,9 @@ class ItemController extends Controller
                     $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
                 })->orderBy('update_api_time', 'ASC');
             } else if ($user->mb_type == 'shipper') {
-                
-               
-                $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number','t_import_expected.update_api_time','t_import_expected.tie_h_bl')
+
+
+                $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number', 't_import_expected.update_api_time', 't_import_expected.tie_h_bl')
                     ->leftjoin('company', function ($join) {
                         $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
                     })->leftjoin('company as parent_shop', function ($join) {
@@ -2473,9 +2473,9 @@ class ItemController extends Controller
                     $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
                 })->orderBy('update_api_time', 'ASC');
             } else if ($user->mb_type == 'spasys') {
-               
 
-                $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number','t_import_expected.update_api_time','t_import_expected.tie_h_bl')
+
+                $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number', 't_import_expected.update_api_time', 't_import_expected.tie_h_bl')
                     ->leftjoin('company as parent_spasys', function ($join) {
                         $join->on('parent_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
                     })
@@ -2516,7 +2516,7 @@ class ItemController extends Controller
                 })->orderBy('update_api_time', 'ASC');
             }
             $import_schedule->whereNull('ddd.te_logistic_manage_number');
-            $import_schedule = $import_schedule->offset(0)->limit(1)->get();
+            $import_schedule = $import_schedule->offset(0)->limit(20)->get();
             $this->createBondedSettlement();
 
             //return $import_schedule;
@@ -2526,63 +2526,126 @@ class ItemController extends Controller
 
             foreach ($import_schedule as $value) {
                 if (isset($value->tie_logistic_manage_number)) {
-                    $logistic_manage_number = $value->tie_logistic_manage_number;//'23KE0EA1FII00100007';//
+                    $logistic_manage_number = $value->tie_logistic_manage_number; //'23KE0EA1FII00100007';//
                     $logistic_manage_number = str_replace('-', '', $logistic_manage_number);
                     $xmlString = simplexml_load_string(file_get_contents("https://unipass.customs.go.kr:38010/ext/rest/cargCsclPrgsInfoQry/retrieveCargCsclPrgsInfo?crkyCn=s230z262h044b104n070k070a3&cargMtNo=" . $logistic_manage_number . ""));
-                    
+
                     $json = json_encode($xmlString);
-                    $array = json_decode($json , TRUE);
-                   
+                    $array = json_decode($json, TRUE);
+
                     if (isset($array['cargCsclPrgsInfoDtlQryVo']) && $array['cargCsclPrgsInfoDtlQryVo']) {
                         $data_apis = $array['cargCsclPrgsInfoDtlQryVo'];
                         foreach ($data_apis as $data) {
                             $status = isset($data['cargTrcnRelaBsopTpcd']) ? $data['cargTrcnRelaBsopTpcd'] : '';
-                           
                             $status1 = '';
                             switch ($status) {
                                 case '수입신고 수리후 정정 완료':
                                     $status1 = '수입신고정정완료';
+                                    if (isset($value->tie_logistic_manage_number)) {
+                                        ImportExpected::where('tie_logistic_manage_number', $value->tie_logistic_manage_number)
+                                            ->update([
+                                                'tie_status_2' => $status1,
+                                                'update_api_time' => Carbon::now(),
+                                            ]);
+                                    }
+
+                                    if (isset($value->ti_i_confirm_number) && isset($value->ti_i_confirm_number)) {
+                                        Import::where('ti_logistic_manage_number', $value->ti_logistic_manage_number)->where('ti_i_confirm_number', $value->ti_i_confirm_number)
+                                            ->update([
+                                                'ti_status_2' => $status1
+                                            ]);
+                                    }
+
+                                    if (isset($value->te_logistic_manage_number) && isset($value->te_carry_out_number)) {
+                                        Export::where('te_logistic_manage_number', $value->te_logistic_manage_number)->where('te_carry_out_number', $value->te_carry_out_number)
+                                            ->update([
+                                                'te_status_2' => $status1
+                                            ]);
+                                    }
                                     break;
                                 case '수입신고 수리후 정정 접수':
                                     $status1 = '수입신고정정접수';
+                                    if (isset($value->tie_logistic_manage_number)) {
+                                        ImportExpected::where('tie_logistic_manage_number', $value->tie_logistic_manage_number)
+                                            ->update([
+                                                'tie_status_2' => $status1,
+                                                'update_api_time' => Carbon::now(),
+                                            ]);
+                                    }
+
+                                    if (isset($value->ti_i_confirm_number) && isset($value->ti_i_confirm_number)) {
+                                        Import::where('ti_logistic_manage_number', $value->ti_logistic_manage_number)->where('ti_i_confirm_number', $value->ti_i_confirm_number)
+                                            ->update([
+                                                'ti_status_2' => $status1
+                                            ]);
+                                    }
+
+                                    if (isset($value->te_logistic_manage_number) && isset($value->te_carry_out_number)) {
+                                        Export::where('te_logistic_manage_number', $value->te_logistic_manage_number)->where('te_carry_out_number', $value->te_carry_out_number)
+                                            ->update([
+                                                'te_status_2' => $status1
+                                            ]);
+                                    }
                                     break;
                                 case '수입신고수리':
                                     $status1 = '수입신고수리';
+                                    if (isset($value->tie_logistic_manage_number)) {
+                                        ImportExpected::where('tie_logistic_manage_number', $value->tie_logistic_manage_number)
+                                            ->update([
+                                                'tie_status_2' => $status1,
+                                                'update_api_time' => Carbon::now(),
+                                            ]);
+                                    }
+
+                                    if (isset($value->ti_i_confirm_number) && isset($value->ti_i_confirm_number)) {
+                                        Import::where('ti_logistic_manage_number', $value->ti_logistic_manage_number)->where('ti_i_confirm_number', $value->ti_i_confirm_number)
+                                            ->update([
+                                                'ti_status_2' => $status1
+                                            ]);
+                                    }
+
+                                    if (isset($value->te_logistic_manage_number) && isset($value->te_carry_out_number)) {
+                                        Export::where('te_logistic_manage_number', $value->te_logistic_manage_number)->where('te_carry_out_number', $value->te_carry_out_number)
+                                            ->update([
+                                                'te_status_2' => $status1
+                                            ]);
+                                    }
                                     break;
                                 case '수입신고':
                                     $status1 = '수입신고접수';
+                                    if (isset($value->tie_logistic_manage_number)) {
+                                        ImportExpected::where('tie_logistic_manage_number', $value->tie_logistic_manage_number)
+                                            ->update([
+                                                'tie_status_2' => $status1,
+                                                'update_api_time' => Carbon::now(),
+                                            ]);
+                                    }
+
+                                    if (isset($value->ti_i_confirm_number) && isset($value->ti_i_confirm_number)) {
+                                        Import::where('ti_logistic_manage_number', $value->ti_logistic_manage_number)->where('ti_i_confirm_number', $value->ti_i_confirm_number)
+                                            ->update([
+                                                'ti_status_2' => $status1
+                                            ]);
+                                    }
+
+                                    if (isset($value->te_logistic_manage_number) && isset($value->te_carry_out_number)) {
+                                        Export::where('te_logistic_manage_number', $value->te_logistic_manage_number)->where('te_carry_out_number', $value->te_carry_out_number)
+                                            ->update([
+                                                'te_status_2' => $status1
+                                            ]);
+                                    }
                                     break;
                                 default:
                                     $status1 = null;
                                     break;
                             }
-                            
-                            if (isset($value->tie_logistic_manage_number)) {
-                            ImportExpected::where('tie_logistic_manage_number', $value->tie_logistic_manage_number)
-                                    ->update([
-                                        'tie_status_2' => $status1,
-                                        'update_api_time' => Carbon::now(),
-                                    ]);
-                            }
 
-                            if (isset($value->ti_i_confirm_number) && isset($value->ti_i_confirm_number)) {
-                                Import::where('ti_logistic_manage_number', $value->ti_logistic_manage_number)->where('ti_i_confirm_number', $value->ti_i_confirm_number)
-                                    ->update([
-                                        'ti_status_2' => $status1
-                                    ]);
-                            }
 
-                            if (isset($value->te_logistic_manage_number) && isset($value->te_carry_out_number)) {
-                                Export::where('te_logistic_manage_number', $value->te_logistic_manage_number)->where('te_carry_out_number', $value->te_carry_out_number)
-                                    ->update([
-                                        'te_status_2' => $status1
-                                    ]);
-                            }
-                           
+
                             //return $array;
-                            if ($status1 != null) {
-                                break;
-                            }
+                            // if ($status1 != null) {
+                            //     break;
+                            // }
                         }
                     }
                 }
@@ -2934,7 +2997,7 @@ class ItemController extends Controller
                     ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                     ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-                $sub_2 = Import::select('receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1','ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
+                $sub_2 = Import::select('receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
                     ->leftjoin('receiving_goods_delivery', function ($join) {
                         $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
                     })
@@ -2998,7 +3061,7 @@ class ItemController extends Controller
                     ->leftjoin('company as parent_spasys', function ($join) {
                         $join->on('parent_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
                     })
-                   ->leftjoin('company', function ($join) {
+                    ->leftjoin('company', function ($join) {
                         $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
                     })->leftjoin('company as parent_shop', function ($join) {
                         $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
@@ -3032,7 +3095,6 @@ class ItemController extends Controller
                     $leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
                     $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
                 })->orderBy('te_carry_out_number', 'DESC');
-
             }
 
 
@@ -3042,9 +3104,7 @@ class ItemController extends Controller
                     $warehousing = Warehousing::updateOrCreate(
                         [
 
-                            'logistic_manage_number' => $item->tie_logistic_manage_number ? $item->tie_logistic_manage_number :
-                            ($item->ti_logistic_manage_number ? $item->ti_logistic_manage_number :
-                            ($item->te_logistic_manage_number ? $item->te_logistic_manage_number : $item->tec_logistic_manage_number)),
+                            'logistic_manage_number' => $item->tie_logistic_manage_number ? $item->tie_logistic_manage_number : ($item->ti_logistic_manage_number ? $item->ti_logistic_manage_number : ($item->te_logistic_manage_number ? $item->te_logistic_manage_number : $item->tec_logistic_manage_number)),
 
                         ],
                         [
@@ -3061,7 +3121,7 @@ class ItemController extends Controller
                     );
 
                     //THUONG EDIT TO MAKE SETTLEMENT
-                    if(isset($warehousing->w_no)){
+                    if (isset($warehousing->w_no)) {
                         ReceivingGoodsDelivery::updateOrCreate(
                             [
                                 'w_no' => $warehousing->w_no,
@@ -3070,13 +3130,10 @@ class ItemController extends Controller
                                 'mb_no' => $user->mb_no,
                                 'service_korean_name' => '보세화물',
                                 'rgd_status1' => '입고',
-                                'rgd_tracking_code' => $item->tie_logistic_manage_number ? $item->tie_logistic_manage_number :
-                                ($item->ti_logistic_manage_number ? $item->ti_logistic_manage_number :
-                                ($item->te_logistic_manage_number ? $item->te_logistic_manage_number : $item->tec_logistic_manage_number)),
+                                'rgd_tracking_code' => $item->tie_logistic_manage_number ? $item->tie_logistic_manage_number : ($item->ti_logistic_manage_number ? $item->ti_logistic_manage_number : ($item->te_logistic_manage_number ? $item->te_logistic_manage_number : $item->tec_logistic_manage_number)),
                             ]
                         );
                     }
-
                 }
             }
             DB::commit();
@@ -3086,5 +3143,4 @@ class ItemController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
-
 }
