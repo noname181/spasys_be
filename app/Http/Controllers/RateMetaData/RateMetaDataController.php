@@ -131,7 +131,31 @@ class RateMetaDataController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
+    public function checkCO($request)
+    {
+    
+        try {
+            $user = Auth::user();
+            // If per_page is null set default data = 15
+          
+            // If page is null set default data = 1
+            
+            $rmd = RateMetaData::with(['rate_meta', 'member:mb_no,co_no,mb_name', 'company'])
+            ->whereNotNull('co_no')
+            ->whereNull('rmd_parent_no')
+            ->whereNull('set_type')
+            ->where('co_no',$request)
+            ->orderBy('rmd_no', 'DESC')->get();
+            
 
+
+            return response()->json($rmd);
+        } catch (\Exception $e) {
+            Log::error($e);
+
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
     public function getAllCOPrecalculateDetails(RateMetaDataSearchRequest $request)
     {
         $validated = $request->validated();
