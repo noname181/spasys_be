@@ -36,7 +36,7 @@ class CreateAccountRequest extends BaseFormRequest
                 'required',
                 'string',
                 'max:20',
-                'min:4',
+                'min:2',
             ],
             'mb_pw' => [
                 '',

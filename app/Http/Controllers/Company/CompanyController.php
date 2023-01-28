@@ -12,6 +12,7 @@ use App\Models\AdjustmentGroup;
 use App\Models\CoAddress;
 use App\Models\ForwarderInfo;
 use App\Models\CustomsInfo;
+use App\Models\RateMetaData;
 use App\Models\Contract;
 use App\Utils\Messages;
 use Illuminate\Support\Facades\Auth;
@@ -188,31 +189,7 @@ class CompanyController extends Controller
 
             $companies = $companies->paginate($per_page, ['*'], 'page', $page);
 
-            $companies->setCollection(
-                $companies->getCollection()->map(function ($item) {
-                    $service_names = explode(" ", $item->co_service);
-                    $co_no = $item->co_no;
-
-                    $settlement_cycle = [];
-
-                    foreach ($service_names as $service_name) {
-                        $service = Service::where('service_name', $service_name)->first();
-                        if (isset($service->service_no)) {
-                            $company_settlement = CompanySettlement::where([
-                                'co_no' => $co_no,
-                                'service_no' => $service->service_no
-                            ])->first();
-                            if ($company_settlement) {
-                                $settlement_cycle[] = $company_settlement->cs_payment_cycle;
-                            }
-                        }
-                    }
-                    $settlement_cycle = implode("/", $settlement_cycle);
-
-                    $item->settlement_cycle = $settlement_cycle;
-                    return $item;
-                })
-            );
+           
 
 
             return response()->json($companies);
@@ -463,6 +440,39 @@ class CompanyController extends Controller
             }
 
             $companies = $companies->paginate($per_page, ['*'], 'page', $page);
+
+            $companies->setCollection(
+                $companies->getCollection()->map(function ($item) {
+                    $service_names = explode(" ", $item->co_service);
+                    $co_no = $item->co_no;
+
+                    $settlement_cycle = [];
+
+                    foreach ($service_names as $service_name) {
+                        $service = Service::where('service_name', $service_name)->first();
+                        if (isset($service->service_no)) {
+                            $company_settlement = CompanySettlement::where([
+                                'co_no' => $co_no,
+                                'service_no' => $service->service_no
+                            ])->first();
+                            if ($company_settlement) {
+                                $settlement_cycle[] = $company_settlement->cs_payment_cycle;
+                            }
+                        }
+                    }
+                    $settlement_cycle = implode("/", $settlement_cycle);
+                         
+                    $rmd = RateMetaData::with(['rate_meta', 'member:mb_no,co_no,mb_name', 'company'])
+                    ->whereNotNull('co_no')
+                    ->whereNull('rmd_parent_no')
+                    ->whereNull('set_type')
+                    ->where('co_no',$co_no)
+                    ->orderBy('rmd_no', 'DESC')->get();
+                    $item->settlement_cycle = $settlement_cycle;
+                    $item->check_rate = $rmd;
+                    return $item;
+                })
+            );
             //return DB::getQueryLog();
             return response()->json($companies);
         } catch (\Exception $e) {
