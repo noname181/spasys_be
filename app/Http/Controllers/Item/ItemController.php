@@ -2386,7 +2386,7 @@ class ItemController extends Controller
         }
     }
 
-    public function apiItemsCargoList(Request $request)
+    public function apiItemsCargoList()
     {
 
         try {
@@ -2515,9 +2515,9 @@ class ItemController extends Controller
                     $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
                 })->orderBy('update_api_time', 'ASC');
             }
-            $import_schedule->whereNull('ddd.te_logistic_manage_number');
+            //$import_schedule->whereNull('ddd.te_logistic_manage_number');
             $import_schedule = $import_schedule->offset(0)->limit(20)->get();
-            $this->createBondedSettlement();
+            //$this->createBondedSettlement();
 
             //return $import_schedule;
             DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
@@ -2526,13 +2526,14 @@ class ItemController extends Controller
 
             foreach ($import_schedule as $value) {
                 if (isset($value->tie_logistic_manage_number)) {
-                    $logistic_manage_number = $value->tie_logistic_manage_number; //'23KE0EA1FII00100007';//
+                    $logistic_manage_number = '23KE0EA1FII00100007';//$value->tie_logistic_manage_number; //'23KE0EA1FII00100007';//
                     $logistic_manage_number = str_replace('-', '', $logistic_manage_number);
+                    
                     $xmlString = simplexml_load_string(file_get_contents("https://unipass.customs.go.kr:38010/ext/rest/cargCsclPrgsInfoQry/retrieveCargCsclPrgsInfo?crkyCn=s230z262h044b104n070k070a3&cargMtNo=" . $logistic_manage_number . ""));
-
+                    
                     $json = json_encode($xmlString);
                     $array = json_decode($json, TRUE);
-
+                    return $array;
                     if (isset($array['cargCsclPrgsInfoDtlQryVo']) && $array['cargCsclPrgsInfoDtlQryVo']) {
                         $data_apis = $array['cargCsclPrgsInfoDtlQryVo'];
                         foreach ($data_apis as $data) {
