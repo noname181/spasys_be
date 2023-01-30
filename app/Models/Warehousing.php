@@ -38,6 +38,8 @@ class Warehousing extends Model
         'm_bl',
         'h_bl',
         'logistic_manage_number',
+        'ti_carry_in_number',
+        'te_carry_out_number',
         'connection_number',
         'tie_no',
         'created_at',
