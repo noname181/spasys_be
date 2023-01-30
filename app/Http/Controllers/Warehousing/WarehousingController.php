@@ -4220,7 +4220,7 @@ class WarehousingController extends Controller
                         ->orWhereNull('rgd_status4');
                 })
                 ->whereHas('w_no', function ($query) {
-                    $query->where('w_type', '=', 'IW')
+                    $query->where('w_type', '=', 'SET')
                         ->where('w_category_name', '=', '보세화물');
                 });
             // ->whereHas('mb_no', function ($q) {
@@ -4293,7 +4293,7 @@ class WarehousingController extends Controller
                         ->orWhere('rgd_status3', '=', $validated['rgd_status3_3'] ? $validated['rgd_status3_3'] : "");
                 });
             }
-            $warehousing->orderBy('updated_at', 'DESC');
+            $warehousing->orderBy('rgd_tracking_code', 'DESC');
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             //return DB::getQueryLog();
 
