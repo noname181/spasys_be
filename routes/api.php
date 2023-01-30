@@ -29,6 +29,7 @@ Route::get('/api_schedule_cron_nologin', [App\Http\Controllers\ScheduleShipment\
 Route::get('/api_stock_list_nologin', [App\Http\Controllers\Item\ItemController::class, 'updateStockItemsApiNoLogin'])->name('api_stock_list_nologin');
 Route::get('/stock_history', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'stock_history'])->name('stock_history');
 Route::post('/banner_load', [App\Http\Controllers\Banner\BannerController::class, 'banner_load'])->name('banner_load');
+Route::get('/api_item_cargo_list', [App\Http\Controllers\Item\ItemController::class, 'apiItemsCargoList'])->name('api_item_cargo_list');
 
 Route::middleware('auth')->group(function () {
 
@@ -354,8 +355,6 @@ Route::middleware('auth')->group(function () {
         Route::delete('/item_channel/{item_channel}', [App\Http\Controllers\Item\ItemController::class, 'deleteItemChannel'])->name('delete_item_channel');
         Route::post('/import_excel', [App\Http\Controllers\Item\ItemController::class, 'importItems'])->name('import_items');
         Route::post('/api_item', [App\Http\Controllers\Item\ItemController::class, 'apiItems'])->name('api_item');
-        Route::post('/api_item_cargo_list', [App\Http\Controllers\Item\ItemController::class, 'apiItemsCargoList'])->name('api_item_cargo_list');
-        Route::post('/create_bonded_settlement', [App\Http\Controllers\Item\ItemController::class, 'createBondedSettlement'])->name('create_bonded_settlement');
         Route::post('/api_update_stock_items', [App\Http\Controllers\Item\ItemController::class, 'apiupdateStockItems'])->name('api_update_stock_items');
         Route::post('/caculate_total_item', [App\Http\Controllers\Item\ItemController::class, 'caculateItem'])->name('caculate_total_item');
         Route::post('/update_stock_items_api', [App\Http\Controllers\Item\ItemController::class, 'updateStockItemsApi'])->name('update_stock_items_api');

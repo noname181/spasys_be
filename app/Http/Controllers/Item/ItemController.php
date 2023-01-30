@@ -2394,101 +2394,101 @@ class ItemController extends Controller
             DB::beginTransaction();
 
             DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
-            $user = Auth::user();
-            if ($user->mb_type == 'shop') {
+            // $user = Auth::user();
+            // if ($user->mb_type == 'shop') {
+
+            //     $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number', 't_import_expected.update_api_time', 't_import_expected.tie_h_bl')
+            //         ->leftjoin('company', function ($join) {
+            //             $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
+            //         })->leftjoin('company as parent_shop', function ($join) {
+            //             $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
+            //         })->leftjoin('company as parent_spasys', function ($join) {
+            //             $join->on('parent_shop.co_parent_no', '=', 'parent_spasys.co_no');
+            //         })->where('parent_shop.co_no', $user->co_no)->where('tie_is_date', '>=', '2022-01-04')
+            //         ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
+            //         ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
+
+            //     $sub_2 = Import::select('ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
+            //         ->leftjoin('receiving_goods_delivery', function ($join) {
+            //             $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
+            //         })
+            //         ->groupBy(['ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number']);
+
+            //     // $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
+            //     //     ->groupBy(['tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number']);
+
+            //     $sub_4 = Export::select('connection_number', 't_export.te_status_2', 'te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number')
+            //         // ->leftjoin('receiving_goods_delivery', function ($join) {
+            //         //     $join->on('t_export.te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
+            //         // })
+            //         ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
+
+
+            //     $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+            //         $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
+            //     })
+            //     // ->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
+            //     //     $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
+            //     // })
+            //     ->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+
+            //         //$leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
+            //         $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+            //     })->orderBy('update_api_time', 'ASC');
+            // } else if ($user->mb_type == 'shipper') {
+
+
+            //     $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number', 't_import_expected.update_api_time', 't_import_expected.tie_h_bl')
+            //         ->leftjoin('company', function ($join) {
+            //             $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
+            //         })->leftjoin('company as parent_shop', function ($join) {
+            //             $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
+            //         })->leftjoin('company as parent_spasys', function ($join) {
+            //             $join->on('parent_shop.co_parent_no', '=', 'parent_spasys.co_no');
+            //         })->where('company.co_no', $user->co_no)->where('tie_is_date', '>=', '2022-01-04')
+            //         ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
+            //         ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
+
+            //     $sub_2 = Import::select('receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
+            //         ->leftjoin('receiving_goods_delivery', function ($join) {
+            //             $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
+            //         })
+            //         ->groupBy(['ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number']);
+
+            //     // $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
+            //     //     ->groupBy(['tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number']);
+
+            //     $sub_4 = Export::select('connection_number', 't_export.te_status_2', 'te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number')
+            //         // ->leftjoin('receiving_goods_delivery', function ($join) {
+            //         //     $join->on('t_export.te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
+            //         // })
+            //         ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
+
+
+            //     $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+            //         $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
+            //     })
+            //     // ->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
+            //     //     $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
+            //     // })
+            //     ->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+
+            //         //$leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
+            //         $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+            //     })->orderBy('update_api_time', 'ASC');
+            // } else if ($user->mb_type == 'spasys') {
+
 
                 $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number', 't_import_expected.update_api_time', 't_import_expected.tie_h_bl')
-                    ->leftjoin('company', function ($join) {
-                        $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
-                    })->leftjoin('company as parent_shop', function ($join) {
-                        $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
-                    })->leftjoin('company as parent_spasys', function ($join) {
-                        $join->on('parent_shop.co_parent_no', '=', 'parent_spasys.co_no');
-                    })->where('parent_shop.co_no', $user->co_no)->where('tie_is_date', '>=', '2022-01-04')
-                    ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
-                    ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
-
-                $sub_2 = Import::select('ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
-                    ->leftjoin('receiving_goods_delivery', function ($join) {
-                        $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
-                    })
-                    ->groupBy(['ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number']);
-
-                // $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
-                //     ->groupBy(['tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number']);
-
-                $sub_4 = Export::select('connection_number', 't_export.te_status_2', 'te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number')
-                    // ->leftjoin('receiving_goods_delivery', function ($join) {
-                    //     $join->on('t_export.te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
+                    // ->leftjoin('company as parent_spasys', function ($join) {
+                    //     $join->on('parent_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
                     // })
-                    ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
-
-
-                $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
-                    $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
-                })
-                // ->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
-                //     $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
-                // })
-                ->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
-
-                    //$leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
-                    $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-                })->orderBy('update_api_time', 'ASC');
-            } else if ($user->mb_type == 'shipper') {
-
-
-                $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number', 't_import_expected.update_api_time', 't_import_expected.tie_h_bl')
-                    ->leftjoin('company', function ($join) {
-                        $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
-                    })->leftjoin('company as parent_shop', function ($join) {
-                        $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
-                    })->leftjoin('company as parent_spasys', function ($join) {
-                        $join->on('parent_shop.co_parent_no', '=', 'parent_spasys.co_no');
-                    })->where('company.co_no', $user->co_no)->where('tie_is_date', '>=', '2022-01-04')
-                    ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
-                    ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
-
-                $sub_2 = Import::select('receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
-                    ->leftjoin('receiving_goods_delivery', function ($join) {
-                        $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
-                    })
-                    ->groupBy(['ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number']);
-
-                // $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
-                //     ->groupBy(['tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number']);
-
-                $sub_4 = Export::select('connection_number', 't_export.te_status_2', 'te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number')
-                    // ->leftjoin('receiving_goods_delivery', function ($join) {
-                    //     $join->on('t_export.te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
+                    // ->leftjoin('company', function ($join) {
+                    //     $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
+                    // })->leftjoin('company as parent_shop', function ($join) {
+                    //     $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
                     // })
-                    ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
-
-
-                $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
-                    $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
-                })
-                // ->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
-                //     $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
-                // })
-                ->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
-
-                    //$leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
-                    $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-                })->orderBy('update_api_time', 'ASC');
-            } else if ($user->mb_type == 'spasys') {
-
-
-                $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number', 't_import_expected.update_api_time', 't_import_expected.tie_h_bl')
-                    ->leftjoin('company as parent_spasys', function ($join) {
-                        $join->on('parent_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
-                    })
-                    ->leftjoin('company', function ($join) {
-                        $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
-                    })->leftjoin('company as parent_shop', function ($join) {
-                        $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
-                    })
-                    ->where('parent_spasys.warehouse_code', $user->company['warehouse_code'])
+                    // ->where('parent_spasys.warehouse_code', $user->company['warehouse_code'])
                     ->where('tie_is_date', '>=', '2022-01-04')
                     ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                     ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
@@ -2520,7 +2520,7 @@ class ItemController extends Controller
                     //$leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
                     $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
                 })->orderBy('update_api_time', 'ASC');
-            }
+            //}
             //$import_schedule->whereNull('ddd.te_logistic_manage_number');
             $import_schedule = $import_schedule->offset(0)->limit(20)->get();
             //$this->createBondedSettlement();

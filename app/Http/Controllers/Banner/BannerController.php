@@ -600,8 +600,8 @@ class BannerController extends Controller
                 
             }
 
-            $import_schedule_a = $import_schedule_a->whereNotNull('aaa.tie_logistic_manage_number')->whereNull('bbb.ti_logistic_manage_number')->whereNull('ccc.tec_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->get()->count();
-            $import_schedule_b = $import_schedule_b->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ccc.tec_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->get()->count();
+            $import_schedule_a = $import_schedule_a->whereNotNull('aaa.tie_logistic_manage_number')->whereNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->get()->count();
+            $import_schedule_b = $import_schedule_b->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->get()->count();
             $import_schedule_d = $import_schedule_d->whereNotNull('ddd.te_logistic_manage_number')->get()->count();
 
             return response()->json([
