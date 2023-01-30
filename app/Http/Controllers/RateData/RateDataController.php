@@ -1856,7 +1856,7 @@ class RateDataController extends Controller
                 'message' => Messages::MSG_0007,
                 '$request->rate_data' => $request->rate_data,
                 'rmd_no' => isset($request->rmd_no) ? $request->rmd_no : $rmd_no,
-                'i' => $i,
+                'i' => isset($i) ? $i : '',
             ], 201);
         } catch (\Exception $e) {
             //return $e;
