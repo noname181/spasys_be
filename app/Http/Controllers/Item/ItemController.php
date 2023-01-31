@@ -3356,6 +3356,8 @@ class ItemController extends Controller
                                 'service_korean_name' => '보세화물',
                                 'rgd_status1' => '입고',
                                 'rgd_tracking_code' => $warehousing->logistic_manage_number,
+                                'rgd_ti_carry_in_number' => $warehousing->ti_carry_in_number,
+                                'rgd_te_carry_out_number' => $warehousing->te_carry_out_number,
                             ]
                         );
                     }
@@ -3365,6 +3367,7 @@ class ItemController extends Controller
             return response()->json(['message' => 'Success']);
         } catch (\Exception $e) {
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
