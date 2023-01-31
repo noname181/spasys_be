@@ -2388,7 +2388,7 @@ class ItemController extends Controller
 
     public function apiItemsCargoList()
     {
-       
+        set_time_limit(120);
         try {
 
             DB::beginTransaction();
@@ -2424,7 +2424,7 @@ class ItemController extends Controller
                 })->orderBy('update_api_time', 'ASC');
 
             //$import_schedule->whereNull('ddd.te_logistic_manage_number');
-            $import_schedule = $import_schedule->offset(0)->limit(20)->get();
+            $import_schedule = $import_schedule->offset(0)->limit(10)->get();
             //$this->createBondedSettlement();
 
             //return $import_schedule;
@@ -2440,8 +2440,8 @@ class ItemController extends Controller
                     ]);
                     $logistic_manage_number = $value->tie_logistic_manage_number; //'23KE0EA1FII00100007';//
                     $logistic_manage_number = str_replace('-', '', $logistic_manage_number);
-
-                    $xmlString = simplexml_load_string(file_get_contents("https://unipass.customs.go.kr:38010/ext/rest/cargCsclPrgsInfoQry/retrieveCargCsclPrgsInfo?crkyCn=s230z262h044b104n070k070a3&cargMtNo=" . $logistic_manage_number . ""));
+                    $url = "https://unipass.customs.go.kr:38010/ext/rest/cargCsclPrgsInfoQry/retrieveCargCsclPrgsInfo?crkyCn=s230z262h044b104n070k070a3&cargMtNo=" . $logistic_manage_number . "";
+                    $xmlString = simplexml_load_string(file_get_contents($url));
 
                     $json = json_encode($xmlString);
                     $array = json_decode($json, TRUE);
