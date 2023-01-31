@@ -550,7 +550,7 @@ class ImportScheduleController extends Controller
             if (isset($validated['tie_status'])) {
 
                 if ($validated['tie_status'] == '반출') {
-                    $import_schedule->whereNotNull('ddd.te_logistic_manage_number');
+                    $import_schedule->whereNotNull('ddd.te_logistic_manage_number')->whereNotNull('ddd.te_carry_out_number');
                 } else if ($validated['tie_status'] == '반출승인') {
                     $import_schedule->whereNull('ddd.te_logistic_manage_number');
                 } else if ($validated['tie_status'] == '반입') {
