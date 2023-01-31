@@ -2462,7 +2462,7 @@ class ItemController extends Controller
                                             ]);
                                     }
 
-                                    if (isset($value->ti_i_confirm_number) && isset($value->ti_i_confirm_number)) {
+                                    if (isset($value->ti_logistic_manage_number) && isset($value->ti_i_confirm_number)) {
                                         Import::where('ti_logistic_manage_number', $value->ti_logistic_manage_number)->where('ti_i_confirm_number', $value->ti_i_confirm_number)
                                             ->update([
                                                 'ti_status_2' => $status1
@@ -2486,7 +2486,7 @@ class ItemController extends Controller
                                             ]);
                                     }
 
-                                    if (isset($value->ti_i_confirm_number) && isset($value->ti_i_confirm_number)) {
+                                    if (isset($value->ti_logistic_manage_number) && isset($value->ti_i_confirm_number)) {
                                         Import::where('ti_logistic_manage_number', $value->ti_logistic_manage_number)->where('ti_i_confirm_number', $value->ti_i_confirm_number)
                                             ->update([
                                                 'ti_status_2' => $status1
@@ -2510,7 +2510,7 @@ class ItemController extends Controller
                                             ]);
                                     }
 
-                                    if (isset($value->ti_i_confirm_number) && isset($value->ti_i_confirm_number)) {
+                                    if (isset($value->ti_logistic_manage_number) && isset($value->ti_i_confirm_number)) {
                                         Import::where('ti_logistic_manage_number', $value->ti_logistic_manage_number)->where('ti_i_confirm_number', $value->ti_i_confirm_number)
                                             ->update([
                                                 'ti_status_2' => $status1
@@ -2534,7 +2534,7 @@ class ItemController extends Controller
                                             ]);
                                     }
 
-                                    if (isset($value->ti_i_confirm_number) && isset($value->ti_i_confirm_number)) {
+                                    if (isset($value->ti_logistic_manage_number) && isset($value->ti_i_confirm_number)) {
                                         Import::where('ti_logistic_manage_number', $value->ti_logistic_manage_number)->where('ti_i_confirm_number', $value->ti_i_confirm_number)
                                             ->update([
                                                 'ti_status_2' => $status1
