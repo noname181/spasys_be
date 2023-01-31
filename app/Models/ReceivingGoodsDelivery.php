@@ -52,6 +52,8 @@ class ReceivingGoodsDelivery extends Model
         'rgd_tax_invoice_number',
         'rgd_integrated_calculate_yn',
         'rgd_calculate_deadline_yn',
+        'rgd_ti_carry_in_number',
+        'rgd_te_carry_out_number',
         'created_at',
         'updated_at',
     ];
@@ -103,7 +105,7 @@ class ReceivingGoodsDelivery extends Model
         return $this->hasMany(RateMetaData::class, 'rgd_no', 'rgd_parent_no')->with(['rate_data']);
     }
     public function t_export(){
-        return $this->belongsTo(Export::class, 'rgd_tracking_code', 'te_logistic_manage_number');
+        return $this->belongsTo(Export::class, 'rgd_te_carry_out_number', 'te_carry_out_number');
     }
     public function settlement_number(){
         return $this->hasMany(ReceivingGoodsDelivery::class, 'rgd_settlement_number', 'rgd_settlement_number')->with(['rate_data_general']);
@@ -113,7 +115,7 @@ class ReceivingGoodsDelivery extends Model
     }
 
     public function t_import(){
-        return $this->belongsTo(Import::class, 'rgd_tracking_code', 'ti_logistic_manage_number');
+        return $this->belongsTo(Import::class, 'rgd_ti_carry_in_number', 'ti_carry_in_number');
     }
 
     public function t_import_expected(){

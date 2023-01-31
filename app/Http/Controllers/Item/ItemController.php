@@ -3317,7 +3317,7 @@ class ItemController extends Controller
 
             foreach ($import_schedule->get() as $item) {
 
-                if (isset($item->co_no)) {
+                
                     if ($item->te_carry_out_number) {
                         $warehousing = Warehousing::updateOrCreate(
                             [
@@ -3351,7 +3351,7 @@ class ItemController extends Controller
                                 'w_schedule_amount' => $item->tie_is_number,
                                 'w_amount' => $item->ti_i_number,
                                 'w_type' => 'SET',
-                                'co_no' => isset($item->co_no) ? $item->co_no : $item->co_no,
+                                'co_no' => isset($item->co_no) ? $item->co_no : null,
                             ]
                         );
                     }
@@ -3368,15 +3368,18 @@ class ItemController extends Controller
                                 'service_korean_name' => '보세화물',
                                 'rgd_status1' => '입고',
                                 'rgd_tracking_code' => $warehousing->logistic_manage_number,
+                                'rgd_ti_carry_in_number' => $item->ti_carry_in_number,
+                                'rgd_te_carry_out_number' => $item->te_carry_out_number,
                             ]
                         );
                     }
-                }
+            
             }
             DB::commit();
             return response()->json(['message' => 'Success']);
         } catch (\Exception $e) {
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
