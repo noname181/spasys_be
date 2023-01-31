@@ -2434,6 +2434,10 @@ class ItemController extends Controller
 
             foreach ($import_schedule as $value) {
                 if (isset($value->tie_logistic_manage_number)) {
+                    ImportExpected::where('tie_logistic_manage_number', $value->tie_logistic_manage_number)
+                    ->update([
+                        'update_api_time' => Carbon::now(),
+                    ]);
                     $logistic_manage_number = $value->tie_logistic_manage_number; //'23KE0EA1FII00100007';//
                     $logistic_manage_number = str_replace('-', '', $logistic_manage_number);
 
