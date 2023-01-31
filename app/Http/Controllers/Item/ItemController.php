@@ -2388,7 +2388,7 @@ class ItemController extends Controller
 
     public function apiItemsCargoList()
     {
-        set_time_limit(90);
+       
         try {
 
             DB::beginTransaction();
