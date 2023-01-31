@@ -2440,8 +2440,8 @@ class ItemController extends Controller
                     ]);
                     $logistic_manage_number = $value->tie_logistic_manage_number; //'23KE0EA1FII00100007';//
                     $logistic_manage_number = str_replace('-', '', $logistic_manage_number);
-
-                    $xmlString = simplexml_load_string(file_get_contents("https://unipass.customs.go.kr:38010/ext/rest/cargCsclPrgsInfoQry/retrieveCargCsclPrgsInfo?crkyCn=s230z262h044b104n070k070a3&cargMtNo=" . $logistic_manage_number . ""));
+                    $url = "https://unipass.customs.go.kr:38010/ext/rest/cargCsclPrgsInfoQry/retrieveCargCsclPrgsInfo?crkyCn=s230z262h044b104n070k070a3&cargMtNo=" . $logistic_manage_number . "";
+                    $xmlString = simplexml_load_string(file_get_contents($url));
 
                     $json = json_encode($xmlString);
                     $array = json_decode($json, TRUE);
