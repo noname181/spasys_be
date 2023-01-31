@@ -2388,7 +2388,7 @@ class ItemController extends Controller
 
     public function apiItemsCargoList()
     {
-        set_time_limit(80);
+        set_time_limit(90);
         try {
 
             DB::beginTransaction();
@@ -2396,7 +2396,7 @@ class ItemController extends Controller
             DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
 
             $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number', 't_import_expected.update_api_time', 't_import_expected.tie_h_bl')
-
+            
                 ->where('tie_is_date', '>=', '2022-01-04')
                 ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                 ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
@@ -2424,7 +2424,7 @@ class ItemController extends Controller
                 })->orderBy('update_api_time', 'ASC');
 
             //$import_schedule->whereNull('ddd.te_logistic_manage_number');
-            $import_schedule = $import_schedule->offset(0)->limit(10)->get();
+            $import_schedule = $import_schedule->offset(0)->limit(20)->get();
             //$this->createBondedSettlement();
 
             //return $import_schedule;
