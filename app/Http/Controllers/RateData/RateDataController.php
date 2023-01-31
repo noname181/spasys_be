@@ -1967,6 +1967,7 @@ class RateDataController extends Controller
             $user = Auth::user();
 
             $import = Import::with(['export_confirm', 'export', 'import_expect'])->where('ti_logistic_manage_number', $is_no)->first();
+            $company_shipper = "";
             $company = Company::select([
                 'company.co_no',
                 'company.co_parent_no',
@@ -2010,7 +2011,7 @@ class RateDataController extends Controller
                 ])->join('contract', 'contract.co_no', 'company.co_no')->with(['co_parent'])->where('company.co_no', $rgd->warehousing->co_no)->first();
             }else if($user->mb_type == 'spasys'){
                 $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_tracking_code', $is_no)->first();
-
+                $company_shipper = $company;
                 $company = Company::select([
                     'company.co_no',
                     'company.co_parent_no',
@@ -2026,6 +2027,7 @@ class RateDataController extends Controller
                     'company.co_email',
                     'company.co_etc',
                     'company.co_tel',
+                    'company.co_type',
                     'contract.c_integrated_calculate_yn as c_integrated_calculate_yn',
                     'contract.c_calculate_deadline_yn as c_calculate_deadline_yn',
                 ])->join('contract', 'contract.co_no', 'company.co_no')->with(['co_parent'])->where('company.co_no', $company->co_parent_no)->first();
@@ -2061,6 +2063,7 @@ class RateDataController extends Controller
                 'rate_data' => $rate_data,
                 'rgd'=>$rgd,
                 'export' => $export,
+                'company_shipper' => $company_shipper,
                 'adjustment_group' => $adjustment_group,
             ], 200);
         } catch (\Exception $e) {
