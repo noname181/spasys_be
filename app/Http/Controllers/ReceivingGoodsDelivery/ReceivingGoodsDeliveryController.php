@@ -815,16 +815,17 @@ class ReceivingGoodsDeliveryController extends Controller
                                 foreach ($data['remove_items'] as $remove) {
                                     WarehousingItem::where('item_no', $remove['item_no'])->where('w_no', $request->w_no)->delete();
                                 }
-
-                                foreach ($data['items'] as $item) {
-                                    WarehousingItem::where('w_no', $request->w_no)->where('item_no', $item['item_no'])->update([
-                                        'item_no' => $item['item_no'],
-                                        'w_no' => $request->w_no,
-                                        'wi_number' => $item['schedule_wi_number'],
-                                        'wi_type' => '출고_shipper'
-                                    ]);
+                                if($request->page_type != 'Page146'){
+                                    foreach ($data['items'] as $item) {
+                                        WarehousingItem::where('w_no', $request->w_no)->where('item_no', $item['item_no'])->update([
+                                            'item_no' => $item['item_no'],
+                                            'w_no' => $request->w_no,
+                                            'wi_number' => $item['schedule_wi_number'],
+                                            'wi_type' => '출고_shipper'
+                                        ]);
+                                    }    
                                 }
-
+                             
                                 foreach ($data['location'] as $location) {
                                     $warehousing_status = isset($location['rgd_status1']) ? $location['rgd_status1'] : null;
                                     $rgd_data = ReceivingGoodsDelivery::where('w_no', $request->w_no)->first();
