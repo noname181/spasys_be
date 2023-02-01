@@ -64,11 +64,13 @@ class WarehousingStatusController extends Controller
             $warehousing = Warehousing::where('w_no', '=', $validated['w_no'])->first();
 
             $warehousing_status = WarehousingStatus::with(['mb_no','warehousing'])->orderBy('ws_no', 'DESC');
-            if($warehousing){
-                $warehousing_status = $warehousing_status->where('w_no', '=', $validated['w_no']);
-            }else{
-                $warehousing_status = $warehousing_status->where('w_no', '=', $validated['w_no']);
+            
+            if($validated['page_type'] == "Page146"){
+                $warehousing_status->where('w_no', '=', $validated['w_no'])->orwhere('w_no', '=', $warehousing->w_import_no);
+            }else{   
+                $warehousing_status->where('w_no', '=', $validated['w_no']);  
             }
+            
 
             $members = Member::where('mb_no', '!=', 0)->get();
 
@@ -78,7 +80,7 @@ class WarehousingStatusController extends Controller
         } catch (\Exception $e) {
             Log::error($e);
             return $e;
-            //return response()->json(['message' => Messages::MSG_0018], 500);
+            return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
 
