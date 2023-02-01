@@ -149,6 +149,9 @@ class RateDataRequest extends BaseFormRequest
             'create_new' => [
                 ''
             ],
+            'rmd_service' => [
+                ''
+            ],
         ];
     }
 

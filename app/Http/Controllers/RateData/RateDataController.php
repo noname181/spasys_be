@@ -1378,6 +1378,7 @@ class RateDataController extends Controller
                 [
                     'mb_no' => $user->mb_no,
                     'rmd_number' => isset($request->activeTab2) ? $request->activeTab2 : null,
+                    'rmd_service' => isset($request->activeTab2) ? $request->activeTab2 : null,
                 ]
             );
 
@@ -1793,6 +1794,7 @@ class RateDataController extends Controller
                         'mb_no' => Auth::user()->mb_no,
                         'rmd_number' => CommonFunc::generate_rmd_number($request['co_no'], $index),
                         'set_type' => 'estimated_costs',
+                        'rmd_service' => $request->activeTab2,
                     ]);
                 }
 
@@ -1801,10 +1803,10 @@ class RateDataController extends Controller
                         [
                             'rmd_no' => $rmd_no,
                             'rd_co_no' => $request->co_no,
-                            'rd_cate_meta1' => $val['rd_cate_meta1'],
-                            'rd_cate_meta2' => $val['rd_cate_meta2'],
-                            'rd_cate1' => $val['rd_cate1'],
-                            'rd_cate2' => $val['rd_cate2'],
+                            'rd_cate_meta1' => isset($val['rd_cate_meta1']) ? $val['rd_cate_meta1'] : '' ,
+                            'rd_cate_meta2' => isset($val['rd_cate_meta2']) ? $val['rd_cate_meta2'] : '',
+                            'rd_cate1' => isset($val['rd_cate1']) ? $val['rd_cate1'] : '',
+                            'rd_cate2' => isset($val['rd_cate2']) ? $val['rd_cate2'] : '',
                             'rd_cate3' => '',
                             'rd_data1' => isset($val['rd_data1']) ? $val['rd_data1'] : '',
                             'rd_data2' => isset($val['rd_data2']) ? $val['rd_data2'] : '',
