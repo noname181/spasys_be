@@ -85,7 +85,7 @@ class ServiceController extends Controller
                 $services = Service::where('service_use_yn', 'y')->where('service_no', '!=', 1)->get();
             }else {
                 $co_service_array = explode(" ", $company->co_service);
-                $services = Service::whereIN("service_name", $co_service_array)->get();
+                $services = Service::where('service_use_yn', 'y')->whereIN("service_name", $co_service_array)->get();
             }
 
             DB::commit();
