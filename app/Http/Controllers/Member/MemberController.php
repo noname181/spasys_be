@@ -75,7 +75,7 @@ class MemberController extends Controller
 
             $check_exists = Member::where('mb_id',$validated['mb_id'])->first();
             if($check_exists){
-                return response()->json(['message' => 'dupplicated id'], 500);
+                return response()->json(['message' => '이미 가입된 ID입니다.'], 500);
             }else{
                 $mb_no = Member::insertGetId($validated);
             }
