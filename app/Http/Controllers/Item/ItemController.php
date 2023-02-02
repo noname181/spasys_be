@@ -3334,6 +3334,7 @@ class ItemController extends Controller
                                 'w_amount' => $item->ti_i_number,
                                 'w_type' => 'SET',
                                 'co_no' => isset($item->co_no) ? $item->co_no : $item->co_no,
+                                'ti_carry_in_number' => $item->ti_carry_in_number,
                             ]
                         );
                     } else if ($item->ti_carry_in_number) {
@@ -3352,6 +3353,7 @@ class ItemController extends Controller
                                 'w_amount' => $item->ti_i_number,
                                 'w_type' => 'SET',
                                 'co_no' => isset($item->co_no) ? $item->co_no : null,
+                                'te_carry_out_number' => $item->te_carry_out_number,
                             ]
                         );
                     }
@@ -3368,8 +3370,8 @@ class ItemController extends Controller
                                 'service_korean_name' => '보세화물',
                                 'rgd_status1' => '입고',
                                 'rgd_tracking_code' => $warehousing->logistic_manage_number,
-                                'rgd_ti_carry_in_number' => $item->ti_carry_in_number,
-                                'rgd_te_carry_out_number' => $item->te_carry_out_number,
+                                'rgd_ti_carry_in_number' => $warehousing->ti_carry_in_number,
+                                'rgd_te_carry_out_number' => $warehousing->te_carry_out_number,
                             ]
                         );
                     }
