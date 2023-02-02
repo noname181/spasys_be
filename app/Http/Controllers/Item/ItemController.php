@@ -3376,7 +3376,7 @@ class ItemController extends Controller
             
             }
             DB::commit();
-            return response()->json(['message' => 'Success']);
+            return response()->json($import_schedule->get());
         } catch (\Exception $e) {
             Log::error($e);
             return $e;
