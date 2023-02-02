@@ -32,7 +32,6 @@ class MemberController extends Controller
         try {
             $validated = $request->validated();
             $roleNoOfUserLogin = Auth::user()->role_no;
-
             // FIXME hard set mb_language = ko and role_no = 1
 
             $validated['mb_language'] = 'ko';
@@ -74,11 +73,18 @@ class MemberController extends Controller
                 $validated['co_no'] = Auth::user()->co_no;
             }
 
-            $mb_no = Member::insertGetId($validated);
+            $check_exists = Member::where('mb_id',$validated['mb_id'])->first();
+            if($check_exists){
+                return response()->json(['message' => 'dupplicated id'], 500);
+            }else{
+                $mb_no = Member::insertGetId($validated);
+            }
+
 
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'mb_no' => $mb_no,
+                'check_exists' => isset($check_exists) ? $check_exists : null,
             ]);
         } catch (\Exception $e) {
             Log::error($e);

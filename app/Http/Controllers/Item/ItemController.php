@@ -2466,32 +2466,8 @@ class ItemController extends Controller
                             $status = isset($data['cargTrcnRelaBsopTpcd']) ? $data['cargTrcnRelaBsopTpcd'] : '';
                             $status1 = '';
                             switch ($status) {
-                                case '수입신고 수리후 정정 완료':
-                                    $status1 = '수입신고정정완료';
-                                    if (isset($value->tie_logistic_manage_number)) {
-                                        ImportExpected::where('tie_logistic_manage_number', $value->tie_logistic_manage_number)
-                                            ->update([
-                                                'tie_status_2' => $status1,
-                                                'update_api_time' => Carbon::now(),
-                                            ]);
-                                    }
-
-                                    if (isset($value->ti_logistic_manage_number) && isset($value->ti_i_confirm_number)) {
-                                        Import::where('ti_logistic_manage_number', $value->ti_logistic_manage_number)->where('ti_i_confirm_number', $value->ti_i_confirm_number)
-                                            ->update([
-                                                'ti_status_2' => $status1
-                                            ]);
-                                    }
-
-                                    if (isset($value->te_logistic_manage_number) && isset($value->te_carry_out_number)) {
-                                        Export::where('te_logistic_manage_number', $value->te_logistic_manage_number)->where('te_carry_out_number', $value->te_carry_out_number)
-                                            ->update([
-                                                'te_status_2' => $status1
-                                            ]);
-                                    }
-                                    break;
-                                case '수입신고 수리후 정정 접수':
-                                    $status1 = '수입신고정정접수';
+                                case '수입신고':
+                                    $status1 = '수입신고접수';
                                     if (isset($value->tie_logistic_manage_number)) {
                                         ImportExpected::where('tie_logistic_manage_number', $value->tie_logistic_manage_number)
                                             ->update([
@@ -2538,8 +2514,32 @@ class ItemController extends Controller
                                             ]);
                                     }
                                     break;
-                                case '수입신고':
-                                    $status1 = '수입신고접수';
+                                case '수입신고 수리후 정정 접수':
+                                    $status1 = '수입신고정정접수';
+                                    if (isset($value->tie_logistic_manage_number)) {
+                                        ImportExpected::where('tie_logistic_manage_number', $value->tie_logistic_manage_number)
+                                            ->update([
+                                                'tie_status_2' => $status1,
+                                                'update_api_time' => Carbon::now(),
+                                            ]);
+                                    }
+
+                                    if (isset($value->ti_logistic_manage_number) && isset($value->ti_i_confirm_number)) {
+                                        Import::where('ti_logistic_manage_number', $value->ti_logistic_manage_number)->where('ti_i_confirm_number', $value->ti_i_confirm_number)
+                                            ->update([
+                                                'ti_status_2' => $status1
+                                            ]);
+                                    }
+
+                                    if (isset($value->te_logistic_manage_number) && isset($value->te_carry_out_number)) {
+                                        Export::where('te_logistic_manage_number', $value->te_logistic_manage_number)->where('te_carry_out_number', $value->te_carry_out_number)
+                                            ->update([
+                                                'te_status_2' => $status1
+                                            ]);
+                                    }
+                                    break;
+                                case '수입신고 수리후 정정 완료':
+                                    $status1 = '수입신고정정완료';
                                     if (isset($value->tie_logistic_manage_number)) {
                                         ImportExpected::where('tie_logistic_manage_number', $value->tie_logistic_manage_number)
                                             ->update([
