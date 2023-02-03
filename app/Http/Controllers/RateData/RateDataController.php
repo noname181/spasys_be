@@ -1968,78 +1968,18 @@ class RateDataController extends Controller
         try {
             $user = Auth::user();
 
-            $import = Import::with(['export_confirm', 'export', 'import_expect'])->where('ti_logistic_manage_number', $is_no)->first();
-            $company_shipper = "";
-            $company = Company::select([
-                'company.co_no',
-                'company.co_parent_no',
-                'company.co_address',
-                'company.co_address_detail',
-                'company.co_country',
-                'company.co_service',
-                'company.co_name',
-                'company.co_license',
-                'company.co_close_yn',
-                'company.co_owner',
-                'company.co_homepage',
-                'company.co_email',
-                'company.co_etc',
-                'company.co_type',
-                'company.co_tel',
-                'contract.c_integrated_calculate_yn as c_integrated_calculate_yn',
-                'contract.c_calculate_deadline_yn as c_calculate_deadline_yn',
-            ])->join('contract', 'contract.co_no', 'company.co_no')->with(['co_parent','co_childen'])->where('co_license', $import->import_expect->tie_co_license)->first();
+            $rgd = ReceivingGoodsDelivery::with(['warehousing', 't_import', 't_export', 't_import_expected'])->where('rgd_no', $is_no)->first();
 
-            if($user->mb_type == 'shop'){
-                $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_tracking_code', $is_no)->first();
+            
 
-                $company = Company::select([
-                    'company.co_no',
-                    'company.co_parent_no',
-                    'company.co_address',
-                    'company.co_address_detail',
-                    'company.co_country',
-                    'company.co_service',
-                    'company.co_name',
-                    'company.co_license',
-                    'company.co_close_yn',
-                    'company.co_owner',
-                    'company.co_homepage',
-                    'company.co_email',
-                    'company.co_etc',
-                    'company.co_tel',
-                    'contract.c_integrated_calculate_yn as c_integrated_calculate_yn',
-                    'contract.c_calculate_deadline_yn as c_calculate_deadline_yn',
-                ])->join('contract', 'contract.co_no', 'company.co_no')->with(['co_parent'])->where('company.co_no', $rgd->warehousing->co_no)->first();
-            }else if($user->mb_type == 'spasys'){
-                $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_tracking_code', $is_no)->first();
-                $company_shipper = $company;
-                if(isset($company->co_type)){
-                    if($company->co_type == 'shipper'){
-                        $company = Company::select([
-                            'company.co_no',
-                            'company.co_parent_no',
-                            'company.co_address',
-                            'company.co_address_detail',
-                            'company.co_country',
-                            'company.co_service',
-                            'company.co_name',
-                            'company.co_license',
-                            'company.co_close_yn',
-                            'company.co_owner',
-                            'company.co_homepage',
-                            'company.co_email',
-                            'company.co_etc',
-                            'company.co_tel',
-                            'company.co_type',
-                            'contract.c_integrated_calculate_yn as c_integrated_calculate_yn',
-                            'contract.c_calculate_deadline_yn as c_calculate_deadline_yn',
-                        ])->join('contract', 'contract.co_no', 'company.co_no')->with(['co_parent'])->where('company.co_no', $company->co_parent_no)->first();
-                    }
-                }
-              
+            $import = Import::with(['export_confirm', 'export', 'import_expect'])->where('ti_carry_in_number', $rgd->rgd_ti_carry_in_number)->first();
 
-            }
+
+            $company = Company::where('co_no', $rgd->warehousing->co_no)->first();
+
+            $company_shipper = $company;
+
+
 
             $rate_data = RateData::where('rd_cate_meta1', '보세화물');
 
@@ -2054,7 +1994,7 @@ class RateDataController extends Controller
             $adjustment_group = AdjustmentGroup::where('co_no', '=', $company->co_no)->first();
             $adjustment_group_all = AdjustmentGroup::where('co_no', '=', $company->co_no)->get();
 
-            $export = Export::with(['import', 'import_expected', 't_export_confirm'])->where('te_logistic_manage_number', $is_no)->first();
+            $export = Export::with(['import', 'import_expected', 't_export_confirm'])->where('te_carry_out_number', $rgd->rgd_te_carry_out_number)->first();
 
             if (empty($export)) {
                 $export = [
