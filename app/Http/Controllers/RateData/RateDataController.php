@@ -1991,8 +1991,8 @@ class RateDataController extends Controller
 
             $rate_data = $rate_data->get();
 
-            $adjustment_group = AdjustmentGroup::where('co_no', '=', $company->co_no)->first();
-            $adjustment_group_all = AdjustmentGroup::where('co_no', '=', $company->co_no)->get();
+            $adjustment_group = AdjustmentGroup::where('co_no', '=', $company->co_parent_no)->first();
+            $adjustment_group_all = AdjustmentGroup::where('co_no', '=', $company->co_parent_no)->get();
 
             $export = Export::with(['import', 'import_expected', 't_export_confirm'])->where('te_carry_out_number', $rgd->rgd_te_carry_out_number)->first();
 
