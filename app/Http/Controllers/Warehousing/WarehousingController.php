@@ -3253,7 +3253,7 @@ class WarehousingController extends Controller
             $check_cofirm = 0;
             $check_paid = 0;
             if ($type == 'monthly') {
-                $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing'])->where('rgd_no', $rgd_no)->first();
+                $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing', 'rate_data_general'])->where('rgd_no', $rgd_no)->first();
                 $w_no = $rgd->w_no;
                 $co_no = $rgd->warehousing->co_no;
                 $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
@@ -3342,7 +3342,7 @@ class WarehousingController extends Controller
                     ]);
                 }, 'co_no', 'warehousing_request', 'w_import_parent', 'warehousing_child'])->withSum('warehousing_item_IW_spasys_confirm', 'wi_number')->find($w_no);
                 $adjustment_group = AdjustmentGroup::where('co_no', '=', $warehousing->co_no)->first();
-                $adjustment_group2 = AdjustmentGroup::select(['ag_name'])->where('co_no', '=', $warehousing->co_no)->get();
+                $adjustment_group2 = AdjustmentGroup::select(['ag_name', 'ag_no'])->where('co_no', '=', $warehousing->co_no)->get();
 
                 $time = str_replace('-', '.', $start_date) . ' ~ ' . str_replace('-', '.', $end_date);
             } else {
@@ -3369,7 +3369,7 @@ class WarehousingController extends Controller
                     ]);
                 }, 'co_no', 'warehousing_request', 'w_import_parent', 'warehousing_child'])->withSum('warehousing_item_IW_spasys_confirm', 'wi_number')->find($w_no);
 
-                $adjustment_group2 = AdjustmentGroup::select(['ag_name'])->where('co_no', '=', $warehousing->co_no)->get();
+                $adjustment_group2 = AdjustmentGroup::select(['ag_name', 'ag_no'])->where('co_no', '=', $warehousing->co_no)->get();
                 $adjustment_group = AdjustmentGroup::where('co_no', '=', $warehousing->co_no)->first();
             }
             $adjustment_group_choose = '';
@@ -4257,7 +4257,7 @@ class WarehousingController extends Controller
                     $q->where(DB::raw('lower(tie_h_bl)'), 'like', '%' . strtolower($validated['h_bl']) . '%');
                 });
             }
-           
+
             if (isset($validated['co_name'])) {
                 $warehousing->whereHas('w_no.co_no', function ($q) use ($validated) {
                     return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
@@ -4273,8 +4273,8 @@ class WarehousingController extends Controller
                     return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
                 });
             }
-           
-    
+
+
             $warehousing->orderBy('rgd_tracking_code', 'DESC');
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             //return DB::getQueryLog();
@@ -5650,12 +5650,13 @@ class WarehousingController extends Controller
                 'rgd_item_first_name' => isset($first_name_item) && isset($final_total) ? ($first_name_item . '외' . ' ' . $final_total . '건') : '',
             ]);
 
-            $rdg_no = RateDataGeneral::insertGetId([
+            RateDataGeneral::insertGetId([
                 'mb_no' => $user->mb_no,
                 'w_no' => $w_no_data,
                 'rgd_no' => $rgd_no,
                 'rgd_no_expectation' => $rgd_no,
                 'rdg_set_type' => $request->adjustment_group,
+                'ag_no' => $request->ag_no,
                 'rdg_bill_type' => 'final',
             ]);
 

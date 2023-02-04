@@ -371,7 +371,7 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
-          
+
             if (empty($rmd) && !empty($rdg)) {
                 $rmd = RateMetaData::where(
                     [
@@ -413,7 +413,7 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
-          
+
             if (empty($rmd) && !empty($rdg)) {
                 $rmd = RateMetaData::where(
                     [
@@ -438,7 +438,7 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
-           
+
         } else if (!isset($rmd->rmd_no) && $set_type == 'domestic_final') {
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
@@ -448,7 +448,7 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
-           
+
             if (empty($rmd) && !empty($rdg)) {
                 $rmd = RateMetaData::where(
                     [
@@ -483,7 +483,7 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
-          
+
             if (empty($rmd) && !empty($rdg)) {
                 $rmd = RateMetaData::where(
                     [
@@ -525,7 +525,7 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
-          
+
             if (empty($rmd) && !empty($rdg)) {
                 $rmd = RateMetaData::where(
                     [
@@ -550,7 +550,7 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
-           
+
         } else if (!isset($rmd->rmd_no) && $set_type == 'domestic_final_check') {
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
@@ -560,7 +560,7 @@ class RateDataController extends Controller
                     ]
                 )->first();
             }
-           
+
             if (empty($rmd) && !empty($rdg)) {
                 $rmd = RateMetaData::where(
                     [
@@ -1593,7 +1593,7 @@ class RateDataController extends Controller
                     $co_rate_data3 = [];
                 }
             }
-          
+
             $rate_meta_data = RateMetaData::where('rmd_no', $rmd_no)->first();
 
             if($rmd_no){
@@ -1687,7 +1687,7 @@ class RateDataController extends Controller
                         'co_no' => $co_no,
                         'mb_no' => Auth::user()->mb_no,
                     ],
-                    [         
+                    [
                         'rmd_number' => CommonFunc::generate_rmd_number($co_no, $index),
                         'rmd_mail_detail1a' => isset($validated['rmd_mail_detail1a']) ? $validated['rmd_mail_detail1a'] : ($rmd ? $rmd->rmd_mail_detail1a : ''),
                         'rmd_mail_detail1b' => isset($validated['rmd_mail_detail1b']) ? $validated['rmd_mail_detail1b'] : ($rmd ? $rmd->rmd_mail_detail1b : ''),
@@ -1697,7 +1697,7 @@ class RateDataController extends Controller
                     ]
                 );
             }
-            
+
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -1973,7 +1973,7 @@ class RateDataController extends Controller
 
             $rgd = ReceivingGoodsDelivery::with(['warehousing', 't_import', 't_export', 't_import_expected'])->where('rgd_no', $is_no)->first();
 
-            
+
 
             $import = Import::with(['export_confirm', 'export', 'import_expect'])->where('ti_carry_in_number', $rgd->rgd_ti_carry_in_number)->first();
 
@@ -2831,8 +2831,17 @@ class RateDataController extends Controller
     {
         try {
             DB::beginTransaction();
-            $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd_no)->first();
-            $co_no = $rgd->warehousing->co_no;
+
+            $user = Auth::user();
+
+            $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general'])->where('rgd_no', $rgd_no)->first();
+
+            if($user->mb_type == 'spasys'){
+                $co_no = $rgd->warehousing->company->co_parent->co_no;
+            }else {
+                $co_no = $rgd->warehousing->co_no;
+            }
+
             $adjustmentgroupall = AdjustmentGroup::where('co_no', $co_no)->get();
             $created_at = Carbon::createFromFormat('Y.m.d H:i:s', $rgd->created_at->format('Y.m.d H:i:s'));
 
@@ -2840,8 +2849,8 @@ class RateDataController extends Controller
             $end_date = $created_at->endOfMonth()->toDateString();
 
             $rgds = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent'])
-                ->whereHas('w_no', function ($q) use ($co_no) {
-                    $q->where('co_no', $co_no)
+                ->whereHas('w_no', function ($q) use ($rgd) {
+                    $q->where('co_no', $rgd->warehousing->co_no)
                         ->where('w_category_name', '유통가공');
                 })->whereHas('mb_no', function ($q) {
                 if (Auth::user()->mb_type == 'spasys') {
@@ -2852,10 +2861,13 @@ class RateDataController extends Controller
 
             })
             // ->doesntHave('rgd_child')
+                ->whereHas('rate_data_general', function($q) use($rgd){
+                    $q->where('ag_no', $rgd->rate_data_general->ag_no);
+                })
                 ->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
                 ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
                 ->where('rgd_status1', '=', '입고')
-                
+
                 ->where('rgd_bill_type', $bill_type)
                 ->where(function ($q) {
                     $q->where('rgd_status5', '!=', 'cancel')
@@ -3268,7 +3280,7 @@ class RateDataController extends Controller
 
                             $final_rdg = $is_exist->replicate();
                             $final_rdg->rdg_bill_type = $request->bill_type; // the new project_id
-    
+
                             $final_rdg->rdg_supply_price1 = $rdg_supply_price1;
                             $final_rdg->rdg_supply_price2 = $rdg_supply_price2;
                             $final_rdg->rdg_supply_price3 = $rdg_supply_price3;
@@ -3276,7 +3288,7 @@ class RateDataController extends Controller
                             $final_rdg->rdg_supply_price5 = $rdg_supply_price5;
                             $final_rdg->rdg_supply_price6 = $rdg_supply_price6;
                             $final_rdg->rdg_supply_price7 = $rdg_supply_price7;
-    
+
                             $final_rdg->rdg_vat1 = $rdg_vat1;
                             $final_rdg->rdg_vat2 = $rdg_vat2;
                             $final_rdg->rdg_vat3 = $rdg_vat3;
@@ -3284,7 +3296,7 @@ class RateDataController extends Controller
                             $final_rdg->rdg_vat5 = $rdg_vat5;
                             $final_rdg->rdg_vat6 = $rdg_vat6;
                             $final_rdg->rdg_vat7 = $rdg_vat7;
-    
+
                             $final_rdg->rdg_sum1 = $rdg_sum1;
                             $final_rdg->rdg_sum2 = $rdg_sum2;
                             $final_rdg->rdg_sum3 = $rdg_sum3;
@@ -3292,9 +3304,9 @@ class RateDataController extends Controller
                             $final_rdg->rdg_sum5 = $rdg_sum5;
                             $final_rdg->rdg_sum6 = $rdg_sum6;
                             $final_rdg->rdg_sum7 = $rdg_sum7;
-    
-                            $final_rdg->save();  
-                        }else 
+
+                            $final_rdg->save();
+                        }else
                             $final_rdg = $is_exist;
                     }
 
@@ -3693,7 +3705,7 @@ class RateDataController extends Controller
                 $final_rgd->rgd_calculate_deadline_yn = $request->rgd_calculate_deadline_yn ? $request->rgd_calculate_deadline_yn : $previous_rgd->rgd_calculate_deadline_yn;
                 $final_rgd->save();
 
-                RateDataGeneral::where('rgd_no_final', $previous_rgd->rgd_no)->update([
+                RateDataGeneral::where('rgd_no_expectation', $previous_rgd->rgd_no)->update([
                     'rgd_no' => $final_rgd->rgd_no,
                 ]);
 
@@ -8182,7 +8194,7 @@ class RateDataController extends Controller
                 if ($rgd_parent->rgd_status5 == 'issued') {
                     ReceivingGoodsDelivery::where('rgd_no', $rgd_parent->rgd_no)->update([
                         'rgd_status5' => ($rgd_parent->rgd_status4 == '확정청구서' ? 'confirmed' : null),
-                        'rgd_issued_date' => NULL,   
+                        'rgd_issued_date' => NULL,
                     ]);
                 }
 
@@ -8208,7 +8220,7 @@ class RateDataController extends Controller
 
                     ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_parent_no'])->update([
                         'rgd_status5' => ($rgd_parent['rgd_status4'] == '확정청구서' ? 'confirmed' : null),
-                        'rgd_issued_date' => NULL,   
+                        'rgd_issued_date' => NULL,
                     ]);
                     CancelBillHistory::insertGetId([
                         'mb_no' => Auth::user()->mb_no,
@@ -8235,11 +8247,11 @@ class RateDataController extends Controller
                             'rgd_issued_date' => NULL,
                         ] : [
                             'rgd_status4' => NULL,
-                            'rgd_issued_date' => NULL,   
+                            'rgd_issued_date' => NULL,
                         ]
                     );
                     RateMetaData::where('rgd_no', $rgd->rgd_parent_no)->update([
-                        'rgd_no' => $rgd['rgd_no'],   
+                        'rgd_no' => $rgd['rgd_no'],
                     ]);
 
                     CancelBillHistory::insertGetId([
@@ -8249,7 +8261,7 @@ class RateDataController extends Controller
                         'cbh_type' => 'cancel',
                     ]);
                 }
-            } else if ($request->bill_type == 'case_bill_final_issue') { 
+            } else if ($request->bill_type == 'case_bill_final_issue') {
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_status5' => NULL,
                     'rgd_confirmed_date' => NULL
@@ -8304,11 +8316,11 @@ class RateDataController extends Controller
                         'rgd_issued_date' => NULL,
                     ] : [
                         'rgd_status4' => NULL,
-                        'rgd_issued_date' => NULL,   
+                        'rgd_issued_date' => NULL,
                     ]
                 );
                 RateMetaData::where('rgd_no', $rgd->rgd_parent_no)->update([
-                    'rgd_no' => $rgd['rgd_no'],   
+                    'rgd_no' => $rgd['rgd_no'],
                 ]);
 
                 $insert_cancel_bill = CancelBillHistory::insertGetId([
