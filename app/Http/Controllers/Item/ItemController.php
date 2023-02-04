@@ -910,7 +910,7 @@ class ItemController extends Controller
                     $q->whereHas('ContractWms.company.co_parent', function ($k) use ($user) {
                         $k->where('co_no', $user->co_no);
                     });
-                })->whereNotNull('stock')->orderBy('product_id', 'DESC');
+                })->whereNotNull('stock')->groupby('product_id')->groupby('option_id')->orderBy('product_id', 'DESC');
             } else if ($user->mb_type == 'shipper') {
                 // $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->select('item.*', 'stock_status_bad.stock')
                 //     ->leftjoin(DB::raw('stock_status_bad'), function ($leftJoin) {
@@ -929,7 +929,7 @@ class ItemController extends Controller
                     $q->whereHas('ContractWms.company', function ($k) use ($user) {
                         $k->where('co_no', $user->co_no);
                     });
-                })->whereNotNull('stock')->orderBy('product_id', 'DESC');
+                })->whereNotNull('stock')->groupby('product_id')->groupby('option_id')->orderBy('product_id', 'DESC');
             } else if ($user->mb_type == 'spasys') {
                 // $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->select('item.*', 'stock_status_bad.stock')
                 //     ->leftjoin(DB::raw('stock_status_bad'), function ($leftJoin) {
