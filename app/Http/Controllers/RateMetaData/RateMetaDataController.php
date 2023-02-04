@@ -12,7 +12,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Http\Requests\RateMetaData\RateMetaDataSearchRequest;
-
+use App\Models\Company;
 class RateMetaDataController extends Controller
 {
     /**
@@ -161,11 +161,14 @@ class RateMetaDataController extends Controller
             ->where('co_no',$request->co_no)
             ->orderBy('rmd_no', 'DESC');
             if($request->co_service){
-            $rmd->whereHas('company', function($rm){
-                $rm->where('co_service','!=','')->orWhereNotNull('co_service');
-            });
+                $company_check = Company::where('co_no',$request->co_no)->first();
             }
             $rmd = $rmd->get();
+            if($request->co_service){
+            if(count($rmd) == 0 && ($company_check->co_service == '' || $company_check->co_service == null)){
+                $rmd = ['123'=>'123'];
+            }
+            }
             
 
 
