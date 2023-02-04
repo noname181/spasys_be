@@ -4236,11 +4236,15 @@ class WarehousingController extends Controller
             // });
 
             if (isset($validated['from_date'])) {
-                $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                $warehousing->whereHas('t_import', function($q) use ($validated){
+                    $q->where('ti_i_date', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                });
             }
 
             if (isset($validated['to_date'])) {
-                $warehousing->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                $warehousing->whereHas('t_import', function($q) use ($validated){
+                    $q->where('ti_i_date', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                });
             }
 
             if (isset($validated['co_parent_name'])) {
@@ -4248,12 +4252,18 @@ class WarehousingController extends Controller
                     $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
                 });
             }
+            if (isset($validated['h_bl'])) {
+                $warehousing->whereHas('t_import_expected', function($q) use ($validated){
+                    $q->where(DB::raw('lower(tie_h_bl)'), 'like', '%' . strtolower($validated['h_bl']) . '%');
+                });
+            }
+           
             if (isset($validated['co_name'])) {
                 $warehousing->whereHas('w_no.co_no', function ($q) use ($validated) {
                     return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
                 });
             }
-            if (isset($validated['settlement_cycle'])) {
+            if (isset($validated['settlement_cycle']) && $validated['settlement_cycle'] != '전체') {
                 $warehousing->whereHas('w_no.co_no.company_bonded_cycle', function ($q) use ($validated) {
                     return $q->where('cs_payment_cycle', $validated['settlement_cycle']);
                 });
@@ -4263,42 +4273,8 @@ class WarehousingController extends Controller
                     return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
                 });
             }
-            if (isset($validated['rgd_status1'])) {
-                $warehousing->where('rgd_status1', '=', $validated['rgd_status1']);
-            }
-            if (isset($validated['rgd_status2'])) {
-                $warehousing->where('rgd_status2', '=', $validated['rgd_status2']);
-            }
-            if (isset($validated['rgd_status3'])) {
-                $warehousing->where('rgd_status3', '=', $validated['rgd_status3']);
-            }
-            if (isset($validated['item_brand'])) {
-                $warehousing->whereHas('w_no.warehousing_item.item_no', function ($q) use ($validated) {
-                    return $q->where(DB::raw('lower(item_brand)'), 'like', '%' . strtolower($validated['item_brand']) . '%');
-                });
-            }
-            if (isset($validated['item_bar_code'])) {
-                $warehousing->whereHas('w_no.warehousing_item.item_no', function ($q) use ($validated) {
-                    return $q->where(DB::raw('lower(item_bar_code)'), 'like', '%' . strtolower($validated['item_bar_code']) . '%');
-                });
-            }
-            if (isset($validated['item_cargo_bar_code'])) {
-                $warehousing->whereHas('w_no.warehousing_item.item_no', function ($q) use ($validated) {
-                    return $q->where(DB::raw('lower(item_cargo_bar_code)'), 'like', '%' . strtolower($validated['item_cargo_bar_code']) . '%');
-                });
-            }
-            if (isset($validated['item_upc_code'])) {
-                $warehousing->whereHas('w_no.warehousing_item.item_no', function ($q) use ($validated) {
-                    return $q->where(DB::raw('lower(item_upc_code)'), 'like', '%' . strtolower($validated['item_upc_code']) . '%');
-                });
-            }
-            if (isset($validated['rgd_status3_1']) || isset($validated['rgd_status3_2']) || isset($validated['rgd_status3_3'])) {
-                $warehousing->where(function ($q) use ($validated) {
-                    $q->Where('rgd_status3', '=', $validated['rgd_status3_1'] ? $validated['rgd_status3_1'] : "")
-                        ->orWhere('rgd_status3', '=', $validated['rgd_status3_2'] ? $validated['rgd_status3_2'] : "")
-                        ->orWhere('rgd_status3', '=', $validated['rgd_status3_3'] ? $validated['rgd_status3_3'] : "");
-                });
-            }
+           
+    
             $warehousing->orderBy('rgd_tracking_code', 'DESC');
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             //return DB::getQueryLog();
