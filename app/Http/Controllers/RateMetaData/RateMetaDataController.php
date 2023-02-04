@@ -145,7 +145,7 @@ class RateMetaDataController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
-    public function checkCO($request)
+    public function checkCO(Request $request)
     {
     
         try {
@@ -153,20 +153,25 @@ class RateMetaDataController extends Controller
             // If per_page is null set default data = 15
           
             // If page is null set default data = 1
-            
+            DB::enableQueryLog();
             $rmd = RateMetaData::with(['rate_meta', 'member:mb_no,co_no,mb_name', 'company'])
             ->whereNotNull('co_no')
             ->whereNull('rmd_parent_no')
             ->whereNull('set_type')
-            ->where('co_no',$request)
-            ->orderBy('rmd_no', 'DESC')->get();
+            ->where('co_no',$request->co_no)
+            ->orderBy('rmd_no', 'DESC');
+            if($request->co_service){
+            $rmd->whereHas('company', function($rm){
+                $rm->where('co_service','!=','')->orWhereNotNull('co_service');
+            });
+            }
+            $rmd = $rmd->get();
             
 
 
             return response()->json($rmd);
         } catch (\Exception $e) {
             Log::error($e);
-
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
