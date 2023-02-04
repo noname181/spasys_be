@@ -1379,6 +1379,8 @@ class RateDataController extends Controller
                     'mb_no' => $user->mb_no,
                     'rmd_number' => isset($request->activeTab2) ? $request->activeTab2 : null,
                     'rmd_service' => isset($request->activeTab2) ? $request->activeTab2 : null,
+                    'rmd_tab_child' => isset($request->rmd_tab_child) ? $request->rmd_tab_child : null,
+
                 ]
             );
 
@@ -1795,6 +1797,7 @@ class RateDataController extends Controller
                         'rmd_number' => CommonFunc::generate_rmd_number($request['co_no'], $index),
                         'set_type' => 'estimated_costs',
                         'rmd_service' => $request->activeTab2,
+                        'rmd_tab_child' => $request->rmd_tab_child,
                     ]);
                 }
 

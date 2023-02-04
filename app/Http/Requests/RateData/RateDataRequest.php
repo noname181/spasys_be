@@ -152,6 +152,9 @@ class RateDataRequest extends BaseFormRequest
             'rmd_service' => [
                 ''
             ],
+            'rmd_tab_child' => [
+                ''
+            ],
         ];
     }
 
