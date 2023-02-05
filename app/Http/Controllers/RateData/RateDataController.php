@@ -3034,7 +3034,7 @@ class RateDataController extends Controller
         try {
             DB::beginTransaction();
             $user = Auth::user();
-            $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd_no)->first();
+            $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general'])->where('rgd_no', $rgd_no)->first();
             $co_no = $rgd->warehousing->co_no;
             $adjustmentgroupall = AdjustmentGroup::where('co_no', $co_no)->get();
             $created_at = Carbon::createFromFormat('Y.m.d H:i:s', $rgd->created_at->format('Y.m.d H:i:s'));
@@ -3046,6 +3046,9 @@ class RateDataController extends Controller
                 ->whereHas('w_no', function ($q) use ($co_no) {
                     $q->where('co_no', $co_no)
                         ->where('w_category_name', '보세화물');
+                })
+                ->whereHas('rate_data_general', function($q) use($rgd){
+                    $q->where('ag_no', $rgd->rate_data_general->ag_no);
                 })
                 ->where('rgd_status1', '=', '입고')
                 ->where('rgd_bill_type', $bill_type)
@@ -3506,8 +3509,8 @@ class RateDataController extends Controller
                         RateDataGeneral::where('rdg_no', $final_rdg->rdg_no)->update([
                             'rgd_no' => $final_rgd->rgd_no,
                             'rgd_no_expectation' => $expectation_rgd->rgd_no,
-                            'rdg_set_type' => isset($ag->ag_name) ? $ag->ag_name : null,
-                            'ag_no' => isset($ag->ag_no) ? $ag->ag_no : null,
+                            'rdg_set_type' => isset($ag->ag_name) ? $ag->ag_name : $is_exist->rdg_set_type,
+                            'ag_no' => isset($ag->ag_no) ? $ag->ag_no : $is_exist->ag_no,
                         ]);
                         RateMetaData::where('rgd_no', $request->rgd_no)->where(function ($q) {
                             $q->where('set_type', 'bonded1_final_monthly')
