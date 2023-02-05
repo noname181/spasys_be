@@ -98,6 +98,9 @@ class RateMetaDataController extends Controller
             ->whereHas('member', function($q) use($user){
                 $q->where('co_no', $user->co_no);
             })
+            ->whereHas('company', function($q) use($user){
+                $q->where('co_type', '!=', 'spasys');
+            })
             ->whereNull('set_type')
             ->orderBy('rmd_no', 'DESC');
             if(isset($validated['from_date'])) {
@@ -147,11 +150,11 @@ class RateMetaDataController extends Controller
     }
     public function checkCO(Request $request)
     {
-    
+
         try {
             $user = Auth::user();
             // If per_page is null set default data = 15
-          
+
             // If page is null set default data = 1
             DB::enableQueryLog();
             $rmd = RateMetaData::with(['rate_meta', 'member:mb_no,co_no,mb_name', 'company'])
@@ -169,7 +172,7 @@ class RateMetaDataController extends Controller
                 $rmd = ['123'=>'123'];
             }
             }
-            
+
 
 
             return response()->json($rmd);
