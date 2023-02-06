@@ -82,10 +82,15 @@ class ServiceController extends Controller
         try {
             $company = Company::where('co_no', $co_no)->first();
             if($company->co_type == 'spasys'){
-                $services = Service::where('service_use_yn', 'y')->where('service_no', '!=', 1)->get();
+                $services = Service::where('service_use_yn', 'y')->get();
             }else {
                 $co_service_array = explode(" ", $company->co_service);
-                $services = Service::where('service_use_yn', 'y')->whereIN("service_name", $co_service_array)->get();
+                if(count($co_service_array) > 1){
+                    $services = Service::where('service_use_yn', 'y')->whereIN("service_name", $co_service_array)->orWhere('service_no', '=', 1)->get();
+                } else {
+                    $services = Service::where('service_use_yn', 'y')->whereIN("service_name", $co_service_array)->get();
+                }
+               
             }
 
             DB::commit();

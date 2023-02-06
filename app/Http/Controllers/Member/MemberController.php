@@ -149,7 +149,7 @@ class MemberController extends Controller
             $member = Member::with('company')->where('mb_no', $mb_no)->first();
 
             if ($member->company->co_type == 'spasys') {
-                $services = Service::where('service_use_yn', 'y')->where('service_no', '!=', 1)->get();
+                $services = Service::where('service_use_yn', 'y')->get();
             } else {
                 $co_service_array = explode(" ", $member->company->co_service);
                 $services = Service::whereIN("service_name", $co_service_array)->get();
