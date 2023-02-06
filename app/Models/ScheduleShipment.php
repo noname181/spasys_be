@@ -50,6 +50,7 @@ class ScheduleShipment extends Model
         'recv_zip',
         'memo',
         'status',
+        'delivery_status',
         'order_cs',
         'collect_date',
         'order_date',
