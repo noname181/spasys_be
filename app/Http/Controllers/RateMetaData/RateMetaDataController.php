@@ -169,7 +169,7 @@ class RateMetaDataController extends Controller
             $rmd = $rmd->get();
             if($request->co_service){
             if(count($rmd) == 0 && ($company_check->co_service == '' || $company_check->co_service == null)){
-                $rmd = ['123'=>'123'];
+                $rmd = ['no_services'=>'123'];
             }
             }
 
