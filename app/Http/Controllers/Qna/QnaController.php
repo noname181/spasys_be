@@ -419,7 +419,7 @@ class QnaController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            if($member_type->mb_type == 'spasys'){
+            //if($member_type->mb_type == 'spasys'){
                 $qna = Qna::with('member')->where('qna_status','!=','삭제')->where(function ($query) use ($member_type){
                     $query->where('co_no_target', '=', Auth::user()->co_no)
                         ->orWhereHas('member',function ($query) use ($member_type){
@@ -441,28 +441,28 @@ class QnaController extends Controller
                 ->orderBy('answer_for')
                 ->orderBy('depth_path','DESC')
                 ->orderBy('qna_no', 'DESC');
-            } else {
-                $qna = Qna::where('qna_status','!=','삭제')->where(function ($query) {
-                    $query->where('mb_no_target', '=', Auth::user()->mb_no)
-                        ->orWhere('mb_no', '=', Auth::user()->mb_no);
-                })->with(['mb_no_target'=>function($query){
-                }])->with(['mb_no'=>function($query){
-                    $query->select(['mb_name','mb_no']);
-                }])->with('files')->with(['childQna'=>function($query){
+            // } else {
+            //     $qna = Qna::where('qna_status','!=','삭제')->where(function ($query) {
+            //         $query->where('mb_no_target', '=', Auth::user()->mb_no)
+            //             ->orWhere('mb_no', '=', Auth::user()->mb_no);
+            //     })->with(['mb_no_target'=>function($query){
+            //     }])->with(['mb_no'=>function($query){
+            //         $query->select(['mb_name','mb_no']);
+            //     }])->with('files')->with(['childQna'=>function($query){
 
-                    $query->with('files')->with(['mb_no_target'=>function($query){
-                        $query->select(['mb_name','mb_no']);
-                    }])->with(['mb_no'=>function($query){
-                        $query->select(['mb_name','mb_no']);
-                    }]);
+            //         $query->with('files')->with(['mb_no_target'=>function($query){
+            //             $query->select(['mb_name','mb_no']);
+            //         }])->with(['mb_no'=>function($query){
+            //             $query->select(['mb_name','mb_no']);
+            //         }]);
 
-                }])->with(['member' => function($query){
+            //     }])->with(['member' => function($query){
 
-                }])
-                ->orderBy('answer_for')
-                ->orderBy('depth_path','DESC')
-                ->orderBy('qna_no', 'DESC');
-            }
+            //     }])
+            //     ->orderBy('answer_for')
+            //     ->orderBy('depth_path','DESC')
+            //     ->orderBy('qna_no', 'DESC');
+            // }
             if (isset($validated['from_date'])) {
                 $qna->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
