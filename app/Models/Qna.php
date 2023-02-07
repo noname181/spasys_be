@@ -24,6 +24,7 @@ class Qna extends Model
      */
     protected $fillable = [
         'qna_no',
+        'co_no_target',
         'mb_no',
         'qna_status',
         'mb_no_target',
