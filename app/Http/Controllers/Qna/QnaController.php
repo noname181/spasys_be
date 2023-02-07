@@ -12,6 +12,7 @@ use App\Models\Qna;
 use App\Utils\Messages;
 use App\Models\File;
 use App\Models\Member;
+use App\Models\Company;
 use DateTime;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
@@ -419,11 +420,12 @@ class QnaController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
             if($member_type->mb_type == 'spasys'){
-                $qna = Qna::where('qna_status','!=','삭제')->where(function ($query) use ($member_type){
-                    $query->where('mb_no_target', '=', Auth::user()->mb_no)
-                        ->orWhere('mb_no', '=', Auth::user()->mb_no)->orwhere('spasys_no',$member_type->co_no);
-                })->with(['mb_no_target'=>function($query){
-                }])->with(['mb_no'=>function($query){
+                $qna = Qna::with('member')->where('qna_status','!=','삭제')->where(function ($query) use ($member_type){
+                    $query->where('co_no_target', '=', Auth::user()->co_no)
+                        ->orWhereHas('member',function ($query) use ($member_type){
+                            $query->where('co_no','=',$member_type->co_no);
+                        });
+                })->with(['mb_no'=>function($query){
                     $query->select(['mb_name','mb_no']);
                 }])->with('files')->with(['childQna'=>function($query){
 
