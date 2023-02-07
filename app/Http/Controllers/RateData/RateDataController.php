@@ -1368,7 +1368,7 @@ class RateDataController extends Controller
     {
         try {
             $user = Auth::user();
-
+            $index = RateMetaData::where('co_no', $request['co_no'])->where('set_type', 'precalculate')->get()->count() + 1;
             $rmd = RateMetaData::updateOrCreate(
                 [
                     'rmd_no' => isset($request->rmd_no) ? $request->rmd_no : null,
@@ -1377,7 +1377,7 @@ class RateDataController extends Controller
                 ],
                 [
                     'mb_no' => $user->mb_no,
-                    'rmd_number' => isset($request->activeTab2) ? $request->activeTab2 : null,
+                    'rmd_number' => CommonFunc::generate_rmd_number($request['co_no'], $index),
                     'rmd_service' => isset($request->activeTab2) ? $request->activeTab2 : null,
                     'rmd_tab_child' => isset($request->rmd_tab_child) ? $request->rmd_tab_child : null,
 
