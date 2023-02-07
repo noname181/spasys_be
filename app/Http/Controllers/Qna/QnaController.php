@@ -70,40 +70,50 @@ class QnaController extends Controller
         try {
             DB::beginTransaction();
             // FIXME hard set mb_no = 1
-            $member2 = Member::with('company')->where('mb_no', $validated['mb_no_target'])->first();
+            //$member2 = Member::with('company')->where('mb_no', $validated['mb_no_target'])->first();
             $member = Member::with('company')->where('mb_id', Auth::user()->mb_id)->first();
           
-            if($member->mb_type != 'spasys' && $member2->mb_type != 'spasys'){
-                if($member->mb_type == 'shop'){
-                    $spasys_no = $member->company->co_parent_no;
-                } else if($member2->mb_type == 'shop'){
-                    $spasys_no = $member2->company->co_parent_no;
-                }
-                $data_qna = [
-                    'mb_no' => $member->mb_no,
-                    'qna_status' => $validated['qna_status'],
-                    'mb_no_target' => $validated['mb_no_target'],
-                    'qna_title' => $validated['qna_title'],
-                    'qna_content' => $validated['qna_content'],
-                    'answer_for' => 0,
-                    'depth_path' => '',
-                    'depth_level' => 0,
-                    'spasys_no'=>$spasys_no
-                ];
-            } else {
-                $data_qna = [
-                    'mb_no' => $member->mb_no,
-                    'qna_status' => $validated['qna_status'],
-                    'mb_no_target' => $validated['mb_no_target'],
-                    'qna_title' => $validated['qna_title'],
-                    'qna_content' => $validated['qna_content'],
-                    'answer_for' => 0,
-                    'depth_path' => '',
-                    'depth_level' => 0,
-                    'spasys_no'=>null
+            // if($member->mb_type != 'spasys' && $member2->mb_type != 'spasys'){
+            //     if($member->mb_type == 'shop'){
+            //         $spasys_no = $member->company->co_parent_no;
+            //     } else if($member2->mb_type == 'shop'){
+            //         $spasys_no = $member2->company->co_parent_no;
+            //     }
+            //     $data_qna = [
+            //         'mb_no' => $member->mb_no,
+            //         'qna_status' => $validated['qna_status'],
+            //         'mb_no_target' => $validated['mb_no_target'],
+            //         'qna_title' => $validated['qna_title'],
+            //         'qna_content' => $validated['qna_content'],
+            //         'answer_for' => 0,
+            //         'depth_path' => '',
+            //         'depth_level' => 0,
+            //         'spasys_no'=>$spasys_no
+            //     ];
+            // } else {
+            //     $data_qna = [
+            //         'mb_no' => $member->mb_no,
+            //         'qna_status' => $validated['qna_status'],
+            //         'mb_no_target' => $validated['mb_no_target'],
+            //         'qna_title' => $validated['qna_title'],
+            //         'qna_content' => $validated['qna_content'],
+            //         'answer_for' => 0,
+            //         'depth_path' => '',
+            //         'depth_level' => 0,
+            //         'spasys_no'=>null
                    
-                ];
-            }
+            //     ];
+            // }
+            $data_qna = [
+                        'mb_no' => $member->mb_no,
+                        'qna_status' => $validated['qna_status'],
+                        'qna_title' => $validated['qna_title'],
+                        'qna_content' => $validated['qna_content'],
+                        'answer_for' => 0,
+                        'depth_path' => '',
+                        'depth_level' => 0,
+                        'co_no_target' => $validated['mb_no_target'],
+                    ];
             $qna_no = Qna::insertGetId($data_qna);
 
             Qna::where('qna_no', $qna_no)->update([
@@ -231,6 +241,7 @@ class QnaController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }

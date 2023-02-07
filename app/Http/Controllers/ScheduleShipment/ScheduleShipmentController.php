@@ -238,6 +238,7 @@ class ScheduleShipmentController extends Controller
                     'recv_zip' => isset($schedule['recv_zip']) ? $schedule['recv_zip'] : null,
                     'memo' => isset($schedule['memo']) ? $schedule['memo'] : null,
                     'status' => isset($schedule['status']) ? $schedule['status'] : null,
+                    'delivery_status' => '택배',
                     'order_cs' => isset($schedule['order_cs']) ? $schedule['order_cs'] : null,
                     'collect_date' => isset($schedule['collect_date']) ? $schedule['collect_date'] : null,
                     'order_date' => isset($schedule['order_date']) ? ($schedule['order_date'] != '0000-00-00 00:00:00' ? $schedule['order_date'] : null) : null,
@@ -348,6 +349,7 @@ class ScheduleShipmentController extends Controller
                         'memo' => isset($schedule_item['memo']) ? $schedule_item['memo'] : null,
                         //'status' => isset($schedule_item['trans_no']) && $schedule_item['trans_no'] != '' ? '출고' : '출고예정',
                         'status' => isset($schedule_item['status']) && $schedule_item['status'] == 8 ? '출고' : '출고예정',
+                        'delivery_status' => '택배',
                         'order_cs' => isset($schedule_item['order_cs']) ? $schedule_item['order_cs'] : null,
                         'collect_date' => isset($schedule_item['collect_date']) ? $schedule_item['collect_date'] : null,
                         'order_date' => isset($schedule_item['order_date']) ? ((int)$schedule_item['order_date'] > 2022 ? $schedule_item['order_date'] : null) : null,
@@ -469,6 +471,7 @@ class ScheduleShipmentController extends Controller
                     'recv_zip' => isset($schedule['recv_zip']) ? $schedule['recv_zip'] : null,
                     'memo' => isset($schedule['memo']) ? $schedule['memo'] : null,
                     'status' => isset($schedule['status']) ? $schedule['status'] : null,
+                    'delivery_status' => '택배',
                     'order_cs' => isset($schedule['order_cs']) ? $schedule['order_cs'] : null,
                     'collect_date' => isset($schedule['collect_date']) ? $schedule['collect_date'] : null,
                     'order_date' => isset($schedule['order_date']) ? ($schedule['order_date'] != '0000-00-00 00:00:00' ? $schedule['order_date'] : null) : null,
@@ -909,7 +912,7 @@ class ScheduleShipmentController extends Controller
         }
         if (empty($api_data['data'])) {
             return response()->json([
-                'param' => $url_api,
+                //'param' => $url_api,
                 'message' => '완료되었습니다.',
                 'status' => 0
             ], 200);
