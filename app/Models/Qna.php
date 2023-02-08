@@ -27,6 +27,7 @@ class Qna extends Model
         'qna_no',
         'co_no_target',
         'mb_no',
+        'mb_no_question',
         'qna_status',
         'mb_no_target',
         'qna_title',
@@ -71,5 +72,9 @@ class Qna extends Model
     public function company()
     {
         return $this->belongsTo(Company::class, 'co_no_target', 'co_no')->with('co_parent');
+    }
+    public function member_question()
+    {
+        return $this->belongsTo(Member::class, 'mb_no_question', 'mb_no')->with('company');
     }
 }

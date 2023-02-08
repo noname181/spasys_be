@@ -111,7 +111,8 @@ class QnaController extends Controller
             $qna_no = Qna::insertGetId($data_qna);
 
             Qna::where('qna_no', $qna_no)->update([
-                'depth_path' => '-'.$qna_no.'-'
+                'depth_path' => '-'.$qna_no.'-',
+                'answer_for' => $qna_no,
             ]);
 
             $path = join('/', ['files', 'qna', $qna_no]);
@@ -187,6 +188,7 @@ class QnaController extends Controller
                 'answer_for' => $answer_for == 0 ? $validated['qna_no'] : $answer_for,
                 'depth_path' => '',
                 'depth_level' => $depth_level,
+                'mb_no_question' => $mb_no_target,
             ]);
             } else {
                 $qna_no = Qna::insertGetId([
@@ -199,6 +201,7 @@ class QnaController extends Controller
                     'spasys_no'=>null,
                     'depth_path' => '',
                     'depth_level' => $depth_level,
+                    'mb_no_question' => $mb_no_target,
                 ]);
             }
 
@@ -412,13 +415,13 @@ class QnaController extends Controller
         try {
             $validated = $request->validated();
 
-            $member_type = Member::with('company')->where('mb_id', Auth::user()->mb_id)->first();
+            $member_type = Member::with(['company'])->where('mb_id', Auth::user()->mb_id)->first();
             // If per_page is null set default data = 15
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
             if($member_type->mb_type == 'spasys'){
-                $qna = Qna::with(['member','company'])->where('qna_status','!=','삭제')->where(function ($query) use ($member_type){
+                $qna = Qna::with(['member','company','member_question'])->where('qna_status','!=','삭제')->where(function ($query) use ($member_type){
                     $query->where('co_no_target', '=', Auth::user()->co_no)->orwhere('spasys_no',$member_type->co_no)
                         ->orWhereHas('member',function ($query) use ($member_type){
                             $query->where('co_no','=',$member_type->co_no);
@@ -436,12 +439,12 @@ class QnaController extends Controller
                 }])->with(['member' => function($query){
 
                 }])
-                ->orderBy('answer_for')
-                ->orderBy('depth_path','DESC')
+                ->orderBy('answer_for','DESC')
+                ->orderBy('depth_path','ASC')
                 ->orderBy('qna_no', 'DESC');
             } else {
-                $qna = Qna::with(['member','company'])->where('qna_status','!=','삭제')->where(function ($query) use ($member_type) {
-                    $query->where('co_no_target', '=', Auth::user()->co_no)
+                $qna = Qna::with(['member','company','member_question'])->where('qna_status','!=','삭제')->where(function ($query) use ($member_type) {
+                    $query->where('co_no_target', '=', Auth::user()->co_no)->orWhere('mb_no_question',$member_type->mb_no)
                         ->orWhereHas('member',function ($query) use ($member_type){
                             $query->where('co_no','=',$member_type->co_no);
                         });
@@ -458,8 +461,8 @@ class QnaController extends Controller
                 }])->with(['member' => function($query){
 
                 }])
-                ->orderBy('answer_for')
-                ->orderBy('depth_path','DESC')
+                ->orderBy('answer_for','DESC')
+                ->orderBy('depth_path','ASC')
                 ->orderBy('qna_no', 'DESC');
             }
             if (isset($validated['from_date'])) {
