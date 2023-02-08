@@ -71,50 +71,43 @@ class QnaController extends Controller
         try {
             DB::beginTransaction();
             // FIXME hard set mb_no = 1
-            //$member2 = Member::with('company')->where('mb_no', $validated['mb_no_target'])->first();
+            $member2 = Company::where('co_no', $validated['mb_no_target'])->first();
             $member = Member::with('company')->where('mb_id', Auth::user()->mb_id)->first();
           
-            // if($member->mb_type != 'spasys' && $member2->mb_type != 'spasys'){
-            //     if($member->mb_type == 'shop'){
-            //         $spasys_no = $member->company->co_parent_no;
-            //     } else if($member2->mb_type == 'shop'){
-            //         $spasys_no = $member2->company->co_parent_no;
-            //     }
-            //     $data_qna = [
-            //         'mb_no' => $member->mb_no,
-            //         'qna_status' => $validated['qna_status'],
-            //         'mb_no_target' => $validated['mb_no_target'],
-            //         'qna_title' => $validated['qna_title'],
-            //         'qna_content' => $validated['qna_content'],
-            //         'answer_for' => 0,
-            //         'depth_path' => '',
-            //         'depth_level' => 0,
-            //         'spasys_no'=>$spasys_no
-            //     ];
-            // } else {
-            //     $data_qna = [
-            //         'mb_no' => $member->mb_no,
-            //         'qna_status' => $validated['qna_status'],
-            //         'mb_no_target' => $validated['mb_no_target'],
-            //         'qna_title' => $validated['qna_title'],
-            //         'qna_content' => $validated['qna_content'],
-            //         'answer_for' => 0,
-            //         'depth_path' => '',
-            //         'depth_level' => 0,
-            //         'spasys_no'=>null
-                   
-            //     ];
-            // }
-            $data_qna = [
+            if($member->mb_type != 'spasys' && $member2->co_type != 'spasys'){
+                if($member->mb_type == 'shop'){
+                    $spasys_no = $member->company->co_parent_no;
+                } else if($member2->co_type == 'shop'){
+                    $spasys_no = $member2->co_parent_no;
+                }
+                    $data_qna = [
                         'mb_no' => $member->mb_no,
                         'qna_status' => $validated['qna_status'],
+                        'co_no_target' => $validated['mb_no_target'],
                         'qna_title' => $validated['qna_title'],
                         'qna_content' => $validated['qna_content'],
                         'answer_for' => 0,
                         'depth_path' => '',
                         'depth_level' => 0,
-                        'co_no_target' => $validated['mb_no_target'],
+                        'spasys_no'=>$spasys_no
+
                     ];
+                
+            } else {
+                $data_qna = [
+                    'mb_no' => $member->mb_no,
+                    'qna_status' => $validated['qna_status'],
+                    'co_no_target' => $validated['mb_no_target'],
+                    'qna_title' => $validated['qna_title'],
+                    'qna_content' => $validated['qna_content'],
+                    'answer_for' => 0,
+                    'depth_path' => '',
+                    'depth_level' => 0,
+                    'spasys_no'=>null
+                   
+                ];
+            }
+            
             $qna_no = Qna::insertGetId($data_qna);
 
             Qna::where('qna_no', $qna_no)->update([
@@ -170,19 +163,19 @@ class QnaController extends Controller
                 'qna_status' => $validated['qna_status']
             ]);
             //$member = Member::where('mb_id', Auth::user()->mb_id)->first();
-            $member2 = Member::with('company')->where('mb_no', $mb_no_target)->first();
+            $member2 = Company::where('co_no', $co_no_target)->first();
             $member = Member::with('company')->where('mb_id', Auth::user()->mb_id)->first();
             $depth_level = $depth_level + 1;
 
-            // if($member->mb_type != 'spasys' && $member2->mb_type != 'spasys'){
-            //     if($member->mb_type == 'shop'){
-            //         $spasys_no = $member->company->co_parent_no;
-            //     } else if($member2->mb_type == 'shop'){
-            //         $spasys_no = $member2->company->co_parent_no;
-            //     }
+            if($member->mb_type != 'spasys' && $member2->co_type != 'spasys'){
+                if($member->mb_type == 'shop'){
+                    $spasys_no = $member->company->co_parent_no;
+                } else if($member2->co_type == 'shop'){
+                    $spasys_no = $member2->co_parent_no;
+                }
             $qna_no = Qna::insertGetId([
                 'mb_no' => $member->mb_no,
-                //'spasys_no'=>$spasys_no,
+                'spasys_no'=>$spasys_no,
                 'qna_status' => 'receipt',
                 'co_no_target' => $co_no_target,
                 'qna_title' => $validated['qna_title'],
@@ -191,19 +184,19 @@ class QnaController extends Controller
                 'depth_path' => '',
                 'depth_level' => $depth_level,
             ]);
-            // } else {
-            //     $qna_no = Qna::insertGetId([
-            //         'mb_no' => $member->mb_no,
-            //         'qna_status' => 'receipt',
-            //         'mb_no_target' => $mb_no_target,
-            //         'qna_title' => $validated['qna_title'],
-            //         'qna_content' => $validated['qna_content'],
-            //         'answer_for' => $answer_for == 0 ? $validated['qna_no'] : $answer_for,
-            //         'spasys_no'=>null,
-            //         'depth_path' => '',
-            //         'depth_level' => $depth_level,
-            //     ]);
-            // }
+            } else {
+                $qna_no = Qna::insertGetId([
+                    'mb_no' => $member->mb_no,
+                    'qna_status' => 'receipt',
+                    'co_no_target' => $co_no_target,
+                    'qna_title' => $validated['qna_title'],
+                    'qna_content' => $validated['qna_content'],
+                    'answer_for' => $answer_for == 0 ? $validated['qna_no'] : $answer_for,
+                    'spasys_no'=>null,
+                    'depth_path' => '',
+                    'depth_level' => $depth_level,
+                ]);
+            }
 
             $qna  = Qna::where('qna_no', $answer_for == 0 ? $validated['qna_no'] : $answer_for)->first();
             if ($qna && $qna['depth_level'] < 5) {
@@ -420,8 +413,30 @@ class QnaController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            //if($member_type->mb_type == 'spasys'){
+            if($member_type->mb_type == 'spasys'){
                 $qna = Qna::with(['member','company'])->where('qna_status','!=','삭제')->where(function ($query) use ($member_type){
+                    $query->where('co_no_target', '=', Auth::user()->co_no)->orwhere('spasys_no',$member_type->co_no)
+                        ->orWhereHas('member',function ($query) use ($member_type){
+                            $query->where('co_no','=',$member_type->co_no);
+                        });
+                })->with(['mb_no'=>function($query){
+                    $query->select(['mb_name','mb_no']);
+                }])->with('files')->with(['childQna'=>function($query){
+
+                    $query->with('files')->with(['mb_no_target'=>function($query){
+                        $query->select(['mb_name','mb_no']);
+                    }])->with(['mb_no'=>function($query){
+                        $query->select(['mb_name','mb_no']);
+                    }]);
+
+                }])->with(['member' => function($query){
+
+                }])
+                ->orderBy('answer_for')
+                ->orderBy('depth_path','DESC')
+                ->orderBy('qna_no', 'DESC');
+            } else {
+                $qna = Qna::with(['member','company'])->where('qna_status','!=','삭제')->where(function ($query) use ($member_type) {
                     $query->where('co_no_target', '=', Auth::user()->co_no)
                         ->orWhereHas('member',function ($query) use ($member_type){
                             $query->where('co_no','=',$member_type->co_no);
@@ -442,28 +457,7 @@ class QnaController extends Controller
                 ->orderBy('answer_for')
                 ->orderBy('depth_path','DESC')
                 ->orderBy('qna_no', 'DESC');
-            // } else {
-            //     $qna = Qna::where('qna_status','!=','삭제')->where(function ($query) {
-            //         $query->where('mb_no_target', '=', Auth::user()->mb_no)
-            //             ->orWhere('mb_no', '=', Auth::user()->mb_no);
-            //     })->with(['mb_no_target'=>function($query){
-            //     }])->with(['mb_no'=>function($query){
-            //         $query->select(['mb_name','mb_no']);
-            //     }])->with('files')->with(['childQna'=>function($query){
-
-            //         $query->with('files')->with(['mb_no_target'=>function($query){
-            //             $query->select(['mb_name','mb_no']);
-            //         }])->with(['mb_no'=>function($query){
-            //             $query->select(['mb_name','mb_no']);
-            //         }]);
-
-            //     }])->with(['member' => function($query){
-
-            //     }])
-            //     ->orderBy('answer_for')
-            //     ->orderBy('depth_path','DESC')
-            //     ->orderBy('qna_no', 'DESC');
-            // }
+            }
             if (isset($validated['from_date'])) {
                 $qna->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
