@@ -506,33 +506,70 @@ class MemberController extends Controller
     {
         try {
             $user = Auth::user();
+            //OLD LOGIC
+
+            // if($user->mb_type == 'shop'){
+            //     $members = Member::with(['company'])
+            //     ->whereHas('company.co_parent',function ($q) use ($user){
+            //         $q->where('co_no', $user->co_no);
+            //     })
+            //     // ->orWhereHas('company',function ($q) use ($user){
+            //     //     $q->where('co_no', $user->company->co_parent->co_no);
+            //     // })
+            //     ->get();
+            // }else if($user->mb_type == 'spasys'){
+            //     $members = Member::with(['company'])
+            //     ->whereHas('company.co_parent.co_parent',function ($q) use ($user){
+            //         $q->where('co_no', $user->co_no);
+            //     })
+            //     ->orWhereHas('company.co_parent',function ($q) use ($user){
+            //         $q->where('co_no', $user->co_no);
+            //     })
+            //     ->get();
+            // }else if($user->mb_type == 'shipper'){
+            //     $members = Member::where('co_no', $user->company->co_parent->co_no)
+            //     ->orwhere('co_no', $user->company->co_parent->co_parent->co_no)
+            //     ->get();
+            // }
+
+            //NEW LOGIC
+            $company = Company::where('co_no', $user->co_no)->first();
             if($user->mb_type == 'shop'){
-                $members = Member::with(['company'])
-                ->whereHas('company.co_parent',function ($q) use ($user){
-                    $q->where('co_no', $user->co_no);
-                })
-                // ->orWhereHas('company',function ($q) use ($user){
-                //     $q->where('co_no', $user->company->co_parent->co_no);
-                // })
-                ->get();
+                $members = Company::with(['co_parent'])->where(function ($q) use ( $user) {
+
+                    $q->WhereHas('co_parent', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
+                    });
+    
+    
+                    // $q->whereHas('co_parent', function($q) use($co_no){
+                    //     $q->where('co_no', $co_no);
+                    // })->orWhereHas('co_parent.co_parent', function($q) use($co_no){
+                    //     $q->where('co_no', $co_no);
+                    // });
+                })->get();
             }else if($user->mb_type == 'spasys'){
-                $members = Member::with(['company'])
-                ->whereHas('company.co_parent.co_parent',function ($q) use ($user){
-                    $q->where('co_no', $user->co_no);
-                })
-                ->orWhereHas('company.co_parent',function ($q) use ($user){
-                    $q->where('co_no', $user->co_no);
-                })
-                ->get();
+                $members = Company::with(['co_parent'])->where(function ($q) use ( $user) {
+                    $q->WhereHas('co_parent', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no)
+                        ->orWhereHas('co_parent', function ($q) use ($user) {
+                            $q->where('co_no', $user->co_no);
+                        });
+                    });
+
+                })->get();
             }else if($user->mb_type == 'shipper'){
-                $members = Member::where('co_no', $user->company->co_parent->co_no)
-                ->orwhere('co_no', $user->company->co_parent->co_parent->co_no)
-                ->get();
+                $members = [];
+                $member2 = Company::with(['co_parent'])->where('co_no',$user->co_no)->first();
+                //$members[] = $member2;
+                $members[] = $member2->co_parent;
+                $members[] = $member2->co_parent->co_parent;
             }
 
             return response()->json(["member" => $members]);
         } catch (\Exception $e) {
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
 
