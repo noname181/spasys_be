@@ -1457,6 +1457,7 @@ class RateDataController extends Controller
     public function getRateData($rm_no, $rmd_no)
     {
         $co_no = Auth::user()->co_no;
+        $rmd = "";
         try {
             $rate_data1 = RateData::where('rm_no', $rm_no)->where('rmd_no', $rmd_no)->where('rd_cate_meta1', '보세화물')->get();
             $rate_data2 = RateData::where('rm_no', $rm_no)->where('rmd_no', $rmd_no)->where('rd_cate_meta1', '수입풀필먼트')->get();
@@ -1505,7 +1506,8 @@ class RateDataController extends Controller
                 'co_rate_data1' => $co_rate_data1,
                 'co_rate_data2' => $co_rate_data2,
                 'co_rate_data3' => $co_rate_data3,
-                'rmd_arr' => isset($rmd_arr) ? $rmd_arr : null
+                'rmd_arr' => isset($rmd_arr) ? $rmd_arr : null,
+                'rmd'=>$rmd
             ], 200);
 
         } catch (\Exception $e) {
