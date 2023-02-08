@@ -1368,7 +1368,10 @@ class RateDataController extends Controller
     {
         try {
             $user = Auth::user();
-            $index = RateMetaData::where('co_no', $request['co_no'])->where('set_type', 'precalculate')->get()->count() + 1;
+            $index = RateMetaData::where('co_no', $request['co_no'])->where(function($q){
+                $q->where('set_type', 'estimated_code')
+                ->orWhere('set_type', 'precalculate');
+            })->get()->count() + 1;
             $rmd = RateMetaData::updateOrCreate(
                 [
                     'rmd_no' => isset($request->rmd_no) ? $request->rmd_no : null,
@@ -1796,7 +1799,10 @@ class RateDataController extends Controller
                 );
             } else {
                 if (isset($request->co_no)) {
-                    $index = RateMetaData::where('rm_no', $request['co_no'])->get()->count() + 1;
+                    $index = RateMetaData::where('co_no', $request['co_no'])->where(function($q){
+                        $q->where('set_type', 'estimated_code')
+                        ->orWhere('set_type', 'precalculate');
+                    })->get()->count() + 1;
                     $rmd_no = RateMetaData::insertGetId([
                         'co_no' => $request->co_no,
                         'mb_no' => Auth::user()->mb_no,
