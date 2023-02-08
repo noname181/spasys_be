@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Member;
 use App\Models\File;
+use App\Models\Company;
 
 class Qna extends Model
 {
@@ -67,4 +68,8 @@ class Qna extends Model
         return $this->belongsTo(Member::class, 'mb_no', 'mb_no')->with('company');
     }
 
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'co_no_target', 'co_no')->with('co_parent');
+    }
 }

@@ -165,6 +165,7 @@ class QnaController extends Controller
             $depth_level = Qna::where('qna_no' ,'=' ,$validated['qna_no'])->first()['depth_level'];
             $answer_for = Qna::where('qna_no' ,'=' ,$validated['qna_no'])->first()['answer_for'];
             $mb_no_target = Qna::where('qna_no' ,'=' ,$validated['qna_no'])->first()['mb_no'];
+            $co_no_target = Qna::where('qna_no' ,'=' ,$validated['qna_no'])->first()['co_no_target'];
             $update_status = Qna::where('qna_no', $validated['qna_no'])->update([
                 'qna_status' => $validated['qna_status']
             ]);
@@ -173,36 +174,36 @@ class QnaController extends Controller
             $member = Member::with('company')->where('mb_id', Auth::user()->mb_id)->first();
             $depth_level = $depth_level + 1;
 
-            if($member->mb_type != 'spasys' && $member2->mb_type != 'spasys'){
-                if($member->mb_type == 'shop'){
-                    $spasys_no = $member->company->co_parent_no;
-                } else if($member2->mb_type == 'shop'){
-                    $spasys_no = $member2->company->co_parent_no;
-                }
+            // if($member->mb_type != 'spasys' && $member2->mb_type != 'spasys'){
+            //     if($member->mb_type == 'shop'){
+            //         $spasys_no = $member->company->co_parent_no;
+            //     } else if($member2->mb_type == 'shop'){
+            //         $spasys_no = $member2->company->co_parent_no;
+            //     }
             $qna_no = Qna::insertGetId([
                 'mb_no' => $member->mb_no,
-                'spasys_no'=>$spasys_no,
+                //'spasys_no'=>$spasys_no,
                 'qna_status' => 'receipt',
-                'mb_no_target' => $mb_no_target,
+                'co_no_target' => $co_no_target,
                 'qna_title' => $validated['qna_title'],
                 'qna_content' => $validated['qna_content'],
                 'answer_for' => $answer_for == 0 ? $validated['qna_no'] : $answer_for,
                 'depth_path' => '',
                 'depth_level' => $depth_level,
             ]);
-            } else {
-                $qna_no = Qna::insertGetId([
-                    'mb_no' => $member->mb_no,
-                    'qna_status' => 'receipt',
-                    'mb_no_target' => $mb_no_target,
-                    'qna_title' => $validated['qna_title'],
-                    'qna_content' => $validated['qna_content'],
-                    'answer_for' => $answer_for == 0 ? $validated['qna_no'] : $answer_for,
-                    'spasys_no'=>null,
-                    'depth_path' => '',
-                    'depth_level' => $depth_level,
-                ]);
-            }
+            // } else {
+            //     $qna_no = Qna::insertGetId([
+            //         'mb_no' => $member->mb_no,
+            //         'qna_status' => 'receipt',
+            //         'mb_no_target' => $mb_no_target,
+            //         'qna_title' => $validated['qna_title'],
+            //         'qna_content' => $validated['qna_content'],
+            //         'answer_for' => $answer_for == 0 ? $validated['qna_no'] : $answer_for,
+            //         'spasys_no'=>null,
+            //         'depth_path' => '',
+            //         'depth_level' => $depth_level,
+            //     ]);
+            // }
 
             $qna  = Qna::where('qna_no', $answer_for == 0 ? $validated['qna_no'] : $answer_for)->first();
             if ($qna && $qna['depth_level'] < 5) {
@@ -420,7 +421,7 @@ class QnaController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
             //if($member_type->mb_type == 'spasys'){
-                $qna = Qna::with('member')->where('qna_status','!=','삭제')->where(function ($query) use ($member_type){
+                $qna = Qna::with(['member','company'])->where('qna_status','!=','삭제')->where(function ($query) use ($member_type){
                     $query->where('co_no_target', '=', Auth::user()->co_no)
                         ->orWhereHas('member',function ($query) use ($member_type){
                             $query->where('co_no','=',$member_type->co_no);
