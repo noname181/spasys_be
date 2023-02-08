@@ -16,6 +16,7 @@ use App\Models\Package;
 use App\Models\ItemChannel;
 use App\Models\TaxInvoiceDivide;
 use App\Models\CancelBillHistory;
+//use App\Models\CargoConnect;
 use App\Utils\Messages;
 use App\Utils\CommonFunc;
 use Illuminate\Http\Request;
@@ -127,6 +128,20 @@ class ReceivingGoodsDeliveryController extends Controller
 
             if (isset($validated['connection_number'])) {
                 if (isset($validated['w_no'])) {
+                    
+                    // if ($validated['type_w_choose'] == "export") {
+                    //     CargoConnect::insertGetId([
+                    //         'w_no' => $validated['w_no'],
+                    //         'is_no' => $validated['connect_w'],
+                    //         'type' => "3_1"
+                    //     ]);
+                    // }else{
+                    //     CargoConnect::insertGetId([
+                    //         'w_no' => $validated['w_no'],
+                    //         'ss_no' => $validated['connect_w'],
+                    //         'type' => "3_2"
+                    //     ]);
+                    // }
                     Warehousing::where('w_no', $validated['w_no'])->update([
                         'connection_number' => $validated['connection_number']
                     ]);
@@ -153,6 +168,19 @@ class ReceivingGoodsDeliveryController extends Controller
                         ]);
                     }
                 } else {
+                    // if ($validated['type_w_choose'] == "export") {
+                    //     CargoConnect::insertGetId([
+                    //         'w_no' => $w_no_data,
+                    //         'is_no' => $validated['connect_w'],
+                    //         'type' => "3_1"
+                    //     ]);
+                    // }else{
+                    //     CargoConnect::insertGetId([
+                    //         'w_no' => $w_no_data,
+                    //         'ss_no' => $validated['connect_w'],
+                    //         'type' => "3_2"
+                    //     ]);
+                    // }
                     Warehousing::where('w_no', $w_no_data)->update([
                         'connection_number' => $validated['connection_number'] . $w_no_data
                     ]);
