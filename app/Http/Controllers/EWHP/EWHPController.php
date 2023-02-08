@@ -75,7 +75,13 @@ class EWHPController extends Controller
                     "ti_logistic_type" => $value['logistic_type'],
                     "ti_warehouse_code" => "abc001",
                 ]);
-                if($import >= 1){
+
+                if (isset($value['logistic_manage_number']) && $value['logistic_manage_number']) {
+                    ImportExpected::where('tie_logistic_manage_number', $value['logistic_manage_number'])->update([
+                        'tie_co_license' => isset($value['co_license']) ? $value['co_license'] : null,
+                    ]);
+                }
+                if ($import >= 1) {
                     $count++;
                 }
             }
@@ -120,7 +126,7 @@ class EWHPController extends Controller
                     "te_co_license" => $value['co_license'],
                     "te_logistic_type" => $value['logistic_type']
                 ]);
-                if($export >= 1){
+                if ($export >= 1) {
                     $count++;
                 }
             }
@@ -155,7 +161,15 @@ class EWHPController extends Controller
                     'tie_is_name_eng' => $value['is_name_eng'],
                     'tie_warehouse_code' => "abc001",
                 ]);
-                if($import_expected >= 1){
+                if (isset($value['logistic_manage_number']) && $value['logistic_manage_number']) {
+                    $import = Import::where('ti_logistic_manage_number', $value['logistic_manage_number'])->first();
+                    if (isset($import) && $import) {
+                        ImportExpected::where('tie_no', $import_expected)->update([
+                            'tie_co_license' => isset($import->ti_co_license) ? $import->ti_co_license : null,
+                        ]);
+                    }
+                }
+                if ($import_expected >= 1) {
                     $count++;
                 }
             }
@@ -186,7 +200,7 @@ class EWHPController extends Controller
                     "tec_register_id" => $value['register_id'],
                     "tec_ec_number" => $value['ec_number'],
                 ]);
-                if($export_confirm >= 1){
+                if ($export_confirm >= 1) {
                     $count++;
                 }
             }
@@ -197,5 +211,4 @@ class EWHPController extends Controller
             return response()->json(['message' => "no"], 500);
         }
     }
-
 }
