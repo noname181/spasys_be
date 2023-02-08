@@ -62,6 +62,7 @@ class RateDataGeneral extends Model
         'rdg_etc6',
         'rdg_etc7',
         'rdg_count_work',
+        'rdg_precalculate_total'
     ];
 
     protected $casts = [
