@@ -172,6 +172,10 @@ class QnaController extends Controller
                     $spasys_no = $member->company->co_parent_no;
                 } else if($member2->co_type == 'shop'){
                     $spasys_no = $member2->co_parent_no;
+                }else if($member->co_type == 'shipper'){
+                    $spasys_no = $member->company->co_parent->co_parent->co_no;
+                }else if($member->mb_type == 'shipper'){
+                    $spasys_no = $member->company->co_parent->co_parent->co_no;
                 }
             $qna_no = Qna::insertGetId([
                 'mb_no' => $member->mb_no,
