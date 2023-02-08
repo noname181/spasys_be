@@ -1407,6 +1407,9 @@ class RateDataController extends Controller
                     'rdg_vat3' => $request->data13,
                     'rdg_vat4' => $request->data14,
                     'rdg_vat5' => $request->data15,
+
+                    'rdg_precalculate_total' => $request->total,
+
                     'mb_no' => $user->mb_no,
                 ]
             );
@@ -1788,6 +1791,7 @@ class RateDataController extends Controller
                         'rdg_etc4' => isset($request->total4['total4_6']) ? $request->total4['total4_6'] : '',
                         'rdg_etc5' => isset($request->total5['total5_6']) ? $request->total5['total5_6'] : '',
                         'rdg_etc6' => isset($request->total['totalall6']) ? $request->total['totalall6'] : '',
+                        'rdg_precalculate_total' =>  isset($request->total['totalall5']) ? $request->total['totalall5'] : '',
                     ]
                 );
             } else {
@@ -1854,6 +1858,8 @@ class RateDataController extends Controller
                         'rdg_etc4' => isset($request->total4['total4_6']) ? $request->total4['total4_6'] : '',
                         'rdg_etc5' => isset($request->total5['total5_6']) ? $request->total5['total5_6'] : '',
                         'rdg_etc6' => isset($request->total['totalall6']) ? $request->total['totalall6'] : '',
+                        'rdg_precalculate_total' =>  isset($request->total['totalall5']) ? $request->total['totalall5'] : '',
+
                     ]
                 );
             }
