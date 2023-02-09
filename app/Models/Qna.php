@@ -52,7 +52,7 @@ class Qna extends Model
 
     public function mb_no()
     {
-        return $this->hasOne(Member::class, 'mb_no', 'mb_no');
+        return $this->hasOne(Member::class, 'mb_no', 'mb_no')->with('company');
     }
 
     public function files()
