@@ -356,7 +356,7 @@ class ImportScheduleController extends Controller
             DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
             $user = Auth::user();
 
-            //DB::enableQueryLog();
+            DB::enableQueryLog();
             if ($user->mb_type == 'shop') {
                
                 $sub = ImportExpected::select('company.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
@@ -396,7 +396,7 @@ class ImportScheduleController extends Controller
 
                     //$leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
                     $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-                })->orderBy('te_carry_out_number', 'DESC');
+                })->orderBy('tie_is_date', 'DESC');
             } else if ($user->mb_type == 'shipper') {
                
                 $sub = ImportExpected::select('company.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
@@ -436,7 +436,7 @@ class ImportScheduleController extends Controller
 
                     //$leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
                     $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-                })->orderBy('te_carry_out_number', 'DESC');
+                })->orderBy('tie_is_date', 'DESC');
             } else if ($user->mb_type == 'spasys') {
                 
                 //FIX NOT WORK 'with'
@@ -491,11 +491,12 @@ class ImportScheduleController extends Controller
 
                     //$leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
                     $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-                })->orderBy('ti_logistic_manage_number', 'DESC')->orderBy('te_logistic_manage_number', 'DESC');
+                })->orderBy('tie_is_date', 'DESC');
+
+
+                
                 //return DB::getQueryLog();
                 //END FIX NOT WORK 'with'
-
-            
             }
             //return $import_schedule->get();
 
@@ -548,27 +549,28 @@ class ImportScheduleController extends Controller
                 $import_schedule->where('aaa.tie_logistic_manage_number', 'like', '%' . $validated['logistic_manage_number'] . '%');
             }
             if (isset($validated['tie_status'])) {
-
                 if ($validated['tie_status'] == '반출') {
-                    $import_schedule->whereNotNull('ddd.te_logistic_manage_number')->whereNotNull('ddd.te_carry_out_number');
-                } else if ($validated['tie_status'] == '반출승인') {
-                    $import_schedule->whereNull('ddd.te_logistic_manage_number');
+                     
+                    $tie_logistic_manage_number = $this->SQL($validated);
+                    $import_schedule->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number);
+                    //return DB::getQueryLog();
                 } else if ($validated['tie_status'] == '반입') {
                     $import_schedule->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number');
                 } else if ($validated['tie_status'] == '반입예정') {
                     $import_schedule->whereNotNull('aaa.tie_logistic_manage_number')->whereNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number');
                 }
             }
+            
             if (isset($validated['tie_status_2'])) {
-                if ($validated['tie_status'] == '반출') {
-                    $import_schedule->where('ddd.te_status_2', '=', $validated['tie_status_2']);
-                } else if ($validated['tie_status'] == '반출승인') {
-                    $import_schedule->where('ddd.tec_status_2', '=', $validated['tie_status_2']);
-                } else if ($validated['tie_status'] == '반입') {
-                    $import_schedule->where('bbb.ti_status_2', '=', $validated['tie_status_2']);
-                } else if ($validated['tie_status'] == '반입예정') {
+                // if ($validated['tie_status'] == '반출') {
+                //     $import_schedule->where('aaa.tie_status_2', '=', $validated['tie_status_2']);
+                // } else if ($validated['tie_status'] == '반출승인') {
+                //     $import_schedule->where('aaa.tie_status_2', '=', $validated['tie_status_2']);
+                // } else if ($validated['tie_status'] == '반입') {
+                //     $import_schedule->where('aaa.tie_status_2', '=', $validated['tie_status_2']);
+                // } else if ($validated['tie_status'] == '반입예정') {
                     $import_schedule->where('aaa.tie_status_2', '=', $validated['tie_status_2']);
-                }
+                //}
             }
 
             // if (isset($validated['import_schedule_status1']) || isset($validated['import_schedule_status2'])) {
@@ -600,6 +602,164 @@ class ImportScheduleController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
+    public function SQL($validated)
+    {
+           
+            // If per_page is null set default data = 15
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+
+            //DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            $user = Auth::user();
+            if ($user->mb_type == 'shop') {
+               
+                $sub = ImportExpected::select('company.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
+                    ->leftjoin('company', function ($join) {
+                        $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
+                    })->leftjoin('company as parent_shop', function ($join) {
+                        $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
+                    })->leftjoin('company as parent_spasys', function ($join) {
+                        $join->on('parent_shop.co_parent_no', '=', 'parent_spasys.co_no');
+                    })->where('parent_shop.co_no', $user->co_no)->where('tie_is_date', '>=', '2022-01-04')
+                    ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
+                    ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
+
+                $sub_2 = Import::select('receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1','ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
+                    ->leftjoin('receiving_goods_delivery', function ($join) {
+                        $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
+                    })
+                    ->groupBy(['ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number']);
+
+                $sub_4 = Export::select('connection_number', 't_export.te_status_2', 'te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number')
+                  
+                    ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
+
+
+                $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+                    $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
+                })
+                
+                ->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+                    
+                    $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+                })->orderBy('te_carry_out_number', 'DESC');
+            } else if ($user->mb_type == 'shipper') {
+               
+                $sub = ImportExpected::select('company.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
+                    ->leftjoin('company', function ($join) {
+                        $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
+                    })->leftjoin('company as parent_shop', function ($join) {
+                        $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
+                    })->leftjoin('company as parent_spasys', function ($join) {
+                        $join->on('parent_shop.co_parent_no', '=', 'parent_spasys.co_no');
+                    })->where('company.co_no', $user->co_no)->where('tie_is_date', '>=', '2022-01-04')
+                    ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
+                    ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
+
+                $sub_2 = Import::select('receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
+                    ->leftjoin('receiving_goods_delivery', function ($join) {
+                        $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
+                    })
+                    ->groupBy(['ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number']);
+
+               
+
+                $sub_4 = Export::select('connection_number', 't_export.te_status_2', 'te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number')
+                    
+                    ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
+
+
+                $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+                    $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
+                })
+             
+                ->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+
+                    
+                    $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+                })->orderBy('te_carry_out_number', 'DESC');
+            } else if ($user->mb_type == 'spasys') {
+                
+                //FIX NOT WORK 'with'
+                $sub = ImportExpected::select('company.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
+                    ->leftjoin('company as parent_spasys', function ($join) {
+                        $join->on('parent_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
+                    })
+                   ->leftjoin('company', function ($join) {
+                        $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
+                    })->leftjoin('company as parent_shop', function ($join) {
+                        $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
+                    })
+
+                    ->where('parent_spasys.warehouse_code', $user->company['warehouse_code'])
+                    ->where('tie_is_date', '>=', '2022-01-04')
+                    ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
+                    ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
+
+                $sub_2 = Import::select('receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
+                    ->leftjoin('receiving_goods_delivery', function ($join) {
+                        $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
+                    })
+                    ->groupBy(['ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number']);
+
+                $sub_4 = Export::select('connection_number', 't_export.te_status_2', 'te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number')
+                  
+                    ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
+
+
+                $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+                    $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
+                })
+             
+                ->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+                    $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+                })->orderBy('ti_logistic_manage_number', 'DESC')->orderBy('te_logistic_manage_number', 'DESC');           
+            }
+          
+            if (isset($validated['status'])) {
+                $import_schedule->where('aaa.rgd_status1', '=', $validated['status']);
+            }
+            if (isset($validated['from_date'])) {
+                $import_schedule->where('aaa.created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            }
+
+            if (isset($validated['to_date'])) {
+                $import_schedule->where('aaa.created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            }
+
+            if (isset($validated['co_parent_name'])) {
+                $import_schedule->where(DB::raw('lower(aaa.co_name_shop)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+            }
+
+            if (isset($validated['co_name'])) {
+                $import_schedule->where(DB::raw('lower(aaa.co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+            }
+
+            if (isset($validated['m_bl'])) {
+                $import_schedule->where(DB::raw('aaa.tie_m_bl'), 'like', '%' . strtolower($validated['m_bl']) . '%');
+            }
+
+            if (isset($validated['h_bl'])) {
+                $import_schedule->where(DB::raw('aaa.tie_h_bl'), 'like', '%' . strtolower($validated['h_bl']) . '%');
+            }
+
+            if (isset($validated['logistic_manage_number'])) {
+                $import_schedule->where('aaa.tie_logistic_manage_number', 'like', '%' . $validated['logistic_manage_number'] . '%');
+            }
+
+            $import_schedule = $import_schedule->whereNull('ddd.te_logistic_manage_number')->get();
+
+
+            //DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            $id = [];
+            foreach($import_schedule as $te){
+                $id[] = $te->tie_logistic_manage_number;
+            }
+            return $id;
+        
+    }
+
     public function getImportAPIPOPUP(ImportScheduleSearchRequest $request)
     {
         try {

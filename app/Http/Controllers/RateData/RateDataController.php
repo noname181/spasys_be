@@ -1985,7 +1985,7 @@ class RateDataController extends Controller
         try {
             $user = Auth::user();
 
-            $rgd = ReceivingGoodsDelivery::with(['warehousing', 't_import', 't_export', 't_import_expected'])->where('rgd_no', $is_no)->first();
+            $rgd = ReceivingGoodsDelivery::with(['warehousing', 't_import', 't_export', 't_import_expected', 'rate_data_general'])->where('rgd_no', $is_no)->first();
 
 
 
@@ -3818,7 +3818,7 @@ class RateDataController extends Controller
             $is_exist = RateDataGeneral::where('rgd_no', $request->rgd_no)->where('rdg_bill_type', $request->bill_type)->first();
 
             //Get RecevingGoodsDelivery base on rgd_no
-            $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+            $rgd = ReceivingGoodsDelivery::with('rate_data_general')->where('rgd_no', $request->rgd_no)->first();
             $w_no = $rgd->w_no;
             $ag = AdjustmentGroup::where('ag_no', $request->rdg_set_type)->first();
 
@@ -3833,8 +3833,8 @@ class RateDataController extends Controller
                     'rgd_no_expectation' => $request->type == 'edit_final' ? $is_exist->rgd_no_expectation : (str_contains($request->bill_type, 'final') ? $request->rgd_no : null),
                     'rgd_no_final' => $request->type == 'edit_additional' ? $is_exist->rgd_no_final : (str_contains($request->bill_type, 'additional') ? $request->rgd_no : null),
                     'mb_no' => Auth::user()->mb_no,
-                    'rdg_set_type' => isset($ag->ag_name) ? $ag->ag_name : NULL,
-                    'ag_no' => isset($ag->ag_no) ? $ag->ag_no : NULL,
+                    'rdg_set_type' => isset($ag->ag_name) ? $ag->ag_name : (isset($rgd->rate_data_general) ? $rgd->rate_data_general->rdg_set_type : NULL),
+                    'ag_no' => isset($ag->ag_no) ? $ag->ag_no : (isset($rgd->rate_data_general) ? $rgd->rate_data_general->ag_no : NULL),
                     'rdg_supply_price1' => $request->bonded1['supply_price'],
                     'rdg_supply_price2' => $request->bonded2['supply_price'],
                     'rdg_supply_price3' => $request->bonded3['supply_price'],
