@@ -3367,6 +3367,25 @@ class ItemController extends Controller
                                     ]
                                 );
                             }
+                        }else {
+                            $warehousing = Warehousing::updateOrCreate(
+                                [
+                                    'te_carry_out_number' => $item->te_carry_out_number,
+                                ],
+                                [
+                                    'logistic_manage_number' => $item->ti_logistic_manage_number ? $item->ti_logistic_manage_number : ($item->te_logistic_manage_number ? $item->te_logistic_manage_number : $item->tec_logistic_manage_number),
+                                    'w_category_name' => '보세화물',
+                                    'mb_no' => $user->mb_no,
+                                    // 'w_completed_day' => $item['import']['ti_i_date'] ? $item['import']['ti_i_date'] : NULL,
+                                    // 'w_schedule_day' => $item['tie_is_date'] ? $item['tie_is_date'] : NULL,
+                                    'tie_no' => $item->tie_no,
+                                    'w_schedule_amount' => $item->tie_is_number,
+                                    'w_amount' => $item->ti_i_number,
+                                    'w_type' => 'SET',
+                                    'co_no' => isset($item->co_no) ? $item->co_no : $item->co_no,
+                                    'ti_carry_in_number' => $item->ti_carry_in_number,
+                                ]
+                            );
                         }
                     } else if ($item->ti_carry_in_number) {
                         $warehousing = Warehousing::updateOrCreate(
