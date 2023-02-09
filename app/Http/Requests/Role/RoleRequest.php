@@ -39,6 +39,9 @@ class RoleRequest extends BaseFormRequest
                 'required',
                 'max:255'
             ],
+            'roles.*.role_type' => [
+                'required',
+            ],
             'roles.*.role_use_yn' => [
                 'required',
                 'string',
