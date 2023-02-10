@@ -547,7 +547,7 @@ class MemberController extends Controller
                     // })->orWhereHas('co_parent.co_parent', function($q) use($co_no){
                     //     $q->where('co_no', $co_no);
                     // });
-                })->get();
+                })->orderBy('co_type', 'DESC')->orderBy('co_name', 'ASC')->get();
             }else if($user->mb_type == 'spasys'){
                 $members = Company::with(['co_parent'])->where(function ($q) use ( $user) {
                     $q->WhereHas('co_parent', function ($q) use ($user) {
@@ -557,13 +557,14 @@ class MemberController extends Controller
                         });
                     });
 
-                })->get();
+                })->orderBy('co_type', 'DESC')->orderBy('co_name', 'ASC')->get();
             }else if($user->mb_type == 'shipper'){
                 $members = [];
                 $member2 = Company::with(['co_parent'])->where('co_no',$user->co_no)->first();
                 //$members[] = $member2;
                 $members[] = $member2->co_parent;
                 $members[] = $member2->co_parent->co_parent;
+                array_multisort($members, SORT_ASC);            
             }
 
             return response()->json(["member" => $members]);
