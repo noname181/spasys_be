@@ -425,6 +425,8 @@ class QnaController extends Controller
                     $query->where('co_no_target', '=', Auth::user()->co_no)->orwhere('spasys_no',$member_type->co_no)
                         ->orWhereHas('member',function ($query) use ($member_type){
                             $query->where('co_no','=',$member_type->co_no);
+                        })->orWhereHas('company',function ($query) use ($member_type){
+                            $query->where('co_no','=',$member_type->co_no);
                         });
                 })->with(['mb_no'=>function($query){
                     $query->select(['mb_name','mb_no']);
@@ -444,7 +446,7 @@ class QnaController extends Controller
                 ->orderBy('qna_no', 'DESC');
             } else {
                 $qna = Qna::with(['member','company','member_question'])->where('qna_status','!=','삭제')->where(function ($query) use ($member_type) {
-                    $query->where('co_no_target', '=', Auth::user()->co_no)->orWhere('mb_no_question',$member_type->mb_no)
+                    $query->where('co_no_target', '=', Auth::user()->co_no)->orWhere('mb_no_question',$member_type->mb_no)->orWhere('co_no_target', '=', $member_type->company->co_parent->co_no)
                         ->orWhereHas('member',function ($query) use ($member_type){
                             $query->where('co_no','=',$member_type->co_no);
                         });
@@ -493,7 +495,9 @@ class QnaController extends Controller
                 });
             }
 
-
+            if (isset($validated['status'])) {
+                $qna->where('qna_status', 'like', '%' . $validated['status'] . '%');
+            }
 
             if (isset($validated['search_string'])) {
                 $qna->where(function($query) use ($validated) {
@@ -509,7 +513,7 @@ class QnaController extends Controller
             return response()->json($qna);
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             //return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
