@@ -548,11 +548,13 @@ class ImportScheduleController extends Controller
             if (isset($validated['logistic_manage_number'])) {
                 $import_schedule->where('aaa.tie_logistic_manage_number', 'like', '%' . $validated['logistic_manage_number'] . '%');
             }
+
             if (isset($validated['tie_status'])) {
                 if ($validated['tie_status'] == '반출') {
                      
                     $tie_logistic_manage_number = $this->SQL($validated);
                     $import_schedule->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number);
+                    //$import_schedule->whereNotNull('ddd.te_logistic_manage_number');
                     //return DB::getQueryLog();
                 } else if ($validated['tie_status'] == '반입') {
                     $import_schedule->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number');
@@ -602,6 +604,7 @@ class ImportScheduleController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
+
     public function SQL($validated)
     {
            
