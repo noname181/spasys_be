@@ -264,7 +264,7 @@ class CompanyController extends Controller
             $customs_info = CustomsInfo::select(['ci_no', 'co_no', 'ci_name', 'ci_manager', 'ci_hp', 'ci_address', 'ci_address_detail'])->where('co_no', $co_no)->get();
             $manager = Manager::where('co_no', $co_no)->first();
             $services = Service::where('service_use_yn', 'y')->where('service_no', '!=', 1)->get();
-
+            $services_use = explode(" ",$company->co_service);
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'company' => $company,
@@ -274,6 +274,7 @@ class CompanyController extends Controller
                 'customs_info' => $customs_info,
                 'manager' => $manager,
                 'services' => $services,
+                'services_use'=>$services_use
             ]);
         } catch (\Exception $e) {
             DB::rollback();
