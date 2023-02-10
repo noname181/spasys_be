@@ -35,6 +35,7 @@ class RoleController extends Controller
                         'role_name' => $val['role_name'],
                         'role_eng' => $val['role_eng'],
                         'role_use_yn' => $val['role_use_yn'],
+                        'role_type' => $val['role_type'],
                     ],
                 );
                 $ids[] = $role->role_no;

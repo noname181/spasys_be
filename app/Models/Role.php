@@ -25,6 +25,7 @@ class Role extends Model
         'role_id',
         'role_name',
         'role_eng',
+        'role_type',
         'role_use_yn',
     ];
 
