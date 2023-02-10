@@ -182,7 +182,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     //     ]);
                     // }
                     Warehousing::where('w_no', $w_no_data)->update([
-                        'connection_number' => $validated['connection_number'] . $w_no_data
+                        'connection_number' => $validated['connection_number']
                     ]);
                     // if ($validated['type_w_choose'] == "export") {
                     //     $connection_number_old = Export::where('te_carry_out_number', $validated['connect_w'])->first();
