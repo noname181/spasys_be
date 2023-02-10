@@ -338,9 +338,14 @@ class WarehousingController extends Controller
                         })->orWhere('w_schedule_number', 'like', '%' . $validated['w_schedule_number_iw'] . '%', 'and', 'w_type', '=', 'IW');
                     });
                 }
+
                 if (isset($validated['rgd_status1'])) {
-                    $warehousing2->whereHas('receving_goods_delivery', function ($query) use ($validated) {
-                        $query->where('rgd_status1', '=', $validated['rgd_status1']);
+                    $warehousing2->where(function ($q) use ($validated) {
+                        $q->whereHas('receving_goods_delivery', function ($query) use ($validated) {
+                            $query->where('rgd_status1', '=', $validated['rgd_status1']);
+                        })->orwhereHas('w_import_parent.receving_goods_delivery_parent', function ($q) use ($validated) {
+                            $q->where('rgd_status1', '=', $validated['rgd_status1']);
+                        });
                     });
                 }
                 if (isset($validated['rgd_status2'])) {

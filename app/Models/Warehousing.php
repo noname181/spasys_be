@@ -93,6 +93,11 @@ class Warehousing extends Model
     {
         return $this->hasMany(ReceivingGoodsDelivery::class, 'w_no', 'w_no');
     }
+    
+    public function receving_goods_delivery_parent()
+    {
+        return $this->hasOne(ReceivingGoodsDelivery::class, 'w_no', 'w_no')->where('rgd_bill_type', null);
+    }
 
     public function import_schedule()
     {
@@ -100,7 +105,7 @@ class Warehousing extends Model
     }
     public function w_import_parent()
     {
-        return $this->belongsTo(Warehousing::class, 'w_import_no', 'w_no');
+        return $this->belongsTo(Warehousing::class, 'w_import_no', 'w_no')->with('receving_goods_delivery_parent');
     }
 
     public function w_ew()
