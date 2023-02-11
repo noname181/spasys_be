@@ -1697,7 +1697,7 @@ class WarehousingController extends Controller
                         ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                         ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-                        $sub_2 = Import::select('receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1','ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
+                        $sub_2 = Import::select('receiving_goods_delivery.rgd_confirmed_date','receiving_goods_delivery.rgd_status3','receiving_goods_delivery.rgd_tracking_code','receiving_goods_delivery.rgd_delivery_company','receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1','ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
                         ->leftjoin('receiving_goods_delivery', function ($join) {
                             $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
                         })
@@ -1728,7 +1728,7 @@ class WarehousingController extends Controller
                         ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                         ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-                        $sub_2 = Import::select('receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
+                        $sub_2 = Import::select('receiving_goods_delivery.rgd_confirmed_date','receiving_goods_delivery.rgd_status3','receiving_goods_delivery.rgd_tracking_code','receiving_goods_delivery.rgd_delivery_company','receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
                             ->leftjoin('receiving_goods_delivery', function ($join) {
                                 $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
                             })
@@ -1773,7 +1773,7 @@ class WarehousingController extends Controller
                         ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                         ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-                    $sub_2 = Import::select('receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
+                    $sub_2 = Import::select('receiving_goods_delivery.rgd_confirmed_date','receiving_goods_delivery.rgd_status3','receiving_goods_delivery.rgd_tracking_code','receiving_goods_delivery.rgd_delivery_company','receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
                         ->leftjoin('receiving_goods_delivery', function ($join) {
                             $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
                         })
@@ -2135,7 +2135,7 @@ class WarehousingController extends Controller
                     ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                     ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-                    $sub_2 = Import::select('receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1','ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
+                    $sub_2 = Import::select('receiving_goods_delivery.rgd_confirmed_date','receiving_goods_delivery.rgd_status3','receiving_goods_delivery.rgd_tracking_code','receiving_goods_delivery.rgd_delivery_company','receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1','ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
                         ->leftjoin('receiving_goods_delivery', function ($join) {
                             $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
                         })
@@ -2174,7 +2174,7 @@ class WarehousingController extends Controller
                     ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                     ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-                    $sub_2 = Import::select('receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
+                    $sub_2 = Import::select('receiving_goods_delivery.rgd_confirmed_date','receiving_goods_delivery.rgd_status3','receiving_goods_delivery.rgd_tracking_code','receiving_goods_delivery.rgd_delivery_company','receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
                         ->leftjoin('receiving_goods_delivery', function ($join) {
                             $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
                         })
@@ -2228,7 +2228,7 @@ class WarehousingController extends Controller
                     ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                     ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-                    $sub_2 = Import::select('receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
+                    $sub_2 = Import::select('receiving_goods_delivery.rgd_confirmed_date','receiving_goods_delivery.rgd_status3','receiving_goods_delivery.rgd_tracking_code','receiving_goods_delivery.rgd_delivery_company','receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
                         ->leftjoin('receiving_goods_delivery', function ($join) {
                             $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
                         })
