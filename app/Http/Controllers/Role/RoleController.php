@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Role;
 
 use App\Models\Role;
+use App\Models\Member;
+use App\Models\Company;
 use App\Utils\Messages;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -61,6 +63,23 @@ class RoleController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'roles' => $role
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+    public function getRoles_member($mb_no)
+    {
+        try {
+            $role = Role::get();
+            $get_role_no = Member::where('mb_no','=',$mb_no)->first()->role_no;
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'roles' => $role,
+                'get_role_no'=>$get_role_no
             ]);
         } catch (\Exception $e) {
             DB::rollback();

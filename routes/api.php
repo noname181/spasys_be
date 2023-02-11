@@ -291,6 +291,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('role')->name('role.')->group(function () {
         Route::post('/', \App\Http\Controllers\Role\RoleController::class)->name('registe_update_role');
         Route::get('/', [App\Http\Controllers\Role\RoleController::class, 'getRoles'])->name('get_role');
+        Route::get('/get_role_member/{co_no}', [App\Http\Controllers\Role\RoleController::class, 'getRoles_member'])->name('get_role_member');
         Route::delete('/{role}', [App\Http\Controllers\Role\RoleController::class, 'deleteRole'])->name('delete_role');
     });
 
