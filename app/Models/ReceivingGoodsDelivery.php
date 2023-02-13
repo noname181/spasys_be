@@ -9,6 +9,8 @@ use App\Models\Warehousing;
 use App\Models\RateMetaData;
 use App\Models\Export;
 use App\Models\CancelBillHistory;
+use App\Models\Payment;
+
 
 class ReceivingGoodsDelivery extends Model
 {
@@ -124,6 +126,9 @@ class ReceivingGoodsDelivery extends Model
 
     public function import_table(){
         return $this->belongsTo(Import::class, 'is_no', 'ti_carry_in_number');
+    }
+    public function payment(){
+        return $this->belongsTo(Payment::class, 'rgd_no', 'rgd_no');
     }
 
 }

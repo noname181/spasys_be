@@ -2735,6 +2735,9 @@ class ReceivingGoodsDeliveryController extends Controller
         try {
 
             $check_payment = Payment::where('rgd_no', $request->rgd_no)->where('p_cancel_yn', 'y')->first();
+            if(isset($request->sumprice) && $request->p_method == 'card' ){
+                $p_method_fee = $request->sumprice/100 ;
+            }
             if (isset($check_payment)) {
                 Payment::where('rgd_no', $check_payment->rgd_no)->update([
                     'p_price' => $request->sumprice,
@@ -2758,6 +2761,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         'p_price' => $request->sumprice,
                         'p_method' => $request->p_method,
                         'p_success_yn' => 'y',
+                        'p_method_fee' => isset($p_method_fee) ? $p_method_fee : null
                     ]
                 );
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
