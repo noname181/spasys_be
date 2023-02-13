@@ -4294,7 +4294,7 @@ class WarehousingController extends Controller
                             $query->select(DB::raw('SUM(rd_data4)'))->where('rd_cate2', '소계');
                         },
                     ]);
-                }])->whereHas('w_no', function ($query) use ($user) {
+                }])->join('t_import','t_import.ti_carry_in_number','=','receiving_goods_delivery.rgd_ti_carry_in_number')->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
@@ -4358,7 +4358,7 @@ class WarehousingController extends Controller
             }
 
 
-            $warehousing->orderBy('rgd_tracking_code', 'DESC');
+            $warehousing->orderBy('ti_i_date', 'DESC')->orderBy('rgd_tracking_code', 'DESC');
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             //return DB::getQueryLog();
 
