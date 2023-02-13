@@ -3943,6 +3943,13 @@ class WarehousingController extends Controller
                         'co_no' => $co_no,
                         'service_no' => $service_no,
                     ])->first();
+
+                    if(isset($item->payment->p_method_fee)){
+                        $item->p_method_fee = $item->payment->p_method_fee + $item->rate_data_general->rdg_sum4;
+                    }else{
+                        $item->p_method_fee = $item->rate_data_general->rdg_sum4;
+                    }
+
                     $item->settlement_cycle = $company_settlement ? $company_settlement->cs_payment_cycle : "";
 
                     $i = 0;
