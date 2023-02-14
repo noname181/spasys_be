@@ -4273,7 +4273,7 @@ class WarehousingController extends Controller
                             $query->select(DB::raw('SUM(rd_data4)'))->where('rd_cate2', '소계');
                         },
                     ]);
-                }])->whereHas('w_no', function ($query) use ($user) {
+                }])->join('t_import','t_import.ti_carry_in_number','=','receiving_goods_delivery.rgd_ti_carry_in_number')->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
@@ -4287,7 +4287,7 @@ class WarehousingController extends Controller
                             $query->select(DB::raw('SUM(rd_data4)'))->where('rd_cate2', '소계');
                         },
                     ]);
-                }])->whereHas('w_no', function ($query) use ($user) {
+                }])->join('t_import','t_import.ti_carry_in_number','=','receiving_goods_delivery.rgd_ti_carry_in_number')->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
