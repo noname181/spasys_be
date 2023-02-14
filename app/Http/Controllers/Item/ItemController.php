@@ -565,15 +565,15 @@ class ItemController extends Controller
             if ($user->mb_type == 'shop') {
                 $item = Item::with(['file', 'company', 'item_channels', 'warehousing_item'])->where('item_service_name', '=', '유통가공')->whereHas('company.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
-                })->orderBy('item_no', 'DESC');
+                })->orderBy('created_at', 'DESC');
             } else if ($user->mb_type == 'shipper') {
                 $item = Item::with(['file', 'company', 'item_channels', 'warehousing_item'])->where('item_service_name', '=', '유통가공')->whereHas('company', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
-                })->orderBy('item_no', 'DESC');
+                })->orderBy('created_at', 'DESC');
             } else if ($user->mb_type == 'spasys') {
                 $item = Item::with(['file', 'company', 'item_channels', 'warehousing_item'])->where('item_service_name', '=', '유통가공')->whereHas('company.co_parent.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
-                })->orderBy('item_no', 'DESC');
+                })->orderBy('created_at', 'DESC');
             }
             if (isset($validated['from_date'])) {
                 $item->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
