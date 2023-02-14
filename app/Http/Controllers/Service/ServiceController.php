@@ -85,11 +85,9 @@ class ServiceController extends Controller
                 $services = Service::where('service_use_yn', 'y')->get();
             }else {
                 $co_service_array = explode(" ", $company->co_service);
-                if(count($co_service_array) > 1){
+           
                     $services = Service::where('service_use_yn', 'y')->whereIN("service_name", $co_service_array)->orWhere('service_no', '=', 1)->get();
-                } else {
-                    $services = Service::where('service_use_yn', 'y')->whereIN("service_name", $co_service_array)->get();
-                }
+               
                
             }
 

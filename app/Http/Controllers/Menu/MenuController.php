@@ -108,7 +108,25 @@ class MenuController extends Controller
 
         try {
             DB::beginTransaction();
-
+            if (isset($validated['menu_url'])) {
+            $menu_check = Menu::where('menu_url',$validated['menu_url'])->first();
+            if(isset($menu_check)){
+                return response()->json([
+                    'error'=>'same_url'
+                ], 201);
+            }
+            }
+            if (isset($validated['menu_name'])) {
+                $service_no_array = explode(" ", $validated['menu_service_no_array']);
+                foreach($service_no_array as $row){
+                    $menu_check_name = Menu::where('menu_name',$validated['menu_name'])->whereIn('service_no_array',[$row])->first();
+                    if(isset($menu_check_name)){
+                        return response()->json([
+                            'error'=>'same_name'
+                        ], 201);
+                    }
+                }
+            }
             $main_menu = Menu::first();
             $sub_menu_level = 0;
             if(!$main_menu){
@@ -172,6 +190,7 @@ class MenuController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'menu_no' => $menu_no
+             
             ], 201);
         } catch (\Throwable $e) {
             DB::rollback();
