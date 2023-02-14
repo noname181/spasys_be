@@ -15,7 +15,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        //$schedule->command('inspire')->hourly();
         $schedule->call('App\Http\Controllers\Item\ItemController@apiItemsCargoList')->everyFifteenMinutes();
         $schedule->call('App\Http\Controllers\Item\ItemController@updateStockItemsApiNoLogin')->everyFifteenMinutes();
         $schedule->call('App\Http\Controllers\Item\ItemController@apiItemCronNoLogin')->everyFifteenMinutes();
