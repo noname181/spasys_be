@@ -1120,7 +1120,7 @@ class WarehousingController extends Controller
                     })->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
-                })->orderBy('rgd_no', 'DESC');
+                });
             } else if ($user->mb_type == 'shipper') {
                 $warehousing = ReceivingGoodsDelivery::with(['w_no', 'warehousing'])->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
                     $query->where('w_type', '=', 'IW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
@@ -1128,7 +1128,7 @@ class WarehousingController extends Controller
                     })->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
-                })->orderBy('rgd_no', 'DESC');
+                });
             } else if ($user->mb_type == 'spasys') {
                 $warehousing = ReceivingGoodsDelivery::with(['w_no', 'warehousing'])->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
                     $query->where('w_type', '=', 'IW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
@@ -1136,7 +1136,7 @@ class WarehousingController extends Controller
                     })->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
-                })->orderBy('rgd_no', 'DESC');
+                });
             }
 
             if (isset($validated['from_date'])) {
@@ -1196,7 +1196,7 @@ class WarehousingController extends Controller
                         ->orWhere('rgd_status1', '=', $validated['rgd_status1_3'] ? $validated['rgd_status1_3'] : "");
                 });
             }
-
+            $warehousing->orderBy('created_at','DESC');
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             $warehousing->setCollection(
                 $warehousing->getCollection()->map(function ($item) {
@@ -1241,34 +1241,34 @@ class WarehousingController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
             if ($user->mb_type == 'shop') {
-                $warehousing = ReceivingGoodsDelivery::with(['w_no', 'warehousing'])->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing = ReceivingGoodsDelivery::with(['w_no', 'warehousing'])->with(['mb_no'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereHas('w_no', function ($query) use ($user) {
                     $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('w_category_name', '=', '유통가공')->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
-                })->orderBy('rgd_no', 'DESC');
+                });
             } else if ($user->mb_type == 'shipper') {
-                $warehousing = ReceivingGoodsDelivery::with(['w_no', 'warehousing'])->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing = ReceivingGoodsDelivery::with(['w_no', 'warehousing'])->with(['mb_no'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereHas('w_no', function ($query) use ($user) {
                     $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('w_category_name', '=', '유통가공')->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
-                })->orderBy('rgd_no', 'DESC');
+                });
             } else if ($user->mb_type == 'spasys') {
-                $warehousing = ReceivingGoodsDelivery::with(['w_no', 'warehousing'])->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing = ReceivingGoodsDelivery::with(['w_no', 'warehousing'])->with(['mb_no'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereHas('w_no', function ($query) use ($user) {
                     $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('w_category_name', '=', '유통가공')->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
-                })->orderBy('rgd_no', 'DESC');
+                });
             }
 
             $warehousing->whereNull('rgd_parent_no');
             if (isset($validated['from_date'])) {
-                $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                $warehousing->where('warehousing.w_completed_day', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
             if (isset($validated['status'])) {
                 $warehousing->where('rgd_status1', '=', $validated['status']);
             }
             if (isset($validated['to_date'])) {
-                $warehousing->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                $warehousing->where('warehousing.w_completed_day', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
             }
 
             if (isset($validated['co_parent_name'])) {
@@ -1297,7 +1297,7 @@ class WarehousingController extends Controller
                     return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number_ew'] . '%');
                 });
             }
-
+            $warehousing->orderBy('w_completed_day','DESC');
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             //return DB::getQueryLog();
             $warehousing->setCollection(
@@ -2904,7 +2904,7 @@ class WarehousingController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
             if ($user->mb_type == 'shop') {
-                $warehousing = ReceivingGoodsDelivery::with(['w_no', 'warehousing'])->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing = ReceivingGoodsDelivery::with(['w_no', 'warehousing'])->with(['mb_no'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereHas('w_no', function ($query) use ($user) {
                     $query->where('w_type', '=', 'EW')
                         ->where('rgd_status1', '=', '출고')
                         ->where('rgd_status2', '=', '작업완료')
@@ -2917,9 +2917,9 @@ class WarehousingController extends Controller
                         })->whereHas('co_no.co_parent', function ($q2) use ($user) {
                             $q2->where('co_no', $user->co_no);
                         });
-                })->orderBy('rgd_no', 'DESC');
+                });
             } else if ($user->mb_type == 'shipper') {
-                $warehousing = ReceivingGoodsDelivery::with(['w_no', 'warehousing'])->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing = ReceivingGoodsDelivery::with(['w_no', 'warehousing'])->with(['mb_no'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereHas('w_no', function ($query) use ($user) {
                     $query->where('w_type', '=', 'EW')
                         ->where('rgd_status1', '=', '출고')
                         ->where('rgd_status2', '=', '작업완료')
@@ -2932,9 +2932,9 @@ class WarehousingController extends Controller
                         })->whereHas('co_no', function ($q2) use ($user) {
                             $q2->where('co_no', $user->co_no);
                         });
-                })->orderBy('rgd_no', 'DESC');
+                });
             } else if ($user->mb_type == 'spasys') {
-                $warehousing = ReceivingGoodsDelivery::with(['w_no', 'warehousing'])->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing = ReceivingGoodsDelivery::with(['w_no', 'warehousing'])->with(['mb_no'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereHas('w_no', function ($query) use ($user) {
                     $query->where('w_type', '=', 'EW')
                         ->where('rgd_status1', '=', '출고')
                         ->where('rgd_status2', '=', '작업완료')
@@ -2947,16 +2947,16 @@ class WarehousingController extends Controller
                         })->whereHas('co_no.co_parent.co_parent', function ($q2) use ($user) {
                             $q2->where('co_no', $user->co_no);
                         });
-                })->orderBy('rgd_no', 'DESC');
+                });
             }
             $warehousing->whereNull('rgd_parent_no');
 
             if (isset($validated['from_date'])) {
-                $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                $warehousing->where('warehousing.w_completed_day', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
 
             if (isset($validated['to_date'])) {
-                $warehousing->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                $warehousing->where('warehousing.w_completed_day', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
             }
 
             if (isset($validated['co_parent_name'])) {
@@ -3036,6 +3036,7 @@ class WarehousingController extends Controller
             if (isset($validated['rgd_contents'])) {
                 $warehousing->where('rgd_contents', '=', $validated['rgd_contents']);
             }
+            $warehousing->orderBy('w_completed_day','DESC');
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
 
             $warehousing->setCollection(
@@ -3064,7 +3065,7 @@ class WarehousingController extends Controller
             return response()->json($warehousing);
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             //return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
