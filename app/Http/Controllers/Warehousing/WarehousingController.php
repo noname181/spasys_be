@@ -3577,7 +3577,7 @@ class WarehousingController extends Controller
                 });
             }
 
-            $warehousing->orderBy('rgd_no', 'DESC');
+            $warehousing->orderBy('created_at', 'DESC');
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             //return DB::getQueryLog();
             $warehousing->setCollection(
@@ -4144,7 +4144,7 @@ class WarehousingController extends Controller
 
             $members = Member::where('mb_no', '!=', 0)->get();
 
-            $warehousing = $warehousing->orderBy('rgd_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
+            $warehousing = $warehousing->orderBy('created_at', 'DESC')->paginate($per_page, ['*'], 'page', $page);
 
             $warehousing->setCollection(
                 $warehousing->getCollection()->map(function ($item) use ($user) {
