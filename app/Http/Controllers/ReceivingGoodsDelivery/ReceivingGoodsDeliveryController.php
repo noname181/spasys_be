@@ -127,8 +127,19 @@ class ReceivingGoodsDeliveryController extends Controller
             }
 
             if (isset($validated['connection_number'])) {
+
                 if (isset($validated['w_no'])) {
-                    
+                    Warehousing::where('w_no', $validated['w_no'])->update([
+                        'connection_number' => $validated['connection_number']
+                    ]);
+                    $check_ex = Warehousing::where('w_import_no', '=', $w_no)->get();
+                    if($check_ex){
+                        foreach($check_ex as $ex){
+                            Warehousing::where('w_no', $ex->w_no)->update([
+                                'connection_number' => $validated['connection_number']
+                            ]);
+                        }
+                    }
                     // if ($validated['type_w_choose'] == "export") {
                     //     CargoConnect::insertGetId([
                     //         'w_no' => $validated['w_no'],
@@ -142,9 +153,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     //         'type' => "3_2"
                     //     ]);
                     // }
-                    Warehousing::where('w_no', $validated['w_no'])->update([
-                        'connection_number' => $validated['connection_number']
-                    ]);
+                   
                     // if ($validated['type_w_choose'] == "export") {
                     //     $connection_number_old = Export::where('te_carry_out_number', $validated['connect_w'])->first();
 
@@ -422,7 +431,8 @@ class ReceivingGoodsDeliveryController extends Controller
                             'w_import_no' => $w_no,
                             'w_type' => 'EW',
                             'w_category_name' => $request->w_category_name,
-                            'co_no' => $validated['co_no']
+                            'co_no' => $validated['co_no'],
+                            'connection_number' => isset($validated['connection_number']) ? $validated['connection_number'] : null,
                         ]);
 
                         Warehousing::where('w_no', $w_no)->update([
@@ -487,6 +497,7 @@ class ReceivingGoodsDeliveryController extends Controller
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
+
     public function create_item_mobile(ReceivingGoodsDeliveryCreateRequest $request)
     {
         $validated = $request->validated();
