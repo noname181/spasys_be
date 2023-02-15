@@ -119,7 +119,7 @@ class MenuController extends Controller
             if (isset($validated['menu_name'])) {
                 $service_no_array = explode(" ", $validated['menu_service_no_array']);
                 foreach($service_no_array as $row){
-                    $menu_check_name = Menu::where('menu_name',$validated['menu_name'])->whereIn('service_no_array',[$row])->first();
+                    $menu_check_name = Menu::where('menu_name',$validated['menu_name'])->where('service_no_array', 'like', '%' . $row . '%')->first();
                     if(isset($menu_check_name)){
                         return response()->json([
                             'error'=>'same_name'
