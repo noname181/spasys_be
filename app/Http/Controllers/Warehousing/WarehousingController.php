@@ -1445,7 +1445,7 @@ class WarehousingController extends Controller
                 $page = isset($validated['page']) ? $validated['page'] : 1;
                 $user = Auth::user();
                 if ($user->mb_type == 'shop') {
-                    $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                    $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereNull('rgd_parent_no')->whereHas('w_no', function ($query) use ($user) {
                         $query->where('w_type', '=', 'EW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
                             $q->where('rgd_status1', '=', '출고')->where('rgd_status3', '!=', '배송완료')->orWhereNull('rgd_status1');
                         })->whereHas('co_no.co_parent', function ($q) use ($user) {
@@ -1453,7 +1453,7 @@ class WarehousingController extends Controller
                         });
                     })->orderBy('rgd_no', 'DESC');
                 } else if ($user->mb_type == 'shipper') {
-                    $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                    $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereNull('rgd_parent_no')->whereHas('w_no', function ($query) use ($user) {
                         $query->where('w_type', '=', 'EW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
                             $q->where('rgd_status1', '=', '출고')->where('rgd_status3', '!=', '배송완료')->orWhereNull('rgd_status1');
                         })->whereHas('co_no', function ($q) use ($user) {
@@ -1461,7 +1461,7 @@ class WarehousingController extends Controller
                         });
                     })->orderBy('rgd_no', 'DESC');
                 } else if ($user->mb_type == 'spasys') {
-                    $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
+                    $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereNull('rgd_parent_no')->whereHas('w_no', function ($query) use ($user) {
                         $query->where('w_type', '=', 'EW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
                             $q->where('rgd_status1', '=', '출고')->where('rgd_status3', '!=', '배송완료')->orWhereNull('rgd_status1');
                         })->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
