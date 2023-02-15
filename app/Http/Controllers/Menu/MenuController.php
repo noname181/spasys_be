@@ -109,7 +109,7 @@ class MenuController extends Controller
         try {
             DB::beginTransaction();
             if (isset($validated['menu_url'])) {
-            $menu_check = Menu::where('menu_url',$validated['menu_url'])->first();
+            $menu_check = Menu::where(strtolower('menu_url'),strtolower($validated['menu_url']))->first();
             if(isset($menu_check)){
                 return response()->json([
                     'error'=>'same_url'
@@ -119,7 +119,7 @@ class MenuController extends Controller
             if (isset($validated['menu_name']) && !isset($validated['menu_url'])) {
                 $service_no_array = explode(" ", $validated['menu_service_no_array']);
                 foreach($service_no_array as $row){
-                    $menu_check_name = Menu::where('menu_name',$validated['menu_name'])->first();
+                    $menu_check_name = Menu::where(strtolower('menu_name'),strtolower($validated['menu_name']))->first();
                     if(isset($menu_check_name)){
                         return response()->json([
                             'error'=>'same_name'
@@ -130,7 +130,7 @@ class MenuController extends Controller
             if (isset($validated['menu_name']) && isset($validated['menu_url'])) {
                 $service_no_array = explode(" ", $validated['menu_service_no_array']);
                 foreach($service_no_array as $row){
-                    $menu_check_name = Menu::where('menu_name',$validated['menu_name'])->where('service_no_array', 'like', '%' . $row . '%')->first();
+                    $menu_check_name = Menu::where(strtolower('menu_name'),strtolower($validated['menu_name']))->where('service_no_array', 'like', '%' . $row . '%')->first();
                     if(isset($menu_check_name)){
                         return response()->json([
                             'error'=>'same_name'
@@ -292,6 +292,36 @@ class MenuController extends Controller
     {
         try {
             $validated = $request->validated();
+            if (isset($validated['menu_url'])) {
+                $menu_check = Menu::where(strtolower('menu_url'),strtolower($validated['menu_url']))->where('menu_no','!=',$validated['menu_no'])->first();
+                if(isset($menu_check)){
+                    return response()->json([
+                        'error'=>'same_url'
+                    ], 201);
+                }
+                }
+                if (isset($validated['menu_name']) && !isset($validated['menu_url'])) {
+                    $service_no_array = explode(" ", $validated['menu_service_no_array']);
+                    foreach($service_no_array as $row){
+                        $menu_check_name = Menu::where(strtolower('menu_name'),strtolower($validated['menu_name']))->where('menu_no','!=',$validated['menu_no'])->first();
+                        if(isset($menu_check_name)){
+                            return response()->json([
+                                'error'=>'same_name'
+                            ], 201);
+                        }
+                    }
+                }
+                if (isset($validated['menu_name']) && isset($validated['menu_url'])) {
+                    $service_no_array = explode(" ", $validated['menu_service_no_array']);
+                    foreach($service_no_array as $row){
+                        $menu_check_name = Menu::where(strtolower('menu_name'),strtolower($validated['menu_name']))->where('menu_no','!=',$validated['menu_no'])->where('service_no_array', 'like', '%' . $row . '%')->first();
+                        if(isset($menu_check_name)){
+                            return response()->json([
+                                'error'=>'same_name'
+                            ], 201);
+                        }
+                    }
+                }
             $menu = Menu::where('menu_no', $validated['menu_no'])
                 ->update($validated);
             if($validated['menu_depth'] == '상위'){
