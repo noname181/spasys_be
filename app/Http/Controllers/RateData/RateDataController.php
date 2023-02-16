@@ -2038,6 +2038,65 @@ class RateDataController extends Controller
         }
     }
 
+    public function getspasys1fromlogisticnumbercheck($is_no)
+    {
+
+        try {
+            $user = Auth::user();
+
+            $rgd = ReceivingGoodsDelivery::with(['warehousing', 't_import', 't_export', 't_import_expected', 'rate_data_general'])->where('rgd_no', $is_no)->first();
+
+
+
+            $import = Import::with(['export_confirm', 'export', 'import_expect'])->where('ti_carry_in_number', $rgd->rgd_ti_carry_in_number)->first();
+
+
+            $company = Company::where('co_no', $rgd->warehousing->co_no)->first();
+
+            $company_shipper = $company;
+
+
+
+            $rate_data = RateData::where('rd_cate_meta1', '보세화물');
+
+            $rmd = RateMetaData::where('co_no', $user->mb_type == 'shop' ? $company->co_parent_no : $company->co_no)->whereNull('set_type')->orderBy('rmd_no', 'DESC')->first();
+            $rate_data = $rate_data->where('rd_co_no', $user->mb_type == 'shop' ? $company->co_parent_no : $company->co_no);
+            if (isset($rmd->rmd_no)) {
+                $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
+            }
+
+            $rate_data = $rate_data->get();
+
+            $adjustment_group = AdjustmentGroup::where('co_no', '=', $user->mb_type == 'shop' ? $company->co_parent_no : $company->co_no)->first();
+            $adjustment_group_all = AdjustmentGroup::where('co_no', '=', $user->mb_type == 'shop' ? $company->co_parent_no : $company->co_no)->get();
+
+            $export = Export::with(['import', 'import_expected', 't_export_confirm'])->where('te_carry_out_number', $rgd->rgd_te_carry_out_number)->first();
+
+            if (empty($export)) {
+                $export = [
+                    'import' => $import,
+                    'import_expected' => $import->import_expect,
+
+                ];
+            }
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'company' => $company,
+                'adjustment_group_all' => $adjustment_group_all,
+                'rate_data' => $rate_data,
+                'rgd'=>$rgd,
+                'export' => $export,
+                'company_shipper' => $company_shipper,
+                'adjustment_group' => $adjustment_group,
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
     public function getSpasysRateData($co_no)
     {
         $user = Auth::user();
