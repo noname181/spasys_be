@@ -46,23 +46,23 @@ class PermissionController extends Controller
             }
 
             $permission = $permission->get();
-            if(isset($validated['service_no']) && $permission->count() > 0 && $validated['service_no'] != 1){
-                $permission = $permission->filter(function ($item) use($validated){
+            // if(isset($validated['service_no']) && $permission->count() > 0 && $validated['service_no'] != 1){
+            //     $permission = $permission->filter(function ($item) use($validated){
 
-                    $menu_no = $item->menu_no;
-                    $menu = Menu::where('menu_no', $menu_no)->first();
-                    if(isset($menu->menu_no)){
-                        $service_no_array = $menu->service_no_array;
-                        $service_no_array = explode(" ", $service_no_array);
+            //         $menu_no = $item->menu_no;
+            //         $menu = Menu::where('menu_no', $menu_no)->first();
+            //         if(isset($menu->menu_no)){
+            //             $service_no_array = $menu->service_no_array;
+            //             $service_no_array = explode(" ", $service_no_array);
 
-                        $check = in_array($validated['service_no'], $service_no_array);
-                        return $check;
-                    }else {
-                        return false;
-                    }
+            //             $check = in_array($validated['service_no'], $service_no_array);
+            //             return $check;
+            //         }else {
+            //             return false;
+            //         }
 
-                })->values();
-            }
+            //     })->values();
+            // }
 
             $array_menu_no = [];
             foreach($permission as $per){
@@ -85,9 +85,17 @@ class PermissionController extends Controller
             }
 
             if (isset($validated['service_no']) && $validated['service_no'] == 0) {
-                $menu = $menu->filter(function ($item) use ($validated) {
-
-                    return $item->service_no_array == '2 3 4';
+                $menu = $menu->filter(function ($item) use ($validated,$services) {
+                    // $service_no_array = $item->service_no_array;
+                    // $service_no_array = explode(" ", $service_no_array);
+                    $services_array = '1 ';
+                    foreach($services as $row){
+        
+                        $services_array .= $row['service_no'].' ';
+                        
+                    }
+                    $services_array = rtrim($services_array," ");
+                    return $item->service_no_array == $services_array;
                 })->values();
             }
 
@@ -97,17 +105,18 @@ class PermissionController extends Controller
                     $menu_selected[] = $key;
                 }
             }
-
+         
             return response()->json([
                 'menu' => $menu,
                 'roles' => $roles,
                 'services' => $services,
                 'menu_selected' => $menu_selected,
+                'validate' => $validated,
             ]);
         }catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
 
