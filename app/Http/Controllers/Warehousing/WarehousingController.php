@@ -3741,7 +3741,7 @@ class WarehousingController extends Controller
                     });
                 })->whereHas('mb_no', function ($q) {
                     $q->where('mb_type', 'shop');
-                });
+                })->orderBy('created_at', 'DESC');
             } else if ($user->mb_type == 'shipper') {
                 $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general','payment'])->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no', function ($q) use ($user) {
@@ -3749,7 +3749,7 @@ class WarehousingController extends Controller
                     });
                 })->whereHas('mb_no', function ($q) {
                     $q->where('mb_type', 'shop');
-                });
+                })->orderBy('created_at', 'DESC');
             } else if ($user->mb_type == 'spasys' && $request->type == 'check_list') {
             } else if ($user->mb_type == 'spasys' && $request->type == 'view_list') {
                 $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 'settlement_number','payment'])->whereHas('w_no', function ($query) use ($user) {
@@ -3769,7 +3769,7 @@ class WarehousingController extends Controller
                     })
                     ->where('w_category_name', '=', '유통가공');
             })
-                ->where('rgd_is_show', 'y');
+                ->where('rgd_is_show', 'y')->orderBy('created_at', 'DESC');
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
@@ -4777,7 +4777,7 @@ class WarehousingController extends Controller
                     })->whereHas('co_no.contract', function ($q) use ($user) {
                         $q->where('c_calculate_deadline_yn', 'y');
                     });
-                });
+                })->orderBy('rgd_tax_invoice_date', 'DESC')->orderBy('rgd_no', 'DESC');
             } else if ($user->mb_type == 'shipper') {
                 $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no', function ($q) use ($user) {
@@ -4785,7 +4785,7 @@ class WarehousingController extends Controller
                     })->whereHas('co_no.contract', function ($q) use ($user) {
                         $q->where('c_calculate_deadline_yn', 'y');
                     });
-                });
+                })->orderBy('rgd_tax_invoice_date', 'DESC')->orderBy('rgd_no', 'DESC');
             } else if ($user->mb_type == 'spasys') {
                 $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
@@ -4805,7 +4805,7 @@ class WarehousingController extends Controller
             $warehousing->where(function ($q) {
                 $q->where('rgd_status4', '추가청구서')
                     ->orWhere('rgd_status4', '확정청구서');
-            })->where('rgd_is_show', 'y')->orderBy('rgd_no', 'DESC');
+            })->where('rgd_is_show', 'y')->orderBy('rgd_tax_invoice_date', 'DESC')->orderBy('rgd_no', 'DESC');
 
             if (isset($validated['status'])) {
                 if ($validated['status'] == 'waiting')
