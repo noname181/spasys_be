@@ -192,4 +192,24 @@ class ServiceController extends Controller
             return response()->json(['message' => Messages::MSG_0006], 500);
         }
     }
+
+    public function getServiceQuotation()
+    {
+        try {
+            $user = Auth::user();
+            $company = Company::where('co_no', $user->co_no)->first();
+            $services_use = explode(" ",$company->co_service);
+
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'company' => $company,
+                'services_use' => $services_use
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+           // return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
 }
