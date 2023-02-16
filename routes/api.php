@@ -421,6 +421,7 @@ Route::middleware('auth')->group(function () {
 
         //FOR SETTLEMENT 보세화물
         Route::get('/get_spasys1_from_logistic_number/{is_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'getspasys1fromlogisticnumber']);
+        Route::get('/get_spasys1_from_logistic_number_check/{is_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'getspasys1fromlogisticnumbercheck']);
         //REGISTER GENERAL DATA 유통가공
         Route::post('/general', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general'])->name('registe_rate_data_general');
         Route::post('/general_final', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_final'])->name('registe_rate_data_general_final');
