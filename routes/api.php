@@ -90,6 +90,8 @@ Route::middleware('auth')->group(function () {
             Route::post('/', \App\Http\Controllers\Service\ServiceController::class)->name('registe_update_services');
             Route::delete('/{service}', [App\Http\Controllers\Service\ServiceController::class, 'deleteService'])->name('delete_services');
         });
+        //get services quotation
+        Route::post('/service_quotation', [App\Http\Controllers\Service\ServiceController::class, 'getServiceQuotation'])->name('service_quotation');
 
         //get services by co_no
         Route::get('/by_co_no/{co_no}', [App\Http\Controllers\Service\ServiceController::class, 'getServiceByCoNo'])->name('get_services_by_co_no');
