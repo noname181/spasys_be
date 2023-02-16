@@ -120,11 +120,11 @@ class PermissionController extends Controller
             DB::beginTransaction();
 
             $ids = [];
+            if(isset($validated['menu'])){
             foreach($validated['menu'] as $menu){
                 $is_exist = Permission::where('role_no', $validated['role_no'])
                 ->where('menu_no', $menu['menu_no'])
-                ->where('menu_device', $menu['menu_device'])
-                ->where('service_no', $validated['service_no'])->first();
+                ->where('menu_device', $menu['menu_device'])->first();
                 if(!$is_exist){
                     Permission::insertGetId([
                         'role_no' => $validated['role_no'],
@@ -135,21 +135,29 @@ class PermissionController extends Controller
                 }
                 $ids[] = $menu['menu_no'];
             }
-
+            
             Permission::where('role_no', $validated['role_no'])
             ->where('menu_device', $menu['menu_device'])
-            ->where('service_no', $validated['service_no'])
             ->whereNotIn('menu_no', $ids)->delete();
+
+            } else {
+                $menu_device = $validated['menu_device'] == 'all' ? '전체' : $validated['menu_device'];
+                Permission::where('role_no', $validated['role_no'])
+                ->where('menu_device', $validated['menu_device'])
+                ->whereNotIn('menu_no', $ids)->delete();
+            }
+
 
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
+                'device' => $menu['menu_device']
             ], 201);
 
         }catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
 
