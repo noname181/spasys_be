@@ -196,14 +196,18 @@ class ServiceController extends Controller
     public function getServiceQuotation()
     {
         try {
+           
             $user = Auth::user();
-            $company = Company::where('co_no', $user->co_no)->first();
-            $services_use = explode(" ",$company->co_service);
+            if($user->mb_type == 'shop'){
+                $company = Company::where('co_no', $user->co_no)->first();
+                $services_use = explode(" ",$company->co_service);
+            }
+            
 
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'company' => $company,
-                'services_use' => $services_use
+                'company' => isset($company) ? $company : '',
+                'services_use' => isset($services_use) ? $services_use : '' ,
             ]);
         } catch (\Exception $e) {
             DB::rollback();
