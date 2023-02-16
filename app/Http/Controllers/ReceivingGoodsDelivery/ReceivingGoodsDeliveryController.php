@@ -478,6 +478,13 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'wi_type' => '출고_shipper'
                             ]);
                         }
+
+                        WarehousingStatus::insert([
+                            'w_no' => $w_no_ew,
+                            'mb_no' => $member->mb_no,
+                            'status' => '출고예정',
+                            'w_category_name' => $request->w_category_name,
+                        ]);
                     }
                 }
             }
@@ -649,7 +656,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         foreach ($data['location'] as $location) {
 
                             $warehousing_status = isset($location['rgd_status1']) ? $location['rgd_status1'] : null;
-                            $warehousing_status3 = isset($location['rgd_status3']) ? $location['rgd_status3'] : null;
+                            //$warehousing_status3 = isset($location['rgd_status3']) ? $location['rgd_status3'] : null;
                             $rgd_data = ReceivingGoodsDelivery::where('w_no', $request->w_no)->first();
 
                             if ($warehousing_status != $rgd_data->rgd_status1) {
@@ -658,11 +665,11 @@ class ReceivingGoodsDeliveryController extends Controller
                                 $warehousing_status = null;
                             }
 
-                            if ($warehousing_status != $rgd_data->rgd_status3) {
-                                $warehousing_status3 = isset($location['rgd_status3']) ? $location['rgd_status3'] : null;
-                            } else {
-                                $warehousing_status3 = null;
-                            }
+                            // if ($warehousing_status != $rgd_data->rgd_status3) {
+                            //     $warehousing_status3 = isset($location['rgd_status3']) ? $location['rgd_status3'] : null;
+                            // } else {
+                            //     $warehousing_status3 = null;
+                            // }
 
                             $rgd_no = ReceivingGoodsDelivery::where('w_no', $request->w_no)->update([
                                 'mb_no' => $member->mb_no,
@@ -695,14 +702,14 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'w_category_name' => $request->w_category_name,
                             ]);
                         }
-                        if ($warehousing_status3) {
-                            WarehousingStatus::insert([
-                                'w_no' => $request->w_no,
-                                'mb_no' => $member->mb_no,
-                                'status' => $warehousing_status3,
-                                'w_category_name' => $request->w_category_name,
-                            ]);
-                        }
+                        // if ($warehousing_status3) {
+                        //     WarehousingStatus::insert([
+                        //         'w_no' => $request->w_no,
+                        //         'mb_no' => $member->mb_no,
+                        //         'status' => $warehousing_status3,
+                        //         'w_category_name' => $request->w_category_name,
+                        //     ]);
+                        // }
                     }
                 }
 
@@ -796,7 +803,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                         foreach ($data['location'] as $location) {
                             $warehousing_status =  isset($location['rgd_status1']) ? $location['rgd_status1'] : null;
-                            $warehousing_status3 =  isset($location['rgd_status3']) ? $location['rgd_status3'] : null;
+                            //$warehousing_status3 =  isset($location['rgd_status3']) ? $location['rgd_status3'] : null;
 
                             $rgd_no = ReceivingGoodsDelivery::insertGetId([
                                 'mb_no' => $member->mb_no,
@@ -829,14 +836,14 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'w_category_name' => $request->w_category_name,
                             ]);
                         }
-                        if ($warehousing_status) {
-                            WarehousingStatus::insert([
-                                'w_no' => $w_no,
-                                'mb_no' => $member->mb_no,
-                                'status' => $warehousing_status3,
-                                'w_category_name' => $request->w_category_name,
-                            ]);
-                        }
+                        // if ($warehousing_status) {
+                        //     WarehousingStatus::insert([
+                        //         'w_no' => $w_no,
+                        //         'mb_no' => $member->mb_no,
+                        //         'status' => $warehousing_status3,
+                        //         'w_category_name' => $request->w_category_name,
+                        //     ]);
+                        // }
                     }
                 } else {
                     if (isset($request->data)) {
@@ -891,7 +898,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                                 foreach ($data['location'] as $location) {
                                     $warehousing_status = isset($location['rgd_status1']) ? $location['rgd_status1'] : null;
-                                    $warehousing_status3 = isset($location['rgd_status3']) ? $location['rgd_status3'] : null;
+                                    //$warehousing_status3 = isset($location['rgd_status3']) ? $location['rgd_status3'] : null;
                                     $rgd_data = ReceivingGoodsDelivery::where('w_no', $request->w_no)->first();
 
                                     if ($warehousing_status != $rgd_data->rgd_status1) {
@@ -900,11 +907,11 @@ class ReceivingGoodsDeliveryController extends Controller
                                         $warehousing_status = null;
                                     }
         
-                                    if ($warehousing_status != $rgd_data->rgd_status3) {
-                                        $warehousing_status3 = isset($location['rgd_status3']) ? $location['rgd_status3'] : null;
-                                    } else {
-                                        $warehousing_status3 = null;
-                                    }
+                                    // if ($warehousing_status != $rgd_data->rgd_status3) {
+                                    //     $warehousing_status3 = isset($location['rgd_status3']) ? $location['rgd_status3'] : null;
+                                    // } else {
+                                    //     $warehousing_status3 = null;
+                                    // }
 
                                     $rgd_no = ReceivingGoodsDelivery::where('w_no', $request->w_no)->update([
                                         'mb_no' => $member->mb_no,
@@ -937,14 +944,14 @@ class ReceivingGoodsDeliveryController extends Controller
                                         'w_category_name' => $request->w_category_name,
                                     ]);
                                 }
-                                if ($warehousing_status3) {
-                                    WarehousingStatus::insert([
-                                        'w_no' => $w_no,
-                                        'mb_no' => $member->mb_no,
-                                        'status' => $warehousing_status3,
-                                        'w_category_name' => $request->w_category_name,
-                                    ]);
-                                }
+                                // if ($warehousing_status3) {
+                                //     WarehousingStatus::insert([
+                                //         'w_no' => $w_no,
+                                //         'mb_no' => $member->mb_no,
+                                //         'status' => $warehousing_status3,
+                                //         'w_category_name' => $request->w_category_name,
+                                //     ]);
+                                // }
                             } else {
                                 $w_no = Warehousing::insertGetId([
                                     'mb_no' => $member->mb_no,
@@ -989,7 +996,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                                 foreach ($data['location'] as $location) {
                                     $warehousing_status =  isset($location['rgd_status1']) ? $location['rgd_status1'] : null;
-                                    $warehousing_status3 =  isset($location['rgd_status3']) ? $location['rgd_status3'] : null;
+                                    //$warehousing_status3 =  isset($location['rgd_status3']) ? $location['rgd_status3'] : null;
                                     $rgd_no = ReceivingGoodsDelivery::insertGetId([
                                         'mb_no' => $member->mb_no,
                                         'w_no' => $w_no,
@@ -1021,14 +1028,14 @@ class ReceivingGoodsDeliveryController extends Controller
                                         'w_category_name' => $request->w_category_name,
                                     ]);
                                 }
-                                if ($warehousing_status3) {
-                                    WarehousingStatus::insert([
-                                        'w_no' => $w_no,
-                                        'mb_no' => $member->mb_no,
-                                        'status' => $warehousing_status3,
-                                        'w_category_name' => $request->w_category_name,
-                                    ]);
-                                }
+                                // if ($warehousing_status3) {
+                                //     WarehousingStatus::insert([
+                                //         'w_no' => $w_no,
+                                //         'mb_no' => $member->mb_no,
+                                //         'status' => $warehousing_status3,
+                                //         'w_category_name' => $request->w_category_name,
+                                //     ]);
+                                // }
                             }
                         }
                     }
@@ -1943,6 +1950,13 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_status1' => '출고예정',
                             'rgd_status2' => '작업완료',
                             'rgd_status3' => null
+                        ]);
+
+                        WarehousingStatus::insert([
+                            'w_no' => $request->w_no,
+                            'mb_no' => $member->mb_no,
+                            'status' => '출고취소',
+                            'w_category_name' => "유통가공",
                         ]);
                     }
                 }
