@@ -88,7 +88,7 @@ class Member extends Authenticatable
         if(!empty($this->company)){
             $service_no_array = $this->company->co_service;
             if($this->company->co_type == 'spasys'){
-                $service_array = Service::where('service_use_yn', 'y')->where('service_no','!=', '1')->get();
+                $service_array = Service::where('service_use_yn', 'y')->get();
                 return $service_array;
             }
         }
