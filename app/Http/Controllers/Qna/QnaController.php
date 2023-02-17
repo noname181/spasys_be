@@ -444,9 +444,31 @@ class QnaController extends Controller
                 ->orderBy('answer_for','DESC')
                 ->orderBy('depth_path','ASC')
                 ->orderBy('qna_no', 'DESC');
-            } else {
+            }else if($member_type->mb_type == 'shop'){
                 $qna = Qna::with(['member','company','member_question'])->where('qna_status','!=','삭제')->where(function ($query) use ($member_type) {
                     $query->where('co_no_target', '=', Auth::user()->co_no)->orWhere('mb_no_question',$member_type->mb_no)->orWhere('co_no_target', '=', $member_type->company->co_parent->co_no)
+                        ->orWhereHas('member',function ($query) use ($member_type){
+                            $query->where('co_no','=',$member_type->co_no);
+                        });
+                })->with(['mb_no'=>function($query){
+                    $query->select(['mb_name','mb_no']);
+                }])->with('files')->with(['childQna'=>function($query){
+
+                    $query->with('files')->with(['mb_no_target'=>function($query){
+                        $query->select(['mb_name','mb_no']);
+                    }])->with(['mb_no'=>function($query){
+                        $query->select(['mb_name','mb_no']);
+                    }]);
+
+                }])->with(['member' => function($query){
+
+                }])
+                ->orderBy('answer_for','DESC')
+                ->orderBy('depth_path','ASC')
+                ->orderBy('qna_no', 'DESC');
+            } else if($member_type->mb_type == 'shipper') {
+                $qna = Qna::with(['member','company','member_question'])->where('qna_status','!=','삭제')->where(function ($query) use ($member_type) {
+                    $query->where('co_no_target', '=', Auth::user()->co_no)->orWhere('mb_no_question',$member_type->mb_no)
                         ->orWhereHas('member',function ($query) use ($member_type){
                             $query->where('co_no','=',$member_type->co_no);
                         });
