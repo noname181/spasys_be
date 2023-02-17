@@ -482,7 +482,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/general/{rgd_no}/{bill_type}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general'])->name('get_rate_data_general');
         //GET FINAL BILL DATA
         Route::get('/general_final/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_final'])->name('get_rate_data_general_final');
-        Route::get('/general_final2/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_final2'])->name('get_rate_data_general_final2');
+        Route::get('/general_fulfillment_final/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_fulfillment_final'])->name('get_rate_data_fulfillment_final');
         Route::get('/general_monthly_final/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_monthly_final'])->name('get_rate_data_general_monthly_final');
         Route::get('/general_monthly_final2/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_monthly_final2'])->name('get_rate_data_general_monthly_final2');
 

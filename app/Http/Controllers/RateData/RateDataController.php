@@ -2514,11 +2514,11 @@ class RateDataController extends Controller
         }
     }
 
-    public function get_rate_data_general_final2($rgd_no)
+    public function get_rate_data_fulfillment_final($rgd_no)
     {
         try {
             DB::beginTransaction();
-            $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
+            $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general'])->where('rgd_no', $rgd_no)->first();
 
             $rdg = RateDataGeneral::with(['warehousing'])->where('rgd_no', $rgd_no)->where('rdg_bill_type', 'final')->first();
             if (empty($rdg)) {
@@ -2547,9 +2547,12 @@ class RateDataController extends Controller
                 $rgd['c_calculate_deadline_yn'] = 'n';
             }
 
+            $ag_name = AdjustmentGroup::where('co_no', $rgd->warehousing->co_no)->get();
+
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
+                'ag_name' => $ag_name,
                 'rdg' => $rdg,
                 'rgd' => $rgd,
             ], 201);
