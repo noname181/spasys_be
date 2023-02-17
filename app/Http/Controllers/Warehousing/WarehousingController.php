@@ -3760,16 +3760,15 @@ class WarehousingController extends Controller
                     $q->where('mb_type', 'spasys');
                 });
             }
-            $warehousing->whereHas('w_no', function ($query) {
-                $query->where('rgd_status1', '=', '입고')
-                    ->where(function ($q) {
-                        $q->where('rgd_status4', '=', '예상경비청구서')
-                            ->orWhere('rgd_status4', '=', '확정청구서')
-                            ->orWhere('rgd_status4', '=', '추가청구서');
-                    })
-                    ->where('w_category_name', '=', '유통가공');
+            $warehousing->where(function ($q) {
+                $q->where('rgd_status4', '=', '예상경비청구서')
+                    ->orWhere('rgd_status4', '=', '확정청구서');
+                    // ->orWhere('rgd_status4', '=', '추가청구서');
             })
-                ->where('rgd_is_show', 'y')->orderBy('created_at', 'DESC');
+            ->whereHas('w_no', function ($query) {
+                $query->where('w_category_name', '=', '유통가공');
+            })
+            ->where('rgd_is_show', 'y')->orderBy('created_at', 'DESC');
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
@@ -3833,8 +3832,8 @@ class WarehousingController extends Controller
             }
             $warehousing_fulfillment->where(function ($q) {
                 $q->where('rgd_status4', '=', '예상경비청구서')
-                    ->orWhere('rgd_status4', '=', '확정청구서')
-                    ->orWhere('rgd_status4', '=', '추가청구서');
+                    ->orWhere('rgd_status4', '=', '확정청구서');
+                    // ->orWhere('rgd_status4', '=', '추가청구서');
             })
                 ->whereHas('w_no', function ($query) {
                     $query->where('w_category_name', '=', '수입풀필먼트');
@@ -3924,8 +3923,8 @@ class WarehousingController extends Controller
             }
             $warehousing_bonded->where(function ($q) {
                 $q->where('rgd_status4', '=', '예상경비청구서')
-                    ->orWhere('rgd_status4', '=', '확정청구서')
-                    ->orWhere('rgd_status4', '=', '추가청구서');
+                    ->orWhere('rgd_status4', '=', '확정청구서');
+                    // ->orWhere('rgd_status4', '=', '추가청구서');
             })->whereHas('w_no', function ($query) {
                 $query->where('w_category_name', '=', '보세화물');
             })
