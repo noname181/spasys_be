@@ -76,16 +76,14 @@ class ReceivingGoodsDeliveryController extends Controller
             DB::beginTransaction();
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
-
+            
             if (isset($validated['w_no'])) {
                 Warehousing::where('w_no', $validated['w_no'])->update([
-
                     'w_schedule_amount' => $validated['w_schedule_amount'],
-                    'w_schedule_day' => $validated['w_schedule_day'],
+                    'w_schedule_day' => isset($validated['w_schedule_day']) ? DateTime::createFromFormat('Y-m-d', $validated['w_schedule_day']) : null,
                     'w_amount' => $validated['w_amount'],
                     'w_type' => 'IW',
                     'w_category_name' => $request->w_category_name,
-
                 ]);
             } else {
                 //return $co_no;
