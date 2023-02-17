@@ -90,6 +90,8 @@ Route::middleware('auth')->group(function () {
             Route::post('/', \App\Http\Controllers\Service\ServiceController::class)->name('registe_update_services');
             Route::delete('/{service}', [App\Http\Controllers\Service\ServiceController::class, 'deleteService'])->name('delete_services');
         });
+        //get services quotation
+        Route::post('/service_quotation', [App\Http\Controllers\Service\ServiceController::class, 'getServiceQuotation'])->name('service_quotation');
 
         //get services by co_no
         Route::get('/by_co_no/{co_no}', [App\Http\Controllers\Service\ServiceController::class, 'getServiceByCoNo'])->name('get_services_by_co_no');
@@ -487,8 +489,6 @@ Route::middleware('auth')->group(function () {
 
         //GET GENERAL BILL FOR CREATE ADDITIONAL MONTHLY BILL PAGE 270
         Route::get('/general_monthly_additional/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_monthly_additional'])->name('get_rate_data_general_monthly_additional');
-        //GET GENERAL BILL FOR EDIT ADDITIONAL BILL PAGE
-        Route::get('/general_additional2/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_additional2'])->name('get_rate_data_general_additional2');
         //GET GENERAL BILL FOR CREATE ADDITIONAL CASE BILL PAGE 268
         Route::get('/general_additional/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general_additional'])->name('get_rate_data_general_additional');
         //GET GENERAL BILL FOR CREATE ADDITIONAL CASE BILL PAGE 268 POPUP

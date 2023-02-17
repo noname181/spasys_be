@@ -2424,6 +2424,9 @@ class RateDataController extends Controller
             DB::beginTransaction();
             $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
 
+            $is_check_page = str_contains($bill_type, 'check');
+            $bill_type = str_replace('_check', '', $bill_type);
+
             $w_no = $rgd->w_no;
             $user = Auth::user();
             $warehousing = Warehousing::with(['w_ew_many' => function ($q) {
@@ -2442,13 +2445,22 @@ class RateDataController extends Controller
             if (empty($rdg)) {
                 $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', $bill_type)->first();
             }
+
+            $co_no = Company::with(['co_parent'])->where('co_no', $warehousing->co_no)->first();
+
             if ($user->mb_type == 'spasys') {
-                $co_no = Company::with(['co_parent'])->where('co_no', $warehousing->co_no)->first();
-                $co_no = $co_no->co_parent->co_no;
-            } else if ($user->mb_type == 'shop') {
-                $co_no = $warehousing->co_no;
-            }else {
-                $co_no = $warehousing->co_no;
+                if($is_check_page){
+                    $co_no = $warehousing->co_no;
+                }else {
+                    $co_no = $co_no->co_parent->co_no;
+                }
+               
+            } else {
+                if($is_check_page){
+                    $co_no = $co_no->co_parent->co_no;
+                }else {
+                    $co_no = $warehousing->co_no;
+                }
             }
 
             $ag_name = AdjustmentGroup::where('co_no', $co_no)->get();
@@ -2674,7 +2686,7 @@ class RateDataController extends Controller
             DB::beginTransaction();
             $is_new = RateDataGeneral::where('rdg_no', $request->rdg_no)->where('rdg_bill_type', 'additional')->first();
 
-            $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+            $rgd = ReceivingGoodsDelivery::with('rate_data_general')->where('rgd_no', $request->rgd_no)->first();
             $w_no = $rgd->w_no;
             $ag = AdjustmentGroup::where('ag_no', $request->rdg_set_type)->first();
 
@@ -2688,8 +2700,8 @@ class RateDataController extends Controller
                     'rdg_bill_type' => 'additional',
                     'rgd_no_final' => $request->rgd_no,
                     'mb_no' => Auth::user()->mb_no,
-                    'rdg_set_type' => isset($ag->ag_name) ? $ag->ag_name : null,
-                    'ag_no' => isset($ag->ag_no) ? $ag->ag_no : null,
+                    'rdg_set_type' => isset($ag->ag_name) ? $ag->ag_name : (isset($rgd->rate_data_general) ? $rgd->rate_data_general->rdg_set_type : null),
+                    'ag_no' => isset($ag->ag_no) ? $ag->ag_no : (isset($rgd->rate_data_general) ? $rgd->rate_data_general->ag_no : null),
                     'rdg_supply_price1' => $request->storageData['supply_price'],
                     'rdg_supply_price2' => $request->workData['supply_price'],
                     'rdg_supply_price3' => $request->domesticData['supply_price'],
@@ -2853,28 +2865,6 @@ class RateDataController extends Controller
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
-    public function get_rate_data_general_additional2($rgd_no)
-    {
-        try {
-            DB::beginTransaction();
-            $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'additional')->first();
-
-            if (!isset($rdg->rdg_no)) {
-                $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'final')->first();
-            }
-
-            DB::commit();
-            return response()->json([
-                'message' => Messages::MSG_0007,
-                'rdg' => $rdg,
-            ], 201);
-        } catch (\Exception $e) {
-            DB::rollback();
-            Log::error($e);
-
-            return response()->json(['message' => Messages::MSG_0020], 500);
-        }
-    }
 
     public function get_rate_data_general_additional3($rgd_no)
     {
@@ -3014,7 +3004,19 @@ class RateDataController extends Controller
             DB::beginTransaction();
             $user = Auth::user();
             $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd_no)->first();
-            $co_no = $rgd->warehousing->co_no;
+            if($user->mb_type == 'spasys'){
+                if($bill_type == 'check'){
+                    $co_no = $rgd->warehousing->co_no;
+                }else {
+                    $co_no = $rgd->warehousing->company->co_parent->co_no;
+                } 
+            }else {
+                if($bill_type == 'check'){
+                    $co_no = $rgd->warehousing->company->co_parent->co_no;
+                }else {
+                    $co_no = $rgd->warehousing->co_no;
+                } 
+            }
             $adjustmentgroupall = AdjustmentGroup::where('co_no', $co_no)->get();
             $created_at = Carbon::createFromFormat('Y.m.d H:i:s', $rgd->created_at->format('Y.m.d H:i:s'));
 
@@ -3022,8 +3024,8 @@ class RateDataController extends Controller
             $end_date = $created_at->endOfMonth()->toDateString();
 
             $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent'])
-                ->whereHas('w_no', function ($q) use ($co_no) {
-                    $q->where('co_no', $co_no)
+                ->whereHas('w_no', function ($q) use ($rgd) {
+                    $q->where('co_no', $rgd->warehousing->co_no)
                         ->where('w_category_name', '유통가공');
                 })
             // ->doesntHave('rgd_child')

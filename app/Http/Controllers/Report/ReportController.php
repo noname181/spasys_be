@@ -330,17 +330,17 @@ class ReportController extends Controller
             if($user->mb_type == 'shop'){
                 $reports = Report::with(['files', 'reports_child','warehousing','export','member'])->whereHas('warehousing.co_no.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
-                })->orderBy('rp_parent_no', 'DESC');
+                })->orderBy('created_at', 'DESC')->orderBy('rp_parent_no', 'DESC');
             }else if($user->mb_type == 'shipper'){
                 $reports = Report::with(['files', 'reports_child','warehousing','export','member'])->whereHas('warehousing.co_no',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
-                })->orderBy('rp_parent_no', 'DESC');
+                })->orderBy('created_at', 'DESC')->orderBy('rp_parent_no', 'DESC');
             }else if($user->mb_type == 'spasys'){
                 $reports = Report::with(['files', 'reports_child','warehousing','export','member'])->whereHas('export.import_expected.company.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->orwhereHas('warehousing.co_no.co_parent.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
-                })->orderBy('rp_parent_no', 'DESC');
+                })->orderBy('created_at', 'DESC')->orderBy('rp_parent_no', 'DESC');
             }
 
             if (isset($validated['from_date'])) {
