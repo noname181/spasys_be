@@ -2514,11 +2514,11 @@ class RateDataController extends Controller
         }
     }
 
-    public function get_rate_data_general_final2($rgd_no)
+    public function get_rate_data_fulfillment_final($rgd_no)
     {
         try {
             DB::beginTransaction();
-            $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
+            $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general'])->where('rgd_no', $rgd_no)->first();
 
             $rdg = RateDataGeneral::with(['warehousing'])->where('rgd_no', $rgd_no)->where('rdg_bill_type', 'final')->first();
             if (empty($rdg)) {
@@ -2547,9 +2547,12 @@ class RateDataController extends Controller
                 $rgd['c_calculate_deadline_yn'] = 'n';
             }
 
+            $ag_name = AdjustmentGroup::where('co_no', $rgd->warehousing->co_no)->get();
+
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
+                'ag_name' => $ag_name,
                 'rdg' => $rdg,
                 'rgd' => $rgd,
             ], 201);
@@ -3758,7 +3761,7 @@ class RateDataController extends Controller
 
             $previous_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_no)->where('rgd_bill_type', '=', $request->previous_bill_type)->first();
 
-            if ($request->bill_type == 'final_spasys' || $request->bill_type == 'final_shop') {
+            if (($request->bill_type == 'final_spasys' || $request->bill_type == 'final_shop') && $request->type != 'edit_final') {
                 $previous_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_no)->first();
 
                 $previous_rgd->rgd_status4 = $user->mb_type == 'shop' ? 'issued' : $previous_rgd->rgd_status4;
