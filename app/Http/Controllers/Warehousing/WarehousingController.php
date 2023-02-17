@@ -3726,8 +3726,10 @@ class WarehousingController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
+
+            $warehousing = ReceivingGoodsDelivery::with(['mb_no','rate_meta_data', 'w_no', 'rate_data_general','payment']);
             if ($user->mb_type == 'shop' && $request->type == 'check_list') {
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no','rate_meta_data', 'w_no', 'rate_data_general','payment'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
@@ -3735,7 +3737,7 @@ class WarehousingController extends Controller
                     $q->where('mb_type', 'spasys');
                 });
             } else if ($user->mb_type == 'shop' && $request->type == 'view_list') {
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general','payment'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
@@ -3743,7 +3745,7 @@ class WarehousingController extends Controller
                     $q->where('mb_type', 'shop');
                 })->orderBy('created_at', 'DESC');
             } else if ($user->mb_type == 'shipper') {
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general','payment'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
@@ -3752,7 +3754,7 @@ class WarehousingController extends Controller
                 })->orderBy('created_at', 'DESC');
             } else if ($user->mb_type == 'spasys' && $request->type == 'check_list') {
             } else if ($user->mb_type == 'spasys' && $request->type == 'view_list') {
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 'settlement_number','payment'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
@@ -3805,26 +3807,27 @@ class WarehousingController extends Controller
             }
 
 
+            $warehousing_fulfillment = ReceivingGoodsDelivery::with(['mb_no', 'rate_meta_data', 'w_no', 'rate_data_general']);
             if ($user->mb_type == 'shop' && $request->type == 'view_list') {
-                $warehousing_fulfillment = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing_fulfillment->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
                 });
             } else if ($user->mb_type == 'shop' && $request->type == 'check_list') {
-                $warehousing_fulfillment = ReceivingGoodsDelivery::with(['mb_no','rate_meta_data', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing_fulfillment->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
                 });
             } else if ($user->mb_type == 'shipper') {
-                $warehousing_fulfillment = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing_fulfillment->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
                 });
             } else if ($user->mb_type == 'spasys' && $request->type == 'view_list') {
-                $warehousing_fulfillment = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing_fulfillment->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
@@ -3889,9 +3892,9 @@ class WarehousingController extends Controller
             }
 
 
-
+            $warehousing_bonded = ReceivingGoodsDelivery::with(['mb_no','rate_meta_data', 'w_no', 'rate_data_general', 't_export']);
             if ($user->mb_type == 'shop' && $request->type == 'view_list') {
-                $warehousing_bonded = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 't_export'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing_bonded->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
@@ -3899,7 +3902,7 @@ class WarehousingController extends Controller
                     $q->where('mb_type', 'shop');
                 });
             } else if ($user->mb_type == 'shop' && $request->type == 'check_list') {
-                $warehousing_bonded = ReceivingGoodsDelivery::with(['mb_no','rate_meta_data', 'w_no', 'rate_data_general', 't_export'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing_bonded->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
@@ -3907,13 +3910,13 @@ class WarehousingController extends Controller
                     $q->where('mb_type', 'spasys');
                 });
             } else if ($user->mb_type == 'shipper') {
-                $warehousing_bonded = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 't_export'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing_bonded->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
                 });
             } else if ($user->mb_type == 'spasys' && $request->type == 'view_list') {
-                $warehousing_bonded = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 't_export'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing_bonded->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
