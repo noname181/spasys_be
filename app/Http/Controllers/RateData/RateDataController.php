@@ -3761,7 +3761,7 @@ class RateDataController extends Controller
 
             $previous_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_no)->where('rgd_bill_type', '=', $request->previous_bill_type)->first();
 
-            if ($request->bill_type == 'final_spasys' || $request->bill_type == 'final_shop') {
+            if (($request->bill_type == 'final_spasys' || $request->bill_type == 'final_shop') && $request->type != 'edit_final') {
                 $previous_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_no)->first();
 
                 $previous_rgd->rgd_status4 = $user->mb_type == 'shop' ? 'issued' : $previous_rgd->rgd_status4;

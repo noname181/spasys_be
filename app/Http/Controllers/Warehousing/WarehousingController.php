@@ -4016,9 +4016,9 @@ class WarehousingController extends Controller
                     ])->first();
 
                     if(isset($item->payment->p_method_fee)){
-                        $item->p_method_fee = $item->payment->p_method_fee + $item->rate_data_general->rdg_sum4;
+                        $item->p_method_fee = $item->payment->p_method_fee + isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : 0;
                     }else{
-                        $item->p_method_fee = $item->rate_data_general->rdg_sum4;
+                        $item->p_method_fee = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : 0;
                     }
 
                     $item->settlement_cycle = $company_settlement ? $company_settlement->cs_payment_cycle : "";
