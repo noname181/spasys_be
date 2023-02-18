@@ -404,7 +404,7 @@ class BannerController extends Controller
         }
     }
 
-    public function CaculateService3()
+    public function CaculateService3($request)
     {
         $user = Auth::user();
         if ($user->mb_type == 'shop') {
@@ -612,14 +612,32 @@ class BannerController extends Controller
         $f = 0;
         $g = 0;
         $h = 0;
-       
-        $warehousinga = $warehousinga->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
-        $warehousingb = $warehousingb->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
-        $warehousingc = $warehousingc->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
-        $warehousingd = $warehousingd->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
-        $warehousinge = $warehousinge->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
-        $warehousingf = $warehousingf->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
-        $warehousingg = $warehousingg->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
+        if ($request->time == 'day') {
+            $warehousinga = $warehousinga->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
+            $warehousingb = $warehousingb->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
+            $warehousingc = $warehousingc->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
+            $warehousingd = $warehousingd->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
+            $warehousinge = $warehousinge->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
+            $warehousingf = $warehousingf->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
+            $warehousingg = $warehousingg->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
+        }elseif($request->time == 'week'){
+            $warehousinga = $warehousinga->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subWeek()->toDateTimeString())->get();
+            $warehousingb = $warehousingb->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subWeek()->toDateTimeString())->get();
+            $warehousingc = $warehousingc->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subWeek()->toDateTimeString())->get();
+            $warehousingd = $warehousingd->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subWeek()->toDateTimeString())->get();
+            $warehousinge = $warehousinge->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subWeek()->toDateTimeString())->get();
+            $warehousingf = $warehousingf->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subWeek()->toDateTimeString())->get();
+            $warehousingg = $warehousingg->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subWeek()->toDateTimeString())->get();
+        }else{
+            $warehousinga = $warehousinga->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subMonth()->toDateTimeString())->get();
+            $warehousingb = $warehousingb->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subMonth()->toDateTimeString())->get();
+            $warehousingc = $warehousingc->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subMonth()->toDateTimeString())->get();
+            $warehousingd = $warehousingd->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subMonth()->toDateTimeString())->get();
+            $warehousinge = $warehousinge->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subMonth()->toDateTimeString())->get();
+            $warehousingf = $warehousingf->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subMonth()->toDateTimeString())->get();
+            $warehousingg = $warehousingg->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subMonth()->toDateTimeString())->get();
+        }
+
 
         $counta = $warehousinga->count();
         $countb = $warehousingb->count();
@@ -660,9 +678,10 @@ class BannerController extends Controller
             $g += WarehousingItem::where('w_no', $item->w_no)->where('wi_type', '입고_spasys')->sum('wi_number');
         }
 
-        return ['warehousingb' => $warehousingd, 'a' => $a, 'b' => $b, 'c' => $c, 'd' => $d, 'e' => $e,'f' => $f,'h' => $h,'g' => $g,
-                'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte,'countf' => $countf,'countg' => $countg
-    
+        return [
+            'warehousingb' => $warehousingd, 'a' => $a, 'b' => $b, 'c' => $c, 'd' => $d, 'e' => $e, 'f' => $f, 'h' => $h, 'g' => $g,
+            'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'countf' => $countf, 'countg' => $countg
+
         ];
     }
 
@@ -683,7 +702,7 @@ class BannerController extends Controller
             $h = 0;
             $check = "";
             if ($request->service == "유통가공") {
-                $total =  $this->CaculateService3();
+                $total =  $this->CaculateService3($request);
                 $a = $total['a'];
                 $b = $total['b'];
                 $c = $total['c'];
@@ -865,7 +884,7 @@ class BannerController extends Controller
                 'count_e' => $counte,
                 'count_f' => $countf,
                 'count_g' => $countg,
-             
+
             ]);
         } catch (\Exception $e) {
             Log::error($e);
