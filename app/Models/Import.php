@@ -75,7 +75,7 @@ class Import extends Model
 
     public function import_expected()
     {
-        return $this->hasOne(ImportExpected::class, 'tie_logistic_manage_number', 'ti_logistic_manage_number');
+        return $this->hasOne(ImportExpected::class, 'tie_logistic_manage_number', 'ti_logistic_manage_number')->with('company');
     }
 
 }
