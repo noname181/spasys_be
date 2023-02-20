@@ -879,7 +879,10 @@ class RateDataController extends Controller
                         'rgd_no' => $rgd->rgd_parent_no,
                         'set_type' => 'bonded2_spasys',
                     ]
-                )->orwhere(
+                )->first();
+            }
+            if (empty($rmd)) {
+                $rmd = RateMetaData::where(
                     [
                         'rgd_no' => $rgd->rgd_parent_no,
                         'set_type' => 'bonded2_shop',
@@ -892,7 +895,10 @@ class RateDataController extends Controller
                         'rgd_no' => $rgd->rgd_no,
                         'set_type' => 'bonded2_spasys',
                     ]
-                )->orwhere(
+                )->first();
+            }
+            if (empty($rmd)) {
+                $rmd = RateMetaData::where(
                     [
                         'rgd_no' => $rgd->rgd_no,
                         'set_type' => 'bonded2_shop',
@@ -912,7 +918,10 @@ class RateDataController extends Controller
                         'rgd_no' => $rgd->rgd_parent_no,
                         'set_type' => 'bonded3_spasys',
                     ]
-                )->orwhere(
+                )->first();
+            }
+            if (empty($rmd)) {
+                $rmd = RateMetaData::where(
                     [
                         'rgd_no' => $rgd->rgd_parent_no,
                         'set_type' => 'bonded3_shop',
@@ -925,7 +934,10 @@ class RateDataController extends Controller
                         'rgd_no' => $rgd->rgd_no,
                         'set_type' => 'bonded3_spasys',
                     ]
-                )->orwhere(
+                )->first();
+            }
+            if (empty($rmd)) {
+                $rmd = RateMetaData::where(
                     [
                         'rgd_no' => $rgd->rgd_no,
                         'set_type' => 'bonded3_shop',
@@ -945,7 +957,10 @@ class RateDataController extends Controller
                         'rgd_no' => $rgd->rgd_parent_no,
                         'set_type' => 'bonded4_spasys',
                     ]
-                )->orwhere(
+                )->first();
+            }
+            if (empty($rmd)) {
+                $rmd = RateMetaData::where(
                     [
                         'rgd_no' => $rgd->rgd_parent_no,
                         'set_type' => 'bonded4_shop',
@@ -958,7 +973,10 @@ class RateDataController extends Controller
                         'rgd_no' => $rgd->rgd_no,
                         'set_type' => 'bonded4_spasys',
                     ]
-                )->orwhere(
+                )->first();
+            }
+            if (empty($rmd)) {
+                $rmd = RateMetaData::where(
                     [
                         'rgd_no' => $rgd->rgd_no,
                         'set_type' => 'bonded4_shop',
@@ -978,7 +996,10 @@ class RateDataController extends Controller
                         'rgd_no' => $rgd->rgd_parent_no,
                         'set_type' => 'bonded5_spasys',
                     ]
-                )->orwhere(
+                )->first();
+            }
+            if (empty($rmd)) {
+                $rmd = RateMetaData::where(
                     [
                         'rgd_no' => $rgd->rgd_parent_no,
                         'set_type' => 'bonded5_shop',
@@ -991,7 +1012,10 @@ class RateDataController extends Controller
                         'rgd_no' => $rgd->rgd_no,
                         'set_type' => 'bonded5_spasys',
                     ]
-                )->orwhere(
+                )->first();
+            }
+            if (empty($rmd)) {
+                $rmd = RateMetaData::where(
                     [
                         'rgd_no' => $rgd->rgd_no,
                         'set_type' => 'bonded5_shop',
@@ -1011,7 +1035,10 @@ class RateDataController extends Controller
                         'rgd_no' => $rgd->rgd_parent_no,
                         'set_type' => 'bonded6_spasys',
                     ]
-                )->orwhere(
+                )->first();
+            }
+            if (empty($rmd)) {
+                $rmd = RateMetaData::where(
                     [
                         'rgd_no' => $rgd->rgd_parent_no,
                         'set_type' => 'bonded6_shop',
@@ -1024,7 +1051,10 @@ class RateDataController extends Controller
                         'rgd_no' => $rgd->rgd_no,
                         'set_type' => 'bonded6_spasys',
                     ]
-                )->orwhere(
+                )->first();
+            }
+            if (empty($rmd)) {
+                $rmd = RateMetaData::where(
                     [
                         'rgd_no' => $rgd->rgd_no,
                         'set_type' => 'bonded6_shop',
