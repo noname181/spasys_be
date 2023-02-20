@@ -56,6 +56,7 @@ class ReceivingGoodsDelivery extends Model
         'rgd_calculate_deadline_yn',
         'rgd_ti_carry_in_number',
         'rgd_te_carry_out_number',
+        'rgd_discount_rate',
         'created_at',
         'updated_at',
     ];
