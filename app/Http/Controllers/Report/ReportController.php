@@ -336,11 +336,19 @@ class ReportController extends Controller
                     $q->where('co_no', $user->co_no);
                 })->orderBy('created_at', 'DESC')->orderBy('rp_parent_no', 'DESC');
             }else if($user->mb_type == 'spasys'){
-                $reports = Report::with(['files', 'reports_child','warehousing','export','member'])->whereHas('export.import_expected.company.co_parent',function ($q) use ($user){
+                $reports = Report::with(['files', 'reports_child','warehousing','warehousing_by_te','warehousing_by_ti','warehousing_by_tie','export','member','import_expect','import'])->whereHas('export.import_expected.company.co_parent',function ($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->orwhereHas('export.import_expected.company.co_parent',function ($q) use ($user){
+                    $q->where('co_parent_no', $user->co_no);
+                })->orwhereHas('import_expect.company.co_parent',function ($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->orwhereHas('import_expect.company_spasys',function ($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->orwhereHas('import.import_expected.company.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->orwhereHas('warehousing.co_no.co_parent.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
-                })->orderBy('created_at', 'DESC')->orderBy('rp_parent_no', 'DESC');
+                })->orderBy('rp_parent_no', 'DESC');
             }
 
             if (isset($validated['from_date'])) {
@@ -408,7 +416,7 @@ class ReportController extends Controller
             return response()->json($reports);
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
 
         }

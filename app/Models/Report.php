@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\File;
 use App\Models\Report;
 use App\Models\Export;
+use App\Models\ImportExpected;
+use App\Models\Import;
 use App\Models\Member;
 class Report extends Model
 {
@@ -51,9 +53,29 @@ class Report extends Model
     {
         return $this->belongsTo(Warehousing::class, 'w_no', 'w_no')->with(['import_schedule','co_no','warehousing_item','receving_goods_delivery']);
     }
+    public function warehousing_by_te()
+    {
+        return $this->belongsTo(Warehousing::class, 'w_no', 'te_carry_out_number')->with(['import_schedule','co_no','warehousing_item','receving_goods_delivery']);
+    }
+    public function warehousing_by_ti()
+    {
+        return $this->belongsTo(Warehousing::class, 'w_no', 'ti_carry_in_number')->with(['import_schedule','co_no','warehousing_item','receving_goods_delivery']);
+    }
+    public function warehousing_by_tie()
+    {
+        return $this->belongsTo(Warehousing::class, 'w_no', 'logistic_manage_number')->with(['import_schedule','co_no','warehousing_item','receving_goods_delivery']);
+    }
     public function export()
     {
         return $this->belongsTo(Export::class, 'w_no', 'te_carry_out_number')->with(['import_expected']);
+    }
+    public function import()
+    {
+        return $this->belongsTo(Import::class, 'w_no', 'ti_carry_in_number')->with(['import_expected']);
+    }
+    public function import_expect()
+    {
+        return $this->belongsTo(ImportExpected::class, 'w_no', 'tie_logistic_manage_number')->with(['company','company_spasys']);
     }
     public function member()
     {
