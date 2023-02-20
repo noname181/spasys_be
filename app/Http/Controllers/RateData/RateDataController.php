@@ -2361,62 +2361,62 @@ class RateDataController extends Controller
         }
     }
 
-    public function registe_rate_data_general(Request $request)
-    {
-        try {
-            DB::beginTransaction();
-            $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
-            $ag = AdjustmentGroup::where('ag_no', $request->rdg_set_type)->first();
+    // public function registe_rate_data_general(Request $request)
+    // {
+    //     try {
+    //         DB::beginTransaction();
+    //         $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+    //         $ag = AdjustmentGroup::where('ag_no', $request->rdg_set_type)->first();
 
-            $rdg = RateDataGeneral::updateOrCreate(
-                [
-                    'rdg_no' => $request->rdg_no,
-                    'rdg_bill_type' => $request->bill_type,
-                ],
-                [
-                    'w_no' => $rgd->w_no,
-                    'rgd_no' => isset($rgd->rgd_no) ? $rgd->rgd_no : null,
-                    'rdg_bill_type' => $request->bill_type,
-                    'mb_no' => Auth::user()->mb_no,
-                    'rdg_set_type' => isset($ag->ag_name) ? $ag->ag_name : null,
-                    'ag_no' => isset($ag->ag_no) ? $ag->ag_no : null,
-                    'rdg_supply_price1' => $request->storageData['supply_price'],
-                    'rdg_supply_price2' => $request->workData['supply_price'],
-                    'rdg_supply_price3' => $request->domesticData['supply_price'],
-                    'rdg_supply_price4' => $request->total['supply_price'],
-                    'rdg_vat1' => $request->storageData['taxes'],
-                    'rdg_vat2' => $request->workData['taxes'],
-                    'rdg_vat3' => $request->domesticData['taxes'],
-                    'rdg_vat4' => $request->total['taxes'],
-                    'rdg_sum1' => $request->storageData['sum'],
-                    'rdg_sum2' => $request->workData['sum'],
-                    'rdg_sum3' => $request->domesticData['sum'],
-                    'rdg_sum4' => $request->total['sum'],
-                    'rdg_etc1' => $request->storageData['etc'],
-                    'rdg_etc2' => $request->workData['etc'],
-                    'rdg_etc3' => $request->domesticData['etc'],
-                    'rdg_etc4' => $request->total['etc'],
-                ]
-            );
+    //         $rdg = RateDataGeneral::updateOrCreate(
+    //             [
+    //                 'rdg_no' => $request->rdg_no,
+    //                 'rdg_bill_type' => $request->bill_type,
+    //             ],
+    //             [
+    //                 'w_no' => $rgd->w_no,
+    //                 'rgd_no' => isset($rgd->rgd_no) ? $rgd->rgd_no : null,
+    //                 'rdg_bill_type' => $request->bill_type,
+    //                 'mb_no' => Auth::user()->mb_no,
+    //                 'rdg_set_type' => isset($ag->ag_name) ? $ag->ag_name : null,
+    //                 'ag_no' => isset($ag->ag_no) ? $ag->ag_no : null,
+    //                 'rdg_supply_price1' => $request->storageData['supply_price'],
+    //                 'rdg_supply_price2' => $request->workData['supply_price'],
+    //                 'rdg_supply_price3' => $request->domesticData['supply_price'],
+    //                 'rdg_supply_price4' => $request->total['supply_price'],
+    //                 'rdg_vat1' => $request->storageData['taxes'],
+    //                 'rdg_vat2' => $request->workData['taxes'],
+    //                 'rdg_vat3' => $request->domesticData['taxes'],
+    //                 'rdg_vat4' => $request->total['taxes'],
+    //                 'rdg_sum1' => $request->storageData['sum'],
+    //                 'rdg_sum2' => $request->workData['sum'],
+    //                 'rdg_sum3' => $request->domesticData['sum'],
+    //                 'rdg_sum4' => $request->total['sum'],
+    //                 'rdg_etc1' => $request->storageData['etc'],
+    //                 'rdg_etc2' => $request->workData['etc'],
+    //                 'rdg_etc3' => $request->domesticData['etc'],
+    //                 'rdg_etc4' => $request->total['etc'],
+    //             ]
+    //         );
 
-            ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-                'rgd_status4' => '예상경비청구서',
-                'rgd_issue_date' => Carbon::now()->toDateTimeString(),
-                'rgd_bill_type' => $request->bill_type,
-            ]);
+    //         ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+    //             'rgd_status4' => '예상경비청구서',
+    //             'rgd_issue_date' => Carbon::now()->toDateTimeString(),
+    //             'rgd_bill_type' => $request->bill_type,
+    //         ]);
 
-            DB::commit();
-            return response()->json([
-                'message' => Messages::MSG_0007,
-                'rdg' => $rdg,
-            ], 201);
-        } catch (\Exception $e) {
-            DB::rollback();
-            Log::error($e);
+    //         DB::commit();
+    //         return response()->json([
+    //             'message' => Messages::MSG_0007,
+    //             'rdg' => $rdg,
+    //         ], 201);
+    //     } catch (\Exception $e) {
+    //         DB::rollback();
+    //         Log::error($e);
 
-            return response()->json(['message' => Messages::MSG_0020], 500);
-        }
-    }
+    //         return response()->json(['message' => Messages::MSG_0020], 500);
+    //     }
+    // }
 
     public function get_rate_data_general($rgd_no, $bill_type)
     {
@@ -2564,7 +2564,7 @@ class RateDataController extends Controller
         }
     }
 
-    public function registe_rate_data_general_final(Request $request)
+    public function registe_rate_data_general(Request $request)
     {
         try {
             DB::beginTransaction();
@@ -3955,6 +3955,7 @@ class RateDataController extends Controller
                 $final_rgd->rgd_storage_days = $request->storage_days;
                 $final_rgd->rgd_integrated_calculate_yn = $request->rgd_integrated_calculate_yn;
                 $final_rgd->rgd_calculate_deadline_yn = $request->rgd_calculate_deadline_yn ? $request->rgd_calculate_deadline_yn : $previous_rgd->rgd_calculate_deadline_yn;
+                $final_rgd->rgd_discount_rate = $request->rgd_discount_rate;
                 $final_rgd->save();
 
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([

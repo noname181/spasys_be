@@ -66,9 +66,10 @@ class WarehousingStatusController extends Controller
             $warehousing_status = WarehousingStatus::with(['mb_no','warehousing'])->orderBy('ws_no', 'DESC');
             
             if(isset($validated['page_type']) && $validated['page_type'] == "Page146"){
-                $warehousing_status->where('w_no', '=', $validated['w_no'])->orwhere('w_no', '=', $warehousing->w_import_no);
+                //$warehousing_status->where('w_no', '=', $validated['w_no'])->orwhere('w_no', '=', $warehousing->w_import_no);
+                $warehousing_status->where('w_no', '=', $validated['w_no'])->where('status','!=','출고예정 취소');
             }else{   
-                $warehousing_status->where('w_no', '=', $validated['w_no']);  
+                $warehousing_status->where('w_no', '=', $validated['w_no'])->where('status','!=','출고예정 취소');  
             }
             
 
