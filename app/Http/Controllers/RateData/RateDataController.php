@@ -2484,7 +2484,7 @@ class RateDataController extends Controller
                 }else {
                     $co_no = $co_no->co_parent->co_no;
                 }
-               
+
             } else {
                 if($is_check_page){
                     $co_no = $co_no->co_parent->co_no;
@@ -3042,13 +3042,13 @@ class RateDataController extends Controller
                     $co_no = $rgd->warehousing->co_no;
                 }else {
                     $co_no = $rgd->warehousing->company->co_parent->co_no;
-                } 
+                }
             }else {
                 if($bill_type == 'check'){
                     $co_no = $rgd->warehousing->company->co_parent->co_no;
                 }else {
                     $co_no = $rgd->warehousing->co_no;
-                } 
+                }
             }
             $adjustmentgroupall = AdjustmentGroup::where('co_no', $co_no)->get();
             $created_at = Carbon::createFromFormat('Y.m.d H:i:s', $rgd->created_at->format('Y.m.d H:i:s'));
@@ -3992,6 +3992,13 @@ class RateDataController extends Controller
                     'rgd_no' => $final_rgd->rgd_no,
                 ]);
 
+                RateMetaData::where('rgd_no', $request->rgd_no)
+                ->where('set_type', 'LIKE', '%' . ($user->mb_type == 'spasys' ? '_spasys' : '_shop') . '%')
+                ->update([
+                    'rgd_no' => $final_rgd->rgd_no,
+                ]);
+
+
                 // ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                 //     'rgd_status4' => '예상경비청구서',
                 //     'rgd_issue_date' => Carbon::now()->toDateTimeString(),
@@ -4028,6 +4035,13 @@ class RateDataController extends Controller
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
                     'rgd_no' => $final_rgd->rgd_no,
                 ]);
+
+                RateMetaData::where('rgd_no', $request->rgd_no)
+                ->where('set_type', 'LIKE', '%' . ($user->mb_type == 'spasys' ? '_spasys' : '_shop') . '%')
+                ->update([
+                    'rgd_no' => $final_rgd->rgd_no,
+                ]);
+
             }
 
             DB::commit();
