@@ -3745,7 +3745,7 @@ class WarehousingController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
 
-            $warehousing = ReceivingGoodsDelivery::with(['mb_no','rate_meta_data', 'w_no', 'rate_data_general','payment']);
+            $warehousing = ReceivingGoodsDelivery::with(['mb_no','rate_meta_data', 'rate_meta_data_parent', 'w_no', 'rate_data_general','payment']);
             if ($user->mb_type == 'shop' && $request->type == 'check_list') {
                 $warehousing->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent', function ($q) use ($user) {
@@ -3825,7 +3825,7 @@ class WarehousingController extends Controller
             }
 
 
-            $warehousing_fulfillment = ReceivingGoodsDelivery::with(['mb_no', 'rate_meta_data', 'w_no', 'rate_data_general']);
+            $warehousing_fulfillment = ReceivingGoodsDelivery::with(['mb_no', 'rate_meta_data', 'rate_meta_data_parent', 'w_no', 'rate_data_general']);
             if ($user->mb_type == 'shop' && $request->type == 'view_list') {
                 $warehousing_fulfillment->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent', function ($q) use ($user) {
@@ -3910,7 +3910,7 @@ class WarehousingController extends Controller
             }
 
 
-            $warehousing_bonded = ReceivingGoodsDelivery::with(['mb_no','rate_meta_data', 'w_no', 'rate_data_general', 't_export']);
+            $warehousing_bonded = ReceivingGoodsDelivery::with(['mb_no','rate_meta_data', 'rate_meta_data_parent', 'w_no', 'rate_data_general', 't_export']);
             if ($user->mb_type == 'shop' && $request->type == 'view_list') {
                 $warehousing_bonded->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent', function ($q) use ($user) {

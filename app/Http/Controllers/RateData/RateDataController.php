@@ -3955,6 +3955,7 @@ class RateDataController extends Controller
                 $final_rgd->rgd_storage_days = $request->storage_days;
                 $final_rgd->rgd_integrated_calculate_yn = $request->rgd_integrated_calculate_yn;
                 $final_rgd->rgd_calculate_deadline_yn = $request->rgd_calculate_deadline_yn ? $request->rgd_calculate_deadline_yn : $previous_rgd->rgd_calculate_deadline_yn;
+                $final_rgd->rgd_discount_rate = $request->rgd_discount_rate;
                 $final_rgd->save();
 
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
