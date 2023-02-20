@@ -2361,62 +2361,62 @@ class RateDataController extends Controller
         }
     }
 
-    public function registe_rate_data_general(Request $request)
-    {
-        try {
-            DB::beginTransaction();
-            $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
-            $ag = AdjustmentGroup::where('ag_no', $request->rdg_set_type)->first();
+    // public function registe_rate_data_general(Request $request)
+    // {
+    //     try {
+    //         DB::beginTransaction();
+    //         $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+    //         $ag = AdjustmentGroup::where('ag_no', $request->rdg_set_type)->first();
 
-            $rdg = RateDataGeneral::updateOrCreate(
-                [
-                    'rdg_no' => $request->rdg_no,
-                    'rdg_bill_type' => $request->bill_type,
-                ],
-                [
-                    'w_no' => $rgd->w_no,
-                    'rgd_no' => isset($rgd->rgd_no) ? $rgd->rgd_no : null,
-                    'rdg_bill_type' => $request->bill_type,
-                    'mb_no' => Auth::user()->mb_no,
-                    'rdg_set_type' => isset($ag->ag_name) ? $ag->ag_name : null,
-                    'ag_no' => isset($ag->ag_no) ? $ag->ag_no : null,
-                    'rdg_supply_price1' => $request->storageData['supply_price'],
-                    'rdg_supply_price2' => $request->workData['supply_price'],
-                    'rdg_supply_price3' => $request->domesticData['supply_price'],
-                    'rdg_supply_price4' => $request->total['supply_price'],
-                    'rdg_vat1' => $request->storageData['taxes'],
-                    'rdg_vat2' => $request->workData['taxes'],
-                    'rdg_vat3' => $request->domesticData['taxes'],
-                    'rdg_vat4' => $request->total['taxes'],
-                    'rdg_sum1' => $request->storageData['sum'],
-                    'rdg_sum2' => $request->workData['sum'],
-                    'rdg_sum3' => $request->domesticData['sum'],
-                    'rdg_sum4' => $request->total['sum'],
-                    'rdg_etc1' => $request->storageData['etc'],
-                    'rdg_etc2' => $request->workData['etc'],
-                    'rdg_etc3' => $request->domesticData['etc'],
-                    'rdg_etc4' => $request->total['etc'],
-                ]
-            );
+    //         $rdg = RateDataGeneral::updateOrCreate(
+    //             [
+    //                 'rdg_no' => $request->rdg_no,
+    //                 'rdg_bill_type' => $request->bill_type,
+    //             ],
+    //             [
+    //                 'w_no' => $rgd->w_no,
+    //                 'rgd_no' => isset($rgd->rgd_no) ? $rgd->rgd_no : null,
+    //                 'rdg_bill_type' => $request->bill_type,
+    //                 'mb_no' => Auth::user()->mb_no,
+    //                 'rdg_set_type' => isset($ag->ag_name) ? $ag->ag_name : null,
+    //                 'ag_no' => isset($ag->ag_no) ? $ag->ag_no : null,
+    //                 'rdg_supply_price1' => $request->storageData['supply_price'],
+    //                 'rdg_supply_price2' => $request->workData['supply_price'],
+    //                 'rdg_supply_price3' => $request->domesticData['supply_price'],
+    //                 'rdg_supply_price4' => $request->total['supply_price'],
+    //                 'rdg_vat1' => $request->storageData['taxes'],
+    //                 'rdg_vat2' => $request->workData['taxes'],
+    //                 'rdg_vat3' => $request->domesticData['taxes'],
+    //                 'rdg_vat4' => $request->total['taxes'],
+    //                 'rdg_sum1' => $request->storageData['sum'],
+    //                 'rdg_sum2' => $request->workData['sum'],
+    //                 'rdg_sum3' => $request->domesticData['sum'],
+    //                 'rdg_sum4' => $request->total['sum'],
+    //                 'rdg_etc1' => $request->storageData['etc'],
+    //                 'rdg_etc2' => $request->workData['etc'],
+    //                 'rdg_etc3' => $request->domesticData['etc'],
+    //                 'rdg_etc4' => $request->total['etc'],
+    //             ]
+    //         );
 
-            ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-                'rgd_status4' => '예상경비청구서',
-                'rgd_issue_date' => Carbon::now()->toDateTimeString(),
-                'rgd_bill_type' => $request->bill_type,
-            ]);
+    //         ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+    //             'rgd_status4' => '예상경비청구서',
+    //             'rgd_issue_date' => Carbon::now()->toDateTimeString(),
+    //             'rgd_bill_type' => $request->bill_type,
+    //         ]);
 
-            DB::commit();
-            return response()->json([
-                'message' => Messages::MSG_0007,
-                'rdg' => $rdg,
-            ], 201);
-        } catch (\Exception $e) {
-            DB::rollback();
-            Log::error($e);
+    //         DB::commit();
+    //         return response()->json([
+    //             'message' => Messages::MSG_0007,
+    //             'rdg' => $rdg,
+    //         ], 201);
+    //     } catch (\Exception $e) {
+    //         DB::rollback();
+    //         Log::error($e);
 
-            return response()->json(['message' => Messages::MSG_0020], 500);
-        }
-    }
+    //         return response()->json(['message' => Messages::MSG_0020], 500);
+    //     }
+    // }
 
     public function get_rate_data_general($rgd_no, $bill_type)
     {
@@ -2564,7 +2564,7 @@ class RateDataController extends Controller
         }
     }
 
-    public function registe_rate_data_general_final(Request $request)
+    public function registe_rate_data_general(Request $request)
     {
         try {
             DB::beginTransaction();
@@ -3899,34 +3899,34 @@ class RateDataController extends Controller
                     'mb_no' => Auth::user()->mb_no,
                     'rdg_set_type' => isset($ag->ag_name) ? $ag->ag_name : (isset($rgd->rate_data_general) ? $rgd->rate_data_general->rdg_set_type : NULL),
                     'ag_no' => isset($ag->ag_no) ? $ag->ag_no : (isset($rgd->rate_data_general) ? $rgd->rate_data_general->ag_no : NULL),
-                    'rdg_supply_price1' => $request->bonded1['supply_price'],
-                    'rdg_supply_price2' => $request->bonded2['supply_price'],
-                    'rdg_supply_price3' => $request->bonded3['supply_price'],
-                    'rdg_supply_price4' => $request->bonded4['supply_price'],
-                    'rdg_supply_price5' => $request->bonded5['supply_price'],
-                    'rdg_supply_price6' => $request->bonded6['supply_price'],
-                    'rdg_supply_price7' => $request->total['supply_price'],
-                    'rdg_vat1' => $request->bonded1['taxes'],
-                    'rdg_vat2' => $request->bonded2['taxes'],
-                    'rdg_vat3' => $request->bonded3['taxes'],
-                    'rdg_vat4' => $request->bonded4['taxes'],
-                    'rdg_vat5' => $request->bonded5['taxes'],
-                    'rdg_vat6' => $request->bonded6['taxes'],
-                    'rdg_vat7' => $request->total['taxes'],
-                    'rdg_sum1' => $request->bonded1['sum'],
-                    'rdg_sum2' => $request->bonded2['sum'],
-                    'rdg_sum3' => $request->bonded3['sum'],
-                    'rdg_sum4' => $request->bonded4['sum'],
-                    'rdg_sum5' => $request->bonded5['sum'],
-                    'rdg_sum6' => $request->bonded6['sum'],
-                    'rdg_sum7' => $request->total['sum'],
-                    'rdg_etc1' => $request->bonded1['etc'],
-                    'rdg_etc2' => $request->bonded2['etc'],
-                    'rdg_etc3' => $request->bonded3['etc'],
-                    'rdg_etc4' => $request->bonded4['etc'],
-                    'rdg_etc5' => $request->bonded5['etc'],
-                    'rdg_etc6' => $request->bonded6['etc'],
-                    'rdg_etc7' => $request->total['etc'],
+                    'rdg_supply_price1' => isset($request->bonded1['supply_price']) ? $request->bonded1['supply_price'] : 0,
+                    'rdg_supply_price2' => isset($request->bonded2['supply_price']) ? $request->bonded2['supply_price'] : 0,
+                    'rdg_supply_price3' => isset($request->bonded3['supply_price']) ? $request->bonded3['supply_price'] : 0,
+                    'rdg_supply_price4' => isset($request->bonded4['supply_price']) ? $request->bonded4['supply_price'] : 0,
+                    'rdg_supply_price5' => isset($request->bonded5['supply_price']) ? $request->bonded5['supply_price'] : 0,
+                    'rdg_supply_price6' => isset($request->bonded6['supply_price']) ? $request->bonded6['supply_price'] : 0,
+                    'rdg_supply_price7' => isset($request->total['supply_price']) ? $request->total['supply_price'] : 0,
+                    'rdg_vat1' => isset($request->bonded1['taxes']) ? $request->bonded1['taxes'] : 0,
+                    'rdg_vat2' => isset($request->bonded2['taxes']) ? $request->bonded2['taxes'] : 0,
+                    'rdg_vat3' => isset($request->bonded3['taxes']) ? $request->bonded3['taxes'] : 0,
+                    'rdg_vat4' => isset($request->bonded4['taxes']) ? $request->bonded4['taxes'] : 0,
+                    'rdg_vat5' => isset($request->bonded5['taxes']) ? $request->bonded5['taxes'] : 0,
+                    'rdg_vat6' => isset($request->bonded6['taxes']) ? $request->bonded6['taxes'] : 0,
+                    'rdg_vat7' => isset($request->total['taxes']) ? $request->total['taxes'] : 0,
+                    'rdg_sum1' => isset($request->bonded1['sum']) ? $request->bonded1['sum'] : 0,
+                    'rdg_sum2' => isset($request->bonded2['sum']) ? $request->bonded2['sum'] : 0,
+                    'rdg_sum3' => isset($request->bonded3['sum']) ? $request->bonded3['sum'] : 0,
+                    'rdg_sum4' => isset($request->bonded4['sum']) ? $request->bonded4['sum'] : 0,
+                    'rdg_sum5' => isset($request->bonded5['sum']) ? $request->bonded5['sum'] : 0,
+                    'rdg_sum6' => isset($request->bonded6['sum']) ? $request->bonded1['sum'] : 0,
+                    'rdg_sum7' => isset($request->total['sum']) ? $request->total['sum'] : 0,
+                    'rdg_etc1' => isset($request->bonded1['etc']) ? $request->bonded1['etc'] : 0,
+                    'rdg_etc2' => isset($request->bonded2['etc']) ? $request->bonded2['etc'] : 0,
+                    'rdg_etc3' => isset($request->bonded3['etc']) ? $request->bonded3['etc'] : 0,
+                    'rdg_etc4' => isset($request->bonded4['etc']) ? $request->bonded4['etc'] : 0,
+                    'rdg_etc5' => isset($request->bonded5['etc']) ? $request->bonded5['etc'] : 0,
+                    'rdg_etc6' => isset($request->bonded6['etc']) ? $request->bonded6['etc'] : 0,
+                    'rdg_etc7' => isset($request->total['etc']) ? $request->total['etc'] : 0,
                 ]
             );
             $previous_rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->where('rgd_bill_type', '=', $request->previous_bill_type)->first();
