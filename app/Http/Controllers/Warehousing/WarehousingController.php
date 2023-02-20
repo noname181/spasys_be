@@ -4825,7 +4825,10 @@ class WarehousingController extends Controller
             $warehousing->where(function ($q) {
                 $q->where('rgd_status4', '추가청구서')
                     ->orWhere('rgd_status4', '확정청구서');
-            })->where('rgd_is_show', 'y')->orderBy('rgd_tax_invoice_date', 'DESC')->orderBy('rgd_no', 'DESC');
+            })->where('rgd_is_show', 'y')
+            ->where('rgd_calculate_deadline_yn', 'y')
+            ->orderBy('rgd_tax_invoice_date', 'DESC')
+            ->orderBy('rgd_no', 'DESC');
 
             if (isset($validated['status'])) {
                 if ($validated['status'] == 'waiting')
@@ -5003,8 +5006,9 @@ class WarehousingController extends Controller
                 $q->where('rgd_status4', '추가청구서')
                     ->orWhere('rgd_status4', '확정청구서');
             })
-                ->where('rgd_status7', 'taxed')
-                ->where('rgd_is_show', 'y')->orderBy('rgd_no', 'DESC');
+            ->where('rgd_calculate_deadline_yn', 'y')
+            ->where('rgd_status7', 'taxed')
+            ->where('rgd_is_show', 'y')->orderBy('rgd_no', 'DESC');
 
             if (isset($validated['service']) && $validated['service'] != '전체') {
                 $warehousing->where(DB::raw('lower(service_korean_name)'), 'like', '%' . strtolower($validated['service']) . '%');
