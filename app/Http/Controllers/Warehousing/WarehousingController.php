@@ -1819,21 +1819,21 @@ class WarehousingController extends Controller
                 }
 
                 if (isset($validated['from_date'])) {
-                    $import_schedule->where('aaa.tie_is_date', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                    $import_schedule->where('te_e_date', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
                 }
 
                 if (isset($validated['to_date'])) {
-                    $import_schedule->where('aaa.tie_is_date', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                    $import_schedule->where('te_e_date', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
                 }
 
                 if (isset($validated['co_parent_name'])) {
 
-                    $import_schedule->where(DB::raw('lower(aaa.co_name_shop)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                    $import_schedule->where(DB::raw('lower(aaa.co_name_shop)'), 'like', '%' . $validated['co_parent_name'] . '%');
                 }
 
                 if (isset($validated['co_name'])) {
 
-                    $import_schedule->where(DB::raw('lower(aaa.co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    $import_schedule->where(DB::raw('lower(aaa.co_name)'), 'like', '%' . $validated['co_name'] . '%');
                 }
 
                 if (isset($validated['m_bl'])) {
@@ -2351,25 +2351,25 @@ class WarehousingController extends Controller
                 //$import_schedule = ImportExpected::with(['import','company'])->orderBy('tie_no', 'DESC');
 
                 if (isset($validated['from_date'])) {
-                    $import_schedule->where('aaa.tie_is_date', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                    $import_schedule->where('te_e_date', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
                 }
 
                 if (isset($validated['to_date'])) {
-                    $import_schedule->where('aaa.tie_is_date', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                    $import_schedule->where('te_e_date', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
                 }
 
                 if (isset($validated['co_parent_name'])) {
                     // $import_schedule->whereHas('company.co_parent', function ($query) use ($validated) {
                     //     $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
                     // });
-                    $import_schedule->where(DB::raw('lower(aaa.co_name_shop)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                    $import_schedule->where(DB::raw('lower(aaa.co_name_shop)'), 'like', '%' . $validated['co_parent_name'] . '%');
                 }
 
                 if (isset($validated['co_name'])) {
                     // $import_schedule->whereHas('company', function ($q) use ($validated) {
                     //     return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
                     // });
-                    $import_schedule->where(DB::raw('lower(aaa.co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    $import_schedule->where(DB::raw('lower(aaa.co_name)'), 'like', '%' . $validated['co_name'] . '%');
                 }
 
                 if (isset($validated['m_bl'])) {
