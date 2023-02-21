@@ -654,7 +654,7 @@ class BannerController extends Controller
 
         foreach ($warehousingb as $item) {
             //$b += WarehousingItem::where('w_no', $item->w_no)->where('wi_type', '입고_spasys')->sum('wi_number');
-            $b += $item->warehousing->w_schedule_amount;
+            $b += $item->warehousing->w_amount;
         }
 
         foreach ($warehousingc as $item) {
