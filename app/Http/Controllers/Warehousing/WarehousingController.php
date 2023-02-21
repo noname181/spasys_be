@@ -1894,7 +1894,6 @@ class WarehousingController extends Controller
                     $join->orOn('ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
                     $join->orOn('tie_logistic_manage_number', '=', 'receiving_goods_delivery.is_no');
                 });
-
                 if (isset($validated['status'])) {
 
 
@@ -1904,11 +1903,14 @@ class WarehousingController extends Controller
                     // });
                     //}
                     if ($validated['status'] == "배송준비") {
-                      $import_schedule->whereNull('rgd_status3')->orWhere('rgd_status3','=','배송준비');
+                        $import_schedule->where(function ($query)  {
+                            $query->whereNull('rgd_status3')->orWhere('rgd_status3','=','배송준비');
+                         });
                         // $import_schedule->orwhereNull('rgd_status3');
                     } else {
-                        
-                        $import_schedule->where('rgd_status3', '=', $validated['status']);
+                        $import_schedule->where(function ($query) use($validated)  {
+                            $query->where('rgd_status3', '=', $validated['status']);
+                        });
                     }
                 }
 
@@ -2435,12 +2437,16 @@ class WarehousingController extends Controller
                     //     $import_schedule->where('rgd_status3', '=', $validated['status']);
                     // }
                     if ($validated['status'] == "배송준비") {
-                        $import_schedule->whereNull('rgd_status3')->orWhere('rgd_status3','=','배송준비');
-                          // $import_schedule->orwhereNull('rgd_status3');
-                      } else {
-                          
-                          $import_schedule->where('rgd_status3', '=', $validated['status']);
-                      }
+                        $import_schedule->where(function ($query)  {
+                            $query->whereNull('rgd_status3')->orWhere('rgd_status3','=','배송준비');
+                         });
+                        // $import_schedule->orwhereNull('rgd_status3');
+                    } else {
+                        $import_schedule->where(function ($query) use($validated)  {
+                            $query->where('rgd_status3', '=', $validated['status']);
+                        });
+                    }
+                      
                 }
                 if (isset($validated['carrier'])) {
                     $import_schedule->whereHas('export.receiving_goods_delivery', function ($q) use ($validated) {
