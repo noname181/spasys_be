@@ -2852,7 +2852,7 @@ class WarehousingController extends Controller
                     })->orwhere('rgd_status1', '=', '출고예정 취소')->where('w_category_name', '=', '유통가공')->whereNotNull('w_import_no')->whereNull('w_children_yn')->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
-                })->orderBy('rgd_no', 'DESC');
+                })->orderBy('created_at', 'DESC');
             } else if ($user->mb_type == 'shipper') {
                 $warehousing2 = Warehousing::where('w_type', '=', 'EW')->where('w_category_name', '=', '유통가공')->whereNull('w_children_yn')->whereHas('co_no', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
@@ -2869,7 +2869,7 @@ class WarehousingController extends Controller
                     })->orwhere('rgd_status1', '=', '출고예정 취소')->where('w_category_name', '=', '유통가공')->whereNotNull('w_import_no')->whereNull('w_children_yn')->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
-                })->orderBy('rgd_no', 'DESC');
+                })->orderBy('created_at', 'DESC');
             } else if ($user->mb_type == 'spasys') {
                 $warehousing2 = Warehousing::where('w_type', '=', 'EW')->where('w_category_name', '=', '유통가공')->whereNull('w_children_yn')->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
@@ -2887,7 +2887,7 @@ class WarehousingController extends Controller
                     })->orwhere('rgd_status1', '=', '출고예정 취소')->where('w_category_name', '=', '유통가공')->whereNotNull('w_import_no')->whereNull('w_children_yn')->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
-                })->orderBy('rgd_no', 'DESC');
+                })->orderBy('created_at', 'DESC');
             }
 
             $warehousing->whereNull('rgd_parent_no');
