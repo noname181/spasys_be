@@ -700,6 +700,7 @@ class BannerController extends Controller
             $f = 0;
             $g = 0;
             $h = 0;
+            
             $check = "";
             if ($request->service == "유통가공") {
                 $total =  $this->CaculateService3($request);
@@ -862,6 +863,23 @@ class BannerController extends Controller
                 $c = 0;
                 $d = 0;
             } else {
+                $total =  $this->CaculateService3($request);
+                $a = $total['a'];
+                $b = $total['b'];
+                $c = $total['c'];
+                $d = $total['d'];
+                $e = $total['e'];
+                $f = $total['f'];
+                $g = $total['g'];
+                $h = $total['h'];
+
+                $counta = $total['counta'];
+                $countb = $total['countb'];
+                $countc = $total['countc'];
+                $countd = $total['countd'];
+                $counte = $total['counte'];
+                $countf = $total['countf'];
+                $countg = $total['countg'];
             }
 
 
@@ -877,13 +895,13 @@ class BannerController extends Controller
                 'total_f' => $f,
                 'total_g' => $g,
                 'total_h' => $h,
-                'count_a' => $counta,
-                'count_b' => $countb,
-                'count_c' => $countc,
-                'count_d' => $countd,
-                'count_e' => $counte,
-                'count_f' => $countf,
-                'count_g' => $countg,
+                'count_a' => isset($counta) ? $counta : 0,
+                'count_b' => isset($countb) ? $countb : 0,
+                'count_c' => isset($countc) ? $countc : 0,
+                'count_d' => isset($countd) ? $countd : 0,
+                'count_e' => isset($counte) ? $counte : 0,
+                'count_f' => isset($countf) ? $countf : 0,
+                'count_g' => isset($countg) ? $countg : 0,
 
             ]);
         } catch (\Exception $e) {
