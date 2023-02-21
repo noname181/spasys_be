@@ -5587,8 +5587,17 @@ class WarehousingController extends Controller
                     //         );
                     // }
                     //return $value['is_no'];
-                    $check_is_no = ReceivingGoodsDelivery::where('is_no', $value['is_no'])->first();
-                    if($check_is_no){
+                    if(isset($value['is_no'])){
+                        $check_is_no = ReceivingGoodsDelivery::where('is_no', $value['is_no'])->first();
+                    }
+                    if(isset($value['te_carry_out_number'])){
+                        $is_no = $value['te_carry_out_number'];
+                    }else if(isset($value['ti_carry_in_number'])){
+                        $is_no = $value['ti_carry_in_number'];
+                    }else{
+                        $is_no = $value['tie_logistic_manage_number'];
+                    }
+                    if(isset($check_is_no)){
                         $rgd = ReceivingGoodsDelivery::updateOrCreate(
                             [
                                 'is_no' =>  $value['is_no']
@@ -5604,7 +5613,7 @@ class WarehousingController extends Controller
                             'mb_no' => Auth::user()->mb_no,
                             'service_korean_name' => '보세화물',
                             'rgd_status3' => "배송완료",
-                            'is_no' =>  $value['is_no']
+                            'is_no' => $is_no,
     
                         ]);
                     }
