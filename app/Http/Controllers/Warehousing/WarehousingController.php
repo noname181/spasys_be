@@ -1261,6 +1261,7 @@ class WarehousingController extends Controller
             }
 
             $warehousing->whereNull('rgd_parent_no');
+            
             if (isset($validated['from_date'])) {
                 $warehousing->where('warehousing.w_completed_day', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
