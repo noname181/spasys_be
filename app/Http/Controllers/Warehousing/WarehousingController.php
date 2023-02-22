@@ -4068,7 +4068,11 @@ class WarehousingController extends Controller
                             $k++;
                         }
                     }
-
+                    if($item->service_korean_name == '보세화물'){
+                        $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum7 : '';
+                    } else {
+                        $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : '';
+                    }
                     if ($i == $k) {
                         $item->is_completed = true;
                         $item->completed_date = Carbon::parse($completed_date)->format('Y.m.d');
