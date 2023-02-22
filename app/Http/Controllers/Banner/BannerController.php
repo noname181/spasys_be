@@ -25,7 +25,9 @@ use App\Models\Export;
 use App\Models\ExportConfirm;
 use App\Models\Warehousing;
 //use AWS\CRT\HTTP\Request;
+use App\Models\StockStatusBad;
 use Illuminate\Http\Request;
+use App\Models\Item;
 
 class BannerController extends Controller
 {
@@ -613,29 +615,29 @@ class BannerController extends Controller
         $g = 0;
         $h = 0;
         if ($request->time == 'day') {
-            $warehousinga = $warehousinga->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
-            $warehousingb = $warehousingb->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
-            $warehousingc = $warehousingc->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
-            $warehousingd = $warehousingd->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
-            $warehousinge = $warehousinge->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
-            $warehousingf = $warehousingf->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
-            $warehousingg = $warehousingg->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
-        }elseif($request->time == 'week'){
-            $warehousinga = $warehousinga->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subWeek()->toDateTimeString())->get();
-            $warehousingb = $warehousingb->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subWeek()->toDateTimeString())->get();
-            $warehousingc = $warehousingc->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subWeek()->toDateTimeString())->get();
-            $warehousingd = $warehousingd->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subWeek()->toDateTimeString())->get();
-            $warehousinge = $warehousinge->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subWeek()->toDateTimeString())->get();
-            $warehousingf = $warehousingf->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subWeek()->toDateTimeString())->get();
-            $warehousingg = $warehousingg->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subWeek()->toDateTimeString())->get();
-        }else{
-            $warehousinga = $warehousinga->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subMonth()->toDateTimeString())->get();
-            $warehousingb = $warehousingb->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subMonth()->toDateTimeString())->get();
-            $warehousingc = $warehousingc->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subMonth()->toDateTimeString())->get();
-            $warehousingd = $warehousingd->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subMonth()->toDateTimeString())->get();
-            $warehousinge = $warehousinge->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subMonth()->toDateTimeString())->get();
-            $warehousingf = $warehousingf->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subMonth()->toDateTimeString())->get();
-            $warehousingg = $warehousingg->where('receiving_goods_delivery.created_at', '>=', Carbon::now()->subMonth()->toDateTimeString())->get();
+            $warehousinga = $warehousinga->get();
+            $warehousingb = $warehousingb->where('warehousing.w_completed_day', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
+            $warehousingc = $warehousingc->get();
+            $warehousingd = $warehousingd->where('warehousing.w_completed_day', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
+            $warehousinge = $warehousinge->get();
+            $warehousingf = $warehousingf->get();
+            $warehousingg = $warehousingg->where('warehousing.w_completed_day', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
+        } elseif ($request->time == 'week') {
+            $warehousinga = $warehousinga->get();
+            $warehousingb = $warehousingb->where('warehousing.w_completed_day', '>=', Carbon::now()->subWeek()->toDateTimeString())->get();
+            $warehousingc = $warehousingc->get();
+            $warehousingd = $warehousingd->where('warehousing.w_completed_day', '>=', Carbon::now()->subWeek()->toDateTimeString())->get();
+            $warehousinge = $warehousinge->get();
+            $warehousingf = $warehousingf->get();
+            $warehousingg = $warehousingg->where('warehousing.w_completed_day', '>=', Carbon::now()->subWeek()->toDateTimeString())->get();
+        } else {
+            $warehousinga = $warehousinga->get();
+            $warehousingb = $warehousingb->where('warehousing.w_completed_day', '>=', Carbon::now()->subMonth()->toDateTimeString())->get();
+            $warehousingc = $warehousingc->get();
+            $warehousingd = $warehousingd->where('warehousing.w_completed_day', '>=', Carbon::now()->subMonth()->toDateTimeString())->get();
+            $warehousinge = $warehousinge->get();
+            $warehousingf = $warehousingf->get();
+            $warehousingg = $warehousingg->where('warehousing.w_completed_day', '>=', Carbon::now()->subMonth()->toDateTimeString())->get();
         }
 
 
@@ -685,6 +687,137 @@ class BannerController extends Controller
         ];
     }
 
+    public function CaculateService2($request)
+    {
+        $user = Auth::user();
+        DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+        if ($user->mb_type == 'shop') {
+            $warehousing2 = Warehousing::join(
+                DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
+                'm.w_no',
+                '=',
+                'warehousing.w_no'
+            )->where('warehousing.w_type', '=', 'EW')->where('w_category_name', '=', '수입풀필먼트')->whereHas('co_no.co_parent', function ($q) use ($user) {
+                $q->where('co_no', $user->co_no);
+            })->get();
+            $w_import_no = collect($warehousing2)->map(function ($q) {
+
+                return $q->w_import_no;
+            });
+            $w_no_in = collect($warehousing2)->map(function ($q) {
+
+                return $q->w_no;
+            });
+            $warehousinga = Warehousing::with('mb_no')
+                ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')->where('w_category_name', '=', '수입풀필먼트')
+                ->whereHas('co_no.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+
+            $warehousingb = StockStatusBad::with(['item_status_bad'])->whereHas('item_status_bad', function ($q) use ($user) {
+                //    $q->where('item_service_name', '=', '수입풀필먼트');
+                //    $q->whereHas('item_info', function ($e) {
+                //             $e->whereNotNull('stock');
+                //     });
+                $q->whereHas('ContractWms.company.co_parent', function ($k) use ($user) {
+                    $k->where('co_no', $user->co_no);
+                });
+            })->whereNotNull('stock')->groupby('product_id')->groupby('option_id')->orderBy('product_id', 'DESC');
+        } else if ($user->mb_type == 'shipper') {
+            $warehousing2 = Warehousing::join(
+                DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
+                'm.w_no',
+                '=',
+                'warehousing.w_no'
+            )->where('warehousing.w_type', '=', 'EW')->where('w_category_name', '=', '수입풀필먼트')->whereHas('co_no', function ($q) use ($user) {
+                $q->where('co_no', $user->co_no);
+            })->get();
+            $w_import_no = collect($warehousing2)->map(function ($q) {
+
+                return $q->w_import_no;
+            });
+            $w_no_in = collect($warehousing2)->map(function ($q) {
+
+                return $q->w_no;
+            });
+            $warehousinga = Warehousing::with('mb_no')
+                ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')->where('w_category_name', '=', '수입풀필먼트')
+                ->whereHas('co_no', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+
+            $warehousingb = StockStatusBad::with(['item_status_bad'])->whereHas('item_status_bad', function ($q) use ($user) {
+                //    $q->where('item_service_name', '=', '수입풀필먼트');
+                //    $q->whereHas('item_info', function ($e) {
+                //             $e->whereNotNull('stock');
+                //     });
+                $q->whereHas('ContractWms.company', function ($k) use ($user) {
+                    $k->where('co_no', $user->co_no);
+                });
+            })->whereNotNull('stock')->groupby('product_id')->groupby('option_id')->orderBy('product_id', 'DESC');
+        } else if ($user->mb_type == 'spasys') {
+
+            $warehousing2 = Warehousing::join(
+                DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
+                'm.w_no',
+                '=',
+                'warehousing.w_no'
+            )->where('warehousing.w_type', '=', 'EW')->where('w_category_name', '=', '수입풀필먼트')->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
+                $q->where('co_no', $user->co_no);
+            })->get();
+            $w_import_no = collect($warehousing2)->map(function ($q) {
+
+                return $q->w_import_no;
+            });
+            $w_no_in = collect($warehousing2)->map(function ($q) {
+
+                return $q->w_no;
+            });
+
+            $warehousinga = Warehousing::with('mb_no')
+                ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent', 'warehousing_child', 'rate_data_general'])->where('w_category_name', '=', '수입풀필먼트')->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')
+                ->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+
+            $warehousingb = StockStatusBad::with(['item_status_bad'])->whereHas('item_status_bad', function ($q) use ($user) {
+                //    $q->where('item_service_name', '=', '수입풀필먼트');
+                //    $q->whereHas('item_info', function ($e) {
+                //             $e->whereNotNull('stock');
+                //     });
+                $q->whereHas('ContractWms.company.co_parent.co_parent', function ($k) use ($user) {
+                    $k->where('co_no', $user->co_no);
+                });
+            })->whereNotNull('stock')->groupby('product_id')->groupby('option_id');
+        }
+        $warehousinga->whereDoesntHave('rate_data_general');
+        $a = 0;
+        $b = 0;
+        $c = 0;
+        $d = 0;
+        $e = 0;
+        $f = 0;
+        $g = 0;
+        $h = 0;
+        $warehousinga = $warehousinga->get();
+        $warehousingb = $warehousingb->get();
+        $counta = $warehousinga->count();
+        $countb = $warehousingb->count();
+        foreach ($warehousinga as $item) {
+            $a += $item->w_amount;
+        }
+        foreach ($warehousingb as $item) {
+            $item4 = Item::with(['item_info'])->where('item.item_no', $item->item_no)->first();
+            if (isset($item4['item_info']['stock'])) {
+                $b += $item4['item_info']['stock'];
+            }
+           
+        }
+        return [
+            'warehousinga' => $warehousinga, 'counta' => $counta,'countb'=>$countb, 'a' => $a, 'b' => $b, 'c' => $c, 'd' => $d, 'e' => $e, 'f' => $f, 'h' => $h, 'g' => $g,
+        ];
+        DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+    }
     public function banner_count(Request $request)
     {
         //return "dsada";
@@ -700,7 +833,7 @@ class BannerController extends Controller
             $f = 0;
             $g = 0;
             $h = 0;
-            
+
             $check = "";
             if ($request->service == "유통가공") {
                 $total =  $this->CaculateService3($request);
@@ -723,6 +856,20 @@ class BannerController extends Controller
                 //$counth = $total['counth'];
                 $check = $total['warehousingb'];
             } elseif ($request->service == "수입풀필먼트") {
+                $total =  $this->CaculateService2($request);
+                $a = $total['a'];
+                $b = $total['b'];
+                $c = $total['c'];
+                $d = $total['d'];
+                $e = $total['e'];
+                $f = $total['f'];
+                $g = $total['g'];
+                $h = $total['h'];
+
+                
+                $check = $total['warehousinga'];
+                $counta = $total['counta'];
+                $countb = $total['countb'];
             } elseif ($request->service == "보세화물") {
                 DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
                 if ($user->mb_type == 'shop') {
