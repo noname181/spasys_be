@@ -1245,19 +1245,19 @@ class WarehousingController extends Controller
                     $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('w_category_name', '=', '유통가공')->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
-                });
+                })->orderBy('receiving_goods_delivery.created_at','DESC');
             } else if ($user->mb_type == 'shipper') {
                 $warehousing = ReceivingGoodsDelivery::with(['w_no', 'warehousing'])->with(['mb_no'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereNull('rgd_parent_no')->whereHas('w_no', function ($query) use ($user) {
                     $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('w_category_name', '=', '유통가공')->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
-                });
+                })->orderBy('receiving_goods_delivery.created_at','DESC');
             } else if ($user->mb_type == 'spasys') {
                 $warehousing = ReceivingGoodsDelivery::with(['w_no', 'warehousing'])->with(['mb_no'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereNull('rgd_parent_no')->whereHas('w_no', function ($query) use ($user) {
                     $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('w_category_name', '=', '유통가공')->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
-                });
+                })->orderBy('receiving_goods_delivery.created_at','DESC');
             }
 
             $warehousing->whereNull('rgd_parent_no');
@@ -1329,7 +1329,7 @@ class WarehousingController extends Controller
             return response()->json($warehousing);
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             //return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -3762,7 +3762,7 @@ class WarehousingController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
 
-            $warehousing = ReceivingGoodsDelivery::with(['mb_no','rate_meta_data', 'rate_meta_data_parent', 'w_no', 'rate_data_general','payment']);
+            $warehousing = ReceivingGoodsDelivery::with(['mb_no','rate_meta_data', 'rate_meta_data_parent', 'w_no', 'rate_data_general','payment','t_import']);
             if ($user->mb_type == 'shop' && $request->type == 'check_list') {
                 $warehousing->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent', function ($q) use ($user) {
