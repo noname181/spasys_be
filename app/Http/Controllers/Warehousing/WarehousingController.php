@@ -6294,15 +6294,15 @@ class WarehousingController extends Controller
 
                 $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
                     $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
-                })
+                })->orderBy('tie_is_date', 'DESC');
                 // ->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
                 //     $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
                 // })
-                ->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+                // ->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
 
-                    //$leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
-                    $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-                })->orderBy('tie_is_date', 'DESC');
+                //     //$leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
+                //     $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+                // })
 
 
                 

@@ -38,6 +38,7 @@ class ReportController extends Controller
                         'rp_cate' => $request->rp_cate,
                         'rp_content' => $rp_content,
                         'rp_parent_no' => empty($parent_no) ? null : $parent_no,
+                        'rp_h_bl' => $request->w_schedule_number
                     ]);
                     if ($i == 0) {
                         $parent_no = $report_no;
@@ -84,6 +85,7 @@ class ReportController extends Controller
                     $report = Report::where('rp_no', $request->rp_file_no[$i])->update([
                         'w_no' => $request->w_no,
                         'rp_cate' => $request->rp_cate,
+                        'rp_h_bl' => $request->w_schedule_number,
                         'rp_content' => $request->rp_content[$i],
                     ]);
                     $rp_file_no[] = $request->rp_file_no[$i];
@@ -124,6 +126,7 @@ class ReportController extends Controller
                             'rp_cate' => $request->rp_cate,
                             'rp_content' => $rp_content,
                             'rp_parent_no' => $rp_parent_no,
+                            'rp_h_bl' => $request->w_schedule_number
                         ]);
                         $index =  0;
                         $rp_file_no[] = $report_no;
@@ -336,7 +339,7 @@ class ReportController extends Controller
                     $q->where('co_no', $user->co_no);
                 })->orderBy('created_at', 'DESC')->orderBy('rp_parent_no', 'DESC');
             }else if($user->mb_type == 'spasys'){
-                $reports = Report::with(['files', 'reports_child','warehousing','warehousing_by_te','warehousing_by_ti','warehousing_by_tie','export','member','import_expect','import'])->whereHas('export.import_expected.company.co_parent',function ($q) use ($user){
+                $reports = Report::with(['files', 'reports_child','warehousing','warehousing_by_te','warehousing_by_ti','warehousing_by_tie','member','import_expect','import'])->whereHas('export.import_expected.company.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->orwhereHas('export.import_expected.company.co_parent',function ($q) use ($user){
                     $q->where('co_parent_no', $user->co_no);

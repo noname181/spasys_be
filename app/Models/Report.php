@@ -31,6 +31,7 @@ class Report extends Model
         'rp_number',
         'rp_cate',
         'rp_content',
+        'rp_h_bl',
     ];
 
     protected $casts = [
@@ -67,15 +68,16 @@ class Report extends Model
     }
     public function export()
     {
-        return $this->belongsTo(Export::class, 'w_no', 'te_carry_out_number')->with(['import_expected']);
+        //$this->belongsTo(Export::class, 'rp_h_bl', 'te_h_bl')->with(['import_expected']);
+        return $this->belongsTo(Export::class, 'rp_h_bl', 'te_h_bl')->with(['import_expected']);
     }
     public function import()
     {
-        return $this->belongsTo(Import::class, 'w_no', 'ti_carry_in_number')->with(['import_expected']);
+        return $this->belongsTo(Import::class, 'rp_h_bl', 'ti_h_bl')->with(['import_expected']);
     }
     public function import_expect()
     {
-        return $this->belongsTo(ImportExpected::class, 'w_no', 'tie_logistic_manage_number')->with(['company','company_spasys']);
+        return $this->belongsTo(ImportExpected::class, 'rp_h_bl', 'tie_h_bl')->with(['company','company_spasys']);
     }
     public function member()
     {
