@@ -846,7 +846,10 @@ class RateDataController extends Controller
                         'rgd_no' => $rgd->rgd_parent_no,
                         'set_type' => 'bonded1_spasys',
                     ]
-                )->orwhere(
+                )->first();
+            }
+            if (empty($rmd)) {
+                $rmd = RateMetaData::where(
                     [
                         'rgd_no' => $rgd->rgd_parent_no,
                         'set_type' => 'bonded1_shop',
@@ -859,7 +862,10 @@ class RateDataController extends Controller
                         'rgd_no' => $rgd->rgd_no,
                         'set_type' => 'bonded1',
                     ]
-                )->orwhere(
+                )->first();
+            }
+            if (empty($rmd)) {
+                $rmd = RateMetaData::where(
                     [
                         'rgd_no' => $rgd->rgd_no,
                         'set_type' => 'bonded1_shop',
@@ -3172,7 +3178,7 @@ class RateDataController extends Controller
 
             $rdgs = [];
             foreach ($rgds as $rgd) {
-                $rdg = RateDataGeneral::where('rgd_no_expectation', $rgd->rgd_no)
+                $rdg = RateDataGeneral::where('rgd_no', $rgd->rgd_no)
                     ->where('rdg_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
                 $rdgs[] = $rdg;
             }
@@ -3242,7 +3248,7 @@ class RateDataController extends Controller
                 $child_rgd = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent', 't_export'])->where('rgd_no', $rgd['rgd_parent_no'])->first();
                 $rgds[$index] = $child_rgd;
 
-                $rdg = RateDataGeneral::where('rgd_no_expectation', $rgd->rgd_no)
+                $rdg = RateDataGeneral::where('rgd_no', $rgd->rgd_no)
                     ->where('rdg_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
                 $rdgs[] = $rdg;
             }
@@ -3555,7 +3561,7 @@ class RateDataController extends Controller
                 }
 
                 foreach ($request->rgds as $key => $rgd) {
-                    $is_exist = RateDataGeneral::where('rgd_no_expectation', $rgd['rgd_no'])->where('rdg_bill_type', 'final_monthly')->first();
+                    $is_exist = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
                     if (!$is_exist) {
                         $is_exist = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
 
@@ -4037,6 +4043,11 @@ class RateDataController extends Controller
                     'rgd_no' => $final_rgd->rgd_no,
                 ]);
 
+                RateMetaData::where('rgd_no', $request->rgd_no)
+                ->where('set_type', 'LIKE', '%_final%')
+                ->update([
+                    'rgd_no' => $final_rgd->rgd_no,
+                ]);
 
             }
 

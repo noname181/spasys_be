@@ -1261,6 +1261,7 @@ class WarehousingController extends Controller
             }
 
             $warehousing->whereNull('rgd_parent_no');
+
             if (isset($validated['from_date'])) {
                 $warehousing->where('warehousing.w_completed_day', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
@@ -1818,21 +1819,21 @@ class WarehousingController extends Controller
                 }
 
                 if (isset($validated['from_date'])) {
-                    $import_schedule->where('aaa.tie_is_date', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                    $import_schedule->where('te_e_date', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
                 }
 
                 if (isset($validated['to_date'])) {
-                    $import_schedule->where('aaa.tie_is_date', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                    $import_schedule->where('te_e_date', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
                 }
 
                 if (isset($validated['co_parent_name'])) {
 
-                    $import_schedule->where(DB::raw('lower(aaa.co_name_shop)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                    $import_schedule->where(DB::raw('lower(aaa.co_name_shop)'), 'like', '%' . $validated['co_parent_name'] . '%');
                 }
 
                 if (isset($validated['co_name'])) {
 
-                    $import_schedule->where(DB::raw('lower(aaa.co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    $import_schedule->where(DB::raw('lower(aaa.co_name)'), 'like', '%' . $validated['co_name'] . '%');
                 }
 
                 if (isset($validated['m_bl'])) {
@@ -1893,7 +1894,6 @@ class WarehousingController extends Controller
                     $join->orOn('ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
                     $join->orOn('tie_logistic_manage_number', '=', 'receiving_goods_delivery.is_no');
                 });
-
                 if (isset($validated['status'])) {
 
 
@@ -1903,11 +1903,17 @@ class WarehousingController extends Controller
                     // });
                     //}
                     if ($validated['status'] == "배송준비") {
-                      $import_schedule->whereNull('rgd_status3')->orWhere('rgd_status3','=','배송준비');
+                        $import_schedule->where(function ($query)  {
+                            $query->whereNull('rgd_status3')->orWhere('rgd_status3','=','배송준비');
+                            $query->where('rgd_status1','!=','반입');
+                         });
+                        //$import_schedule->whereNull('rgd_status3')->orWhere('rgd_status3','=','배송준비');
                         // $import_schedule->orwhereNull('rgd_status3');
                     } else {
-                        
-                        $import_schedule->where('rgd_status3', '=', $validated['status']);
+                        $import_schedule->where(function ($query) use($validated)  {
+                            $query->where('rgd_status3', '=', $validated['status']);
+                            $query->where('rgd_status1','!=','반입');
+                        });
                     }
                 }
 
@@ -2345,25 +2351,25 @@ class WarehousingController extends Controller
                 //$import_schedule = ImportExpected::with(['import','company'])->orderBy('tie_no', 'DESC');
 
                 if (isset($validated['from_date'])) {
-                    $import_schedule->where('aaa.tie_is_date', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                    $import_schedule->where('te_e_date', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
                 }
 
                 if (isset($validated['to_date'])) {
-                    $import_schedule->where('aaa.tie_is_date', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                    $import_schedule->where('te_e_date', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
                 }
 
                 if (isset($validated['co_parent_name'])) {
                     // $import_schedule->whereHas('company.co_parent', function ($query) use ($validated) {
                     //     $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
                     // });
-                    $import_schedule->where(DB::raw('lower(aaa.co_name_shop)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                    $import_schedule->where(DB::raw('lower(aaa.co_name_shop)'), 'like', '%' . $validated['co_parent_name'] . '%');
                 }
 
                 if (isset($validated['co_name'])) {
                     // $import_schedule->whereHas('company', function ($q) use ($validated) {
                     //     return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
                     // });
-                    $import_schedule->where(DB::raw('lower(aaa.co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    $import_schedule->where(DB::raw('lower(aaa.co_name)'), 'like', '%' . $validated['co_name'] . '%');
                 }
 
                 if (isset($validated['m_bl'])) {
@@ -2434,12 +2440,18 @@ class WarehousingController extends Controller
                     //     $import_schedule->where('rgd_status3', '=', $validated['status']);
                     // }
                     if ($validated['status'] == "배송준비") {
-                        $import_schedule->whereNull('rgd_status3')->orWhere('rgd_status3','=','배송준비');
-                          // $import_schedule->orwhereNull('rgd_status3');
-                      } else {
-                          
-                          $import_schedule->where('rgd_status3', '=', $validated['status']);
-                      }
+                        $import_schedule->where(function ($query)  {
+                            $query->whereNull('rgd_status3')->orWhere('rgd_status3','=','배송준비');
+                            $query->where('rgd_status1','!=','반입');
+                         });
+                        // $import_schedule->orwhereNull('rgd_status3');
+                    } else {
+                        $import_schedule->where(function ($query) use($validated)  {
+                            $query->where('rgd_status3', '=', $validated['status']);
+                            $query->where('rgd_status1','!=','반입');
+                        });
+                    }
+                      
                 }
                 if (isset($validated['carrier'])) {
                     $import_schedule->whereHas('export.receiving_goods_delivery', function ($q) use ($validated) {
@@ -2840,7 +2852,7 @@ class WarehousingController extends Controller
                     })->orwhere('rgd_status1', '=', '출고예정 취소')->where('w_category_name', '=', '유통가공')->whereNotNull('w_import_no')->whereNull('w_children_yn')->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
-                })->orderBy('rgd_no', 'DESC');
+                })->orderBy('created_at', 'DESC');
             } else if ($user->mb_type == 'shipper') {
                 $warehousing2 = Warehousing::where('w_type', '=', 'EW')->where('w_category_name', '=', '유통가공')->whereNull('w_children_yn')->whereHas('co_no', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
@@ -2857,7 +2869,7 @@ class WarehousingController extends Controller
                     })->orwhere('rgd_status1', '=', '출고예정 취소')->where('w_category_name', '=', '유통가공')->whereNotNull('w_import_no')->whereNull('w_children_yn')->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
-                })->orderBy('rgd_no', 'DESC');
+                })->orderBy('created_at', 'DESC');
             } else if ($user->mb_type == 'spasys') {
                 $warehousing2 = Warehousing::where('w_type', '=', 'EW')->where('w_category_name', '=', '유통가공')->whereNull('w_children_yn')->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
@@ -2875,7 +2887,7 @@ class WarehousingController extends Controller
                     })->orwhere('rgd_status1', '=', '출고예정 취소')->where('w_category_name', '=', '유통가공')->whereNotNull('w_import_no')->whereNull('w_children_yn')->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
-                })->orderBy('rgd_no', 'DESC');
+                })->orderBy('created_at', 'DESC');
             }
 
             $warehousing->whereNull('rgd_parent_no');
@@ -5580,8 +5592,17 @@ class WarehousingController extends Controller
                     //         );
                     // }
                     //return $value['is_no'];
-                    $check_is_no = ReceivingGoodsDelivery::where('is_no', $value['is_no'])->first();
-                    if($check_is_no){
+                    if(isset($value['is_no'])){
+                        $check_is_no = ReceivingGoodsDelivery::where('is_no', $value['is_no'])->first();
+                    }
+                    if(isset($value['te_carry_out_number'])){
+                        $is_no = $value['te_carry_out_number'];
+                    }else if(isset($value['ti_carry_in_number'])){
+                        $is_no = $value['ti_carry_in_number'];
+                    }else{
+                        $is_no = $value['tie_logistic_manage_number'];
+                    }
+                    if(isset($check_is_no)){
                         $rgd = ReceivingGoodsDelivery::updateOrCreate(
                             [
                                 'is_no' =>  $value['is_no']
@@ -5597,7 +5618,7 @@ class WarehousingController extends Controller
                             'mb_no' => Auth::user()->mb_no,
                             'service_korean_name' => '보세화물',
                             'rgd_status3' => "배송완료",
-                            'is_no' =>  $value['is_no']
+                            'is_no' => $is_no,
     
                         ]);
                     }
@@ -6179,14 +6200,14 @@ class WarehousingController extends Controller
                 $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
                     $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
                 })
-                    // ->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
-                    //     $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
-                    // })
-                    ->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+                // ->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
+                //     $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
+                // })
+                ->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
 
                     //$leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
                     $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-                })->orderBy('te_carry_out_number', 'DESC');
+                })->orderBy('tie_is_date', 'DESC');
             } else if ($user->mb_type == 'shipper') {
                
                 $sub = ImportExpected::select('company.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
@@ -6219,14 +6240,14 @@ class WarehousingController extends Controller
                 $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
                     $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
                 })
-                    // ->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
-                    //     $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
-                    // })
-                    ->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+                // ->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
+                //     $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
+                // })
+                ->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
 
                     //$leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
                     $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-                })->orderBy('te_carry_out_number', 'DESC');
+                })->orderBy('tie_is_date', 'DESC');
             } else if ($user->mb_type == 'spasys') {
                 
                 //FIX NOT WORK 'with'
@@ -6274,14 +6295,19 @@ class WarehousingController extends Controller
                 $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
                     $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
                 })
-                    // ->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
-                    //     $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
-                    // })
-                    ->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+                // ->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
+                //     $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
+                // })
+                ->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
 
-                    $leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
+                    //$leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
                     $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-                })->orderBy('te_carry_out_number', 'DESC');
+                })->orderBy('tie_is_date', 'DESC');
+
+
+                
+                //return DB::getQueryLog();
+                //END FIX NOT WORK 'with'
             }
 
             if (isset($validated['status'])) {
@@ -6290,11 +6316,11 @@ class WarehousingController extends Controller
                 $import_schedule->where('aaa.rgd_status1', '=', $validated['status']);
             }
             if (isset($validated['from_date'])) {
-                $import_schedule->where('aaa.created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                $import_schedule->where('aaa.tie_is_date', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
 
             if (isset($validated['to_date'])) {
-                $import_schedule->where('aaa.created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                $import_schedule->where('aaa.tie_is_date', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
             }
 
             //get_warehousing_api

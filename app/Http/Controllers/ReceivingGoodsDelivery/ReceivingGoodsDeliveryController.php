@@ -846,7 +846,9 @@ class ReceivingGoodsDeliveryController extends Controller
                 } else {
                     if (isset($request->data)) {
                         foreach ($request->data as $key => $data) {
+                            
                             if ($data['w_no'] != "") {
+                               
                                 $w_no = Warehousing::where('w_no', $request->w_no)->update([
                                     'w_schedule_amount' => $data['w_schedule_amount'],
                                     'w_schedule_day' => $request->w_schedule_day,
@@ -885,11 +887,17 @@ class ReceivingGoodsDeliveryController extends Controller
                                 }
                                 if ($request->page_type != 'Page146') {
                                     foreach ($data['items'] as $item) {
-                                        WarehousingItem::where('w_no', $request->w_no)->where('item_no', $item['item_no'])->update([
+                                        WarehousingItem::where('w_no', $request->w_no)->where('item_no', $item['item_no'])->where('wi_type','=','출고_shipper')->update([
                                             'item_no' => $item['item_no'],
                                             'w_no' => $request->w_no,
                                             'wi_number' => $item['schedule_wi_number'],
                                             'wi_type' => '출고_shipper'
+                                        ]);
+                                        WarehousingItem::where('w_no', $request->w_no)->where('item_no', $item['item_no'])->where('wi_type','=','출고_spasys')->update([
+                                            'item_no' => $item['item_no'],
+                                            'w_no' => $request->w_no,
+                                            'wi_number' => $item['schedule_wi_number'],
+                                            'wi_type' => '출고_spasys'
                                         ]);
                                     }
                                 }
@@ -959,7 +967,8 @@ class ReceivingGoodsDeliveryController extends Controller
                                     'w_amount' => $data['w_amount'],
                                     'w_type' => 'EW',
                                     'w_category_name' => $request->w_category_name,
-                                    'co_no' => $request->co_no ? $request->co_no : $co_no
+                                    'co_no' => $request->co_no ? $request->co_no : $co_no,
+                                    'connection_number' => $request->connection_number
                                 ]);
                                 $w_schedule_number = CommonFunc::generate_w_schedule_number($w_no, 'EW');
                                 Warehousing::where('w_no', $w_no)->update([

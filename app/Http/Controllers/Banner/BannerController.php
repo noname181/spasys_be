@@ -546,7 +546,7 @@ class BannerController extends Controller
                 });
             });
 
-            $warehousingb = ReceivingGoodsDelivery::with(['warehousing'])->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
+            $warehousingb = ReceivingGoodsDelivery::with(['warehousing'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
                 $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('w_category_name', '=', '유통가공')->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
@@ -585,19 +585,19 @@ class BannerController extends Controller
                     });
             });
 
-            $warehousinge = ReceivingGoodsDelivery::with(['warehousing'])->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
+            $warehousinge = ReceivingGoodsDelivery::with(['warehousing'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
                 $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('rgd_status2', '=', '작업대기')->where('w_category_name', '=', '유통가공')->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
             });
 
-            $warehousingf = ReceivingGoodsDelivery::with(['warehousing'])->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
+            $warehousingf = ReceivingGoodsDelivery::with(['warehousing'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
                 $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('rgd_status2', '=', '작업중')->where('w_category_name', '=', '유통가공')->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
             });
 
-            $warehousingg = ReceivingGoodsDelivery::with(['warehousing'])->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
+            $warehousingg = ReceivingGoodsDelivery::with(['warehousing'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
                 $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('rgd_status2', '=', '작업완료')->where('w_category_name', '=', '유통가공')->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
@@ -654,7 +654,7 @@ class BannerController extends Controller
 
         foreach ($warehousingb as $item) {
             //$b += WarehousingItem::where('w_no', $item->w_no)->where('wi_type', '입고_spasys')->sum('wi_number');
-            $b += $item->warehousing->w_schedule_amount;
+            $b += $item->warehousing->w_amount;
         }
 
         foreach ($warehousingc as $item) {
@@ -700,6 +700,7 @@ class BannerController extends Controller
             $f = 0;
             $g = 0;
             $h = 0;
+            
             $check = "";
             if ($request->service == "유통가공") {
                 $total =  $this->CaculateService3($request);
@@ -862,6 +863,23 @@ class BannerController extends Controller
                 $c = 0;
                 $d = 0;
             } else {
+                $total =  $this->CaculateService3($request);
+                $a = $total['a'];
+                $b = $total['b'];
+                $c = $total['c'];
+                $d = $total['d'];
+                $e = $total['e'];
+                $f = $total['f'];
+                $g = $total['g'];
+                $h = $total['h'];
+
+                $counta = $total['counta'];
+                $countb = $total['countb'];
+                $countc = $total['countc'];
+                $countd = $total['countd'];
+                $counte = $total['counte'];
+                $countf = $total['countf'];
+                $countg = $total['countg'];
             }
 
 
@@ -877,13 +895,13 @@ class BannerController extends Controller
                 'total_f' => $f,
                 'total_g' => $g,
                 'total_h' => $h,
-                'count_a' => $counta,
-                'count_b' => $countb,
-                'count_c' => $countc,
-                'count_d' => $countd,
-                'count_e' => $counte,
-                'count_f' => $countf,
-                'count_g' => $countg,
+                'count_a' => isset($counta) ? $counta : 0,
+                'count_b' => isset($countb) ? $countb : 0,
+                'count_c' => isset($countc) ? $countc : 0,
+                'count_d' => isset($countd) ? $countd : 0,
+                'count_e' => isset($counte) ? $counte : 0,
+                'count_f' => isset($countf) ? $countf : 0,
+                'count_g' => isset($countg) ? $countg : 0,
 
             ]);
         } catch (\Exception $e) {
