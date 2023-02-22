@@ -3173,7 +3173,7 @@ class RateDataController extends Controller
             $rdgs = [];
             foreach ($rgds as $rgd) {
                 $rdg = RateDataGeneral::where('rgd_no_expectation', $rgd->rgd_no)
-                    ->where('rdg_bill_type', 'final_monthly')->first();
+                    ->where('rdg_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
                 $rdgs[] = $rdg;
             }
 
@@ -3218,6 +3218,7 @@ class RateDataController extends Controller
     {
         try {
             DB::beginTransaction();
+            $user = Auth::user();
             $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd_no)->first();
             $co_no = $rgd->warehousing->co_no;
             $adjustmentgroupall = AdjustmentGroup::where('co_no', $co_no)->get();
@@ -3242,7 +3243,7 @@ class RateDataController extends Controller
                 $rgds[$index] = $child_rgd;
 
                 $rdg = RateDataGeneral::where('rgd_no_expectation', $rgd->rgd_no)
-                    ->where('rdg_bill_type', 'final_monthly')->first();
+                    ->where('rdg_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
                 $rdgs[] = $rdg;
             }
 
@@ -3250,7 +3251,7 @@ class RateDataController extends Controller
 
             foreach ($rgds as $rgd2) {
                 $rdg2 = RateDataGeneral::where('rgd_no', $rgd2->rgd_no)
-                    ->where('rdg_bill_type', 'expectation_monthly')->first();
+                    ->where('rdg_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
                 $rdgs2[] = $rdg2;
             }
 
@@ -4036,11 +4037,6 @@ class RateDataController extends Controller
                     'rgd_no' => $final_rgd->rgd_no,
                 ]);
 
-                RateMetaData::where('rgd_no', $request->rgd_no)
-                ->where('set_type', 'LIKE', '%' . ($user->mb_type == 'spasys' ? '_spasys' : '_shop') . '%')
-                ->update([
-                    'rgd_no' => $final_rgd->rgd_no,
-                ]);
 
             }
 
