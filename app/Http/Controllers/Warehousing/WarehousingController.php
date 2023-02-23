@@ -1735,7 +1735,7 @@ class WarehousingController extends Controller
                         ->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
 
                             $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-                        })->orderBy('tie_is_date', 'DESC');
+                        })->orderBy('te_e_date', 'DESC');
                 } else if ($user->mb_type == 'shipper') {
 
                     $sub = ImportExpected::select('company.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
@@ -1772,7 +1772,7 @@ class WarehousingController extends Controller
 
                             //$leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
                             $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-                        })->orderBy('tie_is_date', 'DESC');
+                        })->orderBy('te_e_date', 'DESC');
                 } else if ($user->mb_type == 'spasys') {
 
                     $sub = ImportExpected::select('company.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
@@ -1815,7 +1815,7 @@ class WarehousingController extends Controller
 
                             //$leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
                             $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-                        })->orderBy('tie_is_date', 'DESC');
+                        })->orderBy('te_e_date', 'DESC');
                 }
 
                 if (isset($validated['from_date'])) {
@@ -2248,7 +2248,7 @@ class WarehousingController extends Controller
 
                             //$leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
                             $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-                        })->orderBy('tie_is_date', 'DESC');
+                        })->orderBy('te_e_date', 'DESC');
                 } else if ($user->mb_type == 'shipper') {
                     $sub = ImportExpected::select('company.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
                         ->leftjoin('company', function ($join) {
@@ -2285,7 +2285,7 @@ class WarehousingController extends Controller
 
                             //$leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
                             $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-                        })->orderBy('tie_is_date', 'DESC');
+                        })->orderBy('te_e_date', 'DESC');
                 } else if ($user->mb_type == 'spasys') {
                     //FIX NOT WORK 'with'
                     $sub = ImportExpected::select('company.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
@@ -2339,7 +2339,7 @@ class WarehousingController extends Controller
 
                             //$leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
                             $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-                        })->orderBy('tie_is_date', 'DESC');
+                        })->orderBy('te_e_date', 'DESC');
                     //return DB::getQueryLog();
                     //END FIX NOT WORK 'with'
                 }
