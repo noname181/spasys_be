@@ -28,6 +28,7 @@ use App\Models\Warehousing;
 use App\Models\StockStatusBad;
 use Illuminate\Http\Request;
 use App\Models\Item;
+use App\Models\ScheduleShipment;
 
 class BannerController extends Controller
 {
@@ -614,7 +615,7 @@ class BannerController extends Controller
         $f = 0;
         $g = 0;
         $h = 0;
-        if ($request->time == 'day') {
+        if ($request->time3 == 'day') {
             $warehousinga = $warehousinga->get();
             $warehousingb = $warehousingb->where('warehousing.w_completed_day', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
             $warehousingc = $warehousingc->get();
@@ -622,7 +623,7 @@ class BannerController extends Controller
             $warehousinge = $warehousinge->get();
             $warehousingf = $warehousingf->get();
             $warehousingg = $warehousingg->where('warehousing.w_completed_day', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
-        } elseif ($request->time == 'week') {
+        } elseif ($request->time3 == 'week') {
             $warehousinga = $warehousinga->get();
             $warehousingb = $warehousingb->where('warehousing.w_completed_day', '>=', Carbon::now()->subWeek()->toDateTimeString())->get();
             $warehousingc = $warehousingc->get();
@@ -640,6 +641,13 @@ class BannerController extends Controller
             $warehousingg = $warehousingg->where('warehousing.w_completed_day', '>=', Carbon::now()->subMonth()->toDateTimeString())->get();
         }
 
+        $counta = 0;
+        $countb = 0;
+        $countc = 0;
+        $countd = 0;
+        $counte = 0;
+        $countf = 0;
+        $countg = 0;
 
         $counta = $warehousinga->count();
         $countb = $warehousingb->count();
@@ -723,6 +731,14 @@ class BannerController extends Controller
                     $k->where('co_no', $user->co_no);
                 });
             })->whereNotNull('stock')->groupby('product_id')->groupby('option_id')->orderBy('product_id', 'DESC');
+
+            $warehousingc = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고예정')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
+                $q->where('co_no', $user->co_no);
+            })->orderBy('ss_no', 'DESC');
+
+            $warehousingd = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
+                $q->where('co_no', $user->co_no);
+            });
         } else if ($user->mb_type == 'shipper') {
             $warehousing2 = Warehousing::join(
                 DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
@@ -755,6 +771,14 @@ class BannerController extends Controller
                     $k->where('co_no', $user->co_no);
                 });
             })->whereNotNull('stock')->groupby('product_id')->groupby('option_id')->orderBy('product_id', 'DESC');
+
+            $warehousingc = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고예정')->whereHas('ContractWms.company', function ($q) use ($user) {
+                $q->where('co_no', $user->co_no);
+            })->orderBy('ss_no', 'DESC');
+
+            $warehousingd = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고')->whereHas('ContractWms.company', function ($q) use ($user) {
+                $q->where('co_no', $user->co_no);
+            });
         } else if ($user->mb_type == 'spasys') {
 
             $warehousing2 = Warehousing::join(
@@ -789,35 +813,95 @@ class BannerController extends Controller
                     $k->where('co_no', $user->co_no);
                 });
             })->whereNotNull('stock')->groupby('product_id')->groupby('option_id');
+
+            $warehousingc = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고예정')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
+                $q->where('co_no', $user->co_no);
+            })->orderBy('ss_no', 'DESC');
+
+            $warehousingd = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
+                $q->where('co_no', $user->co_no);
+            });
         }
         $warehousinga->whereDoesntHave('rate_data_general');
+
         $a = 0;
         $b = 0;
+        $b_2 = 0;
         $c = 0;
         $d = 0;
         $e = 0;
         $f = 0;
         $g = 0;
         $h = 0;
-        $warehousinga = $warehousinga->get();
-        $warehousingb = $warehousingb->get();
+
+        $counta = 0;
+        $countb = 0;
+        $countc = 0;
+        $countd = 0;
+        $counte = 0;
+        $countf = 0;
+        $countg = 0;
+
+        if ($request->time2 == 'day') {
+            $warehousinga = $warehousinga->where('created_at', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
+            $warehousingb = $warehousingb->get();
+            $warehousingc = $warehousingc->get();
+            $warehousingd = $warehousingd->where('created_at', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
+        } elseif ($request->time2 == 'week') {
+            $warehousinga = $warehousinga->where('created_at', '>=', Carbon::now()->subWeek()->toDateTimeString())->get();
+            $warehousingb = $warehousingb->get();
+            $warehousingc = $warehousingc->get();
+            $warehousingd = $warehousingd->where('created_at', '>=', Carbon::now()->subWeek()->toDateTimeString())->get();
+        } else {
+            $warehousinga = $warehousinga->where('created_at', '>=', Carbon::now()->subMonth()->toDateTimeString())->get();
+            $warehousingb = $warehousingb->get();
+            $warehousingc = $warehousingc->get();
+            $warehousingd = $warehousingd->where('created_at', '>=', Carbon::now()->subMonth()->toDateTimeString())->get();
+        }
+
         $counta = $warehousinga->count();
         $countb = $warehousingb->count();
+        $countc = $warehousingc->count();
+        $countd = $warehousingd->count();
+
         foreach ($warehousinga as $item) {
             $a += $item->w_amount;
         }
+
         foreach ($warehousingb as $item) {
             $item4 = Item::with(['item_info'])->where('item.item_no', $item->item_no)->first();
             if (isset($item4['item_info']['stock'])) {
                 $b += $item4['item_info']['stock'];
             }
-           
         }
+
+        foreach ($warehousingb as $item) {
+            $item6 = Item::with(['item_info'])->where('item.item_no', $item->item_no)->first();
+            if (isset($item4['item_info']['stock'])) {
+                $b_2 += $item6->item_price2 * $item6['item_info']['stock'];
+            }
+        }
+
+        foreach ($warehousingc as $item) {
+            $schedule_shipment_item = DB::table('schedule_shipment_info')->where('schedule_shipment_info.ss_no', $item->ss_no)->get();
+            foreach ($schedule_shipment_item as $item_s) {
+                $c += $item_s->qty;
+            }
+        }
+
+        foreach ($warehousingd as $item) {
+            $schedule_shipment_item = DB::table('schedule_shipment_info')->where('schedule_shipment_info.ss_no', $item->ss_no)->get();
+            foreach ($schedule_shipment_item as $item_s) {
+                $d += $item_s->qty;
+            }
+        }
+
         return [
-            'warehousinga' => $warehousinga, 'counta' => $counta,'countb'=>$countb, 'a' => $a, 'b' => $b, 'c' => $c, 'd' => $d, 'e' => $e, 'f' => $f, 'h' => $h, 'g' => $g,
+            'warehousinga' => $warehousinga, 'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'a' => $a, 'b' => $b, 'b_2' => $b_2, 'c' => $c, 'd' => $d, 'e' => $e, 'f' => $f, 'h' => $h, 'g' => $g,
         ];
         DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
     }
+
     public function banner_count(Request $request)
     {
         //return "dsada";
@@ -825,51 +909,18 @@ class BannerController extends Controller
 
             $user = Auth::user();
             //DB::enableQueryLog();
-            $a = 0;
-            $b = 0;
-            $c = 0;
-            $d = 0;
-            $e = 0;
-            $f = 0;
-            $g = 0;
-            $h = 0;
+            $total1 = [];
+            $total2 = [];
+            $total3 = [];
 
             $check = "";
             if ($request->service == "유통가공") {
-                $total =  $this->CaculateService3($request);
-                $a = $total['a'];
-                $b = $total['b'];
-                $c = $total['c'];
-                $d = $total['d'];
-                $e = $total['e'];
-                $f = $total['f'];
-                $g = $total['g'];
-                $h = $total['h'];
-
-                $counta = $total['counta'];
-                $countb = $total['countb'];
-                $countc = $total['countc'];
-                $countd = $total['countd'];
-                $counte = $total['counte'];
-                $countf = $total['countf'];
-                $countg = $total['countg'];
+                $total3 =  $this->CaculateService3($request);
                 //$counth = $total['counth'];
-                $check = $total['warehousingb'];
+                $check = $total1['warehousingb'];
             } elseif ($request->service == "수입풀필먼트") {
-                $total =  $this->CaculateService2($request);
-                $a = $total['a'];
-                $b = $total['b'];
-                $c = $total['c'];
-                $d = $total['d'];
-                $e = $total['e'];
-                $f = $total['f'];
-                $g = $total['g'];
-                $h = $total['h'];
-
-                
-                $check = $total['warehousinga'];
-                $counta = $total['counta'];
-                $countb = $total['countb'];
+                $total2 =  $this->CaculateService2($request);
+                $check = $total2['warehousinga'];
             } elseif ($request->service == "보세화물") {
                 DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
                 if ($user->mb_type == 'shop') {
@@ -1010,23 +1061,8 @@ class BannerController extends Controller
                 $c = 0;
                 $d = 0;
             } else {
-                $total =  $this->CaculateService3($request);
-                $a = $total['a'];
-                $b = $total['b'];
-                $c = $total['c'];
-                $d = $total['d'];
-                $e = $total['e'];
-                $f = $total['f'];
-                $g = $total['g'];
-                $h = $total['h'];
-
-                $counta = $total['counta'];
-                $countb = $total['countb'];
-                $countc = $total['countc'];
-                $countd = $total['countd'];
-                $counte = $total['counte'];
-                $countf = $total['countf'];
-                $countg = $total['countg'];
+                $total2 =  $this->CaculateService2($request);
+                $total3 =  $this->CaculateService3($request);
             }
 
 
@@ -1034,22 +1070,9 @@ class BannerController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'check' => $check,
-                'total_a' => $a,
-                'total_b' => $b,
-                'total_c' => $c,
-                'total_d' => $d,
-                'total_e' => $e,
-                'total_f' => $f,
-                'total_g' => $g,
-                'total_h' => $h,
-                'count_a' => isset($counta) ? $counta : 0,
-                'count_b' => isset($countb) ? $countb : 0,
-                'count_c' => isset($countc) ? $countc : 0,
-                'count_d' => isset($countd) ? $countd : 0,
-                'count_e' => isset($counte) ? $counte : 0,
-                'count_f' => isset($countf) ? $countf : 0,
-                'count_g' => isset($countg) ? $countg : 0,
-
+                'total1' => $total1,
+                'total2' => $total2,
+                'total3' => $total3,
             ]);
         } catch (\Exception $e) {
             Log::error($e);
