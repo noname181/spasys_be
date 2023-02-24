@@ -5133,13 +5133,18 @@ class WarehousingController extends Controller
             DB::enableQueryLog();
             $user = Auth::user();
             $tid = TaxInvoiceDivide::where('rgd_no', $request->rgd_no)->get();
+           
 
             $rgd = ReceivingGoodsDelivery::with('warehousing')->where('rgd_no', $request->rgd_no)->first();
 
+            if($tid->count() == 0){
+                $tid = TaxInvoiceDivide::where('tid_no', $rgd->tid_no)->get();
+            }
+
             if ($user->mb_type == 'spasys' && $rgd->service_korean_name == '수입풀필먼트') {
-                $company = Company::with('co_parent')->where('co_no', $rgd['warehousing']['co_no'])->first();
+                $company = Company::with(['co_parent', 'adjustment_group'])->where('co_no', $rgd['warehousing']['co_no'])->first();
             } else {
-                $company = Company::with('co_parent')->where('co_no', $rgd['warehousing']['company']['co_parent']['co_no'])->first();
+                $company = Company::with(['co_parent', 'adjustment_group'])->where('co_no', $rgd['warehousing']['company']['co_parent']['co_no'])->first();
             }
 
             return response()->json([
@@ -5162,9 +5167,9 @@ class WarehousingController extends Controller
             $rgd = ReceivingGoodsDelivery::with('warehousing')->where('rgd_no', $request->rgd_no)->first();
 
             if ($user->mb_type == 'spasys' && $rgd->service_korean_name == '수입풀필먼트') {
-                $company = Company::with('co_parent')->where('co_no', $rgd['warehousing']['co_no'])->first();
+                $company = Company::with(['co_parent', 'adjustment_group'])->where('co_no', $rgd['warehousing']['co_no'])->first();
             } else {
-                $company = Company::with('co_parent')->where('co_no', $rgd['warehousing']['company']['co_parent']['co_no'])->first();
+                $company = Company::with(['co_parent', 'adjustment_group'])->where('co_no', $rgd['warehousing']['company']['co_parent']['co_no'])->first();
             }
 
             return response()->json([
@@ -5207,7 +5212,8 @@ class WarehousingController extends Controller
                             'co_owner' => $request['company']['co_owner'],
                             'co_name' => $request['company']['co_name'],
                             'co_major' => $request['company']['co_major'],
-                            'co_address' => $request['company']['co_address'],
+                            'co_address' => $request['ag']['ag_email'],
+                            'co_address2' => $request['ag']['ag_email2'],
                             'rgd_number' => $tax_number ? $tax_number : null,
                             'mb_no' => $user->mb_no,
                         ]);
@@ -5231,6 +5237,7 @@ class WarehousingController extends Controller
                             'co_name' => $request['company']['co_name'],
                             'co_major' => $request['company']['co_major'],
                             'co_address' => $request['company']['co_address'],
+                            'co_address2' => $request['ag']['ag_email2'],
                             'rgd_number' => $tax_number ? $tax_number : null,
                             'mb_no' => $user->mb_no,
                         ]);
@@ -5331,6 +5338,12 @@ class WarehousingController extends Controller
                     'tid_vat' => $request->vat,
                     'tid_sum' => $request->sum,
                     'tid_number' => $request->tid_number,
+                    'co_license' => $request['company']['co_license'],
+                    'co_owner' => $request['company']['co_owner'],
+                    'co_name' => $request['company']['co_name'],
+                    'co_major' => $request['company']['co_major'],
+                    'co_address' => $request['ag']['ag_email'],
+                    'co_address2' => $request['ag']['ag_email2'],
                     'mb_no' => $user->mb_no,
                 ]);
 

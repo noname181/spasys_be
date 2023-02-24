@@ -30,6 +30,7 @@ class AdjustmentGroupController extends Controller
                 'ag_name',
                 'ag_manager',
                 'ag_email',
+                'ag_email2',
                 'ag_hp',
             ])
             ->where('co_no', $co_no)
@@ -71,6 +72,7 @@ class AdjustmentGroupController extends Controller
                         'ag_hp' => $value['ag_hp'],
                         'ag_manager' => $value['ag_manager'],
                         'ag_email' => $value['ag_email'],
+                        'ag_email2' => $value['ag_email2'],
                         'ag_auto_issue' => isset($value['ag_auto_issue']) ? $value['ag_auto_issue'] : 'n',
                     ]);
                     $id = $ag->first()->ag_no;
@@ -82,6 +84,7 @@ class AdjustmentGroupController extends Controller
                         'ag_hp' => $value['ag_hp'],
                         'ag_manager' => $value['ag_manager'],
                         'ag_email' => $value['ag_email'],
+                        'ag_email2' => $value['ag_email2'],
                         'ag_auto_issue' => isset($value['ag_auto_issue']) ? $value['ag_auto_issue'] : 'n',
                     ]);
                 }
@@ -123,6 +126,7 @@ class AdjustmentGroupController extends Controller
                     'ag_hp' => $value['ag_hp'],
                     'ag_manager' => $value['ag_manager'],
                     'ag_email' => $value['ag_email'],
+                    'ag_email2' => $value['ag_email2'],
                     'ag_auto_issue' => $value['ag_auto_issue'],
                 ]);
 
@@ -156,6 +160,7 @@ class AdjustmentGroupController extends Controller
 				'ag_hp' => $validated['ag_hp'],
 				'ag_manager' => $validated['ag_manager'],
 				'ag_email' => $validated['ag_email'],
+                'ag_email2' => $value['ag_email2'],
 			]);
 
             DB::commit();
@@ -188,6 +193,7 @@ class AdjustmentGroupController extends Controller
                 'ag_hp' => $validated['ag_hp'],
                 'ag_manager' => $validated['ag_manager'],
                 'ag_email' => $validated['ag_email'],
+                'ag_email2' => $value['ag_email2'],
                 'ag_regtime' =>  date('Y-m-d')
             ]);
             return response()->json(['message' => Messages::MSG_0007], 200);
@@ -207,6 +213,7 @@ class AdjustmentGroupController extends Controller
                 'ag_hp' => $validated['ag_hp'],
                 'ag_manager' => $validated['ag_manager'],
                 'ag_email' => $validated['ag_email'],
+                'ag_email2' => $value['ag_email2'],
             ]);
             return response()->json(['message' => Messages::MSG_0007,'user'=>Auth::user()->mb_no], 200);
         } catch (\Exception $e) {
@@ -218,7 +225,7 @@ class AdjustmentGroupController extends Controller
 
     public function get_all($co_no){
         try {
-            $adjustment_groups = AdjustmentGroup::select(['ag_no', 'co_no', 'ag_name', 'ag_manager', 'ag_hp', 'ag_email'])->where('co_no', $co_no)->get();
+            $adjustment_groups = AdjustmentGroup::select(['ag_no', 'co_no', 'ag_name', 'ag_manager', 'ag_hp', 'ag_email', 'ag_email2'])->where('co_no', $co_no)->get();
 
             return response()->json(['adjustment_groups' => $adjustment_groups], 200);
         } catch (\Exception $e) {

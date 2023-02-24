@@ -50,6 +50,12 @@ class AdjustmentGroupCreateRequest extends BaseFormRequest
                 'max:255',
                 'email',
             ],
+            '*.ag_email2' => [
+                'required',
+                'string',
+                'max:255',
+                'email',
+            ],
             '*.ag_no' => [
                 'integer',
             ],
