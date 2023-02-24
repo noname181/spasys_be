@@ -414,7 +414,7 @@ class ExportExcelController extends Controller
                     if (isset($item2['item_info']['stock'])) {
                         $total_price_row = $item2->item_price2 * $item2['item_info']['stock'];
                     }
-                    if (isset($q->option_id)) {
+                    if (isset($data->option_id)) {
                         $status_0 = StockStatusBad::where('product_id', $data->product_id)->where('option_id', $data->option_id)->where('status', 0)->first();
                     } else {
                         $status_0 = StockStatusBad::where('product_id', $data->product_id)->where('status', 0)->first();
@@ -423,7 +423,7 @@ class ExportExcelController extends Controller
                         $stock_0 = $status_0->stock;
                     }
 
-                    if (isset($q->option_id)) {
+                    if (isset($data->option_id)) {
                         $status_1 = StockStatusBad::where('product_id', $data->product_id)->where('option_id', $data->option_id)->where('status', 1)->first();
                     } else {
                         $status_1 = StockStatusBad::where('product_id', $data->product_id)->where('status', 1)->first();
