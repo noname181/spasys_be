@@ -27,6 +27,7 @@ class AdjustmentGroup extends Model
         'ag_name',
         'ag_manager',
         'ag_email',
+        'ag_email2',
         'ag_hp',
         'ag_auto_issue',
     ];
