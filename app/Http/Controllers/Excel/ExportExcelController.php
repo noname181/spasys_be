@@ -236,7 +236,75 @@ class ExportExcelController extends Controller
                 })->whereNotNull('stock')->groupby('product_id')->groupby('option_id')->orderBy('product_id', 'DESC');
             }
 
+            if (isset($validated['from_date'])) {
+                $item->whereHas('item_status_bad', function ($q) use ($validated) {
+                    $q->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                });
+            }
 
+            if (isset($validated['to_date'])) {
+                $item->whereHas('item_status_bad', function ($q) use ($validated) {
+                    $q->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                });
+            }
+            if (isset($validated['status'])) {
+                if ($validated['status'] == '하') {
+                    $status = 1;
+                } else {
+                    $status = 0;
+                }
+                $item->where(DB::raw('status'), '=', $status);
+            }
+            if (isset($validated['co_name_shop'])) {
+                $item->whereHas('item_status_bad.ContractWms.company.co_parent', function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name_shop']) . '%');
+                });
+            }
+            if (isset($validated['product_id'])) {
+                $item->whereHas('item_status_bad', function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(product_id)'), 'like', '%' . strtolower($validated['product_id']) . '%');
+                });
+            }
+            if (isset($validated['co_name_agency'])) {
+                $item->whereHas('item_status_bad.ContractWms.company', function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name_agency']) . '%', 'and', 'co_type', '=', 'shipper');
+                });
+            }
+            if (isset($validated['item_name'])) {
+                $item->whereHas('item_status_bad', function ($q) use ($validated) {
+                    $q->where(DB::raw('lower(item_name)'), 'like', '%' . strtolower($validated['item_name']) . '%');
+                });
+            }
+            if (isset($validated['item_cargo_bar_code'])) {
+                $item->whereHas('item_status_bad', function ($q) use ($validated) {
+                    $q->where(DB::raw('lower(item_cargo_bar_code)'), 'like', '%' . strtolower($validated['item_cargo_bar_code']) . '%');
+                });
+            }
+            if (isset($validated['item_channel_code'])) {
+                $item->whereHas('item_status_bad.item_channels', function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_channel_name)'), 'like', '%' . strtolower($validated['item_channel_name']) . '%');
+                });
+            }
+            if (isset($validated['item_bar_code'])) {
+                $item->whereHas('item_status_bad', function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_bar_code)'), 'like', '%' . strtolower($validated['item_bar_code']) . '%');
+                });
+            }
+            if (isset($validated['item_upc_code'])) {
+                $item->whereHas('item_status_bad', function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_upc_code)'), 'like', '%' . strtolower($validated['item_upc_code']) . '%');
+                });
+            }
+            if (isset($validated['item_channel_name'])) {
+                $item->whereHas('item_status_bad.item_channels', function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_channel_name)'), 'like', '%' . strtolower($validated['item_channel_name']) . '%');
+                });
+            }
+            if (isset($validated['item_brand'])) {
+                $item->whereHas('item_status_bad', function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_brand)'), 'like', '%' . strtolower($validated['item_brand']) . '%');
+                });
+            }
             $item = $item->get();
             // if (isset($validated['from_date'])) {
             //     $item->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
@@ -334,6 +402,10 @@ class ExportExcelController extends Controller
             $sheet->setCellValue('I1', '하');
             $sheet->setCellValue('J1', '정상가(KRW)');
             $sheet->setCellValue('K1', '판매가(KRW)');
+            $sheet->setCellValue('L1', '할인가(KRW)');
+            $sheet->setCellValue('M1', '정상가 합계');
+            $sheet->setCellValue('N1', '판매가 합계');
+            $sheet->setCellValue('O1', '할인가 합계');
             $sn = 2;
             foreach ($item as $data) {
                 $stock_0 = '';
@@ -378,6 +450,10 @@ class ExportExcelController extends Controller
                 $sheet->setCellValue('I' . $sn, $stock_1);
                 $sheet->setCellValue('J' . $sn, '');
                 $sheet->setCellValue('K' . $sn, $data->item_status_bad->item_price2);
+                $sheet->setCellValue('L' . $sn, '');
+                $sheet->setCellValue('M' . $sn, '');
+                $sheet->setCellValue('N' . $sn, '');
+                $sheet->setCellValue('O' . $sn, '');
                 $sn++;
             }
             $Excel_writer = new Xlsx($spreadsheet);
