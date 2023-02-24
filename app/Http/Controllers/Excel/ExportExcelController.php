@@ -193,6 +193,7 @@ class ExportExcelController extends Controller
         $validated = $request->validated();
         try {
             DB::enableQueryLog();
+            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 10000;
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
@@ -236,7 +237,7 @@ class ExportExcelController extends Controller
             }
 
 
-
+            $item = $item->get();
             // if (isset($validated['from_date'])) {
             //     $item->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             // }
@@ -284,25 +285,25 @@ class ExportExcelController extends Controller
             //         $query->where(DB::raw('lower(item_channel_name)'), 'like','%'. strtolower($validated['item_channel_name']) .'%');
             //     });
             // }
-            $item2 = $item->get();
-            $count_check = 0;
-            $item3 = collect($item2)->map(function ($q){
-                $item4 = Item::with(['item_info'])->where('item_no', $q->item_no)->first();
-                if(isset($item4['item_info']['stock'])){
-                return [ 'total_amount' => $item4['item_info']['stock']];
-                }
-            })->sum('total_amount');
-            $item5 = collect($item2)->map(function ($q){
-                $item6 = Item::with(['item_info'])->where('item_no', $q->item_no)->first();
-                if(isset($item6['item_info']['stock'])){
-                return [ 'total_price' => $item6->item_price2 * $item6['item_info']['stock']];
-                }
-            })->sum('total_price');
+            // $item2 = $item->get();
+            // $count_check = 0;
+            // $item3 = collect($item2)->map(function ($q){
+            //     $item4 = Item::with(['item_info'])->where('item_no', $q->item_no)->first();
+            //     if(isset($item4['item_info']['stock'])){
+            //     return [ 'total_amount' => $item4['item_info']['stock']];
+            //     }
+            // })->sum('total_amount');
+            // $item5 = collect($item2)->map(function ($q){
+            //     $item6 = Item::with(['item_info'])->where('item_no', $q->item_no)->first();
+            //     if(isset($item6['item_info']['stock'])){
+            //     return [ 'total_price' => $item6->item_price2 * $item6['item_info']['stock']];
+            //     }
+            // })->sum('total_price');
 
 
             //$item = $item->paginate($per_page, ['*'], 'page', $page);
 
-            $custom = collect(['sum1' => $item3,'sum2'=>$item5]);
+            //$custom = collect(['sum1' => $item3,'sum2'=>$item5]);
 
             //return DB::getQueryLog();
             // $item->setCollection(
@@ -315,8 +316,9 @@ class ExportExcelController extends Controller
             //     })
             // );
 
-            $data = $custom->merge($item);
-            $data_export = $data['data'];
+            // $data = $custom->merge($item);
+            // $data_export = $data['data'];
+            $item =  json_decode($item);
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
             $spreadsheet->getActiveSheet()->getProtection()->setSheet(true);
@@ -333,26 +335,26 @@ class ExportExcelController extends Controller
             $sheet->setCellValue('J1', '정상가(KRW)');
             $sheet->setCellValue('K1', '판매가(KRW)');
             $sn = 2;
-            foreach ($data_export as $data) {
+            foreach ($item as $data) {
                 $stock_0 = '';
                 $stock_1 = '';
-                $item = Item::with(['item_info'])->where('item.item_no', $data['item_no'])->first();
-                    if (isset($item['item_info']['stock'])) {
-                        $total_price_row = $item->item_price2 * $item['item_info']['stock'];
+                $item2 = Item::with(['item_info'])->where('item.item_no', $data->item_no)->first();
+                    if (isset($item2['item_info']['stock'])) {
+                        $total_price_row = $item2->item_price2 * $item2['item_info']['stock'];
                     }
                     if (isset($q->option_id)) {
-                        $status_0 = StockStatusBad::where('product_id', $data['product_id'])->where('option_id', $data['option_id'])->where('status', 0)->first();
+                        $status_0 = StockStatusBad::where('product_id', $data->product_id)->where('option_id', $data->option_id)->where('status', 0)->first();
                     } else {
-                        $status_0 = StockStatusBad::where('product_id', $data['product_id'])->where('status', 0)->first();
+                        $status_0 = StockStatusBad::where('product_id', $data->product_id)->where('status', 0)->first();
                     }
                     if (isset($status_0->stock)) {
                         $stock_0 = $status_0->stock;
                     }
 
                     if (isset($q->option_id)) {
-                        $status_1 = StockStatusBad::where('product_id', $data['product_id'])->where('option_id', $data['option_id'])->where('status', 1)->first();
+                        $status_1 = StockStatusBad::where('product_id', $data->product_id)->where('option_id', $data->option_id)->where('status', 1)->first();
                     } else {
-                        $status_1 = StockStatusBad::where('product_id', $data['product_id'])->where('status', 1)->first();
+                        $status_1 = StockStatusBad::where('product_id', $data->product_id)->where('status', 1)->first();
                     }
                     if (isset($status_1->stock)) {
                         $stock_1 = $status_1->stock;
@@ -364,18 +366,18 @@ class ExportExcelController extends Controller
                         $stock_total = $stock1 + $stock0;
                     }
 
-                $wi_number = !empty($data['warehousing_item']['wi_number'])?$data['warehousing_item']['wi_number']:'.';
-                $sheet->setCellValue('A' . $sn, $data['item_no']);
-                $sheet->setCellValue('B' . $sn, $data['item_status_bad']['contract_wms']['company']['co_parent']['co_name']);
-                $sheet->setCellValue('C' . $sn, $data['item_status_bad']['contract_wms']['company']['co_name']);
-                $sheet->setCellValue('D' . $sn, $data['product_id']);
-                $sheet->setCellValue('E' . $sn, $data['option_id']);
+                //$wi_number = !empty($data['warehousing_item']['wi_number'])?$data['warehousing_item']['wi_number']:'.';
+                $sheet->setCellValue('A' . $sn, $data->item_no);
+                $sheet->setCellValue('B' . $sn, $data->item_status_bad->contract_wms->company->co_parent->co_name);
+                $sheet->setCellValue('C' . $sn, $data->item_status_bad->contract_wms->company->co_name);
+                $sheet->setCellValue('D' . $sn, $data->product_id);
+                $sheet->setCellValue('E' . $sn, $data->option_id);
                 $sheet->setCellValue('F' . $sn, '');
-                $sheet->setCellValue('G' . $sn, $data['item_status_bad']['item_name']);
+                $sheet->setCellValue('G' . $sn, $data->item_status_bad->item_name);
                 $sheet->setCellValue('H' . $sn, $stock_0);
                 $sheet->setCellValue('I' . $sn, $stock_1);
-                $sheet->setCellValue('J' . $sn, $stock_1);
-                $sheet->setCellValue('K' . $sn, $data['item_status_bad']['item_price2']);
+                $sheet->setCellValue('J' . $sn, '');
+                $sheet->setCellValue('K' . $sn, $data->item_status_bad->item_price2);
                 $sn++;
             }
             $Excel_writer = new Xlsx($spreadsheet);
@@ -394,6 +396,7 @@ class ExportExcelController extends Controller
             array_map('unlink', glob($mask));
             $file_name_download = $path.'FulfillmentStockList-'.date('YmdHis').'.Xlsx';
             $Excel_writer->save($file_name_download);
+            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
             return response()->json([
                 'status' => 1,
                 'link_download' => $file_name_download,
@@ -402,7 +405,7 @@ class ExportExcelController extends Controller
             ob_end_clean();
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
