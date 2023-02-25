@@ -1912,7 +1912,9 @@ class WarehousingController extends Controller
                     } else {
                         $import_schedule->where(function ($query) use($validated)  {
                             $query->where('rgd_status3', '=', $validated['status']);
-                            $query->where('rgd_status1','!=','반입');
+                            $query->where(function ($q) {
+                                $q->where('rgd_status1','!=','반입')->orWhereNull('rgd_status1');
+                            });
                         });
                     }
                 }
