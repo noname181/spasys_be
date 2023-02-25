@@ -877,6 +877,9 @@ class ExportExcelController extends Controller
             $sheet->setCellValue('J1', '반입일자');
             $sheet->setCellValue('K1', '반입수량');
             $sheet->setCellValue('L1', '반입수량');
+            $sheet->setCellValue('M1', '승인일자');
+            $sheet->setCellValue('N1', '반출일자');
+            $sheet->setCellValue('O1', '반출수량');
 
             $num_row = 2;
             $data_schedules =  json_decode($import_schedule);
@@ -902,6 +905,9 @@ class ExportExcelController extends Controller
                 $sheet->setCellValue('J'.$num_row, $data->ti_i_date);
                 $sheet->setCellValue('K'.$num_row, $data->ti_i_number);
                 $sheet->setCellValue('L'.$num_row, $data->te_e_confirm_number);
+                $sheet->setCellValue('M'.$num_row, $data->te_e_confirm_number);
+                $sheet->setCellValue('N'.$num_row, $data->te_e_confirm_number);
+                $sheet->setCellValue('O'.$num_row, $data->te_e_confirm_number);
                 $num_row++;
             }
 
