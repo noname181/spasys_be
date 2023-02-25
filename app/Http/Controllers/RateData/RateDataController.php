@@ -834,16 +834,26 @@ class RateDataController extends Controller
             }
 
         } else if (!isset($rmd->rmd_no) && $set_type == 'bonded1_final') {
-            $rmd = RateMetaData::where(
-                [
-                    'rgd_no' => $rgd->rgd_parent_no,
-                    'set_type' => $set_type,
-                ]
-            )->first();
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
                     [
-                        'rgd_no' => $rgd->rgd_parent_no,
+                        'rgd_no' => $rgd->rgd_no,
+                        'set_type' => 'bonded1_final',
+                    ]
+                )->first();
+            }
+            if (empty($rmd)) {
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_no,
+                        'set_type' => 'bonded1_shop',
+                    ]
+                )->first();
+            }
+            if (empty($rmd)) {
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_no,
                         'set_type' => 'bonded1_spasys',
                     ]
                 )->first();
@@ -859,38 +869,25 @@ class RateDataController extends Controller
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
                     [
-                        'rgd_no' => $rgd->rgd_no,
-                        'set_type' => 'bonded1',
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded1_spasys',
                     ]
                 )->first();
             }
-            if (empty($rmd)) {
-                $rmd = RateMetaData::where(
-                    [
-                        'rgd_no' => $rgd->rgd_no,
-                        'set_type' => 'bonded1_shop',
-                    ]
-                )->first();
-            }
+          
         } else if (!isset($rmd->rmd_no) && $set_type == 'bonded2_final') {
-            $rmd = RateMetaData::where(
-                [
-                    'rgd_no' => $rgd->rgd_parent_no,
-                    'set_type' => $set_type,
-                ]
-            )->first();
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
                     [
-                        'rgd_no' => $rgd->rgd_parent_no,
-                        'set_type' => 'bonded2_spasys',
+                        'rgd_no' => $rgd->rgd_no,
+                        'set_type' => 'bonded2_final',
                     ]
                 )->first();
             }
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
                     [
-                        'rgd_no' => $rgd->rgd_parent_no,
+                        'rgd_no' => $rgd->rgd_no,
                         'set_type' => 'bonded2_shop',
                     ]
                 )->first();
@@ -906,30 +903,32 @@ class RateDataController extends Controller
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
                     [
-                        'rgd_no' => $rgd->rgd_no,
+                        'rgd_no' => $rgd->rgd_parent_no,
                         'set_type' => 'bonded2_shop',
+                    ]
+                )->first();
+            }
+            if (empty($rmd)) {
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded2_spasys',
                     ]
                 )->first();
             }
         } else if (!isset($rmd->rmd_no) && $set_type == 'bonded3_final') {
-            $rmd = RateMetaData::where(
-                [
-                    'rgd_no' => $rgd->rgd_parent_no,
-                    'set_type' => $set_type,
-                ]
-            )->first();
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
                     [
-                        'rgd_no' => $rgd->rgd_parent_no,
-                        'set_type' => 'bonded3_spasys',
+                        'rgd_no' => $rgd->rgd_no,
+                        'set_type' => 'bonded3_final',
                     ]
                 )->first();
             }
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
                     [
-                        'rgd_no' => $rgd->rgd_parent_no,
+                        'rgd_no' => $rgd->rgd_no,
                         'set_type' => 'bonded3_shop',
                     ]
                 )->first();
@@ -945,30 +944,32 @@ class RateDataController extends Controller
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
                     [
-                        'rgd_no' => $rgd->rgd_no,
+                        'rgd_no' => $rgd->rgd_parent_no,
                         'set_type' => 'bonded3_shop',
+                    ]
+                )->first();
+            }
+            if (empty($rmd)) {
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded3_spasys',
                     ]
                 )->first();
             }
         } else if (!isset($rmd->rmd_no) && $set_type == 'bonded4_final') {
-            $rmd = RateMetaData::where(
-                [
-                    'rgd_no' => $rgd->rgd_parent_no,
-                    'set_type' => $set_type,
-                ]
-            )->first();
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
                     [
-                        'rgd_no' => $rgd->rgd_parent_no,
-                        'set_type' => 'bonded4_spasys',
+                        'rgd_no' => $rgd->rgd_no,
+                        'set_type' => 'bonded4_final',
                     ]
                 )->first();
             }
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
                     [
-                        'rgd_no' => $rgd->rgd_parent_no,
+                        'rgd_no' => $rgd->rgd_no,
                         'set_type' => 'bonded4_shop',
                     ]
                 )->first();
@@ -984,30 +985,32 @@ class RateDataController extends Controller
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
                     [
-                        'rgd_no' => $rgd->rgd_no,
+                        'rgd_no' => $rgd->rgd_parent_no,
                         'set_type' => 'bonded4_shop',
+                    ]
+                )->first();
+            }
+            if (empty($rmd)) {
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded4_spasys',
                     ]
                 )->first();
             }
         } else if (!isset($rmd->rmd_no) && $set_type == 'bonded5_final') {
-            $rmd = RateMetaData::where(
-                [
-                    'rgd_no' => $rgd->rgd_parent_no,
-                    'set_type' => $set_type,
-                ]
-            )->first();
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
                     [
-                        'rgd_no' => $rgd->rgd_parent_no,
-                        'set_type' => 'bonded5_spasys',
+                        'rgd_no' => $rgd->rgd_no,
+                        'set_type' => 'bonded5_final',
                     ]
                 )->first();
             }
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
                     [
-                        'rgd_no' => $rgd->rgd_parent_no,
+                        'rgd_no' => $rgd->rgd_no,
                         'set_type' => 'bonded5_shop',
                     ]
                 )->first();
@@ -1023,30 +1026,32 @@ class RateDataController extends Controller
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
                     [
-                        'rgd_no' => $rgd->rgd_no,
+                        'rgd_no' => $rgd->rgd_parent_no,
                         'set_type' => 'bonded5_shop',
+                    ]
+                )->first();
+            }
+            if (empty($rmd)) {
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded5_spasys',
                     ]
                 )->first();
             }
         } else if (!isset($rmd->rmd_no) && $set_type == 'bonded6_final') {
-            $rmd = RateMetaData::where(
-                [
-                    'rgd_no' => $rgd->rgd_parent_no,
-                    'set_type' => $set_type,
-                ]
-            )->first();
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
                     [
-                        'rgd_no' => $rgd->rgd_parent_no,
-                        'set_type' => 'bonded6_spasys',
+                        'rgd_no' => $rgd->rgd_no,
+                        'set_type' => 'bonded6_final',
                     ]
                 )->first();
             }
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
                     [
-                        'rgd_no' => $rgd->rgd_parent_no,
+                        'rgd_no' => $rgd->rgd_no,
                         'set_type' => 'bonded6_shop',
                     ]
                 )->first();
@@ -1062,8 +1067,16 @@ class RateDataController extends Controller
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
                     [
-                        'rgd_no' => $rgd->rgd_no,
+                        'rgd_no' => $rgd->rgd_parent_no,
                         'set_type' => 'bonded6_shop',
+                    ]
+                )->first();
+            }
+            if (empty($rmd)) {
+                $rmd = RateMetaData::where(
+                    [
+                        'rgd_no' => $rgd->rgd_parent_no,
+                        'set_type' => 'bonded6_spasys',
                     ]
                 )->first();
             }
