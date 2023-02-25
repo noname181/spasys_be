@@ -1559,24 +1559,14 @@ class ReceivingGoodsDeliveryController extends Controller
 
 
             if (!isset($validate['w_schedule_number'])) {
-                $w_schedule_number = (new CommonFunc)->generate_w_schedule_number($w_no, 'IW');
-                if (isset($validated['page_type']) && $validated['page_type'] == 'Page130146') {
-                    $w_schedule_number2 = (new CommonFunc)->generate_w_schedule_number($w_no, 'IWC');
-                }
+                $w_schedule_number = (new CommonFunc)->generate_w_schedule_number($w_no, 'IWC');
+               
             }
 
 
             Warehousing::where('w_no', $w_no)->update([
                 'w_schedule_number' =>  $w_schedule_number
             ]);
-
-            if (isset($validated['page_type']) && $validated['page_type'] == 'Page130146') {
-                $mytime = Carbon::now();
-                Warehousing::where('w_no', $w_no)->update([
-                    'w_schedule_number2' =>  $w_schedule_number2,
-                    'w_completed_day' => $mytime->toDateTimeString()
-                ]);
-            }
 
             //T part
 
