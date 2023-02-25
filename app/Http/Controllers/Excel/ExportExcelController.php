@@ -713,7 +713,7 @@ class ExportExcelController extends Controller
                 // $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
                 //     ->groupBy(['tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number']);
 
-                $sub_4 = Export::select('connection_number', 't_export.te_status_2', 'te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number')
+                $sub_4 = Export::select('connection_number', 't_export.te_status_2', 'te_logistic_manage_number','te_e_confirm_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number')
                     // ->leftjoin('receiving_goods_delivery', function ($join) {
                     //     $join->on('t_export.te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
                     // })
@@ -753,7 +753,7 @@ class ExportExcelController extends Controller
                 // $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
                 //     ->groupBy(['tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number']);
 
-                $sub_4 = Export::select('connection_number', 't_export.te_status_2', 'te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number')
+                $sub_4 = Export::select('connection_number', 't_export.te_status_2', 'te_logistic_manage_number', 'te_carry_out_number', 'te_e_date','te_e_confirm_number' ,'te_carry_in_number', 'te_e_order', 'te_e_number')
                     // ->leftjoin('receiving_goods_delivery', function ($join) {
                     //     $join->on('t_export.te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
                     // })
@@ -808,7 +808,7 @@ class ExportExcelController extends Controller
                 // $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
                 //     ->groupBy(['tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number']);
 
-                $sub_4 = Export::select('connection_number', 't_export.te_status_2', 'te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number')
+                $sub_4 = Export::select('connection_number', 't_export.te_status_2', 'te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number','te_e_confirm_number', 'te_e_order', 'te_e_number')
                     // ->leftjoin('receiving_goods_delivery', function ($join) {
                     //     $join->on('t_export.te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
                     // })
@@ -875,6 +875,8 @@ class ExportExcelController extends Controller
             $sheet->setCellValue('H1', '품명');
             $sheet->setCellValue('I1', '입항일자');
             $sheet->setCellValue('J1', '반입일자');
+            $sheet->setCellValue('K1', '반입수량');
+            $sheet->setCellValue('L1', '반입수량');
 
             $num_row = 2;
             $data_schedules =  json_decode($import_schedule);
@@ -897,7 +899,9 @@ class ExportExcelController extends Controller
                 $sheet->setCellValue('G'.$num_row, $data->tie_is_ship);
                 $sheet->setCellValue('H'.$num_row, $data->tie_is_name_eng);
                 $sheet->setCellValue('I'.$num_row, $data->tie_is_date);
-                $sheet->setCellValue('I'.$num_row, $data->ti_i_date);
+                $sheet->setCellValue('J'.$num_row, $data->ti_i_date);
+                $sheet->setCellValue('K'.$num_row, $data->ti_i_number);
+                $sheet->setCellValue('L'.$num_row, $data->te_e_confirm_number);
                 $num_row++;
             }
 
