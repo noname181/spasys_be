@@ -1848,7 +1848,7 @@ class WarehousingController extends Controller
                     $import_schedule->where('aaa.tie_logistic_manage_number', 'like', '%' . $validated['logistic_manage_number'] . '%');
                 }
                 if (isset($validated['w_schedule_number'])) {
-                    $import_schedule->where(DB::raw('aaa.te_carry_out_number'), 'like', '%' . strtolower($validated['w_schedule_number']) . '%');
+                    $import_schedule->where(DB::raw('te_carry_out_number'), 'like', '%' . strtolower($validated['w_schedule_number']) . '%');
                 }
 
                 if (1 == 1) {
@@ -5637,6 +5637,7 @@ class WarehousingController extends Controller
                                 'mb_no' => Auth::user()->mb_no,
                                 'service_korean_name' => '보세화물',
                                 'rgd_status3' => "배송완료",
+                                'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
                             ]
                         );
                     }else{
@@ -5645,6 +5646,7 @@ class WarehousingController extends Controller
                             'service_korean_name' => '보세화물',
                             'rgd_status3' => "배송완료",
                             'is_no' => $is_no,
+                            'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
     
                         ]);
                     }
