@@ -17,11 +17,16 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Reader\Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\WarehousingItem;
 use App\Models\ImportSchedule;
 use App\Models\StockStatusBad;
 use App\Models\ReceivingGoodsDelivery;
+use App\Models\Import;
+use App\Models\ImportExpected;
+use App\Models\Export;
+use App\Models\ExportConfirm;
 
 class ExportExcelController extends Controller
 {
@@ -677,7 +682,7 @@ class ExportExcelController extends Controller
             return $e;
         }
     }
-    public function download_bonded_cargo(ItemSearchRequest $request){
+    public function download_bonded_cargo(ImportScheduleSearchRequest $request){
         try {
             DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
             DB::enableQueryLog();
