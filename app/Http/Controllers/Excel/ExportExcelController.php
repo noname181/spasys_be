@@ -704,7 +704,7 @@ class ExportExcelController extends Controller
                     ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                     ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-                $sub_2 = Import::select('receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1','ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
+                $sub_2 = Import::select('receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1','ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number','ti_logistic_type')
                     ->leftjoin('receiving_goods_delivery', function ($join) {
                         $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
                     })
@@ -744,7 +744,7 @@ class ExportExcelController extends Controller
                     ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                     ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-                $sub_2 = Import::select('receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
+                $sub_2 = Import::select('receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number','ti_logistic_type')
                     ->leftjoin('receiving_goods_delivery', function ($join) {
                         $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
                     })
@@ -799,7 +799,7 @@ class ExportExcelController extends Controller
                     ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                     ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-                $sub_2 = Import::select('receiving_goods_delivery.rgd_no','receiving_goods_delivery.rgd_status3','receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
+                $sub_2 = Import::select('receiving_goods_delivery.rgd_no','receiving_goods_delivery.rgd_status3','receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number','ti_logistic_type')
                     ->leftjoin('receiving_goods_delivery', function ($join) {
                         $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
                     })
@@ -868,13 +868,13 @@ class ExportExcelController extends Controller
             $sheet->setCellValue('A1', 'No');
             $sheet->setCellValue('B1', '가맹점');
             $sheet->setCellValue('C1', '화주');
-            $sheet->setCellValue('D1', 'M-BL');
-            $sheet->setCellValue('E1', 'H-BL');
-            $sheet->setCellValue('F1', '화물상태');
-            $sheet->setCellValue('G1', '통관상태');
-            $sheet->setCellValue('H1', '수량');
-            $sheet->setCellValue('I1', '화물연계번호');
-            $sheet->setCellValue('J1', '반입일');
+            $sheet->setCellValue('D1', 'H-BL');
+            $sheet->setCellValue('E1', '화물유형');
+            $sheet->setCellValue('F1', '화물관리번호');
+            $sheet->setCellValue('G1', '선명');
+            $sheet->setCellValue('H1', '품명');
+            $sheet->setCellValue('I1', '입항일자');
+            $sheet->setCellValue('J1', '반입일자');
 
             $num_row = 2;
             $data_schedules =  json_decode($import_schedule);
@@ -887,10 +887,17 @@ class ExportExcelController extends Controller
                     $shop2= $data->co_name;
                 }
 
-
+                
                 $sheet->setCellValue('A'.$num_row, isset($data->is_no)?$data->is_no:'');
                 $sheet->setCellValue('B'.$num_row, $shop);
                 $sheet->setCellValue('C'.$num_row, $shop2);
+                $sheet->setCellValue('D'.$num_row, $data->tie_h_bl);
+                $sheet->setCellValue('E'.$num_row, $data->ti_logistic_type);
+                $sheet->setCellValue('F'.$num_row, $data->te_logistic_manage_number);
+                $sheet->setCellValue('G'.$num_row, $data->tie_is_ship);
+                $sheet->setCellValue('H'.$num_row, $data->tie_is_name_eng);
+                $sheet->setCellValue('I'.$num_row, $data->tie_is_date);
+                $sheet->setCellValue('I'.$num_row, $data->ti_i_date);
                 $num_row++;
             }
 
