@@ -1472,11 +1472,17 @@ class WarehousingController extends Controller
                 }
 
                 if (isset($validated['from_date'])) {
-                    $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                    // $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                    $warehousing->whereHas('w_no', function ($q) use ($validated) {
+                        return $q->where('w_completed_day',  '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                    });
                 }
 
                 if (isset($validated['to_date'])) {
-                    $warehousing->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                    //$warehousing->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                    $warehousing->whereHas('w_no', function ($q) use ($validated) {
+                        return $q->where('w_completed_day',  '<=',date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                    });
                 }
 
                 if (isset($validated['co_parent_name'])) {
@@ -1588,11 +1594,17 @@ class WarehousingController extends Controller
                 }
 
                 if (isset($validated['from_date'])) {
-                    $schedule_shipment->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                    //$schedule_shipment->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                    // $schedule_shipment->whereHas('receving_goods_delivery', function ($q) use ($validated) {
+                    //     $q->where('rgd_delivery_schedule_day', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                    // });
                 }
 
                 if (isset($validated['to_date'])) {
-                    $schedule_shipment->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                    //$schedule_shipment->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                    // $schedule_shipment->whereHas('receving_goods_delivery', function ($q) use ($validated) {
+                    //     $q->where('rgd_delivery_schedule_day', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                    // });
                 }
 
                 if (isset($validated['co_parent_name'])) {
@@ -1992,12 +2004,25 @@ class WarehousingController extends Controller
                     })->orderBy('rgd_no', 'DESC');
                 }
 
+                // if (isset($validated['from_date'])) {
+                //     $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                // }
+
+                // if (isset($validated['to_date'])) {
+                //     $warehousing->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                // }
                 if (isset($validated['from_date'])) {
-                    $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                    // $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                    $warehousing->whereHas('w_no', function ($q) use ($validated) {
+                        return $q->where('w_completed_day',  '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                    });
                 }
 
                 if (isset($validated['to_date'])) {
-                    $warehousing->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                    //$warehousing->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                    $warehousing->whereHas('w_no', function ($q) use ($validated) {
+                        return $q->where('w_completed_day',  '<=',date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                    });
                 }
 
                 if (isset($validated['co_parent_name'])) {
@@ -2103,11 +2128,17 @@ class WarehousingController extends Controller
                 }
 
                 if (isset($validated['from_date'])) {
-                    $schedule_shipment->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                    //$schedule_shipment->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                    $schedule_shipment->whereHas('receving_goods_delivery', function ($q) use ($validated) {
+                        $q->where('rgd_delivery_schedule_day', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                    });
                 }
 
                 if (isset($validated['to_date'])) {
-                    $schedule_shipment->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                    //$schedule_shipment->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                    $schedule_shipment->whereHas('receving_goods_delivery', function ($q) use ($validated) {
+                        $q->where('rgd_delivery_schedule_day', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                    });
                 }
 
                 if (isset($validated['co_parent_name'])) {

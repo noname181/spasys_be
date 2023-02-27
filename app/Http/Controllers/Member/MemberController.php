@@ -343,6 +343,8 @@ class MemberController extends Controller
                 'co_policy' => isset($validated['co_policy']) ? $validated['co_policy'] : '',
                 'co_help_center' => $validated['co_help_center'],
                 'warehouse_code' => $validated['warehouse_code'],
+                'co_address' => $validated['co_address'],
+                'co_address_detail' => $validated['co_address_detail'],
             ]);
 
             $validated['co_no'] = $com_no;
@@ -408,6 +410,8 @@ class MemberController extends Controller
                 'co_help_center' => $validated['co_help_center'],
                 'co_policy' => $validated['co_policy'],
                 'warehouse_code' => $validated['warehouse_code'],
+                'co_address' => $validated['co_address'],
+                'co_address_detail' => $validated['co_address_detail'],
             ]);
 
             DB::commit();
