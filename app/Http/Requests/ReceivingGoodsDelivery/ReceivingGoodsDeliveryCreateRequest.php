@@ -265,6 +265,9 @@ class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
             'item_new.*.wi_number' => [
                 'nullable'
             ],
+            'location.*.rgd_confirmed_date' => [
+                'nullable'
+            ],
         ];
     }
 
