@@ -90,6 +90,12 @@ class MemberSpasysUpdateRequest extends BaseFormRequest
             'warehouse_code' => [
                 ''
             ],
+            'co_address' => [
+                ''
+            ],
+            'co_address_detail' => [
+                ''
+            ],
 
 
         ];
