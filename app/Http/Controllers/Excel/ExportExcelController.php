@@ -704,7 +704,7 @@ class ExportExcelController extends Controller
                     ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                     ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-                $sub_2 = Import::select('receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1','ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number','ti_logistic_type')
+                $sub_2 = Import::select('receiving_goods_delivery.rgd_no','receiving_goods_delivery.rgd_status3','receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number','ti_logistic_type')
                     ->leftjoin('receiving_goods_delivery', function ($join) {
                         $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
                     })
@@ -713,7 +713,7 @@ class ExportExcelController extends Controller
                 // $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
                 //     ->groupBy(['tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number']);
 
-                $sub_4 = Export::select('connection_number', 't_export.te_status_2', 'te_logistic_manage_number','te_e_confirm_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number')
+                $sub_4 = Export::select('connection_number','tec_ec_date', 't_export.te_status_2', 'te_logistic_manage_number','te_e_price', 'te_carry_out_number','te_e_weight', 'te_e_date', 'te_carry_in_number','te_e_confirm_number', 'te_e_order', 'te_e_number')
                     // ->leftjoin('receiving_goods_delivery', function ($join) {
                     //     $join->on('t_export.te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
                     // })
@@ -733,7 +733,7 @@ class ExportExcelController extends Controller
                 })->orderBy('tie_is_date', 'DESC');
             } else if ($user->mb_type == 'shipper') {
                
-                $sub = ImportExpected::select('company.co_type' ,'t_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
+                $sub = ImportExpected::select('company.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
                     ->leftjoin('company', function ($join) {
                         $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
                     })->leftjoin('company as parent_shop', function ($join) {
@@ -744,7 +744,7 @@ class ExportExcelController extends Controller
                     ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                     ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-                $sub_2 = Import::select('receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number','ti_logistic_type')
+                $sub_2 = Import::select('receiving_goods_delivery.rgd_no','receiving_goods_delivery.rgd_status3','receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number','ti_logistic_type')
                     ->leftjoin('receiving_goods_delivery', function ($join) {
                         $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
                     })
@@ -753,7 +753,7 @@ class ExportExcelController extends Controller
                 // $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
                 //     ->groupBy(['tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number']);
 
-                $sub_4 = Export::select('connection_number', 't_export.te_status_2', 'te_logistic_manage_number', 'te_carry_out_number', 'te_e_date','te_e_confirm_number' ,'te_carry_in_number', 'te_e_order', 'te_e_number')
+                $sub_4 = Export::select('connection_number','tec_ec_date', 't_export.te_status_2', 'te_logistic_manage_number','te_e_price', 'te_carry_out_number','te_e_weight', 'te_e_date', 'te_carry_in_number','te_e_confirm_number', 'te_e_order', 'te_e_number')
                     // ->leftjoin('receiving_goods_delivery', function ($join) {
                     //     $join->on('t_export.te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
                     // })
@@ -1042,7 +1042,25 @@ class ExportExcelController extends Controller
                     $value_ab = '';
                     $value_ac = '';
                 }
-                
+                $value_status1 = '';
+                $value_status2 = '';
+
+                if (isset($data->te_logistic_manage_number)) {
+                    $value_status1 = "반출";
+                } else if (isset($data->ti_logistic_manage_number)) {
+                    $value_status1 = "반입";
+                } else if (isset($data->tie_logistic_manage_number)) {
+                    $value_status1 = "반입예정";
+                }
+
+
+                if (isset($data->te_status_2)) {
+                    $value_status2 = $data->te_status_2;
+                } else if (isset($data->ti_status_2)) {
+                    $value_status2 = $data->ti_status_2;
+                } else if (isset($data->tie_status_2)) {
+                    $value_status2 = $data->tie_status_2;
+                }
 
                 $sheet->setCellValue('A'.$num_row, isset($data->is_no)?$data->is_no:'');
                 $sheet->setCellValue('B'.$num_row, $shop);
@@ -1070,8 +1088,8 @@ class ExportExcelController extends Controller
                 $sheet->setCellValue('X'.$num_row, $value_x);
                 $sheet->setCellValue('Y'.$num_row, $value_y);
                 $sheet->setCellValue('Z'.$num_row, $value_z);
-                $sheet->setCellValue('AA'.$num_row, $value_aa);
-                $sheet->setCellValue('AB'.$num_row, $value_ab);
+                $sheet->setCellValue('AA'.$num_row, $value_status1);
+                $sheet->setCellValue('AB'.$num_row, $value_status2);
                 $sheet->setCellValue('AC'.$num_row, $value_ac);
                 $num_row++;
             }
