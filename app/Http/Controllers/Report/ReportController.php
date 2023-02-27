@@ -331,11 +331,11 @@ class ReportController extends Controller
             $user = Auth::user();
            
             if($user->mb_type == 'shop'){
-                $reports = Report::with(['files', 'reports_child','warehousing','export','member'])->whereHas('warehousing.co_no.co_parent',function ($q) use ($user){
+                $reports = Report::with(['files', 'reports_child','warehousing','export','import_expect','import','member'])->whereHas('warehousing.co_no.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->orderBy('created_at', 'DESC')->orderBy('rp_parent_no', 'DESC');
             }else if($user->mb_type == 'shipper'){
-                $reports = Report::with(['files', 'reports_child','warehousing','export','member'])->whereHas('warehousing.co_no',function ($q) use ($user){
+                $reports = Report::with(['files', 'reports_child','warehousing','export','import_expect','import','member'])->whereHas('warehousing.co_no',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->orderBy('created_at', 'DESC')->orderBy('rp_parent_no', 'DESC');
             }else if($user->mb_type == 'spasys'){

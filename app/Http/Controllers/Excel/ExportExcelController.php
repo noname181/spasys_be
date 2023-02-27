@@ -704,7 +704,7 @@ class ExportExcelController extends Controller
                     ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                     ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-                $sub_2 = Import::select('receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1','ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number','ti_logistic_type')
+                $sub_2 = Import::select('receiving_goods_delivery.rgd_no','receiving_goods_delivery.rgd_status3','receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number','ti_logistic_type')
                     ->leftjoin('receiving_goods_delivery', function ($join) {
                         $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
                     })
@@ -713,7 +713,7 @@ class ExportExcelController extends Controller
                 // $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
                 //     ->groupBy(['tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number']);
 
-                $sub_4 = Export::select('connection_number', 't_export.te_status_2', 'te_logistic_manage_number','te_e_confirm_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number')
+                $sub_4 = Export::select('connection_number','tec_ec_date', 't_export.te_status_2', 'te_logistic_manage_number','te_e_price', 'te_carry_out_number','te_e_weight', 'te_e_date', 'te_carry_in_number','te_e_confirm_number', 'te_e_order', 'te_e_number')
                     // ->leftjoin('receiving_goods_delivery', function ($join) {
                     //     $join->on('t_export.te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
                     // })
@@ -744,7 +744,7 @@ class ExportExcelController extends Controller
                     ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                     ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-                $sub_2 = Import::select('receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number','ti_logistic_type')
+                $sub_2 = Import::select('receiving_goods_delivery.rgd_no','receiving_goods_delivery.rgd_status3','receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number','ti_logistic_type')
                     ->leftjoin('receiving_goods_delivery', function ($join) {
                         $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
                     })
@@ -753,7 +753,7 @@ class ExportExcelController extends Controller
                 // $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
                 //     ->groupBy(['tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number']);
 
-                $sub_4 = Export::select('connection_number', 't_export.te_status_2', 'te_logistic_manage_number', 'te_carry_out_number', 'te_e_date','te_e_confirm_number' ,'te_carry_in_number', 'te_e_order', 'te_e_number')
+                $sub_4 = Export::select('connection_number','tec_ec_date', 't_export.te_status_2', 'te_logistic_manage_number','te_e_price', 'te_carry_out_number','te_e_weight', 'te_e_date', 'te_carry_in_number','te_e_confirm_number', 'te_e_order', 'te_e_number')
                     // ->leftjoin('receiving_goods_delivery', function ($join) {
                     //     $join->on('t_export.te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
                     // })
@@ -808,10 +808,10 @@ class ExportExcelController extends Controller
                 // $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
                 //     ->groupBy(['tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number']);
 
-                $sub_4 = Export::select('connection_number', 't_export.te_status_2', 'te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number','te_e_confirm_number', 'te_e_order', 'te_e_number')
-                    // ->leftjoin('receiving_goods_delivery', function ($join) {
-                    //     $join->on('t_export.te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
-                    // })
+                $sub_4 = Export::select('connection_number','tec_ec_date', 't_export.te_status_2', 'te_logistic_manage_number','te_e_price', 'te_carry_out_number','te_e_weight', 'te_e_date', 'te_carry_in_number','te_e_confirm_number', 'te_e_order', 'te_e_number')
+                    ->leftjoin('t_export_confirm', function ($join) {
+                        $join->on('t_export.te_logistic_manage_number', '=', 't_export_confirm.tec_logistic_manage_number');
+                    })
                     ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
 
 
@@ -832,6 +832,74 @@ class ExportExcelController extends Controller
                 //return DB::getQueryLog();
                 //END FIX NOT WORK 'with'
             }
+            if (isset($validated['status'])) {
+                // $import_schedule->whereHas('export.receiving_goods_delivery', function ($query) use ($validated) {
+                //     $query->where('rgd_status1', '=', $validated['status']);
+                // });
+
+                $import_schedule->where('aaa.rgd_status1', '=', $validated['status']);
+            }
+            if (isset($validated['from_date'])) {
+                $import_schedule->where('aaa.tie_is_date', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            }
+
+            if (isset($validated['to_date'])) {
+                $import_schedule->where('aaa.tie_is_date', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            }
+
+            if (isset($validated['co_parent_name'])) {
+                // $import_schedule->whereHas('company.co_parent', function ($query) use ($validated) {
+                //     $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                // });
+
+                $import_schedule->where(DB::raw('lower(aaa.co_name_shop)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+            }
+
+            if (isset($validated['co_name'])) {
+                // $import_schedule->whereHas('company', function ($q) use ($validated) {
+                //     return $q->where(DB::raw('lower(aaa.co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                // });
+                $import_schedule->where(DB::raw('lower(aaa.co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+            }
+
+            if (isset($validated['m_bl'])) {
+                $import_schedule->where(DB::raw('aaa.tie_m_bl'), 'like', '%' . strtolower($validated['m_bl']) . '%');
+            }
+
+            if (isset($validated['h_bl'])) {
+                $import_schedule->where(DB::raw('aaa.tie_h_bl'), 'like', '%' . strtolower($validated['h_bl']) . '%');
+            }
+
+            if (isset($validated['logistic_manage_number'])) {
+                $import_schedule->where('aaa.tie_logistic_manage_number', 'like', '%' . $validated['logistic_manage_number'] . '%');
+            }
+
+            if (isset($validated['tie_status'])) {
+                if ($validated['tie_status'] == '반출') {
+                     
+                    $tie_logistic_manage_number = $this->SQL($validated);
+                    $import_schedule->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number);
+                    //$import_schedule->whereNotNull('ddd.te_logistic_manage_number');
+                    //return DB::getQueryLog();
+                } else if ($validated['tie_status'] == '반입') {
+                    $import_schedule->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number');
+                } else if ($validated['tie_status'] == '반입예정') {
+                    $import_schedule->whereNotNull('aaa.tie_logistic_manage_number')->whereNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number');
+                }
+            }
+            
+            if (isset($validated['tie_status_2'])) {
+                // if ($validated['tie_status'] == '반출') {
+                //     $import_schedule->where('aaa.tie_status_2', '=', $validated['tie_status_2']);
+                // } else if ($validated['tie_status'] == '반출승인') {
+                //     $import_schedule->where('aaa.tie_status_2', '=', $validated['tie_status_2']);
+                // } else if ($validated['tie_status'] == '반입') {
+                //     $import_schedule->where('aaa.tie_status_2', '=', $validated['tie_status_2']);
+                // } else if ($validated['tie_status'] == '반입예정') {
+                    $import_schedule->where('aaa.tie_status_2', '=', $validated['tie_status_2']);
+                //}
+            }
+
             // $import_schedule = ImportSchedule::with('co_no')->with('files')->orderBy('is_no', 'DESC');
 
             // if (isset($validated['from_date'])) {
@@ -880,10 +948,35 @@ class ExportExcelController extends Controller
             $sheet->setCellValue('M1', '승인일자');
             $sheet->setCellValue('N1', '반출일자');
             $sheet->setCellValue('O1', '반출수량');
-
+            $sheet->setCellValue('P1', '반출중량(KG)');
+            $sheet->setCellValue('Q1', '보관일수');
+            $sheet->setCellValue('R1', '과세금액(₩)');
+            $sheet->setCellValue('S1', '배송방법');
+            $sheet->setCellValue('T1', '배송주소');
+            $sheet->setCellValue('U1', '상세주소');
+            $sheet->setCellValue('V1', '연락처');
+            $sheet->setCellValue('W1', '택배/운송사');
+            $sheet->setCellValue('X1', '송장(배차)번호');
+            $sheet->setCellValue('Y1', '운송인');
+            $sheet->setCellValue('Z1', '운송인 연락처');
+            $sheet->setCellValue('AA1', '화물상태');
+            $sheet->setCellValue('AB1', '통관상태');
+            $sheet->setCellValue('AC1', '배송상태');
+          
             $num_row = 2;
             $data_schedules =  json_decode($import_schedule);
             foreach($data_schedules as $data){
+                $value_s = '';
+                $value_t = '';
+                $value_u = '';
+                $value_v = '';
+                $value_w = '';
+                $value_x = '';
+                $value_y = '';
+                $value_z = '';
+                $value_aa = '';
+                $value_ab = '';
+                $value_ac = '';
                 if($data->co_type == 'shop'){
                     $shop = $data->co_name;
                     $shop2 = "";
@@ -891,8 +984,84 @@ class ExportExcelController extends Controller
                     $shop = $data->co_name_shop;
                     $shop2= $data->co_name;
                 }
+                if(isset($data->te_carry_out_number)){
+                $rgd_from_e = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->where('is_no', $data->te_carry_out_number)->first();
+                }
+                if(isset($data->ti_carry_in_number)){
+                $rgd_from_i = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->where('is_no', $data->ti_carry_in_number)->first();
+                }
+                if(isset($data->tie_logistic_manage_number)){
+                $rgd_from_tie = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->where('is_no', $data->tie_logistic_manage_number)->first();
+                }
+                if(isset($rgd_from_e)){
+                    $value_s = $rgd_from_e->rgd_contents;
+                    $value_t = $rgd_from_e->rgd_address;
+                    $value_u = $rgd_from_e->rgd_address_detail;
+                    $value_v = $rgd_from_e->rgd_hp;
+                    $value_w = $rgd_from_e->rgd_delivery_company;
+                    $value_x = $rgd_from_e->rgd_tracking_code;
+                    $value_y = $rgd_from_e->rgd_delivery_man;
+                    $value_z = $rgd_from_e->rgd_delivery_man_hp;
+                    $value_aa = $rgd_from_e->rgd_status1;
+                    $value_ab = $rgd_from_e->rgd_status2;
+                    $value_ac = $rgd_from_e->rgd_status3;
+                } else if(isset($rgd_from_i)){
+                    $value_s = $rgd_from_i->rgd_contents;
+                    $value_t = $rgd_from_i->rgd_address;
+                    $value_u = $rgd_from_i->rgd_address_detail;
+                    $value_v = $rgd_from_i->rgd_hp;
+                    $value_w = $rgd_from_i->rgd_delivery_company;
+                    $value_x = $rgd_from_i->rgd_tracking_code;
+                    $value_y = $rgd_from_i->rgd_delivery_man;
+                    $value_z = $rgd_from_i->rgd_delivery_man_hp;
+                    $value_aa = $rgd_from_i->rgd_status1;
+                    $value_ab = $rgd_from_i->rgd_status2;
+                    $value_ac = $rgd_from_i->rgd_status3;
+                } else if(isset($rgd_from_tie)){
+                    $value_s = $rgd_from_tie->rgd_contents;
+                    $value_t = $rgd_from_tie->rgd_address;
+                    $value_u = $rgd_from_tie->rgd_address_detail;
+                    $value_v = $rgd_from_tie->rgd_hp;
+                    $value_w = $rgd_from_tie->rgd_delivery_company;
+                    $value_x = $rgd_from_tie->rgd_tracking_code;
+                    $value_y = $rgd_from_tie->rgd_delivery_man;
+                    $value_z = $rgd_from_tie->rgd_delivery_man_hp;
+                    $value_aa = $rgd_from_tie->rgd_status1;
+                    $value_ab = $rgd_from_tie->rgd_status2;
+                    $value_ac = $rgd_from_tie->rgd_status3;
+                }else {
+                    $value_s = '';
+                    $value_t = '';
+                    $value_u = '';
+                    $value_v = '';
+                    $value_w = '';
+                    $value_x = '';
+                    $value_y = '';
+                    $value_z = '';
+                    $value_aa = '';
+                    $value_ab = '';
+                    $value_ac = '';
+                }
+                $value_status1 = '';
+                $value_status2 = '';
 
-                
+                if (isset($data->te_logistic_manage_number)) {
+                    $value_status1 = "반출";
+                } else if (isset($data->ti_logistic_manage_number)) {
+                    $value_status1 = "반입";
+                } else if (isset($data->tie_logistic_manage_number)) {
+                    $value_status1 = "반입예정";
+                }
+
+
+                if (isset($data->te_status_2)) {
+                    $value_status2 = $data->te_status_2;
+                } else if (isset($data->ti_status_2)) {
+                    $value_status2 = $data->ti_status_2;
+                } else if (isset($data->tie_status_2)) {
+                    $value_status2 = $data->tie_status_2;
+                }
+
                 $sheet->setCellValue('A'.$num_row, isset($data->is_no)?$data->is_no:'');
                 $sheet->setCellValue('B'.$num_row, $shop);
                 $sheet->setCellValue('C'.$num_row, $shop2);
@@ -905,9 +1074,23 @@ class ExportExcelController extends Controller
                 $sheet->setCellValue('J'.$num_row, $data->ti_i_date);
                 $sheet->setCellValue('K'.$num_row, $data->ti_i_number);
                 $sheet->setCellValue('L'.$num_row, $data->te_e_confirm_number);
-                $sheet->setCellValue('M'.$num_row, $data->te_e_confirm_number);
-                $sheet->setCellValue('N'.$num_row, $data->te_e_confirm_number);
-                $sheet->setCellValue('O'.$num_row, $data->te_e_confirm_number);
+                $sheet->setCellValue('M'.$num_row, $data->tec_ec_date);
+                $sheet->setCellValue('N'.$num_row, $data->te_e_date);
+                $sheet->setCellValue('O'.$num_row, $data->te_e_number);
+                $sheet->setCellValue('P'.$num_row, $data->te_e_weight);
+                $sheet->setCellValue('Q'.$num_row, $data->te_e_number);
+                $sheet->setCellValue('R'.$num_row, $data->te_e_price);
+                $sheet->setCellValue('S'.$num_row, $value_s);
+                $sheet->setCellValue('T'.$num_row, $value_t);
+                $sheet->setCellValue('U'.$num_row, $value_u);
+                $sheet->setCellValue('V'.$num_row, $value_v);
+                $sheet->setCellValue('W'.$num_row, $value_w);
+                $sheet->setCellValue('X'.$num_row, $value_x);
+                $sheet->setCellValue('Y'.$num_row, $value_y);
+                $sheet->setCellValue('Z'.$num_row, $value_z);
+                $sheet->setCellValue('AA'.$num_row, $value_status1);
+                $sheet->setCellValue('AB'.$num_row, $value_status2);
+                $sheet->setCellValue('AC'.$num_row, $value_ac);
                 $num_row++;
             }
 
@@ -927,7 +1110,9 @@ class ExportExcelController extends Controller
             return response()->json([
                 'status' => 1,
                 'link_download' => $file_name_download,
-                'message' => 'Download File'
+                'message' => 'Download File',
+                'import_schedule'=>$data_schedules,
+             
             ], 200);
             ob_end_clean();
         } catch (\Exception $e) {
