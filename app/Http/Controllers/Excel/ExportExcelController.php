@@ -959,6 +959,10 @@ class ExportExcelController extends Controller
             $num_row = 2;
             $data_schedules =  json_decode($import_schedule);
             foreach($data_schedules as $data){
+                $value_s = '';
+                $value_t = '';
+                $value_u = '';
+                $value_v = '';
                 if($data->co_type == 'shop'){
                     $shop = $data->co_name;
                     $shop2 = "";
