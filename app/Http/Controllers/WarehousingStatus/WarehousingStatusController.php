@@ -19,6 +19,11 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Filesystem\Filesystem;
 use App\Http\Requests\WarehousingStatus\WarehousingStatusRequest;
 
+use App\Models\Import;
+use App\Models\ImportExpected;
+use App\Models\Export;
+use \Carbon\Carbon;
+
 class WarehousingStatusController extends Controller
 {
     /**
@@ -56,27 +61,57 @@ class WarehousingStatusController extends Controller
     {
         try {
             $validated = $request->validated();
-
+            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
             // If per_page is null set default data = 15
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $warehousing = Warehousing::where('w_no', '=', $validated['w_no'])->first();
 
-            $warehousing_status = WarehousingStatus::with(['mb_no','warehousing'])->orderBy('ws_no', 'DESC');
-            
-            if(isset($validated['page_type']) && $validated['page_type'] == "Page146"){
+            $warehousing_status = WarehousingStatus::with(['mb_no', 'warehousing'])->orderBy('ws_no', 'DESC');
+
+            if (isset($validated['page_type']) && $validated['page_type'] == "Page146") {
                 //$warehousing_status->where('w_no', '=', $validated['w_no'])->orwhere('w_no', '=', $warehousing->w_import_no);
-                $warehousing_status->where('w_no', '=', $validated['w_no'])->where('status','!=','출고예정 취소');
-            }else{   
-                $warehousing_status->where('w_no', '=', $validated['w_no'])->where('status','!=','출고예정 취소');  
+                $warehousing_status->where('w_no', '=', $validated['w_no'])->where('status', '!=', '출고예정 취소');
+            } elseif (isset($validated['page_type']) && $validated['page_type'] == "bonded_cargo_list_details") {
+               
+                $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number','tie_is_date')
+                    //->where('parent_spasys.warehouse_code', $user->company['warehouse_code'])
+                    ->where('tie_is_date', '>=', '2022-01-04')
+                    ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
+                    ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
+
+                $sub_2 = Import::select('ti_logistic_manage_number', 'ti_carry_in_number','ti_i_date','ti_i_time')
+
+                    ->groupBy(['ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number']);
+
+                $sub_4 = Export::select('te_logistic_manage_number', 'te_carry_in_number', 'te_carry_out_number','te_e_date','te_e_time')
+                    ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
+
+
+                $warehousing_status = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+                    $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
+                })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+                    $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+                });
+
+                $warehousing_status->where(function ($query) use ($validated) {
+                    $query->where(
+                        $validated['type_page'],'=',$validated['w_no']
+                    );
+                });
+                
+                
+                
+            } else {
+                $warehousing_status->where('w_no', '=', $validated['w_no'])->where('status', '!=', '출고예정 취소');
             }
-            
+
 
             $members = Member::where('mb_no', '!=', 0)->get();
 
             $warehousing_status = $warehousing_status->paginate($per_page, ['*'], 'page', $page);
-
+            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
             return response()->json($warehousing_status);
         } catch (\Exception $e) {
             Log::error($e);
@@ -92,10 +127,10 @@ class WarehousingStatusController extends Controller
 
             $warehousing = Warehousing::where('w_no', '=', $validated['w_no'])->first();
 
-            $warehousing_status = WarehousingStatus::with(['mb_no','warehousing'])->orderBy('ws_no', 'DESC');
-            if($warehousing){
+            $warehousing_status = WarehousingStatus::with(['mb_no', 'warehousing'])->orderBy('ws_no', 'DESC');
+            if ($warehousing) {
                 $warehousing_status = $warehousing_status->where('w_no', '=', $validated['w_no'])->orwhere('w_no', '=', $warehousing->w_import_no);
-            }else{
+            } else {
                 $warehousing_status = $warehousing_status->where('w_no', '=', $validated['w_no']);
             }
 

@@ -32,8 +32,14 @@ class WarehousingStatusRequest extends BaseFormRequest
                 'nullable',
                 'int',
             ],
+            'type_page' => [
+                '',
+            ],
             'page_type' => [
                 '',
+            ],
+            'type' => [
+                ''
             ],
             'w_no' => [
                 '',
