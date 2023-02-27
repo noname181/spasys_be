@@ -955,7 +955,11 @@ class ExportExcelController extends Controller
             $sheet->setCellValue('T1', '배송주소');
             $sheet->setCellValue('U1', '상세주소');
             $sheet->setCellValue('V1', '연락처');
-
+            $sheet->setCellValue('W1', '택배/운송사');
+            $sheet->setCellValue('X1', '송장(배차)번호');
+            $sheet->setCellValue('Y1', '운송인');
+            $sheet->setCellValue('Z1', '운송인 연락처');
+          
             $num_row = 2;
             $data_schedules =  json_decode($import_schedule);
             foreach($data_schedules as $data){
@@ -963,6 +967,10 @@ class ExportExcelController extends Controller
                 $value_t = '';
                 $value_u = '';
                 $value_v = '';
+                $value_w = '';
+                $value_x = '';
+                $value_y = '';
+                $value_z = '';
                 if($data->co_type == 'shop'){
                     $shop = $data->co_name;
                     $shop2 = "";
@@ -970,31 +978,51 @@ class ExportExcelController extends Controller
                     $shop = $data->co_name_shop;
                     $shop2= $data->co_name;
                 }
-                
+                if(isset($data->te_carry_out_number)){
                 $rgd_from_e = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->where('is_no', $data->te_carry_out_number)->first();
+                }
+                if(isset($data->ti_carry_in_number)){
                 $rgd_from_i = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->where('is_no', $data->ti_carry_in_number)->first();
+                }
+                if(isset($data->tie_logistic_manage_number)){
                 $rgd_from_tie = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->where('is_no', $data->tie_logistic_manage_number)->first();
-                
-                if($rgd_from_e){
+                }
+                if(isset($rgd_from_e)){
                     $value_s = $rgd_from_e->rgd_contents;
                     $value_t = $rgd_from_e->rgd_address;
                     $value_u = $rgd_from_e->rgd_address_detail;
                     $value_v = $rgd_from_e->rgd_hp;
-                } else if($rgd_from_i){
+                    $value_w = $rgd_from_e->rgd_delivery_company;
+                    $value_x = $rgd_from_e->rgd_tracking_code;
+                    $value_y = $rgd_from_e->rgd_delivery_man;
+                    $value_z = $rgd_from_e->rgd_delivery_man_hp;
+                } else if(isset($rgd_from_i)){
                     $value_s = $rgd_from_i->rgd_contents;
                     $value_t = $rgd_from_i->rgd_address;
                     $value_u = $rgd_from_i->rgd_address_detail;
                     $value_v = $rgd_from_i->rgd_hp;
-                } else if($rgd_from_tie){
+                    $value_w = $rgd_from_i->rgd_delivery_company;
+                    $value_x = $rgd_from_i->rgd_tracking_code;
+                    $value_y = $rgd_from_i->rgd_delivery_man;
+                    $value_z = $rgd_from_i->rgd_delivery_man_hp;
+                } else if(isset($rgd_from_tie)){
                     $value_s = $rgd_from_tie->rgd_contents;
                     $value_t = $rgd_from_tie->rgd_address;
                     $value_u = $rgd_from_tie->rgd_address_detail;
                     $value_v = $rgd_from_tie->rgd_hp;
+                    $value_w = $rgd_from_tie->rgd_delivery_company;
+                    $value_x = $rgd_from_tie->rgd_tracking_code;
+                    $value_y = $rgd_from_tie->rgd_delivery_man;
+                    $value_z = $rgd_from_tie->rgd_delivery_man_hp;
                 }else {
                     $value_s = '';
                     $value_t = '';
                     $value_u = '';
                     $value_v = '';
+                    $value_w = '';
+                    $value_x = '';
+                    $value_y = '';
+                    $value_z = '';
                 }
                 
 
@@ -1020,6 +1048,10 @@ class ExportExcelController extends Controller
                 $sheet->setCellValue('T'.$num_row, $value_t);
                 $sheet->setCellValue('U'.$num_row, $value_u);
                 $sheet->setCellValue('V'.$num_row, $value_v);
+                $sheet->setCellValue('W'.$num_row, $value_w);
+                $sheet->setCellValue('X'.$num_row, $value_x);
+                $sheet->setCellValue('Y'.$num_row, $value_y);
+                $sheet->setCellValue('Z'.$num_row, $value_z);
                 $num_row++;
             }
 
@@ -1040,7 +1072,8 @@ class ExportExcelController extends Controller
                 'status' => 1,
                 'link_download' => $file_name_download,
                 'message' => 'Download File',
-                'import_schedule'=>$data_schedules
+                'import_schedule'=>$data_schedules,
+             
             ], 200);
             ob_end_clean();
         } catch (\Exception $e) {
