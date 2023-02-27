@@ -959,6 +959,9 @@ class ExportExcelController extends Controller
             $sheet->setCellValue('X1', '송장(배차)번호');
             $sheet->setCellValue('Y1', '운송인');
             $sheet->setCellValue('Z1', '운송인 연락처');
+            $sheet->setCellValue('AA1', '화물상태');
+            $sheet->setCellValue('AB1', '통관상태');
+            $sheet->setCellValue('AC1', '배송상태');
           
             $num_row = 2;
             $data_schedules =  json_decode($import_schedule);
@@ -971,6 +974,9 @@ class ExportExcelController extends Controller
                 $value_x = '';
                 $value_y = '';
                 $value_z = '';
+                $value_aa = '';
+                $value_ab = '';
+                $value_ac = '';
                 if($data->co_type == 'shop'){
                     $shop = $data->co_name;
                     $shop2 = "";
@@ -996,6 +1002,9 @@ class ExportExcelController extends Controller
                     $value_x = $rgd_from_e->rgd_tracking_code;
                     $value_y = $rgd_from_e->rgd_delivery_man;
                     $value_z = $rgd_from_e->rgd_delivery_man_hp;
+                    $value_aa = $rgd_from_e->rgd_status1;
+                    $value_ab = $rgd_from_e->rgd_status2;
+                    $value_ac = $rgd_from_e->rgd_status3;
                 } else if(isset($rgd_from_i)){
                     $value_s = $rgd_from_i->rgd_contents;
                     $value_t = $rgd_from_i->rgd_address;
@@ -1005,6 +1014,9 @@ class ExportExcelController extends Controller
                     $value_x = $rgd_from_i->rgd_tracking_code;
                     $value_y = $rgd_from_i->rgd_delivery_man;
                     $value_z = $rgd_from_i->rgd_delivery_man_hp;
+                    $value_aa = $rgd_from_i->rgd_status1;
+                    $value_ab = $rgd_from_i->rgd_status2;
+                    $value_ac = $rgd_from_i->rgd_status3;
                 } else if(isset($rgd_from_tie)){
                     $value_s = $rgd_from_tie->rgd_contents;
                     $value_t = $rgd_from_tie->rgd_address;
@@ -1014,6 +1026,9 @@ class ExportExcelController extends Controller
                     $value_x = $rgd_from_tie->rgd_tracking_code;
                     $value_y = $rgd_from_tie->rgd_delivery_man;
                     $value_z = $rgd_from_tie->rgd_delivery_man_hp;
+                    $value_aa = $rgd_from_tie->rgd_status1;
+                    $value_ab = $rgd_from_tie->rgd_status2;
+                    $value_ac = $rgd_from_tie->rgd_status3;
                 }else {
                     $value_s = '';
                     $value_t = '';
@@ -1023,6 +1038,9 @@ class ExportExcelController extends Controller
                     $value_x = '';
                     $value_y = '';
                     $value_z = '';
+                    $value_aa = '';
+                    $value_ab = '';
+                    $value_ac = '';
                 }
                 
 
@@ -1052,6 +1070,9 @@ class ExportExcelController extends Controller
                 $sheet->setCellValue('X'.$num_row, $value_x);
                 $sheet->setCellValue('Y'.$num_row, $value_y);
                 $sheet->setCellValue('Z'.$num_row, $value_z);
+                $sheet->setCellValue('AA'.$num_row, $value_aa);
+                $sheet->setCellValue('AB'.$num_row, $value_ab);
+                $sheet->setCellValue('AC'.$num_row, $value_ac);
                 $num_row++;
             }
 
