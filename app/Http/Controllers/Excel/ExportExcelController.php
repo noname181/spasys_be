@@ -733,7 +733,7 @@ class ExportExcelController extends Controller
                 })->orderBy('tie_is_date', 'DESC');
             } else if ($user->mb_type == 'shipper') {
                
-                $sub = ImportExpected::select('company.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
+                $sub = ImportExpected::select('company.co_type', 'tie_logistic_manage_number' ,'t_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
                     ->leftjoin('company', function ($join) {
                         $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
                     })->leftjoin('company as parent_shop', function ($join) {
@@ -774,7 +774,7 @@ class ExportExcelController extends Controller
             } else if ($user->mb_type == 'spasys') {
                 
                 //FIX NOT WORK 'with'
-                $sub = ImportExpected::select('company.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
+                $sub = ImportExpected::select('company.co_type','tie_logistic_manage_number', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
                     ->leftjoin('company as parent_spasys', function ($join) {
                         $join->on('parent_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
                     })
@@ -805,22 +805,22 @@ class ExportExcelController extends Controller
                     })
                     ->groupBy(['ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number']);
 
-                $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
-                    ->groupBy(['tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number']);
+                // $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
+                //     ->groupBy(['tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number']);
 
-                $sub_4 = Export::select('connection_number', 't_export.te_status_2', 'te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number','te_e_confirm_number', 'te_e_order', 'te_e_number')
-                    // ->leftjoin('receiving_goods_delivery', function ($join) {
-                    //     $join->on('t_export.te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
-                    // })
+                $sub_4 = Export::select('connection_number','tec_ec_date', 't_export.te_status_2', 'te_logistic_manage_number','te_e_price', 'te_carry_out_number','te_e_weight', 'te_e_date', 'te_carry_in_number','te_e_confirm_number', 'te_e_order', 'te_e_number')
+                    ->leftjoin('t_export_confirm', function ($join) {
+                        $join->on('t_export.te_logistic_manage_number', '=', 't_export_confirm.tec_logistic_manage_number');
+                    })
                     ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
 
 
                 $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
                     $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
                 })
-                ->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
-                    $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
-                })
+                // ->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
+                //     $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
+                // })
                 ->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
 
                     //$leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
@@ -832,6 +832,74 @@ class ExportExcelController extends Controller
                 //return DB::getQueryLog();
                 //END FIX NOT WORK 'with'
             }
+            if (isset($validated['status'])) {
+                // $import_schedule->whereHas('export.receiving_goods_delivery', function ($query) use ($validated) {
+                //     $query->where('rgd_status1', '=', $validated['status']);
+                // });
+
+                $import_schedule->where('aaa.rgd_status1', '=', $validated['status']);
+            }
+            if (isset($validated['from_date'])) {
+                $import_schedule->where('aaa.tie_is_date', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            }
+
+            if (isset($validated['to_date'])) {
+                $import_schedule->where('aaa.tie_is_date', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            }
+
+            if (isset($validated['co_parent_name'])) {
+                // $import_schedule->whereHas('company.co_parent', function ($query) use ($validated) {
+                //     $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                // });
+
+                $import_schedule->where(DB::raw('lower(aaa.co_name_shop)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+            }
+
+            if (isset($validated['co_name'])) {
+                // $import_schedule->whereHas('company', function ($q) use ($validated) {
+                //     return $q->where(DB::raw('lower(aaa.co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                // });
+                $import_schedule->where(DB::raw('lower(aaa.co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+            }
+
+            if (isset($validated['m_bl'])) {
+                $import_schedule->where(DB::raw('aaa.tie_m_bl'), 'like', '%' . strtolower($validated['m_bl']) . '%');
+            }
+
+            if (isset($validated['h_bl'])) {
+                $import_schedule->where(DB::raw('aaa.tie_h_bl'), 'like', '%' . strtolower($validated['h_bl']) . '%');
+            }
+
+            if (isset($validated['logistic_manage_number'])) {
+                $import_schedule->where('aaa.tie_logistic_manage_number', 'like', '%' . $validated['logistic_manage_number'] . '%');
+            }
+
+            if (isset($validated['tie_status'])) {
+                if ($validated['tie_status'] == '반출') {
+                     
+                    $tie_logistic_manage_number = $this->SQL($validated);
+                    $import_schedule->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number);
+                    //$import_schedule->whereNotNull('ddd.te_logistic_manage_number');
+                    //return DB::getQueryLog();
+                } else if ($validated['tie_status'] == '반입') {
+                    $import_schedule->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number');
+                } else if ($validated['tie_status'] == '반입예정') {
+                    $import_schedule->whereNotNull('aaa.tie_logistic_manage_number')->whereNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number');
+                }
+            }
+            
+            if (isset($validated['tie_status_2'])) {
+                // if ($validated['tie_status'] == '반출') {
+                //     $import_schedule->where('aaa.tie_status_2', '=', $validated['tie_status_2']);
+                // } else if ($validated['tie_status'] == '반출승인') {
+                //     $import_schedule->where('aaa.tie_status_2', '=', $validated['tie_status_2']);
+                // } else if ($validated['tie_status'] == '반입') {
+                //     $import_schedule->where('aaa.tie_status_2', '=', $validated['tie_status_2']);
+                // } else if ($validated['tie_status'] == '반입예정') {
+                    $import_schedule->where('aaa.tie_status_2', '=', $validated['tie_status_2']);
+                //}
+            }
+
             // $import_schedule = ImportSchedule::with('co_no')->with('files')->orderBy('is_no', 'DESC');
 
             // if (isset($validated['from_date'])) {
@@ -880,6 +948,13 @@ class ExportExcelController extends Controller
             $sheet->setCellValue('M1', '승인일자');
             $sheet->setCellValue('N1', '반출일자');
             $sheet->setCellValue('O1', '반출수량');
+            $sheet->setCellValue('P1', '반출중량(KG)');
+            $sheet->setCellValue('Q1', '보관일수');
+            $sheet->setCellValue('R1', '과세금액(₩)');
+            $sheet->setCellValue('S1', '배송방법');
+            $sheet->setCellValue('T1', '배송주소');
+            $sheet->setCellValue('U1', '상세주소');
+            $sheet->setCellValue('V1', '연락처');
 
             $num_row = 2;
             $data_schedules =  json_decode($import_schedule);
@@ -891,8 +966,34 @@ class ExportExcelController extends Controller
                     $shop = $data->co_name_shop;
                     $shop2= $data->co_name;
                 }
-
                 
+                $rgd_from_e = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->where('is_no', $data->te_carry_out_number)->first();
+                $rgd_from_i = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->where('is_no', $data->ti_carry_in_number)->first();
+                $rgd_from_tie = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->where('is_no', $data->tie_logistic_manage_number)->first();
+                
+                if($rgd_from_e){
+                    $value_s = $rgd_from_e->rgd_contents;
+                    $value_t = $rgd_from_e->rgd_address;
+                    $value_u = $rgd_from_e->rgd_address_detail;
+                    $value_v = $rgd_from_e->rgd_hp;
+                } else if($rgd_from_i){
+                    $value_s = $rgd_from_i->rgd_contents;
+                    $value_t = $rgd_from_i->rgd_address;
+                    $value_u = $rgd_from_i->rgd_address_detail;
+                    $value_v = $rgd_from_i->rgd_hp;
+                } else if($rgd_from_tie){
+                    $value_s = $rgd_from_tie->rgd_contents;
+                    $value_t = $rgd_from_tie->rgd_address;
+                    $value_u = $rgd_from_tie->rgd_address_detail;
+                    $value_v = $rgd_from_tie->rgd_hp;
+                }else {
+                    $value_s = '';
+                    $value_t = '';
+                    $value_u = '';
+                    $value_v = '';
+                }
+                
+
                 $sheet->setCellValue('A'.$num_row, isset($data->is_no)?$data->is_no:'');
                 $sheet->setCellValue('B'.$num_row, $shop);
                 $sheet->setCellValue('C'.$num_row, $shop2);
@@ -905,9 +1006,16 @@ class ExportExcelController extends Controller
                 $sheet->setCellValue('J'.$num_row, $data->ti_i_date);
                 $sheet->setCellValue('K'.$num_row, $data->ti_i_number);
                 $sheet->setCellValue('L'.$num_row, $data->te_e_confirm_number);
-                $sheet->setCellValue('M'.$num_row, $data->te_e_confirm_number);
-                $sheet->setCellValue('N'.$num_row, $data->te_e_confirm_number);
-                $sheet->setCellValue('O'.$num_row, $data->te_e_confirm_number);
+                $sheet->setCellValue('M'.$num_row, $data->tec_ec_date);
+                $sheet->setCellValue('N'.$num_row, $data->te_e_date);
+                $sheet->setCellValue('O'.$num_row, $data->te_e_number);
+                $sheet->setCellValue('P'.$num_row, $data->te_e_weight);
+                $sheet->setCellValue('Q'.$num_row, $data->te_e_number);
+                $sheet->setCellValue('R'.$num_row, $data->te_e_price);
+                $sheet->setCellValue('S'.$num_row, $value_s);
+                $sheet->setCellValue('T'.$num_row, $value_t);
+                $sheet->setCellValue('U'.$num_row, $value_u);
+                $sheet->setCellValue('V'.$num_row, $value_v);
                 $num_row++;
             }
 
@@ -927,7 +1035,8 @@ class ExportExcelController extends Controller
             return response()->json([
                 'status' => 1,
                 'link_download' => $file_name_download,
-                'message' => 'Download File'
+                'message' => 'Download File',
+                'import_schedule'=>$data_schedules
             ], 200);
             ob_end_clean();
         } catch (\Exception $e) {
