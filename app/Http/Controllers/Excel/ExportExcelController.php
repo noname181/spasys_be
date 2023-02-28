@@ -717,7 +717,7 @@ class ExportExcelController extends Controller
                 $sheet->setCellValue('A1', 'No');
                 $sheet->setCellValue('B1', '가맹점');
                 $sheet->setCellValue('C1', '화주');
-                $sheet->setCellValue('D1', '');
+                $sheet->setCellValue('D1', '출고화물번호');
                 $sheet->setCellValue('E1', '채널명');
                 $sheet->setCellValue('F1', '주문번호');
                 $sheet->setCellValue('G1', '브랜드');
@@ -739,6 +739,7 @@ class ExportExcelController extends Controller
                
                 $num_row = 2;
                 $data_schedules =  json_decode($schedule_shipment);
+                $no = 1;
                 foreach($data_schedules as $data){
                     $schedule_shipment_item = DB::table('schedule_shipment_info')->where('schedule_shipment_info.ss_no', $data->ss_no)->get();
                     $total_amount = 0;
@@ -789,10 +790,10 @@ class ExportExcelController extends Controller
                    
                       }
 
-                    $sheet->setCellValue('A'.$num_row, isset($data->is_no)?$data->is_no:'');
+                    $sheet->setCellValue('A'.$num_row, $no);
                     $sheet->setCellValue('B'.$num_row, $data->contract_wms->company->co_parent->co_name);
                     $sheet->setCellValue('C'.$num_row, $data->contract_wms->company->co_name);
-                    $sheet->setCellValue('D'.$num_row, '');
+                    $sheet->setCellValue('D'.$num_row, $data->ss_no);
                     $sheet->setCellValue('E'.$num_row, '');
                     $sheet->setCellValue('F'.$num_row, $data->order_id);
                     $sheet->setCellValue('G'.$num_row, '');
@@ -812,6 +813,7 @@ class ExportExcelController extends Controller
                     $sheet->setCellValue('U'.$num_row, '');
                     $sheet->setCellValue('V'.$num_row, $status_cs);
                     $num_row++;
+                    $no++;
                 }
                 $Excel_writer = new Xlsx($spreadsheet);
                 if(isset($user->mb_no)){
