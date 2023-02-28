@@ -779,10 +779,22 @@ class ExportExcelController extends Controller
                     $sheet->setCellValue('M'.$num_row, $total_amount);
                     $num_row++;
                 }
-
+                $Excel_writer = new Xlsx($spreadsheet);
+                if(isset($user->mb_no)){
+                    $path = 'storage/download/'.$user->mb_no.'/';
+                }else{
+                    $path = 'storage/download/no-name/';
+                }
+                if (!is_dir($path)) {
+                    File::makeDirectory($path, $mode = 0777, true, true);
+                }
+                $mask = $path.'DownloadBondedCargo-*.*';
+                array_map('unlink', glob($mask));
+                $file_name_download = $path.'DownloadBondedCargo-'.date('YmdHis').'.Xlsx';
+                $Excel_writer->save($file_name_download);
                 return response()->json([
                     'status' => 1,
-                    //'link_download' => $file_name_download,
+                    'link_download' => $file_name_download,
                     'message' => 'Download File',
                     'import_schedule'=>$data_schedules,
                 ], 200);
