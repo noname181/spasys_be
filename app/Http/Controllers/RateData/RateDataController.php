@@ -2034,7 +2034,7 @@ class RateDataController extends Controller
         try {
             $user = Auth::user();
 
-            $rgd = ReceivingGoodsDelivery::with(['warehousing', 't_import', 't_export', 't_import_expected', 'rate_data_general'])->where('rgd_no', $is_no)->first();
+            $rgd = ReceivingGoodsDelivery::with(['warehousing', 't_import', 't_export', 't_import_expected', 'rate_data_general', 'rgd_child'])->where('rgd_no', $is_no)->first();
 
 
 
