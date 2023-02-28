@@ -86,11 +86,13 @@ class ReceivingGoodsDelivery extends Model
 
     public function warehousing()
     {
-        return $this->hasOne(Warehousing::class, 'w_no', 'w_no')->with(['co_no', 'warehousing_item','w_import_parent', 'warehousing_child', 'warehousing_request', 'company']);
+        return $this->hasOne(Warehousing::class, 'w_no', 'w_no')->with(['warehousing_item','w_import_parent', 'warehousing_child', 'warehousing_request', 'company']);
     }
     public function rgd_child()
     {
-        return $this->hasOne(ReceivingGoodsDelivery::class, 'rgd_parent_no', 'rgd_no')->where('rgd_status5', '!=', 'cancel')->select(['rgd_status5', 'rgd_status4', 'rgd_status6', 'rgd_no', 'rgd_parent_no']);
+        return $this->hasOne(ReceivingGoodsDelivery::class, 'rgd_parent_no', 'rgd_no')->where(function($q) {
+            $q->where('rgd_status5', '!=', 'cancel')->orWhereNull('rgd_status5');
+        })->select(['rgd_status5', 'rgd_status4', 'rgd_status6', 'rgd_no', 'rgd_parent_no']);
     }
 
     public function rgd_parent()
