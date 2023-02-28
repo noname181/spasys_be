@@ -438,8 +438,6 @@ class BannerController extends Controller
                     $q->where('co_no', $user->co_no);
                 })->orwhere('rgd_status1', '=', '출고예정')->where('w_category_name', '=', '유통가공')->whereNotNull('w_import_no')->whereNull('w_children_yn')->whereHas('co_no.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
-                })->orwhere('rgd_status1', '=', '출고예정 취소')->where('w_category_name', '=', '유통가공')->whereNotNull('w_import_no')->whereNull('w_children_yn')->whereHas('co_no.co_parent', function ($q) use ($user) {
-                    $q->where('co_no', $user->co_no);
                 });
             });
 
@@ -475,6 +473,12 @@ class BannerController extends Controller
                     $q->where('co_no', $user->co_no);
                 });
             });
+
+            $warehousingh = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 't_export'])->whereHas('w_no', function ($query) use ($user) {
+                $query->whereHas('co_no.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+            });
         } else if ($user->mb_type == 'shipper') {
             $warehousinga = ReceivingGoodsDelivery::with(['w_no'])->whereNull('rgd_parent_no')->whereHas('w_no', function ($query) use ($user) {
                 $query->where('w_type', '=', 'IW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
@@ -502,8 +506,6 @@ class BannerController extends Controller
                 $query->where('rgd_status1', '=', '입고')->where('w_category_name', '=', '유통가공')->where('w_category_name', '=', '유통가공')->where('rgd_status2', '=', '작업완료')->whereNull('w_children_yn')->whereHas('co_no', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 })->orwhere('rgd_status1', '=', '출고예정')->where('w_category_name', '=', '유통가공')->whereNotNull('w_import_no')->whereNull('w_children_yn')->whereHas('co_no', function ($q) use ($user) {
-                    $q->where('co_no', $user->co_no);
-                })->orwhere('rgd_status1', '=', '출고예정 취소')->where('w_category_name', '=', '유통가공')->whereNotNull('w_import_no')->whereNull('w_children_yn')->whereHas('co_no', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
             });
@@ -540,6 +542,12 @@ class BannerController extends Controller
                     $q->where('co_no', $user->co_no);
                 });
             });
+
+            $warehousingh = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
+                $query->whereHas('co_no', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+            });
         } else if ($user->mb_type == 'spasys') {
             $warehousinga = ReceivingGoodsDelivery::with(['warehousing'])->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
                 $query->where('w_type', '=', 'IW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
@@ -567,8 +575,6 @@ class BannerController extends Controller
                 $query->where('rgd_status1', '=', '입고')->where('w_category_name', '=', '유통가공')->where('rgd_status2', '=', '작업완료')->whereNull('w_children_yn')->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 })->orwhere('rgd_status1', '=', '출고예정')->where('w_category_name', '=', '유통가공')->whereNotNull('w_import_no')->whereNull('w_children_yn')->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
-                    $q->where('co_no', $user->co_no);
-                })->orwhere('rgd_status1', '=', '출고예정 취소')->where('w_category_name', '=', '유통가공')->whereNotNull('w_import_no')->whereNull('w_children_yn')->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
             });
@@ -605,6 +611,14 @@ class BannerController extends Controller
                     $q->where('co_no', $user->co_no);
                 });
             });
+
+            $warehousingh = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
+                $query->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                })->orWhereHas('co_no.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+            });
         }
 
         $a = 0;
@@ -615,30 +629,43 @@ class BannerController extends Controller
         $f = 0;
         $g = 0;
         $h = 0;
+
+        $warehousingh->where(function ($q) {
+            $q->where('rgd_status4', '추가청구서')
+                ->orWhere('rgd_status4', '확정청구서');
+        })
+            ->where('service_korean_name', '=', '유통가공')
+            ->where('rgd_calculate_deadline_yn', 'y')
+            ->where('rgd_status7', 'taxed')
+            ->where('rgd_is_show', 'y')
+            ->whereHas('mb_no', function ($q) use ($user) {
+                $q->where('mb_type', $user->mb_type);
+            });
+
         if ($request->time3 == 'day') {
-            $warehousinga = $warehousinga->get();
-            $warehousingb = $warehousingb->where('warehousing.w_completed_day', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
-            $warehousingc = $warehousingc->get();
-            $warehousingd = $warehousingd->where('warehousing.w_completed_day', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
-            $warehousinge = $warehousinge->get();
-            $warehousingf = $warehousingf->get();
-            $warehousingg = $warehousingg->where('warehousing.w_completed_day', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
+            $warehousinga = $warehousinga->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
+            $warehousingb = $warehousingb->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get();
+            $warehousingc = $warehousingc->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
+            $warehousingd = $warehousingd->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get();
+            $warehousinge = $warehousinge->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
+            $warehousingf = $warehousingf->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
+            $warehousingg = $warehousingg->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get();
         } elseif ($request->time3 == 'week') {
-            $warehousinga = $warehousinga->get();
-            $warehousingb = $warehousingb->where('warehousing.w_completed_day', '>=', Carbon::now()->subWeek()->toDateTimeString())->get();
-            $warehousingc = $warehousingc->get();
-            $warehousingd = $warehousingd->where('warehousing.w_completed_day', '>=', Carbon::now()->subWeek()->toDateTimeString())->get();
-            $warehousinge = $warehousinge->get();
-            $warehousingf = $warehousingf->get();
-            $warehousingg = $warehousingg->where('warehousing.w_completed_day', '>=', Carbon::now()->subWeek()->toDateTimeString())->get();
+            $warehousinga = $warehousinga->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
+            $warehousingb = $warehousingb->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get();
+            $warehousingc = $warehousingc->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
+            $warehousingd = $warehousingd->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get();
+            $warehousinge = $warehousinge->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
+            $warehousingf = $warehousingf->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
+            $warehousingg = $warehousingg->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get();
         } else {
-            $warehousinga = $warehousinga->get();
-            $warehousingb = $warehousingb->where('warehousing.w_completed_day', '>=', Carbon::now()->subMonth()->toDateTimeString())->get();
-            $warehousingc = $warehousingc->get();
-            $warehousingd = $warehousingd->where('warehousing.w_completed_day', '>=', Carbon::now()->subMonth()->toDateTimeString())->get();
-            $warehousinge = $warehousinge->get();
-            $warehousingf = $warehousingf->get();
-            $warehousingg = $warehousingg->where('warehousing.w_completed_day', '>=', Carbon::now()->subMonth()->toDateTimeString())->get();
+            $warehousinga = $warehousinga->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
+            $warehousingb = $warehousingb->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get();
+            $warehousingc = $warehousingc->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
+            $warehousingd = $warehousingd->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get();
+            $warehousinge = $warehousinge->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
+            $warehousingf = $warehousingf->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
+            $warehousingg = $warehousingg->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get();
         }
 
         $counta = 0;
@@ -648,6 +675,8 @@ class BannerController extends Controller
         $counte = 0;
         $countf = 0;
         $countg = 0;
+        $counth = 0;
+        $counth_2 = 0;
 
         $counta = $warehousinga->count();
         $countb = $warehousingb->count();
@@ -688,9 +717,15 @@ class BannerController extends Controller
             $g += WarehousingItem::where('w_no', $item->w_no)->where('wi_type', '입고_spasys')->sum('wi_number');
         }
 
+        $counth = $warehousingh->get()->count();
+        foreach ($warehousingh->get() as $i) {
+            $counth_2 += $i->rate_data_general->rdg_sum4;
+        }
+
         return [
             'warehousingb' => $warehousingd, 'a' => $a, 'b' => $b, 'c' => $c, 'd' => $d, 'e' => $e, 'f' => $f, 'h' => $h, 'g' => $g,
             'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'countf' => $countf, 'countg' => $countg
+            , 'counth' => $counth, 'counth_2' => $counth_2
 
         ];
     }
@@ -739,6 +774,12 @@ class BannerController extends Controller
             $warehousingd = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
                 $q->where('co_no', $user->co_no);
             });
+
+            $warehousinge = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 't_export'])->whereHas('w_no', function ($query) use ($user) {
+                $query->whereHas('co_no.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+            });
         } else if ($user->mb_type == 'shipper') {
             $warehousing2 = Warehousing::join(
                 DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
@@ -778,6 +819,12 @@ class BannerController extends Controller
 
             $warehousingd = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고')->whereHas('ContractWms.company', function ($q) use ($user) {
                 $q->where('co_no', $user->co_no);
+            });
+
+            $warehousinge = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
+                $query->whereHas('co_no', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
             });
         } else if ($user->mb_type == 'spasys') {
 
@@ -821,7 +868,28 @@ class BannerController extends Controller
             $warehousingd = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
                 $q->where('co_no', $user->co_no);
             });
+
+            $warehousinge = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
+                $query->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                })->orWhereHas('co_no.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+            });
         }
+
+        $warehousinge->where(function ($q) {
+            $q->where('rgd_status4', '추가청구서')
+                ->orWhere('rgd_status4', '확정청구서');
+        })
+            ->where('service_korean_name', '=', '수입풀필먼트')
+            ->where('rgd_calculate_deadline_yn', 'y')
+            ->where('rgd_status7', 'taxed')
+            ->where('rgd_is_show', 'y')
+            ->whereHas('mb_no', function ($q) use ($user) {
+                $q->where('mb_type', $user->mb_type);
+            });
+
         $warehousinga->whereDoesntHave('rate_data_general');
 
         $a = 0;
@@ -839,30 +907,34 @@ class BannerController extends Controller
         $countc = 0;
         $countd = 0;
         $counte = 0;
-        $countf = 0;
-        $countg = 0;
+        $counte_2 = 0;
+        
 
         if ($request->time2 == 'day') {
-            $warehousinga = $warehousinga->where('created_at', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
+            $warehousinga = $warehousinga->whereBetween('created_at', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get();
             $warehousingb = $warehousingb->get();
             $warehousingc = $warehousingc->get();
-            $warehousingd = $warehousingd->where('created_at', '>=', Carbon::now()->subDay()->toDateTimeString())->get();
+            $warehousingd = $warehousingd->whereBetween('created_at', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get();
         } elseif ($request->time2 == 'week') {
-            $warehousinga = $warehousinga->where('created_at', '>=', Carbon::now()->subWeek()->toDateTimeString())->get();
+            $warehousinga = $warehousinga->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get();
             $warehousingb = $warehousingb->get();
             $warehousingc = $warehousingc->get();
-            $warehousingd = $warehousingd->where('created_at', '>=', Carbon::now()->subWeek()->toDateTimeString())->get();
+            $warehousingd = $warehousingd->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get();
         } else {
-            $warehousinga = $warehousinga->where('created_at', '>=', Carbon::now()->subMonth()->toDateTimeString())->get();
+            $warehousinga = $warehousinga->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get();
             $warehousingb = $warehousingb->get();
             $warehousingc = $warehousingc->get();
-            $warehousingd = $warehousingd->where('created_at', '>=', Carbon::now()->subMonth()->toDateTimeString())->get();
+            $warehousingd = $warehousingd->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get();
         }
 
         $counta = $warehousinga->count();
         $countb = $warehousingb->count();
         $countc = $warehousingc->count();
         $countd = $warehousingd->count();
+        $counte = $warehousinge->get()->count();
+        foreach ($warehousinge->get() as $i) {
+            $counte_2 += $i->rate_data_general->rdg_sum6;
+        }
 
         foreach ($warehousinga as $item) {
             $a += $item->w_amount;
@@ -897,7 +969,7 @@ class BannerController extends Controller
         }
 
         return [
-            'warehousinga' => $warehousinga, 'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'a' => $a, 'b' => $b, 'b_2' => $b_2, 'c' => $c, 'd' => $d, 'e' => $e, 'f' => $f, 'h' => $h, 'g' => $g,
+            'warehousinga' => $warehousinga, 'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'counte_2' => $counte_2, 'a' => $a, 'b' => $b, 'b_2' => $b_2, 'c' => $c, 'd' => $d, 'e' => $e, 'f' => $f, 'h' => $h, 'g' => $g,
         ];
         DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
     }
@@ -908,7 +980,7 @@ class BannerController extends Controller
         DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
         if ($user->mb_type == 'shop') {
 
-            $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number','aaa.tie_is_date')
+            $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number', 'tie_is_date', 'tie_status_2')
                 ->leftjoin('company', function ($join) {
                     $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
                 })->leftjoin('company as parent_shop', function ($join) {
@@ -950,9 +1022,21 @@ class BannerController extends Controller
             })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
                 $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
             })->orderBy('te_carry_out_number', 'DESC');
+
+            $warehousinge = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+                $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
+            })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+                $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+            });
+
+            $warehousingg = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 't_export'])->whereHas('w_no', function ($query) use ($user) {
+                $query->whereHas('co_no.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+            });
         } else if ($user->mb_type == 'shipper') {
 
-            $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number','tie_is_date')
+            $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number', 'tie_is_date', 'tie_status_2')
                 ->leftjoin('company', function ($join) {
                     $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
                 })->leftjoin('company as parent_shop', function ($join) {
@@ -994,9 +1078,21 @@ class BannerController extends Controller
             })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
                 $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
             })->orderBy('te_carry_out_number', 'DESC');
+
+            $warehousinge = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+                $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
+            })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+                $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+            });
+
+            $warehousingg = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
+                $query->whereHas('co_no', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+            });
         } else if ($user->mb_type == 'spasys') {
             //FIX NOT WORK 'with'
-            $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number','tie_is_date')
+            $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number', 'tie_is_date', 'tie_status_2')
                 ->leftjoin('company as parent_spasys', function ($join) {
                     $join->on('parent_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
                 })
@@ -1033,7 +1129,33 @@ class BannerController extends Controller
             })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
                 $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
             });
+
+            $warehousinge = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+                $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
+            })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+                $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+            });
+
+            $warehousingg = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
+                $query->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                })->orWhereHas('co_no.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+            });
         }
+
+        $warehousingg->where(function ($q) {
+            $q->where('rgd_status4', '추가청구서')
+                ->orWhere('rgd_status4', '확정청구서');
+        })
+            ->where('service_korean_name', '=', '보세화물')
+            ->where('rgd_calculate_deadline_yn', 'y')
+            ->where('rgd_status7', 'taxed')
+            ->where('rgd_is_show', 'y')
+            ->whereHas('mb_no', function ($q) use ($user) {
+                $q->where('mb_type', $user->mb_type);
+            });
 
         $counta = 0;
         $countb = 0;
@@ -1042,33 +1164,33 @@ class BannerController extends Controller
         $counte = 0;
         $countf = 0;
         $countg = 0;
+        $countg_2 = 0;
 
         if ($request->time1 == 'day') {
-            $counta = $warehousinga->whereNotNull('aaa.tie_logistic_manage_number')->whereNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->get()->count();
-            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->where('aaa.tie_is_date', '>=', Carbon::now()->subDay()->toDateTimeString())->get()->count();
+            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->whereBetween('aaa.tie_is_date', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get()->count();
             $tie_logistic_manage_number = $this->SQL();
-            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->where('aaa.tie_is_date', '>=', Carbon::now()->subDay()->toDateTimeString())->get()->count();
-
-            $countc = $countb -  $countd;
+            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('aaa.tie_is_date', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get()->count();
         } elseif ($request->time1 == 'week') {
-            $counta = $warehousinga->whereNotNull('aaa.tie_logistic_manage_number')->whereNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->get()->count();
-            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->where('aaa.tie_is_date', '>=', Carbon::now()->subWeek()->toDateTimeString())->get()->count();
+            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->whereBetween('aaa.tie_is_date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get()->count();
             $tie_logistic_manage_number = $this->SQL();
-            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->where('aaa.tie_is_date', '>=', Carbon::now()->subWeek()->toDateTimeString())->get()->count();
-
-            $countc = $countb -  $countd;
+            $countd = $warehousingd->get()->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('aaa.tie_is_date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get()->count();
         } else {
-            $counta = $warehousinga->whereNotNull('aaa.tie_logistic_manage_number')->whereNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->get()->count();
-            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->where('aaa.tie_is_date', '>=', Carbon::now()->subMonth()->toDateTimeString())->get()->count();
+            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->whereBetween('aaa.tie_is_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get()->count();
             $tie_logistic_manage_number = $this->SQL();
-            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->where('aaa.tie_is_date', '>=', Carbon::now()->subMonth()->toDateTimeString())->get()->count();
+            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('aaa.tie_is_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get()->count();
+        }
 
-            $countc = $countb -  $countd;
+        $counta = $warehousinga->whereNotNull('aaa.tie_logistic_manage_number')->whereNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->get()->count();
+        $countc = $countb -  $countd;
+        $counte = $warehousinge->where('aaa.tie_status_2', '=', '수입신고접수')->orwhere('aaa.tie_status_2', '=', '수입신고정정접수')->get()->count();
+        $countg = $warehousingg->get()->count();
+        foreach ($warehousingg->get() as $i) {
+            $countg_2 += $i->rate_data_general->rdg_sum6;
         }
 
 
         return [
-            'warehousingb' => $warehousingb, 'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd
+            'warehousinge' => $warehousingg->get(), 'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'countg' => $countg, 'countg_2' => $countg_2
         ];
 
         DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
@@ -1091,7 +1213,7 @@ class BannerController extends Controller
             } elseif ($request->service == "수입풀필먼트" || $request->type == "time2") {
                 $total2 =  $this->CaculateService2($request);
             } elseif ($request->service == "보세화물" || $request->type == "time1") {
-                $total1 =  $this->CaculateService1($request);     
+                $total1 =  $this->CaculateService1($request);
             } else {
                 $total1 =  $this->CaculateService1($request);
                 $total2 =  $this->CaculateService2($request);

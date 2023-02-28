@@ -111,6 +111,7 @@ class WarehousingStatusController extends Controller
             $members = Member::where('mb_no', '!=', 0)->get();
 
             $warehousing_status = $warehousing_status->paginate($per_page, ['*'], 'page', $page);
+            
             DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
             return response()->json($warehousing_status);
         } catch (\Exception $e) {
