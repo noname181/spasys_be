@@ -740,20 +740,24 @@ class ExportExcelController extends Controller
                 $num_row = 2;
                 $data_schedules =  json_decode($schedule_shipment);
                 foreach($data_schedules as $data){
-
+                    $schedule_shipment_item = DB::table('schedule_shipment_info')->where('schedule_shipment_info.ss_no', $data->ss_no)->get();
+                    $total_amount = 0;
+                    foreach ($schedule_shipment_item as $item) {
+                        $total_amount += $item->qty;
+                    }
                     $name = '';
                     $option1 = '';
                     if(isset($data->schedule_shipment_info)){
                         foreach($data->schedule_shipment_info as $row){
-                            if($name == '' && $data->shop_product_id == $row['barcode']){
-                                $name = $row['name'];
-                            }else if($name == '' && $data->shop_option_id == $row['barcode']){
-                                $name = $row['name'];
+                            if($name == '' && $data->shop_product_id == $row->barcode){
+                                $name = $row->name;
+                            }else if($name == '' && $data->shop_option_id == $row->barcode){
+                                $name = $row->name;
                             }
-                            if($option1 == '' && $data->shop_product_id == $row['barcode']){
-                                $option1 = $row['options'];
-                            }else if($option1 == '' && $data->shop_option_id == $row['barcode']){
-                                $option1 = $row['options'];
+                            if($option1 == '' && $data->shop_product_id == $row->barcode){
+                                $option1 = $row->options;
+                            }else if($option1 == '' && $data->shop_option_id == $row->barcode){
+                                $option1 = $row->options;
                             }
                         }
                     }
@@ -767,12 +771,12 @@ class ExportExcelController extends Controller
                     $sheet->setCellValue('E'.$num_row, '');
                     $sheet->setCellValue('F'.$num_row, $data->order_id);
                     $sheet->setCellValue('G'.$num_row, '');
-                    $sheet->setCellValue('H'.$num_row, $data->schedule_shipment_info->product_id);
-                    $sheet->setCellValue('I'.$num_row, $data->schedule_shipment_info->option_id);
+                   $sheet->setCellValue('H'.$num_row, $data->shop_product_id);
+                    $sheet->setCellValue('I'.$num_row, $data->shop_option_id);
                     $sheet->setCellValue('J'.$num_row, $name);
                     $sheet->setCellValue('K'.$num_row, $option1);
                     $sheet->setCellValue('L'.$num_row, '');
-                    $sheet->setCellValue('M'.$num_row, $data->total_amount);
+                    $sheet->setCellValue('M'.$num_row, $total_amount);
                     $num_row++;
                 }
 
