@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Item;
 use App\Http\Requests\Item\ItemSearchRequest;
 use App\Http\Requests\ImportSchedule\ImportScheduleSearchRequest;
+use App\Http\Requests\ScheduleShipment\ScheduleShipmentSearchRequest;
 use App\Http\Requests\Warehousing\WarehousingSearchRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -27,6 +28,7 @@ use App\Models\Import;
 use App\Models\ImportExpected;
 use App\Models\Export;
 use App\Models\ExportConfirm;
+use App\Models\ScheduleShipment;
 
 class ExportExcelController extends Controller
 {
@@ -681,6 +683,112 @@ class ExportExcelController extends Controller
             Log::error($e);
             return $e;
         }
+    }
+    
+    public function dowload_fulfillment_schedule_list(ScheduleShipmentSearchRequest $request){
+    
+        try {
+            $validated = $request->validated();
+            $user = Auth::user();
+    
+            DB::enableQueryLog();
+  
+                if ($user->mb_type == 'shop') {
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status','출고예정')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
+                    })->orderBy('ss_no', 'DESC');
+                } else if ($user->mb_type == 'shipper') {
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status','출고예정')->whereHas('ContractWms.company', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
+                    })->orderBy('ss_no', 'DESC');
+                } else if ($user->mb_type == 'spasys') {
+                    $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status','출고예정')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
+                    })->orderBy('ss_no', 'DESC');
+                }
+
+
+
+                $schedule_shipment = $schedule_shipment->get();
+
+                $spreadsheet = new Spreadsheet();
+                $sheet = $spreadsheet->getActiveSheet();
+    
+                $sheet->setCellValue('A1', 'No');
+                $sheet->setCellValue('B1', '가맹점');
+                $sheet->setCellValue('C1', '화주');
+                $sheet->setCellValue('D1', 'H-BL');
+                $sheet->setCellValue('E1', '채널명');
+                $sheet->setCellValue('F1', '주문번호');
+                $sheet->setCellValue('G1', '브랜드');
+                $sheet->setCellValue('H1', '상품코드');
+                $sheet->setCellValue('I1', '옵션코드');
+                $sheet->setCellValue('J1', '상품명');
+                $sheet->setCellValue('K1', '옵션1');
+                $sheet->setCellValue('L1', '옵션2');
+                $sheet->setCellValue('M1', '수량');
+                $sheet->setCellValue('N1', '반출일자');
+                $sheet->setCellValue('O1', '반출수량');
+                $sheet->setCellValue('P1', '반출중량(KG)');
+                $sheet->setCellValue('Q1', '보관일수');
+                $sheet->setCellValue('R1', '과세금액(₩)');
+                $sheet->setCellValue('S1', '배송방법');
+                $sheet->setCellValue('T1', '배송주소');
+                $sheet->setCellValue('U1', '상세주소');
+                $sheet->setCellValue('V1', '연락처');
+               
+                $num_row = 2;
+                $data_schedules =  json_decode($schedule_shipment);
+                foreach($data_schedules as $data){
+
+                    $name = '';
+                    $option1 = '';
+                    if(isset($data->schedule_shipment_info)){
+                        foreach($data->schedule_shipment_info as $row){
+                            if($name == '' && $data->shop_product_id == $row['barcode']){
+                                $name = $row['name'];
+                            }else if($name == '' && $data->shop_option_id == $row['barcode']){
+                                $name = $row['name'];
+                            }
+                            if($option1 == '' && $data->shop_product_id == $row['barcode']){
+                                $option1 = $row['options'];
+                            }else if($option1 == '' && $data->shop_option_id == $row['barcode']){
+                                $option1 = $row['options'];
+                            }
+                        }
+                    }
+                  
+                
+
+                    $sheet->setCellValue('A'.$num_row, isset($data->is_no)?$data->is_no:'');
+                    $sheet->setCellValue('B'.$num_row, $data->contract_wms->company->co_parent->co_name);
+                    $sheet->setCellValue('C'.$num_row, $data->contract_wms->company->co_name);
+                    $sheet->setCellValue('D'.$num_row, '');
+                    $sheet->setCellValue('E'.$num_row, '');
+                    $sheet->setCellValue('F'.$num_row, $data->order_id);
+                    $sheet->setCellValue('G'.$num_row, '');
+                    $sheet->setCellValue('H'.$num_row, $data->schedule_shipment_info->product_id);
+                    $sheet->setCellValue('I'.$num_row, $data->schedule_shipment_info->option_id);
+                    $sheet->setCellValue('J'.$num_row, $name);
+                    $sheet->setCellValue('K'.$num_row, $option1);
+                    $sheet->setCellValue('L'.$num_row, '');
+                    $sheet->setCellValue('M'.$num_row, $data->total_amount);
+                    $num_row++;
+                }
+
+                return response()->json([
+                    'status' => 1,
+                    //'link_download' => $file_name_download,
+                    'message' => 'Download File',
+                    'import_schedule'=>$data_schedules,
+                ], 200);
+                ob_end_clean();
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            //return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    
     }
     public function download_bonded_cargo(ImportScheduleSearchRequest $request){
         try {
