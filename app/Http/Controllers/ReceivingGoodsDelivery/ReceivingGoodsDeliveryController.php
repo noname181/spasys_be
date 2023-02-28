@@ -2960,4 +2960,71 @@ class ReceivingGoodsDeliveryController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
+    public function create_package_delivery(Request $request)
+    {
+
+        try {
+            DB::beginTransaction();
+
+            $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
+            $member = Member::where('mb_id', Auth::user()->mb_id)->first();
+            $package = $request->package;
+             if ($request->is_no){
+                if (isset($package)) {
+                    foreach ($package['location'] as $packages) {
+                        //return $packages;
+                        if (isset($packages['p_no'])) {
+                            Package::where('p_no', $packages['p_no'])->update([
+                                'w_no' => $request->is_no,
+                                'note' => $packages['note'],
+                                'order_number' => $packages['order_number'],
+                                'pack_type' => $packages['pack_type'],
+                                'quantity' => $packages['quantity'],
+                                'reciever' => $packages['reciever'],
+                                'reciever_address' => $packages['reciever_address'],
+                                'reciever_contract' => $packages['reciever_contract'],
+                                'reciever_detail_address' => $packages['reciever_detail_address'],
+                                'sender' => $package['sender'],
+                                'sender_address' => $package['sender_address'],
+                                'sender_contract' => $package['sender_contract'],
+                                'sender_detail_address' => $package['sender_detail_address']
+                            ]);
+                        } else {
+                            Package::insert([
+                                'w_no' => $request->is_no,
+                                'note' => $packages['note'],
+                                'order_number' => $packages['order_number'],
+                                'pack_type' => $packages['pack_type'],
+                                'quantity' => $packages['quantity'],
+                                'reciever' => $packages['reciever'],
+                                'reciever_address' => $packages['reciever_address'],
+                                'reciever_contract' => $packages['reciever_contract'],
+                                'reciever_detail_address' => $packages['reciever_detail_address'],
+                                'sender' => $package['sender'],
+                                'sender_address' => $package['sender_address'],
+                                'sender_contract' => $package['sender_contract'],
+                                'sender_detail_address' => $package['sender_detail_address']
+                            ]);
+                        }
+                    }
+      
+                }
+
+           
+                    
+                }
+            
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'w_no' => isset($w_no) ? $w_no :  $request->is_no,
+            ], 201);
+        } catch (\Throwable $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0001], 500);
+        }
+    }
 }

@@ -238,6 +238,8 @@ Route::middleware('auth')->group(function () {
     Route::post('receiving_goods_delivery/warehousing_release_fulfillment/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_warehousing_release_fulfillment'])->name('create_warehousing_release_fulfillment');
     Route::post('receiving_goods_delivery/import_schedule/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_import_schedule'])->name('rgd_import_schedule');
     Route::post('receiving_goods_delivery/import_schedule_list/rgd_list', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_import_schedule_list'])->name('rgd_import_schedule_list');
+    //715-116
+    Route::post('receiving_goods_delivery/package_delivery/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_package_delivery'])->name('package_delivery');
 
     Route::post('receiving_goods_delivery/warehousing_api', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_warehousing_api'])->name('rgd_warehousing_api');
     Route::post('receiving_goods_delivery/rgd_settlement_number', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'check_settlement_number'])->name('rgd_settlement_number');
@@ -558,7 +560,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/download_bonded_cargo', [\App\Http\Controllers\Excel\ExportExcelController::class,'download_bonded_cargo'])->name('download_bonded_cargo');
     Route::post('/download_distribution_release_list', [\App\Http\Controllers\Excel\ExportExcelController::class,'download_distribution_release_list'])->name('download_distribution_release_list');
     Route::post('get_package_data', [\App\Http\Controllers\Package\PackageController::class,'get_package_data'])->name('get_package_data');
-
+    
+    Route::post('/dowload_fulfillment_schedule_list', [\App\Http\Controllers\Excel\ExportExcelController::class,'dowload_fulfillment_schedule_list'])->name('dowload_fulfillment_schedule_list');
     Route::post('/import_excel_distribution', [\App\Http\Controllers\Warehousing\WarehousingController::class,'importExcelDistribution']);
     Route::post('/update_rgd_status3', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'updateRgdState3'])->name('update_rgd_status3');
 

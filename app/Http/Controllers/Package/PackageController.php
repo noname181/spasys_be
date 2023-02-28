@@ -21,6 +21,7 @@ class PackageController extends Controller
         try {
           
             $package = Package::where('w_no', $request->w_no)->first();
+            $package_get = Package::where('w_no', $request->w_no)->get();
             $manager = Manager::select([
                 'm_no',
                 'co_no',
@@ -62,7 +63,8 @@ class PackageController extends Controller
                 'message' => Messages::MSG_0007,
                 'manager' => $manager,
                 'company' => $company,
-                'package' => $package
+                'package' => $package,
+                'package_get' => $package_get,
             ]);
         } catch (\Exception $e) {
             DB::rollback();
