@@ -717,7 +717,7 @@ class ExportExcelController extends Controller
                 $sheet->setCellValue('A1', 'No');
                 $sheet->setCellValue('B1', '가맹점');
                 $sheet->setCellValue('C1', '화주');
-                $sheet->setCellValue('D1', 'H-BL');
+                $sheet->setCellValue('D1', '');
                 $sheet->setCellValue('E1', '채널명');
                 $sheet->setCellValue('F1', '주문번호');
                 $sheet->setCellValue('G1', '브랜드');
@@ -727,15 +727,15 @@ class ExportExcelController extends Controller
                 $sheet->setCellValue('K1', '옵션1');
                 $sheet->setCellValue('L1', '옵션2');
                 $sheet->setCellValue('M1', '수량');
-                $sheet->setCellValue('N1', '반출일자');
-                $sheet->setCellValue('O1', '반출수량');
-                $sheet->setCellValue('P1', '반출중량(KG)');
-                $sheet->setCellValue('Q1', '보관일수');
-                $sheet->setCellValue('R1', '과세금액(₩)');
-                $sheet->setCellValue('S1', '배송방법');
-                $sheet->setCellValue('T1', '배송주소');
-                $sheet->setCellValue('U1', '상세주소');
-                $sheet->setCellValue('V1', '연락처');
+                $sheet->setCellValue('N1', '배송방법');
+                $sheet->setCellValue('O1', '수취인');
+                $sheet->setCellValue('P1', '배송주소');
+                $sheet->setCellValue('Q1', '상세주소');
+                $sheet->setCellValue('R1', '연락처');
+                $sheet->setCellValue('S1', '배송메모');
+                $sheet->setCellValue('T1', '등록일시');
+                $sheet->setCellValue('U1', '');
+                $sheet->setCellValue('V1', '화물상태');
                
                 $num_row = 2;
                 $data_schedules =  json_decode($schedule_shipment);
@@ -763,6 +763,31 @@ class ExportExcelController extends Controller
                     }
                   
                 
+                    if (count($data->receving_goods_delivery) > 0) {
+                  
+                          if ($data->order_cs == 0) {
+                            $status_cs = "출고예정";
+                          } else if ($data->order_cs == 1) {
+                            $status_cs = "전체취소";
+                          } else if ($data->order_cs == 2) {
+                            $status_cs = "부분취소";
+                          } else {
+                            $status_cs = "출고예정";
+                          }
+                          
+                       
+                      } else {
+                        if ($data->order_cs == 0) {
+                          $status_cs = "정상";
+                        } else if ($data->order_cs == 1) {
+                          $status_cs = "전체취소";
+                        } else if ($data->order_cs == 2) {
+                          $status_cs = "부분취소";
+                        } else {
+                          $status_cs = "정상";
+                        }
+                   
+                      }
 
                     $sheet->setCellValue('A'.$num_row, isset($data->is_no)?$data->is_no:'');
                     $sheet->setCellValue('B'.$num_row, $data->contract_wms->company->co_parent->co_name);
@@ -771,12 +796,21 @@ class ExportExcelController extends Controller
                     $sheet->setCellValue('E'.$num_row, '');
                     $sheet->setCellValue('F'.$num_row, $data->order_id);
                     $sheet->setCellValue('G'.$num_row, '');
-                   $sheet->setCellValue('H'.$num_row, $data->shop_product_id);
+                    $sheet->setCellValue('H'.$num_row, $data->shop_product_id);
                     $sheet->setCellValue('I'.$num_row, $data->shop_option_id);
                     $sheet->setCellValue('J'.$num_row, $name);
                     $sheet->setCellValue('K'.$num_row, $option1);
                     $sheet->setCellValue('L'.$num_row, '');
                     $sheet->setCellValue('M'.$num_row, $total_amount);
+                    $sheet->setCellValue('N'.$num_row, $data->delivery_status);
+                    $sheet->setCellValue('O'.$num_row, $data->recv_name);
+                    $sheet->setCellValue('P'.$num_row, $data->recv_address);
+                    $sheet->setCellValue('Q'.$num_row, '');
+                    $sheet->setCellValue('R'.$num_row, $data->recv_mobile);
+                    $sheet->setCellValue('S'.$num_row, $data->memo);
+                    $sheet->setCellValue('T'.$num_row, $data->collect_date);
+                    $sheet->setCellValue('U'.$num_row, '');
+                    $sheet->setCellValue('V'.$num_row, $status_cs);
                     $num_row++;
                 }
                 $Excel_writer = new Xlsx($spreadsheet);
