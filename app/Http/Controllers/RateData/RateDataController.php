@@ -3168,7 +3168,7 @@ class RateDataController extends Controller
             $start_date = $created_at->startOfMonth()->toDateString();
             $end_date = $created_at->endOfMonth()->toDateString();
 
-            $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent'])
+            $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 't_export', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent'])
                 ->whereHas('w_no', function ($q) use ($co_no) {
                     $q->where('co_no', $co_no)
                         ->where('w_category_name', '보세화물');
@@ -3368,7 +3368,6 @@ class RateDataController extends Controller
 
                 foreach ($request->rgds as $key => $rgd) {
                     $is_exist = RateDataGeneral::where('rgd_no_expectation', $rgd['rgd_no'])->where('rdg_bill_type', 'final_monthly')->first();
-                    return $is_exist;
                     if (!$is_exist) {
                         $is_exist = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
 
