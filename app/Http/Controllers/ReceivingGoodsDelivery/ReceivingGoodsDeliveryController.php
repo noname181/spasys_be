@@ -2969,13 +2969,47 @@ class ReceivingGoodsDeliveryController extends Controller
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
             $package = $request->package;
+            //return $package;
              if ($request->is_no){
                 if (isset($package)) {
                     foreach ($package['location'] as $packages) {
-                        //return $packages;
-                        if (isset($packages['p_no'])) {
-                            Package::where('p_no', $packages['p_no'])->update([
+
+                            $rgd = ReceivingGoodsDelivery::updateOrCreate(
+                                
+                                [
+                                    'rgd_no' =>  isset($packages['rgd_no']) ? $packages['rgd_no'] : null,
+                                ],
+                                [
+                                    'is_no' =>  $request->is_no,
+                                    'mb_no' => $member->mb_no,
+                                    'service_korean_name' => '보세화물',
+                                    'rgd_contents' => $packages['rgd_contents'],
+                                    'rgd_address' => $packages['rgd_address'],
+                                    'rgd_address_detail' => $packages['rgd_address_detail'],
+                                    'rgd_receiver' => $packages['rgd_receiver'],
+                                    'rgd_hp' => $packages['rgd_hp'],
+                                    'rgd_memo' => $packages['rgd_memo'],
+                                    'rgd_status1' => $packages['rgd_status1'],
+                                    'rgd_status2' => $packages['rgd_status2'],
+                                    'rgd_status3' => $packages['rgd_status3'],
+                                    'rgd_status4' => isset($packages['rgd_status4']) ? $packages['rgd_status4'] : null,
+                                    'rgd_delivery_company' => $packages['rgd_delivery_company'],
+                                    'rgd_tracking_code' => $packages['rgd_tracking_code'],
+                                    'rgd_delivery_man' => $packages['rgd_delivery_man'],
+                                    'rgd_delivery_man_hp' => $packages['rgd_delivery_man_hp'],
+                                    'rgd_delivery_schedule_day' => $packages['rgd_delivery_schedule_day'] ? $packages['rgd_delivery_schedule_day'] : null,
+                                    'rgd_arrive_day' => $packages['rgd_arrive_day'] ? $packages['rgd_arrive_day'] : null,
+
+                                ]
+                                
+                            );
+                            Package::updateOrCreate(
+                            [
+                                'p_no' =>  $packages['p_no']
+                            ],
+                            [
                                 'w_no' => $request->is_no,
+                                'rgd_no' => $rgd->rgd_no,
                                 'note' => $packages['note'],
                                 'order_number' => $packages['order_number'],
                                 'pack_type' => $packages['pack_type'],
@@ -2984,30 +3018,25 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'reciever_address' => $packages['reciever_address'],
                                 'reciever_contract' => $packages['reciever_contract'],
                                 'reciever_detail_address' => $packages['reciever_detail_address'],
-                                'sender' => $package['sender'],
-                                'sender_address' => $package['sender_address'],
-                                'sender_contract' => $package['sender_contract'],
-                                'sender_detail_address' => $package['sender_detail_address']
-                            ]);
-                        } else {
-                            Package::insert([
-                                'w_no' => $request->is_no,
-                                'note' => $packages['note'],
-                                'order_number' => $packages['order_number'],
-                                'pack_type' => $packages['pack_type'],
-                                'quantity' => $packages['quantity'],
-                                'reciever' => $packages['reciever'],
-                                'reciever_address' => $packages['reciever_address'],
-                                'reciever_contract' => $packages['reciever_contract'],
-                                'reciever_detail_address' => $packages['reciever_detail_address'],
-                                'sender' => $package['sender'],
-                                'sender_address' => $package['sender_address'],
-                                'sender_contract' => $package['sender_contract'],
-                                'sender_detail_address' => $package['sender_detail_address']
-                            ]);
-                        }
+                                'sender' => $packages['sender'],
+                                'sender_address' => $packages['sender_address'],
+                                'sender_contract' => $packages['sender_contract'],
+                                'sender_detail_address' => $packages['sender_detail_address']
+
+                            ]
+                            
+                            );
+                            
+            
                     }
-      
+                    
+               
+                    foreach ($request['remove'] as $remove) {
+                        ReceivingGoodsDelivery::where('rgd_no', $remove['rgd_no'])->delete();
+                        Package::where('rgd_no', $remove['rgd_no'])->delete();
+                    }
+                    
+                    
                 }
 
            

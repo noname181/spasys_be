@@ -59,6 +59,7 @@ class ReceivingGoodsDelivery extends Model
         'rgd_discount_rate',
         'created_at',
         'updated_at',
+        'is_no'
     ];
 
     protected $casts = [
