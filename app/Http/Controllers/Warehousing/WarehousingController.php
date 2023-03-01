@@ -4102,10 +4102,40 @@ class WarehousingController extends Controller
                         }
                     }
                     if($item->service_korean_name == '보세화물'){
+                        if($item->rgd_bill_type == 'final_monthly'){
+                            $item->sum_price_total2 = "";
+                          }else if(count($item->rate_meta_data) > 0){
+                            $total_discount = 0;
+                            foreach($item->rate_meta_data[0]->rate_data as $row){
+                                if($row->rd_cate2 == '할인금액'){
+                                    $total_discount = $row->rd_data4;
+                                } else {
+                                    $total_discount = 0;
+                                }
+                            }
+
+                            $item->sum_price_total2 = $item->rate_data_general->rdg_sum7 + $total_discount;
+                           
+                          }else if(count($item->rate_meta_data_parent) > 0){
+                            $total_discount = 0;
+                            foreach($item->rate_meta_data_parent[0]->rate_data as $row){
+                                if($row->rd_cate2 == '할인금액'){
+                                    $total_discount = $row->rd_data4;
+                                } else {
+                                    $total_discount = 0;
+                                }
+                            }
+
+                            $item->sum_price_total2 = $item->rate_data_general->rdg_sum7 + $total_discount;
+                            
+                          }
                         $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum7 : '';
                     } else {
+                        $item->sum_price_total2 = $item->rate_data_general->rdg_sum4;
                         $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : '';
                     }
+
+
                     if ($i == $k) {
                         $item->is_completed = true;
                         $item->completed_date = Carbon::parse($completed_date)->format('Y.m.d');
