@@ -4102,35 +4102,35 @@ class WarehousingController extends Controller
                         }
                     }
                     if($item->service_korean_name == '보세화물'){
+                       
                         if($item->rgd_bill_type == 'final_monthly'){
-                            $item->sum_price_total2 = "";
+                            $item->sum_price_total2 = 0;
+                            $item->discount = 0;
                           }else if(count($item->rate_meta_data) > 0){
                             $total_discount = 0;
                             foreach($item->rate_meta_data[0]->rate_data as $row){
                                 if($row->rd_cate2 == '할인금액'){
-                                    $total_discount = $row->rd_data4;
-                                } else {
-                                    $total_discount = 0;
+                                    $total_discount = $row->rd_data4 ? $row->rd_data4 : 0;
                                 }
                             }
 
                             $item->sum_price_total2 = $item->rate_data_general->rdg_sum7 + $total_discount;
+                            $item->discount = $total_discount;
                            
                           }else if(count($item->rate_meta_data_parent) > 0){
                             $total_discount = 0;
                             foreach($item->rate_meta_data_parent[0]->rate_data as $row){
                                 if($row->rd_cate2 == '할인금액'){
-                                    $total_discount = $row->rd_data4;
-                                } else {
-                                    $total_discount = 0;
-                                }
+                                    $total_discount = $row->rd_data4 ? $row->rd_data4 : 0;
+                                } 
                             }
 
                             $item->sum_price_total2 = $item->rate_data_general->rdg_sum7 + $total_discount;
-                            
+                            $item->discount = $total_discount;
                           }
                         $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum7 : '';
                     } else {
+                        $item->discount = "";
                         $item->sum_price_total2 = $item->rate_data_general->rdg_sum4;
                         $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : '';
                     }
