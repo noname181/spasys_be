@@ -586,6 +586,19 @@ class ImportScheduleController extends Controller
 
             $import_schedule = $import_schedule->paginate($per_page, ['*'], 'page', $page);
 
+            $import_schedule->setCollection(
+                $import_schedule->getCollection()->map(function ($item) {
+                    if (isset($item->te_e_number)) {
+                      $item->number = $item->te_e_number;
+                      } else if (isset($item->ti_i_number)) {
+                        $item->number =  $item->ti_i_number;
+                      } else if (isset($item->tie_is_number)) {
+                         $item->number =  $item->tie_is_number;
+                      }
+
+                    return $item;
+                })
+            );
             $status = DB::table('t_import_expected')
                 ->select('tie_status_2')
                 ->groupBy('tie_status_2')

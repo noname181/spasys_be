@@ -4134,6 +4134,12 @@ class WarehousingController extends Controller
                         $item->sum_price_total2 = $item->rate_data_general->rdg_sum4;
                         $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : '';
                     }
+                    
+                    if($item->rate_data_general->rdg_sum7){
+                        $item->sum_price_total3 = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum7 : '';
+                    } else if($item->rate_data_general->rdg_sum4){
+                        $item->sum_price_total3 = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : '';
+                    }
 
 
                     if ($i == $k) {
@@ -5027,7 +5033,25 @@ class WarehousingController extends Controller
 
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             //return DB::getQueryLog();
+            $warehousing->setCollection(
+                $warehousing->getCollection()->map(function ($item) {
+                    if ($item->service_korean_name === "유통가공") {
+                        $item->supply_price_total = $item->rate_data_general->rdg_supply_price4 ? $item->rate_data_general->rdg_supply_price4 : 0;
+                        $item->vat_price_total = $item->rate_data_general->rdg_vat4 ? $item->rate_data_general->rdg_vat4 : 0;
+                        $item->sum_price_total = $item->rate_data_general->rdg_sum4 ? $item->rate_data_general->rdg_sum4 : 0;
+                      } else if ($item->service_korean_name === "수입풀필먼트") {
+                        $item->supply_price_total = $item->rate_data_general->rdg_supply_price6 ? $item->rate_data_general->rdg_supply_price6 : 0;
+                        $item->vat_price_total = $item->rate_data_general->rdg_vat6 ? $item->rate_data_general->rdg_vat6 : 0;
+                        $item->sum_price_total = $item->rate_data_general->rdg_sum6 ? $item->rate_data_general->rdg_sum6 : 0;
+                      } else {
+                        $item->supply_price_total = $item->rate_data_general->rdg_supply_price7 ? $item->rate_data_general->rdg_supply_price7 : 0;
+                        $item->vat_price_total = $item->rate_data_general->rdg_vat7 ? $item->rate_data_general->rdg_vat7 : 0;
+                        $item->sum_price_total = $item->rate_data_general->rdg_sum7 ? $item->rate_data_general->rdg_sum7 : 0;
+                      }
 
+                    return $item;
+                })
+            );
             $data = $custom->merge($warehousing);
 
             return response()->json($data);
@@ -5179,6 +5203,18 @@ class WarehousingController extends Controller
                 $warehousing->where('service_korean_name', '=', $validated['service_korean_name']);
             }
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
+
+
+            $warehousing->setCollection(
+                $warehousing->getCollection()->map(function ($item) {
+                    if ($item->service_korean_name === "유통가공") {
+                        $item->sum_price_total = $item->rate_data_general->rdg_sum4;
+                      } else {
+                        $item->sum_price_total = $item->rate_data_general->rdg_sum6;
+                      } 
+                    return $item;
+                })
+            );
             //return DB::getQueryLog();
 
             return response()->json($warehousing);
