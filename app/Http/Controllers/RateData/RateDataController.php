@@ -3310,10 +3310,7 @@ class RateDataController extends Controller
             DB::beginTransaction();
             $user = Auth::user();
             if ($request->is_edit == 'edit') {
-                $i = 0;
-                foreach ($request->rgds as $key => $rgd) {
-                    $is_exist = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', 'final_monthly')->first();
-                }
+        
             } else {
                 $i = 0;
                 $final_rgds = [];
@@ -3371,7 +3368,7 @@ class RateDataController extends Controller
 
                 foreach ($request->rgds as $key => $rgd) {
                     $is_exist = RateDataGeneral::where('rgd_no_expectation', $rgd['rgd_no'])->where('rdg_bill_type', 'final_monthly')->first();
-
+                    return $is_exist;
                     if (!$is_exist) {
                         $is_exist = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
 
@@ -3404,6 +3401,34 @@ class RateDataController extends Controller
 
                         $final_rdg->save();
                     } else {
+                        
+                        if ($request->is_edit == 'edit') {
+                            RateDataGeneral::where('rgd_no_expectation', $rgd['rgd_no'])->where('rdg_bill_type', 'final_monthly')->update([
+                                'rdg_supply_price1' =>  $rdg_supply_price1,
+                                'rdg_supply_price2' =>  $rdg_supply_price2,
+                                'rdg_supply_price3' =>  $rdg_supply_price3,
+                                'rdg_supply_price4' =>  $rdg_supply_price4,
+                                'rdg_supply_price5' =>  $rdg_supply_price5,
+                                'rdg_supply_price6' =>  $rdg_supply_price6,
+                                'rdg_supply_price7' =>  $rdg_supply_price7,
+        
+                                'rdg_vat1' =>  $rdg_vat1,
+                                'rdg_vat2' =>  $rdg_vat2,
+                                'rdg_vat3' =>  $rdg_vat3,
+                                'rdg_vat4' =>  $rdg_vat4,
+                                'rdg_vat5' =>  $rdg_vat5,
+                                'rdg_vat6' =>  $rdg_vat6,
+                                'rdg_vat7' =>  $rdg_vat7,
+        
+                                'rdg_sum1' =>  $rdg_sum1,
+                                'rdg_sum2' =>  $rdg_sum2,
+                                'rdg_sum3' =>  $rdg_sum3,
+                                'rdg_sum4' =>  $rdg_sum4,
+                                'rdg_sum5' =>  $rdg_sum5,
+                                'rdg_sum6' =>  $rdg_sum6,
+                                'rdg_sum7' =>  $rdg_sum7,
+                            ]);
+                        }
                         $final_rgd = ReceivingGoodsDelivery::where('rgd_no', $is_exist['rgd_no'])->first();
                         if($final_rgd->rgd_status5 == 'cancel') {
                             $is_exist = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
@@ -3496,7 +3521,6 @@ class RateDataController extends Controller
 
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'rdg' => $is_exist,
                 // 'final_rgd' => $final_rgd
             ], 201);
 
