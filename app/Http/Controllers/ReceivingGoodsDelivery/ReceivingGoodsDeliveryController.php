@@ -3029,6 +3029,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             
             
                     }
+                    
                
                     foreach ($request['remove'] as $remove) {
                         ReceivingGoodsDelivery::where('rgd_no', $remove['rgd_no'])->delete();
