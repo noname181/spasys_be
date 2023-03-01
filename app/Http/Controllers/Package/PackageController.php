@@ -13,13 +13,14 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\Manager;
 use App\Models\Company;
+use App\Models\Member;
 class PackageController extends Controller
 {
     
     public function get_package_data(Request $request)
     {
         try {
-          
+            $member = Member::with('company')->where('mb_no', Auth::user()->mb_no)->first();
             $package = Package::where('w_no', $request->w_no)->first();
             $package_get = Package::where('w_no', $request->w_no)->get();
             $manager = Manager::select([
@@ -58,6 +59,8 @@ class PackageController extends Controller
                 // ->where('co_address.co_no', $co_no)
                 ->first();
 
+        
+            
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -65,6 +68,7 @@ class PackageController extends Controller
                 'company' => $company,
                 'package' => $package,
                 'package_get' => $package_get,
+                'member' => $member,
             ]);
         } catch (\Exception $e) {
             DB::rollback();

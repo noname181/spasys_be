@@ -23,6 +23,7 @@ class Package extends Model
     protected $fillable = [
         'p_no',
         'w_no',
+        'rgd_no',
         'wr_contents',
         'wr_type',
         'note',
