@@ -536,6 +536,12 @@ class ImportScheduleController extends Controller
                 // });
                 $import_schedule->where(DB::raw('lower(aaa.co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
             }
+            if (isset($validated['co_no'])) {
+                // $import_schedule->whereHas('company', function ($q) use ($validated) {
+                //     return $q->where(DB::raw('lower(aaa.co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                // });
+                $import_schedule->where('aaa.co_no','=',$validated['co_no']);
+            }
 
             if (isset($validated['m_bl'])) {
                 $import_schedule->where(DB::raw('aaa.tie_m_bl'), 'like', '%' . strtolower($validated['m_bl']) . '%');
