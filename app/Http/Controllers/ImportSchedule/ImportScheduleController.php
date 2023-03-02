@@ -536,6 +536,12 @@ class ImportScheduleController extends Controller
                 // });
                 $import_schedule->where(DB::raw('lower(aaa.co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
             }
+            if (isset($validated['co_no'])) {
+                // $import_schedule->whereHas('company', function ($q) use ($validated) {
+                //     return $q->where(DB::raw('lower(aaa.co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                // });
+                $import_schedule->where('aaa.co_no','=',$validated['co_no']);
+            }
 
             if (isset($validated['m_bl'])) {
                 $import_schedule->where(DB::raw('aaa.tie_m_bl'), 'like', '%' . strtolower($validated['m_bl']) . '%');
@@ -586,6 +592,19 @@ class ImportScheduleController extends Controller
 
             $import_schedule = $import_schedule->paginate($per_page, ['*'], 'page', $page);
 
+            $import_schedule->setCollection(
+                $import_schedule->getCollection()->map(function ($item) {
+                    if (isset($item->te_e_number)) {
+                      $item->number = $item->te_e_number;
+                      } else if (isset($item->ti_i_number)) {
+                        $item->number =  $item->ti_i_number;
+                      } else if (isset($item->tie_is_number)) {
+                         $item->number =  $item->tie_is_number;
+                      }
+
+                    return $item;
+                })
+            );
             $status = DB::table('t_import_expected')
                 ->select('tie_status_2')
                 ->groupBy('tie_status_2')
