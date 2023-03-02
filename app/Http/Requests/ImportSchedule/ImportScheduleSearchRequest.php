@@ -40,6 +40,10 @@ class ImportScheduleSearchRequest extends BaseFormRequest
                 'nullable',
                 'string',
             ],
+            'co_no' => [
+                'nullable',
+                'int',
+            ],
             'm_bl' => [
                 'nullable',
                 'string',
