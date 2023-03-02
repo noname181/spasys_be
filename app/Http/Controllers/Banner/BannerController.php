@@ -724,8 +724,7 @@ class BannerController extends Controller
 
         return [
             'warehousingb' => $warehousingd, 'a' => $a, 'b' => $b, 'c' => $c, 'd' => $d, 'e' => $e, 'f' => $f, 'h' => $h, 'g' => $g,
-            'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'countf' => $countf, 'countg' => $countg
-            , 'counth' => $counth, 'counth_2' => $counth_2
+            'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'countf' => $countf, 'countg' => $countg, 'counth' => $counth, 'counth_2' => $counth_2
 
         ];
     }
@@ -908,7 +907,7 @@ class BannerController extends Controller
         $countd = 0;
         $counte = 0;
         $counte_2 = 0;
-        
+
 
         if ($request->time2 == 'day') {
             $warehousinga = $warehousinga->whereBetween('created_at', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get();
@@ -1173,7 +1172,7 @@ class BannerController extends Controller
         } elseif ($request->time1 == 'week') {
             $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->whereBetween('aaa.tie_is_date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get()->count();
             $tie_logistic_manage_number = $this->SQL();
-            $countd = $warehousingd->get()->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('aaa.tie_is_date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get()->count();
+            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('aaa.tie_is_date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get()->count();
         } else {
             $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->whereBetween('aaa.tie_is_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get()->count();
             $tie_logistic_manage_number = $this->SQL();
@@ -1218,6 +1217,212 @@ class BannerController extends Controller
                 $total1 =  $this->CaculateService1($request);
                 $total2 =  $this->CaculateService2($request);
                 $total3 =  $this->CaculateService3($request);
+            }
+
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'check' => $check,
+                'total1' => $total1,
+                'total2' => $total2,
+                'total3' => $total3,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+
+    public function CaculateChartService1(Request $request)
+    {
+        $user = Auth::user();
+        DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+        if ($user->mb_type == 'shop') {
+
+            $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number', 'tie_is_date', 'tie_status_2')
+                ->leftjoin('company', function ($join) {
+                    $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
+                })->leftjoin('company as parent_shop', function ($join) {
+                    $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
+                })->leftjoin('company as parent_spasys', function ($join) {
+                    $join->on('parent_shop.co_parent_no', '=', 'parent_spasys.co_no');
+                })->where('parent_shop.co_no', $user->co_no)->where('tie_is_date', '>=', '2022-01-04')
+                ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
+                ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
+
+            $sub_2 = Import::select('ti_logistic_manage_number', 'ti_carry_in_number')
+                ->leftjoin('receiving_goods_delivery', function ($join) {
+                    $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
+                })
+                ->groupBy(['ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number']);
+
+            $sub_4 = Export::select('te_logistic_manage_number', 'te_carry_in_number', 'te_carry_out_number')
+
+                ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
+
+
+
+            $warehousingb = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+                $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
+            })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+                $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+            })->orderBy('te_carry_out_number', 'DESC');
+
+            $warehousingd = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+                $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
+            })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+                $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+            })->orderBy('te_carry_out_number', 'DESC');
+        } else if ($user->mb_type == 'shipper') {
+
+            $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number', 'tie_is_date', 'tie_status_2')
+                ->leftjoin('company', function ($join) {
+                    $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
+                })->leftjoin('company as parent_shop', function ($join) {
+                    $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
+                })->leftjoin('company as parent_spasys', function ($join) {
+                    $join->on('parent_shop.co_parent_no', '=', 'parent_spasys.co_no');
+                })->where('company.co_no', $user->co_no)->where('tie_is_date', '>=', '2022-01-04')
+                ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
+                ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
+
+            $sub_2 = Import::select('ti_logistic_manage_number', 'ti_carry_in_number')
+                ->leftjoin('receiving_goods_delivery', function ($join) {
+                    $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
+                })
+                ->groupBy(['ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number']);
+
+            $sub_4 = Export::select('te_logistic_manage_number', 'te_carry_in_number', 'te_carry_out_number')
+
+                ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
+
+
+
+            $warehousingb = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+                $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
+            })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+                $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+            })->orderBy('te_carry_out_number', 'DESC');
+
+            $warehousingd = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+                $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
+            })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+                $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+            })->orderBy('te_carry_out_number', 'DESC');
+        } else if ($user->mb_type == 'spasys') {
+            //FIX NOT WORK 'with'
+            $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number', 'tie_is_date', 'tie_status_2')
+                ->leftjoin('company as parent_spasys', function ($join) {
+                    $join->on('parent_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
+                })
+                ->where('parent_spasys.warehouse_code', $user->company['warehouse_code'])
+                ->where('tie_is_date', '>=', '2022-01-04')
+                ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
+                ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
+
+            $sub_2 = Import::select('ti_logistic_manage_number', 'ti_carry_in_number')
+
+                ->groupBy(['ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number']);
+
+
+
+            $sub_4 = Export::select('te_logistic_manage_number', 'te_carry_in_number', 'te_carry_out_number')
+                ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
+
+
+
+
+            $warehousingb = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+                $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
+            })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+                $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+            });
+
+            $warehousingd = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+                $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
+            })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+                $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+            });
+        }
+        $countb = [];
+        $countd = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereYear('tie_is_date', Carbon::now()->year)->whereNull('ddd.te_logistic_manage_number')->get()->groupBy(function ($date) {
+                //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
+                return Carbon::parse($date->tie_is_date)->format('m'); // grouping by months
+            });
+            $tie_logistic_manage_number = $this->SQL();
+            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereYear('tie_is_date', Carbon::now()->year)->get()->groupBy(function ($date) {
+                //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
+                return Carbon::parse($date->tie_is_date)->format('m'); // grouping by months
+            });;
+        }
+
+        $chartcountb = [];
+        $chartcountd = [];
+        $userArrb = [];
+        $userArrd = [];
+
+        foreach ($countb as $key => $value) {
+            $chartcountb[(int)$key] = count($value);
+        }
+
+        foreach ($countb as $key => $value) {
+            $chartcountd[(int)$key] = count($value);
+        }
+
+        for ($i = 1; $i <= 12; $i++) {
+            if (!empty($usermcount[$i])) {
+                $userArrb[$i] = $chartcountb[$i];
+            } else {
+                $userArrb[$i] = 0;
+            }
+
+            if (!empty($usermcount[$i])) {
+                $userArrd[$i] = $chartcountd[$i];
+            } else {
+                $userArrd[$i] = 0;
+            }
+        }
+
+        return [
+            'countb' => $userArrb, 'countd' => $userArrd
+        ];
+
+        DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+    }
+
+    public function CaculateChartService2(Request $request)
+    {
+    }
+
+    public function CaculateChartService3(Request $request)
+    {
+    }
+
+    public function banner_loadchart(Request $request)
+    {
+        //return "dsada";
+        try {
+
+            $user = Auth::user();
+            //DB::enableQueryLog();
+            $total1 = [];
+            $total2 = [];
+            $total3 = [];
+
+            $check = "";
+            if ($request->service == "유통가공" || $request->type == "time3") {
+                $total3 =  $this->CaculateChartService3($request);
+            } elseif ($request->service == "수입풀필먼트" || $request->type == "time2") {
+                $total2 =  $this->CaculateChartService2($request);
+            } elseif ($request->service == "보세화물" || $request->type == "time1") {
+                $total1 =  $this->CaculateChartService1($request);
+            } else {
+                $total1 =  $this->CaculateChartService1($request);
+                $total2 =  $this->CaculateChartService2($request);
+                $total3 =  $this->CaculateChartService3($request);
             }
 
             return response()->json([
