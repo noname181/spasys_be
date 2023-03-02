@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use App\Models\Manager;
 use App\Models\Company;
 use App\Models\Member;
+use App\Models\Export;
 class PackageController extends Controller
 {
     
@@ -59,6 +60,11 @@ class PackageController extends Controller
                 // ->where('co_address.co_no', $co_no)
                 ->first();
 
+            //for page 715
+            if(isset($request->w_no)){
+                $export = Export::with(['import', 'import_expected', 't_export_confirm'])->where('te_carry_out_number', $request->w_no)->first();
+            }
+
         
             
             DB::commit();
@@ -69,6 +75,7 @@ class PackageController extends Controller
                 'package' => $package,
                 'package_get' => $package_get,
                 'member' => $member,
+                'export' => isset($export) ? $export : '',
             ]);
         } catch (\Exception $e) {
             DB::rollback();
