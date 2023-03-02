@@ -2968,86 +2968,82 @@ class ReceivingGoodsDeliveryController extends Controller
 
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
-            $package = $request->package;
-            //return $package;
-             if ($request->is_no){
-                if (isset($package)) {
-                    foreach ($package['location'] as $packages) {
-
-                            $rgd = ReceivingGoodsDelivery::updateOrCreate(
+            $data = $request->data;
+            $dataSubmit = $request->dataSubmit;
+            if($dataSubmit){
+                $rgd = ReceivingGoodsDelivery::updateOrCreate(
                                 
-                                [
-                                    'rgd_no' =>  isset($packages['rgd_no']) ? $packages['rgd_no'] : null,
-                                ],
-                                [
-                                    'is_no' =>  $request->is_no,
-                                    'mb_no' => $member->mb_no,
-                                    'service_korean_name' => '보세화물',
-                                    'rgd_contents' => $packages['rgd_contents'],
-                                    'rgd_address' => $packages['rgd_address'],
-                                    'rgd_address_detail' => $packages['rgd_address_detail'],
-                                    'rgd_receiver' => $packages['rgd_receiver'],
-                                    'rgd_hp' => $packages['rgd_hp'],
-                                    'rgd_memo' => $packages['rgd_memo'],
-                                    'rgd_status1' => $packages['rgd_status1'],
-                                    'rgd_status2' => $packages['rgd_status2'],
-                                    'rgd_status3' => $packages['rgd_status3'],
-                                    'rgd_status4' => isset($packages['rgd_status4']) ? $packages['rgd_status4'] : null,
-                                    'rgd_delivery_company' => $packages['rgd_delivery_company'],
-                                    'rgd_tracking_code' => $packages['rgd_tracking_code'],
-                                    'rgd_delivery_man' => $packages['rgd_delivery_man'],
-                                    'rgd_delivery_man_hp' => $packages['rgd_delivery_man_hp'],
-                                    'rgd_delivery_schedule_day' => $packages['rgd_delivery_schedule_day'] ? $packages['rgd_delivery_schedule_day'] : null,
-                                    'rgd_arrive_day' => $packages['rgd_arrive_day'] ? $packages['rgd_arrive_day'] : null,
+                    [
+                        'rgd_no' =>  isset($dataSubmit['rgd_no']) ? $dataSubmit['rgd_no'] : null,
+                    ],
+                    [
+                        'is_no' =>  $dataSubmit['is_no'],
+                        'mb_no' => $member->mb_no,
+                        'service_korean_name' => '보세화물',
+                        'rgd_contents' => $dataSubmit['rgd_contents'],
+                        'rgd_address' => $dataSubmit['rgd_address'],
+                        'rgd_address_detail' => $dataSubmit['rgd_address_detail'],
+                        'rgd_receiver' => $dataSubmit['rgd_receiver'],
+                        'rgd_hp' => $dataSubmit['rgd_hp'],
+                        'rgd_memo' => $dataSubmit['rgd_memo'],
+                        'rgd_status1' => $dataSubmit['rgd_status1'],
+                        'rgd_status2' => $dataSubmit['rgd_status2'],
+                        'rgd_status3' => $dataSubmit['rgd_status3'],
+                        'rgd_status4' => isset($dataSubmit['rgd_status4']) ? $dataSubmit['rgd_status4'] : null,
+                        'rgd_delivery_company' => $dataSubmit['rgd_delivery_company'],
+                        'rgd_tracking_code' => $dataSubmit['rgd_tracking_code'],
+                        'rgd_delivery_man' => $dataSubmit['rgd_delivery_man'],
+                        'rgd_delivery_man_hp' => $dataSubmit['rgd_delivery_man_hp'],
+                        'rgd_delivery_schedule_day' => $dataSubmit['rgd_delivery_schedule_day'] ? $dataSubmit['rgd_delivery_schedule_day'] : null,
+                        'rgd_arrive_day' => $dataSubmit['rgd_arrive_day'] ? $dataSubmit['rgd_arrive_day'] : null,
 
-                                ]
-                                
-                            );
-                            Package::updateOrCreate(
-                            [
-                                'p_no' =>  $packages['p_no']
-                            ],
-                            [
-                                'w_no' => $request->is_no,
-                                'rgd_no' => $rgd->rgd_no,
-                                'note' => $packages['note'],
-                                'order_number' => $packages['order_number'],
-                                'pack_type' => $packages['pack_type'],
-                                'quantity' => $packages['quantity'],
-                                'reciever' => $packages['reciever'],
-                                'reciever_address' => $packages['reciever_address'],
-                                'reciever_contract' => $packages['reciever_contract'],
-                                'reciever_detail_address' => $packages['reciever_detail_address'],
-                                'sender' => $packages['sender'],
-                                'sender_address' => $packages['sender_address'],
-                                'sender_contract' => $packages['sender_contract'],
-                                'sender_detail_address' => $packages['sender_detail_address']
+                    ]
+                    
+                );
+                Package::updateOrCreate(
+                [
+                    'p_no' =>  $dataSubmit['p_no']
+                ],
+                [
+                    'w_no' => $dataSubmit['is_no'],
+                    'rgd_no' => $rgd->rgd_no,
+                    'note' => $dataSubmit['note'],
+                    'order_number' => $dataSubmit['order_number'],
+                    'pack_type' => $dataSubmit['pack_type'],
+                    'quantity' => $dataSubmit['quantity'],
+                    'reciever' => $dataSubmit['reciever'],
+                    'reciever_address' => $dataSubmit['reciever_address'],
+                    'reciever_contract' => $dataSubmit['reciever_contract'],
+                    'reciever_detail_address' => $dataSubmit['reciever_detail_address'],
+                    'sender' => $dataSubmit['sender'],
+                    'sender_address' => $dataSubmit['sender_address'],
+                    'sender_contract' => $dataSubmit['sender_contract'],
+                    'sender_detail_address' => $dataSubmit['sender_detail_address']
 
-                            ]
-                            
-                            );
-                            
-            
-                    }
-                    
-               
-                    foreach ($request['remove'] as $remove) {
-                        ReceivingGoodsDelivery::where('rgd_no', $remove['rgd_no'])->delete();
-                        Package::where('rgd_no', $remove['rgd_no'])->delete();
-                    }
-                    
-                    
+                ]
+                
+                );
+            }
+            if(isset($data['remove'])){
+                foreach ($data['remove'] as $remove) {
+                    ReceivingGoodsDelivery::where('rgd_no', $remove['rgd_no'])->delete();
+                    Package::where('rgd_no', $remove['rgd_no'])->delete();
                 }
-
-           
-                    
-                }
+            }
+                // if ($request->is_no){
+                //     if (isset($package)) {
+                //         foreach ($package['location'] as $packages) {   
+                
+                //         }
+                        
+                //     }   
+                // }
             
 
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'w_no' => isset($w_no) ? $w_no :  $request->is_no,
+                'is_no' => isset($dataSubmit['is_no']) ? $dataSubmit['is_no'] :  null,
             ], 201);
         } catch (\Throwable $e) {
             DB::rollback();
