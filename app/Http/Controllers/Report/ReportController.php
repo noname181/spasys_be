@@ -331,7 +331,8 @@ class ReportController extends Controller
             $user = Auth::user();
            
             if($user->mb_type == 'shop'){
-                $reports = Report::with(['files', 'reports_child','warehousing','import_expect','import','member'])->whereHas('export.import_expected.company.co_parent',function ($q) use ($user){
+                $reports = Report::with(['files', 'reports_child','warehousing','import_expect','import','member'])->where(function($q) use($validated,$user) {
+                $q->whereHas('export.import_expected.company.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->orwhereHas('export.import_expected.company.co_parent',function ($q) use ($user){
                     $q->where('co_parent_no', $user->co_no);
@@ -343,25 +344,25 @@ class ReportController extends Controller
                     $q->where('co_no', $user->co_no);
                 })->orwhereHas('warehousing.co_no.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
+                });
                 })->orderBy('created_at', 'DESC')->orderBy('rp_parent_no', 'DESC');
             }else if($user->mb_type == 'shipper'){
-                $reports = Report::with(['files', 'reports_child','warehousing','import_expect','import','member'])->whereHas('export.import_expected.company.co_parent',function ($q) use ($user){
-                    $q->where('co_no', $user->co_no);
-                })->orwhereHas('export.import_expected.company.co_parent',function ($q) use ($user){
-                    $q->where('co_parent_no', $user->co_no);
-                })->orwhereHas('import_expect.company',function ($q) use ($user){
-                    $q->where('co_no', $user->co_no);
-                })->orwhereHas('import.import_expected.company',function ($q) use ($user){
-                    $q->where('co_no', $user->co_no);
-                })->orwhereHas('warehousing.co_no',function ($q) use ($user){
-                    $q->where('co_no', $user->co_no);
+                $reports = Report::with(['files', 'reports_child','warehousing','import_expect','import','member'])->where(function($q) use($validated,$user) {
+                    $q->whereHas('export.import_expected.company.co_parent',function ($q) use ($user){
+                        $q->where('co_no', $user->co_no);
+                    })->orwhereHas('export.import_expected.company.co_parent',function ($q) use ($user){
+                        $q->where('co_parent_no', $user->co_no);
+                    })->orwhereHas('import_expect.company',function ($q) use ($user){
+                        $q->where('co_no', $user->co_no);
+                    })->orwhereHas('import.import_expected.company',function ($q) use ($user){
+                        $q->where('co_no', $user->co_no);
+                    })->orwhereHas('warehousing.co_no',function ($q) use ($user){
+                        $q->where('co_no', $user->co_no);
+                    });
                 })->orderBy('created_at', 'DESC')->orderBy('rp_parent_no', 'DESC');
             }else if($user->mb_type == 'spasys'){
-                $reports = Report::with(['files', 'reports_child','warehousing','member','import_expect','import'])->whereHas('export.import_expected.company.co_parent',function ($q) use ($user){
-                    $q->where('co_no', $user->co_no);
-                })->orwhereHas('export.import_expected.company.co_parent',function ($q) use ($user){
-                    $q->where('co_parent_no', $user->co_no);
-                })->orwhereHas('import_expect.company.co_parent',function ($q) use ($user){
+                $reports = Report::with(['files', 'reports_child','warehousing','member','import_expect','import'])->where(function($q) use($validated,$user) {
+                $q->whereHas('import_expect.company.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->orwhereHas('import_expect.company_spasys',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
@@ -369,7 +370,7 @@ class ReportController extends Controller
                     $q->where('co_no', $user->co_no);
                 })->orwhereHas('warehousing.co_no.co_parent.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
-                })->orderBy('rp_parent_no', 'DESC');
+                });})->orderBy('rp_parent_no', 'DESC');
             }
 
             if (isset($validated['from_date'])) {
@@ -385,13 +386,25 @@ class ReportController extends Controller
 
             }
             if (isset($validated['co_parent_name'])) {
-                $reports->whereHas('warehousing.co_no.co_parent',function($query) use ($validated) {
-                    $query->where(DB::raw('lower(co_name)'), 'like','%'. strtolower($validated['co_parent_name']) .'%');
+                $reports->where(function($q) use($validated) {
+                    $q->whereHas('warehousing.co_no.co_parent',function($q2) use ($validated) {
+                        $q2->where(DB::raw('lower(co_name)'), 'like','%'. strtolower($validated['co_parent_name']) .'%');
+                    })->orwhereHas('import_expect.company.co_parent', function($q3) use($validated) {
+                        return $q3->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                    })->orwhereHas('import_expect.company_spasys', function($q4) use($validated) {
+                        return $q4->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                    });
                 });
             }
             if (isset($validated['co_name'])) {
-                $reports->whereHas('warehousing.co_no', function($q) use($validated) {
-                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                $reports->where(function($q) use($validated) {
+                    $q->whereHas('warehousing.co_no', function($q2) use($validated) {
+                        return $q2->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    })->orwhereHas('import_expect.company', function($q3) use($validated) {
+                        return $q3->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    })->orwhereHas('import_expect.company_spasys', function($q4) use($validated) {
+                        return $q4->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    });
                 });
             }
             if (isset($validated['w_schedule_number'])) {
@@ -423,9 +436,22 @@ class ReportController extends Controller
             }
 
             if (isset($validated['service_name'])) {
-                $reports->whereHas('warehousing', function($q) use($validated) {
-                    return $q->where('w_category_name', '=', $validated['service_name']);
-                });
+               
+                if($validated['service_name'] == '보세화물'){
+                    $reports->where(function($q) use($validated) {
+                        $q->whereHas('warehousing', function($q2) use($validated) {
+                            return $q2->where('w_category_name', '=', $validated['service_name']);
+                        })->orwhereHas('import_expect', function($q3) use($validated) {
+                            return $q3->where('tie_h_bl', '!=', '')->orWhereNotNull('tie_h_bl');
+                        });
+                    });
+                } else {
+                    $reports->where(function($q) use($validated) {
+                        $q->whereHas('warehousing', function($q2) use($validated) {
+                            return $q2->where('w_category_name', '=', $validated['service_name']);
+                        });
+                    });
+                }
             }
 
             $reports = $reports->paginate($per_page, ['*'], 'page', $page);
