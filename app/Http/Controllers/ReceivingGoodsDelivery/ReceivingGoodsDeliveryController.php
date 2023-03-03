@@ -14,6 +14,7 @@ use App\Models\WarehousingSettlement;
 use App\Models\AdjustmentGroup;
 use App\Models\Package;
 use App\Models\ItemChannel;
+use App\Models\Company;
 use App\Models\TaxInvoiceDivide;
 use App\Models\CancelBillHistory;
 //use App\Models\CargoConnect;
@@ -2525,13 +2526,15 @@ class ReceivingGoodsDeliveryController extends Controller
     public function update_status5(Request $request)
     {
         try {
+            $user = Auth::user();
             if ($request->bill_type == 'case') {
-                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+                $rgd = ReceivingGoodsDelivery::with(['rate_data_general'])->where('rgd_no', $request->rgd_no)->first();
 
                 $rate_data_general = RateDataGeneral::where('rgd_no', $request->rgd_no)->first();
 
                 if (isset($rate_data_general->ag_no)) {
                     $ag = AdjustmentGroup::where('ag_no', $rate_data_general->ag_no)->first();
+                    $company = Company::where('co_no', $ag->co_no)->first();
 
                     ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                         'rgd_status5' => 'confirmed',
@@ -2539,6 +2542,33 @@ class ReceivingGoodsDeliveryController extends Controller
                         'rgd_status7' => $ag->ag_auto_issue == 'y' ? 'taxed' : NULL,
                         'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
                     ]);
+
+                    if($ag->ag_auto_issue == 'y'){
+                        $tax_number = CommonFunc::generate_tax_number($rgd->rgd_no);
+
+                        TaxInvoiceDivide::updateOrCreate(
+                            [
+                                'rgd_no' => $rgd->rgd_no,
+                            ],
+                            [
+                                'tid_supply_price' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
+                                'tid_vat' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
+                                'tid_sum' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
+                                'mb_no' => $user->mb_no,
+                                'co_license'  => $company->co_license,
+                                'co_owner'  => $company->co_owner,
+                                'co_name'  => $company->co_name,
+                                'co_major'  => $company->co_major,
+                                'co_address'  => $ag->ag_email,
+                                'co_address2'  => $ag->ag_email2,
+                                'rgd_number' => $tax_number,
+                            ]
+                        );
+                    }
+
+                    
+
+                    
                 } else {
                     ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                         'rgd_status5' => 'confirmed',
@@ -2556,6 +2586,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                     if (isset($rate_data_general->ag_no)) {
                         $ag = AdjustmentGroup::where('ag_no', $rate_data_general->ag_no)->first();
+                        $company = Company::where('co_no', $ag->co_no)->first();
 
                         ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                             'rgd_status5' => 'confirmed',
@@ -2563,6 +2594,30 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_status7' => $ag->ag_auto_issue == 'y' ? 'taxed' : NULL,
                             'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
                         ]);
+
+                        if($ag->ag_auto_issue == 'y'){
+                            $tax_number = CommonFunc::generate_tax_number($rgd->rgd_no);
+    
+                            TaxInvoiceDivide::updateOrCreate(
+                                [
+                                    'rgd_no' => $rgd->rgd_no,
+                                ],
+                                [
+                                    'tid_supply_price' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
+                                    'tid_vat' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
+                                    'tid_sum' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
+                                    'mb_no' => $user->mb_no,
+                                    'co_license'  => $company->co_license,
+                                    'co_owner'  => $company->co_owner,
+                                    'co_name'  => $company->co_name,
+                                    'co_major'  => $company->co_major,
+                                    'co_address'  => $ag->ag_email,
+                                    'co_address2'  => $ag->ag_email2,
+                                    'rgd_number' => $tax_number,
+                                ]
+                            );
+                        }
+                        
                     } else {
                         ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                             'rgd_status5' => 'confirmed',
@@ -2579,6 +2634,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                     if (isset($rate_data_general->ag_no)) {
                         $ag = AdjustmentGroup::where('ag_no', $rate_data_general->ag_no)->first();
+                        $company = Company::where('co_no', $ag->co_no)->first();
 
                         ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                             'rgd_status5' => 'confirmed',
@@ -2586,6 +2642,30 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_status7' => $ag->ag_auto_issue == 'y' ? 'taxed' : NULL,
                             'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
                         ]);
+
+                        if($ag->ag_auto_issue == 'y'){
+                            $tax_number = CommonFunc::generate_tax_number($rgd->rgd_no);
+    
+                            TaxInvoiceDivide::updateOrCreate(
+                                [
+                                    'rgd_no' => $rgd->rgd_no,
+                                ],
+                                [
+                                    'tid_supply_price' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
+                                    'tid_vat' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
+                                    'tid_sum' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
+                                    'mb_no' => $user->mb_no,
+                                    'co_license'  => $company->co_license,
+                                    'co_owner'  => $company->co_owner,
+                                    'co_name'  => $company->co_name,
+                                    'co_major'  => $company->co_major,
+                                    'co_address'  => $ag->ag_email,
+                                    'co_address2'  => $ag->ag_email2,
+                                    'rgd_number' => $tax_number,
+                                ]
+                            );
+                        }
+
                     } else {
                         ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                             'rgd_status5' => 'confirmed',
