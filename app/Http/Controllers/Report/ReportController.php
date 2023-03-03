@@ -357,7 +357,7 @@ class ReportController extends Controller
                     $q->where('co_no', $user->co_no);
                 })->orderBy('created_at', 'DESC')->orderBy('rp_parent_no', 'DESC');
             }else if($user->mb_type == 'spasys'){
-                $reports = Report::with(['files', 'reports_child','warehousing','warehousing_by_te','warehousing_by_ti','warehousing_by_tie','member','import_expect','import'])->whereHas('export.import_expected.company.co_parent',function ($q) use ($user){
+                $reports = Report::with(['files', 'reports_child','warehousing','member','import_expect','import'])->whereHas('export.import_expected.company.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->orwhereHas('export.import_expected.company.co_parent',function ($q) use ($user){
                     $q->where('co_parent_no', $user->co_no);

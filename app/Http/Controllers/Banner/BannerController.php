@@ -1368,18 +1368,18 @@ class BannerController extends Controller
             $chartcountb[(int)$key] = count($value);
         }
 
-        foreach ($countb as $key => $value) {
+        foreach ($countd as $key => $value) {
             $chartcountd[(int)$key] = count($value);
         }
 
         for ($i = 1; $i <= 12; $i++) {
-            if (!empty($usermcount[$i])) {
+            if (!empty($chartcountb[$i])) {
                 $userArrb[$i] = $chartcountb[$i];
             } else {
                 $userArrb[$i] = 0;
             }
 
-            if (!empty($usermcount[$i])) {
+            if (!empty($chartcountd[$i])) {
                 $userArrd[$i] = $chartcountd[$i];
             } else {
                 $userArrd[$i] = 0;
@@ -1395,6 +1395,7 @@ class BannerController extends Controller
 
     public function CaculateChartService2(Request $request)
     {
+        
     }
 
     public function CaculateChartService3(Request $request)
