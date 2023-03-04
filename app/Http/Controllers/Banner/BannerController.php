@@ -1439,9 +1439,9 @@ class BannerController extends Controller
             })->whereNotNull('stock')->groupby('product_id')->groupby('option_id')->orderBy('product_id', 'DESC');
 
 
-            $warehousingd = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
-                $q->where('co_no', $user->co_no);
-            });
+            // $warehousingd = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
+            //     $q->where('co_no', $user->co_no);
+            // });
         } else if ($user->mb_type == 'shipper') {
             $warehousing2 = Warehousing::join(
                 DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
@@ -1476,9 +1476,9 @@ class BannerController extends Controller
             })->whereNotNull('stock')->groupby('product_id')->groupby('option_id')->orderBy('product_id', 'DESC');
 
 
-            $warehousingd = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고')->whereHas('ContractWms.company', function ($q) use ($user) {
-                $q->where('co_no', $user->co_no);
-            });
+            // $warehousingd = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고')->whereHas('ContractWms.company', function ($q) use ($user) {
+            //     $q->where('co_no', $user->co_no);
+            // });
         } else if ($user->mb_type == 'spasys') {
 
             $warehousing2 = Warehousing::join(
@@ -1516,9 +1516,9 @@ class BannerController extends Controller
 
 
 
-            $warehousingd = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
-                $q->where('co_no', $user->co_no);
-            });
+            // $warehousingd = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
+            //     $q->where('co_no', $user->co_no);
+            // });
         }
         $counta = [];
         $countb = [];
@@ -1535,17 +1535,17 @@ class BannerController extends Controller
                 return Carbon::parse($date->created_at)->format('m'); // grouping by months
             });
 
-            $countd = $warehousingd->whereYear('created_at', Carbon::now()->year)->get()->groupBy(function ($date) {
-                //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
-                return Carbon::parse($date->created_at)->format('m'); // grouping by months
-            });;
+            // $countd = $warehousingd->whereYear('created_at', Carbon::now()->year)->get()->groupBy(function ($date) {
+            //     //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
+            //     return Carbon::parse($date->created_at)->format('m'); // grouping by months
+            // });
         }
         $chartcounta = [];
         $chartcountb = [];
         $chartcountd = [];
         $userArra = [];
         $userArrb = [];
-        $userArrd = [];
+        //$userArrd = [];
 
         $userArra['label'] = '반입';
         $userArra['borderColor'] = '#F7C35D';
@@ -1555,9 +1555,9 @@ class BannerController extends Controller
         $userArrb['borderColor'] = '#0493FF';
         $userArrb['backgroundColor'] = '#0493FF';
 
-        $userArrd['label'] = '보관';
-        $userArrd['borderColor'] = '#1EB28C';
-        $userArrd['backgroundColor'] = '#1EB28C';
+        // $userArrd['label'] = '보관';
+        // $userArrd['borderColor'] = '#1EB28C';
+        // $userArrd['backgroundColor'] = '#1EB28C';
 
         foreach ($counta as $key => $value) {
             $chartcounta[(int)$key] = count($value);
@@ -1567,9 +1567,9 @@ class BannerController extends Controller
             $chartcountb[(int)$key] = count($value);
         }
 
-        foreach ($countd as $key => $value) {
-            $chartcountd[(int)$key] = count($value);
-        }
+        // foreach ($countd as $key => $value) {
+        //     $chartcountd[(int)$key] = count($value);
+        // }
 
         for ($i = 1; $i <= 12; $i++) {
             if (!empty($chartcounta[$i])) {
@@ -1584,15 +1584,15 @@ class BannerController extends Controller
                 $userArrb['data'][] = 0;
             }
 
-            if (!empty($chartcountd[$i])) {
-                $userArrd['data'][] = $chartcountd[$i];
-            } else {
-                $userArrd['data'][] = 0;
-            }
+            // if (!empty($chartcountd[$i])) {
+            //     $userArrd['data'][] = $chartcountd[$i];
+            // } else {
+            //     $userArrd['data'][] = 0;
+            // }
         }
 
         return [
-            'counta' => $userArra, 'countb' => $userArrb, 'countc' => $userArrd
+            'counta' => $userArra, 'countb' => $userArrb, //'countc' => $userArrd
         ];
 
         DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
@@ -1633,11 +1633,11 @@ class BannerController extends Controller
             });
 
 
-            $warehousingg = ReceivingGoodsDelivery::with(['warehousing'])->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
-                $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('rgd_status2', '=', '작업완료')->where('w_category_name', '=', '유통가공')->whereHas('co_no.co_parent', function ($q) use ($user) {
-                    $q->where('co_no', $user->co_no);
-                });
-            });
+            // $warehousingg = ReceivingGoodsDelivery::with(['warehousing'])->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
+            //     $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('rgd_status2', '=', '작업완료')->where('w_category_name', '=', '유통가공')->whereHas('co_no.co_parent', function ($q) use ($user) {
+            //         $q->where('co_no', $user->co_no);
+            //     });
+            // });
         } else if ($user->mb_type == 'shipper') {
             $warehousinga = ReceivingGoodsDelivery::with(['w_no'])->whereNull('rgd_parent_no')->whereHas('w_no', function ($query) use ($user) {
                 $query->where('w_type', '=', 'IW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
@@ -1672,11 +1672,11 @@ class BannerController extends Controller
 
 
 
-            $warehousingg = ReceivingGoodsDelivery::with(['warehousing'])->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
-                $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('rgd_status2', '=', '작업완료')->where('w_category_name', '=', '유통가공')->whereHas('co_no', function ($q) use ($user) {
-                    $q->where('co_no', $user->co_no);
-                });
-            });
+            // $warehousingg = ReceivingGoodsDelivery::with(['warehousing'])->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
+            //     $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('rgd_status2', '=', '작업완료')->where('w_category_name', '=', '유통가공')->whereHas('co_no', function ($q) use ($user) {
+            //         $q->where('co_no', $user->co_no);
+            //     });
+            // });
         } else if ($user->mb_type == 'spasys') {
 
 
@@ -1703,17 +1703,17 @@ class BannerController extends Controller
             });
 
 
-            $warehousingg = ReceivingGoodsDelivery::with(['warehousing'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
-                $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('rgd_status2', '=', '작업완료')->where('w_category_name', '=', '유통가공')->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
-                    $q->where('co_no', $user->co_no);
-                });
-            });
+            // $warehousingg = ReceivingGoodsDelivery::with(['warehousing'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
+            //     $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('rgd_status2', '=', '작업완료')->where('w_category_name', '=', '유통가공')->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
+            //         $q->where('co_no', $user->co_no);
+            //     });
+            // });
         }
 
        
         $countb = [];
         $countd = [];
-        $countg = [];
+        //$countg = [];
 
         for ($i = 1; $i <= 12; $i++) {
             $countb = $warehousingb->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereYear('warehousing.w_completed_day', Carbon::now()->year)->get()->groupBy(function ($date) {
@@ -1726,10 +1726,10 @@ class BannerController extends Controller
                 return Carbon::parse($date->created_at)->format('m'); // grouping by months
             });
 
-            $countg = $warehousingg->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereYear('warehousing.w_completed_day', Carbon::now()->year)->get()->groupBy(function ($date) {
-                //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
-                return Carbon::parse($date->created_at)->format('m'); // grouping by months
-            });
+            // $countg = $warehousingg->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereYear('warehousing.w_completed_day', Carbon::now()->year)->get()->groupBy(function ($date) {
+            //     //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
+            //     return Carbon::parse($date->created_at)->format('m'); // grouping by months
+            // });
         }
         
         $chartcountb = [];
@@ -1748,9 +1748,9 @@ class BannerController extends Controller
         $userArrd['borderColor'] = '#0493FF';
         $userArrd['backgroundColor'] = '#0493FF';
 
-        $userArrg['label'] = '보관';
-        $userArrg['borderColor'] = '#1EB28C';
-        $userArrg['backgroundColor'] = '#1EB28C';
+        // $userArrg['label'] = '보관';
+        // $userArrg['borderColor'] = '#1EB28C';
+        // $userArrg['backgroundColor'] = '#1EB28C';
 
     
         foreach ($countb as $key => $value) {
@@ -1761,9 +1761,9 @@ class BannerController extends Controller
             $chartcountd[(int)$key] = count($value);
         }
 
-        foreach ($countg as $key => $value) {
-            $chartcountg[(int)$key] = count($value);
-        }
+        // foreach ($countg as $key => $value) {
+        //     $chartcountg[(int)$key] = count($value);
+        // }
 
         for ($i = 1; $i <= 12; $i++) {
             
@@ -1779,15 +1779,15 @@ class BannerController extends Controller
                 $userArrd['data'][] = 0;
             }
 
-            if (!empty($chartcountg[$i])) {
-                $userArrg['data'][] = $chartcountg[$i];
-            } else {
-                $userArrg['data'][] = 0;
-            }
+            // if (!empty($chartcountg[$i])) {
+            //     $userArrg['data'][] = $chartcountg[$i];
+            // } else {
+            //     $userArrg['data'][] = 0;
+            // }
         }
 
         return [
-           'counta' => $userArrb, 'countb' => $userArrd, 'countc' => $userArrg 
+           'counta' => $userArrb, 'countb' => $userArrd, //'countc' => $userArrg 
         ];
     }
 
