@@ -1348,7 +1348,7 @@ class BannerController extends Controller
         $countb = [];
         $countd = [];
         for ($i = 1; $i <= 12; $i++) {
-            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereYear('tie_is_date', Carbon::now()->year)->whereNull('ddd.te_logistic_manage_number')->get()->groupBy(function ($date) {
+            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->whereYear('tie_is_date', Carbon::now()->year)->get()->groupBy(function ($date) {
                 //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
                 return Carbon::parse($date->tie_is_date)->format('m'); // grouping by months
             });
@@ -1364,6 +1364,14 @@ class BannerController extends Controller
         $userArrb = [];
         $userArrd = [];
 
+        $userArrb['label'] = '반입';
+        $userArrb['borderColor'] = '#F7C35D';
+        $userArrb['backgroundColor'] = '#F7C35D';
+
+        $userArrd['label'] = '반출';
+        $userArrd['borderColor'] = '#0493FF';
+        $userArrd['backgroundColor'] = '#0493FF';
+
         foreach ($countb as $key => $value) {
             $chartcountb[(int)$key] = count($value);
         }
@@ -1374,20 +1382,20 @@ class BannerController extends Controller
 
         for ($i = 1; $i <= 12; $i++) {
             if (!empty($chartcountb[$i])) {
-                $userArrb[$i] = $chartcountb[$i];
+                $userArrb['data'][] = $chartcountb[$i];
             } else {
-                $userArrb[$i] = 0;
+                $userArrb['data'][] = 0;
             }
 
             if (!empty($chartcountd[$i])) {
-                $userArrd[$i] = $chartcountd[$i];
+                 $userArrd['data'][] = $chartcountd[$i];
             } else {
-                $userArrd[$i] = 0;
+                 $userArrd['data'][] = 0;
             }
         }
 
         return [
-            'countb' => $userArrb, 'countd' => $userArrd
+            'counta' => $userArrb, 'countb' => $userArrd
         ];
 
         DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
@@ -1395,11 +1403,392 @@ class BannerController extends Controller
 
     public function CaculateChartService2(Request $request)
     {
-        
+        $user = Auth::user();
+        DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+        if ($user->mb_type == 'shop') {
+            $warehousing2 = Warehousing::join(
+                DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
+                'm.w_no',
+                '=',
+                'warehousing.w_no'
+            )->where('warehousing.w_type', '=', 'EW')->where('w_category_name', '=', '수입풀필먼트')->whereHas('co_no.co_parent', function ($q) use ($user) {
+                $q->where('co_no', $user->co_no);
+            })->get();
+            $w_import_no = collect($warehousing2)->map(function ($q) {
+
+                return $q->w_import_no;
+            });
+            $w_no_in = collect($warehousing2)->map(function ($q) {
+
+                return $q->w_no;
+            });
+            $warehousinga = Warehousing::with('mb_no')
+                ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')->where('w_category_name', '=', '수입풀필먼트')
+                ->whereHas('co_no.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+
+            $warehousingb = StockStatusBad::with(['item_status_bad'])->whereHas('item_status_bad', function ($q) use ($user) {
+                //    $q->where('item_service_name', '=', '수입풀필먼트');
+                //    $q->whereHas('item_info', function ($e) {
+                //             $e->whereNotNull('stock');
+                //     });
+                $q->whereHas('ContractWms.company.co_parent', function ($k) use ($user) {
+                    $k->where('co_no', $user->co_no);
+                });
+            })->whereNotNull('stock')->groupby('product_id')->groupby('option_id')->orderBy('product_id', 'DESC');
+
+
+            $warehousingd = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
+                $q->where('co_no', $user->co_no);
+            });
+        } else if ($user->mb_type == 'shipper') {
+            $warehousing2 = Warehousing::join(
+                DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
+                'm.w_no',
+                '=',
+                'warehousing.w_no'
+            )->where('warehousing.w_type', '=', 'EW')->where('w_category_name', '=', '수입풀필먼트')->whereHas('co_no', function ($q) use ($user) {
+                $q->where('co_no', $user->co_no);
+            })->get();
+            $w_import_no = collect($warehousing2)->map(function ($q) {
+
+                return $q->w_import_no;
+            });
+            $w_no_in = collect($warehousing2)->map(function ($q) {
+
+                return $q->w_no;
+            });
+            $warehousinga = Warehousing::with('mb_no')
+                ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')->where('w_category_name', '=', '수입풀필먼트')
+                ->whereHas('co_no', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+
+            $warehousingb = StockStatusBad::with(['item_status_bad'])->whereHas('item_status_bad', function ($q) use ($user) {
+                //    $q->where('item_service_name', '=', '수입풀필먼트');
+                //    $q->whereHas('item_info', function ($e) {
+                //             $e->whereNotNull('stock');
+                //     });
+                $q->whereHas('ContractWms.company', function ($k) use ($user) {
+                    $k->where('co_no', $user->co_no);
+                });
+            })->whereNotNull('stock')->groupby('product_id')->groupby('option_id')->orderBy('product_id', 'DESC');
+
+
+            $warehousingd = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고')->whereHas('ContractWms.company', function ($q) use ($user) {
+                $q->where('co_no', $user->co_no);
+            });
+        } else if ($user->mb_type == 'spasys') {
+
+            $warehousing2 = Warehousing::join(
+                DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
+                'm.w_no',
+                '=',
+                'warehousing.w_no'
+            )->where('warehousing.w_type', '=', 'EW')->where('w_category_name', '=', '수입풀필먼트')->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
+                $q->where('co_no', $user->co_no);
+            })->get();
+            $w_import_no = collect($warehousing2)->map(function ($q) {
+
+                return $q->w_import_no;
+            });
+            $w_no_in = collect($warehousing2)->map(function ($q) {
+
+                return $q->w_no;
+            });
+
+            $warehousinga = Warehousing::with('mb_no')
+                ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent', 'warehousing_child', 'rate_data_general'])->where('w_category_name', '=', '수입풀필먼트')->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')
+                ->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+
+            $warehousingb = StockStatusBad::with(['item_status_bad'])->whereHas('item_status_bad', function ($q) use ($user) {
+                //    $q->where('item_service_name', '=', '수입풀필먼트');
+                //    $q->whereHas('item_info', function ($e) {
+                //             $e->whereNotNull('stock');
+                //     });
+                $q->whereHas('ContractWms.company.co_parent.co_parent', function ($k) use ($user) {
+                    $k->where('co_no', $user->co_no);
+                });
+            })->whereNotNull('stock')->groupby('product_id')->groupby('option_id');
+
+
+
+            $warehousingd = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
+                $q->where('co_no', $user->co_no);
+            });
+        }
+        $counta = [];
+        $countb = [];
+        $countd = [];
+
+        for ($i = 1; $i <= 12; $i++) {
+            $counta = $warehousinga->whereYear('created_at', Carbon::now()->year)->get()->groupBy(function ($date) {
+                //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
+                return Carbon::parse($date->created_at)->format('m'); // grouping by months
+            });
+
+            $countb = $warehousingb->whereYear('created_at', Carbon::now()->year)->get()->groupBy(function ($date) {
+                //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
+                return Carbon::parse($date->created_at)->format('m'); // grouping by months
+            });
+
+            $countd = $warehousingd->whereYear('created_at', Carbon::now()->year)->get()->groupBy(function ($date) {
+                //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
+                return Carbon::parse($date->created_at)->format('m'); // grouping by months
+            });;
+        }
+        $chartcounta = [];
+        $chartcountb = [];
+        $chartcountd = [];
+        $userArra = [];
+        $userArrb = [];
+        $userArrd = [];
+
+        $userArra['label'] = '반입';
+        $userArra['borderColor'] = '#F7C35D';
+        $userArra['backgroundColor'] = '#F7C35D';
+
+        $userArrb['label'] = '반출';
+        $userArrb['borderColor'] = '#0493FF';
+        $userArrb['backgroundColor'] = '#0493FF';
+
+        $userArrd['label'] = '보관';
+        $userArrd['borderColor'] = '#1EB28C';
+        $userArrd['backgroundColor'] = '#1EB28C';
+
+        foreach ($counta as $key => $value) {
+            $chartcounta[(int)$key] = count($value);
+        }
+
+        foreach ($countb as $key => $value) {
+            $chartcountb[(int)$key] = count($value);
+        }
+
+        foreach ($countd as $key => $value) {
+            $chartcountd[(int)$key] = count($value);
+        }
+
+        for ($i = 1; $i <= 12; $i++) {
+            if (!empty($chartcounta[$i])) {
+                $userArra['data'][] = $chartcounta[$i];
+            } else {
+                $userArra['data'][] = 0;
+            }
+
+            if (!empty($chartcountb[$i])) {
+                $userArrb['data'][] = $chartcountb[$i];
+            } else {
+                $userArrb['data'][] = 0;
+            }
+
+            if (!empty($chartcountd[$i])) {
+                $userArrd['data'][] = $chartcountd[$i];
+            } else {
+                $userArrd['data'][] = 0;
+            }
+        }
+
+        return [
+            'counta' => $userArra, 'countb' => $userArrb, 'countc' => $userArrd
+        ];
+
+        DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
     }
 
     public function CaculateChartService3(Request $request)
     {
+        $user = Auth::user();
+        if ($user->mb_type == 'shop') {
+            $warehousinga = ReceivingGoodsDelivery::with(['w_no'])->whereNull('rgd_parent_no')->whereHas('w_no', function ($query) use ($user) {
+                $query->where('w_type', '=', 'IW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
+                    $q->where('rgd_status1', '!=', '입고')->orWhereNull('rgd_status1');
+                })->whereHas('co_no.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+            });
+
+            $warehousingb = ReceivingGoodsDelivery::with(['w_no'])->whereNull('rgd_parent_no')->whereHas('w_no', function ($query) use ($user) {
+                $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('w_category_name', '=', '유통가공')->whereHas('co_no.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+            });
+
+
+            $warehousingd = ReceivingGoodsDelivery::with(['warehousing'])->with(['mb_no'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
+                $query->where('w_type', '=', 'EW')
+                    ->where('rgd_status1', '=', '출고')
+                    ->where('rgd_status2', '=', '작업완료')
+
+                    ->where(function ($q) {
+                        $q->where(function ($query) {
+                            $query->where('rgd_status4', '!=', '예상경비청구서')->where('rgd_status4', '!=', '확정청구서');
+                        })
+                            ->orWhereNull('rgd_status4');
+                    })->whereHas('co_no.co_parent', function ($q2) use ($user) {
+                        $q2->where('co_no', $user->co_no);
+                    });
+            });
+
+
+            $warehousingg = ReceivingGoodsDelivery::with(['warehousing'])->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
+                $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('rgd_status2', '=', '작업완료')->where('w_category_name', '=', '유통가공')->whereHas('co_no.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+            });
+        } else if ($user->mb_type == 'shipper') {
+            $warehousinga = ReceivingGoodsDelivery::with(['w_no'])->whereNull('rgd_parent_no')->whereHas('w_no', function ($query) use ($user) {
+                $query->where('w_type', '=', 'IW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
+                    $q->where('rgd_status1', '!=', '입고')->orWhereNull('rgd_status1');
+                })->whereHas('co_no', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+            });
+
+            $warehousingb = ReceivingGoodsDelivery::with(['warehousing'])->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
+                $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('w_category_name', '=', '유통가공')->whereHas('co_no', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+            });
+
+
+
+            $warehousingd = ReceivingGoodsDelivery::with(['warehousing'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
+                $query->where('w_type', '=', 'EW')
+                    ->where('rgd_status1', '=', '출고')
+                    ->where('rgd_status2', '=', '작업완료')
+
+                    ->where(function ($q) {
+                        $q->where(function ($query) {
+                            $query->where('rgd_status4', '!=', '예상경비청구서')->where('rgd_status4', '!=', '확정청구서');
+                        })
+                            ->orWhereNull('rgd_status4');
+                    })->whereHas('co_no', function ($q2) use ($user) {
+                        $q2->where('co_no', $user->co_no);
+                    });
+            });
+
+
+
+            $warehousingg = ReceivingGoodsDelivery::with(['warehousing'])->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
+                $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('rgd_status2', '=', '작업완료')->where('w_category_name', '=', '유통가공')->whereHas('co_no', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+            });
+        } else if ($user->mb_type == 'spasys') {
+
+
+            $warehousingb = ReceivingGoodsDelivery::with(['warehousing'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
+                $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('w_category_name', '=', '유통가공')->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+            });
+
+
+            $warehousingd = ReceivingGoodsDelivery::with(['warehousing'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
+                $query->where('w_type', '=', 'EW')
+                    ->where('rgd_status1', '=', '출고')
+                    ->where('rgd_status2', '=', '작업완료')
+                    ->where('w_category_name', '=', '유통가공')
+                    ->where(function ($q) {
+                        $q->where(function ($query) {
+                            $query->where('rgd_status4', '!=', '예상경비청구서')->where('rgd_status4', '!=', '확정청구서');
+                        })
+                            ->orWhereNull('rgd_status4');
+                    })->whereHas('co_no.co_parent.co_parent', function ($q2) use ($user) {
+                        $q2->where('co_no', $user->co_no);
+                    });
+            });
+
+
+            $warehousingg = ReceivingGoodsDelivery::with(['warehousing'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
+                $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('rgd_status2', '=', '작업완료')->where('w_category_name', '=', '유통가공')->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+            });
+        }
+
+       
+        $countb = [];
+        $countd = [];
+        $countg = [];
+
+        for ($i = 1; $i <= 12; $i++) {
+            $countb = $warehousingb->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereYear('warehousing.w_completed_day', Carbon::now()->year)->get()->groupBy(function ($date) {
+                //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
+                return Carbon::parse($date->created_at)->format('m'); // grouping by months
+            });
+
+            $countd = $warehousingd->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereYear('warehousing.w_completed_day', Carbon::now()->year)->get()->groupBy(function ($date) {
+                //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
+                return Carbon::parse($date->created_at)->format('m'); // grouping by months
+            });
+
+            $countg = $warehousingg->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereYear('warehousing.w_completed_day', Carbon::now()->year)->get()->groupBy(function ($date) {
+                //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
+                return Carbon::parse($date->created_at)->format('m'); // grouping by months
+            });
+        }
+        
+        $chartcountb = [];
+        $chartcountd = [];
+        $chartcountg = [];
+       
+        $userArrb = [];
+        $userArrd = [];
+        $userArrg = [];
+        
+        $userArrb['label'] = '반입';
+        $userArrb['borderColor'] = '#F7C35D';
+        $userArrb['backgroundColor'] = '#F7C35D';
+
+        $userArrd['label'] = '반출';
+        $userArrd['borderColor'] = '#0493FF';
+        $userArrd['backgroundColor'] = '#0493FF';
+
+        $userArrg['label'] = '보관';
+        $userArrg['borderColor'] = '#1EB28C';
+        $userArrg['backgroundColor'] = '#1EB28C';
+
+    
+        foreach ($countb as $key => $value) {
+            $chartcountb[(int)$key] = count($value);
+        }
+
+        foreach ($countd as $key => $value) {
+            $chartcountd[(int)$key] = count($value);
+        }
+
+        foreach ($countg as $key => $value) {
+            $chartcountg[(int)$key] = count($value);
+        }
+
+        for ($i = 1; $i <= 12; $i++) {
+            
+            if (!empty($chartcountb[$i])) {
+                $userArrb['data'][] = $chartcountb[$i];
+            } else {
+                $userArrb['data'][] = 0;
+            }
+
+            if (!empty($chartcountd[$i])) {
+                $userArrd['data'][] = $chartcountd[$i];
+            } else {
+                $userArrd['data'][] = 0;
+            }
+
+            if (!empty($chartcountg[$i])) {
+                $userArrg['data'][] = $chartcountg[$i];
+            } else {
+                $userArrg['data'][] = 0;
+            }
+        }
+
+        return [
+           'counta' => $userArrb, 'countb' => $userArrd, 'countc' => $userArrg 
+        ];
     }
 
     public function banner_loadchart(Request $request)
@@ -1414,15 +1803,15 @@ class BannerController extends Controller
             $total3 = [];
 
             $check = "";
-            if ($request->service == "유통가공" || $request->type == "time3") {
+            if ($request->servicechart == "유통가공") {
                 $total3 =  $this->CaculateChartService3($request);
-            } elseif ($request->service == "수입풀필먼트" || $request->type == "time2") {
+            } elseif ($request->servicechart == "수입풀필먼트") {
                 $total2 =  $this->CaculateChartService2($request);
-            } elseif ($request->service == "보세화물" || $request->type == "time1") {
+            } elseif ($request->servicechart == "보세화물") {
                 $total1 =  $this->CaculateChartService1($request);
             } else {
-                $total1 =  $this->CaculateChartService1($request);
-                $total2 =  $this->CaculateChartService2($request);
+                //$total1 =  $this->CaculateChartService1($request);
+                //$total2 =  $this->CaculateChartService2($request);
                 $total3 =  $this->CaculateChartService3($request);
             }
 
