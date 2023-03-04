@@ -49,8 +49,8 @@ class ItemRequest extends BaseFormRequest
                 'max:255',
             ],
             'item_option2' => [
-                'required',
                 'string',
+                'nullable',
                 'max:255',
             ],
             'item_cargo_bar_code' => [
