@@ -1448,7 +1448,7 @@ class WarehousingController extends Controller
                 if ($user->mb_type == 'shop') {
                     $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereNull('rgd_parent_no')->whereHas('w_no', function ($query) use ($user) {
                         $query->where('w_type', '=', 'EW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
-                            $q->where('rgd_status1', '=', '출고')->where('rgd_status3', '!=', '배송완료')->orWhereNull('rgd_status1');
+                            $q->where('rgd_status1', '=', '출고')->orWhereNull('rgd_status1');
                         })->whereHas('co_no.co_parent', function ($q) use ($user) {
                             $q->where('co_no', $user->co_no);
                         });
@@ -1456,7 +1456,7 @@ class WarehousingController extends Controller
                 } else if ($user->mb_type == 'shipper') {
                     $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereNull('rgd_parent_no')->whereHas('w_no', function ($query) use ($user) {
                         $query->where('w_type', '=', 'EW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
-                            $q->where('rgd_status1', '=', '출고')->where('rgd_status3', '!=', '배송완료')->orWhereNull('rgd_status1');
+                            $q->where('rgd_status1', '=', '출고')->orWhereNull('rgd_status1');
                         })->whereHas('co_no', function ($q) use ($user) {
                             $q->where('co_no', $user->co_no);
                         });
@@ -1464,7 +1464,7 @@ class WarehousingController extends Controller
                 } else if ($user->mb_type == 'spasys') {
                     $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereNull('rgd_parent_no')->whereHas('w_no', function ($query) use ($user) {
                         $query->where('w_type', '=', 'EW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
-                            $q->where('rgd_status1', '=', '출고')->where('rgd_status3', '!=', '배송완료')->orWhereNull('rgd_status1');
+                            $q->where('rgd_status1', '=', '출고')->orWhereNull('rgd_status1');
                         })->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                             $q->where('co_no', $user->co_no);
                         });
@@ -1507,7 +1507,11 @@ class WarehousingController extends Controller
                 }
 
                 if (isset($validated['status'])) {
-                    $warehousing->where('rgd_status3', '=', $validated['status']);
+                   $warehousing->where(function ($query) use ($validated)  {
+                        $query->where('rgd_status3','=', $validated['status']);
+                    });
+                    //$warehousing->where('rgd_status3', '=', $validated['status']);
+                    
                 }
 
                 if (isset($validated['rgd_status1'])) {
@@ -1981,7 +1985,7 @@ class WarehousingController extends Controller
                 if ($user->mb_type == 'shop') {
                     $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
                         $query->where('w_type', '=', 'EW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
-                            $q->where('rgd_status1', '=', '출고')->where('rgd_status3', '!=', '배송완료')->orWhereNull('rgd_status1');
+                            $q->where('rgd_status1', '=', '출고')->orWhereNull('rgd_status1');
                         })->whereHas('co_no.co_parent', function ($q) use ($user) {
                             $q->where('co_no', $user->co_no);
                         });
@@ -1989,7 +1993,7 @@ class WarehousingController extends Controller
                 } else if ($user->mb_type == 'shipper') {
                     $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
                         $query->where('w_type', '=', 'EW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
-                            $q->where('rgd_status1', '=', '출고')->where('rgd_status3', '!=', '배송완료')->orWhereNull('rgd_status1');
+                            $q->where('rgd_status1', '=', '출고')->orWhereNull('rgd_status1');
                         })->whereHas('co_no', function ($q) use ($user) {
                             $q->where('co_no', $user->co_no);
                         });
@@ -1997,7 +2001,7 @@ class WarehousingController extends Controller
                 } else if ($user->mb_type == 'spasys') {
                     $warehousing = ReceivingGoodsDelivery::with('w_no')->with(['mb_no'])->whereHas('w_no', function ($query) use ($user) {
                         $query->where('w_type', '=', 'EW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
-                            $q->where('rgd_status1', '=', '출고')->where('rgd_status3', '!=', '배송완료')->orWhereNull('rgd_status1');
+                            $q->where('rgd_status1', '=', '출고')->orWhereNull('rgd_status1');
                         })->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                             $q->where('co_no', $user->co_no);
                         });
@@ -2049,7 +2053,10 @@ class WarehousingController extends Controller
                 }
 
                 if (isset($validated['status'])) {
-                    $warehousing->where('rgd_status3', '=', $validated['status']);
+                    $warehousing->where(function ($query) use ($validated)  {
+                        $query->where('rgd_status3','=', $validated['status']);
+                    });
+                    //$warehousing->where('rgd_status3', '=', $validated['status']);
                 }
 
                 if (isset($validated['rgd_status1'])) {
@@ -5683,6 +5690,7 @@ class WarehousingController extends Controller
                     $rgd = ReceivingGoodsDelivery::where('rgd_no', $value['rgd_no'])
                         ->update([
                             'rgd_status3' => "배송완료",
+                            'rgd_arrive_day' =>Carbon::now()->toDateTimeString(),
                         ]);
                 }
             } elseif ($request->service == "수입풀필먼트") {
