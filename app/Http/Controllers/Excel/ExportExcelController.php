@@ -20,10 +20,12 @@ use PhpOffice\PhpSpreadsheet\Reader\Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Models\Warehousing;
 use App\Models\WarehousingItem;
 use App\Models\ImportSchedule;
 use App\Models\StockStatusBad;
 use App\Models\ReceivingGoodsDelivery;
+use App\Models\Member;
 use App\Models\Import;
 use App\Models\ImportExpected;
 use App\Models\Export;
@@ -684,7 +686,193 @@ class ExportExcelController extends Controller
             return $e;
         }
     }
-    
+    public function download_fullwarehousing_list(WarehousingSearchRequest $request){
+        try {
+            $validated = $request->validated();
+
+            // If per_page is null set default data = 15
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+            $user = Auth::user();
+            if ($user->mb_type == 'shop') {
+                $warehousing2 = Warehousing::join(
+                    DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
+                    'm.w_no',
+                    '=',
+                    'warehousing.w_no'
+                )->where('warehousing.w_type', '=', 'EW')->where('w_category_name', '=', '수입풀필먼트')->whereHas('co_no.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                })->get();
+                $w_import_no = collect($warehousing2)->map(function ($q) {
+
+                    return $q->w_import_no;
+                });
+                $w_no_in = collect($warehousing2)->map(function ($q) {
+
+                    return $q->w_no;
+                });
+                $warehousing = Warehousing::with('mb_no')
+                    ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')->where('w_category_name', '=', '수입풀필먼트')
+                    ->whereHas('co_no.co_parent', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
+                    });
+            } else if ($user->mb_type == 'shipper') {
+                $warehousing2 = Warehousing::join(
+                    DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
+                    'm.w_no',
+                    '=',
+                    'warehousing.w_no'
+                )->where('warehousing.w_type', '=', 'EW')->where('w_category_name', '=', '수입풀필먼트')->whereHas('co_no', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                })->get();
+                $w_import_no = collect($warehousing2)->map(function ($q) {
+
+                    return $q->w_import_no;
+                });
+                $w_no_in = collect($warehousing2)->map(function ($q) {
+
+                    return $q->w_no;
+                });
+                $warehousing = Warehousing::with('mb_no')
+                    ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')->where('w_category_name', '=', '수입풀필먼트')
+                    ->whereHas('co_no', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
+                    });
+            } else if ($user->mb_type == 'spasys') {
+
+                $warehousing2 = Warehousing::join(
+                    DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
+                    'm.w_no',
+                    '=',
+                    'warehousing.w_no'
+                )->where('warehousing.w_type', '=', 'EW')->where('w_category_name', '=', '수입풀필먼트')->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                })->get();
+                $w_import_no = collect($warehousing2)->map(function ($q) {
+
+                    return $q->w_import_no;
+                });
+                $w_no_in = collect($warehousing2)->map(function ($q) {
+
+                    return $q->w_no;
+                });
+
+                $warehousing = Warehousing::with('mb_no')
+                    ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent', 'warehousing_child', 'rate_data_general'])->where('w_category_name', '=', '수입풀필먼트')->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')
+                    ->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
+                    });
+            }
+            $warehousing->whereDoesntHave('rate_data_general');
+
+         
+  
+            $warehousing = $warehousing->orWhereIn('w_no', $w_no_in)->orderBy('w_no', 'DESC');
+            $members = Member::where('mb_no', '!=', 0)->get();
+
+            // $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
+            // $warehousing->setCollection(
+            //     $warehousing->getCollection()->map(function ($item) {
+
+            //         $item->total_item = WarehousingItem::where('w_no', $item->w_no)->where('wi_type', '입고_spasys')->sum('wi_number');
+            //         if ($item['warehousing_item'][0]['item']) {
+            //             $first_name_item = $item['warehousing_item'][0]['item']['item_name'];
+            //             $total_item = $item['warehousing_item']->count();
+            //             $final_total = (($total_item / 2)  - 1);
+            //             if ($final_total <= 0) {
+            //                 $item->first_item_name_total = $first_name_item . '외';
+            //             } else {
+            //                 $item->first_item_name_total = $first_name_item . '외' . ' ' . $final_total . '건';
+            //             }
+            //         } else {
+            //             $item->first_item_name_total = '';
+            //         }
+
+            //         return $item;
+            //     })
+            // );
+            $warehousing = $warehousing->get();
+
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+
+            $sheet->setCellValue('A1', 'No');
+            $sheet->setCellValue('B1', '가맹점');
+            $sheet->setCellValue('C1', '화주');
+            $sheet->setCellValue('D1', '입고화물번호');
+            $sheet->setCellValue('E1', '화물연계번호');
+            $sheet->setCellValue('F1', '주문번호');
+            $sheet->setCellValue('G1', '브랜드');
+            $sheet->setCellValue('H1', '상품코드');
+            $sheet->setCellValue('I1', '옵션코드');
+            $sheet->setCellValue('J1', '상품명');
+            $sheet->setCellValue('K1', '옵션1');
+            $sheet->setCellValue('L1', '옵션2');
+            $sheet->setCellValue('M1', '수량');
+            $sheet->setCellValue('N1', '배송방법');
+            $sheet->setCellValue('O1', '수취인');
+            $sheet->setCellValue('P1', '배송주소');
+            $sheet->setCellValue('Q1', '상세주소');
+            $sheet->setCellValue('R1', '연락처');
+            $sheet->setCellValue('S1', '배송메모');
+            $sheet->setCellValue('T1', '등록일시');
+            $sheet->setCellValue('U1', '');
+           
+            $num_row = 2;
+            $data_fullwarehousing =  json_decode($warehousing);
+            $no = 1;
+            $row3 = 0;
+            foreach($data_fullwarehousing as $data){
+                $quantity = count($data->warehousing_item);
+                $number = $num_row + $row3;
+                $number2 = $num_row + $quantity;
+                //$row3 = $number2 + $row3;
+                $style = array(
+                    'alignment' => array(
+                        'horizontal' => 'center',
+                        'vertical' => 'center',
+                    )
+                );
+            
+                $sheet->getStyle('A'.$num_row.':A'.$number2)->applyFromArray($style);
+                // $sheet->getActiveSheet()->mergeCells('A'.$num_row.':A'.$num_row2);
+                // $sheet->setCellValue('A'.$num_row, $no);
+                //$sheet->cells('A'.$num_row.':A'.$num_row2);
+                $sheet->mergeCells('A'.$num_row.':A'.$number2);
+                $sheet->setCellValue('A'.$num_row, $no);
+                $sheet->setCellValue('B'.$num_row, $data->co_no->co_parent->co_name);
+                $sheet->setCellValue('C'.$num_row, $data->co_no->co_name);
+                $sheet->setCellValue('D'.$num_row, $data->w_schedule_number);
+                $sheet->setCellValue('E'.$num_row, '');
+                $num_row = $number2 + 1;
+                $no++;
+            }
+            $Excel_writer = new Xlsx($spreadsheet);
+            if(isset($user->mb_no)){
+                $path = 'storage/download/'.$user->mb_no.'/';
+            }else{
+                $path = 'storage/download/no-name/';
+            }
+            if (!is_dir($path)) {
+                File::makeDirectory($path, $mode = 0777, true, true);
+            }
+            $mask = $path.'DownloadBondedCargo-*.*';
+            array_map('unlink', glob($mask));
+            $file_name_download = $path.'DownloadBondedCargo-'.date('YmdHis').'.Xlsx';
+            $Excel_writer->save($file_name_download);
+            return response()->json([
+                'status' => 1,
+                'link_download' => $file_name_download,
+                'message' => 'Download File',
+            ], 200);
+            ob_end_clean();
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            //return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
     public function dowload_fulfillment_schedule_list(ScheduleShipmentSearchRequest $request){
     
         try {

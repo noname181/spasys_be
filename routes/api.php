@@ -155,6 +155,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/import_schedule', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'__invoke']);
     Route::post('/get_import_schedule', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'getImportSchedule']);
     Route::post('/get_import_api', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'getImportAPI']);
+    Route::post('/get_import_api2', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'getImportAPI2']);
     Route::post('/get_import_api_popup', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'getImportAPIPOPUP']);
 
     Route::get('/warehousing', [\App\Http\Controllers\Warehousing\WarehousingController::class,'__invoke']);
@@ -560,6 +561,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/dowload_fulfillment_stock_list', [\App\Http\Controllers\Excel\ExportExcelController::class,'dowload_fulfillment_stock_list'])->name('dowload_fulfillment_stock_list');
     Route::post('/download_bonded_cargo', [\App\Http\Controllers\Excel\ExportExcelController::class,'download_bonded_cargo'])->name('download_bonded_cargo');
     Route::post('/download_distribution_release_list', [\App\Http\Controllers\Excel\ExportExcelController::class,'download_distribution_release_list'])->name('download_distribution_release_list');
+    Route::post('/download_fullwarehousing_list', [\App\Http\Controllers\Excel\ExportExcelController::class,'download_fullwarehousing_list'])->name('download_fullwarehousing_list');
     Route::post('get_package_data', [\App\Http\Controllers\Package\PackageController::class,'get_package_data'])->name('get_package_data');
     
     Route::post('/dowload_fulfillment_schedule_list', [\App\Http\Controllers\Excel\ExportExcelController::class,'dowload_fulfillment_schedule_list'])->name('dowload_fulfillment_schedule_list');
