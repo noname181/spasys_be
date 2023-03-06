@@ -3168,7 +3168,7 @@ class RateDataController extends Controller
             $start_date = $created_at->startOfMonth()->toDateString();
             $end_date = $created_at->endOfMonth()->toDateString();
 
-            $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 't_export', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent'])
+            $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 't_export', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent','t_import','t_import_expected'])
                 ->whereHas('w_no', function ($q) use ($co_no) {
                     $q->where('co_no', $co_no)
                         ->where('w_category_name', '보세화물');
@@ -3246,7 +3246,7 @@ class RateDataController extends Controller
             $start_date = $created_at->startOfMonth()->toDateString();
             $end_date = $created_at->endOfMonth()->toDateString();
 
-            $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent', 't_export'])
+            $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent', 't_export','t_import','t_import_expected'])
                 ->whereHas('w_no', function ($q) use ($co_no) {
                     $q->where('co_no', $co_no)
                         ->where('w_category_name', '보세화물');
@@ -3258,7 +3258,7 @@ class RateDataController extends Controller
 
             $rdgs = [];
             foreach ($rgds as $index => $rgd) {
-                $child_rgd = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent', 't_export'])->where('rgd_no', $rgd['rgd_parent_no'])->first();
+                $child_rgd = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent', 't_export','t_import','t_import_expected'])->where('rgd_no', $rgd['rgd_parent_no'])->first();
                 $rgds[$index] = $child_rgd;
 
                 $rdg = RateDataGeneral::where('rgd_no', $rgd->rgd_no)
