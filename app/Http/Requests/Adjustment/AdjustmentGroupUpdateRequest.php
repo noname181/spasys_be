@@ -58,7 +58,7 @@ class AdjustmentGroupUpdateRequest extends BaseFormRequest
                 'email',
             ],
             'ag_email2' => [
-                'required',
+                'nullable',
                 'string',
                 'max:255',
                 'email',
