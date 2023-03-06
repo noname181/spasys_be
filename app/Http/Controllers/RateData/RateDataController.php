@@ -8431,7 +8431,7 @@ class RateDataController extends Controller
                         'cbh_type' => 'cancel',
                     ]);
                 }
-            } else if ($request->bill_type == 'case_bill_final_issue') {
+            } else if ($request->bill_type == 'case_bill_final_issue') { //cancel approval casebill
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_status5' => NULL,
                     'rgd_confirmed_date' => NULL
@@ -8444,7 +8444,7 @@ class RateDataController extends Controller
                     'cbh_type' => 'revert',
                 ]);
 
-            } else if ($request->bill_type == 'month_bill_final_issue') { //page 264
+            } else if ($request->bill_type == 'monthbill_final_issue') { //cancel approval monthbill
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
 
                 $settlement_number = $rgd->rgd_settlement_number;
@@ -8453,6 +8453,7 @@ class RateDataController extends Controller
                 foreach ($rgds as $rgd) {
                     $rgd_update = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
                         'rgd_status5' => null,
+                        'rgd_confirmed_date' => null,
                     ]);
                     CancelBillHistory::insertGetId([
                         'mb_no' => Auth::user()->mb_no,
@@ -8461,18 +8462,18 @@ class RateDataController extends Controller
                         'cbh_status_after' =>  null,
                         'cbh_type' => 'revert',
                     ]);
-                    $rgd_parent_no = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
 
-                    $rgd_update_parent = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_parent_no'])->update([
-                        'rgd_status5' => 'issued',
-                    ]);
-                    CancelBillHistory::insertGetId([
-                        'mb_no' => Auth::user()->mb_no,
-                        'rgd_no' => $rgd['rgd_parent_no'],
-                        'cbh_status_before' => 'confirmed',
-                        'cbh_status_after' => null,
-                        'cbh_type' => 'revert',
-                    ]);
+                    // $rgd_update_parent = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_parent_no'])->update([
+                    //     'rgd_status5' => 'issued',
+                    // ]);
+
+                    // CancelBillHistory::insertGetId([
+                    //     'mb_no' => Auth::user()->mb_no,
+                    //     'rgd_no' => $rgd['rgd_parent_no'],
+                    //     'cbh_status_before' => 'confirmed',
+                    //     'cbh_status_after' => null,
+                    //     'cbh_type' => 'revert',
+                    // ]);
                 }
             } else { //case_bill,monthly_bill
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
