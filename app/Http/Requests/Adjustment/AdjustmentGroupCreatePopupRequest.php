@@ -49,6 +49,7 @@ class AdjustmentGroupCreatePopupRequest extends BaseFormRequest
                 'email',
             ],
             'ag_email2' => [
+                'nullable',
                 'string',
                 'max:255',
                 'email',
