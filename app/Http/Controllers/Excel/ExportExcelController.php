@@ -802,13 +802,13 @@ class ExportExcelController extends Controller
             $sheet->setCellValue('C1', '화주');
             $sheet->setCellValue('D1', '입고화물번호');
             $sheet->setCellValue('E1', '화물연계번호');
-            $sheet->setCellValue('F1', '주문번호');
-            $sheet->setCellValue('G1', '브랜드');
-            $sheet->setCellValue('H1', '상품코드');
-            $sheet->setCellValue('I1', '옵션코드');
-            $sheet->setCellValue('J1', '상품명');
-            $sheet->setCellValue('K1', '옵션1');
-            $sheet->setCellValue('L1', '옵션2');
+            $sheet->setCellValue('F1', '브랜드');
+            $sheet->setCellValue('G1', '상품코드');
+            $sheet->setCellValue('H1', '옵션코드');
+            $sheet->setCellValue('I1', '상품명');
+            $sheet->setCellValue('J1', '옵션1');
+            $sheet->setCellValue('K1', '옵션2');
+            $sheet->setCellValue('L1', '입고수량');
             $sheet->setCellValue('M1', '수량');
             $sheet->setCellValue('N1', '배송방법');
             $sheet->setCellValue('O1', '수취인');
@@ -827,6 +827,7 @@ class ExportExcelController extends Controller
                 $quantity = count($data->warehousing_item);
                 $number = $num_row + $row3;
                 $number2 = $num_row + $quantity;
+                $number3 = $quantity + $number + 1;
                 //$row3 = $number2 + $row3;
                 $style = array(
                     'alignment' => array(
@@ -845,6 +846,21 @@ class ExportExcelController extends Controller
                 $sheet->setCellValue('C'.$num_row, $data->co_no->co_name);
                 $sheet->setCellValue('D'.$num_row, $data->w_schedule_number);
                 $sheet->setCellValue('E'.$num_row, '');
+                $total_number = 0;
+                foreach($data->warehousing_item as $key => $data2){
+                $i = $number + $key;
+                if($data2->wi_number != '' && $data2->wi_number != null){
+                $total_number += $data2->wi_number;
+                }
+                $sheet->setCellValue('F'.$i, '');
+                $sheet->setCellValue('G'.$i, $data2->item_no->product_id);
+                $sheet->setCellValue('H'.$i, $data2->item_no->option_id);
+                $sheet->setCellValue('I'.$i, $data2->item_no->item_name);
+                $sheet->setCellValue('J'.$i, $data2->item_no->item_option1);
+                $sheet->setCellValue('K'.$i, '');
+                $sheet->setCellValue('L'.$i, $data2->wi_number);
+                }
+                $sheet->setCellValue('L'.$number2, $total_number);
                 $num_row = $number2 + 1;
                 $no++;
             }

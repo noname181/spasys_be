@@ -644,9 +644,11 @@ class WarehousingController extends Controller
             //         $query->orWhere('warehousing_status', '=', $validated['warehousing_status2']);
             //     });
             // }
-            if($validated['page_type'] == 'page130'){
+            if(isset($validated['page_type'])){
+                if($validated['page_type'] == 'page130'){
                 $warehousing = $warehousing->orWhereIn('w_no', $w_no_in)->orderBy('w_completed_day', 'DESC');
-            }else{
+                }
+            } else{
                 $warehousing = $warehousing->orWhereIn('w_no', $w_no_in)->orderBy('w_no', 'DESC');
             }
             $members = Member::where('mb_no', '!=', 0)->get();
