@@ -155,6 +155,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/import_schedule', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'__invoke']);
     Route::post('/get_import_schedule', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'getImportSchedule']);
     Route::post('/get_import_api', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'getImportAPI']);
+    Route::post('/get_import_api2', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'getImportAPI2']);
     Route::post('/get_import_api_popup', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'getImportAPIPOPUP']);
 
     Route::get('/warehousing', [\App\Http\Controllers\Warehousing\WarehousingController::class,'__invoke']);
