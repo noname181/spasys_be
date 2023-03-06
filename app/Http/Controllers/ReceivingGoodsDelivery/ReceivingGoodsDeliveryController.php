@@ -2909,14 +2909,14 @@ class ReceivingGoodsDeliveryController extends Controller
                 ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_status6' => 'cancel',
                     'rgd_paid_date' => null,
-                    'rgd_canceled_date' =>  Carbon::now(),
                 ]);
 
                 CancelBillHistory::insertGetId([
                     'mb_no' => Auth::user()->mb_no,
                     'rgd_no' => $request->rgd_no,
-                    'cbh_status_after' => 'cancel_payment_bill',
-                    'cbh_type' => 'payment',
+                    'cbh_status_before' => 'paid',
+                    'cbh_status_after' => 'cancel',
+                    'cbh_type' => 'cancel_payment',
                 ]);
             }
 
