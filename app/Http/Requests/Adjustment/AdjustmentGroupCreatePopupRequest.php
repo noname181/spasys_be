@@ -49,7 +49,6 @@ class AdjustmentGroupCreatePopupRequest extends BaseFormRequest
                 'email',
             ],
             'ag_email2' => [
-                'required',
                 'string',
                 'max:255',
                 'email',
