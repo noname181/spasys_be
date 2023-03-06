@@ -132,21 +132,21 @@ class WarehousingController extends Controller
                     ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->where('w_type', 'IW')->whereNotNull('w_schedule_number2')->where('w_schedule_number2', '!=', '')
                     ->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    })->orderBy('w_no', 'DESC');
+                    })->orderBy('w_completed_day', 'DESC');
             } else if ($user->mb_type == 'shipper') {
 
                 $warehousing = Warehousing::with('mb_no')
                     ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->where('w_type', 'IW')->whereNotNull('w_schedule_number2')->where('w_schedule_number2', '!=', '')
                     ->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    })->orderBy('w_no', 'DESC');
+                    })->orderBy('w_completed_day', 'DESC');
             } else if ($user->mb_type == 'spasys') {
 
                 $warehousing = Warehousing::with('mb_no')
                     ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent', 'warehousing_child'])->where('w_type', 'IW')->whereNotNull('w_schedule_number2')->where('w_schedule_number2', '!=', '')
                     ->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    })->orderBy('w_no', 'DESC');
+                    })->orderBy('w_completed_day', 'DESC');
             }
 
             if (isset($validated['page_type']) && $validated['page_type'] == "page130") {
@@ -644,7 +644,11 @@ class WarehousingController extends Controller
             //         $query->orWhere('warehousing_status', '=', $validated['warehousing_status2']);
             //     });
             // }
-            $warehousing = $warehousing->orWhereIn('w_no', $w_no_in)->orderBy('w_no', 'DESC');
+            if($validated['page_type'] == 'page130'){
+                $warehousing = $warehousing->orWhereIn('w_no', $w_no_in)->orderBy('w_completed_day', 'DESC');
+            }else{
+                $warehousing = $warehousing->orWhereIn('w_no', $w_no_in)->orderBy('w_no', 'DESC');
+            }
             $members = Member::where('mb_no', '!=', 0)->get();
 
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
@@ -6341,7 +6345,7 @@ class WarehousingController extends Controller
 
                     //$leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
                     $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-                })->orderBy('tie_is_date', 'DESC');
+                })->orderBy('ti_i_date', 'DESC');
             } else if ($user->mb_type == 'shipper') {
                
                 $sub = ImportExpected::select('company.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
@@ -6381,7 +6385,7 @@ class WarehousingController extends Controller
 
                     //$leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
                     $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-                })->orderBy('tie_is_date', 'DESC');
+                })->orderBy('ti_i_date', 'DESC');
             } else if ($user->mb_type == 'spasys') {
                 
                 //FIX NOT WORK 'with'
@@ -6428,7 +6432,7 @@ class WarehousingController extends Controller
 
                 $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
                     $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
-                })->orderBy('tie_is_date', 'DESC');
+                })->orderBy('ti_i_date', 'DESC');
                 // ->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
                 //     $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
                 // })
@@ -6605,8 +6609,8 @@ class WarehousingController extends Controller
                 });
             }
 
-
-            $warehousing = $warehousing->orWhereIn('w_no', $w_no_in)->orderBy('w_no', 'DESC');
+            
+            $warehousing = $warehousing->orWhereIn('w_no', $w_no_in)->orderBy('w_completed_day', 'DESC');
             $members = Member::where('mb_no', '!=', 0)->get();
 
 
@@ -6619,21 +6623,21 @@ class WarehousingController extends Controller
                     ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->where('w_type', 'IW')->whereNotNull('w_schedule_number2')->where('w_schedule_number2', '!=', '')
                     ->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    })->orderBy('w_no', 'DESC');
+                    })->orderBy('w_completed_day', 'DESC');
             } else if ($user->mb_type == 'shipper') {
 
                 $warehousing2 = Warehousing::with('mb_no')
                     ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->where('w_type', 'IW')->whereNotNull('w_schedule_number2')->where('w_schedule_number2', '!=', '')
                     ->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    })->orderBy('w_no', 'DESC');
+                    })->orderBy('w_completed_day', 'DESC');
             } else if ($user->mb_type == 'spasys') {
 
                 $warehousing2 = Warehousing::with('mb_no')
                     ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent', 'warehousing_child'])->where('w_type', 'IW')->whereNotNull('w_schedule_number2')->where('w_schedule_number2', '!=', '')
                     ->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    })->orderBy('w_no', 'DESC');
+                    })->orderBy('w_completed_day', 'DESC');
             }
 
             if (isset($validated['page_type']) && $validated['page_type'] == "page130") {
