@@ -824,19 +824,28 @@ class ExportExcelController extends Controller
             $no = 1;
             $row3 = 0;
             foreach($data_fullwarehousing as $data){
+                $quantity = count($data->warehousing_item);
                 $number = $num_row + $row3;
-                $number2 = $num_row + 3;
-                $row3 = $number2 + $row3;
+                $number2 = $num_row + $quantity;
+                //$row3 = $number2 + $row3;
+                $style = array(
+                    'alignment' => array(
+                        'horizontal' => 'center',
+                        'vertical' => 'center',
+                    )
+                );
+            
+                $sheet->getStyle('A'.$num_row.':A'.$number2)->applyFromArray($style);
                 // $sheet->getActiveSheet()->mergeCells('A'.$num_row.':A'.$num_row2);
                 // $sheet->setCellValue('A'.$num_row, $no);
                 //$sheet->cells('A'.$num_row.':A'.$num_row2);
-                $sheet->mergeCells('A'.$number.':A'.$number2);
-                $sheet->setCellValue('A'.$number, $no);
-                $sheet->setCellValue('B'.$number, $data->co_no->co_parent->co_name);
-                $sheet->setCellValue('C'.$number, $data->co_no->co_name);
-                $sheet->setCellValue('D'.$number, $data->w_schedule_number);
-                $sheet->setCellValue('E'.$number, '');
-                $num_row++;
+                $sheet->mergeCells('A'.$num_row.':A'.$number2);
+                $sheet->setCellValue('A'.$num_row, $no);
+                $sheet->setCellValue('B'.$num_row, $data->co_no->co_parent->co_name);
+                $sheet->setCellValue('C'.$num_row, $data->co_no->co_name);
+                $sheet->setCellValue('D'.$num_row, $data->w_schedule_number);
+                $sheet->setCellValue('E'.$num_row, '');
+                $num_row = $number2 + 1;
                 $no++;
             }
             $Excel_writer = new Xlsx($spreadsheet);
