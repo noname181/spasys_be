@@ -425,6 +425,12 @@ class BannerController extends Controller
                 });
             });
 
+            $warehousingchartb = ReceivingGoodsDelivery::with(['w_no'])->whereNull('rgd_parent_no')->whereHas('w_no', function ($query) use ($user) {
+                $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('w_category_name', '=', '유통가공')->whereHas('co_no.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+            });
+
             $warehousing2 = Warehousing::where('w_type', '=', 'EW')->where('w_category_name', '=', '유통가공')->whereNull('w_children_yn')->whereHas('co_no.co_parent', function ($q) use ($user) {
                 $q->where('co_no', $user->co_no);
             })->get();
@@ -442,6 +448,21 @@ class BannerController extends Controller
             });
 
             $warehousingd = ReceivingGoodsDelivery::with(['warehousing'])->with(['mb_no'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
+                $query->where('w_type', '=', 'EW')
+                    ->where('rgd_status1', '=', '출고')
+                    ->where('rgd_status2', '=', '작업완료')
+
+                    ->where(function ($q) {
+                        $q->where(function ($query) {
+                            $query->where('rgd_status4', '!=', '예상경비청구서')->where('rgd_status4', '!=', '확정청구서');
+                        })
+                            ->orWhereNull('rgd_status4');
+                    })->whereHas('co_no.co_parent', function ($q2) use ($user) {
+                        $q2->where('co_no', $user->co_no);
+                    });
+            });
+
+            $warehousingchartd = ReceivingGoodsDelivery::with(['warehousing'])->with(['mb_no'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
                 $query->where('w_type', '=', 'EW')
                     ->where('rgd_status1', '=', '출고')
                     ->where('rgd_status2', '=', '작업완료')
@@ -494,6 +515,12 @@ class BannerController extends Controller
                 });
             });
 
+            $warehousingchartb = ReceivingGoodsDelivery::with(['warehousing'])->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
+                $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('w_category_name', '=', '유통가공')->whereHas('co_no', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+            });
+
             $warehousing2 = Warehousing::where('w_type', '=', 'EW')->where('w_category_name', '=', '유통가공')->whereNull('w_children_yn')->whereHas('co_no', function ($q) use ($user) {
                 $q->where('co_no', $user->co_no);
             })->get();
@@ -511,6 +538,21 @@ class BannerController extends Controller
             });
 
             $warehousingd = ReceivingGoodsDelivery::with(['warehousing'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
+                $query->where('w_type', '=', 'EW')
+                    ->where('rgd_status1', '=', '출고')
+                    ->where('rgd_status2', '=', '작업완료')
+
+                    ->where(function ($q) {
+                        $q->where(function ($query) {
+                            $query->where('rgd_status4', '!=', '예상경비청구서')->where('rgd_status4', '!=', '확정청구서');
+                        })
+                            ->orWhereNull('rgd_status4');
+                    })->whereHas('co_no', function ($q2) use ($user) {
+                        $q2->where('co_no', $user->co_no);
+                    });
+            });
+
+            $warehousingchartd = ReceivingGoodsDelivery::with(['warehousing'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
                 $query->where('w_type', '=', 'EW')
                     ->where('rgd_status1', '=', '출고')
                     ->where('rgd_status2', '=', '작업완료')
@@ -563,6 +605,12 @@ class BannerController extends Controller
                 });
             });
 
+            $warehousingchartb = ReceivingGoodsDelivery::with(['warehousing'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
+                $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('w_category_name', '=', '유통가공')->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+            });
+
             $warehousing2 = Warehousing::where('w_type', '=', 'EW')->where('w_category_name', '=', '유통가공')->whereNull('w_children_yn')->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                 $q->where('co_no', $user->co_no);
             })->get();
@@ -580,6 +628,21 @@ class BannerController extends Controller
             });
 
             $warehousingd = ReceivingGoodsDelivery::with(['warehousing'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
+                $query->where('w_type', '=', 'EW')
+                    ->where('rgd_status1', '=', '출고')
+                    ->where('rgd_status2', '=', '작업완료')
+                    ->where('w_category_name', '=', '유통가공')
+                    ->where(function ($q) {
+                        $q->where(function ($query) {
+                            $query->where('rgd_status4', '!=', '예상경비청구서')->where('rgd_status4', '!=', '확정청구서');
+                        })
+                            ->orWhereNull('rgd_status4');
+                    })->whereHas('co_no.co_parent.co_parent', function ($q2) use ($user) {
+                        $q2->where('co_no', $user->co_no);
+                    });
+            });
+
+            $warehousingchartd = ReceivingGoodsDelivery::with(['warehousing'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
                 $query->where('w_type', '=', 'EW')
                     ->where('rgd_status1', '=', '출고')
                     ->where('rgd_status2', '=', '작업완료')
@@ -722,7 +785,62 @@ class BannerController extends Controller
             $counth_2 += $i->rate_data_general->rdg_sum4;
         }
 
+        $countchartb = [];
+        $countchartd = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $countchartb = $warehousingchartb->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereYear('warehousing.w_completed_day', Carbon::now()->year)->get()->groupBy(function ($date) {
+                //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
+                return Carbon::parse($date->created_at)->format('m'); // grouping by months
+            });
+
+            $countchartd = $warehousingchartd->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereYear('warehousing.w_completed_day', Carbon::now()->year)->get()->groupBy(function ($date) {
+                //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
+                return Carbon::parse($date->created_at)->format('m'); // grouping by months
+            });
+
+            // $countg = $warehousingg->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereYear('warehousing.w_completed_day', Carbon::now()->year)->get()->groupBy(function ($date) {
+            //     //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
+            //     return Carbon::parse($date->created_at)->format('m'); // grouping by months
+            // });
+        }
+
+        $chartcountb = [];
+        $chartcountd = [];
+        $userArrb = [];
+        $userArrd = [];
+
+        $userArrb['label'] = '반입';
+        $userArrb['borderColor'] = '#F7C35D';
+        $userArrb['backgroundColor'] = '#F7C35D';
+
+        $userArrd['label'] = '반출';
+        $userArrd['borderColor'] = '#0493FF';
+        $userArrd['backgroundColor'] = '#0493FF';
+
+        foreach ($countchartb as $key => $value) {
+            $chartcountb[(int)$key] = count($value);
+        }
+
+        foreach ($countchartd as $key => $value) {
+            $chartcountd[(int)$key] = count($value);
+        }
+
+        for ($i = 1; $i <= 12; $i++) {
+            if (!empty($chartcountb[$i])) {
+                $userArrb['data'][] = $chartcountb[$i];
+            } else {
+                $userArrb['data'][] = 0;
+            }
+
+            if (!empty($chartcountd[$i])) {
+                $userArrd['data'][] = $chartcountd[$i];
+            } else {
+                $userArrd['data'][] = 0;
+            }
+        }
+
         return [
+            'countcharta' => $userArrb, 'countchartb' => $userArrd,
             'warehousingb' => $warehousingd, 'a' => $a, 'b' => $b, 'c' => $c, 'd' => $d, 'e' => $e, 'f' => $f, 'h' => $h, 'g' => $g,
             'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'countf' => $countf, 'countg' => $countg, 'counth' => $counth, 'counth_2' => $counth_2
 
@@ -755,6 +873,12 @@ class BannerController extends Controller
                 ->whereHas('co_no.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
+            
+                $warehousingcharta = Warehousing::with('mb_no')
+                ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')->where('w_category_name', '=', '수입풀필먼트')
+                ->whereHas('co_no.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
 
             $warehousingb = StockStatusBad::with(['item_status_bad'])->whereHas('item_status_bad', function ($q) use ($user) {
                 //    $q->where('item_service_name', '=', '수입풀필먼트');
@@ -771,6 +895,10 @@ class BannerController extends Controller
             })->orderBy('ss_no', 'DESC');
 
             $warehousingd = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
+                $q->where('co_no', $user->co_no);
+            });
+
+            $warehousingchartd = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
                 $q->where('co_no', $user->co_no);
             });
 
@@ -802,6 +930,12 @@ class BannerController extends Controller
                     $q->where('co_no', $user->co_no);
                 });
 
+            $warehousingcharta = Warehousing::with('mb_no')
+                ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')->where('w_category_name', '=', '수입풀필먼트')
+                ->whereHas('co_no', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+
             $warehousingb = StockStatusBad::with(['item_status_bad'])->whereHas('item_status_bad', function ($q) use ($user) {
                 //    $q->where('item_service_name', '=', '수입풀필먼트');
                 //    $q->whereHas('item_info', function ($e) {
@@ -817,6 +951,10 @@ class BannerController extends Controller
             })->orderBy('ss_no', 'DESC');
 
             $warehousingd = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고')->whereHas('ContractWms.company', function ($q) use ($user) {
+                $q->where('co_no', $user->co_no);
+            });
+
+            $warehousingchartd = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고')->whereHas('ContractWms.company', function ($q) use ($user) {
                 $q->where('co_no', $user->co_no);
             });
 
@@ -850,6 +988,12 @@ class BannerController extends Controller
                     $q->where('co_no', $user->co_no);
                 });
 
+            $warehousingcharta = Warehousing::with('mb_no')
+                ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent', 'warehousing_child', 'rate_data_general'])->where('w_category_name', '=', '수입풀필먼트')->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')
+                ->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+
             $warehousingb = StockStatusBad::with(['item_status_bad'])->whereHas('item_status_bad', function ($q) use ($user) {
                 //    $q->where('item_service_name', '=', '수입풀필먼트');
                 //    $q->whereHas('item_info', function ($e) {
@@ -865,6 +1009,10 @@ class BannerController extends Controller
             })->orderBy('ss_no', 'DESC');
 
             $warehousingd = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
+                $q->where('co_no', $user->co_no);
+            });
+
+            $warehousingchartd = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
                 $q->where('co_no', $user->co_no);
             });
 
@@ -967,10 +1115,85 @@ class BannerController extends Controller
             }
         }
 
+        $countcharta = [];
+        $countchartd = [];
+
+        for ($i = 1; $i <= 12; $i++) {
+            $countcharta = $warehousingcharta->whereYear('created_at', Carbon::now()->year)->get()->groupBy(function ($date) {
+                //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
+                return Carbon::parse($date->created_at)->format('m'); // grouping by months
+            });
+
+            $countchartd = $warehousingchartd->whereYear('created_at', Carbon::now()->year)->get()->groupBy(function ($date) {
+                //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
+                return Carbon::parse($date->created_at)->format('m'); // grouping by months
+            });
+        }
+
+        $chartcounta = [];
+        $chartcountd = [];
+        $userArra = [];
+        $userArrd = [];
+
+
+        $userArra['label'] = '반입';
+        $userArra['borderColor'] = '#F7C35D';
+        $userArra['backgroundColor'] = '#F7C35D';
+
+        $userArrd['label'] = '반출';
+        $userArrd['borderColor'] = '#0493FF';
+        $userArrd['backgroundColor'] = '#0493FF';
+
+        // $userArrd['label'] = '보관';
+        // $userArrd['borderColor'] = '#1EB28C';
+        // $userArrd['backgroundColor'] = '#1EB28C';
+
+        foreach ($countcharta as $key => $value) {
+            $chartcounta[(int)$key] = count($value);
+        }
+
+        foreach ($countchartd as $key => $value) {
+            $chartcountd[(int)$key] = count($value);
+        }
+
+        // foreach ($countd as $key => $value) {
+        //     $chartcountd[(int)$key] = count($value);
+        // }
+
+        for ($i = 1; $i <= 12; $i++) {
+            if (!empty($chartcounta[$i])) {
+                $userArra['data'][] = $chartcounta[$i];
+            } else {
+                $userArra['data'][] = 0;
+            }
+
+            if (!empty($chartcountd[$i])) {
+                $userArrd['data'][] = $chartcountd[$i];
+            } else {
+                $userArrd['data'][] = 0;
+            }
+
+            // if (!empty($chartcountd[$i])) {
+            //     $userArrd['data'][] = $chartcountd[$i];
+            // } else {
+            //     $userArrd['data'][] = 0;
+            // }
+        }
+
         return [
-            'warehousinga' => $warehousinga, 'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'counte_2' => $counte_2, 'a' => $a, 'b' => $b, 'b_2' => $b_2, 'c' => $c, 'd' => $d, 'e' => $e, 'f' => $f, 'h' => $h, 'g' => $g,
+            'countcharta' => $userArra, 'countchartb' => $userArrd,'warehousinga' => $warehousinga, 'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'counte_2' => $counte_2, 'a' => $a, 'b' => $b, 'b_2' => $b_2, 'c' => $c, 'd' => $d, 'e' => $e, 'f' => $f, 'h' => $h, 'g' => $g,
         ];
         DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+    }
+
+    public function subquery($sub,$sub_2,$sub_4){
+        $warehousing = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+            $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
+        })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+            $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+        })->orderBy('te_carry_out_number', 'DESC');
+
+        return $warehousing;
     }
 
     public function CaculateService1(Request $request)
@@ -1004,11 +1227,7 @@ class BannerController extends Controller
                 ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
 
 
-            $warehousinga = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
-                $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
-            })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
-                $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-            })->orderBy('te_carry_out_number', 'DESC');
+            $warehousinga = $this->subquery($sub,$sub_2,$sub_4);
 
             $warehousingb = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
                 $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
@@ -1032,6 +1251,18 @@ class BannerController extends Controller
                 $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
+            });
+
+            $warehousingchartb = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+                $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
+            })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+                $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+            });
+
+            $warehousingchartd = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+                $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
+            })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+                $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
             });
         } else if ($user->mb_type == 'shipper') {
 
@@ -1089,6 +1320,18 @@ class BannerController extends Controller
                     $q->where('co_no', $user->co_no);
                 });
             });
+
+            $warehousingchartb = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+                $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
+            })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+                $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+            });
+
+            $warehousingchartd = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
+                $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
+            })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+                $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+            });
         } else if ($user->mb_type == 'spasys') {
             //FIX NOT WORK 'with'
             $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number', 'tie_is_date', 'tie_status_2')
@@ -1111,29 +1354,13 @@ class BannerController extends Controller
                 ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
 
 
-            $warehousinga = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
-                $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
-            })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
-                $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-            });
+            $warehousinga = $this->subquery($sub,$sub_2,$sub_4);
 
-            $warehousingb = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
-                $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
-            })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
-                $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-            });
+            $warehousingb = $this->subquery($sub,$sub_2,$sub_4);
 
-            $warehousingd = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
-                $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
-            })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
-                $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-            });
+            $warehousingd = $this->subquery($sub,$sub_2,$sub_4);
 
-            $warehousinge = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
-                $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
-            })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
-                $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-            });
+            $warehousinge = $this->subquery($sub,$sub_2,$sub_4);
 
             $warehousingg = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
                 $query->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
@@ -1142,6 +1369,10 @@ class BannerController extends Controller
                     $q->where('co_no', $user->co_no);
                 });
             });
+
+            $warehousingchartb = $this->subquery($sub,$sub_2,$sub_4);
+
+            $warehousingchartd = $this->subquery($sub,$sub_2,$sub_4);
         }
 
         $warehousingg->where(function ($q) {
@@ -1164,18 +1395,16 @@ class BannerController extends Controller
         $countf = 0;
         $countg = 0;
         $countg_2 = 0;
+        $tie_logistic_manage_number = $this->SQL();
 
         if ($request->time1 == 'day') {
             $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->whereBetween('aaa.tie_is_date', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get()->count();
-            $tie_logistic_manage_number = $this->SQL();
             $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('aaa.tie_is_date', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get()->count();
         } elseif ($request->time1 == 'week') {
             $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->whereBetween('aaa.tie_is_date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get()->count();
-            $tie_logistic_manage_number = $this->SQL();
             $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('aaa.tie_is_date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get()->count();
         } else {
             $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->whereBetween('aaa.tie_is_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get()->count();
-            $tie_logistic_manage_number = $this->SQL();
             $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('aaa.tie_is_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get()->count();
         }
 
@@ -1187,9 +1416,59 @@ class BannerController extends Controller
             $countg_2 += $i->rate_data_general->rdg_sum6;
         }
 
+        $countchartb = [];
+        $countchartd = [];
+
+        for ($i = 1; $i <= 12; $i++) {
+            $countchartb = $warehousingchartb->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->whereYear('tie_is_date', Carbon::now()->year)->get()->groupBy(function ($date) {
+                //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
+                return Carbon::parse($date->tie_is_date)->format('m'); // grouping by months
+            });
+
+            $countchartd = $warehousingchartd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereYear('tie_is_date', Carbon::now()->year)->get()->groupBy(function ($date) {
+                //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
+                return Carbon::parse($date->tie_is_date)->format('m'); // grouping by months
+            });
+        }
+
+        $chartcountb = [];
+        $chartcountd = [];
+        $userArrb = [];
+        $userArrd = [];
+
+        $userArrb['label'] = '반입';
+        $userArrb['borderColor'] = '#F7C35D';
+        $userArrb['backgroundColor'] = '#F7C35D';
+
+        $userArrd['label'] = '반출';
+        $userArrd['borderColor'] = '#0493FF';
+        $userArrd['backgroundColor'] = '#0493FF';
+
+        foreach ($countchartb as $key => $value) {
+            $chartcountb[(int)$key] = count($value);
+        }
+
+        foreach ($countchartd as $key => $value) {
+            $chartcountd[(int)$key] = count($value);
+        }
+
+        for ($i = 1; $i <= 12; $i++) {
+            if (!empty($chartcountb[$i])) {
+                $userArrb['data'][] = $chartcountb[$i];
+            } else {
+                $userArrb['data'][] = 0;
+            }
+
+            if (!empty($chartcountd[$i])) {
+                $userArrd['data'][] = $chartcountd[$i];
+            } else {
+                $userArrd['data'][] = 0;
+            }
+        }
+
 
         return [
-            'warehousinge' => $warehousingg->get(), 'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'countg' => $countg, 'countg_2' => $countg_2
+            'countcharta' => $userArrb, 'countchartb' => $userArrd, 'warehousinge' => $warehousingg->get(), 'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'countg' => $countg, 'countg_2' => $countg_2
         ];
 
         DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
@@ -1206,17 +1485,41 @@ class BannerController extends Controller
             $total2 = [];
             $total3 = [];
 
+            $charttotal1 = [];
+            $charttotal2 = [];
+            $charttotal3 = [];
+
             $check = "";
             if ($request->service == "유통가공" || $request->type == "time3") {
                 $total3 =  $this->CaculateService3($request);
+                $charttotal1[] = $total3['countcharta'];
+                $charttotal1[] = $total3['countchartb'];
             } elseif ($request->service == "수입풀필먼트" || $request->type == "time2") {
                 $total2 =  $this->CaculateService2($request);
+                $charttotal1[] = $total2['countcharta'];
+                $charttotal1[] = $total2['countchartb'];
             } elseif ($request->service == "보세화물" || $request->type == "time1") {
                 $total1 =  $this->CaculateService1($request);
+                $charttotal1[] = $total1['countcharta'];
+                $charttotal1[] = $total1['countchartb'];
+            } elseif ($request->servicechart == "보세화물") {
+                $totala1 =  $this->CaculateService1($request);
+                $charttotal1[] = $totala1['countcharta'];
+                $charttotal1[] = $totala1['countchartb'];
+            } elseif ($request->servicechart == "수입풀필먼트") {
+                $totala2 =  $this->CaculateService2($request);
+                $charttotal1[] = $totala2['countcharta'];
+                $charttotal1[] = $totala2['countchartb'];
+            } elseif ($request->servicechart == "유통가공") {
+                $totala3 =  $this->CaculateService3($request);
+                $charttotal1[] = $totala3['countcharta'];
+                $charttotal1[] = $totala3['countchartb'];
             } else {
                 $total1 =  $this->CaculateService1($request);
                 $total2 =  $this->CaculateService2($request);
                 $total3 =  $this->CaculateService3($request);
+                $charttotal1[] = $total1['countcharta'];
+                $charttotal1[] = $total1['countchartb'];
             }
 
             return response()->json([
@@ -1225,6 +1528,9 @@ class BannerController extends Controller
                 'total1' => $total1,
                 'total2' => $total2,
                 'total3' => $total3,
+                'charttotal1' => $charttotal1,
+                'charttotal2' => $charttotal2,
+                'charttotal3' => $charttotal3,
             ]);
         } catch (\Exception $e) {
             Log::error($e);
@@ -1388,9 +1694,9 @@ class BannerController extends Controller
             }
 
             if (!empty($chartcountd[$i])) {
-                 $userArrd['data'][] = $chartcountd[$i];
+                $userArrd['data'][] = $chartcountd[$i];
             } else {
-                 $userArrd['data'][] = 0;
+                $userArrd['data'][] = 0;
             }
         }
 
@@ -1710,7 +2016,7 @@ class BannerController extends Controller
             // });
         }
 
-       
+
         $countb = [];
         $countd = [];
         //$countg = [];
@@ -1731,15 +2037,15 @@ class BannerController extends Controller
             //     return Carbon::parse($date->created_at)->format('m'); // grouping by months
             // });
         }
-        
+
         $chartcountb = [];
         $chartcountd = [];
         $chartcountg = [];
-       
+
         $userArrb = [];
         $userArrd = [];
         $userArrg = [];
-        
+
         $userArrb['label'] = '반입';
         $userArrb['borderColor'] = '#F7C35D';
         $userArrb['backgroundColor'] = '#F7C35D';
@@ -1752,7 +2058,7 @@ class BannerController extends Controller
         // $userArrg['borderColor'] = '#1EB28C';
         // $userArrg['backgroundColor'] = '#1EB28C';
 
-    
+
         foreach ($countb as $key => $value) {
             $chartcountb[(int)$key] = count($value);
         }
@@ -1766,7 +2072,7 @@ class BannerController extends Controller
         // }
 
         for ($i = 1; $i <= 12; $i++) {
-            
+
             if (!empty($chartcountb[$i])) {
                 $userArrb['data'][] = $chartcountb[$i];
             } else {
@@ -1787,7 +2093,7 @@ class BannerController extends Controller
         }
 
         return [
-           'counta' => $userArrb, 'countb' => $userArrd, //'countc' => $userArrg 
+            'counta' => $userArrb, 'countb' => $userArrd, //'countc' => $userArrg 
         ];
     }
 
@@ -1804,11 +2110,17 @@ class BannerController extends Controller
 
             $check = "";
             if ($request->servicechart == "유통가공") {
-                $total3 =  $this->CaculateChartService3($request);
+                $totala3 =  $this->CaculateChartService3($request);
+                $total3[] = $totala3['counta'];
+                $total3[] = $totala3['countb'];
             } elseif ($request->servicechart == "수입풀필먼트") {
-                $total2 =  $this->CaculateChartService2($request);
+                $totala2 =  $this->CaculateChartService2($request);
+                $total2[] = $totala2['counta'];
+                $total2[] = $totala2['countb'];
             } elseif ($request->servicechart == "보세화물") {
-                $total1 =  $this->CaculateChartService1($request);
+                $totala1 =  $this->CaculateChartService1($request);
+                $total1[] = $totala1['counta'];
+                $total1[] = $totala1['countb'];
             } else {
                 //$total1 =  $this->CaculateChartService1($request);
                 //$total2 =  $this->CaculateChartService2($request);

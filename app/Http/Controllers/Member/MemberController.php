@@ -506,7 +506,7 @@ class MemberController extends Controller
      * Get members not paginate
      */
 
-    public function list_members()
+    public function list_members(Request $request)
     {
         try {
             $user = Auth::user();
@@ -553,15 +553,27 @@ class MemberController extends Controller
                     // });
                 })->orderBy('co_type', 'DESC')->orderBy('co_name', 'ASC')->get();
             }else if($user->mb_type == 'spasys'){
-                $members = Company::with(['co_parent'])->where(function ($q) use ( $user) {
-                    $q->WhereHas('co_parent', function ($q) use ($user) {
-                        $q->where('co_no', $user->co_no)
-                        ->orWhereHas('co_parent', function ($q) use ($user) {
-                            $q->where('co_no', $user->co_no);
-                        });
-                    });
+               
 
-                })->orderBy('co_type', 'DESC')->orderBy('co_name', 'ASC')->get();
+                if($request->type == "shop_only"){
+                    $members = Company::with(['co_parent'])->where(function ($q) use ( $user) {
+                        $q->WhereHas('co_parent', function ($q) use ($user) {
+                            $q->where('co_no', $user->co_no);
+                           
+                        });
+    
+                    })->orderBy('co_type', 'DESC')->orderBy('co_name', 'ASC')->get();
+                }else{
+                    $members = Company::with(['co_parent'])->where(function ($q) use ( $user) {
+                        $q->WhereHas('co_parent', function ($q) use ($user) {
+                            $q->where('co_no', $user->co_no)
+                            ->orWhereHas('co_parent', function ($q) use ($user) {
+                                $q->where('co_no', $user->co_no);
+                            });
+                        });
+    
+                    })->orderBy('co_type', 'DESC')->orderBy('co_name', 'ASC')->get();
+                }
             }else if($user->mb_type == 'shipper'){
                 $members = [];
                 $member2 = Company::with(['co_parent'])->where('co_no',$user->co_no)->first();
