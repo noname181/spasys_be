@@ -2472,9 +2472,12 @@ class WarehousingController extends Controller
                 }
 
                 $import_schedule = $import_schedule->leftjoin('receiving_goods_delivery', function ($join) {
-                    $join->on('te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
-                    $join->orOn('ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
-                    $join->orOn('tie_logistic_manage_number', '=', 'receiving_goods_delivery.is_no');
+                    // $join->on('te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
+                    // $join->orOn('ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
+                    // $join->orOn('tie_logistic_manage_number', '=', 'receiving_goods_delivery.is_no');
+                    $join->on('te_carry_out_number', '=', 'receiving_goods_delivery.is_no')->where('te_carry_out_number','!=',null);
+                    $join->orOn('ti_carry_in_number', '=', 'receiving_goods_delivery.is_no')->whereNull('te_carry_out_number');
+                    $join->orOn('tie_logistic_manage_number', '=', 'receiving_goods_delivery.is_no')->whereNull('te_carry_out_number')->whereNull('ti_carry_in_number');
                 });
 
                 if (isset($validated['status'])) {
