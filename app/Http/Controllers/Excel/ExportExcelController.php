@@ -809,11 +809,11 @@ class ExportExcelController extends Controller
             $sheet->setCellValue('J1', '옵션1');
             $sheet->setCellValue('K1', '옵션2');
             $sheet->setCellValue('L1', '입고수량');
-            $sheet->setCellValue('M1', '수량');
-            $sheet->setCellValue('N1', '배송방법');
-            $sheet->setCellValue('O1', '수취인');
-            $sheet->setCellValue('P1', '배송주소');
-            $sheet->setCellValue('Q1', '상세주소');
+            $sheet->setCellValue('M1', '제조사');
+            $sheet->setCellValue('N1', '원산지');
+            $sheet->setCellValue('O1', '할인가(KRW)');
+            $sheet->setCellValue('P1', '판매가(KRW)');
+            $sheet->setCellValue('Q1', '정상가(KRW)');
             $sheet->setCellValue('R1', '연락처');
             $sheet->setCellValue('S1', '배송메모');
             $sheet->setCellValue('T1', '등록일시');
@@ -859,6 +859,11 @@ class ExportExcelController extends Controller
                 $sheet->setCellValue('J'.$i, $data2->item_no->item_option1);
                 $sheet->setCellValue('K'.$i, '');
                 $sheet->setCellValue('L'.$i, $data2->wi_number);
+                $sheet->setCellValue('M'.$i, $data2->item_no->item_info->marker);
+                $sheet->setCellValue('N'.$i, $data2->item_no->item_origin);
+                $sheet->setCellValue('O'.$i, '');
+                $sheet->setCellValue('P'.$i, $data2->item_no->item_origin);
+                $sheet->setCellValue('Q'.$i, '');
                 }
                 $sheet->setCellValue('L'.$number2, $total_number);
                 $num_row = $number2 + 1;
