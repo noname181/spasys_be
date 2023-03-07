@@ -1953,36 +1953,46 @@ class RateDataController extends Controller
             //$company = Company::with(['co_parent'])->where('co_license', $export->import_expected->tie_co_license)->first();
             $rate_data = RateData::where('rd_cate_meta1', '보세화물');
 
-            if ($user->mb_type == 'spasys') {
-                $co_no = $company->co_no;
-                $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
-                $rate_data = $rate_data->where('rd_co_no', $co_no);
-                if (isset($rmd->rmd_no)) {
-                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no)->get();
-                }else {
-                    $rate_data = [];
-                }
-            } else if ($user->mb_type == 'shop') {
-                $co_no = $company->co_no;
-                $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
-                $rate_data = $rate_data->where('rd_co_no', $co_no);
-                if (isset($rmd->rmd_no)) {
-                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no)->get();
-                }else {
-                    $rate_data = [];
-                }
-            } else {
-                $co_no = $company->co_no;
-                $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
-                $rate_data = $rate_data->where('rd_co_no', $co_no);
-                if (isset($rmd->rmd_no)) {
-                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no)->get();
-                }else {
-                    $rate_data = [];
-                }
+            $rmd = RateMetaData::where('co_no', $user->mb_type == 'spasys' ? $company->co_parent_no : $company->co_no)->whereNull('set_type')->orderBy('rmd_no', 'DESC')->first();
+            $rate_data = $rate_data->where('rd_co_no', $user->mb_type == 'spasys' ? $company->co_parent_no : $company->co_no);
+            if (isset($rmd->rmd_no)) {
+                $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no)->get();
+            }else {
+                $rate_data = [];
             }
 
-            $adjustment_group = AdjustmentGroup::where('co_no', $co_no)->first();
+
+            // if ($user->mb_type == 'spasys') {
+            //     $co_no = $company->co_no;
+                
+            //     $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
+            //     $rate_data = $rate_data->where('rd_co_no', $company->co_parent->co_no);
+            //     if (isset($rmd->rmd_no)) {
+            //         $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no)->get();
+            //     }else {
+            //         $rate_data = [];
+            //     }
+            // } else if ($user->mb_type == 'shop') {
+            //     $co_no = $company->co_no;
+            //     $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
+            //     $rate_data = $rate_data->where('rd_co_no', $co_no);
+            //     if (isset($rmd->rmd_no)) {
+            //         $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no)->get();
+            //     }else {
+            //         $rate_data = [];
+            //     }
+            // } else {
+            //     $co_no = $company->co_no;
+            //     $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
+            //     $rate_data = $rate_data->where('rd_co_no', $co_no);
+            //     if (isset($rmd->rmd_no)) {
+            //         $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no)->get();
+            //     }else {
+            //         $rate_data = [];
+            //     }
+            // }
+
+            $adjustment_group = AdjustmentGroup::where('co_no', $user->mb_type == 'spasys' ? $company->co_parent_no : $company->co_no)->first();
 
             return response()->json([
                 'message' => Messages::MSG_0007,
