@@ -763,7 +763,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             'w_schedule_day' => $request->w_schedule_day,
                             'w_import_no' => $data['w_import_no'],
                             'w_type' => 'EW',
-                            'w_category_name' => $request->w_category_name,
+                            'w_category_name' => '유통가공',
                             'co_no' => $warehousing_data->co_no
                         ]);
 
@@ -807,7 +807,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             $rgd_no = ReceivingGoodsDelivery::insertGetId([
                                 'mb_no' => $member->mb_no,
                                 'w_no' => $w_no,
-                                'service_korean_name' => $request->w_category_name,
+                                'service_korean_name' => '유통가공',
                                 'rgd_contents' => $location['rgd_contents'],
                                 'rgd_address' => $location['rgd_address'],
                                 'rgd_address_detail' => $location['rgd_address_detail'],
@@ -832,7 +832,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'w_no' => $w_no,
                                 'mb_no' => $member->mb_no,
                                 'status' => $warehousing_status,
-                                'w_category_name' => $request->w_category_name,
+                                'w_category_name' => '유통가공',
                             ]);
                         }
                         // if ($warehousing_status) {
@@ -856,7 +856,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                     'w_import_no' => $warehousing_data->w_import_no,
                                     'w_amount' => $data['w_amount'],
                                     'w_type' => 'EW',
-                                    'w_category_name' => $request->w_category_name,
+                                    'w_category_name' => '유통가공',
                                 ]);
                                 Warehousing::where('w_no', $warehousing_data->w_import_no)->update([
                                     'w_children_yn' => "y"
@@ -923,7 +923,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                     $rgd_no = ReceivingGoodsDelivery::where('w_no', $request->w_no)->update([
                                         'mb_no' => $member->mb_no,
                                         'w_no' => $request->w_no,
-                                        'service_korean_name' => $request->w_category_name,
+                                        'service_korean_name' => '유통가공',
                                         'rgd_contents' => $location['rgd_contents'],
                                         'rgd_address' => $location['rgd_address'],
                                         'rgd_address_detail' => $location['rgd_address_detail'],
@@ -948,7 +948,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                         'w_no' => $w_no,
                                         'mb_no' => $member->mb_no,
                                         'status' => $warehousing_status,
-                                        'w_category_name' => $request->w_category_name,
+                                        'w_category_name' => '유통가공',
                                     ]);
                                 }
                                 // if ($warehousing_status3) {
@@ -967,7 +967,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                     'w_import_no' => $data['w_import_no'],
                                     'w_amount' => $data['w_amount'],
                                     'w_type' => 'EW',
-                                    'w_category_name' => $request->w_category_name,
+                                    'w_category_name' => '유통가공',
                                     'co_no' => $request->co_no ? $request->co_no : $co_no,
                                     'connection_number' => $request->connection_number
                                 ]);
@@ -1008,7 +1008,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                     $rgd_no = ReceivingGoodsDelivery::insertGetId([
                                         'mb_no' => $member->mb_no,
                                         'w_no' => $w_no,
-                                        'service_korean_name' => $request->w_category_name,
+                                        'service_korean_name' => '유통가공',
                                         'rgd_contents' => $location['rgd_contents'],
                                         'rgd_address' => $location['rgd_address'],
                                         'rgd_address_detail' => $location['rgd_address_detail'],
@@ -1033,7 +1033,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                         'w_no' => $w_no,
                                         'mb_no' => $member->mb_no,
                                         'status' => $warehousing_status,
-                                        'w_category_name' => $request->w_category_name,
+                                        'w_category_name' => '유통가공',
                                     ]);
                                 }
                                 // if ($warehousing_status3) {
