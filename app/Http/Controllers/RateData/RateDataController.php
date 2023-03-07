@@ -8431,7 +8431,7 @@ class RateDataController extends Controller
                         'cbh_type' => 'cancel',
                     ]);
                 }
-            } else if ($request->bill_type == 'case_bill_final_issue') { //cancel approval casebill
+            } else if ($request->bill_type == 'casebill_final_issue') { //cancel approval casebill
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_status5' => NULL,
                     'rgd_confirmed_date' => NULL
@@ -8439,7 +8439,7 @@ class RateDataController extends Controller
                 $insert_cancel_bill = CancelBillHistory::insertGetId([
                     'mb_no' => Auth::user()->mb_no,
                     'rgd_no' => $request->rgd_no,
-                    'cbh_status_before' => 'issued',
+                    'cbh_status_before' => 'confirmed',
                     'cbh_status_after' =>  NULL,
                     'cbh_type' => 'revert',
                 ]);
