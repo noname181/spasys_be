@@ -1486,8 +1486,8 @@ class BannerController extends Controller
             $total3 = [];
 
             $charttotal1 = [];
-            $charttotal2 = [];
-            $charttotal3 = [];
+            // $charttotal2 = [];
+            // $charttotal3 = [];
 
             $check = "";
             if ($request->service == "유통가공" || $request->type == "time3") {
@@ -1502,18 +1502,34 @@ class BannerController extends Controller
                 $total1 =  $this->CaculateService1($request);
                 $charttotal1[] = $total1['countcharta'];
                 $charttotal1[] = $total1['countchartb'];
-            } elseif ($request->servicechart == "보세화물") {
-                $totala1 =  $this->CaculateService1($request);
-                $charttotal1[] = $totala1['countcharta'];
-                $charttotal1[] = $totala1['countchartb'];
-            } elseif ($request->servicechart == "수입풀필먼트") {
-                $totala2 =  $this->CaculateService2($request);
-                $charttotal1[] = $totala2['countcharta'];
-                $charttotal1[] = $totala2['countchartb'];
-            } elseif ($request->servicechart == "유통가공") {
-                $totala3 =  $this->CaculateService3($request);
-                $charttotal1[] = $totala3['countcharta'];
-                $charttotal1[] = $totala3['countchartb'];
+            } elseif (isset($request->servicechart) && $request->co_no != "") {
+                if ($request->servicechart == "보세화물") {
+                    $totala1 =  $this->CaculateService1($request);
+                    $charttotal1[] = $totala1['counta'];
+                    $charttotal1[] = $totala1['countb'];
+                } elseif ($request->servicechart == "수입풀필먼트") {
+                    $totala2 =  $this->CaculateService2($request);
+                    $charttotal1[] = $totala2['counta'];
+                    $charttotal1[] = $totala2['countb'];
+                } elseif ($request->servicechart == "유통가공") {
+                    $totala3 =  $this->CaculateService3($request);
+                    $charttotal1[] = $totala3['counta'];
+                    $charttotal1[] = $totala3['countb'];
+                }
+            } elseif (isset($request->servicechart) && $request->co_no == ""){
+                if ($request->servicechart == "보세화물") {
+                    $totala1 =  $this->CaculateService1($request);
+                    $charttotal1[] = $totala1['countcharta'];
+                    $charttotal1[] = $totala1['countchartb'];
+                } elseif ($request->servicechart == "수입풀필먼트") {
+                    $totala2 =  $this->CaculateService2($request);
+                    $charttotal1[] = $totala2['countcharta'];
+                    $charttotal1[] = $totala2['countchartb'];
+                } elseif ($request->servicechart == "유통가공") {
+                    $totala3 =  $this->CaculateService3($request);
+                    $charttotal1[] = $totala3['countcharta'];
+                    $charttotal1[] = $totala3['countchartb'];
+                }
             } else {
                 $total1 =  $this->CaculateService1($request);
                 $total2 =  $this->CaculateService2($request);
@@ -1529,8 +1545,6 @@ class BannerController extends Controller
                 'total2' => $total2,
                 'total3' => $total3,
                 'charttotal1' => $charttotal1,
-                'charttotal2' => $charttotal2,
-                'charttotal3' => $charttotal3,
             ]);
         } catch (\Exception $e) {
             Log::error($e);
@@ -1568,18 +1582,9 @@ class BannerController extends Controller
                 ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
 
 
+            $warehousingb = $this->subquery($sub,$sub_2,$sub_4);
 
-            $warehousingb = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
-                $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
-            })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
-                $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-            })->orderBy('te_carry_out_number', 'DESC');
-
-            $warehousingd = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
-                $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
-            })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
-                $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-            })->orderBy('te_carry_out_number', 'DESC');
+            $warehousingd = $this->subquery($sub,$sub_2,$sub_4);
         } else if ($user->mb_type == 'shipper') {
 
             $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number', 'tie_is_date', 'tie_status_2')
@@ -1605,17 +1610,9 @@ class BannerController extends Controller
 
 
 
-            $warehousingb = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
-                $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
-            })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
-                $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-            })->orderBy('te_carry_out_number', 'DESC');
+            $warehousingb = $this->subquery($sub,$sub_2,$sub_4);
 
-            $warehousingd = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
-                $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
-            })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
-                $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-            })->orderBy('te_carry_out_number', 'DESC');
+            $warehousingd = $this->subquery($sub,$sub_2,$sub_4);
         } else if ($user->mb_type == 'spasys') {
             //FIX NOT WORK 'with'
             $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number', 'tie_is_date', 'tie_status_2')
@@ -1636,20 +1633,9 @@ class BannerController extends Controller
             $sub_4 = Export::select('te_logistic_manage_number', 'te_carry_in_number', 'te_carry_out_number')
                 ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
 
+            $warehousingb = $this->subquery($sub,$sub_2,$sub_4);
 
-
-
-            $warehousingb = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
-                $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
-            })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
-                $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-            });
-
-            $warehousingd = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
-                $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
-            })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
-                $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-            });
+            $warehousingd = $this->subquery($sub,$sub_2,$sub_4);
         }
         $countb = [];
         $countd = [];
@@ -2143,12 +2129,6 @@ class BannerController extends Controller
 
     public function SQL($validated = null)
     {
-
-        // If per_page is null set default data = 15
-        $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
-        // If page is null set default data = 1
-        $page = isset($validated['page']) ? $validated['page'] : 1;
-
         //DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
         $user = Auth::user();
         if ($user->mb_type == 'shop') {
@@ -2182,7 +2162,7 @@ class BannerController extends Controller
                 ->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
 
                     $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-                })->orderBy('te_carry_out_number', 'DESC');
+                });
         } else if ($user->mb_type == 'shipper') {
 
             $sub = ImportExpected::select('company.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
@@ -2217,7 +2197,7 @@ class BannerController extends Controller
 
 
                     $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-                })->orderBy('te_carry_out_number', 'DESC');
+                });
         } else if ($user->mb_type == 'spasys') {
 
             //FIX NOT WORK 'with'
@@ -2253,7 +2233,7 @@ class BannerController extends Controller
 
                 ->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
                     $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-                })->orderBy('ti_logistic_manage_number', 'DESC')->orderBy('te_logistic_manage_number', 'DESC');
+                });
         }
 
         $import_schedule = $import_schedule->whereNull('ddd.te_logistic_manage_number')->get();
