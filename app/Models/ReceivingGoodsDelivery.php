@@ -102,7 +102,7 @@ class ReceivingGoodsDelivery extends Model
     }
 
     public function rate_data_general(){
-        return $this->hasOne(RateDataGeneral::class, 'rgd_no', 'rgd_no')->with(['rgd_no_final']);
+        return $this->hasOne(RateDataGeneral::class, 'rgd_no', 'rgd_no')->with(['rgd_no_final', 'adjustment_group']);
     }
     public function rate_meta_data(){
         return $this->hasMany(RateMetaData::class, 'rgd_no', 'rgd_no')->with(['rate_data']);

@@ -80,4 +80,9 @@ class RateDataGeneral extends Model
         return $this->belongsTo(RateDataGeneral::class, 'rgd_no_final', 'rgd_no');
     }
 
+    public function adjustment_group()
+    {
+        return $this->hasOne(AdjustmentGroup::class, 'ag_no', 'ag_no')->select(['ag_no', 'ag_auto_issue']);
+    }
+
 }

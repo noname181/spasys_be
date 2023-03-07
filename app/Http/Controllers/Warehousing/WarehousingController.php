@@ -6061,7 +6061,7 @@ class WarehousingController extends Controller
     }
     public function load_table_top_right($rgd_no)
     {
-        $data = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child'])->find($rgd_no);
+        $data = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child', 'rate_data_general'])->find($rgd_no);
         if (!empty($data)) {
             return response()->json(
                 [
