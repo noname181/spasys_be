@@ -1911,10 +1911,12 @@ class WarehousingController extends Controller
                     $import_schedule->where('te_logistic_manage_number', 'like', '%' . $validated['order_id'] . '%');
                 }
 
-                $import_schedule = $import_schedule->leftjoin('receiving_goods_delivery', function ($join) {
-                    $join->on('te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
-                    $join->orOn('ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
-                    $join->orOn('tie_logistic_manage_number', '=', 'receiving_goods_delivery.is_no');
+                $import_schedule = $import_schedule->leftjoin('receiving_goods_delivery', function ($join){
+                        $join->on('te_carry_out_number', '=', 'receiving_goods_delivery.is_no')->where('te_carry_out_number','!=',null);
+                        $join->orOn('ti_carry_in_number', '=', 'receiving_goods_delivery.is_no')->whereNull('te_carry_out_number');
+                        $join->orOn('tie_logistic_manage_number', '=', 'receiving_goods_delivery.is_no')->whereNull('te_carry_out_number')->whereNull('ti_carry_in_number');
+                    
+                    
                 });
                 if (isset($validated['status'])) {
 
@@ -2142,16 +2144,16 @@ class WarehousingController extends Controller
 
                 if (isset($validated['from_date'])) {
                     //$schedule_shipment->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
-                    $schedule_shipment->whereHas('receving_goods_delivery', function ($q) use ($validated) {
-                        $q->where('rgd_delivery_schedule_day', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
-                    });
+                    // $schedule_shipment->whereHas('receving_goods_delivery', function ($q) use ($validated) {
+                    //     $q->where('rgd_delivery_schedule_day', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                    // });
                 }
 
                 if (isset($validated['to_date'])) {
                     //$schedule_shipment->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
-                    $schedule_shipment->whereHas('receving_goods_delivery', function ($q) use ($validated) {
-                        $q->where('rgd_delivery_schedule_day', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
-                    });
+                    // $schedule_shipment->whereHas('receving_goods_delivery', function ($q) use ($validated) {
+                    //     $q->where('rgd_delivery_schedule_day', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                    // });
                 }
 
                 if (isset($validated['co_parent_name'])) {
@@ -2470,9 +2472,12 @@ class WarehousingController extends Controller
                 }
 
                 $import_schedule = $import_schedule->leftjoin('receiving_goods_delivery', function ($join) {
-                    $join->on('te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
-                    $join->orOn('ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
-                    $join->orOn('tie_logistic_manage_number', '=', 'receiving_goods_delivery.is_no');
+                    // $join->on('te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
+                    // $join->orOn('ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
+                    // $join->orOn('tie_logistic_manage_number', '=', 'receiving_goods_delivery.is_no');
+                    $join->on('te_carry_out_number', '=', 'receiving_goods_delivery.is_no')->where('te_carry_out_number','!=',null);
+                    $join->orOn('ti_carry_in_number', '=', 'receiving_goods_delivery.is_no')->whereNull('te_carry_out_number');
+                    $join->orOn('tie_logistic_manage_number', '=', 'receiving_goods_delivery.is_no')->whereNull('te_carry_out_number')->whereNull('ti_carry_in_number');
                 });
 
                 if (isset($validated['status'])) {

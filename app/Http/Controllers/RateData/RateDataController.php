@@ -3610,7 +3610,9 @@ class RateDataController extends Controller
                 foreach ($request->rgds as $key => $rgd) {
                     $expectation_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->where('rgd_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
                     $is_exist = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', 'final_monthly')->first();
-                    if (!$is_exist) {
+                    $final_rgd = ReceivingGoodsDelivery::where('rgd_parent_no', $rgd['rgd_no'])->where('rgd_bill_type', 'final_monthly')->first();
+
+                    if (!$is_exist || $final_rgd->rgd_status5 == 'cancel') {
                         $is_exist = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
 
                         $final_rdg = $is_exist->replicate();
@@ -3646,11 +3648,11 @@ class RateDataController extends Controller
                     }
 
                     $expectation_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->where('rgd_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
-                    $final_rgd = ReceivingGoodsDelivery::where('rgd_parent_no', $rgd['rgd_no'])->where('rgd_bill_type', 'final_monthly')->first();
+                    
 
                     $final_rgds[] = $final_rgd;
 
-                    if (!$final_rgd) {
+                    if (!$final_rgd || $final_rgd->rgd_status5 == 'cancel') {
                         $expectation_rgd->rgd_status5 = 'issued';
                         $expectation_rgd->save();
 
@@ -8441,7 +8443,7 @@ class RateDataController extends Controller
                         'cbh_type' => 'cancel',
                     ]);
                 }
-            } else if ($request->bill_type == 'case_bill_final_issue') { //cancel approval casebill
+            } else if ($request->bill_type == 'casebill_final_issue') { //cancel approval casebill
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_status5' => NULL,
                     'rgd_confirmed_date' => NULL
@@ -8449,7 +8451,7 @@ class RateDataController extends Controller
                 $insert_cancel_bill = CancelBillHistory::insertGetId([
                     'mb_no' => Auth::user()->mb_no,
                     'rgd_no' => $request->rgd_no,
-                    'cbh_status_before' => 'issued',
+                    'cbh_status_before' => 'confirmed',
                     'cbh_status_after' =>  NULL,
                     'cbh_type' => 'revert',
                 ]);
