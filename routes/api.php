@@ -215,8 +215,7 @@ Route::middleware('auth')->group(function () {
     Route::post('receiving_goods_delivery/update_request', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_request']);
     Route::post('receiving_goods_delivery/update_status6', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_status6']);
     Route::post('receiving_goods_delivery/update_status7', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_status7']);
-    Route::post('receiving_goods_delivery/update_status5_fulfillment', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_status5_fulfillment']);
-
+    
     Route::post('receiving_goods_delivery/payment', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'payment']);
     Route::post('receiving_goods_delivery/cancel_payment', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'cancel_payment']);
     Route::post('receiving_goods_delivery/load_payment', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'load_payment']);
