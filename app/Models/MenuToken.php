@@ -11,7 +11,7 @@ class MenuToken extends Model
 {
     use HasFactory;
 
-    protected $table = "menu";
+    protected $table = "menu_token";
 
     protected $primaryKey = 'mt_no';
 
