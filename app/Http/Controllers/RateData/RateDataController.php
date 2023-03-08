@@ -1953,36 +1953,46 @@ class RateDataController extends Controller
             //$company = Company::with(['co_parent'])->where('co_license', $export->import_expected->tie_co_license)->first();
             $rate_data = RateData::where('rd_cate_meta1', '보세화물');
 
-            if ($user->mb_type == 'spasys') {
-                $co_no = $company->co_no;
-                $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
-                $rate_data = $rate_data->where('rd_co_no', $co_no);
-                if (isset($rmd->rmd_no)) {
-                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no)->get();
-                }else {
-                    $rate_data = [];
-                }
-            } else if ($user->mb_type == 'shop') {
-                $co_no = $company->co_no;
-                $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
-                $rate_data = $rate_data->where('rd_co_no', $co_no);
-                if (isset($rmd->rmd_no)) {
-                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no)->get();
-                }else {
-                    $rate_data = [];
-                }
-            } else {
-                $co_no = $company->co_no;
-                $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
-                $rate_data = $rate_data->where('rd_co_no', $co_no);
-                if (isset($rmd->rmd_no)) {
-                    $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no)->get();
-                }else {
-                    $rate_data = [];
-                }
+            $rmd = RateMetaData::where('co_no', $user->mb_type == 'spasys' ? $company->co_parent_no : $company->co_no)->whereNull('set_type')->orderBy('rmd_no', 'DESC')->first();
+            $rate_data = $rate_data->where('rd_co_no', $user->mb_type == 'spasys' ? $company->co_parent_no : $company->co_no);
+            if (isset($rmd->rmd_no)) {
+                $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no)->get();
+            }else {
+                $rate_data = [];
             }
 
-            $adjustment_group = AdjustmentGroup::where('co_no', $co_no)->first();
+
+            // if ($user->mb_type == 'spasys') {
+            //     $co_no = $company->co_no;
+                
+            //     $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
+            //     $rate_data = $rate_data->where('rd_co_no', $company->co_parent->co_no);
+            //     if (isset($rmd->rmd_no)) {
+            //         $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no)->get();
+            //     }else {
+            //         $rate_data = [];
+            //     }
+            // } else if ($user->mb_type == 'shop') {
+            //     $co_no = $company->co_no;
+            //     $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
+            //     $rate_data = $rate_data->where('rd_co_no', $co_no);
+            //     if (isset($rmd->rmd_no)) {
+            //         $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no)->get();
+            //     }else {
+            //         $rate_data = [];
+            //     }
+            // } else {
+            //     $co_no = $company->co_no;
+            //     $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
+            //     $rate_data = $rate_data->where('rd_co_no', $co_no);
+            //     if (isset($rmd->rmd_no)) {
+            //         $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no)->get();
+            //     }else {
+            //         $rate_data = [];
+            //     }
+            // }
+
+            $adjustment_group = AdjustmentGroup::where('co_no', $user->mb_type == 'spasys' ? $company->co_parent_no : $company->co_no)->first();
 
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -3600,7 +3610,9 @@ class RateDataController extends Controller
                 foreach ($request->rgds as $key => $rgd) {
                     $expectation_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->where('rgd_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
                     $is_exist = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', 'final_monthly')->first();
-                    if (!$is_exist) {
+                    $final_rgd = ReceivingGoodsDelivery::where('rgd_parent_no', $rgd['rgd_no'])->where('rgd_bill_type', 'final_monthly')->first();
+
+                    if (!$is_exist || $final_rgd->rgd_status5 == 'cancel') {
                         $is_exist = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
 
                         $final_rdg = $is_exist->replicate();
@@ -3636,11 +3648,11 @@ class RateDataController extends Controller
                     }
 
                     $expectation_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->where('rgd_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
-                    $final_rgd = ReceivingGoodsDelivery::where('rgd_parent_no', $rgd['rgd_no'])->where('rgd_bill_type', 'final_monthly')->first();
+                    
 
                     $final_rgds[] = $final_rgd;
 
-                    if (!$final_rgd) {
+                    if (!$final_rgd || $final_rgd->rgd_status5 == 'cancel') {
                         $expectation_rgd->rgd_status5 = 'issued';
                         $expectation_rgd->save();
 
@@ -8346,92 +8358,8 @@ class RateDataController extends Controller
             //     }
             // }
             $user = Auth::user();
-            //month_bill_edit && case_bill_edit && case_bill_final
-            if ($request->bill_type == 'case_bill_final' || $request->bill_type == 'case_bill_edit' || $request->bill_type == 'month_bill_edit') {
-                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-                    'rgd_status5' => 'cancel',
-                    'rgd_canceled_date' => Carbon::now()->toDateTimeString(),
-                ]);
-                $insert_cancel_bill = CancelBillHistory::insertGetId([
-                    'mb_no' => Auth::user()->mb_no,
-                    'rgd_no' => $request->rgd_no,
-                    'cbh_status_after' => 'cancel',
-                    'cbh_type' => 'cancel',
-                ]);
-                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
-                $rgd_parent = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
-
-                if ($rgd_parent->rgd_status5 == 'issued') {
-                    ReceivingGoodsDelivery::where('rgd_no', $rgd_parent->rgd_no)->update([
-                        'rgd_status5' => ($rgd_parent->rgd_status4 == '확정청구서' ? 'confirmed' : null),
-                        'rgd_issued_date' => NULL,
-                    ]);
-                }
-
-            } else if ($request->bill_type == 'monthly') { //final bill
-
-                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
-
-                $settlement_number = $rgd->rgd_settlement_number;
-
-                $rgds = ReceivingGoodsDelivery::where('rgd_settlement_number', $settlement_number)->get();
-                foreach ($rgds as $rgd) {
-                    $rgd_update = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
-                        'rgd_status5' => 'cancel',
-                        'rgd_canceled_date' => Carbon::now()->toDateTimeString(),
-                    ]);
-                    CancelBillHistory::insertGetId([
-                        'mb_no' => Auth::user()->mb_no,
-                        'rgd_no' => $rgd['rgd_no'],
-                        'cbh_status_after' => 'cancel',
-                        'cbh_type' => 'cancel',
-                    ]);
-                    $rgd_parent = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_parent_no'])->first();
-
-                    ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_parent_no'])->update([
-                        'rgd_status5' => ($rgd_parent['rgd_status4'] == '확정청구서' ? 'confirmed' : null),
-                        'rgd_issued_date' => NULL,
-                    ]);
-                    CancelBillHistory::insertGetId([
-                        'mb_no' => Auth::user()->mb_no,
-                        'rgd_no' => $rgd['rgd_parent_no'],
-                        'cbh_status_after' => 'revert',
-                        'cbh_type' => 'revert',
-                    ]);
-                }
-            } else if ($request->bill_type == 'monthly_service2') { //page 253 service 2
-                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
-
-                $settlement_number = $rgd->rgd_settlement_number;
-
-                $rgds = ReceivingGoodsDelivery::where('rgd_settlement_number', $settlement_number)->get();
-                foreach ($rgds as $rgd) {
-                    $rgd_update = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
-                        'rgd_status5' => 'cancel',
-                        'rgd_canceled_date' => Carbon::now()->toDateTimeString(),
-                    ]);
-                    $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->first();
-                    $rgd_parent_no = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->update(
-                        $user->mb_type == 'spasys' ? [
-                            'rgd_status5' => NULL,
-                            'rgd_issued_date' => NULL,
-                        ] : [
-                            'rgd_status4' => NULL,
-                            'rgd_issued_date' => NULL,
-                        ]
-                    );
-                    RateMetaData::where('rgd_no', $rgd->rgd_parent_no)->update([
-                        'rgd_no' => $rgd['rgd_no'],
-                    ]);
-
-                    CancelBillHistory::insertGetId([
-                        'mb_no' => Auth::user()->mb_no,
-                        'rgd_no' => $rgd['rgd_no'],
-                        'cbh_status_after' => 'cancel',
-                        'cbh_type' => 'cancel',
-                    ]);
-                }
-            } else if ($request->bill_type == 'casebill_final_issue') { //cancel approval casebill
+            // CANCEL APPROVAL PROCESS
+            if ($request->bill_type == 'casebill_final_issue') { //cancel approval casebill
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_status5' => NULL,
                     'rgd_confirmed_date' => NULL
@@ -8475,7 +8403,59 @@ class RateDataController extends Controller
                     //     'cbh_type' => 'revert',
                     // ]);
                 }
-            } else { //case_bill,monthly_bill
+            } else if ($request->bill_type == 'case_bill_final') { //case_bill_final && month_bill_final 
+                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                    'rgd_status5' => 'cancel',
+                    'rgd_canceled_date' => Carbon::now()->toDateTimeString(),
+                ]);
+                $insert_cancel_bill = CancelBillHistory::insertGetId([
+                    'mb_no' => Auth::user()->mb_no,
+                    'rgd_no' => $request->rgd_no,
+                    'cbh_status_after' => 'cancel',
+                    'cbh_type' => 'cancel',
+                ]);
+                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+                $rgd_parent = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
+
+                if ($rgd_parent->rgd_status5 == 'issued') {
+                    ReceivingGoodsDelivery::where('rgd_no', $rgd_parent->rgd_no)->update([
+                        'rgd_status5' => ($rgd_parent->rgd_status4 == '확정청구서' ? 'confirmed' : null),
+                        'rgd_issued_date' => NULL,
+                    ]);
+                }
+
+            } else if ($request->bill_type == 'month_bill_final') { //final bill
+
+                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+
+                $settlement_number = $rgd->rgd_settlement_number;
+
+                $rgds = ReceivingGoodsDelivery::where('rgd_settlement_number', $settlement_number)->get();
+                foreach ($rgds as $rgd) {
+                    $rgd_update = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
+                        'rgd_status5' => 'cancel',
+                        'rgd_canceled_date' => Carbon::now()->toDateTimeString(),
+                    ]);
+                    CancelBillHistory::insertGetId([
+                        'mb_no' => Auth::user()->mb_no,
+                        'rgd_no' => $rgd['rgd_no'],
+                        'cbh_status_after' => 'cancel',
+                        'cbh_type' => 'cancel',
+                    ]);
+                    $rgd_parent = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_parent_no'])->first();
+
+                    ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_parent_no'])->update([
+                        'rgd_status5' => ($rgd_parent['rgd_status4'] == '확정청구서' ? 'confirmed' : null),
+                        'rgd_issued_date' => NULL,
+                    ]);
+                    CancelBillHistory::insertGetId([
+                        'mb_no' => Auth::user()->mb_no,
+                        'rgd_no' => $rgd['rgd_parent_no'],
+                        'cbh_status_after' => 'revert',
+                        'cbh_type' => 'revert',
+                    ]);
+                }
+            } else { //est_case_bill, est_monthly_bill, final_month_bill_fulfill
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_status5' => 'cancel',
                     'rgd_canceled_date' => Carbon::now()->toDateTimeString(),

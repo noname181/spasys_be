@@ -146,4 +146,8 @@ class Warehousing extends Model
     {
         return $this->hasOne(WarehousingStatus::class, 'w_no', 'w_no');
     }
+    public function package()
+    {
+        return $this->hasOne(Package::class, 'w_no', 'w_no');
+    }
 }

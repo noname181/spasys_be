@@ -273,7 +273,7 @@ class WarehousingController extends Controller
                     return $q->w_no;
                 });
                 $warehousing = Warehousing::with('mb_no')
-                    ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')->where('w_category_name', '=', '유통가공')
+                    ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent','package'])->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')->where('w_category_name', '=', '유통가공')
                     ->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     })->orWhereIn('w_no', $w_no_in)->orderBy('w_no', 'DESC');
@@ -295,7 +295,7 @@ class WarehousingController extends Controller
                     return $q->w_no;
                 });
                 $warehousing = Warehousing::with('mb_no')
-                    ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')->where('w_category_name', '=', '유통가공')
+                    ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent','package'])->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')->where('w_category_name', '=', '유통가공')
                     ->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     })->orWhereIn('w_no', $w_no_in)->orderBy('w_no', 'DESC');
@@ -381,7 +381,7 @@ class WarehousingController extends Controller
                 });
 
                 $warehousing = Warehousing::with('mb_no')
-                    ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent', 'warehousing_child'])->withCount([
+                    ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent', 'warehousing_child','package'])->withCount([
                         'warehousing_item as bonusQuantity' => function ($query) {
 
                             $query->select(DB::raw('SUM(wi_number)'))->where('wi_type', '출고_spasys');
@@ -2144,16 +2144,16 @@ class WarehousingController extends Controller
 
                 if (isset($validated['from_date'])) {
                     //$schedule_shipment->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
-                    $schedule_shipment->whereHas('receving_goods_delivery', function ($q) use ($validated) {
-                        $q->where('rgd_delivery_schedule_day', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
-                    });
+                    // $schedule_shipment->whereHas('receving_goods_delivery', function ($q) use ($validated) {
+                    //     $q->where('rgd_delivery_schedule_day', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                    // });
                 }
 
                 if (isset($validated['to_date'])) {
                     //$schedule_shipment->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
-                    $schedule_shipment->whereHas('receving_goods_delivery', function ($q) use ($validated) {
-                        $q->where('rgd_delivery_schedule_day', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
-                    });
+                    // $schedule_shipment->whereHas('receving_goods_delivery', function ($q) use ($validated) {
+                    //     $q->where('rgd_delivery_schedule_day', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                    // });
                 }
 
                 if (isset($validated['co_parent_name'])) {
@@ -4157,9 +4157,10 @@ class WarehousingController extends Controller
                         $item->sum_price_total3 = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum7 : 0;
                     } else if($item->rate_data_general->rdg_sum4){
                         $item->sum_price_total3 = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : 0;
-                    } else {
-                        $item->sum_price_total3 = 0;
                     }
+                    //  else {
+                    //     $item->sum_price_total3 = 0;
+                    // }
 
 
                     if ($i == $k) {
@@ -5330,8 +5331,8 @@ class WarehousingController extends Controller
                             'co_owner' => $request['company']['co_owner'],
                             'co_name' => $request['company']['co_name'],
                             'co_major' => $request['company']['co_major'],
-                            'co_address' => $request['ag']['ag_email'],
-                            'co_address2' => $request['ag']['ag_email2'],
+                            'co_address' => $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null,
+                            'co_address2' => $request['ag']['ag_email2'] ? $request['ag']['ag_email2'] : null,
                             'rgd_number' => $tax_number ? $tax_number : null,
                             'mb_no' => $user->mb_no,
                         ]);

@@ -79,7 +79,7 @@ class Member extends Authenticatable
 
     public function role()
     {
-        return $this->belongsTo(Role::class, 'role_no', 'role_no');
+        return $this->belongsTo(Role::class, 'role_no', 'role_no')->with('menu_token');
     }
 
     public function getMbServicesAttribute()

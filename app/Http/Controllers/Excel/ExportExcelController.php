@@ -814,10 +814,10 @@ class ExportExcelController extends Controller
             $sheet->setCellValue('O1', '할인가(KRW)');
             $sheet->setCellValue('P1', '판매가(KRW)');
             $sheet->setCellValue('Q1', '정상가(KRW)');
-            $sheet->setCellValue('R1', '연락처');
-            $sheet->setCellValue('S1', '배송메모');
-            $sheet->setCellValue('T1', '등록일시');
-            $sheet->setCellValue('U1', '');
+            $sheet->setCellValue('R1', '카테고리(대)');
+            $sheet->setCellValue('S1', '등록일시');
+            $sheet->setCellValue('T1', '');
+            $sheet->setCellValue('U1', '입고상태');
            
             $num_row = 2;
             $data_fullwarehousing =  json_decode($warehousing);
@@ -864,8 +864,12 @@ class ExportExcelController extends Controller
                 $sheet->setCellValue('O'.$i, '');
                 $sheet->setCellValue('P'.$i, $data2->item_no->item_origin);
                 $sheet->setCellValue('Q'.$i, '');
+                $sheet->setCellValue('R'.$i, $data2->item_no->item_info->category);
+                $sheet->setCellValue('S'.$i, $data2->item_no->created_at);
                 }
                 $sheet->setCellValue('L'.$number2, $total_number);
+                $sheet->setCellValue('T'.$number2, $total_number);
+                $sheet->setCellValue('U'.$number2, $data2->receving_goods_delivery->rgd_status1);
                 $num_row = $number2 + 1;
                 $no++;
             }
