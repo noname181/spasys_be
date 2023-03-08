@@ -2115,6 +2115,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
             foreach ($validated['remove'] as $remove) {
                 ReceivingGoodsDelivery::where('rgd_no', $remove['rgd_no'])->delete();
+                Package::where('rgd_no', $remove['rgd_no'])->delete();
             }
 
             if (isset($validated['connection_number'])) {
