@@ -5331,8 +5331,8 @@ class WarehousingController extends Controller
                             'co_owner' => $request['company']['co_owner'],
                             'co_name' => $request['company']['co_name'],
                             'co_major' => $request['company']['co_major'],
-                            'co_address' => $request['ag']['ag_email'],
-                            'co_address2' => $request['ag']['ag_email2'],
+                            'co_address' => $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null,
+                            'co_address2' => $request['ag']['ag_email2'] ? $request['ag']['ag_email2'] : null,
                             'rgd_number' => $tax_number ? $tax_number : null,
                             'mb_no' => $user->mb_no,
                         ]);
