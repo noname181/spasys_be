@@ -8403,7 +8403,7 @@ class RateDataController extends Controller
                     //     'cbh_type' => 'revert',
                     // ]);
                 }
-            } else if ($request->bill_type == 'case_bill_final' || $request->bill_type == 'month_bill_final') { //case_bill_final && month_bill_final 
+            } else if ($request->bill_type == 'case_bill_final') { //case_bill_final && month_bill_final 
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_status5' => 'cancel',
                     'rgd_canceled_date' => Carbon::now()->toDateTimeString(),
