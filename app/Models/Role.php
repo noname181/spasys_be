@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Member;
+use App\Models\MenuToken;
 
 class Role extends Model
 {
@@ -42,6 +43,9 @@ class Role extends Model
     public function permission()
     {
         return $this->hasMany(Permission::class, 'role_no', 'role_no');
+    }
+    public function menu_token(){
+        return $this->hasOne(MenuToken::class, 'role_no','role_no');
     }
 
 }
