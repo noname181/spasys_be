@@ -44,8 +44,8 @@ class ItemRequest extends BaseFormRequest
                 'max:255',
             ],
             'item_option1' => [
-                'required',
                 'string',
+                'nullable',
                 'max:255',
             ],
             'item_option2' => [
