@@ -2776,7 +2776,6 @@ class ReceivingGoodsDeliveryController extends Controller
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     'rgd_status6' => 'paid',
                     'rgd_paid_date' =>  Carbon::now(),
-                    'rgd_canceled_date' => null
                 ]);
             } else {
                 Payment::insertGetId(
