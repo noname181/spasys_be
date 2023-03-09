@@ -1730,7 +1730,7 @@ class BannerController extends Controller
         $countchartg = [];
 
         for ($i = 1; $i <= 6; $i++) {
-            $countchartg = $warehousingg->get()->groupBy(function ($date) {
+            $countchartg = $warehousingg->whereDate('created_at','>', now()->subYear())->get()->groupBy(function ($date) {
                 //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
                 return Carbon::parse($date->created_at)->format('m'); // grouping by months
             });
