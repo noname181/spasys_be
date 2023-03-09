@@ -243,10 +243,11 @@ class MenuController extends Controller
     {
         try {
             $user = Auth::user();
+            $member = Member::with('company')->where('mb_no', Auth::user()->mb_no)->first();
             $menu = Menu::whereHas('permission', function($q) use($user) {
                 $q->where('role_no', $user->role_no);
             })->get();
-            if($user->mb_type == 'shop' || $user->mb_type == 'shipper'){
+            if($member->mb_service_no_array == '공통'){
                 $menu_main = Menu::with(['menu_childs' => function($q) use($user) {
                     $q->whereHas('permission', function($q) use($user) {
                         $q->where('role_no', $user->role_no);
@@ -297,7 +298,8 @@ class MenuController extends Controller
             return response()->json([
                 'menu_main' => $menu_main,
                 'information' => $information,
-                '$user->role_no' => $user->role_no
+                '$user->role_no' => $user->role_no,
+                'member' => $member,
             ]);
         } catch (\Exception $e) {
             Log::error($e);
