@@ -9,6 +9,7 @@ use App\Http\Requests\RateData\RateDataSendMailRequest;
 use App\Models\AdjustmentGroup;
 use App\Models\CancelBillHistory;
 use App\Models\Company;
+use App\Models\Member;
 use App\Models\Contract;
 use App\Models\Export;
 use App\Models\Import;
@@ -2260,14 +2261,16 @@ class RateDataController extends Controller
         $user = Auth::user();
         $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd_no)->first();
 
+        $user_created_bill = Member::where('mb_no', $rgd->mb_no)->first(); 
+
         $service_korean_name = $service == 'distribution' ? '유통가공' : ($service == 'fulfillment' ? '수입풀필먼트' : '보세화물');
 
         try {
             $rate_data = RateData::where('rd_cate_meta1', $service_korean_name);
 
-            if ($user->mb_type == 'spasys') {
+            if ($user_created_bill->mb_type == 'spasys') {
                 $co_no = ($service == 'distribution' || $service == 'bonded') ? $rgd->warehousing->company->co_parent->co_no : $rgd->warehousing->co_no;
-            } else if ($user->mb_type == 'shop') {
+            } else if ($user_created_bill->mb_type == 'shop') {
                 $co_no = $rgd->warehousing->company->co_no;
             } else {
                 $co_no = $user->co_no;
