@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Member;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use App\Models\WarehousingItem;
 use App\Models\Import;
 use App\Models\ImportExpected;
@@ -1646,7 +1647,7 @@ class BannerController extends Controller
     public function CaculateInvoice($request)
     {
         $user = Auth::user();
-        if($request->co_no != ''){
+        if ($request->co_no != '') {
             $user->mb_type = 'shop';
             $user->co_no = $request->co_no;
         }
@@ -1729,13 +1730,13 @@ class BannerController extends Controller
         $countchartg = [];
 
         for ($i = 1; $i <= 6; $i++) {
-            $countchartg = $warehousingg->whereYear('created_at', Carbon::now()->year)->get()->groupBy(function ($date) {
+            $countchartg = $warehousingg->get()->groupBy(function ($date) {
                 //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
                 return Carbon::parse($date->created_at)->format('m'); // grouping by months
             });
         }
 
-
+        //return $countchartg;
 
         $userArrd = [];
         $chartcountd = [];
@@ -1775,16 +1776,29 @@ class BannerController extends Controller
             }
         }
 
-        for ($i = 1; $i <= 6; $i++) {
-            if (!empty($chartcountd[$i])) {
-                $userArrd['data'][] = $chartcountd[$i];
+        $period = CarbonPeriod::create(today()->subMonths(6), '1 month', today()->subMonth());
+
+        $final = [];
+
+        foreach ($period as $date) {
+            $m = (int)$date->format('m');
+            if (!empty($chartcountd[$m])) {
+                $userArrd['data'][] = $chartcountd[$m];
             } else {
                 $userArrd['data'][] = 0;
             }
         }
 
+        // for ($i = 1; $i <= 6; $i++) {
+        //     if (!empty($chartcountd[$i])) {
+        //         $userArrd['data'][] = $chartcountd[$i];
+        //     } else {
+        //         $userArrd['data'][] = 0;
+        //     }
+        // }
+
         return [
-            'userArrd' => $userArrd, 'request' => $request, 'countchartg' => $countchartg
+            'userArrd' => $userArrd, 'request' => $request, 'countchartg' => $countchartg, 'period' => $period,'chartcountd'=>$chartcountd
         ];
     }
 
