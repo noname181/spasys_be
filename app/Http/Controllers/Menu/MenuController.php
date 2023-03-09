@@ -246,15 +246,32 @@ class MenuController extends Controller
             $menu = Menu::whereHas('permission', function($q) use($user) {
                 $q->where('role_no', $user->role_no);
             })->get();
-            $menu_main = Menu::with(['menu_childs' => function($q) use($user) {
-                $q->whereHas('permission', function($q) use($user) {
-                    $q->where('role_no', $user->role_no);
-                });
-            }])->whereHas('menu_childs', function($q) use($user) {
-                $q->whereHas('permission', function($q) use($user) {
-                    $q->where('role_no', $user->role_no);
-                });
-            })->select(['menu_no', 'menu_name', 'service_no_array'])->where('menu_depth', '상위')->get();
+            if($user->mb_type == 'shop' || $user->mb_type == 'shipper'){
+                $menu_main = Menu::with(['menu_childs' => function($q) use($user) {
+                    $q->whereHas('permission', function($q) use($user) {
+                        $q->where('role_no', $user->role_no);
+                    })->where(function($q) {
+                        $q->where('service_no_array','=', '1 2 3 4')->orWhere('service_no_array','=', '2 3 4');
+                    });
+                }])->whereHas('menu_childs', function($q) use($user) {
+                    $q->whereHas('permission', function($q) use($user) {
+                        $q->where('role_no', $user->role_no);
+                    })->where(function ($q){
+                        $q->where('service_no_array','=', '1 2 3 4')->orWhere('service_no_array','=', '2 3 4');
+                    });
+                })->select(['menu_no', 'menu_name', 'service_no_array'])->where('menu_depth', '상위')->get();
+            }else{
+                $menu_main = Menu::with(['menu_childs' => function($q) use($user) {
+                    $q->whereHas('permission', function($q) use($user) {
+                        $q->where('role_no', $user->role_no);
+                    });
+                }])->whereHas('menu_childs', function($q) use($user) {
+                    $q->whereHas('permission', function($q) use($user) {
+                        $q->where('role_no', $user->role_no);
+                    });
+                })->select(['menu_no', 'menu_name', 'service_no_array'])->where('menu_depth', '상위')->get();
+            }
+            
 
 
             // getCustomerCenterInformation
@@ -284,7 +301,7 @@ class MenuController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0002], 500);
         }
     }
