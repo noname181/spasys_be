@@ -1646,7 +1646,10 @@ class BannerController extends Controller
     public function CaculateInvoice($request)
     {
         $user = Auth::user();
-
+        if($request->co_no != ''){
+            $user->mb_type = 'shop';
+            $user->co_no = $request->co_no;
+        }
         if ($user->mb_type == 'shop') {
             $warehousingg = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 't_export'])->whereHas('w_no', function ($query) use ($user) {
                 $query->whereHas('co_no.co_parent', function ($q) use ($user) {
@@ -1669,7 +1672,7 @@ class BannerController extends Controller
             });
         }
 
-        if ($request->service == "보세화물") {
+        if ($request->serviceinvoicechart == "보세화물" || $request->service == "보세화물") {
             $warehousingg->where(function ($q) {
                 $q->where('rgd_status4', '추가청구서')
                     ->orWhere('rgd_status4', '확정청구서');
@@ -1681,7 +1684,7 @@ class BannerController extends Controller
                 ->whereHas('mb_no', function ($q) use ($user) {
                     $q->where('mb_type', $user->mb_type);
                 });
-        } else if ($request->service == "수입풀필먼트") {
+        } else if ($request->serviceinvoicechart == "수입풀필먼트" || $request->service == "수입풀필먼트") {
             $warehousingg->where(function ($q) {
                 $q->where('rgd_status4', '추가청구서')
                     ->orWhere('rgd_status4', '확정청구서');
@@ -1693,7 +1696,7 @@ class BannerController extends Controller
                 ->whereHas('mb_no', function ($q) use ($user) {
                     $q->where('mb_type', $user->mb_type);
                 });
-        } else if ($request->service == "유통가공") {
+        } else if ($request->serviceinvoicechart == "유통가공" || $request->service == "유통가공") {
             $warehousingg->where(function ($q) {
                 $q->where('rgd_status4', '추가청구서')
                     ->orWhere('rgd_status4', '확정청구서');
@@ -1742,21 +1745,21 @@ class BannerController extends Controller
         $userArrd['backgroundColor'] = '#F7C35D';
         $number  = 0;
 
-        if ($request->service == "보세화물") {
+        if ($request->serviceinvoicechart == "보세화물" || $request->service == "보세화물") {
             foreach ($countchartg as $key => $value) {
                 foreach ($value as $ke => $i) {
                     $number += $i->rate_data_general->rdg_sum6;
                 }
                 $chartcountd[(int)$key] = $number;
             }
-        } else if ($request->service == "수입풀필먼트") {
+        } else if ($request->serviceinvoicechart == "수입풀필먼트" || $request->service == "수입풀필먼트") {
             foreach ($countchartg as $key => $value) {
                 foreach ($value as $ke => $i) {
                     $number += $i->rate_data_general->rdg_sum6;
                 }
                 $chartcountd[(int)$key] = $number;
             }
-        } else if ($request->service == "유통가공") {
+        } else if ($request->serviceinvoicechart == "유통가공" || $request->service == "유통가공") {
             foreach ($countchartg as $key => $value) {
                 foreach ($value as $ke => $i) {
                     $number += $i->rate_data_general->rdg_sum4;
@@ -1766,7 +1769,7 @@ class BannerController extends Controller
         } else {
             foreach ($countchartg as $key => $value) {
                 foreach ($value as $ke => $i) {
-                    $number += $i->rate_data_general->rdg_sum4;
+                    $number += $i->rate_data_general->rdg_sum6;
                 }
                 $chartcountd[(int)$key] = $number;
             }
@@ -1781,7 +1784,7 @@ class BannerController extends Controller
         }
 
         return [
-            'userArrd' => $userArrd, 'request' => $request
+            'userArrd' => $userArrd, 'request' => $request, 'countchartg' => $countchartg
         ];
     }
 
@@ -1806,19 +1809,26 @@ class BannerController extends Controller
                 $total3 =  $this->CaculateService3($request);
                 $charttotal1[] = $total3['countcharta'];
                 $charttotal1[] = $total3['countchartb'];
+                $totalinvoice =  $this->CaculateInvoice($request);
+                $chartinvoice[] = $totalinvoice['userArrd'];
             } elseif ($request->service == "수입풀필먼트" || $request->type == "time2") {
                 $total2 =  $this->CaculateService2($request);
                 $charttotal1[] = $total2['countcharta'];
                 $charttotal1[] = $total2['countchartb'];
+                $totalinvoice =  $this->CaculateInvoice($request);
+                $chartinvoice[] = $totalinvoice['userArrd'];
             } elseif ($request->service == "보세화물" || $request->type == "time1") {
                 $total1 =  $this->CaculateService1($request);
                 $charttotal1[] = $total1['countcharta'];
                 $charttotal1[] = $total1['countchartb'];
+                $totalinvoice =  $this->CaculateInvoice($request);
+                $chartinvoice[] = $totalinvoice['userArrd'];
             } elseif (isset($request->servicechart) && ($request->co_no != "화주별" && $request->co_no != "")) {
-                $totala1 =  $this->CaculateService1Shop($request);
+                $totala1 =  $this->CaculateService1Shop($request); //chart1
                 $charttotal1[] = $totala1['countcharta'];
                 $charttotal1[] = $totala1['countchartb'];
             } elseif (isset($request->servicechart) && ($request->co_no == "화주별" || $request->co_no == "")) {
+                //chart1
                 if ($request->servicechart == "보세화물") {
                     $totala1 =  $this->CaculateService1($request);
                     $charttotal1[] = $totala1['countcharta'];
@@ -1834,6 +1844,14 @@ class BannerController extends Controller
                     $charttotal1[] = $totala3['countcharta'];
                     $charttotal1[] = $totala3['countchartb'];
                 }
+            } elseif (isset($request->serviceinvoicechart) && ($request->co_no != "화주별" && $request->co_no != "")) {
+                //chart2
+                $totalinvoice =  $this->CaculateInvoice($request);
+                $chartinvoice[] = $totalinvoice['userArrd'];
+            } elseif (isset($request->serviceinvoicechart) && ($request->co_no == "화주별" || $request->co_no == "")) {
+                //chart2
+                $totalinvoice =  $this->CaculateInvoice($request);
+                $chartinvoice[] = $totalinvoice['userArrd'];
             } else {
                 $totalinvoice = $this->CaculateInvoice($request);
                 $chartinvoice[] = $totalinvoice['userArrd'];
