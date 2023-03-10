@@ -721,7 +721,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         Package::where('p_no', $package['p_no'])->update([
                             'w_no' => $request->w_no,
                             'note' => $package['note'],
-                            'order_number' => $package['order_number'],
+                            'order_number' => $package['order_number'] ? $package['order_number'] : CommonFunc::generate_w_schedule_number($request->w_no, 'EWC'),
                             'pack_type' => $package['pack_type'],
                             'quantity' => $package['quantity'],
                             'reciever' => $package['reciever'],
