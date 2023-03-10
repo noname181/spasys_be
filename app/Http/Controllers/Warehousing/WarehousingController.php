@@ -4125,8 +4125,8 @@ class WarehousingController extends Controller
                         if ($item->rgd_bill_type == 'final_monthly') {
                             $item->discount = '';
                             $total_discount = 0;
-                            foreach ($item->rgd_settlement as $row0) {
-                                $rate_data = RateData::where('rmd_no', $row0->rate_meta_data_parent[0]->rate_data[0]->rmd_no)->where('rd_cate2', '할인금액')->first();
+                            foreach ($item->rgd_settlement as $row) {
+                                $rate_data = RateData::where('rmd_no', $row->rate_meta_data_parent[0]->rate_data[0]->rmd_no)->where('rd_cate2', '할인금액')->first();
                                 $total_discount += $rate_data->rd_data4 ? $rate_data->rd_data4 : 0;
                             }
                             $item->discount = $total_discount;
