@@ -309,6 +309,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     if (isset($item_new['item_name'])) {
                         $item_no_new = Item::insertGetId([
                             'mb_no' => Auth::user()->mb_no,
+                            'item_bar_code' => $item_new['item_bar_code'],
                             'item_brand' => $item_new['item_brand'],
                             'item_service_name' => '유통가공',
                             'co_no' => $validated['co_no'] ? $validated['co_no'] : $co_no,
