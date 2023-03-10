@@ -1532,7 +1532,8 @@ class ReceivingGoodsDeliveryController extends Controller
                     'w_amount' => $validated['w_amount'],
                     'w_type' => 'IW',
                     'w_category_name' => $request->w_category_name,
-                    'w_completed_day' => Carbon::now()->toDateTimeString()
+                    'w_completed_day' => Carbon::now()->toDateTimeString(),
+                    
                 ]);
             } else {
                 $w_no_data = Warehousing::insertGetId([
@@ -1630,7 +1631,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     $checkexit1 = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_spasys')->first();
                     if (!isset($checkexit1->wi_no)) {
                         WarehousingItem::insert([
-                            'item_no' => $item_no,
+                            'item_no' => isset($item_no) && $item_no != null ? $item_no : null,
                             'w_no' => $w_no,
                             'wi_number' => $warehousing_item['warehousing_item2'][0]['wi_number'],
                             'wi_type' => '입고_spasys'
@@ -1644,7 +1645,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     $checkexit2 = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_shipper')->first();
                     if (!isset($checkexit2->wi_no)) {
                         WarehousingItem::insert([
-                            'item_no' => $item_no,
+                            'item_no' => isset($item_no) && $item_no != null ? $item_no : null,
                             'w_no' => $w_no,
                             'wi_number' => null,
                             'wi_type' => '입고_shipper'
@@ -1672,7 +1673,17 @@ class ReceivingGoodsDeliveryController extends Controller
                     ]);
                 }
             }
-
+            if (isset($request->connection_number)) {
+                if (isset($request->w_no)) {
+                    Warehousing::where('w_no', $request->w_no)->update([
+                        'connection_number' => $request->connection_number
+                    ]);
+                }else{
+                    Warehousing::where('w_no', $w_no)->update([
+                        'connection_number' => $request->connection_number
+                    ]);
+                }
+            }
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
