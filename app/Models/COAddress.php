@@ -36,6 +36,6 @@ class COAddress extends Model
     ];
     public function company()
     {
-        return $this->belongsTo(Company::class, 'co_no', 'co_no')->with('co_parent');
+        return $this->belongsTo(Company::class, 'co_no', 'co_no')->with('co_parent','contract');
     }
 }
