@@ -100,7 +100,10 @@ class ReceivingGoodsDelivery extends Model
     {
         return $this->belongsTo(ReceivingGoodsDelivery::class, 'rgd_parent_no', 'rgd_no')->select(['rgd_status5', 'rgd_status4', 'rgd_status6', 'rgd_no']);
     }
-
+    public function rgd_settlement()
+    {
+        return $this->hasMany(ReceivingGoodsDelivery::class, 'rgd_settlement_number', 'rgd_settlement_number')->with(['rate_data_general', 'rate_meta_data', 'rate_meta_data_parent'])->select(['rgd_status5', 'rgd_status4', 'rgd_status6', 'rgd_no', 'rgd_parent_no', 'rgd_settlement_number']);
+    }
     public function rate_data_general(){
         return $this->hasOne(RateDataGeneral::class, 'rgd_no', 'rgd_no')->with(['rgd_no_final', 'adjustment_group']);
     }
