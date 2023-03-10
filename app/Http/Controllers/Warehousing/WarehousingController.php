@@ -596,7 +596,13 @@ class WarehousingController extends Controller
                     return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
                 });
             }
-
+            if (isset($validated['co_no'])) {
+                // $import_schedule->whereHas('company', function ($q) use ($validated) {
+                //     return $q->where(DB::raw('lower(aaa.co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                // });
+                $warehousing->where('co_no','=',$validated['co_no']);
+                    
+            }
             if (isset($validated['w_schedule_number'])) {
                 $warehousing->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
             }

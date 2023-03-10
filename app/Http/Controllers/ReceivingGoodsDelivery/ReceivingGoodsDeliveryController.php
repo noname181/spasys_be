@@ -309,6 +309,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     if (isset($item_new['item_name'])) {
                         $item_no_new = Item::insertGetId([
                             'mb_no' => Auth::user()->mb_no,
+                            'item_bar_code' => $item_new['item_bar_code'],
                             'item_brand' => $item_new['item_brand'],
                             'item_service_name' => '유통가공',
                             'co_no' => $validated['co_no'] ? $validated['co_no'] : $co_no,
@@ -720,7 +721,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         Package::where('p_no', $package['p_no'])->update([
                             'w_no' => $request->w_no,
                             'note' => $package['note'],
-                            'order_number' => $package['order_number'],
+                            'order_number' => $package['order_number'] ? $package['order_number'] : CommonFunc::generate_w_schedule_number($request->w_no, 'EWC'),
                             'pack_type' => $package['pack_type'],
                             'quantity' => $package['quantity'],
                             'reciever' => $package['reciever'],

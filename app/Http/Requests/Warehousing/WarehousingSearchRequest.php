@@ -65,6 +65,10 @@ class WarehousingSearchRequest extends BaseFormRequest
                 'nullable',
                 'string',
             ],
+            'co_no' => [
+                'nullable',
+                'int',
+            ],
             'w_schedule_number' => [
                 '',
             ],
