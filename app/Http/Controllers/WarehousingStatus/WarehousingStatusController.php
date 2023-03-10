@@ -74,18 +74,18 @@ class WarehousingStatusController extends Controller
                 //$warehousing_status->where('w_no', '=', $validated['w_no'])->orwhere('w_no', '=', $warehousing->w_import_no);
                 $warehousing_status->where('w_no', '=', $validated['w_no'])->where('status', '!=', '출고예정 취소');
             } elseif (isset($validated['page_type']) && $validated['page_type'] == "bonded_cargo_list_details") {
-               
-                $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number','tie_is_date')
+
+                $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number', 'tie_is_date')
                     //->where('parent_spasys.warehouse_code', $user->company['warehouse_code'])
                     ->where('tie_is_date', '>=', '2022-01-04')
                     ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                     ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-                $sub_2 = Import::select('ti_logistic_manage_number', 'ti_carry_in_number','ti_i_date','ti_i_time')
+                $sub_2 = Import::select('ti_logistic_manage_number', 'ti_carry_in_number', 'ti_i_date', 'ti_i_time')
 
                     ->groupBy(['ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number']);
 
-                $sub_4 = Export::select('te_logistic_manage_number', 'te_carry_in_number', 'te_carry_out_number','te_e_date','te_e_time')
+                $sub_4 = Export::select('te_logistic_manage_number', 'te_carry_in_number', 'te_carry_out_number', 'te_e_date', 'te_e_time')
                     ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
 
 
@@ -97,21 +97,25 @@ class WarehousingStatusController extends Controller
 
                 $warehousing_status->where(function ($query) use ($validated) {
                     $query->where(
-                        $validated['type_page'],'=',$validated['w_no']
+                        $validated['type_page'],
+                        '=',
+                        $validated['w_no']
                     );
                 });
-                
-                
-                
             } else {
                 $warehousing_status->where('w_no', '=', $validated['w_no'])->where('status', '!=', '출고예정 취소');
             }
 
-
             $members = Member::where('mb_no', '!=', 0)->get();
 
             $warehousing_status = $warehousing_status->paginate($per_page, ['*'], 'page', $page);
-            
+
+            // $warehousing_status->setCollection(
+            //     $warehousing_status->getCollection()->map(function ($item) {
+
+            //     })
+            // );
+
             DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
             return response()->json($warehousing_status);
         } catch (\Exception $e) {
