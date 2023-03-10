@@ -2256,24 +2256,28 @@ class RateDataController extends Controller
         }
     }
 
-    public function getRateDataByRgd($rgd_no, $service)
+    public function getRateDataByRgd($rgd_no, $service, Request $request)
     {
         $user = Auth::user();
-        $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd_no)->first();
+        $pathname = $request->header('Pathname');
+        $is_check_page = str_contains($pathname, '_check');
 
-        $user_created_bill = Member::where('mb_no', $rgd->mb_no)->first(); 
+
+        $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd_no)->first();
 
         $service_korean_name = $service == 'distribution' ? '유통가공' : ($service == 'fulfillment' ? '수입풀필먼트' : '보세화물');
 
         try {
             $rate_data = RateData::where('rd_cate_meta1', $service_korean_name);
 
-            if ($user_created_bill->mb_type == 'spasys') {
+            if ($user->mb_type == 'spasys') {
                 $co_no = ($service == 'distribution' || $service == 'bonded') ? $rgd->warehousing->company->co_parent->co_no : $rgd->warehousing->co_no;
-            } else if ($user_created_bill->mb_type == 'shop') {
-                $co_no = $rgd->warehousing->company->co_no;
-            } else {
-                $co_no = $user->co_no;
+            } else if ($user->mb_type == 'shop' && !$is_check_page) {
+                $co_no = $rgd->warehousing->co_no;
+            } else if ($user->mb_type == 'shop' && $is_check_page) {
+                $co_no = $rgd->warehousing->company->co_parent->co_no;
+            } else if ($user->mb_type == 'shipper' && $is_check_page){
+                $co_no = $rgd->warehousing->co_no;
             }
 
             $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
