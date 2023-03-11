@@ -233,10 +233,9 @@ class ItemController extends Controller
                     }
                 });
 
-                $sql_count = WarehousingItem::where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고_spasys')->get();
-                $count = $sql_count->count();
-
-                if ($count != 0) {
+                $sql_count = WarehousingItem::where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고_spasys')->get()->count();
+               
+                if ($sql_count != 0) {
                     $items->with(['warehousing_item2' => function ($query) use ($validated) {
                         $query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고_spasys');
                     }]);
@@ -249,6 +248,14 @@ class ItemController extends Controller
                         }
                     });
                 }
+            }
+
+            if (isset($validated['w_no']) && isset($validated['items']) && $validated['type'] == "EW") {
+                $warehousing = Warehousing::find($validated['w_no']);
+
+                $items->with(['warehousing_item' => function ($query) use ($validated) {
+                    $query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '출고_shipper');
+                }]);
             }
 
             if (!isset($validated['w_no']) && !isset($validated['items'])) {
