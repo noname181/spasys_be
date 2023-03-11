@@ -1444,6 +1444,114 @@ class WarehousingController extends Controller
             //return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
+    public function getWarehousingImport7103(WarehousingSearchRequest $request) //page 7103 popup
+
+    {
+        try {
+            DB::enableQueryLog();
+            $validated = $request->validated();
+
+            // If per_page is null set default data = 15
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+            $user = Auth::user();
+            if ($user->mb_type == 'shop') {
+                $warehousing = ReceivingGoodsDelivery::with(['w_no', 'warehousing'])->with(['mb_no'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereNull('rgd_parent_no')->whereHas('w_no', function ($query) use ($validated) {
+                    $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('w_category_name', '=', '유통가공')->where('co_no', $validated['co_no']);
+                    // ->whereHas('co_no.co_parent', function ($q) use ($validated) {
+                    //     $q->where('co_no', $validated['co_no']);
+                    // });
+                })->orderBy('receiving_goods_delivery.created_at','DESC');
+            } else if ($user->mb_type == 'shipper') {
+                $warehousing = ReceivingGoodsDelivery::with(['w_no', 'warehousing'])->with(['mb_no'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereNull('rgd_parent_no')->whereHas('w_no', function ($query) use ($validated) {
+                    $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('w_category_name', '=', '유통가공')->where('co_no', $validated['co_no']);
+                    // ->whereHas('co_no', function ($q) use ($validated) {
+                    //     $q->where('co_no', $validated['co_no']);
+                    // });
+                })->orderBy('receiving_goods_delivery.created_at','DESC');
+            } else if ($user->mb_type == 'spasys') {
+                $warehousing = ReceivingGoodsDelivery::with(['w_no', 'warehousing'])->with(['mb_no'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereNull('rgd_parent_no')->whereHas('w_no', function ($query) use ($validated) {
+                    $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('w_category_name', '=', '유통가공')->where('co_no', $validated['co_no']);
+                    // ->whereHas('co_no.co_parent.co_parent', function ($q) use ($validated) {
+                    //     $q->where('co_no', $validated['co_no']);
+                    // });
+                })->orderBy('receiving_goods_delivery.created_at','DESC');
+            }
+
+            $warehousing->whereNull('rgd_parent_no');
+
+            if (isset($validated['from_date'])) {
+                $warehousing->where('warehousing.w_completed_day', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            }
+            if (isset($validated['status'])) {
+                $warehousing->where('rgd_status1', '=', $validated['status']);
+            }
+            if (isset($validated['to_date'])) {
+                $warehousing->where('warehousing.w_completed_day', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            }
+
+            if (isset($validated['co_parent_name'])) {
+                $warehousing->whereHas('w_no.co_no.co_parent', function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                });
+            }
+            if (isset($validated['co_name'])) {
+                $warehousing->whereHas('w_no.co_no', function ($q) use ($validated) {
+                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                });
+            }
+
+            if (isset($validated['w_schedule_number_iw'])) {
+                $warehousing->whereHas('w_no', function ($q) use ($validated) {
+                    return $q->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number_iw'] . '%');
+                });
+            }
+            if (isset($validated['connection_number'])) {
+                $warehousing->whereHas('w_no', function ($q) use ($validated) {
+                    return $q->where('connection_number', 'like', '%' . $validated['connection_number'] . '%');
+                });
+            }
+            if (isset($validated['w_schedule_number_ew'])) {
+                $warehousing->whereHas('w_no.w_import_parent', function ($q) use ($validated) {
+                    return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number_ew'] . '%');
+                });
+            }
+            $warehousing->orderBy('w_completed_day', 'DESC');
+            $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
+            //return DB::getQueryLog();
+            $warehousing->setCollection(
+                $warehousing->getCollection()->map(function ($item) {
+                    // if(!empty($item->w_no)){
+                    //     $item->w_amount_left = $item->w_no->w_amount - $item->w_no->w_schedule_amount;
+                    // }
+                    $warehousing = Warehousing::where('w_no', $item->w_no)->first();
+                    $item->w_amount_left = $warehousing->w_amount - $warehousing->w_schedule_amount;
+
+                    $item->total_item = WarehousingItem::where('w_no', $item->w_no)->where('wi_type', '입고_shipper')->sum('wi_number');
+                    if (!empty($item['warehousing']['warehousing_item'][0]) && isset($item['warehousing']['warehousing_item'][0]['item'])) {
+                        $first_name_item = $item['warehousing']['warehousing_item'][0]['item']['item_name'];
+                        $total_item = $item['warehousing']['warehousing_item']->count();
+                        $final_total = ($total_item   - 1);
+                        if ($final_total <= 0) {
+                            $item->first_item_name_total = $first_name_item . '외';
+                        } else {
+                            $item->first_item_name_total = $first_name_item . '외' . ' ' . $final_total . '건';
+                        }
+                    } else {
+                        $item->first_item_name_total = '';
+                    }
+
+                    return $item;
+                })
+            );
+            return response()->json($warehousing);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            //return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
     public function getWarehousingDelivery(WarehousingSearchRequest $request) //page715 show delivery
 
     {
