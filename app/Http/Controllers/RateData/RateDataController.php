@@ -8377,7 +8377,7 @@ class RateDataController extends Controller
                     'rgd_no' => $request->rgd_no,
                     'cbh_status_before' => 'confirmed',
                     'cbh_status_after' =>  NULL,
-                    'cbh_type' => 'revert',
+                    'cbh_type' => 'revert_approval',
                 ]);
 
             } else if ($request->bill_type == 'monthbill_final_issue') { //cancel approval monthbill
@@ -8396,7 +8396,7 @@ class RateDataController extends Controller
                         'rgd_no' => $rgd['rgd_no'],
                         'cbh_status_before' => 'confirmed',
                         'cbh_status_after' =>  null,
-                        'cbh_type' => 'revert',
+                        'cbh_type' => 'revert_approval',
                     ]);
 
                     // $rgd_update_parent = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_parent_no'])->update([
@@ -8529,6 +8529,25 @@ class RateDataController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $list = CancelBillHistory::with('member')->where('rgd_no', '=', $request->rgd_no)->where('cbh_type', '=', 'payment')->whereIn('cbh_status_after', ['payment_bill', 'cancel_payment_bill'])->orderBy('cbh_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
+
+            return response()->json($list);
+        } catch (\Exception $e) {
+            return $e;
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function get_approval_history(CancelBillRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+
+            // If per_page is null set default data = 15
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+            $list = CancelBillHistory::with(['member', 'rgd'])->where('rgd_no', '=', $request->rgd_no)->whereIn('cbh_type', ['approval', 'revert_approval'])->orderBy('cbh_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
 
             return response()->json($list);
         } catch (\Exception $e) {

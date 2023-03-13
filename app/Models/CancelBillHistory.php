@@ -37,4 +37,9 @@ class CancelBillHistory extends Model
     {
         return $this->belongsTo(Member::class, 'mb_no', 'mb_no')->with('company');
     }
+
+    public function rgd()
+    {
+        return $this->hasOne(ReceivingGoodsDelivery::class, 'rgd_no', 'rgd_no')->select(['rgd_no', 'rgd_settlement_number', 'rgd_status4']);
+    }
 }
