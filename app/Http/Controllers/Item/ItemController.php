@@ -1112,6 +1112,55 @@ class ItemController extends Controller
             return response()->json($item);
         } catch (\Exception $e) {
             Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function getItemByIdApi(Item $item)
+    {
+        try {
+            $file = $item->file()->first();
+            $item_channels = $item->item_channels()->get();
+            $company = $item->company()->get();
+            $item_info = $item->item_info()->get();
+            $item['item_channels'] = $item_channels;
+            $item['file'] = $file;
+            $item['company'] = $company;
+            $item['item_info'] = $item_info;
+            $item_api = Item::with(['item_info'])->where('item.item_no', $item->item_no)->first();
+            if(isset($item->option_id)){
+                $status_0 = StockStatusBad::where('product_id', $item->product_id)->where('option_id', $item->option_id)->where('status', 0)->first();
+            }else {
+                $status_0 = StockStatusBad::where('product_id', $item->product_id)->where('status', 0)->first();
+            }
+            if (isset($status_0->stock)) {
+                $stock_0 = $status_0->stock;
+            }
+            if (isset($item->option_id)) {
+                $status_1 = StockStatusBad::where('product_id', $item->product_id)->where('option_id', $item->option_id)->where('status', 1)->first();
+            } else {
+                $status_1 = StockStatusBad::where('product_id', $item->product_id)->where('status', 1)->first();
+            }
+            if (isset($status_1->stock)) {
+                $stock_1 = $status_1->stock;
+            }
+
+            if (isset($status_0->stock) || isset($status_1->stock)) {
+                $stock0 = isset($status_0->stock) ? $status_0->stock : 0;
+                $stock1 = isset($status_1->stock) ? $status_1->stock : 0;
+                $stock_total = $stock1 + $stock0;
+            }
+
+            return response()->json([
+            'item' => $item,
+            'stock_0' => isset($stock_0) ? $stock_0 : '',
+            'stock_1' =>isset($stock_1) ? $stock_1 : '',
+            'stock_total' => isset($stock_total) ? $stock_total: ''
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }

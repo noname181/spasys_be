@@ -359,6 +359,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/', \App\Http\Controllers\Item\ItemController::class)->name('create_or_update');
         Route::post('/update_file', [\App\Http\Controllers\Item\ItemController::class, 'updateFile'])->name('update_file');
         Route::get('/{item}', [App\Http\Controllers\Item\ItemController::class, 'getItemById'])->name('get_item_by_id');
+        Route::get('/get_item_by_id_api/{item}', [App\Http\Controllers\Item\ItemController::class, 'getItemByIdApi'])->name('get_item_by_id_api');
+
         Route::delete('/item_channel/{item_channel}', [App\Http\Controllers\Item\ItemController::class, 'deleteItemChannel'])->name('delete_item_channel');
         Route::post('/import_excel', [App\Http\Controllers\Item\ItemController::class, 'importItems'])->name('import_items');
         Route::post('/api_item', [App\Http\Controllers\Item\ItemController::class, 'apiItems'])->name('api_item');
