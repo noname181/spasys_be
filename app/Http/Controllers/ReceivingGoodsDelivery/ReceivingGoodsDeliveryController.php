@@ -2556,6 +2556,14 @@ class ReceivingGoodsDeliveryController extends Controller
                         'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
                     ]);
 
+                    $cbh = CancelBillHistory::insertGetId([
+                        'rgd_no' => $request->rgd_no,
+                        'mb_no' => $user->mb_no,
+                        'cbh_type' => 'approval',
+                        'cbh_status_before' => null,
+                        'cbh_status_after' => 'confirmed'
+                    ]);
+
                     if($ag->ag_auto_issue == 'y'){
                         $tax_number = CommonFunc::generate_tax_number($rgd->rgd_no);
 
@@ -2596,6 +2604,14 @@ class ReceivingGoodsDeliveryController extends Controller
                     })->first();
 
                     $rate_data_general = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->first();
+
+                    $cbh = CancelBillHistory::insertGetId([
+                        'rgd_no' => $rgd['rgd_no'],
+                        'mb_no' => $user->mb_no,
+                        'cbh_type' => 'approval',
+                        'cbh_status_before' => null,
+                        'cbh_status_after' => 'confirmed'
+                    ]);
 
                     if (isset($rate_data_general->ag_no)) {
                         $ag = AdjustmentGroup::where('ag_no', $rate_data_general->ag_no)->first();
@@ -2644,6 +2660,14 @@ class ReceivingGoodsDeliveryController extends Controller
                     $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->first();
 
                     $rate_data_general = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->first();
+
+                    $cbh = CancelBillHistory::insertGetId([
+                        'rgd_no' => $rgd['rgd_no'],
+                        'mb_no' => $user->mb_no,
+                        'cbh_type' => 'approval',
+                        'cbh_status_before' => null,
+                        'cbh_status_after' => 'confirmed'
+                    ]);
 
                     if (isset($rate_data_general->ag_no)) {
                         $ag = AdjustmentGroup::where('ag_no', $rate_data_general->ag_no)->first();
