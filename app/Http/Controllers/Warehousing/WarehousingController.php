@@ -5095,42 +5095,13 @@ class WarehousingController extends Controller
                     return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
                 });
             }
-            if (isset($validated['rgd_status1'])) {
-                $warehousing->where('rgd_status1', '=', $validated['rgd_status1']);
+            if (isset($validated['rgd_status1']) && $validated['rgd_status1'] != '전체') {
+                if($validated['rgd_status1'] == 'waiting'){
+                    $warehousing->whereNull('rgd_status7');
+                }else 
+                    $warehousing->where('rgd_status7', '=', $validated['rgd_status1']);
             }
-            if (isset($validated['rgd_status2'])) {
-                $warehousing->where('rgd_status2', '=', $validated['rgd_status2']);
-            }
-            if (isset($validated['rgd_status3'])) {
-                $warehousing->where('rgd_status3', '=', $validated['rgd_status3']);
-            }
-            if (isset($validated['item_brand'])) {
-                $warehousing->whereHas('w_no.warehousing_item.item_no', function ($q) use ($validated) {
-                    return $q->where(DB::raw('lower(item_brand)'), 'like', '%' . strtolower($validated['item_brand']) . '%');
-                });
-            }
-            if (isset($validated['item_bar_code'])) {
-                $warehousing->whereHas('w_no.warehousing_item.item_no', function ($q) use ($validated) {
-                    return $q->where(DB::raw('lower(item_bar_code)'), 'like', '%' . strtolower($validated['item_bar_code']) . '%');
-                });
-            }
-            if (isset($validated['item_cargo_bar_code'])) {
-                $warehousing->whereHas('w_no.warehousing_item.item_no', function ($q) use ($validated) {
-                    return $q->where(DB::raw('lower(item_cargo_bar_code)'), 'like', '%' . strtolower($validated['item_cargo_bar_code']) . '%');
-                });
-            }
-            if (isset($validated['item_upc_code'])) {
-                $warehousing->whereHas('w_no.warehousing_item.item_no', function ($q) use ($validated) {
-                    return $q->where(DB::raw('lower(item_upc_code)'), 'like', '%' . strtolower($validated['item_upc_code']) . '%');
-                });
-            }
-            if (isset($validated['rgd_status3_1']) || isset($validated['rgd_status3_2']) || isset($validated['rgd_status3_3'])) {
-                $warehousing->where(function ($q) use ($validated) {
-                    $q->Where('rgd_status3', '=', $validated['rgd_status3_1'] ? $validated['rgd_status3_1'] : "")
-                        ->orWhere('rgd_status3', '=', $validated['rgd_status3_2'] ? $validated['rgd_status3_2'] : "")
-                        ->orWhere('rgd_status3', '=', $validated['rgd_status3_3'] ? $validated['rgd_status3_3'] : "");
-                });
-            }
+
             if (isset($validated['service_korean_name'])) {
                 $warehousing->where('service_korean_name', '=', $validated['service_korean_name']);
             }
