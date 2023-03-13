@@ -5095,42 +5095,13 @@ class WarehousingController extends Controller
                     return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
                 });
             }
-            if (isset($validated['rgd_status1'])) {
-                $warehousing->where('rgd_status1', '=', $validated['rgd_status1']);
+            if (isset($validated['rgd_status1']) && $validated['rgd_status1'] != '전체') {
+                if($validated['rgd_status1'] == 'waiting'){
+                    $warehousing->whereNull('rgd_status7');
+                }else 
+                    $warehousing->where('rgd_status7', '=', $validated['rgd_status1']);
             }
-            if (isset($validated['rgd_status2'])) {
-                $warehousing->where('rgd_status2', '=', $validated['rgd_status2']);
-            }
-            if (isset($validated['rgd_status3'])) {
-                $warehousing->where('rgd_status3', '=', $validated['rgd_status3']);
-            }
-            if (isset($validated['item_brand'])) {
-                $warehousing->whereHas('w_no.warehousing_item.item_no', function ($q) use ($validated) {
-                    return $q->where(DB::raw('lower(item_brand)'), 'like', '%' . strtolower($validated['item_brand']) . '%');
-                });
-            }
-            if (isset($validated['item_bar_code'])) {
-                $warehousing->whereHas('w_no.warehousing_item.item_no', function ($q) use ($validated) {
-                    return $q->where(DB::raw('lower(item_bar_code)'), 'like', '%' . strtolower($validated['item_bar_code']) . '%');
-                });
-            }
-            if (isset($validated['item_cargo_bar_code'])) {
-                $warehousing->whereHas('w_no.warehousing_item.item_no', function ($q) use ($validated) {
-                    return $q->where(DB::raw('lower(item_cargo_bar_code)'), 'like', '%' . strtolower($validated['item_cargo_bar_code']) . '%');
-                });
-            }
-            if (isset($validated['item_upc_code'])) {
-                $warehousing->whereHas('w_no.warehousing_item.item_no', function ($q) use ($validated) {
-                    return $q->where(DB::raw('lower(item_upc_code)'), 'like', '%' . strtolower($validated['item_upc_code']) . '%');
-                });
-            }
-            if (isset($validated['rgd_status3_1']) || isset($validated['rgd_status3_2']) || isset($validated['rgd_status3_3'])) {
-                $warehousing->where(function ($q) use ($validated) {
-                    $q->Where('rgd_status3', '=', $validated['rgd_status3_1'] ? $validated['rgd_status3_1'] : "")
-                        ->orWhere('rgd_status3', '=', $validated['rgd_status3_2'] ? $validated['rgd_status3_2'] : "")
-                        ->orWhere('rgd_status3', '=', $validated['rgd_status3_3'] ? $validated['rgd_status3_3'] : "");
-                });
-            }
+
             if (isset($validated['service_korean_name'])) {
                 $warehousing->where('service_korean_name', '=', $validated['service_korean_name']);
             }
@@ -5442,8 +5413,9 @@ class WarehousingController extends Controller
                             'co_owner' => $request['company']['co_owner'],
                             'co_name' => $request['company']['co_name'],
                             'co_major' => $request['company']['co_major'],
-                            'co_address' => $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null,
-                            'co_address2' => $request['ag']['ag_email2'] ? $request['ag']['ag_email2'] : null,
+                            'co_address' => $request['company']['co_address'],
+                            'co_email' => $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null,
+                            'co_email2' => $request['ag']['ag_email2'] ? $request['ag']['ag_email2'] : null,
                             'rgd_number' => $tax_number ? $tax_number : null,
                             'mb_no' => $user->mb_no,
                         ]);
@@ -5467,7 +5439,8 @@ class WarehousingController extends Controller
                             'co_name' => $request['company']['co_name'],
                             'co_major' => $request['company']['co_major'],
                             'co_address' => $request['company']['co_address'],
-                            'co_address2' => $request['ag']['ag_email2'],
+                            'co_email' => $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null,
+                            'co_email2' => $request['ag']['ag_email2'] ? $request['ag']['ag_email2'] : null,
                             'rgd_number' => $tax_number ? $tax_number : null,
                             'mb_no' => $user->mb_no,
                         ]);
@@ -5572,8 +5545,9 @@ class WarehousingController extends Controller
                     'co_owner' => $request['company']['co_owner'],
                     'co_name' => $request['company']['co_name'],
                     'co_major' => $request['company']['co_major'],
-                    'co_address' => $request['ag']['ag_email'],
-                    'co_address2' => $request['ag']['ag_email2'],
+                    'co_address' => $request['company']['co_address'],
+                    'co_email' => $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null,
+                    'co_email2' => $request['ag']['ag_email2'] ? $request['ag']['ag_email2'] : null,
                     'mb_no' => $user->mb_no,
                 ]);
 
@@ -5602,20 +5576,39 @@ class WarehousingController extends Controller
                 $user = Auth::user();
 
                 foreach ($request->rgds as $rgd) {
+                   
+                    $tax_number = CommonFunc::generate_tax_number($rgd['rgd_no']);
+
+                    ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
+                        'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
+                        'rgd_status7' => 'taxed',
+                        'rgd_tax_invoice_number' => $tax_number ? $tax_number : null,
+                    ]);
+
+                    $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general'])->where('rgd_no', $rgd['rgd_no'])->first();
+
+                    if ($user->mb_type == 'spasys' && $rgd->service_korean_name == '수입풀필먼트') {
+                        $company = Company::with(['co_parent', 'adjustment_group'])->where('co_no', $rgd['warehousing']['co_no'])->first();
+                    } else {
+                        $company = Company::with(['co_parent', 'adjustment_group'])->where('co_no', $rgd['warehousing']['company']['co_parent']['co_no'])->first();
+                    }
+
+                    $ag = AdjustmentGroup::where('ag_no', $rgd->rate_data_general->ag_no)->first();
+
                     $id = TaxInvoiceDivide::insertGetId([
                         'tid_supply_price' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : ($rgd['service_korean_name']  == '수입풀필먼트' ? $rgd['rate_data_general']['rdg_supply_price6'] : $rgd['rate_data_general']['rdg_supply_price4']),
                         'tid_vat' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_vat7'] : ($rgd['service_korean_name']  == '수입풀필먼트' ? $rgd['rate_data_general']['rdg_vat6'] : $rgd['rate_data_general']['rdg_vat4']),
                         'tid_sum' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_sum7'] : ($rgd['service_korean_name']  == '수입풀필먼트' ? $rgd['rate_data_general']['rdg_sum6'] : $rgd['rate_data_general']['rdg_sum4']),
                         'rgd_no' => $rgd['rgd_no'],
+                        'co_license' => $company['co_license'],
+                        'co_owner' => $company['co_owner'],
+                        'co_name' => $company['co_name'],
+                        'co_major' => $company['co_major'],
+                        'co_address' => $company['co_address'],
+                        'co_email' => $ag['ag_email'] ? $ag['ag_email'] : null,
+                        'co_email2' => $ag['ag_email2'] ? $ag['ag_email2'] : null,
+                        'rgd_number' => $tax_number ? $tax_number : null,
                         'mb_no' => $user->mb_no,
-                    ]);
-
-                    $tax_number = CommonFunc::generate_tax_number($rgd['rgd_no']);
-
-                    $rgd_ = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
-                        'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
-                        'rgd_status7' => 'taxed',
-                        'rgd_tax_invoice_number' => $tax_number ? $tax_number : null,
                     ]);
 
                     $cbh = CancelBillHistory::insertGetId([
