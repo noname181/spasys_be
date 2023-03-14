@@ -5200,25 +5200,36 @@ class WarehousingController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
             if ($user->mb_type == 'shop') {
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 't_export'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 't_export', 't_import'])->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
+                    })->whereHas('co_no.contract', function ($q) use ($user) {
+                        $q->where('c_calculate_deadline_yn', 'y');
                     });
-                });
+                })->orderBy('rgd_tax_invoice_date', 'DESC')->orderBy('rgd_no', 'DESC');
             } else if ($user->mb_type == 'shipper') {
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 't_export', 't_import'])->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
+                    })->whereHas('co_no.contract', function ($q) use ($user) {
+                        $q->where('c_calculate_deadline_yn', 'y');
                     });
-                });
+                })->orderBy('rgd_tax_invoice_date', 'DESC')->orderBy('rgd_no', 'DESC');
             } else if ($user->mb_type == 'spasys') {
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
+                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 't_export', 't_import'])->whereHas('w_no', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     })->orWhereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
-                });
+                })
+                    ->whereHas('w_no', function ($query) use ($user) {
+                        $query->whereHas('co_no.co_parent.contract', function ($q) use ($user) {
+                            $q->where('c_calculate_deadline_yn', 'y');
+                        })->orWhereHas('co_no.contract', function ($q) use ($user) {
+                            $q->where('c_calculate_deadline_yn', 'y');
+                        });
+                    });
             }
             $warehousing->where(function ($q) {
                 $q->where('rgd_status4', '추가청구서')
