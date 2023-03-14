@@ -4234,8 +4234,13 @@ class WarehousingController extends Controller
                             $item->discount = '';
                             $total_discount = 0;
                             foreach ($item->rgd_settlement as $row) {
-                                $rate_data = RateData::where('rmd_no', $row->rate_meta_data_parent[0]->rate_data[0]->rmd_no)->where('rd_cate2', '할인금액')->first();
-                                $total_discount += $rate_data->rd_data4 ? $rate_data->rd_data4 : 0;
+                                if(isset($row->rate_meta_data_parent[0])){
+                                    $rate_data = RateData::where('rmd_no', $row->rate_meta_data_parent[0]->rate_data[0]->rmd_no)->where('rd_cate2', '할인금액')->first();
+                                    $total_discount += $rate_data->rd_data4 ? $rate_data->rd_data4 : 0;
+                                }else {
+                                    $total_discount += 0;
+                                }
+                                
                             }
                             $item->discount = $total_discount;
                             $item->sum_price_total2 = $item->rate_data_general->rdg_sum7 + $total_discount;
