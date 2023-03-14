@@ -6119,7 +6119,7 @@ class WarehousingController extends Controller
 
             $schedule_number = (new CommonFunc)->generate_w_schedule_number($w_no_data, 'IW');
             Warehousing::where('w_no', $w_no_data)->update([
-                'w_schedule_number' => $schedule_number
+                'w_schedule_number' => null
             ]);
             //THUONG EDIT TO MAKE SETTLEMENT
             $rgd_no = ReceivingGoodsDelivery::insertGetId([
