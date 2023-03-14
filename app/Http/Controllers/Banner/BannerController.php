@@ -1140,12 +1140,12 @@ class BannerController extends Controller
         $countchartd = [];
 
         for ($i = 1; $i <= 12; $i++) {
-            $countcharta = $warehousingcharta->whereYear('created_at', Carbon::now()->year)->get()->groupBy(function ($date) {
+            $countcharta = $warehousingcharta->whereDate('created_at', '>', now()->subYear())->get()->groupBy(function ($date) {
                 //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
                 return Carbon::parse($date->created_at)->format('m'); // grouping by months
             });
 
-            $countchartd = $warehousingchartd->whereYear('created_at', Carbon::now()->year)->get()->groupBy(function ($date) {
+            $countchartd = $warehousingchartd->whereDate('created_at', '>', now()->subYear())->get()->groupBy(function ($date) {
                 //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
                 return Carbon::parse($date->created_at)->format('m'); // grouping by months
             });
@@ -1181,24 +1181,41 @@ class BannerController extends Controller
         //     $chartcountd[(int)$key] = count($value);
         // }
 
-        for ($i = 1; $i <= 12; $i++) {
-            if (!empty($chartcounta[$i])) {
-                $userArra['data'][] = $chartcounta[$i];
+        // for ($i = 1; $i <= 12; $i++) {
+        //     if (!empty($chartcounta[$i])) {
+        //         $userArra['data'][] = $chartcounta[$i];
+        //     } else {
+        //         $userArra['data'][] = 0;
+        //     }
+
+        //     if (!empty($chartcountd[$i])) {
+        //         $userArrd['data'][] = $chartcountd[$i];
+        //     } else {
+        //         $userArrd['data'][] = 0;
+        //     }
+
+        //     // if (!empty($chartcountd[$i])) {
+        //     //     $userArrd['data'][] = $chartcountd[$i];
+        //     // } else {
+        //     //     $userArrd['data'][] = 0;
+        //     // }
+        // }
+
+        $period = CarbonPeriod::create(today()->subMonths(5), '1 month', today());
+
+        foreach ($period as $date) {
+            $m = (int)$date->format('m');
+            if (!empty($chartcounta[$m])) {
+                $userArra['data'][] = $chartcounta[$m];
             } else {
                 $userArra['data'][] = 0;
             }
 
-            if (!empty($chartcountd[$i])) {
-                $userArrd['data'][] = $chartcountd[$i];
+            if (!empty($chartcountd[$m])) {
+                $userArrd['data'][] = $chartcountd[$m];
             } else {
                 $userArrd['data'][] = 0;
             }
-
-            // if (!empty($chartcountd[$i])) {
-            //     $userArrd['data'][] = $chartcountd[$i];
-            // } else {
-            //     $userArrd['data'][] = 0;
-            // }
         }
 
         return [
@@ -1456,13 +1473,13 @@ class BannerController extends Controller
         $countchartb = [];
         $countchartd = [];
 
-        for ($i = 1; $i <= 12; $i++) {
-            $countchartb = $warehousingchartb->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->whereYear('tie_is_date', Carbon::now()->year)->get()->groupBy(function ($date) {
+        for ($i = 1; $i <= 6; $i++) {
+            $countchartb = $warehousingchartb->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->whereDate('tie_is_date', '>', now()->subYear())->get()->groupBy(function ($date) {
                 //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
                 return Carbon::parse($date->tie_is_date)->format('m'); // grouping by months
             });
 
-            $countchartd = $warehousingchartd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereYear('tie_is_date', Carbon::now()->year)->get()->groupBy(function ($date) {
+            $countchartd = $warehousingchartd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereDate('tie_is_date', '>', now()->subYear())->get()->groupBy(function ($date) {
                 //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
                 return Carbon::parse($date->tie_is_date)->format('m'); // grouping by months
             });
@@ -1489,20 +1506,38 @@ class BannerController extends Controller
             $chartcountd[(int)$key] = count($value);
         }
 
-        for ($i = 1; $i <= 12; $i++) {
-            if (!empty($chartcountb[$i])) {
-                $userArrb['data'][] = $chartcountb[$i];
+        // for ($i = 1; $i <= 12; $i++) {
+        //     if (!empty($chartcountb[$i])) {
+        //         $userArrb['data'][] = $chartcountb[$i];
+        //     } else {
+        //         $userArrb['data'][] = 0;
+        //     }
+
+        //     if (!empty($chartcountd[$i])) {
+        //         $userArrd['data'][] = $chartcountd[$i];
+        //     } else {
+        //         $userArrd['data'][] = 0;
+        //     }
+        // }
+
+        $period = CarbonPeriod::create(today()->subMonths(5), '1 month', today());
+
+        $final = [];
+
+        foreach ($period as $date) {
+            $m = (int)$date->format('m');
+            if (!empty($chartcountb[$m])) {
+                $userArrb['data'][] = $chartcountb[$m];
             } else {
                 $userArrb['data'][] = 0;
             }
 
-            if (!empty($chartcountd[$i])) {
-                $userArrd['data'][] = $chartcountd[$i];
+            if (!empty($chartcountd[$m])) {
+                $userArrd['data'][] = $chartcountd[$m];
             } else {
                 $userArrd['data'][] = 0;
             }
         }
-
 
         return [
             'warehousingb2' => $warehousingb2,'warehousingd2' => $warehousingd2,'countcharta' => $userArrb, 'countchartb' => $userArrd, 'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'countg' => $countg, 'countg_2' => $countg_2
@@ -1546,13 +1581,13 @@ class BannerController extends Controller
 
             $tie_logistic_manage_number = $this->SQL();
 
-            for ($i = 1; $i <= 12; $i++) {
-                $countchartb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->whereYear('tie_is_date', Carbon::now()->year)->get()->groupBy(function ($date) {
+            for ($i = 1; $i <= 6; $i++) {
+                $countchartb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->whereDate('tie_is_date', '>', now()->subYear())->get()->groupBy(function ($date) {
                     //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
                     return Carbon::parse($date->tie_is_date)->format('m'); // grouping by months
                 });
 
-                $countchartd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereYear('tie_is_date', Carbon::now()->year)->get()->groupBy(function ($date) {
+                $countchartd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereDate('tie_is_date', '>', now()->subYear())->get()->groupBy(function ($date) {
                     //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
                     return Carbon::parse($date->tie_is_date)->format('m'); // grouping by months
                 });
@@ -1584,13 +1619,13 @@ class BannerController extends Controller
                 $q->where('co_no', $request->co_no);
             });
 
-            for ($i = 1; $i <= 12; $i++) {
-                $countchartb = $warehousingb->whereYear('created_at', Carbon::now()->year)->get()->groupBy(function ($date) {
+            for ($i = 1; $i <= 6; $i++) {
+                $countchartb = $warehousingb->whereDate('created_at', '>', now()->subYear())->get()->groupBy(function ($date) {
                     //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
                     return Carbon::parse($date->created_at)->format('m'); // grouping by months
                 });
 
-                $countchartd = $warehousingd->whereYear('created_at', Carbon::now()->year)->get()->groupBy(function ($date) {
+                $countchartd = $warehousingd->whereDate('created_at', '>', now()->subYear())->get()->groupBy(function ($date) {
                     //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
                     return Carbon::parse($date->created_at)->format('m'); // grouping by months
                 });
@@ -1623,13 +1658,13 @@ class BannerController extends Controller
                     });
             });
 
-            for ($i = 1; $i <= 12; $i++) {
-                $countchartb = $warehousingb->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereYear('warehousing.w_completed_day', Carbon::now()->year)->get()->groupBy(function ($date) {
+            for ($i = 1; $i <= 6; $i++) {
+                $countchartb = $warehousingb->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereDate('warehousing.w_completed_day', '>', now()->subYear())->get()->groupBy(function ($date) {
                     //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
                     return Carbon::parse($date->created_at)->format('m'); // grouping by months
                 });
 
-                $countchartd = $warehousingd->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereYear('warehousing.w_completed_day', Carbon::now()->year)->get()->groupBy(function ($date) {
+                $countchartd = $warehousingd->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereDate('warehousing.w_completed_day', '>', now()->subYear())->get()->groupBy(function ($date) {
                     //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
                     return Carbon::parse($date->created_at)->format('m'); // grouping by months
                 });
@@ -1657,15 +1692,32 @@ class BannerController extends Controller
             $chartcountd[(int)$key] = count($value);
         }
 
-        for ($i = 1; $i <= 12; $i++) {
+        // for ($i = 1; $i <= 12; $i++) {
+        //     if (!empty($chartcountb[$i])) {
+        //         $userArrb['data'][] = $chartcountb[$i];
+        //     } else {
+        //         $userArrb['data'][] = 0;
+        //     }
+
+        //     if (!empty($chartcountd[$i])) {
+        //         $userArrd['data'][] = $chartcountd[$i];
+        //     } else {
+        //         $userArrd['data'][] = 0;
+        //     }
+        // }
+        $period = CarbonPeriod::create(today()->subMonths(5), '1 month', today());
+
+        foreach ($period as $date) {
+            $m = (int)$date->format('m');
+
             if (!empty($chartcountb[$i])) {
                 $userArrb['data'][] = $chartcountb[$i];
             } else {
                 $userArrb['data'][] = 0;
             }
 
-            if (!empty($chartcountd[$i])) {
-                $userArrd['data'][] = $chartcountd[$i];
+            if (!empty($chartcountd[$m])) {
+                $userArrd['data'][] = $chartcountd[$m];
             } else {
                 $userArrd['data'][] = 0;
             }
