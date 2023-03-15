@@ -264,8 +264,6 @@ class AlarmController extends Controller
                     $alarm->where(function($q) use($validated) {
                         $q->whereHas('warehousing', function ($q) use ($validated) {
                             return $q->where(DB::raw('lower(w_category_name)'), 'like', '%' . strtolower($validated['service']) . '%');
-                        })->orwhereHas('export.import_expected', function($q3) use($validated) {
-                            return $q3->where('tie_h_bl', '!=', '')->orWhereNotNull('tie_h_bl');
                         });
                     });
                 }
