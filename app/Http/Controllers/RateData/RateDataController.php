@@ -3616,7 +3616,7 @@ class RateDataController extends Controller
 
                 foreach ($request->rgds as $key => $rgd) {
                     $expectation_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->where('rgd_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
-                    $is_exist = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', 'final_monthly')->first();
+                    $is_exist = RateDataGeneral::where('rgd_no_expectation', $rgd['rgd_no'])->where('rdg_bill_type', 'final_monthly')->first();
                     $final_rgd = ReceivingGoodsDelivery::where('rgd_parent_no', $rgd['rgd_no'])->where('rgd_bill_type', 'final_monthly')->first();
 
                     if (!$is_exist || $final_rgd->rgd_status5 == 'cancel') {
@@ -3652,6 +3652,31 @@ class RateDataController extends Controller
                         $final_rdg->save();
                     } else {
                         $final_rdg = $is_exist;
+                        RateDataGeneral::where('rgd_no_expectation', $rgd['rgd_no'])->where('rdg_bill_type', 'final_monthly')->update([
+                            'rdg_supply_price1' => $rdg_supply_price1,
+                            'rdg_supply_price2' => $rdg_supply_price2,
+                            'rdg_supply_price3' => $rdg_supply_price3,
+                            'rdg_supply_price4' => $rdg_supply_price4,
+                            'rdg_supply_price5' => $rdg_supply_price5,
+                            'rdg_supply_price6' => $rdg_supply_price6,
+                            'rdg_supply_price7' => $rdg_supply_price7,
+
+                            'rdg_vat1' => $rdg_vat1,
+                            'rdg_vat2' => $rdg_vat2,
+                            'rdg_vat3' => $rdg_vat3,
+                            'rdg_vat4' => $rdg_vat4,
+                            'rdg_vat5' => $rdg_vat5,
+                            'rdg_vat6' => $rdg_vat6,
+                            'rdg_vat7' => $rdg_vat7,
+
+                            'rdg_sum1' => $rdg_sum1,
+                            'rdg_sum2' => $rdg_sum2,
+                            'rdg_sum3' => $rdg_sum3,
+                            'rdg_sum4' => $rdg_sum4,
+                            'rdg_sum5' => $rdg_sum5,
+                            'rdg_sum6' => $rdg_sum6,
+                            'rdg_sum7' => $rdg_sum7,
+                        ]);
                     }
 
                     $expectation_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->where('rgd_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
