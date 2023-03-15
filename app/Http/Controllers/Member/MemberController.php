@@ -136,6 +136,7 @@ class MemberController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -356,6 +357,7 @@ class MemberController extends Controller
                 'mb_tel' => $validated['mb_tel'],
                 'mb_id' => $validated['mb_id'],
                 'mb_note' => $validated['mb_note'],
+                'mb_email'=> $validated['co_email'],
                 'mb_type' => $validated['mb_type'],
                 'mb_parent' => $validated['mb_parent'],
                 'role_no' => $validated['role_no'],

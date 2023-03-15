@@ -17,9 +17,7 @@ class MenuToken extends Model
 
     public $timestamps = false;
 
-    protected $attributes = ['service_name_array'];
 
-    protected $appends = ['service_name_array'];
 
     /**
      * The attributes that are mass assignable.
