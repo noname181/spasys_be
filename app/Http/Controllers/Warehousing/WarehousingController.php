@@ -2473,9 +2473,9 @@ class WarehousingController extends Controller
                         ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
                     $sub_2 = Import::select('ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
-                        ->leftjoin('receiving_goods_delivery', function ($join) {
-                            $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
-                        })
+                        // ->leftjoin('receiving_goods_delivery', function ($join) {
+                        //     $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
+                        // })
                         ->groupBy(['ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number']);
 
                     // $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
