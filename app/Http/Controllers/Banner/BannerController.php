@@ -322,6 +322,7 @@ class BannerController extends Controller
                 ->where('banner_use_yn', '=', '1')
                 ->where('banner_start', '<=', $today)
                 ->where('banner_end', '>=', $today)->latest('created_at')
+                ->where('mb_no','=','133')
                 ->first();
 
             $banner_login_right_top = Banner::with('files')
@@ -330,6 +331,7 @@ class BannerController extends Controller
                 ->where('banner_use_yn', '=', '1')
                 ->where('banner_start', '<=', $today)
                 ->where('banner_end', '>=', $today)->latest('created_at')
+                ->where('mb_no','=','133')
                 ->first();
 
             $banner_login_right_bottom = Banner::with('files')
@@ -338,6 +340,7 @@ class BannerController extends Controller
                 ->where('banner_use_yn', '=', '1')
                 ->where('banner_start', '<=', $today)
                 ->where('banner_end', '>=', $today)->latest('created_at')
+                ->where('mb_no','=','133')
                 ->first();
 
             $banner_index_top = Banner::with('files')
@@ -346,6 +349,7 @@ class BannerController extends Controller
                 ->where('banner_use_yn', '=', '1')
                 ->where('banner_start', '<=', $today)
                 ->where('banner_end', '>=', $today)->latest('created_at')
+                ->where('mb_no','=','133')
                 ->first();
 
             $banner_index_bottom = Banner::with('files')
@@ -354,6 +358,7 @@ class BannerController extends Controller
                 ->where('banner_use_yn', '=', '1')
                 ->where('banner_start', '<=', $today)
                 ->where('banner_end', '>=', $today)->latest('created_at')
+                ->where('mb_no','=','133')
                 ->first();
 
             return response()->json([
@@ -384,6 +389,7 @@ class BannerController extends Controller
                 ->where('banner_use_yn', '=', '1')
                 ->where('banner_start', '<=', $today)
                 ->where('banner_end', '>=', $today)->latest('created_at')
+                ->where('mb_no','=','133')
                 ->first();
 
             $banner_index_bottom = Banner::with('files')
@@ -393,6 +399,7 @@ class BannerController extends Controller
                 ->where('banner_use_yn', '=', '1')
                 ->where('banner_start', '<=', $today)
                 ->where('banner_end', '>=', $today)->latest('created_at')
+                ->where('mb_no','=','133')
                 ->first();
 
             return response()->json([
