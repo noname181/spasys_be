@@ -199,17 +199,17 @@ class WarehousingController extends Controller
             }
             if (isset($validated['rgd_status1'])) {
                 $warehousing->whereHas('receving_goods_delivery', function ($query) use ($validated) {
-                    $query->where('rgd_status1', '=', $validated['rgd_status1']);
+                    $query->where('rgd_status1', '=', $validated['rgd_status1'])->whereNull('rgd_parent_no');
                 });
             }
             if (isset($validated['rgd_status2'])) {
                 $warehousing->whereHas('receving_goods_delivery', function ($query) use ($validated) {
-                    $query->where('rgd_status2', '=', $validated['rgd_status2']);
+                    $query->where('rgd_status2', '=', $validated['rgd_status2'])->whereNull('rgd_parent_no');
                 });
             }
             if (isset($validated['rgd_status3'])) {
                 $warehousing->whereHas('receving_goods_delivery', function ($query) use ($validated) {
-                    $query->where('rgd_status3', '=', $validated['rgd_status3']);
+                    $query->where('rgd_status3', '=', $validated['rgd_status3'])->whereNull('rgd_parent_no');
                 });
             }
 
@@ -342,22 +342,22 @@ class WarehousingController extends Controller
                 if (isset($validated['rgd_status1'])) {
                     $warehousing2->where(function ($q) use ($validated) {
                         $q->whereHas('receving_goods_delivery', function ($query) use ($validated) {
-                            $query->where('rgd_status1', '=', $validated['rgd_status1']);
+                            $query->where('rgd_status1', '=', $validated['rgd_status1'])->whereNull('rgd_parent_no');
                         })->orwhereHas('w_import_parent.receving_goods_delivery_parent', function ($q) use ($validated) {
-                            $q->where('rgd_status1', '=', $validated['rgd_status1']);
+                            $q->where('rgd_status1', '=', $validated['rgd_status1'])->whereNull('rgd_parent_no');
                         });
                     });
                 }
 
                 if (isset($validated['rgd_status2'])) {
                     $warehousing2->whereHas('receving_goods_delivery', function ($query) use ($validated) {
-                        $query->where('rgd_status2', '=', $validated['rgd_status2']);
+                        $query->where('rgd_status2', '=', $validated['rgd_status2'])->whereNull('rgd_parent_no');
                     });
                 }
                 
                 if (isset($validated['rgd_status3'])) {
                     $warehousing2->whereHas('receving_goods_delivery', function ($query) use ($validated) {
-                        $query->where('rgd_status3', '=', $validated['rgd_status3']);
+                        $query->where('rgd_status3', '=', $validated['rgd_status3'])->whereNull('rgd_parent_no');
                     });
                 }
                 if (isset($validated['w_schedule_number_ew'])) {
@@ -372,7 +372,7 @@ class WarehousingController extends Controller
                 if (isset($validated['h_bl'])) {
                     $warehousing2->where('h_bl', 'like', '%' . $validated['h_bl'] . '%');
                 }
-                
+
                 $warehousing2 = $warehousing2->get();
                 $w_import_no = collect($warehousing2)->map(function ($q) {
 
@@ -453,17 +453,17 @@ class WarehousingController extends Controller
             }
             if (isset($validated['rgd_status1'])) {
                 $warehousing->whereHas('receving_goods_delivery', function ($query) use ($validated) {
-                    $query->where('rgd_status1', '=', $validated['rgd_status1']);
+                    $query->where('rgd_status1', '=', $validated['rgd_status1'])->whereNull('rgd_parent_no');
                 });
             }
             if (isset($validated['rgd_status2'])) {
                 $warehousing->whereHas('receving_goods_delivery', function ($query) use ($validated) {
-                    $query->where('rgd_status2', '=', $validated['rgd_status2']);
+                    $query->where('rgd_status2', '=', $validated['rgd_status2'])->whereNull('rgd_parent_no');
                 });
             }
             if (isset($validated['rgd_status3'])) {
                 $warehousing->whereHas('receving_goods_delivery', function ($query) use ($validated) {
-                    $query->where('rgd_status3', '=', $validated['rgd_status3']);
+                    $query->where('rgd_status3', '=', $validated['rgd_status3'])->whereNull('rgd_parent_no');
                 });
             }
 

@@ -827,11 +827,11 @@ class BannerController extends Controller
         $userArrb = [];
         $userArrd = [];
 
-        $userArrb['label'] = '반입';
+        $userArrb['label'] = '입고';
         $userArrb['borderColor'] = '#F7C35D';
         $userArrb['backgroundColor'] = '#F7C35D';
 
-        $userArrd['label'] = '반출';
+        $userArrd['label'] = '출고';
         $userArrd['borderColor'] = '#0493FF';
         $userArrd['backgroundColor'] = '#0493FF';
 
@@ -1164,11 +1164,11 @@ class BannerController extends Controller
         $userArrd = [];
 
 
-        $userArra['label'] = '반입';
+        $userArra['label'] = '입고';
         $userArra['borderColor'] = '#F7C35D';
         $userArra['backgroundColor'] = '#F7C35D';
 
-        $userArrd['label'] = '반출';
+        $userArrd['label'] = '출고';
         $userArrd['borderColor'] = '#0493FF';
         $userArrd['backgroundColor'] = '#0493FF';
 
