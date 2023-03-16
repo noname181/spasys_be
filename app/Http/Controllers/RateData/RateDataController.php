@@ -3009,6 +3009,7 @@ class RateDataController extends Controller
                         ->orWhereNull('rgd_status5');
                 })
                 ->whereDoesntHave('rgd_child')
+                ->orderBy('created_at')
                 ->get();
 
             $rdgs = [];
@@ -3102,6 +3103,7 @@ class RateDataController extends Controller
                 ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
                 ->where('rgd_status1', '=', '입고')
                 ->where('rgd_settlement_number', $rgd->rgd_settlement_number)
+                ->orderBy('rgd_no')
                 ->get();
 
             $rdgs = [];
@@ -3204,6 +3206,7 @@ class RateDataController extends Controller
                         ->orWhereNull('rgd_status5');
                 })
                 ->whereDoesntHave('rgd_child')
+                ->orderBy('created_at')
                 ->get();
 
             $rdgs = [];
@@ -3271,6 +3274,7 @@ class RateDataController extends Controller
             // ->doesntHave('rgd_child')
                 ->where('rgd_settlement_number', $rgd->rgd_settlement_number)
             // ->whereDoesntHave('rgd_child')
+                ->orderBy('rgd_no')
                 ->get();
 
             $rdgs = [];
