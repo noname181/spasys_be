@@ -1101,24 +1101,24 @@ class BannerController extends Controller
         $countd = $warehousingd->count();
         $counte = $warehousinge->get()->count();
         foreach ($warehousinge->get() as $i) {
-            $counte_2 += $i->rate_data_general->rdg_sum6;
+            $counte_2 += isset($i->rate_data_general->rdg_sum6) ? $i->rate_data_general->rdg_sum6 : 0;
         }
 
         foreach ($warehousinga as $item) {
-            $a += $item->w_amount;
+            $a += isset($item->w_amount) ? $item->w_amount : 0;
         }
 
         foreach ($warehousingb as $item) {
             $item4 = Item::with(['item_info'])->where('item.item_no', $item->item_no)->first();
             if (isset($item4['item_info']['stock'])) {
-                $b += $item4['item_info']['stock'];
+                $b += isset($item4['item_info']['stock']) ? $item4['item_info']['stock'] : 0;
             }
         }
 
         foreach ($warehousingb as $item) {
             $item6 = Item::with(['item_info'])->where('item.item_no', $item->item_no)->first();
             if (isset($item4['item_info']['stock'])) {
-                $b_2 += $item6->item_price2 * $item6['item_info']['stock'];
+                $b_2 += $item6->item_price2 * $item6['item_info']['stock'] ? $item6->item_price2 * $item6['item_info']['stock'] : 0;
             }
         }
 
@@ -1845,7 +1845,7 @@ class BannerController extends Controller
             foreach ($countchartg as $key => $value) {
                 $number  = 0;
                 foreach ($value as $ke => $i) {
-                    $number += $i->rate_data_general->rdg_sum7;
+                    $number += isset($i->rate_data_general->rdg_sum7) ? $i->rate_data_general->rdg_sum7 : 0;
                 }
                 $chartcountd[(int)$key] = $number;
             }
@@ -1853,7 +1853,7 @@ class BannerController extends Controller
             foreach ($countchartg as $key => $value) {
                 $number  = 0;
                 foreach ($value as $ke => $i) {
-                    $number += $i->rate_data_general->rdg_sum6;
+                    $number += isset($i->rate_data_general->rdg_sum6) ? $i->rate_data_general->rdg_sum6 : 0;
                 }
                 $chartcountd[(int)$key] = $number;
             }
@@ -1861,7 +1861,7 @@ class BannerController extends Controller
             foreach ($countchartg as $key => $value) {
                 $number  = 0;
                 foreach ($value as $ke => $i) {
-                    $number += $i->rate_data_general->rdg_sum4;
+                    $number += isset($i->rate_data_general->rdg_sum4) ? $i->rate_data_general->rdg_sum4 : 0;
                 }
                 $chartcountd[(int)$key] = $number;
             }
@@ -1869,7 +1869,7 @@ class BannerController extends Controller
             foreach ($countchartg as $key => $value) {
                 $number = 0;
                 foreach ($value as $ke => $i) {
-                    $number += $i->rate_data_general->rdg_sum7;
+                    $number += isset($i->rate_data_general->rdg_sum7) ? $i->rate_data_general->rdg_sum7 : 0;
                 }
                 $chartcountd[(int)$key] = $number;
             }
