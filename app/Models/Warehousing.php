@@ -26,6 +26,9 @@ class Warehousing extends Model
     protected $fillable = [
         'w_no',
         'w_schedule_number',
+        'w_schedule_number2',
+        'w_schedule_number_settle',
+        'w_schedule_number_settle2',
         'w_type',
         'w_category_name',
         'mb_no',

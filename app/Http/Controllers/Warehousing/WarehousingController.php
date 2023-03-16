@@ -6128,7 +6128,7 @@ class WarehousingController extends Controller
                         $q->where('co_no', $request->co_no);
                     });
             });
-            $warehousing_list = $warehousing->get();
+            $warehousing_list = $warehousing->orderBy('w_no', 'DESC')->get();
             $amount = $warehousing->orWhereIn('w_no', $w_no_in)->orderBy('w_no', 'DESC')->sum('w_amount');
 
             if ($user->mb_type == 'shop') {
@@ -6155,9 +6155,9 @@ class WarehousingController extends Controller
             }
 
             $amount_export = $schedule_shipment->sum('qty');
-            //  return $warehousing->get();
+            // return $warehousing_list[0]['w_schedule_number'];
             if (count($warehousing->get()) > 0) {
-                $first_name_item = $warehousing->get()[0]['warehousing_item'][0]['item'] ? $warehousing->get()[0]['warehousing_item'][0]['item']['item_name'] : '';
+                $first_name_item = $warehousing->get()[0]['warehousing_item'][0]['item'] ? $warehousing->get()[0]['warehousing_item'][0]['item']['item_name'] : null;
                 $total_item = $warehousing->get()[0]['warehousing_item']->count();
                 $final_total = (($total_item / 2)  - 1);
             }
@@ -6169,13 +6169,15 @@ class WarehousingController extends Controller
                 'w_type' => 'IW',
                 'w_category_name' => '수입풀필먼트',
                 'w_amount_export' => $amount_export,
+                'w_schedule_number_settle' => $warehousing_list[0]['w_schedule_number'] ? $warehousing_list[0]['w_schedule_number'] : null,
+                'w_schedule_number_settle2' => $warehousing_list[0]['w_schedule_number2'] ? $warehousing_list[0]['w_schedule_number2'] : null,
                 'co_no' => $request->co_no,
             ]);
 
-            $schedule_number = (new CommonFunc)->generate_w_schedule_number($w_no_data, 'IW');
-            Warehousing::where('w_no', $w_no_data)->update([
-                'w_schedule_number' => null
-            ]);
+            // $schedule_number = (new CommonFunc)->generate_w_schedule_number($w_no_data, 'IW');
+            // Warehousing::where('w_no', $w_no_data)->update([
+            //     'w_schedule_number' => null
+            // ]);
             //THUONG EDIT TO MAKE SETTLEMENT
             $rgd_no = ReceivingGoodsDelivery::insertGetId([
                 'mb_no' => $user->mb_no,
