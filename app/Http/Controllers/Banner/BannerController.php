@@ -273,7 +273,7 @@ class BannerController extends Controller
             $user = Auth::user();
 
 
-            $banner = Banner::with('mb_no')->with('files')->where('mb_no', $user->mb_no)->orderBy('banner_no', 'DESC');
+            $banner = Banner::with('mb_no')->with('files')->where('mb_no', '133')->orderBy('banner_no', 'DESC');
 
             if (isset($validated['from_date'])) {
                 $banner->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
