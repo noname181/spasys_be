@@ -322,6 +322,7 @@ class BannerController extends Controller
                 ->where('banner_use_yn', '=', '1')
                 ->where('banner_start', '<=', $today)
                 ->where('banner_end', '>=', $today)->latest('created_at')
+                ->where('mb_no','=','133')
                 ->first();
 
             $banner_login_right_top = Banner::with('files')
@@ -330,6 +331,7 @@ class BannerController extends Controller
                 ->where('banner_use_yn', '=', '1')
                 ->where('banner_start', '<=', $today)
                 ->where('banner_end', '>=', $today)->latest('created_at')
+                ->where('mb_no','=','133')
                 ->first();
 
             $banner_login_right_bottom = Banner::with('files')
@@ -338,6 +340,7 @@ class BannerController extends Controller
                 ->where('banner_use_yn', '=', '1')
                 ->where('banner_start', '<=', $today)
                 ->where('banner_end', '>=', $today)->latest('created_at')
+                ->where('mb_no','=','133')
                 ->first();
 
             $banner_index_top = Banner::with('files')
@@ -346,6 +349,7 @@ class BannerController extends Controller
                 ->where('banner_use_yn', '=', '1')
                 ->where('banner_start', '<=', $today)
                 ->where('banner_end', '>=', $today)->latest('created_at')
+                ->where('mb_no','=','133')
                 ->first();
 
             $banner_index_bottom = Banner::with('files')
@@ -354,6 +358,7 @@ class BannerController extends Controller
                 ->where('banner_use_yn', '=', '1')
                 ->where('banner_start', '<=', $today)
                 ->where('banner_end', '>=', $today)->latest('created_at')
+                ->where('mb_no','=','133')
                 ->first();
 
             return response()->json([
@@ -378,21 +383,23 @@ class BannerController extends Controller
             $today = Carbon::now()->format('Y-m-d');
 
             $banner_index_top = Banner::with('files')
-                ->where('mb_no', $user->mb_no)
+                //->where('mb_no', $user->mb_no)
                 ->where('banner_position', '=', '메인')
                 ->where('banner_position_detail', '=', '상단')
                 ->where('banner_use_yn', '=', '1')
                 ->where('banner_start', '<=', $today)
                 ->where('banner_end', '>=', $today)->latest('created_at')
+                ->where('mb_no','=','133')
                 ->first();
 
             $banner_index_bottom = Banner::with('files')
-                ->where('mb_no', $user->mb_no)
+                // ->where('mb_no', $user->mb_no)
                 ->where('banner_position', '=', '메인')
                 ->where('banner_position_detail', '=', '하단')
                 ->where('banner_use_yn', '=', '1')
                 ->where('banner_start', '<=', $today)
                 ->where('banner_end', '>=', $today)->latest('created_at')
+                ->where('mb_no','=','133')
                 ->first();
 
             return response()->json([
