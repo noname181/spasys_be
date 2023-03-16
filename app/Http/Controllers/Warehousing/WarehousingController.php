@@ -348,11 +348,13 @@ class WarehousingController extends Controller
                         });
                     });
                 }
+
                 if (isset($validated['rgd_status2'])) {
                     $warehousing2->whereHas('receving_goods_delivery', function ($query) use ($validated) {
                         $query->where('rgd_status2', '=', $validated['rgd_status2']);
                     });
                 }
+                
                 if (isset($validated['rgd_status3'])) {
                     $warehousing2->whereHas('receving_goods_delivery', function ($query) use ($validated) {
                         $query->where('rgd_status3', '=', $validated['rgd_status3']);
@@ -370,16 +372,18 @@ class WarehousingController extends Controller
                 if (isset($validated['h_bl'])) {
                     $warehousing2->where('h_bl', 'like', '%' . $validated['h_bl'] . '%');
                 }
+                
                 $warehousing2 = $warehousing2->get();
                 $w_import_no = collect($warehousing2)->map(function ($q) {
 
                     return $q->w_import_no;
                 });
+
                 $w_no_in = collect($warehousing2)->map(function ($q) {
 
                     return $q->w_no;
                 });
-
+                
                 $warehousing = Warehousing::with('mb_no')
                     ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent', 'warehousing_child', 'package'])->withCount([
                         'warehousing_item as bonusQuantity' => function ($query) {
@@ -3172,7 +3176,7 @@ class WarehousingController extends Controller
                     $query->where('w_type', '=', 'EW')
                         ->where('rgd_status1', '=', '출고')
                         ->where('rgd_status2', '=', '작업완료')
-
+                        ->where('w_category_name', '=', '유통가공')
                         ->where(function ($q) {
                             $q->where(function ($query) {
                                 $query->where('rgd_status4', '!=', '예상경비청구서')->where('rgd_status4', '!=', '확정청구서');
@@ -3187,7 +3191,7 @@ class WarehousingController extends Controller
                     $query->where('w_type', '=', 'EW')
                         ->where('rgd_status1', '=', '출고')
                         ->where('rgd_status2', '=', '작업완료')
-
+                        ->where('w_category_name', '=', '유통가공')
                         ->where(function ($q) {
                             $q->where(function ($query) {
                                 $query->where('rgd_status4', '!=', '예상경비청구서')->where('rgd_status4', '!=', '확정청구서');
@@ -3202,7 +3206,7 @@ class WarehousingController extends Controller
                     $query->where('w_type', '=', 'EW')
                         ->where('rgd_status1', '=', '출고')
                         ->where('rgd_status2', '=', '작업완료')
-
+                        ->where('w_category_name', '=', '유통가공')
                         ->where(function ($q) {
                             $q->where(function ($query) {
                                 $query->where('rgd_status4', '!=', '예상경비청구서')->where('rgd_status4', '!=', '확정청구서');

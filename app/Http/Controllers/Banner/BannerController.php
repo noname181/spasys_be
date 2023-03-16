@@ -452,7 +452,7 @@ class BannerController extends Controller
                 $query->where('w_type', '=', 'EW')
                     ->where('rgd_status1', '=', '출고')
                     ->where('rgd_status2', '=', '작업완료')
-
+                    ->where('w_category_name', '=', '유통가공')
                     ->where(function ($q) {
                         $q->where(function ($query) {
                             $query->where('rgd_status4', '!=', '예상경비청구서')->where('rgd_status4', '!=', '확정청구서');
@@ -467,7 +467,7 @@ class BannerController extends Controller
                 $query->where('w_type', '=', 'EW')
                     ->where('rgd_status1', '=', '출고')
                     ->where('rgd_status2', '=', '작업완료')
-
+                    ->where('w_category_name', '=', '유통가공')
                     ->where(function ($q) {
                         $q->where(function ($query) {
                             $query->where('rgd_status4', '!=', '예상경비청구서')->where('rgd_status4', '!=', '확정청구서');
@@ -544,7 +544,7 @@ class BannerController extends Controller
                 $query->where('w_type', '=', 'EW')
                     ->where('rgd_status1', '=', '출고')
                     ->where('rgd_status2', '=', '작업완료')
-
+                    ->where('w_category_name', '=', '유통가공')
                     ->where(function ($q) {
                         $q->where(function ($query) {
                             $query->where('rgd_status4', '!=', '예상경비청구서')->where('rgd_status4', '!=', '확정청구서');
@@ -559,7 +559,7 @@ class BannerController extends Controller
                 $query->where('w_type', '=', 'EW')
                     ->where('rgd_status1', '=', '출고')
                     ->where('rgd_status2', '=', '작업완료')
-
+                    ->where('w_category_name', '=', '유통가공')
                     ->where(function ($q) {
                         $q->where(function ($query) {
                             $query->where('rgd_status4', '!=', '예상경비청구서')->where('rgd_status4', '!=', '확정청구서');
