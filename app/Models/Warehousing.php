@@ -153,4 +153,8 @@ class Warehousing extends Model
     {
         return $this->hasOne(Package::class, 'w_no', 'w_no');
     }
+
+    public function settlement_cargo(){
+        return $this->belongsTo(Warehousing::class, 'w_schedule_number_settle', 'w_schedule_number');
+    }
 }

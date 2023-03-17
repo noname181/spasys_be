@@ -4286,11 +4286,12 @@ class RateDataController extends Controller
             $company = Company::where('co_no', $request->co_no)->first();
             $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                 'rgd_storage_days' => $request->storage_days,
+                'rgd_e_price' => $request->te_e_price ? $request->te_e_price : null,
             ]);
 
             Import::where('ti_logistic_manage_number', $request->ti_logistic_manage_number)->update([
                 'ti_co_license' => isset($company->co_license) ? $company->co_license : null,
-                'ti_logistic_type' => isset($request->te_e_price) ? $request->ti_logistic_type : null,
+                'ti_logistic_type' => isset($request->ti_logistic_type) ? $request->ti_logistic_type : null,
                 'ti_i_storeday' => $request->storage_days ? $request->storage_days : $request->storagedays,
             ]);
 
