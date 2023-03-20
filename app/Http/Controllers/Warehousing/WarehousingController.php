@@ -5067,7 +5067,7 @@ class WarehousingController extends Controller
                 else if ($validated['status'] == 'taxed')
                     $warehousing->where('rgd_status7', '=', 'taxed');
                 else
-                    $warehousing->where('rgd_status7', '=', 'cancelled');
+                    $warehousing->where('rgd_status7', '=', 'cancel');
             }
 
             if (isset($validated['service']) && $validated['service'] != '전체') {
@@ -5482,6 +5482,7 @@ class WarehousingController extends Controller
                             'rgd_no' => $request->rgd_no,
                             'mb_no' => $user->mb_no,
                             'cbh_type' => 'tax',
+                            'cbh_status_before' => 'taxed',
                             'cbh_status_after' => 'edited'
                         ]);
                     } else {
@@ -5622,7 +5623,7 @@ class WarehousingController extends Controller
                         'rgd_no' => $rgd['rgd_no'],
                         'mb_no' => $user->mb_no,
                         'cbh_type' => 'tax',
-                        'cbh_status_after' => 'issued'
+                        'cbh_status_after' => 'taxed'
                     ]);
                 }
                 DB::commit();
@@ -5672,7 +5673,7 @@ class WarehousingController extends Controller
                         'rgd_no' => $rgd['rgd_no'],
                         'mb_no' => $user->mb_no,
                         'cbh_type' => 'tax',
-                        'cbh_status_after' => 'issued'
+                        'cbh_status_after' => 'taxed'
                     ]);
                 }
                 DB::commit();
@@ -6131,6 +6132,15 @@ class WarehousingController extends Controller
                     });
             });
             $warehousing_list = $warehousing->orderBy('w_no', 'DESC')->get();
+
+
+            if(count($warehousing_list) == 0){
+                return response()->json([
+                    'message' => '입고된 화물내역이 없습니다.',
+                    'error' => 'y'
+                ]);
+            }
+
             $amount = $warehousing->orWhereIn('w_no', $w_no_in)->orderBy('w_no', 'DESC')->sum('w_amount');
 
             if ($user->mb_type == 'shop') {
@@ -6223,7 +6233,6 @@ class WarehousingController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
