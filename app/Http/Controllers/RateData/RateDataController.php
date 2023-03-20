@@ -8600,6 +8600,14 @@ class RateDataController extends Controller
                     'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
                 ]);
 
+                $cbh = CancelBillHistory::insertGetId([
+                    'rgd_no' => $rgd['rgd_no'],
+                    'mb_no' => $user->mb_no,
+                    'cbh_type' => 'tax',
+                    'cbh_status_before' => null,
+                    'cbh_status_after' => 'taxed'
+                ]);
+
                 $id = TaxInvoiceDivide::insertGetId([
                     'tid_supply_price' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
                     'tid_vat' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
