@@ -1487,7 +1487,7 @@ class BannerController extends Controller
         }
 
         $counta = $warehousinga->whereNotNull('aaa.tie_logistic_manage_number')->whereNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->get()->count();
-        $countc = $warehousingb2 -  $warehousingd2;
+        $countc = $warehousingb2;
         $counte = $warehousinge->where('aaa.tie_status_2', '=', '수입신고접수')->orwhere('aaa.tie_status_2', '=', '수입신고정정접수')->get()->count();
         $countg = $warehousingg->get()->count();
         foreach ($warehousingg->get() as $i) {
