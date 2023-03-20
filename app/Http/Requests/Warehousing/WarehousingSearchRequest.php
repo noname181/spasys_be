@@ -69,6 +69,9 @@ class WarehousingSearchRequest extends BaseFormRequest
                 'nullable',
                 'int',
             ],
+            'co_close_yn' => [
+                '',
+            ],
             'w_schedule_number' => [
                 '',
             ],
@@ -174,13 +177,25 @@ class WarehousingSearchRequest extends BaseFormRequest
             'carrier' => [
                 '',
             ],
+            'rgd_status4' => [
+                '',
+            ],
             'rgd_status5' => [
+                '',
+            ],
+            'rgd_status6' => [
+                '',
+            ],
+            'rgd_status7' => [
                 '',
             ],
             'rgd_receiver' => [
                 '',
             ],
             'rgd_contents' => [
+                '',
+            ],
+            'rgd_settlement_number' => [
                 '',
             ],
         ];
