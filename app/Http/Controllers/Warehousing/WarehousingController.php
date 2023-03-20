@@ -5066,7 +5066,7 @@ class WarehousingController extends Controller
                 else if ($validated['status'] == 'taxed')
                     $warehousing->where('rgd_status7', '=', 'taxed');
                 else
-                    $warehousing->where('rgd_status7', '=', 'cancelled');
+                    $warehousing->where('rgd_status7', '=', 'cancel');
             }
 
             if (isset($validated['service']) && $validated['service'] != '전체') {
@@ -5481,6 +5481,7 @@ class WarehousingController extends Controller
                             'rgd_no' => $request->rgd_no,
                             'mb_no' => $user->mb_no,
                             'cbh_type' => 'tax',
+                            'cbh_status_before' => 'taxed',
                             'cbh_status_after' => 'edited'
                         ]);
                     } else {
@@ -5621,7 +5622,7 @@ class WarehousingController extends Controller
                         'rgd_no' => $rgd['rgd_no'],
                         'mb_no' => $user->mb_no,
                         'cbh_type' => 'tax',
-                        'cbh_status_after' => 'issued'
+                        'cbh_status_after' => 'taxed'
                     ]);
                 }
                 DB::commit();
@@ -5671,7 +5672,7 @@ class WarehousingController extends Controller
                         'rgd_no' => $rgd['rgd_no'],
                         'mb_no' => $user->mb_no,
                         'cbh_type' => 'tax',
-                        'cbh_status_after' => 'issued'
+                        'cbh_status_after' => 'taxed'
                     ]);
                 }
                 DB::commit();
