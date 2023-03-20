@@ -76,6 +76,9 @@ class ImportScheduleSearchRequest extends BaseFormRequest
             'status' => [
                 '',
             ],
+            'rgd_status3' => [
+                '',
+            ],
             'connection' => [
                 ''
             ]

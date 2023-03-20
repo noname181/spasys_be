@@ -384,7 +384,7 @@ class ImportScheduleController extends Controller
                     //     $join->on('t_export.te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
                     // })
                     ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
-                $sub_5 = ReceivingGoodsDelivery::select('is_no', 'rgd_status3')->groupBy('is_no');
+                $sub_5 = ReceivingGoodsDelivery::select('is_no', 'rgd_status3', 'rgd_status1')->groupBy('is_no');
 
                 $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
                     $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
@@ -428,7 +428,7 @@ class ImportScheduleController extends Controller
                     //     $join->on('t_export.te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
                     // })
                     ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
-                $sub_5 = ReceivingGoodsDelivery::select('is_no', 'rgd_status3')->groupBy('is_no');
+                $sub_5 = ReceivingGoodsDelivery::select('is_no', 'rgd_status3', 'rgd_status1')->groupBy('is_no');
 
                 $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
                     $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
@@ -488,7 +488,7 @@ class ImportScheduleController extends Controller
                     // })
                     ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
 
-                $sub_5 = ReceivingGoodsDelivery::select('is_no', 'rgd_status3')->groupBy('is_no');
+                $sub_5 = ReceivingGoodsDelivery::select('is_no', 'rgd_status3', 'rgd_status1')->groupBy('is_no');
 
 
                 $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
@@ -602,17 +602,17 @@ class ImportScheduleController extends Controller
                 //}
             }
 
-            if (isset($validated['status'])) {
+            if (isset($validated['rgd_status3'])) {
 
-                if ($validated['status'] == "배송준비") {
+                if ($validated['rgd_status3'] == "배송준비") {
                     $import_schedule->where(function ($query) {
-                        $query->whereNull('nnn.rgd_status3')->orWhere('rgd_status3', '=', '배송준비');
-                        $query->where('nnn.rgd_status1', '!=', '반입');
+                        $query->whereNull('rgd_status3')->orWhere('rgd_status3', '=', '배송준비');
+                        $query->where('rgd_status1', '!=', '반입');
                     });
                 } else {
                     $import_schedule->where(function ($query) use ($validated) {
-                        $query->where('nnn.rgd_status3', '=', $validated['status']);
-                        $query->where('nnn.rgd_status1', '!=', '반입');
+                        $query->where('rgd_status3', '=', $validated['rgd_status3']);
+                        $query->where('rgd_status1', '!=', '반입');
                     });
                 }
             }
