@@ -559,14 +559,21 @@ class MemberController extends Controller
 
 
                 if ($request->type == "shop_only") {
+                    // $members = Company::with(['co_parent'])->where(function ($q) use ($user) {
+                    //     $q->WhereHas('co_parent', function ($q) use ($user) {
+                    //         $q->where('co_no', $user->co_no);
+                    //     });
+                    // })->orderBy('co_type', 'DESC')->orderBy('co_name', 'ASC')->get();
+
                     $members = Company::with(['co_parent'])->where(function ($q) use ($user) {
                         $q->WhereHas('co_parent', function ($q) use ($user) {
-                            $q->where('co_no', $user->co_no)
-                                ->orWhereHas('co_parent', function ($q) use ($user) {
+                            
+                            $q->WhereHas('co_parent', function ($q) use ($user) {
                                     $q->where('co_no', $user->co_no);
                                 });
                         });
                     })->orderBy('co_type', 'DESC')->orderBy('co_name', 'ASC')->get();
+                    
                 } else {
                     
                         $members = Company::with(['co_parent'])->where(function ($q) use ($user) {
