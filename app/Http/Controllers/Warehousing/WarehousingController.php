@@ -2616,6 +2616,7 @@ class WarehousingController extends Controller
                         });
                     }
                 }
+                
                 if (isset($validated['carrier'])) {
                     $import_schedule->whereHas('export.receiving_goods_delivery', function ($q) use ($validated) {
                         // return $q->where('rgd_delivery_company', '=', $validated['carrier']);

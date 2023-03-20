@@ -40,27 +40,25 @@ class MemberController extends Controller
                 $validated['mb_type'] = Member::SPASYS;
                 $validated['mb_parent'] = Member::ADMIN;
             } else if ($roleNoOfUserLogin == Member::ROLE_SPASYS_ADMIN) {
-                if(empty($validated['co_no'])){
+                if (empty($validated['co_no'])) {
                     $validated['mb_type'] = Member::SPASYS;
                     $validated['mb_parent'] = null;
-                }else {
+                } else {
                     $company = Company::where('co_no', $validated['co_no'])->first();
-                    if($company->co_type == 'shop'){
+                    if ($company->co_type == 'shop') {
                         $validated['mb_type'] = Member::SHOP;
                         $validated['mb_parent'] = Member::SPASYS;
-                    }else if($company->co_type == 'shipper'){
+                    } else if ($company->co_type == 'shipper') {
                         $validated['mb_type'] = Member::SHIPPER;
                         $validated['mb_parent'] = Member::SHOP;
                     }
                 }
-              
-
             } else if ($roleNoOfUserLogin == Member::ROLE_SHOP_MANAGER) {
-                if(empty($validated['co_no'])){
+                if (empty($validated['co_no'])) {
                     $validated['mb_type'] = Member::SHOP;
                     $validated['mb_parent'] = Member::SPASYS;
-                }else {
-                   
+                } else {
+
                     $validated['mb_type'] = Member::SHIPPER;
                     $validated['mb_parent'] = Member::SHOP;
                 }
@@ -69,14 +67,14 @@ class MemberController extends Controller
             $validated['mb_token'] = '';
             $validated['mb_pw'] = Hash::make($validated['mb_pw']);
 
-            if(empty($validated['co_no'])){
+            if (empty($validated['co_no'])) {
                 $validated['co_no'] = Auth::user()->co_no;
             }
 
-            $check_exists = Member::where('mb_id',$validated['mb_id'])->first();
-            if($check_exists){
+            $check_exists = Member::where('mb_id', $validated['mb_id'])->first();
+            if ($check_exists) {
                 return response()->json(['message' => '이미 가입된 ID입니다.'], 500);
-            }else{
+            } else {
                 $mb_no = Member::insertGetId($validated);
             }
 
@@ -185,26 +183,26 @@ class MemberController extends Controller
             $user = Member::where('mb_no', Auth::user()->mb_no)->with('company')->first();
 
             if ($user->mb_type == 'spasys') {
-                $members = Member::with('company')->whereHas('company', function($q) use($user){
+                $members = Member::with('company')->whereHas('company', function ($q) use ($user) {
                     $q->where('co_no', $user->company->co_no)
-                    ->orWhereHas('co_parent', function($q) use($user){
-                        $q->where('co_no', $user->company->co_no);
-                    })->orWhereHas('co_parent', function($q) use($user){
-                        $q->whereHas('co_parent', function($q) use($user){
+                        ->orWhereHas('co_parent', function ($q) use ($user) {
+                            $q->where('co_no', $user->company->co_no);
+                        })->orWhereHas('co_parent', function ($q) use ($user) {
+                            $q->whereHas('co_parent', function ($q) use ($user) {
+                                $q->where('co_no', $user->company->co_no);
+                            });
+                        });
+                })
+                    ->orderBy('mb_no', 'DESC');
+            } else if ($user->mb_type == 'shop') {
+                $members = Member::with('company')->whereHas('company', function ($q) use ($user) {
+                    $q->where('co_no', $user->company->co_no)
+                        ->orWhereHas('co_parent', function ($q) use ($user) {
                             $q->where('co_no', $user->company->co_no);
                         });
-                    });
-                })
-                ->orderBy('mb_no', 'DESC');
-            }else if($user->mb_type == 'shop'){
-                $members = Member::with('company')->whereHas('company', function($q) use($user){
-                    $q->where('co_no', $user->company->co_no)
-                    ->orWhereHas('co_parent', function($q) use($user){
-                        $q->where('co_no', $user->company->co_no);
-                    });
                 });
-            }else if($user->mb_type == 'shipper'){
-                $members = Member::with('company')->whereHas('company', function($q) use($user){
+            } else if ($user->mb_type == 'shipper') {
+                $members = Member::with('company')->whereHas('company', function ($q) use ($user) {
                     $q->where('co_no', $user->company->co_no);
                 });
             }
@@ -222,19 +220,18 @@ class MemberController extends Controller
             if (isset($validated['co_parent_name'])) {
                 $members->whereHas('company', function ($q) use ($validated) {
                     $q->where(function ($q) use ($validated) {
-                        $q->where('co_name', 'like', '%' . $validated['co_parent_name'] . '%')->where('co_type','=','shop');
+                        $q->where('co_name', 'like', '%' . $validated['co_parent_name'] . '%')->where('co_type', '=', 'shop');
                     })
-                    ->orwhereHas('co_parent', function ($q) use ($validated) {
-                        $q->where('co_name', 'like', '%' . $validated['co_parent_name'] . '%')->where('co_type','=','shop');
-                    });
+                        ->orwhereHas('co_parent', function ($q) use ($validated) {
+                            $q->where('co_name', 'like', '%' . $validated['co_parent_name'] . '%')->where('co_type', '=', 'shop');
+                        });
                 });
             }
 
             if (isset($validated['co_name'])) {
                 $members->whereHas('company', function ($q) use ($validated) {
-                 
-                    $q->where('co_name', 'like', '%' . $validated['co_name'] . '%')->where('co_type','=','shipper');
-          
+
+                    $q->where('co_name', 'like', '%' . $validated['co_name'] . '%')->where('co_type', '=', 'shipper');
                 });
             }
 
@@ -357,7 +354,7 @@ class MemberController extends Controller
                 'mb_tel' => $validated['mb_tel'],
                 'mb_id' => $validated['mb_id'],
                 'mb_note' => $validated['mb_note'],
-                'mb_email'=> $validated['co_email'],
+                'mb_email' => $validated['co_email'],
                 'mb_type' => $validated['mb_type'],
                 'mb_parent' => $validated['mb_parent'],
                 'role_no' => $validated['role_no'],
@@ -540,49 +537,61 @@ class MemberController extends Controller
 
             //NEW LOGIC
             $company = Company::where('co_no', $user->co_no)->first();
-            if($user->mb_type == 'shop'){
-                $members = Company::with(['co_parent'])->where(function ($q) use ( $user) {
+            if ($user->mb_type == 'shop') {
+                if ($request->type == "shop_only") {
+                    $members = Company::with(['co_parent'])->where('co_no', $user->co_no)->orderBy('co_type', 'DESC')->orderBy('co_name', 'ASC')->get();
+                } else {
+                    $members = Company::with(['co_parent'])->where(function ($q) use ($user) {
 
-                    $q->WhereHas('co_parent', function ($q) use ($user) {
-                        $q->where('co_no', $user->co_no);
-                    });
-    
-    
-                    // $q->whereHas('co_parent', function($q) use($co_no){
-                    //     $q->where('co_no', $co_no);
-                    // })->orWhereHas('co_parent.co_parent', function($q) use($co_no){
-                    //     $q->where('co_no', $co_no);
-                    // });
-                })->orderBy('co_type', 'DESC')->orderBy('co_name', 'ASC')->get();
-            }else if($user->mb_type == 'spasys'){
-               
-
-                if($request->type == "shop_only"){
-                    $members = Company::with(['co_parent'])->where(function ($q) use ( $user) {
                         $q->WhereHas('co_parent', function ($q) use ($user) {
                             $q->where('co_no', $user->co_no);
-                           
                         });
-    
-                    })->orderBy('co_type', 'DESC')->orderBy('co_name', 'ASC')->get();
-                }else{
-                    $members = Company::with(['co_parent'])->where(function ($q) use ( $user) {
-                        $q->WhereHas('co_parent', function ($q) use ($user) {
-                            $q->where('co_no', $user->co_no)
-                            ->orWhereHas('co_parent', function ($q) use ($user) {
-                                $q->where('co_no', $user->co_no);
-                            });
-                        });
-    
+
+
+                        // $q->whereHas('co_parent', function($q) use($co_no){
+                        //     $q->where('co_no', $co_no);
+                        // })->orWhereHas('co_parent.co_parent', function($q) use($co_no){
+                        //     $q->where('co_no', $co_no);
+                        // });
                     })->orderBy('co_type', 'DESC')->orderBy('co_name', 'ASC')->get();
                 }
-            }else if($user->mb_type == 'shipper'){
+            } else if ($user->mb_type == 'spasys') {
+
+
+                if ($request->type == "shop_only") {
+                    $members = Company::with(['co_parent'])->where(function ($q) use ($user) {
+                        $q->WhereHas('co_parent', function ($q) use ($user) {
+                            $q->where('co_no', $user->co_no);
+                        });
+                    })->orderBy('co_type', 'DESC')->orderBy('co_name', 'ASC')->get();
+                } else {
+                    if ($request->type == "shop_only") {
+                        $members = Company::with(['co_parent'])->where('co_no', $user->co_no)->orderBy('co_type', 'DESC')->orderBy('co_name', 'ASC')->get();
+                    } else {
+                        $members = Company::with(['co_parent'])->where(function ($q) use ($user) {
+                            $q->WhereHas('co_parent', function ($q) use ($user) {
+                                $q->where('co_no', $user->co_no)
+                                    ->orWhereHas('co_parent', function ($q) use ($user) {
+                                        $q->where('co_no', $user->co_no);
+                                    });
+                            });
+                        })->orderBy('co_type', 'DESC')->orderBy('co_name', 'ASC')->get();
+                    }
+                }
+            } else if ($user->mb_type == 'shipper') {
+                
+                 
                 $members = [];
-                $member2 = Company::with(['co_parent'])->where('co_no',$user->co_no)->first();
+                $member2 = Company::with(['co_parent'])->where('co_no', $user->co_no)->first();
                 //$members[] = $member2;
-                $members[] = $member2->co_parent;
-                $members[] = $member2->co_parent->co_parent;
-                array_multisort($members, SORT_ASC);            
+                if ($request->type == "shop_only") {
+                    $members[] = $member2->co_parent;
+                }else{
+                    $members[] = $member2->co_parent;
+                    $members[] = $member2->co_parent->co_parent;
+                }
+                
+                array_multisort($members, SORT_ASC);
             }
 
             return response()->json(["member" => $members]);
@@ -591,7 +600,5 @@ class MemberController extends Controller
             return $e;
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
-
     }
-
 }
