@@ -602,6 +602,21 @@ class ImportScheduleController extends Controller
                 //}
             }
 
+            if (isset($validated['status'])) {
+
+                if ($validated['status'] == "배송준비") {
+                    $import_schedule->where(function ($query) {
+                        $query->whereNull('nnn.rgd_status3')->orWhere('rgd_status3', '=', '배송준비');
+                        $query->where('nnn.rgd_status1', '!=', '반입');
+                    });
+                } else {
+                    $import_schedule->where(function ($query) use ($validated) {
+                        $query->where('nnn.rgd_status3', '=', $validated['status']);
+                        $query->where('nnn.rgd_status1', '!=', '반입');
+                    });
+                }
+            }
+
             // if (isset($validated['import_schedule_status1']) || isset($validated['import_schedule_status2'])) {
             //     $import_schedule->where(function($query) use ($validated) {
             //         $query->orwhere('import_schedule_status', '=', $validated['import_schedule_status1']);
