@@ -6132,6 +6132,15 @@ class WarehousingController extends Controller
                     });
             });
             $warehousing_list = $warehousing->orderBy('w_no', 'DESC')->get();
+
+
+            if(count($warehousing_list) == 0){
+                return response()->json([
+                    'message' => '입고된 화물내역이 없습니다.',
+                    'error' => 'y'
+                ]);
+            }
+
             $amount = $warehousing->orWhereIn('w_no', $w_no_in)->orderBy('w_no', 'DESC')->sum('w_amount');
 
             if ($user->mb_type == 'shop') {
@@ -6224,7 +6233,6 @@ class WarehousingController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
