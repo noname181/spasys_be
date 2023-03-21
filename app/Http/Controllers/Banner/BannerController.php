@@ -1664,12 +1664,11 @@ class BannerController extends Controller
                 // });
             }
         } elseif ($request->servicechart == "유통가공") {
-            $warehousingb = ReceivingGoodsDelivery::with(['w_no'])->whereNull('rgd_parent_no')->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereHas('w_no', function ($query) use ($request) {
+            $warehousingb = ReceivingGoodsDelivery::with(['warehousing'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($request) {
                 $query->where('w_type', '=', 'IW')->where('rgd_status1', '=', '입고')->where('w_category_name', '=', '유통가공')->whereHas('co_no', function ($q) use ($request) {
                     $q->where('co_no', $request->co_no);
                 });
             });
-
 
             $warehousingd = ReceivingGoodsDelivery::with(['warehousing'])->with(['mb_no'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($request) {
                 $query->where('w_type', '=', 'EW')
@@ -1738,8 +1737,8 @@ class BannerController extends Controller
         foreach ($period as $date) {
             $m = (int)$date->format('m');
 
-            if (!empty($chartcountb[$i])) {
-                $userArrb['data'][] = $chartcountb[$i];
+            if (!empty($chartcountb[$m])) {
+                $userArrb['data'][] = $chartcountb[$m];
             } else {
                 $userArrb['data'][] = 0;
             }
