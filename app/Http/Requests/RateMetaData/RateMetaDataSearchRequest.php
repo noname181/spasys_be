@@ -60,6 +60,9 @@ class RateMetaDataSearchRequest extends BaseFormRequest
                 'nullable',
                 'int',
             ],
+            'rd_cate_meta1' => [
+                '',
+            ],
         ];
     }
 

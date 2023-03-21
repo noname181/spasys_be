@@ -59,6 +59,11 @@ class RateMetaDataController extends Controller
                     $rm->where('rm_owner_name', 'like', '%'.$validated['rm_owner_name'].'%');
                 });
             }
+            if(isset($validated['rd_cate_meta1'])) {
+                $rmd->whereHas('rate_data_one', function($rm) use ($validated){
+                    $rm->where('rd_cate_meta1', '=', $validated['rd_cate_meta1']);
+                });
+            }
             $rmd = $rmd->paginate($per_page, ['*'], 'page', $page);
 
             $rmd->setCollection(
