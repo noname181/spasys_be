@@ -6938,10 +6938,44 @@ class WarehousingController extends Controller
 
 
             $warehousing = $warehousing->get();
+            if(isset($warehousing)){
+                foreach ($warehousing as $item) {
+                    $item->total_item = WarehousingItem::where('w_no', $item->w_no)->where('wi_type', '입고_spasys')->sum('wi_number');
+                        if ($item['warehousing_item'][0]['item']) {
+                            $first_name_item = $item['warehousing_item'][0]['item']['item_name'];
+                            $total_item = $item['warehousing_item']->count();
+                            $final_total = (($total_item / 2)  - 1);
+                            if ($final_total <= 0) {
+                                $item->first_item_name_total = $first_name_item . '외';
+                            } else {
+                                $item->first_item_name_total = $first_name_item . '외' . ' ' . $final_total . '건';
+                            }
+                        } else {
+                            $item->first_item_name_total = '';
+                        }
+                }
+            }
 
             $import_schedule = $import_schedule->get();
 
             $warehousing2 = $warehousing2->get();
+            if(isset($warehousing2)){
+                foreach($warehousing2 as $item){
+                    $item->total_item = WarehousingItem::where('w_no', $item->w_no)->where('wi_type', '입고_spasys')->sum('wi_number');
+                    if ($item['warehousing_item'][0]['item']) {
+                        $first_name_item = $item['warehousing_item'][0]['item']['item_name'];
+                        $total_item = $item['warehousing_item']->count();
+                        $final_total = (($total_item / 2)  - 1);
+                        if ($final_total <= 0) {
+                            $item->first_item_name_total = $first_name_item . '외';
+                        } else {
+                            $item->first_item_name_total = $first_name_item . '외' . ' ' . $final_total . '건';
+                        }
+                    } else {
+                        $item->first_item_name_total = '';
+                    }  
+                }
+            }
 
             $final2 = collect($warehousing)->map(function ($q) {
 
@@ -6960,7 +6994,7 @@ class WarehousingController extends Controller
 
             $final4 = $final2->merge($final)->merge($final3);
 
-            $data = $this->paginate($final4, $validated['per_page'], $validated['page']);
+            $data = $this->paginate($final4, isset($validated['per_page']) ? $validated['per_page'] : 200, isset($validated['page']) ? $validated['page'] : 1);
 
             // $status = DB::table('t_import_expected')
             //     ->select('tie_status_2')
