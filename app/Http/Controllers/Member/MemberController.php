@@ -567,39 +567,73 @@ class MemberController extends Controller
 
                     $members = Company::with(['co_parent'])->where(function ($q) use ($user) {
                         $q->WhereHas('co_parent', function ($q) use ($user) {
-                            
+
                             $q->WhereHas('co_parent', function ($q) use ($user) {
+                                $q->where('co_no', $user->co_no);
+                            });
+                        });
+                    })->orderBy('co_type', 'DESC')->orderBy('co_name', 'ASC')->get();
+                } else {
+
+                    $members = Company::with(['co_parent'])->where(function ($q) use ($user) {
+                        $q->WhereHas('co_parent', function ($q) use ($user) {
+                            $q->where('co_no', $user->co_no)
+                                ->orWhereHas('co_parent', function ($q) use ($user) {
                                     $q->where('co_no', $user->co_no);
                                 });
                         });
                     })->orderBy('co_type', 'DESC')->orderBy('co_name', 'ASC')->get();
-                    
-                } else {
-                    
-                        $members = Company::with(['co_parent'])->where(function ($q) use ($user) {
-                            $q->WhereHas('co_parent', function ($q) use ($user) {
-                                $q->where('co_no', $user->co_no)
-                                    ->orWhereHas('co_parent', function ($q) use ($user) {
-                                        $q->where('co_no', $user->co_no);
-                                    });
-                            });
-                        })->orderBy('co_type', 'DESC')->orderBy('co_name', 'ASC')->get();
-                    
                 }
             } else if ($user->mb_type == 'shipper') {
-                
-                 
+
+
                 $members = [];
                 $member2 = Company::with(['co_parent'])->where('co_no', $user->co_no)->first();
                 //$members[] = $member2;
                 if ($request->type == "shop_only") {
                     $members[] = $member2->co_parent;
-                }else{
+                } else {
                     $members[] = $member2->co_parent;
                     $members[] = $member2->co_parent->co_parent;
                 }
-                
+
                 array_multisort($members, SORT_ASC);
+            }
+
+            return response()->json(["member" => $members]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+    public function list_members_chart(Request $request)
+    {
+        try {
+            $user = Auth::user();
+
+            //NEW LOGIC
+            $company = Company::where('co_no', $user->co_no)->first();
+            if ($user->mb_type == 'shop') {
+                $members = Company::with(['co_parent'])->where('co_no', $user->co_no)->where('co_service', 'like', '%' . $request->service . '%')->orderBy('co_type', 'DESC')->orderBy('co_name', 'ASC')->get();
+            } else if ($user->mb_type == 'spasys') {
+
+                $members = Company::with(['co_parent'])->where(function ($q) use ($user,$request) {
+                    $q->WhereHas('co_parent', function ($q) use ($user,$request) {
+                        $q->WhereHas('co_parent', function ($q) use ($user,$request) {
+                            $q->where('co_no', $user->co_no);
+                        });
+                    });
+                })->where('co_service', 'like', '%' . $request->service . '%')->orderBy('co_type', 'DESC')->orderBy('co_name', 'ASC')->get();
+
+            } else if ($user->mb_type == 'shipper') {
+
+                $members = [];
+                $member2 = Company::with(['co_parent'])->where('co_no', $user->co_no)->where('co_service', 'like', '%' . $request->service . '%')->first();
+                $members[] = $member2->co_parent;
+                array_multisort($members, SORT_ASC);
+
             }
 
             return response()->json(["member" => $members]);
