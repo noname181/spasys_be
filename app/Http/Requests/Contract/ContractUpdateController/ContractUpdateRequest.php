@@ -107,20 +107,24 @@ class ContractUpdateRequest extends BaseFormRequest
                 '',
             ],
             'c_file_insulance' => [
-                'max:2048',
-                'mimes:pdf,png,jpg,jpeg'
+                ''
+                // 'max:2048',
+                // 'mimes:pdf,png,jpg,jpeg'
             ],
             'c_file_license' => [
-                'max:2048',
-                'mimes:pdf,png,jpg,jpeg'
+                ''
+                // 'max:2048',
+                // 'mimes:pdf,png,jpg,jpeg'
             ],
             'c_file_contract' => [
-                'max:2048',
-                'mimes:pdf,png,jpg,jpeg'
+                ''
+                // 'max:2048',
+                // 'mimes:pdf,png,jpg,jpeg'
             ],
             'c_file_bank_account' => [
-                'max:2048',
-                'mimes:pdf,png,jpg,jpeg'
+                ''
+                // 'max:2048',
+                // 'mimes:pdf,png,jpg,jpeg'
             ],
             'c_deposit_return_price' => [
                 ''
