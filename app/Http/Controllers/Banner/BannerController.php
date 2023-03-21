@@ -716,6 +716,7 @@ class BannerController extends Controller
             $q->where('rgd_status4', '추가청구서')
                 ->orWhere('rgd_status4', '확정청구서');
         })
+            ->whereNull('rgd_status6')
             ->where('service_korean_name', '=', '유통가공')
             ->where('rgd_calculate_deadline_yn', 'y')
             ->where('rgd_is_show', 'y')
@@ -1075,6 +1076,7 @@ class BannerController extends Controller
             $q->where('rgd_status4', '추가청구서')
                 ->orWhere('rgd_status4', '확정청구서');
         })
+            ->whereNull('rgd_status6')
             ->where('service_korean_name', '=', '수입풀필먼트')
             ->where('rgd_calculate_deadline_yn', 'y')
             ->where('rgd_is_show', 'y')
@@ -1456,6 +1458,8 @@ class BannerController extends Controller
             $q->where('rgd_status4', '추가청구서')
                 ->orWhere('rgd_status4', '확정청구서');
         })
+            ->whereNull('rgd_status6')
+            ->whereNull('rgd_status6')
             ->where('service_korean_name', '=', '보세화물')
             ->where('rgd_calculate_deadline_yn', 'y')
             ->where('rgd_is_show', 'y')
@@ -1800,6 +1804,7 @@ class BannerController extends Controller
                 $q->where('rgd_status4', '추가청구서')
                     ->orWhere('rgd_status4', '확정청구서');
             })
+                ->whereNull('rgd_status6')
                 ->where('service_korean_name', '=', '보세화물')
                 ->where('rgd_calculate_deadline_yn', 'y')
                 ->where('rgd_is_show', 'y')
@@ -1811,6 +1816,7 @@ class BannerController extends Controller
                 $q->where('rgd_status4', '추가청구서')
                     ->orWhere('rgd_status4', '확정청구서');
             })
+                ->whereNull('rgd_status6')
                 ->where('service_korean_name', '=', '수입풀필먼트')
                 ->where('rgd_calculate_deadline_yn', 'y')
                 ->where('rgd_is_show', 'y')
@@ -1822,6 +1828,7 @@ class BannerController extends Controller
                 $q->where('rgd_status4', '추가청구서')
                     ->orWhere('rgd_status4', '확정청구서');
             })
+                ->whereNull('rgd_status6')
                 ->where('service_korean_name', '=', '유통가공')
                 ->where('rgd_calculate_deadline_yn', 'y')
                 ->where('rgd_is_show', 'y')
@@ -1833,6 +1840,7 @@ class BannerController extends Controller
                 $q->where('rgd_status4', '추가청구서')
                     ->orWhere('rgd_status4', '확정청구서');
             })
+                ->whereNull('rgd_status6')
                 ->where('service_korean_name', '=', '보세화물')
                 ->where('rgd_calculate_deadline_yn', 'y')
 
