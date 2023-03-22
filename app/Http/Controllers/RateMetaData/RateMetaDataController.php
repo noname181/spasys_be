@@ -115,8 +115,10 @@ class RateMetaDataController extends Controller
                 $rmd->where('created_at', '<=' , date('Y-m-d 23:59:59', strtotime($validated['to_date'])));
             }
             if(isset($validated['service'])) {
+      
                 $rmd->whereHas('company', function($rm) use ($validated){
-                    $rm->where('co_service', 'like', '%'.$validated['service'].'%');
+                 
+                    $rm->where(DB::raw('lower(co_service)'), 'like','%'. strtolower($validated['service']) .'%');
                 });
             }
             if(isset($validated['co_name'])) {
@@ -124,9 +126,28 @@ class RateMetaDataController extends Controller
                     $rm->where('co_name', 'like', '%'.$validated['co_name'].'%');
                 });
             }
+            if(isset($validated['c_transaction_yn'])) {
+                if($validated['c_transaction_yn'] == '준비중'){
+                $rmd->whereHas('company.contract', function($rm) use ($validated){
+                    $rm->where('c_transaction_yn', '=', 'y');
+                });
+                }
+                if($validated['c_transaction_yn'] == '거래중'){
+                    $rmd->whereHas('company.contract', function($rm) use ($validated){
+                        $rm->where('c_transaction_yn', '=', 'c');
+                    });
+                }
+                if($validated['c_transaction_yn'] == '거래종료'){
+                    $rmd->whereHas('company.contract', function($rm) use ($validated){
+                            $rm->where('c_transaction_yn', '!=', 'c')->where('c_transaction_yn','!=','y');
+                    });
+                }
+            }
             if(isset($validated['co_parent_name'])) {
                 $rmd->whereHas('company', function($rm) use ($validated){
-                    $rm->where('rm_owner_name', 'like', '%'.$validated['rm_owner_name'].'%');
+                     
+                        $rm->where('co_name', 'like', '%'.$validated['co_parent_name'].'%'); 
+                           
                 });
             }
 
@@ -149,7 +170,7 @@ class RateMetaDataController extends Controller
             return response()->json($rmd);
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }

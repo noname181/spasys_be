@@ -3964,9 +3964,7 @@ class WarehousingController extends Controller
                 });
             }
             $warehousing->where(function ($q) {
-                $q->where('rgd_status4', '=', '예상경비청구서')
-                    ->orWhere('rgd_status4', '=', '확정청구서');
-                // ->orWhere('rgd_status4', '=', '추가청구서');
+                $q->Where('rgd_status4', '!=', '추가청구서');
             })
                 ->whereHas('warehousing', function ($query) {
                     $query->where('w_category_name', '=', '유통가공');
@@ -3989,6 +3987,9 @@ class WarehousingController extends Controller
                 $warehousing->whereHas('warehousing.co_no', function ($q) use ($validated) {
                     return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
                 });
+            }
+            if (isset($validated['rgd_status4']) && $validated['rgd_status4'] != '전체') {
+                $warehousing->where('rgd_status4', '=', $validated['rgd_status4']);
             }
 
             if (isset($validated['w_schedule_number'])) {
@@ -4016,7 +4017,7 @@ class WarehousingController extends Controller
                 $warehousing->where('service_korean_name', '=', $validated['service']);
             }
             if (isset($validated['rgd_status5'])) {
-                if ($validated['rgd_status5'] == '청구서 취소') {
+                if ($validated['rgd_status5'] == '청구서취소') {
                     $warehousing->where('rgd_status5', '=', 'cancel');
                 } else if ($validated['rgd_status5'] == '발행') {
                     $warehousing->where(function ($q){
@@ -4116,9 +4117,7 @@ class WarehousingController extends Controller
                 });
             }
             $warehousing_fulfillment->where(function ($q) {
-                $q->where('rgd_status4', '=', '예상경비청구서')
-                    ->orWhere('rgd_status4', '=', '확정청구서');
-                // ->orWhere('rgd_status4', '=', '추가청구서');
+                $q->Where('rgd_status4', '!=', '추가청구서');
             })
                 ->whereHas('warehousing', function ($query) {
                     $query->where('w_category_name', '=', '수입풀필먼트');
@@ -4142,10 +4141,8 @@ class WarehousingController extends Controller
                     return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
                 });
             }
-            if (isset($validated['w_type'])) {
-                $warehousing_fulfillment->whereHas('warehousing', function ($q) use ($validated) {
-                    return $q->where('w_type', 'like', '%' . $validated['w_type'] . '%');
-                });
+            if (isset($validated['rgd_status4']) && $validated['rgd_status4'] != '전체') {
+                $warehousing_fulfillment->where('rgd_status4', '=', $validated['rgd_status4']);
             }
             if (isset($validated['w_schedule_number'])) {
                 $warehousing_fulfillment->whereHas('warehousing', function ($q) use ($validated) {
@@ -4262,6 +4259,13 @@ class WarehousingController extends Controller
             if (isset($validated['service']) && $validated['service'] != '전체') {
                 $warehousing_fulfillment->where('service_korean_name', '=', $validated['service']);
             }
+            if (isset($validated['rgd_status5'])) {
+                if ($validated['rgd_status5'] == '청구서취소') {
+                    $warehousing_fulfillment->where('rgd_status5', '=', 'cancel');
+                } else if ($validated['rgd_status5'] == '발행') {
+                    $warehousing_fulfillment->where('rgd_status5', '!=', 'cancel');
+                }
+            }
 
 
             $warehousing_bonded = ReceivingGoodsDelivery::with(['rate_meta_data', 'rate_data_general', 't_export', 'rgd_settlement']);
@@ -4297,9 +4301,7 @@ class WarehousingController extends Controller
                 });
             }
             $warehousing_bonded->where(function ($q) {
-                $q->where('rgd_status4', '=', '예상경비청구서')
-                    ->orWhere('rgd_status4', '=', '확정청구서');
-                // ->orWhere('rgd_status4', '=', '추가청구서');
+                $q->Where('rgd_status4', '!=', '추가청구서');
             })->whereHas('warehousing', function ($query) {
                 $query->where('w_category_name', '=', '보세화물');
             })
@@ -4329,10 +4331,8 @@ class WarehousingController extends Controller
                 });
             }
 
-            if (isset($validated['w_type'])) {
-                $warehousing_bonded->whereHas('warehousing', function ($q) use ($validated) {
-                    return $q->where('w_type', 'like', '%' . $validated['w_type'] . '%');
-                });
+            if (isset($validated['rgd_status4']) && $validated['rgd_status4'] != '전체') {
+                $warehousing_bonded->where('rgd_status4', '=', $validated['rgd_status4']);
             }
             if (isset($validated['w_schedule_number'])) {
                 $warehousing_bonded->whereHas('warehousing', function ($q) use ($validated) {
@@ -4449,7 +4449,13 @@ class WarehousingController extends Controller
             if (isset($validated['service']) && $validated['service'] != '전체') {
                 $warehousing_bonded->where('service_korean_name', '=', $validated['service']);
             }
-
+            if (isset($validated['rgd_status5'])) {
+                if ($validated['rgd_status5'] == '청구서취소') {
+                    $warehousing_bonded->where('rgd_status5', '=', 'cancel');
+                } else if ($validated['rgd_status5'] == '발행') {
+                    $warehousing_bonded->where('rgd_status5', '!=', 'cancel');
+                }
+            }
 
             $warehousing->union($warehousing_fulfillment)->union($warehousing_bonded)->orderBy('updated_at', 'DESC')
                 ->orderBy('rgd_no', 'DESC');
@@ -4534,9 +4540,9 @@ class WarehousingController extends Controller
                         $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : '';
                     }
 
-                    if ($item->rate_data_general->rdg_sum7) {
+                    if (isset($item->rate_data_general->rdg_sum7)) {
                         $item->sum_price_total3 = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum7 : 0;
-                    } else if ($item->rate_data_general->rdg_sum4) {
+                    } else if (isset($item->rate_data_general->rdg_sum4)) {
                         $item->sum_price_total3 = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : 0;
                     }
                     //  else {
