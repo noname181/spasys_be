@@ -323,7 +323,7 @@ class ReportController extends Controller
     {
         try {
             $validated = $request->validated();
-
+            ini_set('memory_limit', '-1');
             // If per_page is null set default data = 15
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 5;
             // If page is null set default data = 1

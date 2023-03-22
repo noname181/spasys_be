@@ -1186,7 +1186,9 @@ class WarehousingController extends Controller
                 });
             }
             if (isset($validated['rgd_status1'])) {
-                $warehousing->where('rgd_status1', '=', $validated['rgd_status1']);
+                if($validated['rgd_status1'] != "전체"){
+                    $warehousing->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
+                }
             }
             if (isset($validated['rgd_status2'])) {
                 $warehousing->where('rgd_status2', '=', $validated['rgd_status2']);
