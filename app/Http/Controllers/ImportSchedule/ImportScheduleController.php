@@ -1288,16 +1288,16 @@ class ImportScheduleController extends Controller
                 $import_schedule->where('aaa.tie_logistic_manage_number', 'like', '%' . $validated['logistic_manage_number'] . '%');
             }
 
-            if (isset($validated['status'])) {
-                if ($validated['status'] == '반출') {
+            if (isset($validated['tie_status'])) {
+                if ($validated['tie_status'] == '반출') {
                      
                     $tie_logistic_manage_number = $this->SQL($validated);
                     $import_schedule->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number);
                     //$import_schedule->whereNotNull('ddd.te_logistic_manage_number');
                     //return DB::getQueryLog();
-                } else if ($validated['status'] == '반입') {
+                } else if ($validated['tie_status'] == '반입') {
                     $import_schedule->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number');
-                } else if ($validated['status'] == '반입예정') {
+                } else if ($validated['tie_status'] == '반입예정') {
                     $import_schedule->whereNotNull('aaa.tie_logistic_manage_number')->whereNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number');
                 }
             }
