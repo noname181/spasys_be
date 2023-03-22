@@ -145,7 +145,7 @@ class RateMetaDataController extends Controller
             }
             if(isset($validated['co_parent_name'])) {
                 $rmd->whereHas('company', function($rm) use ($validated){
-                    $rm->where('rm_owner_name', 'like', '%'.$validated['rm_owner_name'].'%');
+                    $rm->where('co_name', 'like', '%'.$validated['co_parent_name'].'%');
                 });
             }
 
@@ -168,7 +168,7 @@ class RateMetaDataController extends Controller
             return response()->json($rmd);
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
