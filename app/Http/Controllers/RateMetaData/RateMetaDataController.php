@@ -126,6 +126,23 @@ class RateMetaDataController extends Controller
                     $rm->where('co_name', 'like', '%'.$validated['co_name'].'%');
                 });
             }
+            if(isset($validated['c_transaction_yn'])) {
+                if($validated['c_transaction_yn'] == '준비중'){
+                $rmd->whereHas('company.contract', function($rm) use ($validated){
+                    $rm->where('c_transaction_yn', '=', 'y');
+                });
+                }
+                if($validated['c_transaction_yn'] == '거래중'){
+                    $rmd->whereHas('company.contract', function($rm) use ($validated){
+                        $rm->where('c_transaction_yn', '=', 'c');
+                    });
+                }
+                if($validated['c_transaction_yn'] == '거래종료'){
+                    $rmd->whereHas('company.contract', function($rm) use ($validated){
+                            $rm->where('c_transaction_yn', '!=', 'c')->where('c_transaction_yn','!=','y');
+                    });
+                }
+            }
             if(isset($validated['co_parent_name'])) {
                 $rmd->whereHas('company', function($rm) use ($validated){
                     $rm->where('rm_owner_name', 'like', '%'.$validated['rm_owner_name'].'%');
