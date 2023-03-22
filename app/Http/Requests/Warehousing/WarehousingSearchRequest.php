@@ -198,6 +198,15 @@ class WarehousingSearchRequest extends BaseFormRequest
             'rgd_settlement_number' => [
                 '',
             ],
+            'rgd_bill_type' => [
+                '',
+            ],
+            'rgd_status456' => [
+                '',
+            ],
+            'rgd_status5_1' => [
+                '',
+            ],
         ];
     }
 
