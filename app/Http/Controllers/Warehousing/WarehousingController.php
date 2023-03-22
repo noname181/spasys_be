@@ -4058,7 +4058,10 @@ class WarehousingController extends Controller
                             ->where('rgd_status5','confirmed')
                             ->whereNull('rgd_status6');
                         })->orWhere(function($q3){
-                            $q3->where('rgd_status5','confirmed')->where('rgd_status6', '!=', 'paid')->where(function ($q4){
+                            $q3->where('rgd_status5','confirmed')->where(function ($q4){
+                                $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '=', 'cancel');
+                            })
+                                ->where(function ($q4){
                                 $q4->where('rgd_status4','추가청구서')->orWhere('rgd_status4','확정청구서');
                             });
                         });
@@ -4070,11 +4073,11 @@ class WarehousingController extends Controller
             if (isset($validated['rgd_status5_1'])) {
                 if($validated['rgd_status5_1'] == '요청중'){
                     $warehousing->where(function ($q){
-                        $q->where('rgd_bill_type','like', '%' . 'final'. '%')->where('rgd_status5','!=','cancel')->whereNull('rgd_status5');
+                        $q->where('rgd_bill_type','like', '%' . 'final'. '%')->whereNull('rgd_status5');
                     });
                 }else if($validated['rgd_status5_1'] == '승인완료'){
                     $warehousing->where(function ($q){
-                        $q->where('rgd_status5','issued')->Where(function ($q2){
+                        $q->where('rgd_bill_type','like', '%' . 'final'. '%')->Where(function ($q2){
                             $q2->where('rgd_status5','confirmed')->orWhere('rgd_status5','issued');
                         });
                     });
@@ -4207,7 +4210,10 @@ class WarehousingController extends Controller
                             ->where('rgd_status5','confirmed')
                             ->whereNull('rgd_status6');
                         })->orWhere(function($q3){
-                            $q3->where('rgd_status5','confirmed')->where('rgd_status6', '!=', 'paid')->where(function ($q4){
+                            $q3->where('rgd_status5','confirmed')->where(function ($q4){
+                                $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '=', 'cancel');
+                            })
+                                ->where(function ($q4){
                                 $q4->where('rgd_status4','추가청구서')->orWhere('rgd_status4','확정청구서');
                             });
                         });
@@ -4219,11 +4225,11 @@ class WarehousingController extends Controller
             if (isset($validated['rgd_status5_1'])) {
                 if($validated['rgd_status5_1'] == '요청중'){
                     $warehousing_fulfillment->where(function ($q){
-                        $q->where('rgd_bill_type','like', '%' . 'final'. '%')->where('rgd_status5','!=','cancel')->whereNull('rgd_status5');
+                        $q->where('rgd_bill_type','like', '%' . 'final'. '%')->whereNull('rgd_status5');
                     });
                 }else if($validated['rgd_status5_1'] == '승인완료'){
                     $warehousing_fulfillment->where(function ($q){
-                        $q->where('rgd_status5','issued')->Where(function ($q2){
+                        $q->where('rgd_bill_type','like', '%' . 'final'. '%')->Where(function ($q2){
                             $q2->where('rgd_status5','confirmed')->orWhere('rgd_status5','issued');
                         });
                     });
@@ -4397,7 +4403,10 @@ class WarehousingController extends Controller
                             ->where('rgd_status5','confirmed')
                             ->whereNull('rgd_status6');
                         })->orWhere(function($q3){
-                            $q3->where('rgd_status5','confirmed')->where('rgd_status6', '!=', 'paid')->where(function ($q4){
+                            $q3->where('rgd_status5','confirmed')->where(function ($q4){
+                                $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '=', 'cancel');
+                            })
+                                ->where(function ($q4){
                                 $q4->where('rgd_status4','추가청구서')->orWhere('rgd_status4','확정청구서');
                             });
                         });
@@ -4409,11 +4418,11 @@ class WarehousingController extends Controller
             if (isset($validated['rgd_status5_1'])) {
                 if($validated['rgd_status5_1'] == '요청중'){
                     $warehousing_bonded->where(function ($q){
-                        $q->where('rgd_bill_type','like', '%' . 'final'. '%')->where('rgd_status5','!=','cancel')->whereNull('rgd_status5');
+                        $q->where('rgd_bill_type','like', '%' . 'final'. '%')->whereNull('rgd_status5');
                     });
                 }else if($validated['rgd_status5_1'] == '승인완료'){
                     $warehousing_bonded->where(function ($q){
-                        $q->where('rgd_status5','issued')->Where(function ($q2){
+                        $q->where('rgd_bill_type','like', '%' . 'final'. '%')->Where(function ($q2){
                             $q2->where('rgd_status5','confirmed')->orWhere('rgd_status5','issued');
                         });
                     });
