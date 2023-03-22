@@ -115,8 +115,10 @@ class RateMetaDataController extends Controller
                 $rmd->where('created_at', '<=' , date('Y-m-d 23:59:59', strtotime($validated['to_date'])));
             }
             if(isset($validated['service'])) {
+      
                 $rmd->whereHas('company', function($rm) use ($validated){
-                    $rm->where('co_service', 'like', '%'.$validated['service'].'%');
+                 
+                    $rm->where(DB::raw('lower(co_service)'), 'like','%'. strtolower($validated['service']) .'%');
                 });
             }
             if(isset($validated['co_name'])) {

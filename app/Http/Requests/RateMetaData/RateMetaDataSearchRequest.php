@@ -56,6 +56,10 @@ class RateMetaDataSearchRequest extends BaseFormRequest
                 'nullable',
                 'int',
             ],
+            'service' => [
+                'nullable',
+                'string',
+            ],
             'page' => [
                 'nullable',
                 'int',
