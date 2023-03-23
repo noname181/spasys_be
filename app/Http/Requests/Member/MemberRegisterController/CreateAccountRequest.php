@@ -30,7 +30,7 @@ class CreateAccountRequest extends BaseFormRequest
                 // 'max:20',
                 // 'min:4',
                 // 'regex:/^[a-zA-Z]{1,}([0-9]*)?$/',
-                // 'unique:member,mb_id'
+                'unique:member,mb_id'
             ],
             'mb_name' => [
                 'required',
