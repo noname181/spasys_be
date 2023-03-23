@@ -172,7 +172,7 @@ class CompanyController extends Controller
             }
             if (isset($validated['co_close_yn'])) {
                 $companies->where(function ($query) use ($validated) {
-                    $query->orwhere('co_close_yn', '=', $validated['co_close_yn']);
+                    $query->where('co_close_yn', '=', $validated['co_close_yn']);
                 });
             }
             if (isset($validated['c_calculate_deadline_yn'])) {
