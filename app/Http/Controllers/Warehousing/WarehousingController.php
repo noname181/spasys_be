@@ -4577,6 +4577,11 @@ class WarehousingController extends Controller
                         }
 
                         $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum7 : '';
+                    } else if ($item->service_korean_name == '수입풀필먼트') {
+                        $item->discount = "";
+                        $item->sum_price_total2 = $item->rate_data_general->rdg_sum6;
+                        $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum6 : '';
+                        
                     } else {
                         $item->discount = "";
                         $item->sum_price_total2 = $item->rate_data_general->rdg_sum4;
@@ -6549,7 +6554,7 @@ class WarehousingController extends Controller
                 'rgd_no_expectation' => $rgd_no,
                 'rdg_set_type' => $request->adjustment_group,
                 'ag_no' => $request->ag_no,
-                'rdg_bill_type' => 'final',
+                'rdg_bill_type' =>  $user->mb_type == 'spasys' ? 'final_spasys' : 'final_shop',
             ]);
 
 
