@@ -82,6 +82,45 @@ class BannerController extends Controller
         try {
             DB::beginTransaction();
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
+            if(isset($validated['banner_start']) && isset($validated['banner_end'])){
+                $check_banner_times = Banner::where('banner_position',$validated['banner_position'])
+                ->where('banner_position_detail',$validated['banner_position_detail'])
+                ->where('banner_end','>=',$validated['banner_start'])
+                ->where('banner_start','<=',$validated['banner_start'])
+                ->first();
+
+                $check_banner_times2 = Banner::where('banner_position',$validated['banner_position'])
+                ->where('banner_position_detail',$validated['banner_position_detail'])
+                ->where('banner_end','>=',$validated['banner_end'])
+                ->where('banner_start','<=',$validated['banner_end'])->first();
+
+                $check_banner_times3 = Banner::where(function ($query) use ($validated){
+                    $query->where('banner_end','<=',$validated['banner_start'])->orWhere('banner_start','>=',$validated['banner_end']);
+                })->first();
+
+            }
+            if(isset($check_banner_times) || isset($check_banner_times2) || !isset($check_banner_times3)){
+                if( !isset($check_banner_times3) ){
+                    $check_banner_times4 = Banner::where('banner_position',$validated['banner_position'])
+                    ->where('banner_position_detail',$validated['banner_position_detail'])->first();
+                    if(isset($check_banner_times4)){
+                        return response()->json([
+                            'error'=>'same_time',
+                            'check_banner_times' => isset($check_banner_times) ? $check_banner_times : '',
+                            'check_banner_times2' => isset($check_banner_times2) ? $check_banner_times2 : '',
+                            'check_banner_times3' => isset($check_banner_times3) ? $check_banner_times3 : '',
+                        ], 201);
+                    }
+                } else {
+                    return response()->json([
+                        'error'=>'same_time',
+                        'check_banner_times' => isset($check_banner_times) ? $check_banner_times : '',
+                        'check_banner_times2' => isset($check_banner_times2) ? $check_banner_times2 : '',
+                        'check_banner_times3' => isset($check_banner_times3) ? $check_banner_times3 : '',
+                    ], 201);
+                }
+              
+            }
             $banner_no = Banner::insertGetId([
                 'banner_title' => $validated['banner_title'],
                 'banner_lat' => '',
@@ -120,7 +159,9 @@ class BannerController extends Controller
             File::insert($files);
 
             DB::commit();
-            return response()->json(['message' => Messages::MSG_0007, 'banner_no' => $banner_no], 201);
+            return response()->json(['message' => Messages::MSG_0007, 'banner_no' => $banner_no,'check_banner_times' => isset($check_banner_times) ? $check_banner_times : '',
+            'check_banner_times2' => isset($check_banner_times2) ? $check_banner_times2 : '',
+            'check_banner_times3' => isset($check_banner_times3) ? $check_banner_times3 : '',], 201);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
@@ -144,7 +185,45 @@ class BannerController extends Controller
             $validated = $request->validated();
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
 
+            if(isset($validated['banner_start']) && isset($validated['banner_end'])){
+                $check_banner_times = Banner::where('banner_position',$validated['banner_position'])
+                ->where('banner_position_detail',$validated['banner_position_detail'])
+                ->where('banner_end','>=',$validated['banner_start'])
+                ->where('banner_start','<=',$validated['banner_start'])->where('banner_no','!=',$validated['banner_no'])
+                ->first();
 
+                $check_banner_times2 = Banner::where('banner_position',$validated['banner_position'])
+                ->where('banner_position_detail',$validated['banner_position_detail'])
+                ->where('banner_end','>=',$validated['banner_end'])
+                ->where('banner_start','<=',$validated['banner_end'])->where('banner_no','!=',$validated['banner_no'])->first();
+
+                $check_banner_times3 = Banner::where(function ($query) use ($validated){
+                    $query->where('banner_end','<=',$validated['banner_start'])->orWhere('banner_start','>=',$validated['banner_end'])->where('banner_no','!=',$validated['banner_no']);
+                })->first();
+
+            }
+            if(isset($check_banner_times) || isset($check_banner_times2) || !isset($check_banner_times3)){
+                if( !isset($check_banner_times3) ){
+                    $check_banner_times4 = Banner::where('banner_position',$validated['banner_position'])
+                    ->where('banner_position_detail',$validated['banner_position_detail'])->where('banner_no','!=',$validated['banner_no'])->first();
+                    if(isset($check_banner_times4)){
+                        return response()->json([
+                            'error'=>'same_time',
+                            'check_banner_times' => isset($check_banner_times) ? $check_banner_times : '',
+                            'check_banner_times2' => isset($check_banner_times2) ? $check_banner_times2 : '',
+                            'check_banner_times3' => isset($check_banner_times3) ? $check_banner_times3 : '',
+                        ], 201);
+                    }
+                } else {
+                    return response()->json([
+                        'error'=>'same_time',
+                        'check_banner_times' => isset($check_banner_times) ? $check_banner_times : '',
+                        'check_banner_times2' => isset($check_banner_times2) ? $check_banner_times2 : '',
+                        'check_banner_times3' => isset($check_banner_times3) ? $check_banner_times3 : '',
+                    ], 201);
+                }
+              
+            }
             //FILE PART
 
             $path = join('/', ['files', 'banner', $validated['banner_no']]);
