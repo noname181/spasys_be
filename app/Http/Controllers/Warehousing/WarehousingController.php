@@ -3964,12 +3964,13 @@ class WarehousingController extends Controller
                 });
             }
             $warehousing->where(function ($q) {
-                $q->Where('rgd_status4', '!=', '추가청구서');
+                $q->where('rgd_status4', '=', '예상경비청구서')
+                    ->orWhere('rgd_status4', '=', '확정청구서');
             })
-                ->whereHas('warehousing', function ($query) {
-                    $query->where('w_category_name', '=', '유통가공');
-                })
-                ->where('rgd_is_show', 'y')->orderBy('created_at', 'DESC');
+            ->whereHas('warehousing', function ($query) {
+                $query->where('w_category_name', '=', '유통가공');
+            })
+            ->where('rgd_is_show', 'y')->orderBy('created_at', 'DESC');
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
@@ -4138,12 +4139,13 @@ class WarehousingController extends Controller
                 });
             }
             $warehousing_fulfillment->where(function ($q) {
-                $q->Where('rgd_status4', '!=', '추가청구서');
+                $q->where('rgd_status4', '=', '예상경비청구서')
+                    ->orWhere('rgd_status4', '=', '확정청구서');
             })
-                ->whereHas('warehousing', function ($query) {
-                    $query->where('w_category_name', '=', '수입풀필먼트');
-                })
-                ->where('rgd_is_show', 'y');
+            ->whereHas('warehousing', function ($query) {
+                $query->where('w_category_name', '=', '수입풀필먼트');
+            })
+            ->where('rgd_is_show', 'y');
             if (isset($validated['from_date'])) {
                 $warehousing_fulfillment->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
@@ -4335,12 +4337,11 @@ class WarehousingController extends Controller
                     $q->where('mb_type', 'spasys');
                 });
             }
-            $warehousing_bonded->where(function ($q) {
-                $q->Where('rgd_status4', '!=', '추가청구서');
-            })->whereHas('warehousing', function ($query) {
+            $warehousing_bonded->where('rgd_status4', '!=', '추가청구서')
+            ->whereHas('warehousing', function ($query) {
                 $query->where('w_category_name', '=', '보세화물');
             })
-                ->where('rgd_is_show', 'y');
+            ->where('rgd_is_show', 'y');
             if (isset($validated['from_date'])) {
                 $warehousing_bonded->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
@@ -4582,6 +4583,11 @@ class WarehousingController extends Controller
                         }
 
                         $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum7 : '';
+                    } else if ($item->service_korean_name == '수입풀필먼트') {
+                        $item->discount = "";
+                        $item->sum_price_total2 = $item->rate_data_general->rdg_sum6;
+                        $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum6 : '';
+                        
                     } else {
                         $item->discount = "";
                         $item->sum_price_total2 = $item->rate_data_general->rdg_sum4;
@@ -6554,7 +6560,7 @@ class WarehousingController extends Controller
                 'rgd_no_expectation' => $rgd_no,
                 'rdg_set_type' => $request->adjustment_group,
                 'ag_no' => $request->ag_no,
-                'rdg_bill_type' => 'final',
+                'rdg_bill_type' =>  $user->mb_type == 'spasys' ? 'final_spasys' : 'final_shop',
             ]);
 
 

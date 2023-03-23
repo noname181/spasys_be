@@ -117,8 +117,9 @@ class RateMetaDataController extends Controller
             if(isset($validated['service'])) {
       
                 $rmd->whereHas('company', function($rm) use ($validated){
-                 
+                    
                     $rm->where(DB::raw('lower(co_service)'), 'like','%'. strtolower($validated['service']) .'%');
+
                 });
             }
             if(isset($validated['co_name'])) {
@@ -144,10 +145,17 @@ class RateMetaDataController extends Controller
                 }
             }
             if(isset($validated['co_parent_name'])) {
-                $rmd->whereHas('company', function($rm) use ($validated){
+                $rmd->where(function ($query) use ($validated) {
+                    $query->whereHas('company', function($rm) use ($validated){
                      
                         $rm->where('co_name', 'like', '%'.$validated['co_parent_name'].'%'); 
                            
+                    })->orWhereHas('company.co_parent', function($rm) use ($validated){
+                     
+                        $rm->where('co_name', 'like', '%'.$validated['co_parent_name'].'%'); 
+                           
+                    });
+                   
                 });
             }
 

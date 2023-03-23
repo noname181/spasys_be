@@ -88,7 +88,8 @@ class CompanySearchRequest extends BaseFormRequest
                 '',
             ],
             'co_close_yn' => [
-                '',
+                'string',
+                'nullable',
             ],
             'c_calculate_deadline_yn' => [
                 '',
