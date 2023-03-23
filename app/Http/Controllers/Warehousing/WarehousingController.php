@@ -4337,7 +4337,10 @@ class WarehousingController extends Controller
                     $q->where('mb_type', 'spasys');
                 });
             }
-            $warehousing_bonded->where('rgd_status4', '!=', '추가청구서')
+            $warehousing_bonded->where(function ($q) {
+                $q->where('rgd_status4', '=', '예상경비청구서')
+                    ->orWhere('rgd_status4', '=', '확정청구서');
+            })
             ->whereHas('warehousing', function ($query) {
                 $query->where('w_category_name', '=', '보세화물');
             })
@@ -6485,12 +6488,12 @@ class WarehousingController extends Controller
             $warehousing_list = $warehousing->orderBy('w_no', 'DESC')->get();
 
 
-            if(count($warehousing_list) == 0){
-                return response()->json([
-                    'message' => '입고된 화물내역이 없습니다.',
-                    'error' => 'y'
-                ]);
-            }
+            // if(count($warehousing_list) == 0){
+            //     return response()->json([
+            //         'message' => '입고된 화물내역이 없습니다.',
+            //         'error' => 'y'
+            //     ]);
+            // }
 
             $amount = $warehousing->orWhereIn('w_no', $w_no_in)->orderBy('w_no', 'DESC')->sum('w_amount');
 
@@ -6532,8 +6535,8 @@ class WarehousingController extends Controller
                 'w_type' => 'IW',
                 'w_category_name' => '수입풀필먼트',
                 'w_amount_export' => $amount_export,
-                'w_schedule_number_settle' => $warehousing_list[0]['w_schedule_number'] ? $warehousing_list[0]['w_schedule_number'] : null,
-                'w_schedule_number_settle2' => $warehousing_list[0]['w_schedule_number2'] ? $warehousing_list[0]['w_schedule_number2'] : null,
+                'w_schedule_number_settle' => count($warehousing->get()) > 0 ? $warehousing_list[0]['w_schedule_number'] : null,
+                'w_schedule_number_settle2' => count($warehousing->get()) > 0 ? $warehousing_list[0]['w_schedule_number2'] : null,
                 'co_no' => $request->co_no,
             ]);
 
