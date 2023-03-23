@@ -25,7 +25,7 @@ class CreateAccountRequest extends BaseFormRequest
     {
         return [
             'mb_id' => [
-                '',
+                //'',
                 // 'string',
                 // 'max:20',
                 // 'min:4',
