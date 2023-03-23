@@ -3963,7 +3963,10 @@ class WarehousingController extends Controller
                     $q->where('mb_type', 'spasys');
                 });
             }
-            $warehousing->where('rgd_status4', '!=', '추가청구서')
+            $warehousing->where(function ($q) {
+                $q->where('rgd_status4', '=', '예상경비청구서')
+                    ->orWhere('rgd_status4', '=', '확정청구서');
+            })
             ->whereHas('warehousing', function ($query) {
                 $query->where('w_category_name', '=', '유통가공');
             })
@@ -4135,7 +4138,10 @@ class WarehousingController extends Controller
                     });
                 });
             }
-            $warehousing_fulfillment->where('rgd_status4', '!=', '추가청구서')
+            $warehousing_fulfillment->where(function ($q) {
+                $q->where('rgd_status4', '=', '예상경비청구서')
+                    ->orWhere('rgd_status4', '=', '확정청구서');
+            })
             ->whereHas('warehousing', function ($query) {
                 $query->where('w_category_name', '=', '수입풀필먼트');
             })
