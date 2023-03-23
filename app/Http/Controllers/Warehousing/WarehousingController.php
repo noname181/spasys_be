@@ -3963,13 +3963,11 @@ class WarehousingController extends Controller
                     $q->where('mb_type', 'spasys');
                 });
             }
-            $warehousing->where(function ($q) {
-                $q->Where('rgd_status4', '!=', '추가청구서');
+            $warehousing->where('rgd_status4', '!=', '추가청구서')
+            ->whereHas('warehousing', function ($query) {
+                $query->where('w_category_name', '=', '유통가공');
             })
-                ->whereHas('warehousing', function ($query) {
-                    $query->where('w_category_name', '=', '유통가공');
-                })
-                ->where('rgd_is_show', 'y')->orderBy('created_at', 'DESC');
+            ->where('rgd_is_show', 'y')->orderBy('created_at', 'DESC');
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
@@ -4137,13 +4135,11 @@ class WarehousingController extends Controller
                     });
                 });
             }
-            $warehousing_fulfillment->where(function ($q) {
-                $q->Where('rgd_status4', '!=', '추가청구서');
+            $warehousing_fulfillment->where('rgd_status4', '!=', '추가청구서')
+            ->whereHas('warehousing', function ($query) {
+                $query->where('w_category_name', '=', '수입풀필먼트');
             })
-                ->whereHas('warehousing', function ($query) {
-                    $query->where('w_category_name', '=', '수입풀필먼트');
-                })
-                ->where('rgd_is_show', 'y');
+            ->where('rgd_is_show', 'y');
             if (isset($validated['from_date'])) {
                 $warehousing_fulfillment->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
@@ -4335,12 +4331,11 @@ class WarehousingController extends Controller
                     $q->where('mb_type', 'spasys');
                 });
             }
-            $warehousing_bonded->where(function ($q) {
-                $q->Where('rgd_status4', '!=', '추가청구서');
-            })->whereHas('warehousing', function ($query) {
+            $warehousing_bonded->where('rgd_status4', '!=', '추가청구서')
+            ->whereHas('warehousing', function ($query) {
                 $query->where('w_category_name', '=', '보세화물');
             })
-                ->where('rgd_is_show', 'y');
+            ->where('rgd_is_show', 'y');
             if (isset($validated['from_date'])) {
                 $warehousing_bonded->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }

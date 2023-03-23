@@ -503,13 +503,32 @@ class BannerController extends Controller
                 });
             });
 
-            $warehousingh = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 't_export'])->whereHas('w_no', function ($query) use ($user) {
+            $warehousing_distribution = ReceivingGoodsDelivery::with(['rate_data_general']);
+            $warehousing_fulfillment = ReceivingGoodsDelivery::with(['rate_data_general']);
+            $warehousing_bonded = ReceivingGoodsDelivery::with(['rate_data_general']);
+    
+            $warehousing_distribution->whereHas('warehousing', function ($query) use ($user) {
                 $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
-                })->whereHas('co_no.contract', function ($q) use ($user) {
-                    $q->where('c_calculate_deadline_yn', 'y');
+                });
+            })->whereHas('mb_no', function ($q) {
+                $q->where('mb_type', 'spasys');
+            });
+
+            $warehousing_fulfillment->whereHas('warehousing', function ($query) use ($user) {
+                $query->whereHas('co_no', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
                 });
             });
+
+            $warehousing_bonded->whereHas('warehousing', function ($query) use ($user) {
+                $query->whereHas('co_no.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+            })->whereHas('mb_no', function ($q) use ($user) {
+                $q->where('mb_type', 'spasys');
+            });
+
         } else if ($user->mb_type == 'shipper') {
             $warehousinga = ReceivingGoodsDelivery::with(['w_no'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereNull('rgd_parent_no')->whereHas('w_no', function ($query) use ($user) {
                 $query->where('w_type', '=', 'IW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
@@ -595,13 +614,30 @@ class BannerController extends Controller
                 });
             });
 
-            $warehousingh = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
+            $warehousing_distribution = ReceivingGoodsDelivery::with(['rate_data_general']);
+            $warehousing_fulfillment = ReceivingGoodsDelivery::with(['rate_data_general']);
+            $warehousing_bonded = ReceivingGoodsDelivery::with(['rate_data_general']);
+    
+            $warehousing_distribution->whereHas('warehousing', function ($query) use ($user) {
                 $query->whereHas('co_no', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
-                })->whereHas('co_no.contract', function ($q) use ($user) {
-                    $q->where('c_calculate_deadline_yn', 'y');
+                });
+            })->whereHas('mb_no', function ($q) {
+                $q->where('mb_type', 'shop');
+            })->orderBy('created_at', 'DESC');
+
+            $warehousing_fulfillment->whereHas('warehousing', function ($query) use ($user) {
+                $query->whereHas('co_no', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
                 });
             });
+
+            $warehousing_bonded->whereHas('warehousing', function ($query) use ($user) {
+                $query->whereHas('co_no', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+            });
+
         } else if ($user->mb_type == 'spasys') {
             $warehousinga = ReceivingGoodsDelivery::with(['warehousing'])->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
                 $query->where('w_type', '=', 'IW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
@@ -687,20 +723,9 @@ class BannerController extends Controller
                 });
             });
 
-            $warehousingh = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
-                $query->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
-                    $q->where('co_no', $user->co_no);
-                })->orWhereHas('co_no.co_parent', function ($q) use ($user) {
-                    $q->where('co_no', $user->co_no);
-                });
-            })
-                ->whereHas('w_no', function ($query) use ($user) {
-                    $query->whereHas('co_no.co_parent.contract', function ($q) use ($user) {
-                        $q->where('c_calculate_deadline_yn', 'y');
-                    })->orWhereHas('co_no.contract', function ($q) use ($user) {
-                        $q->where('c_calculate_deadline_yn', 'y');
-                    });
-                });
+            $warehousing_distribution = ReceivingGoodsDelivery::with(['rate_data_general'])->whereNull('rgd_no');
+            $warehousing_fulfillment = ReceivingGoodsDelivery::with(['rate_data_general'])->whereNull('rgd_no');
+            $warehousing_bonded = ReceivingGoodsDelivery::with(['rate_data_general'])->whereNull('rgd_no');
         }
 
         $a = 0;
@@ -712,17 +737,19 @@ class BannerController extends Controller
         $g = 0;
         $h = 0;
 
-        $warehousingh->where(function ($q) {
-            $q->where('rgd_status4', '추가청구서')
-                ->orWhere('rgd_status4', '확정청구서');
-        })
-            ->whereNull('rgd_status6')
-            ->where('service_korean_name', '=', '유통가공')
-            ->where('rgd_calculate_deadline_yn', 'y')
-            ->where('rgd_is_show', 'y')
-            ->whereHas('mb_no', function ($q) use ($user) {
-                $q->where('mb_type', $user->mb_type);
-            });
+        $warehousing_distribution->where('rgd_status4', '!=', '추가청구서')
+        ->where('service_korean_name', '=', '유통가공')
+        ->where('rgd_is_show', 'y');
+
+        $warehousing_fulfillment->where('rgd_status4', '!=', '추가청구서')
+        ->where('service_korean_name', '=', '유통가공')
+        ->where('rgd_is_show', 'y');
+
+        $warehousing_bonded->where('rgd_status4', '!=', '추가청구서')
+        ->where('service_korean_name', '=', '유통가공')
+        ->where('rgd_is_show', 'y');
+
+        $warehousingh = $warehousing_distribution->union($warehousing_fulfillment)->union($warehousing_bonded);
 
         if ($request->time3 == 'day') {
             $warehousinga = $warehousinga->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
@@ -938,13 +965,32 @@ class BannerController extends Controller
                 $q->where('co_no', $user->co_no);
             });
 
-            $warehousinge = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 't_export'])->whereHas('w_no', function ($query) use ($user) {
+            $warehousing_distribution = ReceivingGoodsDelivery::with(['rate_data_general']);
+            $warehousing_fulfillment = ReceivingGoodsDelivery::with(['rate_data_general']);
+            $warehousing_bonded = ReceivingGoodsDelivery::with(['rate_data_general']);
+    
+            $warehousing_distribution->whereHas('warehousing', function ($query) use ($user) {
                 $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
-                })->whereHas('co_no.contract', function ($q) use ($user) {
-                    $q->where('c_calculate_deadline_yn', 'y');
+                });
+            })->whereHas('mb_no', function ($q) {
+                $q->where('mb_type', 'spasys');
+            });
+
+            $warehousing_fulfillment->whereHas('warehousing', function ($query) use ($user) {
+                $query->whereHas('co_no', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
                 });
             });
+
+            $warehousing_bonded->whereHas('warehousing', function ($query) use ($user) {
+                $query->whereHas('co_no.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+            })->whereHas('mb_no', function ($q) use ($user) {
+                $q->where('mb_type', 'spasys');
+            });
+
         } else if ($user->mb_type == 'shipper') {
             $warehousing2 = Warehousing::join(
                 DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
@@ -996,13 +1042,30 @@ class BannerController extends Controller
                 $q->where('co_no', $user->co_no);
             });
 
-            $warehousinge = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
+            $warehousing_distribution = ReceivingGoodsDelivery::with(['rate_data_general']);
+            $warehousing_fulfillment = ReceivingGoodsDelivery::with(['rate_data_general']);
+            $warehousing_bonded = ReceivingGoodsDelivery::with(['rate_data_general']);
+    
+            $warehousing_distribution->whereHas('warehousing', function ($query) use ($user) {
                 $query->whereHas('co_no', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
-                })->whereHas('co_no.contract', function ($q) use ($user) {
-                    $q->where('c_calculate_deadline_yn', 'y');
+                });
+            })->whereHas('mb_no', function ($q) {
+                $q->where('mb_type', 'shop');
+            })->orderBy('created_at', 'DESC');
+
+            $warehousing_fulfillment->whereHas('warehousing', function ($query) use ($user) {
+                $query->whereHas('co_no', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
                 });
             });
+
+            $warehousing_bonded->whereHas('warehousing', function ($query) use ($user) {
+                $query->whereHas('co_no', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+            });
+
         } else if ($user->mb_type == 'spasys') {
 
             $warehousing2 = Warehousing::join(
@@ -1056,33 +1119,24 @@ class BannerController extends Controller
                 $q->where('co_no', $user->co_no);
             });
 
-            $warehousinge = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
-                $query->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
-                    $q->where('co_no', $user->co_no);
-                })->orWhereHas('co_no.co_parent', function ($q) use ($user) {
-                    $q->where('co_no', $user->co_no);
-                });
-            })
-                ->whereHas('w_no', function ($query) use ($user) {
-                    $query->whereHas('co_no.co_parent.contract', function ($q) use ($user) {
-                        $q->where('c_calculate_deadline_yn', 'y');
-                    })->orWhereHas('co_no.contract', function ($q) use ($user) {
-                        $q->where('c_calculate_deadline_yn', 'y');
-                    });
-                });
+            $warehousing_distribution = ReceivingGoodsDelivery::with(['rate_data_general'])->whereNull('rgd_no');
+            $warehousing_fulfillment = ReceivingGoodsDelivery::with(['rate_data_general'])->whereNull('rgd_no');
+            $warehousing_bonded = ReceivingGoodsDelivery::with(['rate_data_general'])->whereNull('rgd_no');
         }
 
-        $warehousinge->where(function ($q) {
-            $q->where('rgd_status4', '추가청구서')
-                ->orWhere('rgd_status4', '확정청구서');
-        })
-            ->whereNull('rgd_status6')
-            ->where('service_korean_name', '=', '수입풀필먼트')
-            ->where('rgd_calculate_deadline_yn', 'y')
-            ->where('rgd_is_show', 'y')
-            ->whereHas('mb_no', function ($q) use ($user) {
-                $q->where('mb_type', $user->mb_type);
-            });
+        $warehousing_distribution->where('rgd_status4', '!=', '추가청구서')
+        ->where('service_korean_name', '=', '수입풀필먼트')
+        ->where('rgd_is_show', 'y');
+
+        $warehousing_fulfillment->where('rgd_status4', '!=', '추가청구서')
+        ->where('service_korean_name', '=', '수입풀필먼트')
+        ->where('rgd_is_show', 'y');
+
+        $warehousing_bonded->where('rgd_status4', '!=', '추가청구서')
+        ->where('service_korean_name', '=', '수입풀필먼트')
+        ->where('rgd_is_show', 'y');
+
+        $warehousinge = $warehousing_distribution->union($warehousing_fulfillment)->union($warehousing_bonded);
 
         $warehousinga->whereDoesntHave('rate_data_general');
 
@@ -1312,12 +1366,30 @@ class BannerController extends Controller
                 $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
             });
 
-            $warehousingg = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 't_export'])->whereHas('w_no', function ($query) use ($user) {
+            $warehousing_distribution = ReceivingGoodsDelivery::with(['rate_data_general']);
+            $warehousing_fulfillment = ReceivingGoodsDelivery::with(['rate_data_general']);
+            $warehousing_bonded = ReceivingGoodsDelivery::with(['rate_data_general']);
+    
+            $warehousing_distribution->whereHas('warehousing', function ($query) use ($user) {
                 $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
-                })->whereHas('co_no.contract', function ($q) use ($user) {
-                    $q->where('c_calculate_deadline_yn', 'y');
                 });
+            })->whereHas('mb_no', function ($q) {
+                $q->where('mb_type', 'spasys');
+            });
+
+            $warehousing_fulfillment->whereHas('warehousing', function ($query) use ($user) {
+                $query->whereHas('co_no', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+            });
+
+            $warehousing_bonded->whereHas('warehousing', function ($query) use ($user) {
+                $query->whereHas('co_no.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+            })->whereHas('mb_no', function ($q) use ($user) {
+                $q->where('mb_type', 'spasys');
             });
 
             $warehousingchartb = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
@@ -1383,13 +1455,33 @@ class BannerController extends Controller
                 $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
             });
 
-            $warehousingg = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
+         
+            $warehousing_distribution = ReceivingGoodsDelivery::with(['rate_data_general']);
+            $warehousing_fulfillment = ReceivingGoodsDelivery::with(['rate_data_general']);
+            $warehousing_bonded = ReceivingGoodsDelivery::with(['rate_data_general']);
+    
+            $warehousing_distribution->whereHas('warehousing', function ($query) use ($user) {
                 $query->whereHas('co_no', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
-                })->whereHas('co_no.contract', function ($q) use ($user) {
-                    $q->where('c_calculate_deadline_yn', 'y');
+                });
+            })->whereHas('mb_no', function ($q) {
+                $q->where('mb_type', 'shop');
+            })->orderBy('created_at', 'DESC');
+
+            $warehousing_fulfillment->whereHas('warehousing', function ($query) use ($user) {
+                $query->whereHas('co_no', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
                 });
             });
+
+            $warehousing_bonded->whereHas('warehousing', function ($query) use ($user) {
+                $query->whereHas('co_no', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+            });
+    
+           
+    
 
             $warehousingchartb = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
                 $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
@@ -1432,20 +1524,9 @@ class BannerController extends Controller
 
             $warehousinge = $this->subquery($sub, $sub_2, $sub_4);
 
-            $warehousingg = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
-                $query->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
-                    $q->where('co_no', $user->co_no);
-                })->orWhereHas('co_no.co_parent', function ($q) use ($user) {
-                    $q->where('co_no', $user->co_no);
-                });
-            })
-                ->whereHas('w_no', function ($query) use ($user) {
-                    $query->whereHas('co_no.co_parent.contract', function ($q) use ($user) {
-                        $q->where('c_calculate_deadline_yn', 'y');
-                    })->orWhereHas('co_no.contract', function ($q) use ($user) {
-                        $q->where('c_calculate_deadline_yn', 'y');
-                    });
-                });
+            $warehousing_distribution = ReceivingGoodsDelivery::with(['rate_data_general'])->whereNull('rgd_no');
+            $warehousing_fulfillment = ReceivingGoodsDelivery::with(['rate_data_general'])->whereNull('rgd_no');
+            $warehousing_bonded = ReceivingGoodsDelivery::with(['rate_data_general'])->whereNull('rgd_no');
 
             $warehousingchartb = $this->subquery($sub, $sub_2, $sub_4);
 
@@ -1454,18 +1535,19 @@ class BannerController extends Controller
             
         }
 
-        $warehousingg->where(function ($q) {
-            $q->where('rgd_status4', '추가청구서')
-                ->orWhere('rgd_status4', '확정청구서');
-        })
-            ->whereNull('rgd_status6')
-            ->whereNull('rgd_status6')
-            ->where('service_korean_name', '=', '보세화물')
-            ->where('rgd_calculate_deadline_yn', 'y')
-            ->where('rgd_is_show', 'y')
-            ->whereHas('mb_no', function ($q) use ($user) {
-                $q->where('mb_type', $user->mb_type);
-            });
+        $warehousing_distribution->where('rgd_status4', '!=', '추가청구서')
+        ->where('service_korean_name', '=', '보세화물')
+        ->where('rgd_is_show', 'y');
+
+        $warehousing_fulfillment->where('rgd_status4', '!=', '추가청구서')
+        ->where('service_korean_name', '=', '보세화물')
+        ->where('rgd_is_show', 'y');
+
+        $warehousing_bonded->where('rgd_status4', '!=', '추가청구서')
+        ->where('service_korean_name', '=', '보세화물')
+        ->where('rgd_is_show', 'y');
+
+        $warehousingg = $warehousing_distribution->union($warehousing_fulfillment)->union($warehousing_bonded);
 
         $counta = 0;
         $countb = 0;
@@ -1765,93 +1847,150 @@ class BannerController extends Controller
             $user->mb_type = 'shipper';
             $user->co_no = $request->co_no;
         }
+        $warehousing_distribution = ReceivingGoodsDelivery::with(['rate_data_general']);
+        $warehousing_fulfillment = ReceivingGoodsDelivery::with(['rate_data_general']);
+        $warehousing_bonded = ReceivingGoodsDelivery::with(['rate_data_general']);
+
         if ($user->mb_type == 'shop') {
-            $warehousingg = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 't_export'])->whereHas('w_no', function ($query) use ($user) {
+
+            $warehousing_distribution->whereHas('warehousing', function ($query) use ($user) {
                 $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
-                })->whereHas('co_no.contract', function ($q) use ($user) {
-                    $q->where('c_calculate_deadline_yn', 'y');
                 });
+            })->whereHas('mb_no', function ($q) {
+                $q->where('mb_type', 'spasys');
             });
-        } else if ($user->mb_type == 'shipper') {
-            $warehousingg = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
+
+            $warehousing_fulfillment->whereHas('warehousing', function ($query) use ($user) {
                 $query->whereHas('co_no', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
-                })->whereHas('co_no.contract', function ($q) use ($user) {
-                    $q->where('c_calculate_deadline_yn', 'y');
                 });
             });
-        } else if ($user->mb_type == 'spasys') {
-            $warehousingg = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general'])->whereHas('w_no', function ($query) use ($user) {
-                $query->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
-                    $q->where('co_no', $user->co_no);
-                })->orWhereHas('co_no.co_parent', function ($q) use ($user) {
+
+            $warehousing_bonded->whereHas('warehousing', function ($query) use ($user) {
+                $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
-            })
-                ->whereHas('w_no', function ($query) use ($user) {
-                    $query->whereHas('co_no.co_parent.contract', function ($q) use ($user) {
-                        $q->where('c_calculate_deadline_yn', 'y');
-                    })->orWhereHas('co_no.contract', function ($q) use ($user) {
-                        $q->where('c_calculate_deadline_yn', 'y');
-                    });
+            })->whereHas('mb_no', function ($q) use ($user) {
+                $q->where('mb_type', 'spasys');
+            });
+
+        } else if ($user->mb_type == 'shipper') {
+
+            $warehousing_distribution->whereHas('warehousing', function ($query) use ($user) {
+                $query->whereHas('co_no', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
                 });
+            })->whereHas('mb_no', function ($q) {
+                $q->where('mb_type', 'shop');
+            })->orderBy('created_at', 'DESC');
+
+            $warehousing_fulfillment->whereHas('warehousing', function ($query) use ($user) {
+                $query->whereHas('co_no', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+            });
+
+            $warehousing_bonded->whereHas('warehousing', function ($query) use ($user) {
+                $query->whereHas('co_no', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                });
+            });
+
+        } else if ($user->mb_type == 'spasys' ) {
+            $warehousing_distribution->whereNull('rgd_no');
+            $warehousing_fulfillment->whereNull('rgd_no');
+            $warehousing_bonded->whereNull('rgd_no');
         }
 
         if ($request->serviceinvoicechart == "보세화물" || $request->service == "보세화물") {
-            $warehousingg->where(function ($q) {
-                $q->where('rgd_status4', '추가청구서')
-                    ->orWhere('rgd_status4', '확정청구서');
-            })
-                ->whereNull('rgd_status6')
-                ->where('service_korean_name', '=', '보세화물')
-                ->where('rgd_calculate_deadline_yn', 'y')
-                ->where('rgd_is_show', 'y')
-                ->whereHas('mb_no', function ($q) use ($user) {
-                    $q->where('mb_type', $user->mb_type);
-                });
-        } else if ($request->serviceinvoicechart == "수입풀필먼트" || $request->service == "수입풀필먼트") {
-            $warehousingg->where(function ($q) {
-                $q->where('rgd_status4', '추가청구서')
-                    ->orWhere('rgd_status4', '확정청구서');
-            })
-                ->whereNull('rgd_status6')
-                ->where('service_korean_name', '=', '수입풀필먼트')
-                ->where('rgd_calculate_deadline_yn', 'y')
-                ->where('rgd_is_show', 'y')
-                ->whereHas('mb_no', function ($q) use ($user) {
-                    $q->where('mb_type', $user->mb_type);
-                });
-        } else if ($request->serviceinvoicechart == "유통가공" || $request->service == "유통가공") {
-            $warehousingg->where(function ($q) {
-                $q->where('rgd_status4', '추가청구서')
-                    ->orWhere('rgd_status4', '확정청구서');
-            })
-                ->whereNull('rgd_status6')
-                ->where('service_korean_name', '=', '유통가공')
-                ->where('rgd_calculate_deadline_yn', 'y')
-                ->where('rgd_is_show', 'y')
-                ->whereHas('mb_no', function ($q) use ($user) {
-                    $q->where('mb_type', $user->mb_type);
-                });
-        } else {
-            $warehousingg->where(function ($q) {
-                $q->where('rgd_status4', '추가청구서')
-                    ->orWhere('rgd_status4', '확정청구서');
-            })
-                ->whereNull('rgd_status6')
-                ->where('service_korean_name', '=', '보세화물')
-                ->where('rgd_calculate_deadline_yn', 'y')
 
-                ->where('rgd_is_show', 'y')
-                ->whereHas('mb_no', function ($q) use ($user) {
-                    $q->where('mb_type', $user->mb_type);
-                });
+            $warehousing_distribution->where('rgd_status4', '!=', '추가청구서')
+            ->whereHas('warehousing', function ($query) {
+                $query->where('w_category_name', '=', '보세화물');
+            })
+            ->where('rgd_is_show', 'y');
+
+            $warehousing_fulfillment->where('rgd_status4', '!=', '추가청구서')
+            ->whereHas('warehousing', function ($query) {
+                $query->where('w_category_name', '=', '보세화물');
+            })
+            ->where('rgd_is_show', 'y');
+
+            $warehousing_bonded->where('rgd_status4', '!=', '추가청구서')
+            ->whereHas('warehousing', function ($query) {
+                $query->where('w_category_name', '=', '보세화물');
+            })
+            ->where('rgd_is_show', 'y');
+
+        } else if ($request->serviceinvoicechart == "수입풀필먼트" || $request->service == "수입풀필먼트") {
+
+            $warehousing_distribution->where('rgd_status4', '!=', '추가청구서')
+            ->whereHas('warehousing', function ($query) {
+                $query->where('w_category_name', '=', '수입풀필먼트');
+            })
+            ->where('rgd_is_show', 'y');
+
+            $warehousing_fulfillment->where('rgd_status4', '!=', '추가청구서')
+            ->whereHas('warehousing', function ($query) {
+                $query->where('w_category_name', '=', '수입풀필먼트');
+            })
+            ->where('rgd_is_show', 'y');
+
+            $warehousing_bonded->where('rgd_status4', '!=', '추가청구서')
+            ->whereHas('warehousing', function ($query) {
+                $query->where('w_category_name', '=', '수입풀필먼트');
+            })
+            ->where('rgd_is_show', 'y');
+         
+        } else if ($request->serviceinvoicechart == "유통가공" || $request->service == "유통가공") {
+
+            $warehousing_distribution->where('rgd_status4', '!=', '추가청구서')
+            ->whereHas('warehousing', function ($query) {
+                $query->where('w_category_name', '=', '유통가공');
+            })
+            ->where('rgd_is_show', 'y');
+
+            $warehousing_fulfillment->where('rgd_status4', '!=', '추가청구서')
+            ->whereHas('warehousing', function ($query) {
+                $query->where('w_category_name', '=', '유통가공');
+            })
+            ->where('rgd_is_show', 'y');
+
+            $warehousing_bonded->where('rgd_status4', '!=', '추가청구서')
+            ->whereHas('warehousing', function ($query) {
+                $query->where('w_category_name', '=', '유통가공');
+            })
+            ->where('rgd_is_show', 'y');
+           
+        } else {
+
+            $warehousing_distribution->where('rgd_status4', '!=', '추가청구서')
+            ->whereHas('warehousing', function ($query) {
+                $query->where('w_category_name', '=', '보세화물');
+            })
+            ->where('rgd_is_show', 'y');
+
+            $warehousing_fulfillment->where('rgd_status4', '!=', '추가청구서')
+            ->whereHas('warehousing', function ($query) {
+                $query->where('w_category_name', '=', '보세화물');
+            })
+            ->where('rgd_is_show', 'y');
+
+            $warehousing_bonded->where('rgd_status4', '!=', '추가청구서')
+            ->whereHas('warehousing', function ($query) {
+                $query->where('w_category_name', '=', '보세화물');
+            })
+            ->where('rgd_is_show', 'y');
+          
         }
 
         // foreach ($warehousingg->get() as $i) {
         //     $countg_2 += $i->rate_data_general->rdg_sum6;
         // }
+
+        $warehousingg = $warehousing_distribution->union($warehousing_fulfillment)->union($warehousing_bonded);
+
 
         $countchartg = [];
 
