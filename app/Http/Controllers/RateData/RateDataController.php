@@ -2704,7 +2704,7 @@ class RateDataController extends Controller
                 $final_rgd->rgd_tax_invoice_date = null;
                 $final_rgd->rgd_tax_invoice_number = null;
                 $final_rgd->rgd_calculate_deadline_yn = $request->rgd_calculate_deadline_yn ? $request->rgd_calculate_deadline_yn : $rgd->rgd_calculate_deadline_yn;
-                $final_rgd->rgd_settlement_number = $request->rgd_settlement_number ? $request->rgd_settlement_number : null;
+                $final_rgd->rgd_settlement_number = $request->settlement_number ? $request->settlement_number : null;
                 $final_rgd->mb_no = Auth::user()->mb_no;
                 $final_rgd->save();
 
