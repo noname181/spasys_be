@@ -82,30 +82,29 @@ class BannerController extends Controller
         try {
             DB::beginTransaction();
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
-            if(isset($validated['banner_start']) && isset($validated['banner_end'])){
-                $check_banner_times = Banner::where('banner_position',$validated['banner_position'])
-                ->where('banner_position_detail',$validated['banner_position_detail'])
-                ->where('banner_end','>=',$validated['banner_start'])
-                ->where('banner_start','<=',$validated['banner_start'])
-                ->first();
+            if (isset($validated['banner_start']) && isset($validated['banner_end'])) {
+                $check_banner_times = Banner::where('banner_position', $validated['banner_position'])
+                    ->where('banner_position_detail', $validated['banner_position_detail'])
+                    ->where('banner_end', '>=', $validated['banner_start'])
+                    ->where('banner_start', '<=', $validated['banner_start'])
+                    ->first();
 
-                $check_banner_times2 = Banner::where('banner_position',$validated['banner_position'])
-                ->where('banner_position_detail',$validated['banner_position_detail'])
-                ->where('banner_end','>=',$validated['banner_end'])
-                ->where('banner_start','<=',$validated['banner_end'])->first();
+                $check_banner_times2 = Banner::where('banner_position', $validated['banner_position'])
+                    ->where('banner_position_detail', $validated['banner_position_detail'])
+                    ->where('banner_end', '>=', $validated['banner_end'])
+                    ->where('banner_start', '<=', $validated['banner_end'])->first();
 
-                $check_banner_times3 = Banner::where(function ($query) use ($validated){
-                    $query->where('banner_end','<=',$validated['banner_start'])->orWhere('banner_start','>=',$validated['banner_end']);
+                $check_banner_times3 = Banner::where(function ($query) use ($validated) {
+                    $query->where('banner_end', '<=', $validated['banner_start'])->orWhere('banner_start', '>=', $validated['banner_end']);
                 })->first();
-
             }
-            if(isset($check_banner_times) || isset($check_banner_times2) || !isset($check_banner_times3)){
-                if( !isset($check_banner_times3) ){
-                    $check_banner_times4 = Banner::where('banner_position',$validated['banner_position'])
-                    ->where('banner_position_detail',$validated['banner_position_detail'])->first();
-                    if(isset($check_banner_times4)){
+            if (isset($check_banner_times) || isset($check_banner_times2) || !isset($check_banner_times3)) {
+                if (!isset($check_banner_times3)) {
+                    $check_banner_times4 = Banner::where('banner_position', $validated['banner_position'])
+                        ->where('banner_position_detail', $validated['banner_position_detail'])->first();
+                    if (isset($check_banner_times4)) {
                         return response()->json([
-                            'error'=>'same_time',
+                            'error' => 'same_time',
                             'check_banner_times' => isset($check_banner_times) ? $check_banner_times : '',
                             'check_banner_times2' => isset($check_banner_times2) ? $check_banner_times2 : '',
                             'check_banner_times3' => isset($check_banner_times3) ? $check_banner_times3 : '',
@@ -113,13 +112,12 @@ class BannerController extends Controller
                     }
                 } else {
                     return response()->json([
-                        'error'=>'same_time',
+                        'error' => 'same_time',
                         'check_banner_times' => isset($check_banner_times) ? $check_banner_times : '',
                         'check_banner_times2' => isset($check_banner_times2) ? $check_banner_times2 : '',
                         'check_banner_times3' => isset($check_banner_times3) ? $check_banner_times3 : '',
                     ], 201);
                 }
-              
             }
             $banner_no = Banner::insertGetId([
                 'banner_title' => $validated['banner_title'],
@@ -159,9 +157,11 @@ class BannerController extends Controller
             File::insert($files);
 
             DB::commit();
-            return response()->json(['message' => Messages::MSG_0007, 'banner_no' => $banner_no,'check_banner_times' => isset($check_banner_times) ? $check_banner_times : '',
-            'check_banner_times2' => isset($check_banner_times2) ? $check_banner_times2 : '',
-            'check_banner_times3' => isset($check_banner_times3) ? $check_banner_times3 : '',], 201);
+            return response()->json([
+                'message' => Messages::MSG_0007, 'banner_no' => $banner_no, 'check_banner_times' => isset($check_banner_times) ? $check_banner_times : '',
+                'check_banner_times2' => isset($check_banner_times2) ? $check_banner_times2 : '',
+                'check_banner_times3' => isset($check_banner_times3) ? $check_banner_times3 : '',
+            ], 201);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
@@ -185,30 +185,29 @@ class BannerController extends Controller
             $validated = $request->validated();
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
 
-            if(isset($validated['banner_start']) && isset($validated['banner_end'])){
-                $check_banner_times = Banner::where('banner_position',$validated['banner_position'])
-                ->where('banner_position_detail',$validated['banner_position_detail'])
-                ->where('banner_end','>=',$validated['banner_start'])
-                ->where('banner_start','<=',$validated['banner_start'])->where('banner_no','!=',$validated['banner_no'])
-                ->first();
+            if (isset($validated['banner_start']) && isset($validated['banner_end'])) {
+                $check_banner_times = Banner::where('banner_position', $validated['banner_position'])
+                    ->where('banner_position_detail', $validated['banner_position_detail'])
+                    ->where('banner_end', '>=', $validated['banner_start'])
+                    ->where('banner_start', '<=', $validated['banner_start'])->where('banner_no', '!=', $validated['banner_no'])
+                    ->first();
 
-                $check_banner_times2 = Banner::where('banner_position',$validated['banner_position'])
-                ->where('banner_position_detail',$validated['banner_position_detail'])
-                ->where('banner_end','>=',$validated['banner_end'])
-                ->where('banner_start','<=',$validated['banner_end'])->where('banner_no','!=',$validated['banner_no'])->first();
+                $check_banner_times2 = Banner::where('banner_position', $validated['banner_position'])
+                    ->where('banner_position_detail', $validated['banner_position_detail'])
+                    ->where('banner_end', '>=', $validated['banner_end'])
+                    ->where('banner_start', '<=', $validated['banner_end'])->where('banner_no', '!=', $validated['banner_no'])->first();
 
-                $check_banner_times3 = Banner::where(function ($query) use ($validated){
-                    $query->where('banner_end','<=',$validated['banner_start'])->orWhere('banner_start','>=',$validated['banner_end'])->where('banner_no','!=',$validated['banner_no']);
+                $check_banner_times3 = Banner::where(function ($query) use ($validated) {
+                    $query->where('banner_end', '<=', $validated['banner_start'])->orWhere('banner_start', '>=', $validated['banner_end'])->where('banner_no', '!=', $validated['banner_no']);
                 })->first();
-
             }
-            if(isset($check_banner_times) || isset($check_banner_times2) || !isset($check_banner_times3)){
-                if( !isset($check_banner_times3) ){
-                    $check_banner_times4 = Banner::where('banner_position',$validated['banner_position'])
-                    ->where('banner_position_detail',$validated['banner_position_detail'])->where('banner_no','!=',$validated['banner_no'])->first();
-                    if(isset($check_banner_times4)){
+            if (isset($check_banner_times) || isset($check_banner_times2) || !isset($check_banner_times3)) {
+                if (!isset($check_banner_times3)) {
+                    $check_banner_times4 = Banner::where('banner_position', $validated['banner_position'])
+                        ->where('banner_position_detail', $validated['banner_position_detail'])->where('banner_no', '!=', $validated['banner_no'])->first();
+                    if (isset($check_banner_times4)) {
                         return response()->json([
-                            'error'=>'same_time',
+                            'error' => 'same_time',
                             'check_banner_times' => isset($check_banner_times) ? $check_banner_times : '',
                             'check_banner_times2' => isset($check_banner_times2) ? $check_banner_times2 : '',
                             'check_banner_times3' => isset($check_banner_times3) ? $check_banner_times3 : '',
@@ -216,13 +215,12 @@ class BannerController extends Controller
                     }
                 } else {
                     return response()->json([
-                        'error'=>'same_time',
+                        'error' => 'same_time',
                         'check_banner_times' => isset($check_banner_times) ? $check_banner_times : '',
                         'check_banner_times2' => isset($check_banner_times2) ? $check_banner_times2 : '',
                         'check_banner_times3' => isset($check_banner_times3) ? $check_banner_times3 : '',
                     ], 201);
                 }
-              
             }
             //FILE PART
 
@@ -401,7 +399,7 @@ class BannerController extends Controller
                 ->where('banner_use_yn', '=', '1')
                 ->where('banner_start', '<=', $today)
                 ->where('banner_end', '>=', $today)->latest('created_at')
-                ->where('mb_no','=','133')
+                ->where('mb_no', '=', '133')
                 ->first();
 
             $banner_login_right_top = Banner::with('files')
@@ -410,7 +408,7 @@ class BannerController extends Controller
                 ->where('banner_use_yn', '=', '1')
                 ->where('banner_start', '<=', $today)
                 ->where('banner_end', '>=', $today)->latest('created_at')
-                ->where('mb_no','=','133')
+                ->where('mb_no', '=', '133')
                 ->first();
 
             $banner_login_right_bottom = Banner::with('files')
@@ -419,7 +417,7 @@ class BannerController extends Controller
                 ->where('banner_use_yn', '=', '1')
                 ->where('banner_start', '<=', $today)
                 ->where('banner_end', '>=', $today)->latest('created_at')
-                ->where('mb_no','=','133')
+                ->where('mb_no', '=', '133')
                 ->first();
 
             $banner_index_top = Banner::with('files')
@@ -428,7 +426,7 @@ class BannerController extends Controller
                 ->where('banner_use_yn', '=', '1')
                 ->where('banner_start', '<=', $today)
                 ->where('banner_end', '>=', $today)->latest('created_at')
-                ->where('mb_no','=','133')
+                ->where('mb_no', '=', '133')
                 ->first();
 
             $banner_index_bottom = Banner::with('files')
@@ -437,7 +435,7 @@ class BannerController extends Controller
                 ->where('banner_use_yn', '=', '1')
                 ->where('banner_start', '<=', $today)
                 ->where('banner_end', '>=', $today)->latest('created_at')
-                ->where('mb_no','=','133')
+                ->where('mb_no', '=', '133')
                 ->first();
 
             return response()->json([
@@ -468,7 +466,7 @@ class BannerController extends Controller
                 ->where('banner_use_yn', '=', '1')
                 ->where('banner_start', '<=', $today)
                 ->where('banner_end', '>=', $today)->latest('created_at')
-                ->where('mb_no','=','133')
+                ->where('mb_no', '=', '133')
                 ->first();
 
             $banner_index_bottom = Banner::with('files')
@@ -478,7 +476,7 @@ class BannerController extends Controller
                 ->where('banner_use_yn', '=', '1')
                 ->where('banner_start', '<=', $today)
                 ->where('banner_end', '>=', $today)->latest('created_at')
-                ->where('mb_no','=','133')
+                ->where('mb_no', '=', '133')
                 ->first();
 
             return response()->json([
@@ -585,7 +583,7 @@ class BannerController extends Controller
             $warehousing_distribution = ReceivingGoodsDelivery::with(['rate_data_general']);
             $warehousing_fulfillment = ReceivingGoodsDelivery::with(['rate_data_general']);
             $warehousing_bonded = ReceivingGoodsDelivery::with(['rate_data_general']);
-    
+
             $warehousing_distribution->whereHas('warehousing', function ($query) use ($user) {
                 $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
@@ -607,7 +605,6 @@ class BannerController extends Controller
             })->whereHas('mb_no', function ($q) use ($user) {
                 $q->where('mb_type', 'spasys');
             });
-
         } else if ($user->mb_type == 'shipper') {
             $warehousinga = ReceivingGoodsDelivery::with(['w_no'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereNull('rgd_parent_no')->whereHas('w_no', function ($query) use ($user) {
                 $query->where('w_type', '=', 'IW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
@@ -696,7 +693,7 @@ class BannerController extends Controller
             $warehousing_distribution = ReceivingGoodsDelivery::with(['rate_data_general']);
             $warehousing_fulfillment = ReceivingGoodsDelivery::with(['rate_data_general']);
             $warehousing_bonded = ReceivingGoodsDelivery::with(['rate_data_general']);
-    
+
             $warehousing_distribution->whereHas('warehousing', function ($query) use ($user) {
                 $query->whereHas('co_no', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
@@ -716,7 +713,6 @@ class BannerController extends Controller
                     $q->where('co_no', $user->co_no);
                 });
             });
-
         } else if ($user->mb_type == 'spasys') {
             $warehousinga = ReceivingGoodsDelivery::with(['warehousing'])->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
                 $query->where('w_type', '=', 'IW')->where('w_category_name', '=', '유통가공')->where(function ($q) {
@@ -817,28 +813,28 @@ class BannerController extends Controller
         $h = 0;
 
         $warehousing_distribution->where(function ($q) {
-                $q->where('rgd_status4', '=', '예상경비청구서')
-                    ->orWhere('rgd_status4', '=', '확정청구서');
-            })
-        ->where('service_korean_name', '=', '유통가공')
-        ->whereNull('rgd_status6')
-        ->where('rgd_is_show', 'y');
+            $q->where('rgd_status4', '=', '예상경비청구서')
+                ->orWhere('rgd_status4', '=', '확정청구서');
+        })
+            ->where('service_korean_name', '=', '유통가공')
+            ->whereNull('rgd_status6')
+            ->where('rgd_is_show', 'y');
 
         $warehousing_fulfillment->where(function ($q) {
-                $q->where('rgd_status4', '=', '예상경비청구서')
-                    ->orWhere('rgd_status4', '=', '확정청구서');
-            })
-        ->where('service_korean_name', '=', '유통가공')
-        ->whereNull('rgd_status6')
-        ->where('rgd_is_show', 'y');
+            $q->where('rgd_status4', '=', '예상경비청구서')
+                ->orWhere('rgd_status4', '=', '확정청구서');
+        })
+            ->where('service_korean_name', '=', '유통가공')
+            ->whereNull('rgd_status6')
+            ->where('rgd_is_show', 'y');
 
         $warehousing_bonded->where(function ($q) {
-                $q->where('rgd_status4', '=', '예상경비청구서')
-                    ->orWhere('rgd_status4', '=', '확정청구서');
-            })
-        ->where('service_korean_name', '=', '유통가공')
-        ->whereNull('rgd_status6')
-        ->where('rgd_is_show', 'y');
+            $q->where('rgd_status4', '=', '예상경비청구서')
+                ->orWhere('rgd_status4', '=', '확정청구서');
+        })
+            ->where('service_korean_name', '=', '유통가공')
+            ->whereNull('rgd_status6')
+            ->where('rgd_is_show', 'y');
 
         $warehousingh = $warehousing_distribution->union($warehousing_fulfillment)->union($warehousing_bonded);
 
@@ -994,7 +990,7 @@ class BannerController extends Controller
         }
 
         return [
-            'countcharta' => $userArrb, 'countchartb' => $userArrd,'warehousingh'=>$warehousingh->get(),
+            'countcharta' => $userArrb, 'countchartb' => $userArrd, 'warehousingh' => $warehousingh->get(),
             'warehousingb' => $warehousingd, 'a' => $a, 'b' => $b, 'c' => $c, 'd' => $d, 'e' => $e, 'f' => $f, 'h' => $h, 'g' => $g,
             'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'countf' => $countf, 'countg' => $countg, 'counth' => $counth, 'counth_2' => $counth_2
 
@@ -1059,7 +1055,7 @@ class BannerController extends Controller
             $warehousing_distribution = ReceivingGoodsDelivery::with(['rate_data_general']);
             $warehousing_fulfillment = ReceivingGoodsDelivery::with(['rate_data_general']);
             $warehousing_bonded = ReceivingGoodsDelivery::with(['rate_data_general']);
-    
+
             $warehousing_distribution->whereHas('warehousing', function ($query) use ($user) {
                 $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
@@ -1081,7 +1077,6 @@ class BannerController extends Controller
             })->whereHas('mb_no', function ($q) use ($user) {
                 $q->where('mb_type', 'spasys');
             });
-
         } else if ($user->mb_type == 'shipper') {
             $warehousing2 = Warehousing::join(
                 DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
@@ -1136,7 +1131,7 @@ class BannerController extends Controller
             $warehousing_distribution = ReceivingGoodsDelivery::with(['rate_data_general']);
             $warehousing_fulfillment = ReceivingGoodsDelivery::with(['rate_data_general']);
             $warehousing_bonded = ReceivingGoodsDelivery::with(['rate_data_general']);
-    
+
             $warehousing_distribution->whereHas('warehousing', function ($query) use ($user) {
                 $query->whereHas('co_no', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
@@ -1156,7 +1151,6 @@ class BannerController extends Controller
                     $q->where('co_no', $user->co_no);
                 });
             });
-
         } else if ($user->mb_type == 'spasys') {
 
             $warehousing2 = Warehousing::join(
@@ -1216,28 +1210,28 @@ class BannerController extends Controller
         }
 
         $warehousing_distribution->where(function ($q) {
-                $q->where('rgd_status4', '=', '예상경비청구서')
-                    ->orWhere('rgd_status4', '=', '확정청구서');
-            })
-        ->where('service_korean_name', '=', '수입풀필먼트')
-        ->whereNull('rgd_status6')
-        ->where('rgd_is_show', 'y');
+            $q->where('rgd_status4', '=', '예상경비청구서')
+                ->orWhere('rgd_status4', '=', '확정청구서');
+        })
+            ->where('service_korean_name', '=', '수입풀필먼트')
+            ->whereNull('rgd_status6')
+            ->where('rgd_is_show', 'y');
 
         $warehousing_fulfillment->where(function ($q) {
-                $q->where('rgd_status4', '=', '예상경비청구서')
-                    ->orWhere('rgd_status4', '=', '확정청구서');
-            })
-        ->where('service_korean_name', '=', '수입풀필먼트')
-        ->whereNull('rgd_status6')
-        ->where('rgd_is_show', 'y');
+            $q->where('rgd_status4', '=', '예상경비청구서')
+                ->orWhere('rgd_status4', '=', '확정청구서');
+        })
+            ->where('service_korean_name', '=', '수입풀필먼트')
+            ->whereNull('rgd_status6')
+            ->where('rgd_is_show', 'y');
 
         $warehousing_bonded->where(function ($q) {
-                $q->where('rgd_status4', '=', '예상경비청구서')
-                    ->orWhere('rgd_status4', '=', '확정청구서');
-            })
-        ->where('service_korean_name', '=', '수입풀필먼트')
-        ->whereNull('rgd_status6')
-        ->where('rgd_is_show', 'y');
+            $q->where('rgd_status4', '=', '예상경비청구서')
+                ->orWhere('rgd_status4', '=', '확정청구서');
+        })
+            ->where('service_korean_name', '=', '수입풀필먼트')
+            ->whereNull('rgd_status6')
+            ->where('rgd_is_show', 'y');
 
         $warehousinge = $warehousing_distribution->union($warehousing_fulfillment)->union($warehousing_bonded);
 
@@ -1435,10 +1429,10 @@ class BannerController extends Controller
                 ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                 ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-            $sub_2 = Import::select('ti_logistic_manage_number', 'ti_carry_in_number')
-                ->leftjoin('receiving_goods_delivery', function ($join) {
-                    $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
-                })
+            $sub_2 = Import::select('ti_logistic_manage_number', 'ti_carry_in_number', 'ti_i_date')
+                // ->leftjoin('receiving_goods_delivery', function ($join) {
+                //     $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
+                // })
                 ->groupBy(['ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number']);
 
             // $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
@@ -1472,7 +1466,7 @@ class BannerController extends Controller
             $warehousing_distribution = ReceivingGoodsDelivery::with(['rate_data_general']);
             $warehousing_fulfillment = ReceivingGoodsDelivery::with(['rate_data_general']);
             $warehousing_bonded = ReceivingGoodsDelivery::with(['rate_data_general']);
-    
+
             $warehousing_distribution->whereHas('warehousing', function ($query) use ($user) {
                 $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
@@ -1506,7 +1500,6 @@ class BannerController extends Controller
             })->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
                 $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
             });
-
         } else if ($user->mb_type == 'shipper') {
 
             $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number', 'tie_is_date', 'tie_status_2')
@@ -1520,10 +1513,10 @@ class BannerController extends Controller
                 ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                 ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-            $sub_2 = Import::select('ti_logistic_manage_number', 'ti_carry_in_number')
-                ->leftjoin('receiving_goods_delivery', function ($join) {
-                    $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
-                })
+            $sub_2 = Import::select('ti_logistic_manage_number', 'ti_carry_in_number', 'ti_i_date')
+                // ->leftjoin('receiving_goods_delivery', function ($join) {
+                //     $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
+                // })
                 ->groupBy(['ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number']);
 
             // $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
@@ -1558,11 +1551,11 @@ class BannerController extends Controller
                 $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
             });
 
-         
+
             $warehousing_distribution = ReceivingGoodsDelivery::with(['rate_data_general']);
             $warehousing_fulfillment = ReceivingGoodsDelivery::with(['rate_data_general']);
             $warehousing_bonded = ReceivingGoodsDelivery::with(['rate_data_general']);
-    
+
             $warehousing_distribution->whereHas('warehousing', function ($query) use ($user) {
                 $query->whereHas('co_no', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
@@ -1582,9 +1575,9 @@ class BannerController extends Controller
                     $q->where('co_no', $user->co_no);
                 });
             });
-    
-           
-    
+
+
+
 
             $warehousingchartb = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
                 $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
@@ -1608,7 +1601,7 @@ class BannerController extends Controller
                 ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                 ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-            $sub_2 = Import::select('ti_logistic_manage_number', 'ti_carry_in_number')
+            $sub_2 = Import::select('ti_logistic_manage_number', 'ti_carry_in_number', 'ti_i_date')
 
                 ->groupBy(['ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number']);
 
@@ -1616,14 +1609,17 @@ class BannerController extends Controller
             //     ->groupBy(['tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number']);
 
             $sub_4 = Export::select('te_logistic_manage_number', 'te_carry_in_number', 'te_carry_out_number')
-                ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
+                ->groupBy(['te_logistic_manage_number','te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
+
+            $sub_5 = Export::select('te_logistic_manage_number', 'te_carry_in_number', 'te_carry_out_number')
+                ->groupBy(['te_logistic_manage_number','te_e_confirm_number','te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
 
 
             $warehousinga = $this->subquery($sub, $sub_2, $sub_4);
 
             $warehousingb = $this->subquery($sub, $sub_2, $sub_4);
 
-            $warehousingd = $this->subquery($sub, $sub_2, $sub_4);
+            $warehousingd = $this->subquery($sub, $sub_2, $sub_5);
 
             $warehousinge = $this->subquery($sub, $sub_2, $sub_4);
 
@@ -1632,35 +1628,32 @@ class BannerController extends Controller
             $warehousing_bonded = ReceivingGoodsDelivery::with(['rate_data_general'])->whereNull('rgd_no');
 
             $warehousingchartb = $this->subquery($sub, $sub_2, $sub_4);
-
-            $warehousingchartd = $this->subquery($sub, $sub_2, $sub_4);
-
-            
+            $warehousingchartd = $this->subquery($sub, $sub_2, $sub_5);
         }
 
         $warehousing_distribution->where(function ($q) {
-                $q->where('rgd_status4', '=', '예상경비청구서')
-                    ->orWhere('rgd_status4', '=', '확정청구서');
-            })
-        ->where('service_korean_name', '=', '보세화물')
-        ->whereNull('rgd_status6')
-        ->where('rgd_is_show', 'y');
+            $q->where('rgd_status4', '=', '예상경비청구서')
+                ->orWhere('rgd_status4', '=', '확정청구서');
+        })
+            ->where('service_korean_name', '=', '보세화물')
+            ->whereNull('rgd_status6')
+            ->where('rgd_is_show', 'y');
 
         $warehousing_fulfillment->where(function ($q) {
-                $q->where('rgd_status4', '=', '예상경비청구서')
-                    ->orWhere('rgd_status4', '=', '확정청구서');
-            })
-        ->where('service_korean_name', '=', '보세화물')
-        ->whereNull('rgd_status6')
-        ->where('rgd_is_show', 'y');
+            $q->where('rgd_status4', '=', '예상경비청구서')
+                ->orWhere('rgd_status4', '=', '확정청구서');
+        })
+            ->where('service_korean_name', '=', '보세화물')
+            ->whereNull('rgd_status6')
+            ->where('rgd_is_show', 'y');
 
         $warehousing_bonded->where(function ($q) {
-                $q->where('rgd_status4', '=', '예상경비청구서')
-                    ->orWhere('rgd_status4', '=', '확정청구서');
-            })
-        ->where('service_korean_name', '=', '보세화물')
-        ->whereNull('rgd_status6')
-        ->where('rgd_is_show', 'y');
+            $q->where('rgd_status4', '=', '예상경비청구서')
+                ->orWhere('rgd_status4', '=', '확정청구서');
+        })
+            ->where('service_korean_name', '=', '보세화물')
+            ->whereNull('rgd_status6')
+            ->where('rgd_is_show', 'y');
 
         $warehousingg = $warehousing_distribution->union($warehousing_fulfillment)->union($warehousing_bonded);
 
@@ -1672,19 +1665,19 @@ class BannerController extends Controller
         $countf = 0;
         $countg = 0;
         $countg_2 = 0;
-        $tie_logistic_manage_number = $this->SQL();
+        //$tie_logistic_manage_number = $this->SQL();
         $warehousingb2 = $this->subquery($sub, $sub_2, $sub_4)->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->get()->count();
-        $warehousingd2 = $this->subquery($sub, $sub_2, $sub_4)->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->get()->count();
+        $warehousingd2 = $this->subquery($sub, $sub_2, $sub_4)->whereNotNull('ddd.te_logistic_manage_number')->get()->count();
 
         if ($request->time1 == 'day') {
-            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->whereBetween('aaa.tie_is_date', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get()->count();
-            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('aaa.tie_is_date', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get()->count();
+            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereBetween('bbb.ti_i_date', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get()->count();
+            $countd = $warehousingd->whereNotNull('ddd.te_logistic_manage_number')->whereBetween('aaa.tie_is_date', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get()->count();
         } elseif ($request->time1 == 'week') {
-            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->whereBetween('aaa.tie_is_date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get()->count();
-            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('aaa.tie_is_date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get()->count();
+            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereBetween('bbb.ti_i_date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get()->count();
+            $countd = $warehousingd->whereNotNull('ddd.te_logistic_manage_number')->whereBetween('aaa.tie_is_date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get()->count();
         } elseif ($request->time1 == 'month') {
-            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->whereBetween('aaa.tie_is_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get()->count();
-            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('aaa.tie_is_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get()->count();
+            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereBetween('bbb.ti_i_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get()->count();
+            $countd = $warehousingd->whereNotNull('ddd.te_logistic_manage_number')->whereBetween('aaa.tie_is_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get()->count();
         }
 
         $counta = $warehousinga->whereNotNull('aaa.tie_logistic_manage_number')->whereNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->get()->count();
@@ -1699,12 +1692,12 @@ class BannerController extends Controller
         $countchartd = [];
 
         for ($i = 1; $i <= 6; $i++) {
-            $countchartb = $warehousingchartb->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->whereDate('tie_is_date', '>', now()->subYear())->get()->groupBy(function ($date) {
+            $countchartb = $warehousingchartb->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->whereDate('ti_i_date', '>', now()->subYear())->get()->groupBy(function ($date) {
                 //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
                 return Carbon::parse($date->tie_is_date)->format('m'); // grouping by months
             });
 
-            $countchartd = $warehousingchartd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereDate('tie_is_date', '>', now()->subYear())->get()->groupBy(function ($date) {
+            $countchartd = $warehousingchartd->whereNotNull('ddd.te_logistic_manage_number')->whereDate('tie_is_date', '>', now()->subYear())->get()->groupBy(function ($date) {
                 //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
                 return Carbon::parse($date->tie_is_date)->format('m'); // grouping by months
             });
@@ -1765,7 +1758,7 @@ class BannerController extends Controller
         }
 
         return [
-            'warehousingb2' => $warehousingb2,'warehousingd2' => $warehousingd2,'countcharta' => $userArrb, 'countchartb' => $userArrd, 'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'countg' => $countg, 'countg_2' => $countg_2
+            'warehousingb2' => $warehousingb2, 'warehousingd2' => $warehousingd2, 'countcharta' => $userArrb, 'countchartb' => $userArrd, 'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'countg' => $countg, 'countg_2' => $countg_2
         ];
 
         DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
@@ -1779,15 +1772,15 @@ class BannerController extends Controller
         $countchartd = [];
         if ($request->servicechart == "보세화물") {
             $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number', 'tie_is_date', 'tie_status_2')
-            ->leftjoin('company', function ($join) {
-                $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
-            })->leftjoin('company as parent_shop', function ($join) {
-                $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
-            })->leftjoin('company as parent_spasys', function ($join) {
-                $join->on('parent_shop.co_parent_no', '=', 'parent_spasys.co_no');
-            })->where('company.co_no', $request->co_no)->where('tie_is_date', '>=', '2022-01-04')
-            ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
-            ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
+                ->leftjoin('company', function ($join) {
+                    $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
+                })->leftjoin('company as parent_shop', function ($join) {
+                    $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
+                })->leftjoin('company as parent_spasys', function ($join) {
+                    $join->on('parent_shop.co_parent_no', '=', 'parent_spasys.co_no');
+                })->where('company.co_no', $request->co_no)->where('tie_is_date', '>=', '2022-01-04')
+                ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
+                ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
             $sub_2 = Import::select('ti_logistic_manage_number', 'ti_carry_in_number')
                 ->leftjoin('receiving_goods_delivery', function ($join) {
@@ -1989,7 +1982,6 @@ class BannerController extends Controller
             })->whereHas('mb_no', function ($q) use ($user) {
                 $q->where('mb_type', 'spasys');
             });
-
         } else if ($user->mb_type == 'shipper') {
 
             $warehousing_distribution->whereHas('warehousing', function ($query) use ($user) {
@@ -2011,8 +2003,7 @@ class BannerController extends Controller
                     $q->where('co_no', $user->co_no);
                 });
             });
-
-        } else if ($user->mb_type == 'spasys' ) {
+        } else if ($user->mb_type == 'spasys') {
             $warehousing_distribution->whereNull('rgd_no');
             $warehousing_fulfillment->whereNull('rgd_no');
             $warehousing_bonded->whereNull('rgd_no');
@@ -2024,128 +2015,124 @@ class BannerController extends Controller
                 $q->where('rgd_status4', '=', '예상경비청구서')
                     ->orWhere('rgd_status4', '=', '확정청구서');
             })
-            ->whereHas('warehousing', function ($query) {
-                $query->where('w_category_name', '=', '보세화물');
-            })
-            ->whereNull('rgd_status6')
-            ->where('rgd_is_show', 'y');
+                ->whereHas('warehousing', function ($query) {
+                    $query->where('w_category_name', '=', '보세화물');
+                })
+                ->whereNull('rgd_status6')
+                ->where('rgd_is_show', 'y');
 
             $warehousing_fulfillment->where(function ($q) {
                 $q->where('rgd_status4', '=', '예상경비청구서')
                     ->orWhere('rgd_status4', '=', '확정청구서');
             })
-            ->whereHas('warehousing', function ($query) {
-                $query->where('w_category_name', '=', '보세화물');
-            })
-            ->whereNull('rgd_status6')
-            ->where('rgd_is_show', 'y');
+                ->whereHas('warehousing', function ($query) {
+                    $query->where('w_category_name', '=', '보세화물');
+                })
+                ->whereNull('rgd_status6')
+                ->where('rgd_is_show', 'y');
 
             $warehousing_bonded->where(function ($q) {
                 $q->where('rgd_status4', '=', '예상경비청구서')
                     ->orWhere('rgd_status4', '=', '확정청구서');
             })
-            ->whereHas('warehousing', function ($query) {
-                $query->where('w_category_name', '=', '보세화물');
-            })
-            ->whereNull('rgd_status6')
-            ->where('rgd_is_show', 'y');
-
+                ->whereHas('warehousing', function ($query) {
+                    $query->where('w_category_name', '=', '보세화물');
+                })
+                ->whereNull('rgd_status6')
+                ->where('rgd_is_show', 'y');
         } else if ($request->serviceinvoicechart == "수입풀필먼트" || $request->service == "수입풀필먼트") {
 
             $warehousing_distribution->where(function ($q) {
                 $q->where('rgd_status4', '=', '예상경비청구서')
                     ->orWhere('rgd_status4', '=', '확정청구서');
             })
-            ->whereHas('warehousing', function ($query) {
-                $query->where('w_category_name', '=', '수입풀필먼트');
-            })
-            ->whereNull('rgd_status6')
-            ->where('rgd_is_show', 'y');
+                ->whereHas('warehousing', function ($query) {
+                    $query->where('w_category_name', '=', '수입풀필먼트');
+                })
+                ->whereNull('rgd_status6')
+                ->where('rgd_is_show', 'y');
 
             $warehousing_fulfillment->where(function ($q) {
                 $q->where('rgd_status4', '=', '예상경비청구서')
                     ->orWhere('rgd_status4', '=', '확정청구서');
             })
-            ->whereHas('warehousing', function ($query) {
-                $query->where('w_category_name', '=', '수입풀필먼트');
-            })
-            ->whereNull('rgd_status6')
-            ->where('rgd_is_show', 'y');
+                ->whereHas('warehousing', function ($query) {
+                    $query->where('w_category_name', '=', '수입풀필먼트');
+                })
+                ->whereNull('rgd_status6')
+                ->where('rgd_is_show', 'y');
 
             $warehousing_bonded->where(function ($q) {
                 $q->where('rgd_status4', '=', '예상경비청구서')
                     ->orWhere('rgd_status4', '=', '확정청구서');
             })
-            ->whereHas('warehousing', function ($query) {
-                $query->where('w_category_name', '=', '수입풀필먼트');
-            })
-            ->whereNull('rgd_status6')
-            ->where('rgd_is_show', 'y');
-         
+                ->whereHas('warehousing', function ($query) {
+                    $query->where('w_category_name', '=', '수입풀필먼트');
+                })
+                ->whereNull('rgd_status6')
+                ->where('rgd_is_show', 'y');
         } else if ($request->serviceinvoicechart == "유통가공" || $request->service == "유통가공") {
 
             $warehousing_distribution->where(function ($q) {
                 $q->where('rgd_status4', '=', '예상경비청구서')
                     ->orWhere('rgd_status4', '=', '확정청구서');
             })
-            ->whereHas('warehousing', function ($query) {
-                $query->where('w_category_name', '=', '유통가공');
-            })
-            ->whereNull('rgd_status6')
-            ->where('rgd_is_show', 'y');
+                ->whereHas('warehousing', function ($query) {
+                    $query->where('w_category_name', '=', '유통가공');
+                })
+                ->whereNull('rgd_status6')
+                ->where('rgd_is_show', 'y');
 
             $warehousing_fulfillment->where(function ($q) {
                 $q->where('rgd_status4', '=', '예상경비청구서')
                     ->orWhere('rgd_status4', '=', '확정청구서');
             })
-            ->whereHas('warehousing', function ($query) {
-                $query->where('w_category_name', '=', '유통가공');
-            })
-            ->whereNull('rgd_status6')
-            ->where('rgd_is_show', 'y');
+                ->whereHas('warehousing', function ($query) {
+                    $query->where('w_category_name', '=', '유통가공');
+                })
+                ->whereNull('rgd_status6')
+                ->where('rgd_is_show', 'y');
 
             $warehousing_bonded->where(function ($q) {
                 $q->where('rgd_status4', '=', '예상경비청구서')
                     ->orWhere('rgd_status4', '=', '확정청구서');
             })
-            ->whereHas('warehousing', function ($query) {
-                $query->where('w_category_name', '=', '유통가공');
-            })
-            ->whereNull('rgd_status6')
-            ->where('rgd_is_show', 'y');
-           
+                ->whereHas('warehousing', function ($query) {
+                    $query->where('w_category_name', '=', '유통가공');
+                })
+                ->whereNull('rgd_status6')
+                ->where('rgd_is_show', 'y');
         } else {
 
             $warehousing_distribution->where(function ($q) {
                 $q->where('rgd_status4', '=', '예상경비청구서')
                     ->orWhere('rgd_status4', '=', '확정청구서');
             })
-            ->whereHas('warehousing', function ($query) {
-                $query->where('w_category_name', '=', '보세화물');
-            })
-            ->whereNull('rgd_status6')
-            ->where('rgd_is_show', 'y');
+                ->whereHas('warehousing', function ($query) {
+                    $query->where('w_category_name', '=', '보세화물');
+                })
+                ->whereNull('rgd_status6')
+                ->where('rgd_is_show', 'y');
 
             $warehousing_fulfillment->where(function ($q) {
                 $q->where('rgd_status4', '=', '예상경비청구서')
                     ->orWhere('rgd_status4', '=', '확정청구서');
             })
-            ->whereHas('warehousing', function ($query) {
-                $query->where('w_category_name', '=', '보세화물');
-            })
-            ->whereNull('rgd_status6')
-            ->where('rgd_is_show', 'y');
+                ->whereHas('warehousing', function ($query) {
+                    $query->where('w_category_name', '=', '보세화물');
+                })
+                ->whereNull('rgd_status6')
+                ->where('rgd_is_show', 'y');
 
             $warehousing_bonded->where(function ($q) {
                 $q->where('rgd_status4', '=', '예상경비청구서')
                     ->orWhere('rgd_status4', '=', '확정청구서');
             })
-            ->whereHas('warehousing', function ($query) {
-                $query->where('w_category_name', '=', '보세화물');
-            })
-            ->whereNull('rgd_status6')
-            ->where('rgd_is_show', 'y');
-          
+                ->whereHas('warehousing', function ($query) {
+                    $query->where('w_category_name', '=', '보세화물');
+                })
+                ->whereNull('rgd_status6')
+                ->where('rgd_is_show', 'y');
         }
 
         // foreach ($warehousingg->get() as $i) {
@@ -2172,7 +2159,7 @@ class BannerController extends Controller
         $userArrd['label'] = '반입';
         $userArrd['borderColor'] = '#F7C35D';
         $userArrd['backgroundColor'] = '#F7C35D';
-       
+
 
         if ($request->serviceinvoicechart == "보세화물" || $request->service == "보세화물") {
             foreach ($countchartg as $key => $value) {
