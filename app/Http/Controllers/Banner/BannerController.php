@@ -822,6 +822,7 @@ class BannerController extends Controller
             })
         ->where('service_korean_name', '=', '유통가공')
         ->whereNull('rgd_status6')
+        ->where('rgd_status7', 'taxed')
         ->where('rgd_is_show', 'y');
 
         $warehousing_fulfillment->where(function ($q) {
@@ -830,6 +831,7 @@ class BannerController extends Controller
             })
         ->where('service_korean_name', '=', '유통가공')
         ->whereNull('rgd_status6')
+        ->where('rgd_status7', 'taxed')
         ->where('rgd_is_show', 'y');
 
         $warehousing_bonded->where(function ($q) {
@@ -838,6 +840,7 @@ class BannerController extends Controller
             })
         ->where('service_korean_name', '=', '유통가공')
         ->whereNull('rgd_status6')
+        ->where('rgd_status7', 'taxed')
         ->where('rgd_is_show', 'y');
 
         $warehousingh = $warehousing_distribution->union($warehousing_fulfillment)->union($warehousing_bonded);
@@ -1221,6 +1224,7 @@ class BannerController extends Controller
             })
         ->where('service_korean_name', '=', '수입풀필먼트')
         ->whereNull('rgd_status6')
+        ->where('rgd_status7', 'taxed')
         ->where('rgd_is_show', 'y');
 
         $warehousing_fulfillment->where(function ($q) {
@@ -1229,6 +1233,7 @@ class BannerController extends Controller
             })
         ->where('service_korean_name', '=', '수입풀필먼트')
         ->whereNull('rgd_status6')
+        ->where('rgd_status7', 'taxed')
         ->where('rgd_is_show', 'y');
 
         $warehousing_bonded->where(function ($q) {
@@ -1237,6 +1242,7 @@ class BannerController extends Controller
             })
         ->where('service_korean_name', '=', '수입풀필먼트')
         ->whereNull('rgd_status6')
+        ->where('rgd_status7', 'taxed')
         ->where('rgd_is_show', 'y');
 
         $warehousinge = $warehousing_distribution->union($warehousing_fulfillment)->union($warehousing_bonded);
@@ -1644,6 +1650,7 @@ class BannerController extends Controller
             })
         ->where('service_korean_name', '=', '보세화물')
         ->whereNull('rgd_status6')
+        ->where('rgd_status7', 'taxed')
         ->where('rgd_is_show', 'y');
 
         $warehousing_fulfillment->where(function ($q) {
@@ -1652,6 +1659,7 @@ class BannerController extends Controller
             })
         ->where('service_korean_name', '=', '보세화물')
         ->whereNull('rgd_status6')
+        ->where('rgd_status7', 'taxed')
         ->where('rgd_is_show', 'y');
 
         $warehousing_bonded->where(function ($q) {
@@ -1660,6 +1668,7 @@ class BannerController extends Controller
             })
         ->where('service_korean_name', '=', '보세화물')
         ->whereNull('rgd_status6')
+        ->where('rgd_status7', 'taxed')
         ->where('rgd_is_show', 'y');
 
         $warehousingg = $warehousing_distribution->union($warehousing_fulfillment)->union($warehousing_bonded);
@@ -2028,6 +2037,7 @@ class BannerController extends Controller
                 $query->where('w_category_name', '=', '보세화물');
             })
             ->whereNull('rgd_status6')
+            ->where('rgd_status7', 'taxed')
             ->where('rgd_is_show', 'y');
 
             $warehousing_fulfillment->where(function ($q) {
@@ -2038,6 +2048,7 @@ class BannerController extends Controller
                 $query->where('w_category_name', '=', '보세화물');
             })
             ->whereNull('rgd_status6')
+            ->where('rgd_status7', 'taxed')
             ->where('rgd_is_show', 'y');
 
             $warehousing_bonded->where(function ($q) {
@@ -2048,6 +2059,7 @@ class BannerController extends Controller
                 $query->where('w_category_name', '=', '보세화물');
             })
             ->whereNull('rgd_status6')
+            ->where('rgd_status7', 'taxed')
             ->where('rgd_is_show', 'y');
 
         } else if ($request->serviceinvoicechart == "수입풀필먼트" || $request->service == "수입풀필먼트") {
@@ -2060,6 +2072,7 @@ class BannerController extends Controller
                 $query->where('w_category_name', '=', '수입풀필먼트');
             })
             ->whereNull('rgd_status6')
+            ->where('rgd_status7', 'taxed')
             ->where('rgd_is_show', 'y');
 
             $warehousing_fulfillment->where(function ($q) {
@@ -2070,6 +2083,7 @@ class BannerController extends Controller
                 $query->where('w_category_name', '=', '수입풀필먼트');
             })
             ->whereNull('rgd_status6')
+            ->where('rgd_status7', 'taxed')
             ->where('rgd_is_show', 'y');
 
             $warehousing_bonded->where(function ($q) {
@@ -2080,6 +2094,7 @@ class BannerController extends Controller
                 $query->where('w_category_name', '=', '수입풀필먼트');
             })
             ->whereNull('rgd_status6')
+            ->where('rgd_status7', 'taxed')
             ->where('rgd_is_show', 'y');
          
         } else if ($request->serviceinvoicechart == "유통가공" || $request->service == "유통가공") {
@@ -2092,6 +2107,7 @@ class BannerController extends Controller
                 $query->where('w_category_name', '=', '유통가공');
             })
             ->whereNull('rgd_status6')
+            ->where('rgd_status7', 'taxed')
             ->where('rgd_is_show', 'y');
 
             $warehousing_fulfillment->where(function ($q) {
@@ -2102,6 +2118,7 @@ class BannerController extends Controller
                 $query->where('w_category_name', '=', '유통가공');
             })
             ->whereNull('rgd_status6')
+            ->where('rgd_status7', 'taxed')
             ->where('rgd_is_show', 'y');
 
             $warehousing_bonded->where(function ($q) {
@@ -2112,6 +2129,7 @@ class BannerController extends Controller
                 $query->where('w_category_name', '=', '유통가공');
             })
             ->whereNull('rgd_status6')
+            ->where('rgd_status7', 'taxed')
             ->where('rgd_is_show', 'y');
            
         } else {
@@ -2124,6 +2142,7 @@ class BannerController extends Controller
                 $query->where('w_category_name', '=', '보세화물');
             })
             ->whereNull('rgd_status6')
+            ->where('rgd_status7', 'taxed')
             ->where('rgd_is_show', 'y');
 
             $warehousing_fulfillment->where(function ($q) {
@@ -2134,6 +2153,7 @@ class BannerController extends Controller
                 $query->where('w_category_name', '=', '보세화물');
             })
             ->whereNull('rgd_status6')
+            ->where('rgd_status7', 'taxed')
             ->where('rgd_is_show', 'y');
 
             $warehousing_bonded->where(function ($q) {
@@ -2144,6 +2164,7 @@ class BannerController extends Controller
                 $query->where('w_category_name', '=', '보세화물');
             })
             ->whereNull('rgd_status6')
+            ->where('rgd_status7', 'taxed')
             ->where('rgd_is_show', 'y');
           
         }
