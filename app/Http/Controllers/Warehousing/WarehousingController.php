@@ -4112,6 +4112,21 @@ class WarehousingController extends Controller
                     });
                 }
             }
+            if (isset($validated['rgd_status1']) && $validated['rgd_status1'] != '전체') {
+                if ($validated['rgd_status1'] == 'waiting') {
+                    $warehousing->where(function ($q){
+                        $q->where('rgd_status4', '확정청구서')->orwhere(function ($q){
+                            $q->where('service_korean_name', '==', '보세화물')->where('rgd_status4', '예상경비청구서')->where('rgd_bill_type', 'not like', '%' . 'monthly'. '%');
+                        });
+                    })
+                    ->where(function ($q){
+                        $q->where('rgd_status5', '!=', 'cancel')->orwhereNull('rgd_status5');
+                    })
+                    ->whereNull('rgd_status7');
+                } else
+                    $warehousing->where('rgd_status7', '=', $validated['rgd_status1']);
+            }
+
             $warehousing_fulfillment = ReceivingGoodsDelivery::with(['rate_meta_data', 'rate_meta_data_parent', 'rate_data_general', 'rgd_settlement']);
             if ($user->mb_type == 'shop' && $request->type == 'view_list') {
                 $warehousing_fulfillment->whereHas('warehousing', function ($query) use ($user) {
@@ -4283,8 +4298,19 @@ class WarehousingController extends Controller
                     });
                 }
             }
-            if (isset($validated['rgd_status1'])) {
-                $warehousing_fulfillment->where('rgd_status1', '=', $validated['rgd_status1']);
+            if (isset($validated['rgd_status1']) && $validated['rgd_status1'] != '전체') {
+                if ($validated['rgd_status1'] == 'waiting') {
+                    $warehousing_fulfillment->where(function ($q){
+                        $q->where('rgd_status4', '확정청구서')->orwhere(function ($q){
+                            $q->where('service_korean_name', '==', '보세화물')->where('rgd_status4', '예상경비청구서')->where('rgd_bill_type', 'not like', '%' . 'monthly'. '%');
+                        });
+                    })
+                    ->where(function ($q){
+                        $q->where('rgd_status5', '!=', 'cancel')->orwhereNull('rgd_status5');
+                    })
+                    ->whereNull('rgd_status7');
+                } else
+                    $warehousing_fulfillment->where('rgd_status7', '=', $validated['rgd_status1']);
             }
             if (isset($validated['rgd_status2'])) {
                 $warehousing_fulfillment->where('rgd_status2', '=', $validated['rgd_status2']);
@@ -4488,8 +4514,19 @@ class WarehousingController extends Controller
                     });
                 }
             }
-            if (isset($validated['rgd_status1'])) {
-                $warehousing_bonded->where('rgd_status1', '=', $validated['rgd_status1']);
+            if (isset($validated['rgd_status1']) && $validated['rgd_status1'] != '전체') {
+                if ($validated['rgd_status1'] == 'waiting') {
+                    $warehousing_bonded->where(function ($q){
+                        $q->where('rgd_status4', '확정청구서')->orwhere(function ($q){
+                            $q->where('service_korean_name', '==', '보세화물')->where('rgd_status4', '예상경비청구서')->where('rgd_bill_type', 'not like', '%' . 'monthly'. '%');
+                        });
+                    })
+                    ->where(function ($q){
+                        $q->where('rgd_status5', '!=', 'cancel')->orwhereNull('rgd_status5');
+                    })
+                    ->whereNull('rgd_status7');
+                } else
+                    $warehousing_bonded->where('rgd_status7', '=', $validated['rgd_status1']);
             }
             if (isset($validated['rgd_status2'])) {
                 $warehousing_bonded->where('rgd_status2', '=', $validated['rgd_status2']);

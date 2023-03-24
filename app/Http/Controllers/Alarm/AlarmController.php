@@ -28,7 +28,8 @@ class AlarmController extends Controller
                 $alarm_no = Alarm::insertGetId([
                     'mb_no' => Auth::user()->mb_no,
                     'w_no' => $validated['w_no'], // FIXME hard set
-                    'alarm_content' => $validated['alarm_content']
+                    'alarm_content' => $validated['alarm_content'],
+                    'alarm_h_bl' => isset($validated['w_schedule_number']) ? $validated['w_schedule_number'] : $validated['alarm_h_bl'],
                 ]);
             } else {
                 // Update data
@@ -40,7 +41,8 @@ class AlarmController extends Controller
                 $update = [
                     'mb_no' => Auth::user()->mb_no,
                     'w_no' => $validated['w_no'],
-                    'alarm_content' => $validated['alarm_content']
+                    'alarm_content' => $validated['alarm_content'],
+                    'alarm_h_bl' => isset($validated['w_schedule_number']) ? $validated['w_schedule_number'] : $validated['alarm_h_bl'],
                 ];
                 $alarm->update($update);
             }
@@ -52,6 +54,7 @@ class AlarmController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0019], 500);
         }
     }
@@ -72,8 +75,16 @@ class AlarmController extends Controller
                 //     $q->where('co_no', $user->company->co_parent->co_no);
                 //     //->orWhere('co_no', $user->company->co_parent->co_parent->co_no);
                 // })
-                $alarm = Alarm::with('warehousing','member','export')->where(function($q) use($validated,$user) {
+                $alarm = Alarm::with('warehousing','member','export','import_expect','import')->where(function($q) use($validated,$user) {
                 $q->whereHas('export.import_expected.company.co_parent',function ($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->orwhereHas('export.import_expected.company.co_parent',function ($q) use ($user){
+                    $q->where('co_parent_no', $user->co_no);
+                })->orwhereHas('import_expect.company.co_parent',function ($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->orwhereHas('import_expect.company_spasys',function ($q) use ($user){
+                    $q->where('co_no', $user->co_no);
+                })->orwhereHas('import.import_expected.company.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->orwhereHas('warehousing.co_no.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
@@ -84,15 +95,19 @@ class AlarmController extends Controller
                 //     $q->where('co_no', $user->company->co_parent->co_no)
                 //     ->orWhere('co_no', $user->company->co_parent->co_parent->co_no);
                 // })
-                $alarm = Alarm::with('warehousing','member','export')->where(function($q) use($validated,$user) {
+                $alarm = Alarm::with('warehousing','member','export','import_expect','import')->where(function($q) use($validated,$user) {
                     $q->whereHas('export.import_expected.company',function ($q) use ($user){
+                        $q->where('co_no', $user->co_no);
+                    })->orwhereHas('import_expect.company',function ($q) use ($user){
+                        $q->where('co_no', $user->co_no);
+                    })->orwhereHas('import.import_expected.company',function ($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     })->orwhereHas('warehousing.co_no',function ($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     });})->orderBy('alarm_no', 'DESC');
                
             } else if ($user->mb_type == 'spasys'){
-                $alarm = Alarm::with('warehousing','member','export')->whereHas('member',function ($q) use ($user){
+                $alarm = Alarm::with('warehousing','member','export','import_expect','import')->whereHas('member',function ($q) use ($user){
                     $q->where('mb_no',$user->mb_no);
                 })->orderBy('alarm_no', 'DESC');
             }
@@ -214,7 +229,7 @@ class AlarmController extends Controller
                 $alarm = Alarm::with('warehousing','member','export')->where('alarm.mb_no','=',$user->mb_no)->orderBy('alarm_no', 'DESC');
                
             } else if ($user->mb_type == 'spasys'){
-                $alarm = Alarm::with('warehousing','member','export')->where('alarm.mb_no','=',$user->mb_no)->orderBy('alarm_no', 'DESC');
+                $alarm = Alarm::with('warehousing','member','export','import_expect','import')->where('alarm.mb_no','=',$user->mb_no)->orderBy('alarm_no', 'DESC');
             }
 
             
