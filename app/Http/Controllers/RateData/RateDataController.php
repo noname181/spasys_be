@@ -2704,7 +2704,7 @@ class RateDataController extends Controller
                 $final_rgd->rgd_tax_invoice_date = null;
                 $final_rgd->rgd_tax_invoice_number = null;
                 $final_rgd->rgd_calculate_deadline_yn = $request->rgd_calculate_deadline_yn ? $request->rgd_calculate_deadline_yn : $rgd->rgd_calculate_deadline_yn;
-                $final_rgd->rgd_settlement_number = $request->settlement_number ? $request->settlement_number : $rgd->rgd_settlement_number;
+                $final_rgd->rgd_settlement_number = $request->rgd_settlement_number ? $request->rgd_settlement_number : null;
                 $final_rgd->mb_no = Auth::user()->mb_no;
                 $final_rgd->save();
 
@@ -2712,22 +2712,22 @@ class RateDataController extends Controller
                     'rgd_no' => $final_rgd->rgd_no,
                 ]);
 
-                if ($request->bill_type == 'final') {
-                    $settlement_number = explode('_', $final_rgd->rgd_settlement_number);
-                    $settlement_number[2] = str_replace("C", "CF", $settlement_number[2]);
-                    $final_rgd->rgd_settlement_number = implode("_", $settlement_number);
-                    $final_rgd->save();
-                } else if ($request->bill_type == 'final_monthly') {
-                    $settlement_number = explode('_', $final_rgd->rgd_settlement_number);
-                    $settlement_number[2] = str_replace("M", "MF", $settlement_number[2]);
-                    $final_rgd->rgd_settlement_number = implode("_", $settlement_number);
-                    $final_rgd->save();
-                } else if ($request->bill_type == 'additional_monthly') {
-                    $settlement_number = explode('_', $final_rgd->rgd_settlement_number);
-                    $settlement_number[2] = str_replace("MF", "MA", $settlement_number[2]);
-                    $final_rgd->rgd_settlement_number = implode("_", $settlement_number);
-                    $final_rgd->save();
-                }
+                // if ($request->bill_type == 'final') {
+                //     $settlement_number = explode('_', $final_rgd->rgd_settlement_number);
+                //     $settlement_number[2] = str_replace("C", "CF", $settlement_number[2]);
+                //     $final_rgd->rgd_settlement_number = implode("_", $settlement_number);
+                //     $final_rgd->save();
+                // } else if ($request->bill_type == 'final_monthly') {
+                //     $settlement_number = explode('_', $final_rgd->rgd_settlement_number);
+                //     $settlement_number[2] = str_replace("M", "MF", $settlement_number[2]);
+                //     $final_rgd->rgd_settlement_number = implode("_", $settlement_number);
+                //     $final_rgd->save();
+                // } else if ($request->bill_type == 'additional_monthly') {
+                //     $settlement_number = explode('_', $final_rgd->rgd_settlement_number);
+                //     $settlement_number[2] = str_replace("MF", "MA", $settlement_number[2]);
+                //     $final_rgd->rgd_settlement_number = implode("_", $settlement_number);
+                //     $final_rgd->save();
+                // }
 
             } else {
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
