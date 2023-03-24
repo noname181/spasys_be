@@ -587,7 +587,7 @@ class BannerController extends Controller
             $warehousing_bonded = ReceivingGoodsDelivery::with(['rate_data_general']);
     
             $warehousing_distribution->whereHas('warehousing', function ($query) use ($user) {
-                $query->whereHas('co_no.co_parent', function ($q) use ($user) {
+                $query->whereHas('company.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
             })->whereHas('mb_no', function ($q) {
@@ -595,13 +595,13 @@ class BannerController extends Controller
             });
 
             $warehousing_fulfillment->whereHas('warehousing', function ($query) use ($user) {
-                $query->whereHas('co_no', function ($q) use ($user) {
+                $query->whereHas('company', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
             });
 
             $warehousing_bonded->whereHas('warehousing', function ($query) use ($user) {
-                $query->whereHas('co_no.co_parent', function ($q) use ($user) {
+                $query->whereHas('company.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
             })->whereHas('mb_no', function ($q) use ($user) {
@@ -698,7 +698,7 @@ class BannerController extends Controller
             $warehousing_bonded = ReceivingGoodsDelivery::with(['rate_data_general']);
     
             $warehousing_distribution->whereHas('warehousing', function ($query) use ($user) {
-                $query->whereHas('co_no', function ($q) use ($user) {
+                $query->whereHas('company', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
             })->whereHas('mb_no', function ($q) {
@@ -706,13 +706,13 @@ class BannerController extends Controller
             })->orderBy('created_at', 'DESC');
 
             $warehousing_fulfillment->whereHas('warehousing', function ($query) use ($user) {
-                $query->whereHas('co_no', function ($q) use ($user) {
+                $query->whereHas('company', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
             });
 
             $warehousing_bonded->whereHas('warehousing', function ($query) use ($user) {
-                $query->whereHas('co_no', function ($q) use ($user) {
+                $query->whereHas('company', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
             });
@@ -821,7 +821,13 @@ class BannerController extends Controller
                     ->orWhere('rgd_status4', '=', '확정청구서');
             })
         ->where('service_korean_name', '=', '유통가공')
-        ->whereNull('rgd_status6')
+        ->where(function ($q4){
+                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                            })
+                            ->where(function ($q4){
+                                $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                            })
+        ->where('rgd_status7', 'taxed')
         ->where('rgd_is_show', 'y');
 
         $warehousing_fulfillment->where(function ($q) {
@@ -829,7 +835,13 @@ class BannerController extends Controller
                     ->orWhere('rgd_status4', '=', '확정청구서');
             })
         ->where('service_korean_name', '=', '유통가공')
-        ->whereNull('rgd_status6')
+        ->where(function ($q4){
+                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                            })
+                            ->where(function ($q4){
+                                $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                            })
+        ->where('rgd_status7', 'taxed')
         ->where('rgd_is_show', 'y');
 
         $warehousing_bonded->where(function ($q) {
@@ -837,7 +849,13 @@ class BannerController extends Controller
                     ->orWhere('rgd_status4', '=', '확정청구서');
             })
         ->where('service_korean_name', '=', '유통가공')
-        ->whereNull('rgd_status6')
+        ->where(function ($q4){
+                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                            })
+                            ->where(function ($q4){
+                                $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                            })
+        ->where('rgd_status7', 'taxed')
         ->where('rgd_is_show', 'y');
 
         $warehousingh = $warehousing_distribution->union($warehousing_fulfillment)->union($warehousing_bonded);
@@ -1220,7 +1238,13 @@ class BannerController extends Controller
                     ->orWhere('rgd_status4', '=', '확정청구서');
             })
         ->where('service_korean_name', '=', '수입풀필먼트')
-        ->whereNull('rgd_status6')
+        ->where(function ($q4){
+                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                            })
+                            ->where(function ($q4){
+                                $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                            })
+        ->where('rgd_status7', 'taxed')
         ->where('rgd_is_show', 'y');
 
         $warehousing_fulfillment->where(function ($q) {
@@ -1228,7 +1252,13 @@ class BannerController extends Controller
                     ->orWhere('rgd_status4', '=', '확정청구서');
             })
         ->where('service_korean_name', '=', '수입풀필먼트')
-        ->whereNull('rgd_status6')
+        ->where(function ($q4){
+                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                            })
+                            ->where(function ($q4){
+                                $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                            })
+        ->where('rgd_status7', 'taxed')
         ->where('rgd_is_show', 'y');
 
         $warehousing_bonded->where(function ($q) {
@@ -1236,7 +1266,13 @@ class BannerController extends Controller
                     ->orWhere('rgd_status4', '=', '확정청구서');
             })
         ->where('service_korean_name', '=', '수입풀필먼트')
-        ->whereNull('rgd_status6')
+        ->where(function ($q4){
+                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                            })
+                            ->where(function ($q4){
+                                $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                            })
+        ->where('rgd_status7', 'taxed')
         ->where('rgd_is_show', 'y');
 
         $warehousinge = $warehousing_distribution->union($warehousing_fulfillment)->union($warehousing_bonded);
@@ -1643,7 +1679,13 @@ class BannerController extends Controller
                     ->orWhere('rgd_status4', '=', '확정청구서');
             })
         ->where('service_korean_name', '=', '보세화물')
-        ->whereNull('rgd_status6')
+        ->where(function ($q4){
+                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                            })
+                            ->where(function ($q4){
+                                $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                            })
+        ->where('rgd_status7', 'taxed')
         ->where('rgd_is_show', 'y');
 
         $warehousing_fulfillment->where(function ($q) {
@@ -1651,7 +1693,13 @@ class BannerController extends Controller
                     ->orWhere('rgd_status4', '=', '확정청구서');
             })
         ->where('service_korean_name', '=', '보세화물')
-        ->whereNull('rgd_status6')
+        ->where(function ($q4){
+                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                            })
+                            ->where(function ($q4){
+                                $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                            })
+        ->where('rgd_status7', 'taxed')
         ->where('rgd_is_show', 'y');
 
         $warehousing_bonded->where(function ($q) {
@@ -1659,7 +1707,13 @@ class BannerController extends Controller
                     ->orWhere('rgd_status4', '=', '확정청구서');
             })
         ->where('service_korean_name', '=', '보세화물')
-        ->whereNull('rgd_status6')
+        ->where(function ($q4){
+                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                            })
+                            ->where(function ($q4){
+                                $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                            })
+        ->where('rgd_status7', 'taxed')
         ->where('rgd_is_show', 'y');
 
         $warehousingg = $warehousing_distribution->union($warehousing_fulfillment)->union($warehousing_bonded);
@@ -1969,7 +2023,7 @@ class BannerController extends Controller
         if ($user->mb_type == 'shop') {
 
             $warehousing_distribution->whereHas('warehousing', function ($query) use ($user) {
-                $query->whereHas('co_no.co_parent', function ($q) use ($user) {
+                $query->whereHas('company.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
             })->whereHas('mb_no', function ($q) {
@@ -1977,13 +2031,13 @@ class BannerController extends Controller
             });
 
             $warehousing_fulfillment->whereHas('warehousing', function ($query) use ($user) {
-                $query->whereHas('co_no', function ($q) use ($user) {
+                $query->whereHas('company', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
             });
 
             $warehousing_bonded->whereHas('warehousing', function ($query) use ($user) {
-                $query->whereHas('co_no.co_parent', function ($q) use ($user) {
+                $query->whereHas('company.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
             })->whereHas('mb_no', function ($q) use ($user) {
@@ -1993,7 +2047,7 @@ class BannerController extends Controller
         } else if ($user->mb_type == 'shipper') {
 
             $warehousing_distribution->whereHas('warehousing', function ($query) use ($user) {
-                $query->whereHas('co_no', function ($q) use ($user) {
+                $query->whereHas('company', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
             })->whereHas('mb_no', function ($q) {
@@ -2001,13 +2055,13 @@ class BannerController extends Controller
             })->orderBy('created_at', 'DESC');
 
             $warehousing_fulfillment->whereHas('warehousing', function ($query) use ($user) {
-                $query->whereHas('co_no', function ($q) use ($user) {
+                $query->whereHas('company', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
             });
 
             $warehousing_bonded->whereHas('warehousing', function ($query) use ($user) {
-                $query->whereHas('co_no', function ($q) use ($user) {
+                $query->whereHas('company', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
             });
@@ -2027,7 +2081,13 @@ class BannerController extends Controller
             ->whereHas('warehousing', function ($query) {
                 $query->where('w_category_name', '=', '보세화물');
             })
-            ->whereNull('rgd_status6')
+            ->where(function ($q4){
+                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                            })
+                            ->where(function ($q4){
+                                $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                            })
+            ->where('rgd_status7', 'taxed')
             ->where('rgd_is_show', 'y');
 
             $warehousing_fulfillment->where(function ($q) {
@@ -2037,7 +2097,13 @@ class BannerController extends Controller
             ->whereHas('warehousing', function ($query) {
                 $query->where('w_category_name', '=', '보세화물');
             })
-            ->whereNull('rgd_status6')
+            ->where(function ($q4){
+                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                            })
+                            ->where(function ($q4){
+                                $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                            })
+            ->where('rgd_status7', 'taxed')
             ->where('rgd_is_show', 'y');
 
             $warehousing_bonded->where(function ($q) {
@@ -2047,7 +2113,13 @@ class BannerController extends Controller
             ->whereHas('warehousing', function ($query) {
                 $query->where('w_category_name', '=', '보세화물');
             })
-            ->whereNull('rgd_status6')
+            ->where(function ($q4){
+                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                            })
+                            ->where(function ($q4){
+                                $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                            })
+            ->where('rgd_status7', 'taxed')
             ->where('rgd_is_show', 'y');
 
         } else if ($request->serviceinvoicechart == "수입풀필먼트" || $request->service == "수입풀필먼트") {
@@ -2059,7 +2131,13 @@ class BannerController extends Controller
             ->whereHas('warehousing', function ($query) {
                 $query->where('w_category_name', '=', '수입풀필먼트');
             })
-            ->whereNull('rgd_status6')
+            ->where(function ($q4){
+                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                            })
+                            ->where(function ($q4){
+                                $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                            })
+            ->where('rgd_status7', 'taxed')
             ->where('rgd_is_show', 'y');
 
             $warehousing_fulfillment->where(function ($q) {
@@ -2069,7 +2147,13 @@ class BannerController extends Controller
             ->whereHas('warehousing', function ($query) {
                 $query->where('w_category_name', '=', '수입풀필먼트');
             })
-            ->whereNull('rgd_status6')
+            ->where(function ($q4){
+                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                            })
+                            ->where(function ($q4){
+                                $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                            })
+            ->where('rgd_status7', 'taxed')
             ->where('rgd_is_show', 'y');
 
             $warehousing_bonded->where(function ($q) {
@@ -2079,7 +2163,13 @@ class BannerController extends Controller
             ->whereHas('warehousing', function ($query) {
                 $query->where('w_category_name', '=', '수입풀필먼트');
             })
-            ->whereNull('rgd_status6')
+            ->where(function ($q4){
+                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                            })
+                            ->where(function ($q4){
+                                $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                            })
+            ->where('rgd_status7', 'taxed')
             ->where('rgd_is_show', 'y');
          
         } else if ($request->serviceinvoicechart == "유통가공" || $request->service == "유통가공") {
@@ -2091,7 +2181,13 @@ class BannerController extends Controller
             ->whereHas('warehousing', function ($query) {
                 $query->where('w_category_name', '=', '유통가공');
             })
-            ->whereNull('rgd_status6')
+            ->where(function ($q4){
+                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                            })
+                            ->where(function ($q4){
+                                $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                            })
+            ->where('rgd_status7', 'taxed')
             ->where('rgd_is_show', 'y');
 
             $warehousing_fulfillment->where(function ($q) {
@@ -2101,7 +2197,13 @@ class BannerController extends Controller
             ->whereHas('warehousing', function ($query) {
                 $query->where('w_category_name', '=', '유통가공');
             })
-            ->whereNull('rgd_status6')
+            ->where(function ($q4){
+                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                            })
+                            ->where(function ($q4){
+                                $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                            })
+            ->where('rgd_status7', 'taxed')
             ->where('rgd_is_show', 'y');
 
             $warehousing_bonded->where(function ($q) {
@@ -2111,7 +2213,13 @@ class BannerController extends Controller
             ->whereHas('warehousing', function ($query) {
                 $query->where('w_category_name', '=', '유통가공');
             })
-            ->whereNull('rgd_status6')
+            ->where(function ($q4){
+                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                            })
+                            ->where(function ($q4){
+                                $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                            })
+            ->where('rgd_status7', 'taxed')
             ->where('rgd_is_show', 'y');
            
         } else {
@@ -2123,7 +2231,13 @@ class BannerController extends Controller
             ->whereHas('warehousing', function ($query) {
                 $query->where('w_category_name', '=', '보세화물');
             })
-            ->whereNull('rgd_status6')
+            ->where(function ($q4){
+                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                            })
+                            ->where(function ($q4){
+                                $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                            })
+            ->where('rgd_status7', 'taxed')
             ->where('rgd_is_show', 'y');
 
             $warehousing_fulfillment->where(function ($q) {
@@ -2133,7 +2247,13 @@ class BannerController extends Controller
             ->whereHas('warehousing', function ($query) {
                 $query->where('w_category_name', '=', '보세화물');
             })
-            ->whereNull('rgd_status6')
+            ->where(function ($q4){
+                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                            })
+                            ->where(function ($q4){
+                                $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                            })
+            ->where('rgd_status7', 'taxed')
             ->where('rgd_is_show', 'y');
 
             $warehousing_bonded->where(function ($q) {
@@ -2143,7 +2263,13 @@ class BannerController extends Controller
             ->whereHas('warehousing', function ($query) {
                 $query->where('w_category_name', '=', '보세화물');
             })
-            ->whereNull('rgd_status6')
+            ->where(function ($q4){
+                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                            })
+                            ->where(function ($q4){
+                                $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                            })
+            ->where('rgd_status7', 'taxed')
             ->where('rgd_is_show', 'y');
           
         }
