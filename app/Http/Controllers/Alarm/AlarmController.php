@@ -134,48 +134,67 @@ class AlarmController extends Controller
                 $alarm->where(function($q) use($validated,$user) {
                     $q->whereHas('export.import_expected.company.co_parent',function ($query) use ($validated){
                         $query->where(DB::raw('lower(co_name)'), 'like','%'. strtolower($validated['co_parent_name']) .'%');
+                    })->orwhereHas('import_expect.company.co_parent', function($q3) use($validated) {
+                        return $q3->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                    })->orwhereHas('import_expect.company_spasys', function($q4) use($validated) {
+                        return $q4->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
                     })->orwhereHas('warehousing.co_no.co_parent',function($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like','%'. strtolower($validated['co_parent_name']) .'%');
-                });
-                });
+                });});
             }
-            // if (isset($validated['co_name'])) {
-            //     $alarm->whereHas('member.company', function ($q) use ($validated) {
-            //         return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
-            //     });
-            // }
             if (isset($validated['co_name'])) {
                 $alarm->where(function($q) use($validated,$user) {
-                $q->whereHas('warehousing.co_no', function($q) use($validated) {
-                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
-                })->orwhereHas('export.import_expected.company',function ($q) use ($user,$validated){
-                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
-                }); });
+                    $q->whereHas('warehousing.co_no', function($q) use($validated) {
+                        return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    })->orwhereHas('import_expect.company', function($q3) use($validated) {
+                        return $q3->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    })->orwhereHas('import_expect.company_spasys', function($q4) use($validated) {
+                        return $q4->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    })->orwhereHas('export.import_expected.company',function ($q) use ($validated,$user){
+                        return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    }); });
             }
             if (isset($validated['service'])) {
                 if($validated['service'] == '보세화물'){
                     $alarm->where(function($q) use($validated) {
-                        $q->whereHas('warehousing', function ($q) use ($validated) {
-                            return $q->where(DB::raw('lower(w_category_name)'), 'like', '%' . strtolower($validated['service']) . '%');
-                        })->orwhereHas('export.import_expected', function($q3) use($validated) {
+                        $q->whereHas('warehousing', function($q2) use($validated) {
+                            return $q2->where('w_category_name', '=', $validated['service']);
+                        })->orwhereHas('import_expect', function($q3) use($validated) {
                             return $q3->where('tie_h_bl', '!=', '')->orWhereNotNull('tie_h_bl');
                         });
                     });
                 } else {
                     $alarm->where(function($q) use($validated) {
-                        $q->whereHas('warehousing', function ($q) use ($validated) {
-                            return $q->where(DB::raw('lower(w_category_name)'), 'like', '%' . strtolower($validated['service']) . '%');
+                        $q->whereHas('warehousing', function($q2) use($validated) {
+                            return $q2->where('w_category_name', '=', $validated['service']);
                         });
                     });
                 }
+                // if($validated['service'] == '보세화물'){
+                //     $alarm->where(function($q) use($validated) {
+                //         $q->whereHas('warehousing', function ($q) use ($validated) {
+                //             return $q->where(DB::raw('lower(w_category_name)'), 'like', '%' . strtolower($validated['service']) . '%');
+                //         })->orwhereHas('export.import_expected', function($q3) use($validated) {
+                //             return $q3->where('tie_h_bl', '!=', '')->orWhereNotNull('tie_h_bl');
+                //         });
+                //     });
+                // } else {
+                //     $alarm->where(function($q) use($validated) {
+                //         $q->whereHas('warehousing', function ($q) use ($validated) {
+                //             return $q->where(DB::raw('lower(w_category_name)'), 'like', '%' . strtolower($validated['service']) . '%');
+                //         });
+                //     });
+                // }
             }
             if (isset($validated['w_schedule_number'])) {
                 $alarm->where(function($q) use($validated) {
+                    
                     $q->whereHas('warehousing', function($q) use($validated) {
                         return $q->where(DB::raw('lower(w_schedule_number)'), 'like', '%' . strtolower($validated['w_schedule_number']) . '%')->orWhere(DB::raw('lower(w_schedule_number2)'), 'like', '%' . strtolower($validated['w_schedule_number']) . '%');
-                    })->orWhereHas('export.import_expected', function ($q2) use ($validated){
+                    })->orWhereHas('import_expect', function ($q2) use ($validated){
                         $q2->where('tie_h_bl', 'like', '%' . $validated['w_schedule_number'] . '%');
                     });
+                
                 });
             }
             if (isset($validated['service_name'])) {
@@ -254,6 +273,10 @@ class AlarmController extends Controller
                 $alarm->where(function($q) use($validated,$user) {
                     $q->whereHas('export.import_expected.company.co_parent',function ($query) use ($validated){
                         $query->where(DB::raw('lower(co_name)'), 'like','%'. strtolower($validated['co_parent_name']) .'%');
+                    })->orwhereHas('import_expect.company.co_parent', function($q3) use($validated) {
+                        return $q3->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                    })->orwhereHas('import_expect.company_spasys', function($q4) use($validated) {
+                        return $q4->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
                     })->orwhereHas('warehousing.co_no.co_parent',function($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like','%'. strtolower($validated['co_parent_name']) .'%');
                 });});
@@ -262,6 +285,10 @@ class AlarmController extends Controller
                 $alarm->where(function($q) use($validated,$user) {
                     $q->whereHas('warehousing.co_no', function($q) use($validated) {
                         return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    })->orwhereHas('import_expect.company', function($q3) use($validated) {
+                        return $q3->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    })->orwhereHas('import_expect.company_spasys', function($q4) use($validated) {
+                        return $q4->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
                     })->orwhereHas('export.import_expected.company',function ($q) use ($validated,$user){
                         return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
                     }); });
@@ -269,27 +296,44 @@ class AlarmController extends Controller
             if (isset($validated['service'])) {
                 if($validated['service'] == '보세화물'){
                     $alarm->where(function($q) use($validated) {
-                        $q->whereHas('warehousing', function ($q) use ($validated) {
-                            return $q->where(DB::raw('lower(w_category_name)'), 'like', '%' . strtolower($validated['service']) . '%');
-                        })->orwhereHas('export.import_expected', function($q3) use($validated) {
+                        $q->whereHas('warehousing', function($q2) use($validated) {
+                            return $q2->where('w_category_name', '=', $validated['service']);
+                        })->orwhereHas('import_expect', function($q3) use($validated) {
                             return $q3->where('tie_h_bl', '!=', '')->orWhereNotNull('tie_h_bl');
                         });
                     });
                 } else {
                     $alarm->where(function($q) use($validated) {
-                        $q->whereHas('warehousing', function ($q) use ($validated) {
-                            return $q->where(DB::raw('lower(w_category_name)'), 'like', '%' . strtolower($validated['service']) . '%');
+                        $q->whereHas('warehousing', function($q2) use($validated) {
+                            return $q2->where('w_category_name', '=', $validated['service']);
                         });
                     });
                 }
+                // if($validated['service'] == '보세화물'){
+                //     $alarm->where(function($q) use($validated) {
+                //         $q->whereHas('warehousing', function ($q) use ($validated) {
+                //             return $q->where(DB::raw('lower(w_category_name)'), 'like', '%' . strtolower($validated['service']) . '%');
+                //         })->orwhereHas('export.import_expected', function($q3) use($validated) {
+                //             return $q3->where('tie_h_bl', '!=', '')->orWhereNotNull('tie_h_bl');
+                //         });
+                //     });
+                // } else {
+                //     $alarm->where(function($q) use($validated) {
+                //         $q->whereHas('warehousing', function ($q) use ($validated) {
+                //             return $q->where(DB::raw('lower(w_category_name)'), 'like', '%' . strtolower($validated['service']) . '%');
+                //         });
+                //     });
+                // }
             }
             if (isset($validated['w_schedule_number'])) {
                 $alarm->where(function($q) use($validated) {
+                    
                     $q->whereHas('warehousing', function($q) use($validated) {
                         return $q->where(DB::raw('lower(w_schedule_number)'), 'like', '%' . strtolower($validated['w_schedule_number']) . '%')->orWhere(DB::raw('lower(w_schedule_number2)'), 'like', '%' . strtolower($validated['w_schedule_number']) . '%');
-                    })->orWhereHas('export.import_expected', function ($q2) use ($validated){
+                    })->orWhereHas('import_expect', function ($q2) use ($validated){
                         $q2->where('tie_h_bl', 'like', '%' . $validated['w_schedule_number'] . '%');
                     });
+                
                 });
             }
             if (isset($validated['service_name'])) {
