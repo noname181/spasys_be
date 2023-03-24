@@ -941,12 +941,12 @@ class BannerController extends Controller
         for ($i = 1; $i <= 6; $i++) {
             $countchartb = $warehousingchartb->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereDate('warehousing.w_completed_day', '>', now()->subYear())->get()->groupBy(function ($date) {
                 //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
-                return Carbon::parse($date->created_at)->format('m'); // grouping by months
+                return Carbon::parse($date->warehousing->w_completed_day)->format('m'); // grouping by months
             });
 
             $countchartd = $warehousingchartd->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereDate('warehousing.w_completed_day', '>', now()->subYear())->get()->groupBy(function ($date) {
                 //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
-                return Carbon::parse($date->created_at)->format('m'); // grouping by months
+                return Carbon::parse($date->warehousing->w_completed_day)->format('m'); // grouping by months
             });
 
             // $countg = $warehousingg->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereYear('warehousing.w_completed_day', Carbon::now()->year)->get()->groupBy(function ($date) {
@@ -1008,7 +1008,7 @@ class BannerController extends Controller
         }
 
         return [
-            'countcharta' => $userArrb, 'countchartb' => $userArrd, 'warehousingh' => $warehousingh->get(),
+            'countcharta' => $userArrb, 'countchartb' => $userArrd, 'countchartb_v' => $countchartb,'dddd'=>now()->subYear(),
             'warehousingb' => $warehousingd, 'a' => $a, 'b' => $b, 'c' => $c, 'd' => $d, 'e' => $e, 'f' => $f, 'h' => $h, 'g' => $g,
             'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'countf' => $countf, 'countg' => $countg, 'counth' => $counth, 'counth_2' => $counth_2
 
@@ -1887,12 +1887,12 @@ class BannerController extends Controller
             for ($i = 1; $i <= 6; $i++) {
                 $countchartb = $warehousingb->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereDate('warehousing.w_completed_day', '>', now()->subYear())->get()->groupBy(function ($date) {
                     //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
-                    return Carbon::parse($date->created_at)->format('m'); // grouping by months
+                    return Carbon::parse($date->warehousing->w_completed_day)->format('m'); // grouping by months
                 });
 
                 $countchartd = $warehousingd->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereDate('warehousing.w_completed_day', '>', now()->subYear())->get()->groupBy(function ($date) {
                     //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
-                    return Carbon::parse($date->created_at)->format('m'); // grouping by months
+                    return Carbon::parse($date->warehousing->w_completed_day)->format('m'); // grouping by months
                 });
             }
         }
@@ -2382,7 +2382,8 @@ class BannerController extends Controller
                 'total3' => $total3,
                 'charttotal1' => $charttotal1,
                 'totalinvoice' => $totalinvoice,
-                'chartinvoice' => $chartinvoice
+                'chartinvoice' => $chartinvoice,
+                'totala3' => isset($totala3) ? $totala3 : ''
             ]);
         } catch (\Exception $e) {
             Log::error($e);
@@ -2890,12 +2891,12 @@ class BannerController extends Controller
         for ($i = 1; $i <= 12; $i++) {
             $countb = $warehousingb->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereYear('warehousing.w_completed_day', Carbon::now()->year)->get()->groupBy(function ($date) {
                 //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
-                return Carbon::parse($date->created_at)->format('m'); // grouping by months
+                return Carbon::parse($date->warehousing->w_completed_day)->format('m'); // grouping by months
             });
 
             $countd = $warehousingd->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereYear('warehousing.w_completed_day', Carbon::now()->year)->get()->groupBy(function ($date) {
                 //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
-                return Carbon::parse($date->created_at)->format('m'); // grouping by months
+                return Carbon::parse($date->warehousing->w_completed_day)->format('m'); // grouping by months
             });
 
             // $countg = $warehousingg->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereYear('warehousing.w_completed_day', Carbon::now()->year)->get()->groupBy(function ($date) {
