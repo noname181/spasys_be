@@ -342,6 +342,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 // $sql_r = ReceivingGoodsDelivery::where('w_no', '=', $validated['w_no'])->first();
 
                 // if ($sql_r->rgd_status1 != "입고" && $sql_r->rgd_status2 != "작업완료") {
+                if (isset($validated['items'])) {
                 foreach ($validated['items'] as $warehousing_item) {
 
 
@@ -396,6 +397,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             }
                         }
                     }
+                }
                 }
                 //}
             } else {
