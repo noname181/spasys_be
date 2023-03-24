@@ -32,6 +32,17 @@ class AlarmRequest extends BaseFormRequest
                 'string',
                 'max:255',
             ],
+            'w_schedule_number' => [
+                'nullable',
+                'string',
+                'max:255',
+            ], 
+            'alarm_h_bl' => [
+                'nullable',
+                'string',
+                'max:255',
+            ] 
+
         ];
     }
 

@@ -9,6 +9,8 @@ use App\Models\Warehousing;
 use App\Models\WarehousingItem;
 use App\Models\Member;
 use App\Models\Export;
+use App\Models\ImportExpected;
+use App\Models\Import;
 
 class Alarm extends Model
 {
@@ -36,6 +38,7 @@ class Alarm extends Model
         'mb_no',
         'w_no',
         'alarm_content',
+        'alarm_h_bl',
     ];
     // public function item()
     // {
@@ -49,8 +52,21 @@ class Alarm extends Model
     {
         return $this->hasOne(Member::class, 'mb_no', 'mb_no');;
     }
+    // public function export()
+    // {
+    //     return $this->belongsTo(Export::class, 'w_no', 'te_carry_out_number')->with(['import_expected']);
+    // }
     public function export()
     {
-        return $this->belongsTo(Export::class, 'w_no', 'te_carry_out_number')->with(['import_expected']);
+        //$this->belongsTo(Export::class, 'rp_h_bl', 'te_h_bl')->with(['import_expected']);
+        return $this->belongsTo(Export::class, 'alarm_h_bl', 'te_h_bl')->with(['import_expected']);
+    }
+    public function import()
+    {
+        return $this->belongsTo(Import::class, 'alarm_h_bl', 'ti_h_bl')->with(['import_expected']);
+    }
+    public function import_expect()
+    {
+        return $this->belongsTo(ImportExpected::class, 'alarm_h_bl', 'tie_h_bl')->with(['company','company_spasys']);
     }
 }
