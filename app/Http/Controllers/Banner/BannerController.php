@@ -2392,6 +2392,204 @@ class BannerController extends Controller
         }
     }
 
+    public function banner_count1(Request $request)
+    {
+        //return "dsada";
+        try {
+
+            //DB::enableQueryLog();
+            $total1 = [];
+            $total2 = [];
+            $total3 = [];
+            $totalinvoice = [];
+
+            $charttotal1 = [];
+            $chartinvoice = [];
+            // $charttotal2 = [];
+            // $charttotal3 = [];
+
+            $check = "";
+           if ($request->service == "보세화물" || $request->type == "time1") {
+                $total1 =  $this->CaculateService1($request);
+                $charttotal1[] = $total1['countcharta'];
+                $charttotal1[] = $total1['countchartb'];
+                $totalinvoice =  $this->CaculateInvoice($request);
+                $chartinvoice[] = $totalinvoice['userArrd'];
+            } elseif (isset($request->servicechart) && ($request->co_no != "전체" && $request->co_no != "")) {
+                $totala1 =  $this->CaculateService1Shop($request); //chart1
+                $charttotal1[] = $totala1['countcharta'];
+                $charttotal1[] = $totala1['countchartb'];
+            } elseif (isset($request->servicechart) && ($request->co_no == "전체" || $request->co_no == "")) {
+                //chart1
+                if ($request->servicechart == "보세화물") {
+                    $totala1 =  $this->CaculateService1($request);
+                    $charttotal1[] = $totala1['countcharta'];
+                    $charttotal1[] = $totala1['countchartb'];
+                }
+            } elseif (isset($request->serviceinvoicechart) && ($request->co_no != "전체" && $request->co_no != "")) {
+                //chart2
+                $totalinvoice =  $this->CaculateInvoice($request);
+                $chartinvoice[] = $totalinvoice['userArrd'];
+            } elseif (isset($request->serviceinvoicechart) && ($request->co_no == "전체" || $request->co_no == "")) {
+                //chart2
+                $totalinvoice =  $this->CaculateInvoice($request);
+                $chartinvoice[] = $totalinvoice['userArrd'];
+            } else {
+                $totalinvoice = $this->CaculateInvoice($request);
+                $chartinvoice[] = $totalinvoice['userArrd'];
+                $total1 =  $this->CaculateService1($request);
+                $charttotal1[] = $total1['countcharta'];
+                $charttotal1[] = $total1['countchartb'];
+            }
+
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'check' => $check,
+                'total1' => $total1,
+                'total2' => $total2,
+                'total3' => $total3,
+                'charttotal1' => $charttotal1,
+                'totalinvoice' => $totalinvoice,
+                'chartinvoice' => $chartinvoice,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function banner_count2(Request $request)
+    {
+        //return "dsada";
+        try {
+
+            //DB::enableQueryLog();
+            $total1 = [];
+            $total2 = [];
+            $total3 = [];
+            $totalinvoice = [];
+
+            $charttotal1 = [];
+            $chartinvoice = [];
+            // $charttotal2 = [];
+            // $charttotal3 = [];
+
+            $check = "";
+           if ($request->service == "수입풀필먼트" || $request->type == "time2") {
+                $total2 =  $this->CaculateService2($request);
+                $charttotal1[] = $total2['countcharta'];
+                $charttotal1[] = $total2['countchartb'];
+                $totalinvoice =  $this->CaculateInvoice($request);
+                $chartinvoice[] = $totalinvoice['userArrd'];
+            } elseif (isset($request->servicechart) && ($request->co_no != "전체" && $request->co_no != "")) {
+                $totala1 =  $this->CaculateService1Shop($request); //chart1
+                $charttotal1[] = $totala1['countcharta'];
+                $charttotal1[] = $totala1['countchartb'];
+            } elseif (isset($request->servicechart) && ($request->co_no == "전체" || $request->co_no == "")) {
+                //chart1
+               if ($request->servicechart == "수입풀필먼트") {
+                    $totala2 =  $this->CaculateService2($request);
+                    $charttotal1[] = $totala2['countcharta'];
+                    $charttotal1[] = $totala2['countchartb'];
+                }
+            } elseif (isset($request->serviceinvoicechart) && ($request->co_no != "전체" && $request->co_no != "")) {
+                //chart2
+                $totalinvoice =  $this->CaculateInvoice($request);
+                $chartinvoice[] = $totalinvoice['userArrd'];
+            } elseif (isset($request->serviceinvoicechart) && ($request->co_no == "전체" || $request->co_no == "")) {
+                //chart2
+                $totalinvoice =  $this->CaculateInvoice($request);
+                $chartinvoice[] = $totalinvoice['userArrd'];
+            } else {
+                $totalinvoice = $this->CaculateInvoice($request);
+                $chartinvoice[] = $totalinvoice['userArrd'];
+                $total2 =  $this->CaculateService2($request);
+            }
+
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'check' => $check,
+                'total1' => $total1,
+                'total2' => $total2,
+                'total3' => $total3,
+                'charttotal1' => $charttotal1,
+                'totalinvoice' => $totalinvoice,
+                'chartinvoice' => $chartinvoice,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function banner_count3(Request $request)
+    {
+        //return "dsada";
+        try {
+
+            //DB::enableQueryLog();
+            $total1 = [];
+            $total2 = [];
+            $total3 = [];
+            $totalinvoice = [];
+
+            $charttotal1 = [];
+            $chartinvoice = [];
+            // $charttotal2 = [];
+            // $charttotal3 = [];
+
+            $check = "";
+            if ($request->service == "유통가공" || $request->type == "time3") {
+                $total3 =  $this->CaculateService3($request);
+                $charttotal1[] = $total3['countcharta'];
+                $charttotal1[] = $total3['countchartb'];
+                $totalinvoice =  $this->CaculateInvoice($request);
+                $chartinvoice[] = $totalinvoice['userArrd'];
+            } elseif (isset($request->servicechart) && ($request->co_no != "전체" && $request->co_no != "")) {
+                $totala1 =  $this->CaculateService1Shop($request); //chart1
+                $charttotal1[] = $totala1['countcharta'];
+                $charttotal1[] = $totala1['countchartb'];
+            } elseif (isset($request->servicechart) && ($request->co_no == "전체" || $request->co_no == "")) {
+                //chart1
+                if ($request->servicechart == "유통가공") {
+                    $totala3 =  $this->CaculateService3($request);
+                    $charttotal1[] = $totala3['countcharta'];
+                    $charttotal1[] = $totala3['countchartb'];
+                }
+
+            } elseif (isset($request->serviceinvoicechart) && ($request->co_no != "전체" && $request->co_no != "")) {
+                //chart2
+                $totalinvoice =  $this->CaculateInvoice($request);
+                $chartinvoice[] = $totalinvoice['userArrd'];
+            } elseif (isset($request->serviceinvoicechart) && ($request->co_no == "전체" || $request->co_no == "")) {
+                //chart2
+                $totalinvoice =  $this->CaculateInvoice($request);
+                $chartinvoice[] = $totalinvoice['userArrd'];
+            } else {
+                $totalinvoice = $this->CaculateInvoice($request);
+                $chartinvoice[] = $totalinvoice['userArrd'];
+                $total3 =  $this->CaculateService3($request);   
+            }
+
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'check' => $check,
+                'total1' => $total1,
+                'total2' => $total2,
+                'total3' => $total3,
+                'charttotal1' => $charttotal1,
+                'totalinvoice' => $totalinvoice,
+                'chartinvoice' => $chartinvoice,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
     public function banner_count_invoice(Request $request)
     {
 
