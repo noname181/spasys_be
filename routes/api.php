@@ -140,6 +140,9 @@ Route::middleware('auth')->group(function () {
         Route::patch('{banner}', [App\Http\Controllers\Banner\BannerController::class, 'update'])->name('update_banner');
         Route::post('/get_banners', [App\Http\Controllers\Banner\BannerController::class, 'getBanner'])->name('get_banners');
         Route::post('/banner_count', [App\Http\Controllers\Banner\BannerController::class, 'banner_count'])->name('banner_count');
+        Route::post('/banner_count1', [App\Http\Controllers\Banner\BannerController::class, 'banner_count1'])->name('banner_count1');
+        Route::post('/banner_count2', [App\Http\Controllers\Banner\BannerController::class, 'banner_count2'])->name('banner_count2');
+        Route::post('/banner_count3', [App\Http\Controllers\Banner\BannerController::class, 'banner_count3'])->name('banner_count3');
         Route::post('/banner_load2', [App\Http\Controllers\Banner\BannerController::class, 'banner_load2'])->name('banner_load2');
         Route::post('/banner_loadchart', [App\Http\Controllers\Banner\BannerController::class, 'banner_loadchart'])->name('banner_loadchart');
     });
