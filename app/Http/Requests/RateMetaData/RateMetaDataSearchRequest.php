@@ -52,6 +52,11 @@ class RateMetaDataSearchRequest extends BaseFormRequest
                 'string',
                 'max:255'
             ],
+            'co_name_2' => [
+                'nullable',
+                'string',
+                'max:255'
+            ],
             'co_parent_name' => [
                 'nullable',
                 'string',
