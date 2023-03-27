@@ -4039,7 +4039,9 @@ class WarehousingController extends Controller
                 
             }
             if (isset($validated['rgd_status6'])) {
-                if ($validated['rgd_status6'] == 'paid') {
+                if ($validated['rgd_status6'] == 'cancel') {
+                    $warehousing->where('rgd_status6', '=','cancel');
+                } else if ($validated['rgd_status6'] == 'paid') {
                     $warehousing->where('rgd_status6', '=','paid');
                 } else if($validated['rgd_status6'] == '진행중'){
                     $warehousing->where(function($q){
@@ -4105,10 +4107,10 @@ class WarehousingController extends Controller
             }
             if (isset($validated['rgd_status7'])) {
                 if ($validated['rgd_status7'] == '정산완료') {
-                    $warehousing->where('rgd_status7', '=', 'taxed');
+                    $warehousing->where('rgd_status7', '=', 'taxed')->where('rgd_status6', '=', 'paid');
                 } else if ($validated['rgd_status7'] == '진행중') {
-                    $warehousing->where(function ($q){
-                        $q->where('rgd_status7', '!=', 'taxed')->orWhereNull('rgd_status7');
+                    $warehousing->where(function($q) use ($validated){
+                        $q->whereNull('rgd_status7');
                     });
                 }
             }
@@ -4225,7 +4227,9 @@ class WarehousingController extends Controller
                 }
             }
             if (isset($validated['rgd_status6'])) {
-                if ($validated['rgd_status6'] == 'paid') {
+                if ($validated['rgd_status6'] == 'cancel') {
+                    $warehousing_fulfillment->where('rgd_status6', '=','cancel');
+                } else if ($validated['rgd_status6'] == 'paid') {
                     $warehousing_fulfillment->where('rgd_status6', '=','paid');
                 } else if($validated['rgd_status6'] == '진행중'){
                     $warehousing_fulfillment->where(function($q){
@@ -4291,10 +4295,10 @@ class WarehousingController extends Controller
             }
             if (isset($validated['rgd_status7'])) {
                 if ($validated['rgd_status7'] == '정산완료') {
-                    $warehousing_fulfillment->where('rgd_status7', '=', 'taxed');
+                    $warehousing_fulfillment->where('rgd_status7', '=', 'taxed')->where('rgd_status6', '=', 'paid');
                 } else if ($validated['rgd_status7'] == '진행중') {
-                    $warehousing_fulfillment->where(function ($q){
-                        $q->where('rgd_status7', '!=', 'taxed')->orWhereNull('rgd_status7');
+                    $warehousing_fulfillment->where(function($q) use ($validated){
+                        $q->whereNull('rgd_status7');
                     });
                 }
             }
@@ -4442,7 +4446,9 @@ class WarehousingController extends Controller
                 }
             }
             if (isset($validated['rgd_status6'])) {
-                if ($validated['rgd_status6'] == 'paid') {
+                if ($validated['rgd_status6'] == 'cancel') {
+                    $warehousing_bonded->where('rgd_status6', '=','cancel');
+                } else if ($validated['rgd_status6'] == 'paid') {
                     $warehousing_bonded->where('rgd_status6', '=','paid');
                 } else if($validated['rgd_status6'] == '진행중'){
                     $warehousing_bonded->where(function($q){
@@ -4507,13 +4513,14 @@ class WarehousingController extends Controller
             }
             if (isset($validated['rgd_status7'])) {
                 if ($validated['rgd_status7'] == '정산완료') {
-                    $warehousing_bonded->where('rgd_status7', '=', 'taxed');
+                    $warehousing_bonded->where('rgd_status7', '=', 'taxed')->where('rgd_status6', '=', 'paid');
                 } else if ($validated['rgd_status7'] == '진행중') {
-                    $warehousing_bonded->where(function ($q){
-                        $q->where('rgd_status7', '!=', 'taxed')->orWhereNull('rgd_status7');
+                    $warehousing_bonded->where(function($q) use ($validated){
+                        $q->whereNull('rgd_status7');
                     });
                 }
             }
+           
             if (isset($validated['rgd_status1']) && $validated['rgd_status1'] != '전체') {
                 if ($validated['rgd_status1'] == 'waiting') {
                     $warehousing_bonded->where(function ($q){
@@ -5494,12 +5501,11 @@ class WarehousingController extends Controller
             if (isset($validated['rgd_status7'])) {
                 if ($validated['rgd_status7'] == '정산완료') {
                     $warehousing->where('rgd_status7', '=', 'taxed')->where('rgd_status6', '=', 'paid');
-                } else if ($validated['rgd_status7'] == '전체') {
-                   
-                } else
+                } else if ($validated['rgd_status7'] == '진행중') {
                     $warehousing->where(function($q) use ($validated){
-                        $q->whereNull('rgd_status7')->orWhereNull('rgd_status6');
+                        $q->whereNull('rgd_status7');
                     });
+                }
             }
 
 
