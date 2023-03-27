@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Collection;
 use App\Utils\CommonFunc;
+use Carbon\Carbon;
 
 class ReportController extends Controller
 {
@@ -38,13 +39,15 @@ class ReportController extends Controller
                         'rp_cate' => $request->rp_cate,
                         'rp_content' => $rp_content,
                         'rp_parent_no' => empty($parent_no) ? null : $parent_no,
-                        'rp_h_bl' => $request->w_schedule_number
+                        'rp_h_bl' => $request->w_schedule_number,
+                        'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
                     ]);
                     if ($i == 0) {
                         $parent_no = $report_no;
                         Report::where('rp_no', $report_no)->update([
                             'rp_parent_no'=> $report_no,
-                            'rp_number' =>  CommonFunc::report_number($report_no)
+                            'rp_number' =>  CommonFunc::report_number($report_no),
+                            'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
                         ]);
 
                     }
