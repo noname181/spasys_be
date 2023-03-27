@@ -32,6 +32,8 @@ class Report extends Model
         'rp_cate',
         'rp_content',
         'rp_h_bl',
+        'created_at',
+        'updated_at',
     ];
 
     protected $casts = [
