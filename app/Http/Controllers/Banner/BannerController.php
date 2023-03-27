@@ -1032,7 +1032,7 @@ class BannerController extends Controller
         }
 
         return [
-            'countcharta' => $userArrb, 'countchartb' => $userArrd,
+            'countcharta' => $userArrb, 'countchartb' => $userArrd, 'countchartb_v' => $countchartb,'dddd'=>now()->subYear(),
             'warehousingb' => $warehousingd, 'a' => $a, 'b' => $b, 'c' => $c, 'd' => $d, 'e' => $e, 'f' => $f, 'h' => $h, 'g' => $g,
             'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'countf' => $countf, 'countg' => $countg, 'counth' => $counth, 'counth_2' => $counth_2
 
