@@ -8,6 +8,7 @@ use App\Http\Requests\Report\ReportSearchRequest;
 use App\Models\File;
 use App\Models\Report;
 use App\Utils\Messages;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -38,13 +39,15 @@ class ReportController extends Controller
                         'rp_cate' => $request->rp_cate,
                         'rp_content' => $rp_content,
                         'rp_parent_no' => empty($parent_no) ? null : $parent_no,
-                        'rp_h_bl' => $request->w_schedule_number
+                        'rp_h_bl' => $request->w_schedule_number,
+                        'created_at'=>Carbon::now()->format('Y-m-d H:i:s')
                     ]);
                     if ($i == 0) {
                         $parent_no = $report_no;
                         Report::where('rp_no', $report_no)->update([
                             'rp_parent_no'=> $report_no,
-                            'rp_number' =>  CommonFunc::report_number($report_no)
+                            'rp_number' =>  CommonFunc::report_number($report_no),
+                            'updated_at'=>Carbon::now()->format('Y-m-d H:i:s')
                         ]);
 
                     }
@@ -87,6 +90,7 @@ class ReportController extends Controller
                         'rp_cate' => $request->rp_cate,
                         'rp_h_bl' => $request->w_schedule_number,
                         'rp_content' => $request->rp_content[$i],
+                        'updated_at'=>Carbon::now()->format('Y-m-d H:i:s')
                     ]);
                     $rp_file_no[] = $request->rp_file_no[$i];
                     $files = [];
@@ -126,7 +130,9 @@ class ReportController extends Controller
                             'rp_cate' => $request->rp_cate,
                             'rp_content' => $rp_content,
                             'rp_parent_no' => $rp_parent_no,
-                            'rp_h_bl' => $request->w_schedule_number
+                            'rp_h_bl' => $request->w_schedule_number,
+                            'created_at'=>Carbon::now()->format('Y-m-d H:i:s'),
+                            'updated_at'=>Carbon::now()->format('Y-m-d H:i:s')
                         ]);
                         $index =  0;
                         $rp_file_no[] = $report_no;
