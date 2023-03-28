@@ -5453,7 +5453,7 @@ class WarehousingController extends Controller
                 });
             }
             if (isset($validated['rgd_settlement_number'])) {
-                $warehousing->where('rgd_settlement_number', '=', $validated['rgd_settlement_number']);
+                $warehousing->where('rgd_settlement_number','like', '%' . $validated['rgd_settlement_number']. '%');
             }
             if (isset($validated['w_schedule_number'])) {
                 $warehousing->whereHas('warehousing', function ($q) use ($validated) {
@@ -5463,10 +5463,10 @@ class WarehousingController extends Controller
             if (isset($validated['w_schedule_number2'])) {
                 $warehousing->where(function ($q) use ($validated){
                     $q->whereHas('warehousing', function ($q) use ($validated) {
-                        $q->where('w_category_name', '=', '수입풀필먼트')->where('w_schedule_number2', $validated['w_schedule_number2']);
+                        $q->where('w_category_name', '=', '수입풀필먼트')->where('w_schedule_number2','like', '%' .$validated['w_schedule_number2']. '%');
                     })->orwhereHas('warehousing', function ($q) use ($validated) {
                         $q->where('w_category_name', '=', '유통가공')->whereHas('company', function ($q1) use ($validated) {
-                            $q1->where('w_schedule_number2', $validated['w_schedule_number2']);
+                            $q1->where('w_schedule_number2','like', '%' .$validated['w_schedule_number2']. '%');
                         });
                     })->orwhereHas('t_import', function ($q) use ($validated) {
                         $q->where('ti_h_bl', $validated['w_schedule_number2']);
