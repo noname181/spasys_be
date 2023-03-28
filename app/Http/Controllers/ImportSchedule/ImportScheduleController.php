@@ -113,7 +113,7 @@ class ImportScheduleController extends Controller
                     //     $join->on('t_export.te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
                     // })
                     ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
-                $sub_5 = ReceivingGoodsDelivery::select('is_no', 'rgd_status3', 'rgd_status1')->groupBy('is_no');
+                $sub_5 = ReceivingGoodsDelivery::select('rgd_no','is_no', 'rgd_status3', 'rgd_status1')->groupBy('is_no');
 
                 $sub_6 = File::select('file_no', 'file_url','file_table_key');
 
@@ -163,7 +163,7 @@ class ImportScheduleController extends Controller
                     //     $join->on('t_export.te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
                     // })
                     ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
-                $sub_5 = ReceivingGoodsDelivery::select('is_no', 'rgd_status3', 'rgd_status1')->groupBy('is_no');
+                $sub_5 = ReceivingGoodsDelivery::select('rgd_no','is_no', 'rgd_status3', 'rgd_status1')->groupBy('is_no');
                 $sub_6 = File::select('file_no', 'file_url','file_table_key');
 
                 $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
@@ -228,7 +228,7 @@ class ImportScheduleController extends Controller
                     // })
                     ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
 
-                $sub_5 = ReceivingGoodsDelivery::select('is_no', 'rgd_status3', 'rgd_status1')->groupBy('is_no');
+                $sub_5 = ReceivingGoodsDelivery::select('rgd_no','is_no', 'rgd_status3', 'rgd_status1')->groupBy('is_no');
                 $sub_6 = File::select('file_no', 'file_url','file_table_key');
 
 
