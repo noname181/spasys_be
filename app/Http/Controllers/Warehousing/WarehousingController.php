@@ -4135,18 +4135,24 @@ class WarehousingController extends Controller
                     $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
+                })->whereHas('mb_no', function ($q) {
+                    $q->where('mb_type', 'shop');
                 });
             } else if ($user->mb_type == 'shop' && $request->type == 'check_list') {
                 $warehousing_fulfillment->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
+                })->whereHas('mb_no', function ($q) {
+                    $q->where('mb_type', 'spasys');
                 });
             } else if ($user->mb_type == 'shipper') {
                 $warehousing_fulfillment->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
+                })->whereHas('mb_no', function ($q) {
+                    $q->where('mb_type', 'shop');
                 });
             } else if ($user->mb_type == 'spasys' && $request->type == 'view_list') {
                 $warehousing_fulfillment->whereHas('warehousing', function ($query) use ($user) {
@@ -4357,6 +4363,8 @@ class WarehousingController extends Controller
                     $query->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
+                })->whereHas('mb_no', function ($q) {
+                    $q->where('mb_type', 'shop');
                 });
             } else if ($user->mb_type == 'spasys' && $request->type == 'view_list') {
                 $warehousing_bonded->whereHas('warehousing', function ($query) use ($user) {
