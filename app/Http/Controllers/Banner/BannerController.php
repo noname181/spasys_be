@@ -1032,7 +1032,7 @@ class BannerController extends Controller
         }
 
         return [
-            'countcharta' => $userArrb, 'countchartb' => $userArrd, 'countchartb_v' => $countchartb,'dddd'=>now()->subYear(),
+            'countcharta' => $userArrb, 'countchartb' => $userArrd,
             'warehousingb' => $warehousingd, 'a' => $a, 'b' => $b, 'c' => $c, 'd' => $d, 'e' => $e, 'f' => $f, 'h' => $h, 'g' => $g,
             'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'countf' => $countf, 'countg' => $countg, 'counth' => $counth, 'counth_2' => $counth_2
 
@@ -2421,7 +2421,7 @@ class BannerController extends Controller
                 'charttotal1' => $charttotal1,
                 'totalinvoice' => $totalinvoice,
                 'chartinvoice' => $chartinvoice,
-                'totala3' => isset($totala3) ? $totala3 : ''
+                // 'totala3' => isset($totala3) ? $totala3 : ''
             ]);
         } catch (\Exception $e) {
             Log::error($e);
