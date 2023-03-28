@@ -4776,36 +4776,23 @@ class WarehousingController extends Controller
                 });
             }
             if (isset($validated['co_parent_name'])) {
-                $warehousing->whereHas('co_no.co_parent', function ($query) use ($validated) {
+                if($user->mb_type == 'shop'){
+                $warehousing->whereHas('w_no.co_no.co_parent', function ($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
                 });
+                } else {
+                    $warehousing->whereHas('w_no.co_no', function ($query) use ($validated) {
+                        $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                    });
+                }
             }
             if (isset($validated['co_name'])) {
-                $warehousing->whereHas('co_no', function ($q) use ($validated) {
+                $warehousing->whereHas('w_no.co_no', function ($q) use ($validated) {
                     return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
                 });
             }
 
-            if (isset($validated['w_schedule_number'])) {
-                $warehousing->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
-            }
-            if (isset($validated['w_schedule_number_iw'])) {
-                $warehousing->whereHas('w_import_parent', function ($q) use ($validated) {
-                    return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number_iw'] . '%', 'and', 'w_type', '=', 'IW');
-                });
-            }
-            if (isset($validated['w_schedule_number_ew'])) {
-                $warehousing->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number_ew'] . '%', 'and', 'w_type', '=', 'EW');
-            }
-            if (isset($validated['logistic_manage_number'])) {
-                $warehousing->where('logistic_manage_number', 'like', '%' . $validated['logistic_manage_number'] . '%');
-            }
-            if (isset($validated['m_bl'])) {
-                $warehousing->where('m_bl', 'like', '%' . $validated['m_bl'] . '%');
-            }
-            if (isset($validated['h_bl'])) {
-                $warehousing->where('h_bl', 'like', '%' . $validated['h_bl'] . '%');
-            }
+           
             if (isset($validated['rgd_status1'])) {
                 $warehousing->whereHas('receving_goods_delivery', function ($query) use ($validated) {
                     $query->where('rgd_status1', '=', $validated['rgd_status1']);
@@ -4822,12 +4809,7 @@ class WarehousingController extends Controller
                 });
             }
 
-            // if (isset($validated['warehousing_status1']) || isset($validated['warehousing_status2'])) {
-            //     $warehousing->where(function($query) use ($validated) {
-            //         $query->orwhere('warehousing_status', '=', $validated['warehousing_status1']);
-            //         $query->orWhere('warehousing_status', '=', $validated['warehousing_status2']);
-            //     });
-            // }
+         
 
             $members = Member::where('mb_no', '!=', 0)->get();
 

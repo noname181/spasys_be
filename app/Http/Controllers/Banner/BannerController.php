@@ -957,6 +957,8 @@ class BannerController extends Controller
 
         $chartcountb = [];
         $chartcountd = [];
+        $chartcountb_2 = []; 
+        $chartcountd_2 = []; 
         $userArrb = [];
         $userArrd = [];
 
@@ -968,11 +970,29 @@ class BannerController extends Controller
         $userArrd['borderColor'] = '#0493FF';
         $userArrd['backgroundColor'] = '#0493FF';
 
+        // foreach ($countchartb as $key => $value) {
+        //     $chartcountb[(int)$key] = count($value);
+        // }
+
+        // foreach ($countchartd as $key => $value) {
+        //     $chartcountd[(int)$key] = count($value);
+        // }
+
         foreach ($countchartb as $key => $value) {
+            $total_b = 0;
+            foreach($value as $item){
+                $total_b += isset($item->warehousing->w_amount) ? $item->warehousing->w_amount : 0;
+            }
+            $chartcountb_2[(int)$key] = $total_b;
             $chartcountb[(int)$key] = count($value);
         }
 
         foreach ($countchartd as $key => $value) {
+            $total_d = 0;
+            foreach($value as $item){
+                $total_d += isset($item->w_schedule_amount) ? $item->w_schedule_amount : 0;
+            }
+            $chartcountd_2[(int)$key] = $total_d;
             $chartcountd[(int)$key] = count($value);
         }
 
@@ -996,14 +1016,18 @@ class BannerController extends Controller
             $m = (int)$date->format('m');
             if (!empty($chartcountb[$m])) {
                 $userArrb['data'][] = $chartcountb[$m];
+                $userArrb['data2'][] = $chartcountb_2[$m];
             } else {
                 $userArrb['data'][] = 0;
+                $userArrb['data2'][] = 0;
             }
 
             if (!empty($chartcountd[$m])) {
                 $userArrd['data'][] = $chartcountd[$m];
+                $userArrd['data2'][] = $chartcountd_2[$m];
             } else {
                 $userArrd['data'][] = 0;
+                $userArrd['data2'][] = 0;
             }
         }
 
@@ -1911,10 +1935,20 @@ class BannerController extends Controller
         $userArrd['backgroundColor'] = '#0493FF';
 
         foreach ($countchartb as $key => $value) {
+            $total_b = 0;
+            foreach($value as $item){
+                $total_b += isset($item->warehousing->w_amount) ? $item->warehousing->w_amount : 0;
+            }
+            $chartcountb_2[(int)$key] = $total_b;
             $chartcountb[(int)$key] = count($value);
         }
 
         foreach ($countchartd as $key => $value) {
+            $total_d = 0;
+            foreach($value as $item){
+                $total_d += isset($item->w_schedule_amount) ? $item->w_schedule_amount : 0;
+            }
+            $chartcountd_2[(int)$key] = $total_d;
             $chartcountd[(int)$key] = count($value);
         }
 
@@ -1931,21 +1965,25 @@ class BannerController extends Controller
         //         $userArrd['data'][] = 0;
         //     }
         // }
+
         $period = CarbonPeriod::create(today()->subMonths(5), '1 month', today());
 
         foreach ($period as $date) {
             $m = (int)$date->format('m');
-
             if (!empty($chartcountb[$m])) {
                 $userArrb['data'][] = $chartcountb[$m];
+                $userArrb['data2'][] = $chartcountb_2[$m];
             } else {
                 $userArrb['data'][] = 0;
+                $userArrb['data2'][] = 0;
             }
 
             if (!empty($chartcountd[$m])) {
                 $userArrd['data'][] = $chartcountd[$m];
+                $userArrd['data2'][] = $chartcountd_2[$m];
             } else {
                 $userArrd['data'][] = 0;
+                $userArrd['data2'][] = 0;
             }
         }
 

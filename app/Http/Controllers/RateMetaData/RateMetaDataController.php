@@ -245,21 +245,35 @@ class RateMetaDataController extends Controller
                 });
             }
             if(isset($validated['co_name'])) {
+               
                 $rmd->whereHas('company', function($rm) use ($validated){
                     $rm->where('co_name', 'like', '%'.$validated['co_name'].'%');
                 });
             }
-            if(isset($validated['co_parent_name'])) {
+            if(isset($validated['co_name_2'])) {
+               
                 $rmd->whereHas('company', function($rm) use ($validated){
-                    $rm->where('rm_owner_name', 'like', '%'.$validated['rm_owner_name'].'%');
+                    $rm->where('co_name', 'like', '%'.$validated['co_name_2'].'%');
                 });
+            }
+            if(isset($validated['co_parent_name'])) {
+              
+                if($user->mb_type == 'shop'){
+                    $rmd->whereHas('company.co_parent', function($rm) use ($validated){
+                        $rm->where('co_name', 'like', '%'.$validated['co_parent_name'].'%');
+                    });
+                } else {
+                    $rmd->whereHas('company', function($rm) use ($validated){
+                        $rm->where('co_name', 'like', '%'.$validated['co_parent_name'].'%');
+                    });
+                }
             }
 
             $rmd = $rmd->paginate($per_page, ['*'], 'page', $page);
             return response()->json($rmd);
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -273,7 +287,7 @@ class RateMetaDataController extends Controller
             return response()->json($rmd);
         } catch (\Exception $e) {
             Log::error($e);
-
+     
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
