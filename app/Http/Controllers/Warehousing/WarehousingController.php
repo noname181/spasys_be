@@ -5711,6 +5711,10 @@ class WarehousingController extends Controller
                 $warehousing->where('service_korean_name', '=', $validated['service_korean_name']);
             }
 
+            if (isset($validated['rgd_settlement_number'])) {
+                $warehousing->where('rgd_settlement_number','like', '%' .  $validated['rgd_settlement_number']. '%');
+            }
+
             $warehousing_data = $warehousing->get();
 
             $arr_data = collect($warehousing_data)->map(function ($item) {
@@ -6567,6 +6571,7 @@ class WarehousingController extends Controller
                 'w_amount' => $amount,
                 'w_type' => 'IW',
                 'w_category_name' => '수입풀필먼트',
+                'w_no_cargo' => count($warehousing->get()) > 0 ? $warehousing_list[0]['w_no'] : null,
                 'w_amount_export' => $amount_export,
                 'w_schedule_number_settle' => count($warehousing->get()) > 0 ? $warehousing_list[0]['w_schedule_number'] : null,
                 'w_schedule_number_settle2' => count($warehousing->get()) > 0 ? $warehousing_list[0]['w_schedule_number2'] : null,
