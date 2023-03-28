@@ -47,6 +47,7 @@ class Warehousing extends Model
         'tie_no',
         'created_at',
         'updated_at',
+        'w_no_cargo',
     ];
 
     protected $casts = [

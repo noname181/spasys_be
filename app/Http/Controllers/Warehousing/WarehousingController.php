@@ -3928,7 +3928,7 @@ class WarehousingController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
 
-            $warehousing = ReceivingGoodsDelivery::with(['rate_meta_data', 'rate_meta_data_parent', 'rate_data_general', 'payment', 't_import', 'rgd_settlement']);
+            $warehousing = ReceivingGoodsDelivery::with(['rate_meta_data', 'rate_meta_data_parent', 'rate_data_general', 'payment', 't_import', 'rgd_settlement','cancel_bill_history']);
             if ($user->mb_type == 'shop' && $request->type == 'check_list') {
                 $warehousing->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent', function ($q) use ($user) {
@@ -4129,24 +4129,30 @@ class WarehousingController extends Controller
                     $warehousing->where('rgd_status7', '=', $validated['rgd_status1']);
             }
 
-            $warehousing_fulfillment = ReceivingGoodsDelivery::with(['rate_meta_data', 'rate_meta_data_parent', 'rate_data_general', 'rgd_settlement']);
+            $warehousing_fulfillment = ReceivingGoodsDelivery::with(['rate_meta_data', 'rate_meta_data_parent', 'rate_data_general', 'rgd_settlement','cancel_bill_history']);
             if ($user->mb_type == 'shop' && $request->type == 'view_list') {
                 $warehousing_fulfillment->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
+                })->whereHas('mb_no', function ($q) {
+                    $q->where('mb_type', 'shop');
                 });
             } else if ($user->mb_type == 'shop' && $request->type == 'check_list') {
                 $warehousing_fulfillment->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
+                })->whereHas('mb_no', function ($q) {
+                    $q->where('mb_type', 'spasys');
                 });
             } else if ($user->mb_type == 'shipper') {
                 $warehousing_fulfillment->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
+                })->whereHas('mb_no', function ($q) {
+                    $q->where('mb_type', 'shop');
                 });
             } else if ($user->mb_type == 'spasys' && $request->type == 'view_list') {
                 $warehousing_fulfillment->whereHas('warehousing', function ($query) use ($user) {
@@ -4335,7 +4341,7 @@ class WarehousingController extends Controller
             }
 
 
-            $warehousing_bonded = ReceivingGoodsDelivery::with(['rate_meta_data', 'rate_data_general', 't_export', 'rgd_settlement']);
+            $warehousing_bonded = ReceivingGoodsDelivery::with(['rate_meta_data', 'rate_data_general', 't_export', 'rgd_settlement','cancel_bill_history']);
             if ($user->mb_type == 'shop' && $request->type == 'view_list') {
                 $warehousing_bonded->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent', function ($q) use ($user) {
@@ -4357,6 +4363,8 @@ class WarehousingController extends Controller
                     $query->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
+                })->whereHas('mb_no', function ($q) {
+                    $q->where('mb_type', 'shop');
                 });
             } else if ($user->mb_type == 'spasys' && $request->type == 'view_list') {
                 $warehousing_bonded->whereHas('warehousing', function ($query) use ($user) {
@@ -5445,7 +5453,7 @@ class WarehousingController extends Controller
                 });
             }
             if (isset($validated['rgd_settlement_number'])) {
-                $warehousing->where('rgd_settlement_number', '=', $validated['rgd_settlement_number']);
+                $warehousing->where('rgd_settlement_number','like', '%' . $validated['rgd_settlement_number']. '%');
             }
             if (isset($validated['w_schedule_number'])) {
                 $warehousing->whereHas('warehousing', function ($q) use ($validated) {
@@ -5455,10 +5463,10 @@ class WarehousingController extends Controller
             if (isset($validated['w_schedule_number2'])) {
                 $warehousing->where(function ($q) use ($validated){
                     $q->whereHas('warehousing', function ($q) use ($validated) {
-                        $q->where('w_category_name', '=', '수입풀필먼트')->where('w_schedule_number2', $validated['w_schedule_number2']);
+                        $q->where('w_category_name', '=', '수입풀필먼트')->where('w_schedule_number2','like', '%' .$validated['w_schedule_number2']. '%');
                     })->orwhereHas('warehousing', function ($q) use ($validated) {
                         $q->where('w_category_name', '=', '유통가공')->whereHas('company', function ($q1) use ($validated) {
-                            $q1->where('w_schedule_number2', $validated['w_schedule_number2']);
+                            $q1->where('w_schedule_number2','like', '%' .$validated['w_schedule_number2']. '%');
                         });
                     })->orwhereHas('t_import', function ($q) use ($validated) {
                         $q->where('ti_h_bl', $validated['w_schedule_number2']);
@@ -5662,13 +5670,13 @@ class WarehousingController extends Controller
             if (isset($validated['w_schedule_number2'])) {
                 $warehousing->where(function ($q) use ($validated){
                     $q->whereHas('warehousing', function ($q) use ($validated) {
-                        $q->where('w_category_name', '=', '수입풀필먼트')->where('w_schedule_number2', $validated['w_schedule_number2']);
+                        $q->where('w_category_name', '=', '수입풀필먼트')->where('w_schedule_number2','like', '%' .  $validated['w_schedule_number2']. '%');
                     })->orwhereHas('warehousing', function ($q) use ($validated) {
                         $q->where('w_category_name', '=', '유통가공')->whereHas('company', function ($q1) use ($validated) {
-                            $q1->where('w_schedule_number2', $validated['w_schedule_number2']);
+                            $q1->where('w_schedule_number2','like', '%' .  $validated['w_schedule_number2']. '%');
                         });
                     })->orwhereHas('t_import', function ($q) use ($validated) {
-                        $q->where('ti_h_bl', $validated['w_schedule_number2']);
+                        $q->where('ti_h_bl','like', '%' .  $validated['w_schedule_number2']. '%');
                     });
                 });
             }
@@ -5701,6 +5709,10 @@ class WarehousingController extends Controller
 
             if (isset($validated['service_korean_name'])) {
                 $warehousing->where('service_korean_name', '=', $validated['service_korean_name']);
+            }
+
+            if (isset($validated['rgd_settlement_number'])) {
+                $warehousing->where('rgd_settlement_number','like', '%' .  $validated['rgd_settlement_number']. '%');
             }
 
             $warehousing_data = $warehousing->get();
@@ -6375,7 +6387,7 @@ class WarehousingController extends Controller
                 // })->orWhereHas('co_parent.co_parent', function($q) use($co_no){
                 //     $q->where('co_no', $co_no);
                 // });
-            })->get();
+            })->where('co_service', 'like', '%'.'수입풀필먼트'.'%')->get();
 
             // $rate_data = RateData::where('rd_cate_meta1', '수입풀필먼트');
 
@@ -6559,6 +6571,7 @@ class WarehousingController extends Controller
                 'w_amount' => $amount,
                 'w_type' => 'IW',
                 'w_category_name' => '수입풀필먼트',
+                'w_no_cargo' => count($warehousing->get()) > 0 ? $warehousing_list[0]['w_no'] : null,
                 'w_amount_export' => $amount_export,
                 'w_schedule_number_settle' => count($warehousing->get()) > 0 ? $warehousing_list[0]['w_schedule_number'] : null,
                 'w_schedule_number_settle2' => count($warehousing->get()) > 0 ? $warehousing_list[0]['w_schedule_number2'] : null,
