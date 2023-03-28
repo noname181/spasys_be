@@ -588,8 +588,8 @@ class BannerController extends Controller
                 $query->whereHas('company.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
-            })->whereHas('mb_no', function ($q) {
-                $q->where('mb_type', 'spasys');
+            })->whereHas('mb_no', function ($q) use($user){
+                $q->where('mb_type', $user->mb_type == 'shop' ? 'spasys' : ($user->mb_type == 'shipper' ? 'shop' : 'spasys'));
             });
 
             $warehousing_fulfillment->whereHas('warehousing', function ($query) use ($user) {
@@ -603,7 +603,7 @@ class BannerController extends Controller
                     $q->where('co_no', $user->co_no);
                 });
             })->whereHas('mb_no', function ($q) use ($user) {
-                $q->where('mb_type', 'spasys');
+                $q->where('mb_type', $user->mb_type == 'shop' ? 'spasys' : ($user->mb_type == 'shipper' ? 'shop' : 'spasys'));
             });
         } else if ($user->mb_type == 'shipper') {
             $warehousinga = ReceivingGoodsDelivery::with(['w_no'])->join('warehousing', 'warehousing.w_no', '=', 'receiving_goods_delivery.w_no')->whereNull('rgd_parent_no')->whereHas('w_no', function ($query) use ($user) {
@@ -698,8 +698,8 @@ class BannerController extends Controller
                 $query->whereHas('company', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
-            })->whereHas('mb_no', function ($q) {
-                $q->where('mb_type', 'shop');
+            })->whereHas('mb_no', function ($q) use($user){
+                $q->where('mb_type', $user->mb_type == 'shop' ? 'spasys' : ($user->mb_type == 'shipper' ? 'shop' : 'spasys'));
             })->orderBy('created_at', 'DESC');
 
             $warehousing_fulfillment->whereHas('warehousing', function ($query) use ($user) {
@@ -712,6 +712,8 @@ class BannerController extends Controller
                 $query->whereHas('company', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
+            })->whereHas('mb_no', function ($q) use($user){
+                $q->where('mb_type', $user->mb_type == 'shop' ? 'spasys' : ($user->mb_type == 'shipper' ? 'shop' : 'spasys'));
             });
         } else if ($user->mb_type == 'spasys') {
             $warehousinga = ReceivingGoodsDelivery::with(['warehousing'])->whereNull('rgd_parent_no')->whereHas('warehousing', function ($query) use ($user) {
@@ -1102,8 +1104,8 @@ class BannerController extends Controller
                 $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
-            })->whereHas('mb_no', function ($q) {
-                $q->where('mb_type', 'spasys');
+            })->whereHas('mb_no', function ($q) use($user){
+                $q->where('mb_type', $user->mb_type == 'shop' ? 'spasys' : ($user->mb_type == 'shipper' ? 'shop' : 'spasys'));
             });
 
             $warehousing_fulfillment->whereHas('warehousing', function ($query) use ($user) {
@@ -1116,8 +1118,8 @@ class BannerController extends Controller
                 $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
-            })->whereHas('mb_no', function ($q) use ($user) {
-                $q->where('mb_type', 'spasys');
+            })->whereHas('mb_no', function ($q) use($user){
+                $q->where('mb_type', $user->mb_type == 'shop' ? 'spasys' : ($user->mb_type == 'shipper' ? 'shop' : 'spasys'));
             });
         } else if ($user->mb_type == 'shipper') {
             $warehousing2 = Warehousing::join(
@@ -1178,8 +1180,8 @@ class BannerController extends Controller
                 $query->whereHas('co_no', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
-            })->whereHas('mb_no', function ($q) {
-                $q->where('mb_type', 'shop');
+            })->whereHas('mb_no', function ($q) use($user){
+                $q->where('mb_type', $user->mb_type == 'shop' ? 'spasys' : ($user->mb_type == 'shipper' ? 'shop' : 'spasys'));
             })->orderBy('created_at', 'DESC');
 
             $warehousing_fulfillment->whereHas('warehousing', function ($query) use ($user) {
@@ -1192,6 +1194,8 @@ class BannerController extends Controller
                 $query->whereHas('co_no', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
+            })->whereHas('mb_no', function ($q) use($user){
+                $q->where('mb_type', $user->mb_type == 'shop' ? 'spasys' : ($user->mb_type == 'shipper' ? 'shop' : 'spasys'));
             });
         } else if ($user->mb_type == 'spasys') {
 
@@ -1521,8 +1525,8 @@ class BannerController extends Controller
                 $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
-            })->whereHas('mb_no', function ($q) {
-                $q->where('mb_type', 'spasys');
+            })->whereHas('mb_no', function ($q) use($user){
+                $q->where('mb_type', $user->mb_type == 'shop' ? 'spasys' : ($user->mb_type == 'shipper' ? 'shop' : 'spasys'));
             });
 
             $warehousing_fulfillment->whereHas('warehousing', function ($query) use ($user) {
@@ -1535,8 +1539,8 @@ class BannerController extends Controller
                 $query->whereHas('co_no.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
-            })->whereHas('mb_no', function ($q) use ($user) {
-                $q->where('mb_type', 'spasys');
+            })->whereHas('mb_no', function ($q) use($user){
+                $q->where('mb_type', $user->mb_type == 'shop' ? 'spasys' : ($user->mb_type == 'shipper' ? 'shop' : 'spasys'));
             });
 
             $warehousingchartb = $this->subquery($sub, $sub_2, $sub_4);
@@ -1587,8 +1591,8 @@ class BannerController extends Controller
                 $query->whereHas('co_no', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
-            })->whereHas('mb_no', function ($q) {
-                $q->where('mb_type', 'shop');
+            })->whereHas('mb_no', function ($q) use($user){
+                $q->where('mb_type', $user->mb_type == 'shop' ? 'spasys' : ($user->mb_type == 'shipper' ? 'shop' : 'spasys'));
             })->orderBy('created_at', 'DESC');
 
             $warehousing_fulfillment->whereHas('warehousing', function ($query) use ($user) {
@@ -1601,6 +1605,8 @@ class BannerController extends Controller
                 $query->whereHas('co_no', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
+            })->whereHas('mb_no', function ($q) use($user){
+                $q->where('mb_type', $user->mb_type == 'shop' ? 'spasys' : ($user->mb_type == 'shipper' ? 'shop' : 'spasys'));
             });
 
             $warehousingchartb = $this->subquery($sub, $sub_2, $sub_4);
@@ -2012,8 +2018,8 @@ class BannerController extends Controller
                 $query->whereHas('company.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
-            })->whereHas('mb_no', function ($q) {
-                $q->where('mb_type', 'spasys');
+            })->whereHas('mb_no', function ($q) use($user) {
+                $q->where('mb_type', $user->mb_type == 'shop' ? 'spasys' : ($user->mb_type == 'shipper' ? 'shop' : 'spasys'));
             });
 
             $warehousing_fulfillment->whereHas('warehousing', function ($query) use ($user) {
@@ -2026,8 +2032,8 @@ class BannerController extends Controller
                 $query->whereHas('company.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
-            })->whereHas('mb_no', function ($q) use ($user) {
-                $q->where('mb_type', 'spasys');
+            })->whereHas('mb_no', function ($q) use($user) {
+                $q->where('mb_type', $user->mb_type == 'shop' ? 'spasys' : ($user->mb_type == 'shipper' ? 'shop' : 'spasys'));
             });
         } else if ($user->mb_type == 'shipper') {
 
@@ -2035,8 +2041,8 @@ class BannerController extends Controller
                 $query->whereHas('company', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
-            })->whereHas('mb_no', function ($q) {
-                $q->where('mb_type', 'shop');
+            })->whereHas('mb_no', function ($q) use($user) {
+                $q->where('mb_type', $user->mb_type == 'shop' ? 'spasys' : ($user->mb_type == 'shipper' ? 'shop' : 'spasys'));
             })->orderBy('created_at', 'DESC');
 
             $warehousing_fulfillment->whereHas('warehousing', function ($query) use ($user) {
@@ -2049,6 +2055,8 @@ class BannerController extends Controller
                 $query->whereHas('company', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 });
+            })->whereHas('mb_no', function ($q) use($user){
+                $q->where('mb_type', $user->mb_type == 'shop' ? 'spasys' : ($user->mb_type == 'shipper' ? 'shop' : 'spasys'));
             });
         } else if ($user->mb_type == 'spasys') {
             $warehousing_distribution->whereNull('rgd_no');
