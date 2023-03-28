@@ -6383,7 +6383,7 @@ class WarehousingController extends Controller
                 // })->orWhereHas('co_parent.co_parent', function($q) use($co_no){
                 //     $q->where('co_no', $co_no);
                 // });
-            })->get();
+            })->where('co_service', 'like', '%'.'수입풀필먼트'.'%')->get();
 
             // $rate_data = RateData::where('rd_cate_meta1', '수입풀필먼트');
 
