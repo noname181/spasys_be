@@ -976,8 +976,6 @@ class BannerController extends Controller
         }
 
         return [
-            'aaaaaaaaa' => $warehousingh->get(),
-            'user' => $user,
             'countcharta' => $userArrb, 'countchartb' => $userArrd, 'countchartb_v' => $countchartb,'dddd'=>now()->subYear(),
             'warehousingb' => $warehousingd, 'a' => $a, 'b' => $b, 'c' => $c, 'd' => $d, 'e' => $e, 'f' => $f, 'h' => $h, 'g' => $g,
             'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'countf' => $countf, 'countg' => $countg, 'counth' => $counth, 'counth_2' => $counth_2
@@ -1529,7 +1527,7 @@ class BannerController extends Controller
             ->where('rgd_status7', 'taxed')
             ->where('rgd_is_show', 'y');
 
-        $warehousingg = $warehousing_distribution->union($warehousing_fulfillment)->union($warehousing_bonded);
+        $warehousingg = $warehousing_bonded;
 
         $counta = 0;
         $countb = 0;
