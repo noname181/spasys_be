@@ -5639,32 +5639,32 @@ class WarehousingController extends Controller
             $user = Auth::user();
             if ($user->mb_type == 'shop') {
                 $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
-                    $query->whereHas('co_no.co_parent', function ($q) use ($user) {
+                    $query->whereHas('company.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    })->whereHas('co_no.contract', function ($q) use ($user) {
+                    })->whereHas('company.contract', function ($q) use ($user) {
                         $q->where('c_calculate_deadline_yn', 'y');
                     });
                 })->orderBy('rgd_tax_invoice_date', 'DESC')->orderBy('rgd_no', 'DESC');
             } else if ($user->mb_type == 'shipper') {
                 $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
-                    $query->whereHas('co_no', function ($q) use ($user) {
+                    $query->whereHas('company', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    })->whereHas('co_no.contract', function ($q) use ($user) {
+                    })->whereHas('company.contract', function ($q) use ($user) {
                         $q->where('c_calculate_deadline_yn', 'y');
                     });
                 })->orderBy('rgd_tax_invoice_date', 'DESC')->orderBy('rgd_no', 'DESC');
             } else if ($user->mb_type == 'spasys') {
                 $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
-                    $query->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
+                    $query->whereHas('company.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    })->orWhereHas('co_no.co_parent', function ($q) use ($user) {
+                    })->orWhereHas('company.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
                 })
                     ->whereHas('warehousing', function ($query) use ($user) {
-                        $query->whereHas('co_no.co_parent.contract', function ($q) use ($user) {
+                        $query->whereHas('company.co_parent.contract', function ($q) use ($user) {
                             $q->where('c_calculate_deadline_yn', 'y');
-                        })->orWhereHas('co_no.contract', function ($q) use ($user) {
+                        })->orWhereHas('company.contract', function ($q) use ($user) {
                             $q->where('c_calculate_deadline_yn', 'y');
                         });
                     });
