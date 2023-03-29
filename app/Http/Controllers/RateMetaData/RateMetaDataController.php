@@ -215,7 +215,7 @@ class RateMetaDataController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
-    public function getAllCOPrecalculateDetails(RateMetaDataSearchRequest $request)
+    public function get_precalculate_details(RateMetaDataSearchRequest $request)
     {
         $validated = $request->validated();
         try {
@@ -248,6 +248,12 @@ class RateMetaDataController extends Controller
                
                 $rmd->whereHas('company', function($rm) use ($validated){
                     $rm->where('co_name', 'like', '%'.$validated['co_name'].'%');
+                });
+            }
+            if(isset($validated['hbl'])) {
+               
+                $rmd->whereHas('rate_data_general', function($rm) use ($validated){
+                    $rm->where('rdg_sum1', 'like', '%'.$validated['hbl'].'%');
                 });
             }
             if(isset($validated['co_name_2'])) {

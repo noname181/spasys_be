@@ -404,7 +404,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/rm', [App\Http\Controllers\RateMetaData\RateMetaDataController::class, 'getAllRM'])->name('get_all_rm');
         Route::post('/co', [App\Http\Controllers\RateMetaData\RateMetaDataController::class, 'getAllCO'])->name('get_all_co');
         Route::post('/check', [App\Http\Controllers\RateMetaData\RateMetaDataController::class, 'checkCO'])->name('check_co');
-        Route::post('/get_precalculate_details', [App\Http\Controllers\RateMetaData\RateMetaDataController::class, 'getAllCOPrecalculateDetails'])->name('get_all_co_precalculate_details');
+        Route::post('/get_precalculate_details', [App\Http\Controllers\RateMetaData\RateMetaDataController::class, 'get_precalculate_details'])->name('get_all_co_precalculate_details');
     });
 
     Route::prefix('rate_data')->name('rate_data.')->group(function () {
