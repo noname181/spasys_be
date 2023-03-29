@@ -189,6 +189,9 @@ class WarehousingSearchRequest extends BaseFormRequest
             'rgd_status7' => [
                 '',
             ],
+            'rgd_status67' => [
+                '',
+            ],
             'rgd_receiver' => [
                 '',
             ],
