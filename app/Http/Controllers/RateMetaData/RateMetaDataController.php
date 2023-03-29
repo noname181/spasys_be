@@ -215,7 +215,7 @@ class RateMetaDataController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
-    public function getAllCOPrecalculateDetails(RateMetaDataSearchRequest $request)
+    public function get_precalculate_details(RateMetaDataSearchRequest $request)
     {
         $validated = $request->validated();
         try {
@@ -245,9 +245,18 @@ class RateMetaDataController extends Controller
                 });
             }
             if(isset($validated['co_name'])) {
+                if($user->mb_type == 'shop'){
+                    $rmd->whereHas('company', function($rm) use ($validated){
+                        $rm->where('co_name', 'like', '%'.$validated['co_name'].'%');
+                    });
+                }else {
+                    $rmd->whereNull('rmd_no');
+                }
+            }
+            if(isset($validated['hbl'])) {
                
-                $rmd->whereHas('company', function($rm) use ($validated){
-                    $rm->where('co_name', 'like', '%'.$validated['co_name'].'%');
+                $rmd->whereHas('rate_data_general', function($rm) use ($validated){
+                    $rm->where('rdg_sum1', 'like', '%'.$validated['hbl'].'%');
                 });
             }
             if(isset($validated['co_name_2'])) {
@@ -263,7 +272,7 @@ class RateMetaDataController extends Controller
                         $rm->where('co_name', 'like', '%'.$validated['co_parent_name'].'%');
                     });
                 } else {
-                    $rmd->whereHas('company', function($rm) use ($validated){
+                    $rmd->whereNull('company', function($rm) use ($validated){
                         $rm->where('co_name', 'like', '%'.$validated['co_parent_name'].'%');
                     });
                 }

@@ -70,6 +70,10 @@ class RateMetaDataSearchRequest extends BaseFormRequest
                 'nullable',
                 'string',
             ],
+            'hbl' => [
+                'nullable',
+                'string',
+            ],
             'c_transaction_yn' => [
                 'nullable',
                 'string',
