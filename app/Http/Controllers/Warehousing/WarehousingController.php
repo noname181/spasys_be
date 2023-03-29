@@ -5380,32 +5380,32 @@ class WarehousingController extends Controller
             $user = Auth::user();
             if ($user->mb_type == 'shop') {
                 $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
-                    $query->whereHas('co_no.co_parent', function ($q) use ($user) {
+                    $query->whereHas('company.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    })->whereHas('co_no.contract', function ($q) use ($user) {
+                    })->whereHas('company.contract', function ($q) use ($user) {
                         $q->where('c_calculate_deadline_yn', 'y');
                     });
                 })->orderBy('rgd_tax_invoice_date', 'DESC')->orderBy('rgd_no', 'DESC');
             } else if ($user->mb_type == 'shipper') {
                 $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
-                    $query->whereHas('co_no', function ($q) use ($user) {
+                    $query->whereHas('company', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    })->whereHas('co_no.contract', function ($q) use ($user) {
+                    })->whereHas('company.contract', function ($q) use ($user) {
                         $q->where('c_calculate_deadline_yn', 'y');
                     });
                 })->orderBy('rgd_tax_invoice_date', 'DESC')->orderBy('rgd_no', 'DESC');
             } else if ($user->mb_type == 'spasys') {
                 $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
-                    $query->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
+                    $query->whereHas('company.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    })->orWhereHas('co_no.co_parent', function ($q) use ($user) {
+                    })->orWhereHas('company.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
                 })
                     ->whereHas('warehousing', function ($query) use ($user) {
-                        $query->whereHas('co_no.co_parent.contract', function ($q) use ($user) {
+                        $query->whereHas('company.co_parent.contract', function ($q) use ($user) {
                             $q->where('c_calculate_deadline_yn', 'y');
-                        })->orWhereHas('co_no.contract', function ($q) use ($user) {
+                        })->orWhereHas('company.contract', function ($q) use ($user) {
                             $q->where('c_calculate_deadline_yn', 'y');
                         });
                     });
@@ -5446,13 +5446,13 @@ class WarehousingController extends Controller
             }
 
             if (isset($validated['co_parent_name'])) {
-                $warehousing->whereHas('warehousing.co_no.co_parent', function ($query) use ($validated) {
+                $warehousing->whereHas('warehousing.company.co_parent', function ($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
                 });
             }
             if (isset($validated['co_name'])) {
-                $warehousing->whereHas('warehousing.co_no', function ($q) use ($validated) {
-                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                $warehousing->whereHas('warehousing.company', function ($q) use ($validated) {
+                    $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
                 });
             }
             if (isset($validated['rgd_settlement_number'])) {
@@ -5460,7 +5460,7 @@ class WarehousingController extends Controller
             }
             if (isset($validated['w_schedule_number'])) {
                 $warehousing->whereHas('warehousing', function ($q) use ($validated) {
-                    return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
+                    $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
                 });
             }
             if (isset($validated['w_schedule_number2'])) {
@@ -5472,7 +5472,7 @@ class WarehousingController extends Controller
                             $q1->where('w_schedule_number2','like', '%' .$validated['w_schedule_number2']. '%');
                         });
                     })->orwhereHas('t_import', function ($q) use ($validated) {
-                        $q->where('ti_h_bl', $validated['w_schedule_number2']);
+                        $q->where('ti_h_bl', 'like', '%' .$validated['w_schedule_number2']. '%');
                     });
                 });
             }
@@ -5724,7 +5724,7 @@ class WarehousingController extends Controller
             }
             if (isset($validated['co_name'])) {
                 $warehousing->whereHas('warehousing.company', function ($q) use ($validated) {
-                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
                 });
             }
             if (isset($validated['rgd_status4'])) {
