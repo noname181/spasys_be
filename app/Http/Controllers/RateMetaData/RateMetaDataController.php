@@ -245,10 +245,13 @@ class RateMetaDataController extends Controller
                 });
             }
             if(isset($validated['co_name'])) {
-               
-                $rmd->whereHas('company', function($rm) use ($validated){
-                    $rm->where('co_name', 'like', '%'.$validated['co_name'].'%');
-                });
+                if($user->mb_type == 'shop'){
+                    $rmd->whereHas('company', function($rm) use ($validated){
+                        $rm->where('co_name', 'like', '%'.$validated['co_name'].'%');
+                    });
+                }else {
+                    $rmd->whereNull('rmd_no');
+                }
             }
             if(isset($validated['hbl'])) {
                
@@ -269,7 +272,7 @@ class RateMetaDataController extends Controller
                         $rm->where('co_name', 'like', '%'.$validated['co_parent_name'].'%');
                     });
                 } else {
-                    $rmd->whereHas('company', function($rm) use ($validated){
+                    $rmd->whereNull('company', function($rm) use ($validated){
                         $rm->where('co_name', 'like', '%'.$validated['co_parent_name'].'%');
                     });
                 }
