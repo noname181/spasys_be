@@ -411,7 +411,7 @@ class CompanyController extends Controller
             // If page is null set default data = 1
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : '';
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $companies = Company::with(['contract', 'co_parent'])->where('co_type', 'shop')->orderBy('co_no', 'DESC');
+            $companies = Company::with(['contract', 'co_parent', 'adjustment_group'])->where('co_type', 'shop')->orderBy('co_no', 'DESC');
 
 
             $companies->whereHas('co_parent', function ($query) use ($co_no) {
@@ -554,6 +554,37 @@ class CompanyController extends Controller
             }
 
             $companies = $companies->get();
+            forEach($companies as $item){
+                $service_names = explode(" ", $item->co_service);
+                $co_no = $item->co_no;
+
+                $settlement_cycle = [];
+
+                foreach ($service_names as $service_name) {
+                    $service = Service::where('service_name', $service_name)->first();
+                    if (isset($service->service_no)) {
+                        $company_settlement = CompanySettlement::where([
+                            'co_no' => $co_no,
+                            'service_no' => $service->service_no
+                        ])->first();
+                        if ($company_settlement) {
+                            $settlement_cycle[] = $company_settlement->cs_payment_cycle;
+                        }
+                    }
+                }
+                $settlement_cycle = implode("/", $settlement_cycle);
+                     
+                $rmd = RateMetaData::with(['rate_meta', 'member:mb_no,co_no,mb_name', 'company'])
+                ->whereNotNull('co_no')
+                ->whereNull('rmd_parent_no')
+                ->whereNull('set_type')
+                ->where('co_no',$co_no)
+                ->orderBy('rmd_no', 'DESC')->get();
+                $item->settlement_cycle = $settlement_cycle;
+                $item->check_rate = $rmd;
+               // return $item;
+            }
+
             //return DB::getQueryLog();
             return response()->json(['data' => $companies]);
         } catch (\Exception $e) {
@@ -746,7 +777,7 @@ class CompanyController extends Controller
 
             $companies = $companies->get();
 
-            return response()->json($companies);
+            return response()->json(['data' =>$companies]);
         } catch (\Exception $e) {
             Log::error($e);
 
