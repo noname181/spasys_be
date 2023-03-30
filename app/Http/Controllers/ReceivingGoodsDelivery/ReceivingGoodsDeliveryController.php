@@ -77,7 +77,7 @@ class ReceivingGoodsDeliveryController extends Controller
             DB::beginTransaction();
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
-            
+
             if (isset($validated['w_no'])) {
                 Warehousing::where('w_no', $validated['w_no'])->update([
                     'w_schedule_amount' => $validated['w_schedule_amount'],
@@ -132,8 +132,8 @@ class ReceivingGoodsDeliveryController extends Controller
                         'connection_number' => $validated['connection_number']
                     ]);
                     $check_ex = Warehousing::where('w_import_no', '=', $w_no)->get();
-                    if($check_ex){
-                        foreach($check_ex as $ex){
+                    if ($check_ex) {
+                        foreach ($check_ex as $ex) {
                             Warehousing::where('w_no', $ex->w_no)->update([
                                 'connection_number' => $validated['connection_number']
                             ]);
@@ -152,7 +152,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     //         'type' => "3_2"
                     //     ]);
                     // }
-                   
+
                     // if ($validated['type_w_choose'] == "export") {
                     //     $connection_number_old = Export::where('te_carry_out_number', $validated['connect_w'])->first();
 
@@ -343,61 +343,61 @@ class ReceivingGoodsDeliveryController extends Controller
 
                 // if ($sql_r->rgd_status1 != "입고" && $sql_r->rgd_status2 != "작업완료") {
                 if (isset($validated['items'])) {
-                foreach ($validated['items'] as $warehousing_item) {
+                    foreach ($validated['items'] as $warehousing_item) {
 
 
-                    $item_no = $warehousing_item['item_no'] ? $warehousing_item['item_no'] : '';
+                        $item_no = $warehousing_item['item_no'] ? $warehousing_item['item_no'] : '';
 
-                    if (isset($item_no) && $item_no) {
+                        if (isset($item_no) && $item_no) {
 
-                        if (isset($validated['page_type']) && $validated['page_type'] == 'Page130146') {
-                            $checkexit1 = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_spasys')->first();
-                            if (!isset($checkexit1->wi_no)) {
-                                WarehousingItem::insert([
-                                    'item_no' => $item_no,
-                                    'w_no' => $w_no,
-                                    'wi_number' => $warehousing_item['warehousing_item2'][0]['wi_number'],
-                                    'wi_type' => '입고_spasys'
-                                ]);
-                            } else {
-                                $warehousing_items = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_spasys')->update([
-                                    'wi_number' => $warehousing_item['warehousing_item2'][0]['wi_number'],
-                                ]);
-                            }
+                            if (isset($validated['page_type']) && $validated['page_type'] == 'Page130146') {
+                                $checkexit1 = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_spasys')->first();
+                                if (!isset($checkexit1->wi_no)) {
+                                    WarehousingItem::insert([
+                                        'item_no' => $item_no,
+                                        'w_no' => $w_no,
+                                        'wi_number' => $warehousing_item['warehousing_item2'][0]['wi_number'],
+                                        'wi_type' => '입고_spasys'
+                                    ]);
+                                } else {
+                                    $warehousing_items = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_spasys')->update([
+                                        'wi_number' => $warehousing_item['warehousing_item2'][0]['wi_number'],
+                                    ]);
+                                }
 
-                            $checkexit2 = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_shipper')->first();
-                            if (!isset($checkexit2->wi_no)) {
-                                WarehousingItem::insert([
-                                    'item_no' => $item_no,
-                                    'w_no' => $w_no,
-                                    'wi_number' => $warehousing_item['warehousing_item'][0]['wi_number'],
-                                    'wi_type' => '입고_shipper'
-                                ]);
-                            } else {
-                                $warehousing_items = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_shipper')->update([
-                                    'wi_number' => $warehousing_item['warehousing_item'][0]['wi_number'],
-                                ]);
-                            }
-                        } else {
-
-                            $checkexit3 = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_shipper')->first();
-                            if (!isset($checkexit3->wi_no)) {
-                                WarehousingItem::insert([
-                                    'item_no' => $item_no,
-                                    'w_no' => $w_no,
-                                    'wi_number' => $warehousing_item['warehousing_item'][0]['wi_number'],
-                                    'wi_type' => '입고_shipper'
-                                ]);
-                            } else {
-                                if (isset($warehousing_item['warehousing_item'][0]['wi_number'])) {
+                                $checkexit2 = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_shipper')->first();
+                                if (!isset($checkexit2->wi_no)) {
+                                    WarehousingItem::insert([
+                                        'item_no' => $item_no,
+                                        'w_no' => $w_no,
+                                        'wi_number' => $warehousing_item['warehousing_item'][0]['wi_number'],
+                                        'wi_type' => '입고_shipper'
+                                    ]);
+                                } else {
                                     $warehousing_items = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_shipper')->update([
                                         'wi_number' => $warehousing_item['warehousing_item'][0]['wi_number'],
                                     ]);
                                 }
+                            } else {
+
+                                $checkexit3 = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_shipper')->first();
+                                if (!isset($checkexit3->wi_no)) {
+                                    WarehousingItem::insert([
+                                        'item_no' => $item_no,
+                                        'w_no' => $w_no,
+                                        'wi_number' => $warehousing_item['warehousing_item'][0]['wi_number'],
+                                        'wi_type' => '입고_shipper'
+                                    ]);
+                                } else {
+                                    if (isset($warehousing_item['warehousing_item'][0]['wi_number'])) {
+                                        $warehousing_items = WarehousingItem::where('item_no', $item_no)->where('w_no', $validated['w_no'])->where('wi_type', '입고_shipper')->update([
+                                            'wi_number' => $warehousing_item['warehousing_item'][0]['wi_number'],
+                                        ]);
+                                    }
+                                }
                             }
                         }
                     }
-                }
                 }
                 //}
             } else {
@@ -850,9 +850,9 @@ class ReceivingGoodsDeliveryController extends Controller
                 } else {
                     if (isset($request->data)) {
                         foreach ($request->data as $key => $data) {
-                            
+
                             if ($data['w_no'] != "") {
-                               
+
                                 $w_no = Warehousing::where('w_no', $request->w_no)->update([
                                     'w_schedule_amount' => $data['w_schedule_amount'],
                                     'w_schedule_day' => $request->w_schedule_day,
@@ -891,13 +891,13 @@ class ReceivingGoodsDeliveryController extends Controller
                                 }
                                 if ($request->page_type != 'Page146') {
                                     foreach ($data['items'] as $item) {
-                                        WarehousingItem::where('w_no', $request->w_no)->where('item_no', $item['item_no'])->where('wi_type','=','출고_shipper')->update([
+                                        WarehousingItem::where('w_no', $request->w_no)->where('item_no', $item['item_no'])->where('wi_type', '=', '출고_shipper')->update([
                                             'item_no' => $item['item_no'],
                                             'w_no' => $request->w_no,
                                             'wi_number' => $item['schedule_wi_number'],
                                             'wi_type' => '출고_shipper'
                                         ]);
-                                        WarehousingItem::where('w_no', $request->w_no)->where('item_no', $item['item_no'])->where('wi_type','=','출고_spasys')->update([
+                                        WarehousingItem::where('w_no', $request->w_no)->where('item_no', $item['item_no'])->where('wi_type', '=', '출고_spasys')->update([
                                             'item_no' => $item['item_no'],
                                             'w_no' => $request->w_no,
                                             'wi_number' => $item['schedule_wi_number'],
@@ -916,7 +916,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                     } else {
                                         $warehousing_status = null;
                                     }
-        
+
                                     // if ($warehousing_status != $rgd_data->rgd_status3) {
                                     //     $warehousing_status3 = isset($location['rgd_status3']) ? $location['rgd_status3'] : null;
                                     // } else {
@@ -1535,7 +1535,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'w_type' => 'IW',
                     'w_category_name' => $request->w_category_name,
                     'w_completed_day' => Carbon::now()->toDateTimeString(),
-                    
+
                 ]);
             } else {
                 $w_no_data = Warehousing::insertGetId([
@@ -1565,7 +1565,6 @@ class ReceivingGoodsDeliveryController extends Controller
 
             if (!isset($validate['w_schedule_number'])) {
                 $w_schedule_number = (new CommonFunc)->generate_w_schedule_number($w_no, 'IWC');
-               
             }
 
 
@@ -1680,7 +1679,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     Warehousing::where('w_no', $request->w_no)->update([
                         'connection_number' => $request->connection_number
                     ]);
-                }else{
+                } else {
                     Warehousing::where('w_no', $w_no)->update([
                         'connection_number' => $request->connection_number
                     ]);
@@ -1811,7 +1810,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'rgd_status1' => '입고 취소'
                             ]);
 
-                            //THUONG 
+                            //THUONG
                             $warehousing_settlement = WarehousingSettlement::where('w_no', $value['w_no']['w_no'])->get();
                             foreach ($warehousing_settlement as $ws) {
                                 $warehousing =  Warehousing::where(['w_no' => $ws['w_no_settlement']])->first();
@@ -1821,7 +1820,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                     'w_amount' => $warehousing->w_amount - $ws['w_amount']
                                 ]);
                             }
-                            //THUONG 
+                            //THUONG
 
                             WarehousingStatus::insert([
                                 'w_no' => $value['w_no']['w_no'],
@@ -1839,7 +1838,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'rgd_status1' => '입고 취소'
                             ]);
 
-                        //THUONG 
+                        //THUONG
                         $warehousing_settlement = WarehousingSettlement::where('w_no', $request->w_no)->get();
                         foreach ($warehousing_settlement as $ws) {
                             $warehousing =  Warehousing::where(['w_no' => $ws['w_no_settlement']])->first();
@@ -1849,7 +1848,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'w_amount' => $warehousing->w_amount - $ws['w_amount']
                             ]);
                         }
-                        //THUONG 
+                        //THUONG
 
                         WarehousingStatus::insert([
                             'w_no' => $request->w_no,
@@ -2252,7 +2251,6 @@ class ReceivingGoodsDeliveryController extends Controller
             foreach ($validated['remove'] as $remove) {
                 ReceivingGoodsDelivery::where('rgd_no', $remove['rgd_no'])->delete();
                 Package::where('rgd_no', $remove['rgd_no'])->delete();
-
             }
 
             if ($validated['wr_contents'] && $validated['is_no']) {
@@ -2568,7 +2566,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         'cbh_status_after' => 'confirmed'
                     ]);
 
-                    if($ag->ag_auto_issue == 'y'){
+                    if ($ag->ag_auto_issue == 'y') {
                         $tax_number = CommonFunc::generate_tax_number($rgd->rgd_no);
 
                         TaxInvoiceDivide::updateOrCreate(
@@ -2590,10 +2588,6 @@ class ReceivingGoodsDeliveryController extends Controller
                             ]
                         );
                     }
-
-                    
-
-                    
                 } else {
                     ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                         'rgd_status5' => 'confirmed',
@@ -2628,9 +2622,9 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
                         ]);
 
-                        if($ag->ag_auto_issue == 'y'){
+                        if ($ag->ag_auto_issue == 'y') {
                             $tax_number = CommonFunc::generate_tax_number($rgd->rgd_no);
-    
+
                             TaxInvoiceDivide::updateOrCreate(
                                 [
                                     'rgd_no' => $rgd->rgd_no,
@@ -2650,7 +2644,6 @@ class ReceivingGoodsDeliveryController extends Controller
                                 ]
                             );
                         }
-                        
                     } else {
                         ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                             'rgd_status5' => 'confirmed',
@@ -2684,9 +2677,9 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
                         ]);
 
-                        if($ag->ag_auto_issue == 'y'){
+                        if ($ag->ag_auto_issue == 'y') {
                             $tax_number = CommonFunc::generate_tax_number($rgd->rgd_no);
-    
+
                             TaxInvoiceDivide::updateOrCreate(
                                 [
                                     'rgd_no' => $rgd->rgd_no,
@@ -2706,7 +2699,6 @@ class ReceivingGoodsDeliveryController extends Controller
                                 ]
                             );
                         }
-
                     } else {
                         ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                             'rgd_status5' => 'confirmed',
@@ -2795,13 +2787,31 @@ class ReceivingGoodsDeliveryController extends Controller
         }
     }
 
+    public function payment_from_est(Request $request)
+    {
+        try {
+            $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+            ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                'rgd_status6' => 'paid',
+                'rgd_paid_date' =>  Carbon::now(),
+            ]);
+            return response()->json([
+                'message' => 'Success',
+                //'check_payment' =>$check_payment->rgd_no
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
     public function payment(Request $request)
     {
         try {
 
             $check_payment = Payment::where('rgd_no', $request->rgd_no)->where('p_cancel_yn', 'y')->first();
-            if(isset($request->sumprice) && $request->p_method == 'card' ){
-                $p_method_fee = $request->sumprice/100 ;
+            if (isset($request->sumprice) && $request->p_method == 'card') {
+                $p_method_fee = $request->sumprice / 100;
             }
             if (isset($check_payment)) {
                 Payment::where('rgd_no', $check_payment->rgd_no)->update([
@@ -3013,9 +3023,9 @@ class ReceivingGoodsDeliveryController extends Controller
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
             $data = $request->data;
             $dataSubmit = $request->dataSubmit;
-            if($dataSubmit){
+            if ($dataSubmit) {
                 $rgd = ReceivingGoodsDelivery::updateOrCreate(
-                                
+
                     [
                         'rgd_no' =>  isset($dataSubmit['rgd_no']) ? $dataSubmit['rgd_no'] : null,
                     ],
@@ -3041,47 +3051,47 @@ class ReceivingGoodsDeliveryController extends Controller
                         'rgd_arrive_day' => $dataSubmit['rgd_arrive_day'] ? $dataSubmit['rgd_arrive_day'] : null,
 
                     ]
-                    
+
                 );
                 Package::updateOrCreate(
-                [
-                    'p_no' =>  $dataSubmit['p_no']
-                ],
-                [
-                    'w_no' => $dataSubmit['is_no'],
-                    'rgd_no' => $rgd->rgd_no,
-                    'note' => $dataSubmit['note'],
-                    'order_number' => $dataSubmit['order_number'],
-                    'pack_type' => $dataSubmit['pack_type'],
-                    'quantity' => $dataSubmit['quantity'],
-                    'reciever' => $dataSubmit['reciever'],
-                    'reciever_address' => $dataSubmit['reciever_address'],
-                    'reciever_contract' => $dataSubmit['reciever_contract'],
-                    'reciever_detail_address' => $dataSubmit['reciever_detail_address'],
-                    'sender' => $dataSubmit['sender'],
-                    'sender_address' => $dataSubmit['sender_address'],
-                    'sender_contract' => $dataSubmit['sender_contract'],
-                    'sender_detail_address' => $dataSubmit['sender_detail_address']
+                    [
+                        'p_no' =>  $dataSubmit['p_no']
+                    ],
+                    [
+                        'w_no' => $dataSubmit['is_no'],
+                        'rgd_no' => $rgd->rgd_no,
+                        'note' => $dataSubmit['note'],
+                        'order_number' => $dataSubmit['order_number'],
+                        'pack_type' => $dataSubmit['pack_type'],
+                        'quantity' => $dataSubmit['quantity'],
+                        'reciever' => $dataSubmit['reciever'],
+                        'reciever_address' => $dataSubmit['reciever_address'],
+                        'reciever_contract' => $dataSubmit['reciever_contract'],
+                        'reciever_detail_address' => $dataSubmit['reciever_detail_address'],
+                        'sender' => $dataSubmit['sender'],
+                        'sender_address' => $dataSubmit['sender_address'],
+                        'sender_contract' => $dataSubmit['sender_contract'],
+                        'sender_detail_address' => $dataSubmit['sender_detail_address']
 
-                ]
-                
+                    ]
+
                 );
             }
-            if(isset($data['remove'])){
+            if (isset($data['remove'])) {
                 foreach ($data['remove'] as $remove) {
                     ReceivingGoodsDelivery::where('rgd_no', $remove['rgd_no'])->delete();
                     Package::where('rgd_no', $remove['rgd_no'])->delete();
                 }
             }
-                // if ($request->is_no){
-                //     if (isset($package)) {
-                //         foreach ($package['location'] as $packages) {   
-                
-                //         }
-                        
-                //     }   
-                // }
-            
+            // if ($request->is_no){
+            //     if (isset($package)) {
+            //         foreach ($package['location'] as $packages) {
+
+            //         }
+
+            //     }
+            // }
+
 
             DB::commit();
             return response()->json([
