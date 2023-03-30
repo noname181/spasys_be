@@ -777,7 +777,7 @@ class CompanyController extends Controller
 
             $companies = $companies->get();
 
-            return response()->json($companies);
+            return response()->json(['data' =>$companies]);
         } catch (\Exception $e) {
             Log::error($e);
 
