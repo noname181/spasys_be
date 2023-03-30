@@ -3617,7 +3617,7 @@ class RateDataController extends Controller
             foreach ($request->rgds as $key => $rgd) {
 
                 //Get the est bill
-                $expectation_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->where('rgd_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
+                $expectation_rdg = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->where('rgd_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
                 //Check if there is any RateDataGeneral of est bill
                 $is_exist = RateDataGeneral::where('rgd_no_expectation', $rgd['rgd_no'])->where('rdg_bill_type', 'final_monthly')->first();
                 //Get the final bill if any
@@ -3625,9 +3625,9 @@ class RateDataController extends Controller
 
                 //Creating RateDataGeneral for final bill if not
                 if (!$is_exist || $final_rgd->rgd_status5 == 'cancel') {
-                    $expectation_rgd = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
+                    $expectation_rdg = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
 
-                    $final_rdg = $expectation_rgd->replicate();
+                    $final_rdg = $expectation_rdg->replicate();
                     $final_rdg->rdg_bill_type = $request->bill_type; // the new project_id
 
                     $final_rdg->rdg_supply_price1 = $rdg_supply_price1;
@@ -3683,7 +3683,7 @@ class RateDataController extends Controller
                         'rdg_sum7' => $rdg_sum7,
                     ]);
                 }  
-
+                $expectation_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->where('rgd_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
                 $final_rgds[] = $final_rgd;
                 //Creating final bill
                 if (!$final_rgd || $final_rgd->rgd_status5 == 'cancel') {
