@@ -75,7 +75,7 @@ class AlarmController extends Controller
                 //     $q->where('co_no', $user->company->co_parent->co_no);
                 //     //->orWhere('co_no', $user->company->co_parent->co_parent->co_no);
                 // })
-                $alarm = Alarm::with('warehousing','member','export','import_expect','import')->where(function($q) use($validated,$user) {
+                $alarm = Alarm::with('warehousing','member','import_expect')->where(function($q) use($validated,$user) {
                 $q->whereHas('export.import_expected.company.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->orwhereHas('export.import_expected.company.co_parent',function ($q) use ($user){
@@ -95,7 +95,7 @@ class AlarmController extends Controller
                 //     $q->where('co_no', $user->company->co_parent->co_no)
                 //     ->orWhere('co_no', $user->company->co_parent->co_parent->co_no);
                 // })
-                $alarm = Alarm::with('warehousing','member','export','import_expect','import')->where(function($q) use($validated,$user) {
+                $alarm = Alarm::with('warehousing','member','import_expect')->where(function($q) use($validated,$user) {
                     $q->whereHas('export.import_expected.company',function ($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     })->orwhereHas('import_expect.company',function ($q) use ($user){
@@ -107,7 +107,7 @@ class AlarmController extends Controller
                     });})->orderBy('alarm_no', 'DESC');
                
             } else if ($user->mb_type == 'spasys'){
-                $alarm = Alarm::with('warehousing','member','export','import_expect','import')->whereHas('member',function ($q) use ($user){
+                $alarm = Alarm::with('warehousing','member','import_expect')->whereHas('member',function ($q) use ($user){
                     $q->where('mb_no',$user->mb_no);
                 })->orderBy('alarm_no', 'DESC');
             }
@@ -248,7 +248,7 @@ class AlarmController extends Controller
                 $alarm = Alarm::with('warehousing','member','export')->where('alarm.mb_no','=',$user->mb_no)->orderBy('alarm_no', 'DESC');
                
             } else if ($user->mb_type == 'spasys'){
-                $alarm = Alarm::with('warehousing','member','export','import_expect','import')->where('alarm.mb_no','=',$user->mb_no)->orderBy('alarm_no', 'DESC');
+                $alarm = Alarm::with('warehousing','member','import_expect')->where('alarm.mb_no','=',$user->mb_no)->orderBy('alarm_no', 'DESC');
             }
 
             
