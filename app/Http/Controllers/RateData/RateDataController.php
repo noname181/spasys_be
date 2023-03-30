@@ -3558,195 +3558,190 @@ class RateDataController extends Controller
         try {
             DB::beginTransaction();
             $user = Auth::user();
-            if ($request->is_edit == 'edit') {
-                $i = 0;
-                foreach ($request->rgds as $key => $rgd) {
-                    $is_exist = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', 'final_monthly')->first();
-                }
-            } else {
-                $i = 0;
-                $final_rgds = [];
 
-                $rdg_supply_price1 = 0;
-                $rdg_supply_price2 = 0;
-                $rdg_supply_price3 = 0;
-                $rdg_supply_price4 = 0;
-                $rdg_supply_price5 = 0;
-                $rdg_supply_price6 = 0;
-                $rdg_supply_price7 = 0;
+            $i = 0;
+            $final_rgds = [];
 
-                $rdg_vat1 = 0;
-                $rdg_vat2 = 0;
-                $rdg_vat3 = 0;
-                $rdg_vat4 = 0;
-                $rdg_vat5 = 0;
-                $rdg_vat6 = 0;
-                $rdg_vat7 = 0;
+            $rdg_supply_price1 = 0;
+            $rdg_supply_price2 = 0;
+            $rdg_supply_price3 = 0;
+            $rdg_supply_price4 = 0;
+            $rdg_supply_price5 = 0;
+            $rdg_supply_price6 = 0;
+            $rdg_supply_price7 = 0;
 
-                $rdg_sum1 = 0;
-                $rdg_sum2 = 0;
-                $rdg_sum3 = 0;
-                $rdg_sum4 = 0;
-                $rdg_sum5 = 0;
-                $rdg_sum6 = 0;
-                $rdg_sum7 = 0;
+            $rdg_vat1 = 0;
+            $rdg_vat2 = 0;
+            $rdg_vat3 = 0;
+            $rdg_vat4 = 0;
+            $rdg_vat5 = 0;
+            $rdg_vat6 = 0;
+            $rdg_vat7 = 0;
 
-                foreach ($request->rgds as $key => $rgd) {
-                    $is_exist = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
-                    $rdg_supply_price1 = $rdg_supply_price1 + $is_exist['rdg_supply_price1'];
-                    $rdg_supply_price2 = $rdg_supply_price2 + $is_exist['rdg_supply_price2'];
-                    $rdg_supply_price3 = $rdg_supply_price3 + $is_exist['rdg_supply_price3'];
-                    $rdg_supply_price4 = $rdg_supply_price4 + $is_exist['rdg_supply_price4'];
-                    $rdg_supply_price5 = $rdg_supply_price5 + $is_exist['rdg_supply_price5'];
-                    $rdg_supply_price6 = $rdg_supply_price6 + $is_exist['rdg_supply_price6'];
-                    $rdg_supply_price7 = $rdg_supply_price7 + $is_exist['rdg_supply_price7'];
+            $rdg_sum1 = 0;
+            $rdg_sum2 = 0;
+            $rdg_sum3 = 0;
+            $rdg_sum4 = 0;
+            $rdg_sum5 = 0;
+            $rdg_sum6 = 0;
+            $rdg_sum7 = 0;
 
-                    $rdg_vat1 = $rdg_vat1 + $is_exist['rdg_vat1'];
-                    $rdg_vat2 = $rdg_vat2 + $is_exist['rdg_vat2'];
-                    $rdg_vat3 = $rdg_vat3 + $is_exist['rdg_vat3'];
-                    $rdg_vat4 = $rdg_vat4 + $is_exist['rdg_vat4'];
-                    $rdg_vat5 = $rdg_vat5 + $is_exist['rdg_vat5'];
-                    $rdg_vat6 = $rdg_vat6 + $is_exist['rdg_vat6'];
-                    $rdg_vat7 = $rdg_vat7 + $is_exist['rdg_vat7'];
+            foreach ($request->rgds as $key => $rgd) {
+                $is_exist = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
+                $rdg_supply_price1 = $rdg_supply_price1 + $is_exist['rdg_supply_price1'];
+                $rdg_supply_price2 = $rdg_supply_price2 + $is_exist['rdg_supply_price2'];
+                $rdg_supply_price3 = $rdg_supply_price3 + $is_exist['rdg_supply_price3'];
+                $rdg_supply_price4 = $rdg_supply_price4 + $is_exist['rdg_supply_price4'];
+                $rdg_supply_price5 = $rdg_supply_price5 + $is_exist['rdg_supply_price5'];
+                $rdg_supply_price6 = $rdg_supply_price6 + $is_exist['rdg_supply_price6'];
+                $rdg_supply_price7 = $rdg_supply_price7 + $is_exist['rdg_supply_price7'];
 
-                    $rdg_sum1 = $rdg_sum1 + $is_exist['rdg_sum1'];
-                    $rdg_sum2 = $rdg_sum2 + $is_exist['rdg_sum2'];
-                    $rdg_sum3 = $rdg_sum3 + $is_exist['rdg_sum3'];
-                    $rdg_sum4 = $rdg_sum4 + $is_exist['rdg_sum4'];
-                    $rdg_sum5 = $rdg_sum5 + $is_exist['rdg_sum5'];
-                    $rdg_sum6 = $rdg_sum6 + $is_exist['rdg_sum6'];
-                    $rdg_sum7 = $rdg_sum7 + $is_exist['rdg_sum7'];
-                }
+                $rdg_vat1 = $rdg_vat1 + $is_exist['rdg_vat1'];
+                $rdg_vat2 = $rdg_vat2 + $is_exist['rdg_vat2'];
+                $rdg_vat3 = $rdg_vat3 + $is_exist['rdg_vat3'];
+                $rdg_vat4 = $rdg_vat4 + $is_exist['rdg_vat4'];
+                $rdg_vat5 = $rdg_vat5 + $is_exist['rdg_vat5'];
+                $rdg_vat6 = $rdg_vat6 + $is_exist['rdg_vat6'];
+                $rdg_vat7 = $rdg_vat7 + $is_exist['rdg_vat7'];
 
-                //Loop through  rgds from the request
-                foreach ($request->rgds as $key => $rgd) {
-
-                    //Get the est bill
-                    $expectation_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->where('rgd_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
-                    //Check if there is any RateDataGeneral of est bill
-                    $is_exist = RateDataGeneral::where('rgd_no_expectation', $rgd['rgd_no'])->where('rdg_bill_type', 'final_monthly')->first();
-                    //Get the final bill if any
-                    $final_rgd = ReceivingGoodsDelivery::where('rgd_parent_no', $rgd['rgd_no'])->where('rgd_bill_type', 'final_monthly')->first();
-
-                    //Creating RateDataGeneral for final bill if not
-                    if (!$is_exist || $final_rgd->rgd_status5 == 'cancel') {
-                        $expectation_rgd = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
-
-                        $final_rdg = $expectation_rgd->replicate();
-                        $final_rdg->rdg_bill_type = $request->bill_type; // the new project_id
-
-                        $final_rdg->rdg_supply_price1 = $rdg_supply_price1;
-                        $final_rdg->rdg_supply_price2 = $rdg_supply_price2;
-                        $final_rdg->rdg_supply_price3 = $rdg_supply_price3;
-                        $final_rdg->rdg_supply_price4 = $rdg_supply_price4;
-                        $final_rdg->rdg_supply_price5 = $rdg_supply_price5;
-                        $final_rdg->rdg_supply_price6 = $rdg_supply_price6;
-                        $final_rdg->rdg_supply_price7 = $rdg_supply_price7;
-
-                        $final_rdg->rdg_vat1 = $rdg_vat1;
-                        $final_rdg->rdg_vat2 = $rdg_vat2;
-                        $final_rdg->rdg_vat3 = $rdg_vat3;
-                        $final_rdg->rdg_vat4 = $rdg_vat4;
-                        $final_rdg->rdg_vat5 = $rdg_vat5;
-                        $final_rdg->rdg_vat6 = $rdg_vat6;
-                        $final_rdg->rdg_vat7 = $rdg_vat7;
-
-                        $final_rdg->rdg_sum1 = $rdg_sum1;
-                        $final_rdg->rdg_sum2 = $rdg_sum2;
-                        $final_rdg->rdg_sum3 = $rdg_sum3;
-                        $final_rdg->rdg_sum4 = $rdg_sum4;
-                        $final_rdg->rdg_sum5 = $rdg_sum5;
-                        $final_rdg->rdg_sum6 = $rdg_sum6;
-                        $final_rdg->rdg_sum7 = $rdg_sum7;
-
-                        $final_rdg->save();
-                    } else {
-                        $final_rdg = $is_exist;
-                        RateDataGeneral::where('rgd_no_expectation', $rgd['rgd_no'])->where('rdg_bill_type', 'final_monthly')->update([
-                            'rdg_supply_price1' => $rdg_supply_price1,
-                            'rdg_supply_price2' => $rdg_supply_price2,
-                            'rdg_supply_price3' => $rdg_supply_price3,
-                            'rdg_supply_price4' => $rdg_supply_price4,
-                            'rdg_supply_price5' => $rdg_supply_price5,
-                            'rdg_supply_price6' => $rdg_supply_price6,
-                            'rdg_supply_price7' => $rdg_supply_price7,
-
-                            'rdg_vat1' => $rdg_vat1,
-                            'rdg_vat2' => $rdg_vat2,
-                            'rdg_vat3' => $rdg_vat3,
-                            'rdg_vat4' => $rdg_vat4,
-                            'rdg_vat5' => $rdg_vat5,
-                            'rdg_vat6' => $rdg_vat6,
-                            'rdg_vat7' => $rdg_vat7,
-
-                            'rdg_sum1' => $rdg_sum1,
-                            'rdg_sum2' => $rdg_sum2,
-                            'rdg_sum3' => $rdg_sum3,
-                            'rdg_sum4' => $rdg_sum4,
-                            'rdg_sum5' => $rdg_sum5,
-                            'rdg_sum6' => $rdg_sum6,
-                            'rdg_sum7' => $rdg_sum7,
-                        ]);
-                    }  
-
-                    $final_rgds[] = $final_rgd;
-                    //Creating final bill
-                    if (!$final_rgd || $final_rgd->rgd_status5 == 'cancel') {
-                        $expectation_rgd->rgd_status5 = 'issued';
-                        $expectation_rgd->save();
-
-                        $final_rgd = $expectation_rgd->replicate();
-                        $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
-                        $final_rgd->rgd_status4 = '확정청구서';
-                        $final_rgd->rgd_issue_date = Carbon::now()->toDateTimeString();
-                        $final_rgd->rgd_status5 = null;
-                        $final_rgd->rgd_status6 = null;
-                        $final_rgd->rgd_status7 = null;
-                        $final_rgd->rgd_is_show = ($i == 0 ? 'y' : 'n');
-                        $final_rgd->rgd_parent_no = $expectation_rgd->rgd_no;
-                        $final_rgd->rgd_settlement_number = $request->settlement_number;
-                        $final_rgd->save();
-
-                        $ag = AdjustmentGroup::where('ag_no', $request->rdg_set_type)->first();
-                        //Update for the created RateDataGeneral
-                        RateDataGeneral::where('rdg_no', $final_rdg->rdg_no)->update([
-                            'rgd_no' => $final_rgd->rgd_no,
-                            'rgd_no_expectation' => $expectation_rgd->rgd_no,
-                            'rdg_set_type' => isset($ag->ag_name) ? $ag->ag_name : $is_exist->rdg_set_type,
-                            'ag_no' => isset($ag->ag_no) ? $ag->ag_no : $is_exist->ag_no,
-                        ]);
-                        //Update for the created RateMetaData
-                        RateMetaData::where('rgd_no', $request->rgd_no)->where(function ($q) {
-                            $q->where('set_type', 'bonded1_final_monthly')
-                                ->orWhere('set_type', 'bonded2_final_monthly')
-                                ->orWhere('set_type', 'bonded3_final_monthly')
-                                ->orWhere('set_type', 'bonded4_final_monthly')
-                                ->orWhere('set_type', 'bonded5_final_monthly')
-                                ->orWhere('set_type', 'bonded6_final_monthly');
-                        })->update([
-                            'rgd_no' => $final_rgd->rgd_no,
-                        ]);
-
-                    } else {
-                        $expectation_rgd->rgd_status5 = 'issued';
-                        $expectation_rgd->save();
-
-                        $final_rgd->rgd_settlement_number = $request->settlement_number;
-                        if ($i == 0) {
-                            $final_rgd->rgd_is_show = 'y';
-                        } else {
-                            $final_rgd->rgd_is_show = 'n';
-                        }
-                        $final_rgd->save();
-
-                        RateDataGeneral::where('rdg_no', $final_rdg->rdg_no)->update([
-                            'rgd_no' => $final_rgd->rgd_no,
-                            'rgd_no_expectation' => $expectation_rgd->rgd_no,
-                        ]);
-                    }
-                    $i++;
-                }
+                $rdg_sum1 = $rdg_sum1 + $is_exist['rdg_sum1'];
+                $rdg_sum2 = $rdg_sum2 + $is_exist['rdg_sum2'];
+                $rdg_sum3 = $rdg_sum3 + $is_exist['rdg_sum3'];
+                $rdg_sum4 = $rdg_sum4 + $is_exist['rdg_sum4'];
+                $rdg_sum5 = $rdg_sum5 + $is_exist['rdg_sum5'];
+                $rdg_sum6 = $rdg_sum6 + $is_exist['rdg_sum6'];
+                $rdg_sum7 = $rdg_sum7 + $is_exist['rdg_sum7'];
             }
+
+            //Loop through  rgds from the request
+            foreach ($request->rgds as $key => $rgd) {
+
+                //Get the est bill
+                $expectation_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->where('rgd_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
+                //Check if there is any RateDataGeneral of est bill
+                $is_exist = RateDataGeneral::where('rgd_no_expectation', $rgd['rgd_no'])->where('rdg_bill_type', 'final_monthly')->first();
+                //Get the final bill if any
+                $final_rgd = ReceivingGoodsDelivery::where('rgd_parent_no', $rgd['rgd_no'])->where('rgd_bill_type', 'final_monthly')->first();
+
+                //Creating RateDataGeneral for final bill if not
+                if (!$is_exist || $final_rgd->rgd_status5 == 'cancel') {
+                    $expectation_rgd = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
+
+                    $final_rdg = $expectation_rgd->replicate();
+                    $final_rdg->rdg_bill_type = $request->bill_type; // the new project_id
+
+                    $final_rdg->rdg_supply_price1 = $rdg_supply_price1;
+                    $final_rdg->rdg_supply_price2 = $rdg_supply_price2;
+                    $final_rdg->rdg_supply_price3 = $rdg_supply_price3;
+                    $final_rdg->rdg_supply_price4 = $rdg_supply_price4;
+                    $final_rdg->rdg_supply_price5 = $rdg_supply_price5;
+                    $final_rdg->rdg_supply_price6 = $rdg_supply_price6;
+                    $final_rdg->rdg_supply_price7 = $rdg_supply_price7;
+
+                    $final_rdg->rdg_vat1 = $rdg_vat1;
+                    $final_rdg->rdg_vat2 = $rdg_vat2;
+                    $final_rdg->rdg_vat3 = $rdg_vat3;
+                    $final_rdg->rdg_vat4 = $rdg_vat4;
+                    $final_rdg->rdg_vat5 = $rdg_vat5;
+                    $final_rdg->rdg_vat6 = $rdg_vat6;
+                    $final_rdg->rdg_vat7 = $rdg_vat7;
+
+                    $final_rdg->rdg_sum1 = $rdg_sum1;
+                    $final_rdg->rdg_sum2 = $rdg_sum2;
+                    $final_rdg->rdg_sum3 = $rdg_sum3;
+                    $final_rdg->rdg_sum4 = $rdg_sum4;
+                    $final_rdg->rdg_sum5 = $rdg_sum5;
+                    $final_rdg->rdg_sum6 = $rdg_sum6;
+                    $final_rdg->rdg_sum7 = $rdg_sum7;
+
+                    $final_rdg->save();
+                } else {
+                    $final_rdg = $is_exist;
+                    RateDataGeneral::where('rgd_no_expectation', $rgd['rgd_no'])->where('rdg_bill_type', 'final_monthly')->update([
+                        'rdg_supply_price1' => $rdg_supply_price1,
+                        'rdg_supply_price2' => $rdg_supply_price2,
+                        'rdg_supply_price3' => $rdg_supply_price3,
+                        'rdg_supply_price4' => $rdg_supply_price4,
+                        'rdg_supply_price5' => $rdg_supply_price5,
+                        'rdg_supply_price6' => $rdg_supply_price6,
+                        'rdg_supply_price7' => $rdg_supply_price7,
+
+                        'rdg_vat1' => $rdg_vat1,
+                        'rdg_vat2' => $rdg_vat2,
+                        'rdg_vat3' => $rdg_vat3,
+                        'rdg_vat4' => $rdg_vat4,
+                        'rdg_vat5' => $rdg_vat5,
+                        'rdg_vat6' => $rdg_vat6,
+                        'rdg_vat7' => $rdg_vat7,
+
+                        'rdg_sum1' => $rdg_sum1,
+                        'rdg_sum2' => $rdg_sum2,
+                        'rdg_sum3' => $rdg_sum3,
+                        'rdg_sum4' => $rdg_sum4,
+                        'rdg_sum5' => $rdg_sum5,
+                        'rdg_sum6' => $rdg_sum6,
+                        'rdg_sum7' => $rdg_sum7,
+                    ]);
+                }  
+
+                $final_rgds[] = $final_rgd;
+                //Creating final bill
+                if (!$final_rgd || $final_rgd->rgd_status5 == 'cancel') {
+                    $expectation_rgd->rgd_status5 = 'issued';
+                    $expectation_rgd->save();
+
+                    $final_rgd = $expectation_rgd->replicate();
+                    $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
+                    $final_rgd->rgd_status4 = '확정청구서';
+                    $final_rgd->rgd_issue_date = Carbon::now()->toDateTimeString();
+                    $final_rgd->rgd_status5 = null;
+                    $final_rgd->rgd_status6 = null;
+                    $final_rgd->rgd_status7 = null;
+                    $final_rgd->rgd_is_show = ($i == 0 ? 'y' : 'n');
+                    $final_rgd->rgd_parent_no = $expectation_rgd->rgd_no;
+                    $final_rgd->rgd_settlement_number = $request->settlement_number;
+                    $final_rgd->save();
+
+                    $ag = AdjustmentGroup::where('ag_no', $request->rdg_set_type)->first();
+                    //Update for the created RateDataGeneral
+                    RateDataGeneral::where('rdg_no', $final_rdg->rdg_no)->update([
+                        'rgd_no' => $final_rgd->rgd_no,
+                        'rgd_no_expectation' => $expectation_rgd->rgd_no,
+                        'rdg_set_type' => isset($ag->ag_name) ? $ag->ag_name : $is_exist->rdg_set_type,
+                        'ag_no' => isset($ag->ag_no) ? $ag->ag_no : $is_exist->ag_no,
+                    ]);
+                    //Update for the created RateMetaData
+                    RateMetaData::where('rgd_no', $request->rgd_no)->where(function ($q) {
+                        $q->where('set_type', 'bonded1_final_monthly')
+                            ->orWhere('set_type', 'bonded2_final_monthly')
+                            ->orWhere('set_type', 'bonded3_final_monthly')
+                            ->orWhere('set_type', 'bonded4_final_monthly')
+                            ->orWhere('set_type', 'bonded5_final_monthly')
+                            ->orWhere('set_type', 'bonded6_final_monthly');
+                    })->update([
+                        'rgd_no' => $final_rgd->rgd_no,
+                    ]);
+
+                } else {
+                    $expectation_rgd->rgd_status5 = 'issued';
+                    $expectation_rgd->save();
+
+                    $final_rgd->rgd_settlement_number = $request->settlement_number;
+                    if ($i == 0) {
+                        $final_rgd->rgd_is_show = 'y';
+                    } else {
+                        $final_rgd->rgd_is_show = 'n';
+                    }
+                    $final_rgd->save();
+
+                    RateDataGeneral::where('rdg_no', $final_rdg->rdg_no)->update([
+                        'rgd_no' => $final_rgd->rgd_no,
+                        'rgd_no_expectation' => $expectation_rgd->rgd_no,
+                    ]);
+                }
+                $i++;
+            }
+            
 
             DB::commit();
 
