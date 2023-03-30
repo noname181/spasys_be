@@ -33,7 +33,8 @@ class SendEmailController extends Controller
                 'se_email_receiver' => $validated['se_email_receiver'],
                 'se_name_receiver' => $validated['se_name_receiver'],
                 'se_title' => $validated['se_title'],
-                'se_content' => $validated['se_content']
+                'se_content' => $validated['se_content'],
+                'se_rmd_number'=>$validated['rmd_number']
             ]);
 
             return response()->json([
