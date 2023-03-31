@@ -645,7 +645,7 @@ class ImportScheduleController extends Controller
 
                 if ($validated['rgd_status3'] == "배송준비") {
                     $import_schedule->where(function ($query) {
-                        $query->whereNull('rgd_status3')->orWhere('rgd_status3', '=', '배송준비');
+                        $query->Where('rgd_status3', '=', '배송준비');
                         $query->where('rgd_status1', '!=', '반입');
                     });
                 } else {
