@@ -132,7 +132,7 @@ class ReceivingGoodsDelivery extends Model
     }
 
     public function t_import_expected(){
-        return $this->belongsTo(ImportExpected::class, 'rgd_tracking_code', 'tie_logistic_manage_number');
+        return $this->belongsTo(ImportExpected::class, 'rgd_tracking_code', 'tie_logistic_manage_number')->with('export');
     }
 
     public function import_table(){
