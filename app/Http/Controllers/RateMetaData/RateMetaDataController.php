@@ -256,7 +256,9 @@ class RateMetaDataController extends Controller
             if(isset($validated['hbl'])) {
                
                 $rmd->whereHas('rate_data_general', function($rm) use ($validated){
-                    $rm->where('rdg_sum1', 'like', '%'.$validated['hbl'].'%');
+                    $rm->where('rdg_sum1', 'like', '%'.$validated['hbl'].'%')
+                    ->orwhere('rdg_supply_price1', 'like', '%'.$validated['hbl'].'%')
+                    ->orwhere('rdg_vat1', 'like', '%'.$validated['hbl'].'%');
                 });
             }
             if(isset($validated['co_name_2'])) {

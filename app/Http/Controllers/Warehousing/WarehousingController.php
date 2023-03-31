@@ -1994,7 +1994,10 @@ class WarehousingController extends Controller
                 }
 
                 if (isset($validated['h_bl'])) {
-                    $import_schedule->where(DB::raw('aaa.tie_h_bl'), 'like', '%' . strtolower($validated['h_bl']) . '%');
+                    $import_schedule->where(function ($query) use ($validated) {
+                        $query->where(DB::raw('ddd.te_h_bl'), 'like', '%' . $validated['h_bl'] . '%')
+                        ->orWhere(DB::raw('aaa.tie_h_bl'), 'like', '%' . $validated['h_bl'] . '%');
+                    });
                 }
 
                 if (isset($validated['logistic_manage_number'])) {
@@ -2536,7 +2539,10 @@ class WarehousingController extends Controller
                 }
 
                 if (isset($validated['h_bl'])) {
-                    $import_schedule->where(DB::raw('aaa.tie_h_bl'), 'like', '%' . strtolower($validated['h_bl']) . '%');
+                    $import_schedule->where(function ($query) use ($validated) {
+                        $query->where(DB::raw('ddd.te_h_bl'), 'like', '%' . $validated['h_bl'] . '%')
+                        ->orWhere(DB::raw('aaa.tie_h_bl'), 'like', '%' . $validated['h_bl'] . '%');
+                    });
                 }
                 if (isset($validated['w_schedule_number'])) {
                     $import_schedule->where(DB::raw('te_carry_out_number'), 'like', '%' . strtolower($validated['w_schedule_number']) . '%');

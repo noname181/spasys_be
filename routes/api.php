@@ -220,7 +220,8 @@ Route::middleware('auth')->group(function () {
     Route::post('receiving_goods_delivery/update_request', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_request']);
     Route::post('receiving_goods_delivery/update_status6', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_status6']);
     Route::post('receiving_goods_delivery/update_status7', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_status7']);
-    
+
+    Route::post('receiving_goods_delivery/payment_from_est', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'payment_from_est']);
     Route::post('receiving_goods_delivery/payment', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'payment']);
     Route::post('receiving_goods_delivery/cancel_payment', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'cancel_payment']);
     Route::post('receiving_goods_delivery/load_payment', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'load_payment']);
@@ -434,7 +435,7 @@ Route::middleware('auth')->group(function () {
         //FOR SETTLEMENT 보세화물
         Route::get('/get_spasys1_from_logistic_number/{is_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'getspasys1fromlogisticnumber']);
         Route::get('/get_spasys1_from_logistic_number_check/{is_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'getspasys1fromlogisticnumbercheck']);
-        
+
         //REGISTER GENERAL DATA 유통가공
         Route::post('/general', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general'])->name('registe_rate_data_general');
         Route::post('/general_monthly_final', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_monthly_final'])->name('registe_rate_data_general_monthly_final');
@@ -569,7 +570,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/download_distribution_release_list', [\App\Http\Controllers\Excel\ExportExcelController::class,'download_distribution_release_list'])->name('download_distribution_release_list');
     Route::post('/download_fullwarehousing_list', [\App\Http\Controllers\Excel\ExportExcelController::class,'download_fullwarehousing_list'])->name('download_fullwarehousing_list');
     Route::post('get_package_data', [\App\Http\Controllers\Package\PackageController::class,'get_package_data'])->name('get_package_data');
-    
+
     Route::post('/dowload_fulfillment_schedule_list', [\App\Http\Controllers\Excel\ExportExcelController::class,'dowload_fulfillment_schedule_list'])->name('dowload_fulfillment_schedule_list');
     Route::post('/import_excel_distribution', [\App\Http\Controllers\Warehousing\WarehousingController::class,'importExcelDistribution']);
     Route::post('/update_rgd_status3', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'updateRgdState3'])->name('update_rgd_status3');
