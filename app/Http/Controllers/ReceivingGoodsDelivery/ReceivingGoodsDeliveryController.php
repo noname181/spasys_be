@@ -2791,16 +2791,39 @@ class ReceivingGoodsDeliveryController extends Controller
     {
         try {
             $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+            $est_payment = Payment::where('rgd_no', $rgd->rgd_parent_no)->where('p_success_yn', 'y')->first();
+
+            Payment::insertGetId(
+                [
+                    'mb_no' => Auth::user()->mb_no,
+                    'rgd_no' => $request->rgd_no,
+                    'p_price' => 0,
+                    'p_method' => $est_payment->p_method,
+                    'p_success_yn' => 'y',
+                    'p_method_fee' =>$est_payment->p_method_fee,
+                ]
+            );
+
             ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                 'rgd_status6' => 'paid',
                 'rgd_paid_date' =>  Carbon::now(),
             ]);
+        
+
+            CancelBillHistory::insertGetId([
+                'mb_no' => Auth::user()->mb_no,
+                'rgd_no' => $request->rgd_no,
+                'cbh_status_after' => 'payment_bill',
+                'cbh_type' => 'payment',
+            ]);
+
             return response()->json([
                 'message' => 'Success',
                 //'check_payment' =>$check_payment->rgd_no
             ]);
         } catch (\Exception $e) {
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
