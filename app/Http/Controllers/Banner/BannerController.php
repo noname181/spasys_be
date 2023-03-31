@@ -954,7 +954,7 @@ class BannerController extends Controller
         //     }
         // }
 
-        $period = CarbonPeriod::create(today()->subMonths(5), '1 month', today());
+        $period = CarbonPeriod::create(today()->subMonths(6), '1 month', today());
 
         foreach ($period as $date) {
             $m = (int)$date->format('m');
@@ -1333,7 +1333,7 @@ class BannerController extends Controller
         //     // }
         // }
 
-        $period = CarbonPeriod::create(today()->subMonths(5), '1 month', today());
+        $period = CarbonPeriod::create(today()->subMonths(6), '1 month', today());
 
         foreach ($period as $date) {
             $m = (int)$date->format('m');
@@ -1564,9 +1564,9 @@ class BannerController extends Controller
         $countchartd = [];
 
         for ($i = 1; $i <= 6; $i++) {
-            $countchartb = $warehousingchartb->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->whereDate('ti_i_date', '>', now()->subYear())->get()->groupBy(function ($date) {
+            $countchartb = $warehousingchartb->whereNotNull('bbb.ti_logistic_manage_number')->whereDate('ti_i_date', '>', now()->subYear())->get()->groupBy(function ($date) {
                 //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
-                return Carbon::parse($date->tie_is_date)->format('m'); // grouping by months
+                return Carbon::parse($date->ti_i_date)->format('m'); // grouping by months
             });
 
             $countchartd = $warehousingchartd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereDate('tie_is_date', '>', now()->subYear())->get()->groupBy(function ($date) {
@@ -1610,7 +1610,7 @@ class BannerController extends Controller
         //     }
         // }
 
-        $period = CarbonPeriod::create(today()->subMonths(5), '1 month', today());
+        $period = CarbonPeriod::create(today()->subMonths(6), '1 month', today());
 
         $final = [];
 
@@ -1654,7 +1654,7 @@ class BannerController extends Controller
                 ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                 ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-            $sub_2 = Import::select('ti_logistic_manage_number', 'ti_carry_in_number')
+            $sub_2 = Import::select('ti_logistic_manage_number', 'ti_carry_in_number','ti_i_date')
                 ->leftjoin('receiving_goods_delivery', function ($join) {
                     $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
                 })
@@ -1664,17 +1664,19 @@ class BannerController extends Controller
 
                 ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
 
+            $sub_5 = Export::select('te_logistic_manage_number', 'te_carry_in_number', 'te_carry_out_number')
+                ->groupBy(['te_logistic_manage_number', 'te_e_confirm_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
 
             $warehousingb = $this->subquery($sub, $sub_2, $sub_4);
 
-            $warehousingd = $this->subquery($sub, $sub_2, $sub_4);
+            $warehousingd = $this->subquery($sub, $sub_2, $sub_5);
 
             $tie_logistic_manage_number = $this->SQL();
 
             for ($i = 1; $i <= 6; $i++) {
-                $countchartb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->whereDate('tie_is_date', '>', now()->subYear())->get()->groupBy(function ($date) {
+                $countchartb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereDate('ti_i_date', '>', now()->subYear())->get()->groupBy(function ($date) {
                     //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
-                    return Carbon::parse($date->tie_is_date)->format('m'); // grouping by months
+                    return Carbon::parse($date->ti_i_date)->format('m'); // grouping by months
                 });
 
                 $countchartd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereDate('tie_is_date', '>', now()->subYear())->get()->groupBy(function ($date) {
@@ -1805,7 +1807,7 @@ class BannerController extends Controller
         //     }
         // }
 
-        $period = CarbonPeriod::create(today()->subMonths(5), '1 month', today());
+        $period = CarbonPeriod::create(today()->subMonths(6), '1 month', today());
 
         foreach ($period as $date) {
             $m = (int)$date->format('m');
@@ -2155,7 +2157,7 @@ class BannerController extends Controller
             }
         }
 
-        $period = CarbonPeriod::create(today()->subMonths(5), '1 month', today());
+        $period = CarbonPeriod::create(today()->subMonths(6), '1 month', today());
 
         $final = [];
 
