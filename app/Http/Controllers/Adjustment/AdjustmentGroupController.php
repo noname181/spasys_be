@@ -72,7 +72,7 @@ class AdjustmentGroupController extends Controller
                         'ag_hp' => $value['ag_hp'],
                         'ag_manager' => $value['ag_manager'],
                         'ag_email' => $value['ag_email'],
-                        'ag_email2' => $value['ag_email2'],
+                        'ag_email2' => isset($value['ag_email2']) ? $value['ag_email2'] : 'n',
                         'ag_auto_issue' => isset($value['ag_auto_issue']) ? $value['ag_auto_issue'] : 'n',
                     ]);
                     $id = $ag->first()->ag_no;
@@ -84,7 +84,7 @@ class AdjustmentGroupController extends Controller
                         'ag_hp' => $value['ag_hp'],
                         'ag_manager' => $value['ag_manager'],
                         'ag_email' => $value['ag_email'],
-                        'ag_email2' => $value['ag_email2'],
+                        'ag_email2' => isset($value['ag_email2']) ? $value['ag_email2'] : 'n',
                         'ag_auto_issue' => isset($value['ag_auto_issue']) ? $value['ag_auto_issue'] : 'n',
                     ]);
                 }
@@ -103,6 +103,7 @@ class AdjustmentGroupController extends Controller
         } catch (\Throwable $e) {
             DB::rollback();
             Log::error($e);
+            return $e;
             // return response()->json(['message' => Messages::MSG_0001], 500);
 
         }

@@ -462,7 +462,7 @@ class ReportController extends Controller
 
             $reports = $reports->paginate($per_page, ['*'], 'page', $page);
 
-            $data = new Collection();
+            //$data = new Collection();
 
 
 
