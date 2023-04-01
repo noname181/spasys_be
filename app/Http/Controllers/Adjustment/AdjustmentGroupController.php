@@ -127,8 +127,8 @@ class AdjustmentGroupController extends Controller
                     'ag_hp' => $value['ag_hp'],
                     'ag_manager' => $value['ag_manager'],
                     'ag_email' => $value['ag_email'],
-                    'ag_email2' => $value['ag_email2'],
-                    'ag_auto_issue' => $value['ag_auto_issue'],
+                    'ag_email2' => isset($value['ag_email2']) ? $value['ag_email2'] : "n",
+                    'ag_auto_issue' => isset($value['ag_auto_issue']) ? $value['ag_auto_issue'] : '',
                 ]);
 
 
@@ -142,6 +142,7 @@ class AdjustmentGroupController extends Controller
         } catch (\Throwable $e) {
             DB::rollback();
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
 
         }
@@ -161,7 +162,7 @@ class AdjustmentGroupController extends Controller
 				'ag_hp' => $validated['ag_hp'],
 				'ag_manager' => $validated['ag_manager'],
 				'ag_email' => $validated['ag_email'],
-                'ag_email2' => isset($validated['ag_email2']) ? $validated['ag_email2'] : '',
+                'ag_email2' => isset($validated['ag_email2']) ? $validated['ag_email2'] : 'n',
 			]);
 
             DB::commit();
@@ -194,7 +195,7 @@ class AdjustmentGroupController extends Controller
                 'ag_hp' => $validated['ag_hp'],
                 'ag_manager' => $validated['ag_manager'],
                 'ag_email' => $validated['ag_email'],
-                'ag_email2' => isset($validated['ag_email2']) ? $validated['ag_email2'] : '',
+                'ag_email2' => isset($validated['ag_email2']) ? $validated['ag_email2'] : 'n',
                 'ag_regtime' =>  date('Y-m-d')
             ]);
             return response()->json(['message' => Messages::MSG_0007], 200);
@@ -214,7 +215,7 @@ class AdjustmentGroupController extends Controller
                 'ag_hp' => $validated['ag_hp'],
                 'ag_manager' => $validated['ag_manager'],
                 'ag_email' => $validated['ag_email'],
-                'ag_email2' => isset($validated['ag_email2']) ? $validated['ag_email2'] : '',
+                'ag_email2' => isset($validated['ag_email2']) ? $validated['ag_email2'] : 'n',
             ]);
             return response()->json(['message' => Messages::MSG_0007,'user'=>Auth::user()->mb_no], 200);
         } catch (\Exception $e) {

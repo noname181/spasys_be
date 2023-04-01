@@ -337,44 +337,52 @@ class ReportController extends Controller
             $user = Auth::user();
            
             if($user->mb_type == 'shop'){
-                $reports = Report::with(['files', 'reports_child','warehousing','import_expect','import','member'])->where(function($q) use($validated,$user) {
-                $q->whereHas('export.import_expected.company.co_parent',function ($q) use ($user){
-                    $q->where('co_no', $user->co_no);
-                })->orwhereHas('export.import_expected.company.co_parent',function ($q) use ($user){
-                    $q->where('co_parent_no', $user->co_no);
-                })->orwhereHas('import_expect.company.co_parent',function ($q) use ($user){
+                $reports = Report::with(['files', 'reports_child','warehousing','import_expect','member'])->where(function($q) use($validated,$user) {
+                // $q->whereHas('export.import_expected.company.co_parent',function ($q) use ($user){
+                //     $q->where('co_no', $user->co_no);
+                // })
+                // $q->WhereHas('export.import_expected.company.co_parent',function ($q) use ($user){
+                //     $q->where('co_parent_no', $user->co_no);
+                // })->
+                $q->WhereHas('import_expect.company.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->orwhereHas('import_expect.company_spasys',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
-                })->orwhereHas('import.import_expected.company.co_parent',function ($q) use ($user){
-                    $q->where('co_no', $user->co_no);
-                })->orwhereHas('warehousing.co_no.co_parent',function ($q) use ($user){
+                })
+                // ->orwhereHas('import.import_expected.company.co_parent',function ($q) use ($user){
+                //     $q->where('co_no', $user->co_no);
+                // })
+                ->orwhereHas('warehousing.co_no.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 });
                 })->orderBy('created_at', 'DESC')->orderBy('rp_parent_no', 'DESC');
             }else if($user->mb_type == 'shipper'){
-                $reports = Report::with(['files', 'reports_child','warehousing','import_expect','import','member'])->where(function($q) use($validated,$user) {
+                $reports = Report::with(['files', 'reports_child','warehousing','import_expect','member'])->where(function($q) use($validated,$user) {
                     $q->whereHas('export.import_expected.company.co_parent',function ($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     })->orwhereHas('export.import_expected.company.co_parent',function ($q) use ($user){
                         $q->where('co_parent_no', $user->co_no);
                     })->orwhereHas('import_expect.company',function ($q) use ($user){
                         $q->where('co_no', $user->co_no);
-                    })->orwhereHas('import.import_expected.company',function ($q) use ($user){
-                        $q->where('co_no', $user->co_no);
-                    })->orwhereHas('warehousing.co_no',function ($q) use ($user){
+                    })
+                    // ->orwhereHas('import.import_expected.company',function ($q) use ($user){
+                    //     $q->where('co_no', $user->co_no);
+                    // })
+                    ->orwhereHas('warehousing.co_no',function ($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     });
                 })->orderBy('created_at', 'DESC')->orderBy('rp_parent_no', 'DESC');
             }else if($user->mb_type == 'spasys'){
-                $reports = Report::with(['files', 'reports_child','warehousing','member','import_expect','import'])->where(function($q) use($validated,$user) {
+                $reports = Report::with(['files', 'reports_child','warehousing','member','import_expect'])->where(function($q) use($validated,$user) {
                 $q->whereHas('import_expect.company.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 })->orwhereHas('import_expect.company_spasys',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
-                })->orwhereHas('import.import_expected.company.co_parent',function ($q) use ($user){
-                    $q->where('co_no', $user->co_no);
-                })->orwhereHas('warehousing.co_no.co_parent.co_parent',function ($q) use ($user){
+                })
+                // ->orwhereHas('import.import_expected.company.co_parent',function ($q) use ($user){
+                //     $q->where('co_no', $user->co_no);
+                // })
+                ->orwhereHas('warehousing.co_no.co_parent.co_parent',function ($q) use ($user){
                     $q->where('co_no', $user->co_no);
                 });})->orderBy('rp_parent_no', 'DESC');
             }
