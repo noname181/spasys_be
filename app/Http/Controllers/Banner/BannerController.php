@@ -954,7 +954,7 @@ class BannerController extends Controller
         //     }
         // }
 
-        $period = CarbonPeriod::create(today()->subMonths(6), '1 month', today());
+        $period = CarbonPeriod::create(today()->subMonths(5), '1 month', today());
 
         foreach ($period as $date) {
             $m = (int)$date->format('m');
@@ -1333,7 +1333,7 @@ class BannerController extends Controller
         //     // }
         // }
 
-        $period = CarbonPeriod::create(today()->subMonths(6), '1 month', today());
+        $period = CarbonPeriod::create(today()->subMonths(5), '1 month', today());
 
         foreach ($period as $date) {
             $m = (int)$date->format('m');
@@ -1610,7 +1610,7 @@ class BannerController extends Controller
         //     }
         // }
 
-        $period = CarbonPeriod::create(today()->subMonths(6), '1 month', today());
+        $period = CarbonPeriod::create(today()->subMonths(5), '1 month', today());
 
         $final = [];
 
@@ -1807,7 +1807,7 @@ class BannerController extends Controller
         //     }
         // }
 
-        $period = CarbonPeriod::create(today()->subMonths(6), '1 month', today());
+        $period = CarbonPeriod::create(today()->subMonths(5), '1 month', today());
 
         foreach ($period as $date) {
             $m = (int)$date->format('m');
