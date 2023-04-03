@@ -163,6 +163,7 @@ class AdjustmentGroupController extends Controller
 				'ag_manager' => $validated['ag_manager'],
 				'ag_email' => $validated['ag_email'],
                 'ag_email2' => isset($validated['ag_email2']) ? $validated['ag_email2'] : 'n',
+                'ag_auto_issue' => isset($validated['ag_auto_issue']) ? $validated['ag_auto_issue'] : 'n',
 			]);
 
             DB::commit();
@@ -216,6 +217,7 @@ class AdjustmentGroupController extends Controller
                 'ag_manager' => $validated['ag_manager'],
                 'ag_email' => $validated['ag_email'],
                 'ag_email2' => isset($validated['ag_email2']) ? $validated['ag_email2'] : 'n',
+                'ag_auto_issue' => isset($validated['ag_auto_issue']) ? $validated['ag_auto_issue'] : 'n',
             ]);
             return response()->json(['message' => Messages::MSG_0007,'user'=>Auth::user()->mb_no], 200);
         } catch (\Exception $e) {
