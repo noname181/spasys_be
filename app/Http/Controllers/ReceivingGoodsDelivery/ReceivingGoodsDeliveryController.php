@@ -2455,7 +2455,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'mb_no' => $user->mb_no,
                     'cbh_type' => 'tax',
                     'cbh_status_before' => 'taxed',
-                    'cbh_status_after' => 'canceled'
+                    'cbh_status_after' => 'cancel'
                 ]);
             } else {
                 ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
@@ -2471,7 +2471,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'mb_no' => $user->mb_no,
                     'cbh_type' => 'tax',
                     'cbh_status_before' => 'taxed',
-                    'cbh_status_after' => 'canceled'
+                    'cbh_status_after' => 'cancel'
                 ]);
             }
 
