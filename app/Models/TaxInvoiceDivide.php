@@ -35,6 +35,8 @@ class TaxInvoiceDivide extends Model
         'co_owner',
         'co_name',
         'co_major',
+        'co_email',
+        'co_email2',
         'co_address',
         'co_address2',
     ];

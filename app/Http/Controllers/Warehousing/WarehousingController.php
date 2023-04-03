@@ -5413,9 +5413,10 @@ class WarehousingController extends Controller
                     });
             }
             $warehousing->where(function ($q) {
-                $q->where('rgd_status4', '추가청구서')
-                    ->orWhere('rgd_status4', '확정청구서');
-            })->where('rgd_is_show', 'y')
+                $q->where('rgd_status4', '확정청구서');
+            })
+                ->where('rgd_status5', 'confirmed')
+                ->where('rgd_is_show', 'y')
                 ->where('rgd_calculate_deadline_yn', 'y')
                 ->whereHas('member', function ($q) use ($user) {
                     $q->where('mb_type', $user->mb_type);
@@ -5671,9 +5672,9 @@ class WarehousingController extends Controller
                     });
             }
             $warehousing->where(function ($q) {
-                $q->where('rgd_status4', '추가청구서')
-                    ->orWhere('rgd_status4', '확정청구서');
+                $q->where('rgd_status4', '확정청구서');
             })
+                ->where('rgd_status5', 'confirmed')
                 ->where('rgd_calculate_deadline_yn', 'y')
                 ->whereNull('rgd_status6')
                 ->where('rgd_is_show', 'y')
