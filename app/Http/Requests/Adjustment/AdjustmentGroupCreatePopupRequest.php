@@ -54,6 +54,9 @@ class AdjustmentGroupCreatePopupRequest extends BaseFormRequest
                 'max:255',
                 'email',
             ],
+            'ag_auto_issue' => [
+                '',
+            ],
         ];
     }
 
