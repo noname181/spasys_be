@@ -5381,7 +5381,7 @@ class WarehousingController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
             if ($user->mb_type == 'shop') {
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
+                $warehousing = ReceivingGoodsDelivery::with(['member', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('company.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     })->whereHas('company.contract', function ($q) use ($user) {
@@ -5389,7 +5389,7 @@ class WarehousingController extends Controller
                     });
                 })->orderBy('rgd_tax_invoice_date', 'DESC')->orderBy('rgd_no', 'DESC');
             } else if ($user->mb_type == 'shipper') {
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
+                $warehousing = ReceivingGoodsDelivery::with(['member', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('company', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     })->whereHas('company.contract', function ($q) use ($user) {
@@ -5397,7 +5397,7 @@ class WarehousingController extends Controller
                     });
                 })->orderBy('rgd_tax_invoice_date', 'DESC')->orderBy('rgd_no', 'DESC');
             } else if ($user->mb_type == 'spasys') {
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
+                $warehousing = ReceivingGoodsDelivery::with(['member', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('company.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     })->orWhereHas('company.co_parent', function ($q) use ($user) {
@@ -5413,17 +5413,18 @@ class WarehousingController extends Controller
                     });
             }
             $warehousing->where(function ($q) {
-                $q->where('rgd_status4', '추가청구서')
-                    ->orWhere('rgd_status4', '확정청구서');
-            })->where('rgd_is_show', 'y')
+                $q->where('rgd_status4', '확정청구서');
+            })
+                ->where('rgd_status5', 'confirmed')
+                ->where('rgd_is_show', 'y')
                 ->where('rgd_calculate_deadline_yn', 'y')
-                ->whereHas('mb_no', function ($q) use ($user) {
+                ->whereHas('member', function ($q) use ($user) {
                     $q->where('mb_type', $user->mb_type);
                 })
                 ->where(function ($q4){
                     $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
                 })
-                ->orderBy('rgd_tax_invoice_date', 'DESC')
+                // ->orderBy('rgd_tax_invoice_date', 'DESC')
                 ->orderBy('rgd_no', 'DESC');
 
             if (isset($validated['status'])) {
@@ -5671,9 +5672,9 @@ class WarehousingController extends Controller
                     });
             }
             $warehousing->where(function ($q) {
-                $q->where('rgd_status4', '추가청구서')
-                    ->orWhere('rgd_status4', '확정청구서');
+                $q->where('rgd_status4', '확정청구서');
             })
+                ->where('rgd_status5', 'confirmed')
                 ->where('rgd_calculate_deadline_yn', 'y')
                 ->whereNull('rgd_status6')
                 ->where('rgd_is_show', 'y')
