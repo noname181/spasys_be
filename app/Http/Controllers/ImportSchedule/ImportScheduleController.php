@@ -353,7 +353,13 @@ class ImportScheduleController extends Controller
 
 
                     //foreach($te_carry_out_number as $te_carry_out_number_){
-                    $file = File::where('file_table_key', $item->te_carry_out_number)->get();
+                        if(isset($item->te_carry_out_number)){
+                            $file = File::where('file_table_key', $item->te_carry_out_number)->get();
+                        } else if(isset($item->ti_carry_in_number) && $item->te_carry_out_number == null) {
+                            $file = File::where('file_table_key', $item->ti_carry_in_number)->get();
+                        } else if(isset($item->tie_logistic_manage_number) && $item->ti_carry_in_number == null && $item->te_carry_out_number == null){
+                            $file = File::where('file_table_key', $item->tie_logistic_manage_number)->get();
+                        }
                     //$files[] = $file;
                     //}
                     $item->files = $file;
