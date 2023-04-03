@@ -2540,6 +2540,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
     public function update_status5(Request $request)
     {
+        DB::beginTransaction();
         try {
             $user = Auth::user();
             if ($request->bill_type == 'case') {
@@ -2582,8 +2583,9 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'co_owner'  => $company->co_owner,
                                 'co_name'  => $company->co_name,
                                 'co_major'  => $company->co_major,
-                                'co_address'  => $ag->ag_email,
-                                'co_address2'  => $ag->ag_email2,
+                                'co_address'  => $company->co_address,
+                                'co_email'  => $ag->ag_email,
+                                'co_email2'  => $ag->ag_email2,
                                 'rgd_number' => $tax_number,
                             ]
                         );
@@ -2638,8 +2640,9 @@ class ReceivingGoodsDeliveryController extends Controller
                                     'co_owner'  => $company->co_owner,
                                     'co_name'  => $company->co_name,
                                     'co_major'  => $company->co_major,
-                                    'co_address'  => $ag->ag_email,
-                                    'co_address2'  => $ag->ag_email2,
+                                    'co_address'  => $company->co_address,
+                                    'co_email'  => $ag->ag_email,
+                                    'co_email2'  => $ag->ag_email2,
                                     'rgd_number' => $tax_number,
                                 ]
                             );
@@ -2693,8 +2696,9 @@ class ReceivingGoodsDeliveryController extends Controller
                                     'co_owner'  => $company->co_owner,
                                     'co_name'  => $company->co_name,
                                     'co_major'  => $company->co_major,
-                                    'co_address'  => $ag->ag_email,
-                                    'co_address2'  => $ag->ag_email2,
+                                    'co_address'  => $company->co_address,
+                                    'co_email'  => $ag->ag_email,
+                                    'co_email2'  => $ag->ag_email2,
                                     'rgd_number' => $tax_number,
                                 ]
                             );
@@ -2728,7 +2732,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     // }
                 }
             }
-
+            DB::commit();
             return response()->json([
                 'message' => 'Success'
             ]);
