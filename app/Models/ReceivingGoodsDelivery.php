@@ -79,6 +79,10 @@ class ReceivingGoodsDelivery extends Model
     {
         return $this->hasOne(Member::class, 'mb_no', 'mb_no');
     }
+    public function member()
+    {
+        return $this->hasOne(Member::class, 'mb_no', 'mb_no');
+    }
 
     public function w_no()
     {
