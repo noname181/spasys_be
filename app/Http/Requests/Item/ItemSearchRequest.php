@@ -89,6 +89,9 @@ class ItemSearchRequest extends BaseFormRequest
             'product_id' => [
                 ''
             ],
+            'item_data' => [
+                ''
+            ],
             'option_id' => [
                 ''
             ],

@@ -362,7 +362,12 @@ class ItemController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
 
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : '';
-            $item
+            $item = [];
+
+            foreach($validated['item_data'] as $value){
+                $item[] = $value['item_no'];
+            }
+
             $items = Item::with(['item_channels', 'company', 'file'])->where('item_service_name', '유통가공')->orderBy('item_no', 'DESC');
 
             if (isset($validated['co_no']) && Auth::user()->mb_type == "shop") {
@@ -414,6 +419,7 @@ class ItemController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'items' => $items,
+                'item' => $item,
                 'user' => Auth::user(),
                 'sql' => DB::getQueryLog()
             ]);
