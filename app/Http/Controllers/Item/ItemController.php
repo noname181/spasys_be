@@ -375,20 +375,19 @@ class ItemController extends Controller
             
             $items = Item::with(['item_channels', 'company', 'file'])->where('item_service_name', '유통가공');
 
-            
-        
-
-            if (isset($validated['co_no']) && Auth::user()->mb_type == "shop") {
-                $items->where('co_no', $validated['co_no']);
-            } else if (isset($validated['co_no']) && Auth::user()->mb_type == "spasys") {
-                $items->where('co_no', $validated['co_no']);
-            } else if (isset($validated['co_no']) && Auth::user()->mb_type == "shipper") {
-                $items->where('co_no', $validated['co_no']);
-            }
+           
 
             if (isset($validated['w_no'])) {
                 $warehousing = Warehousing::where('w_no', $validated['w_no'])->first();
                 $items->where('co_no', $warehousing->co_no);
+            }else{
+                if (isset($validated['co_no']) && Auth::user()->mb_type == "shop") {
+                    $items->where('co_no', $validated['co_no']);
+                } else if (isset($validated['co_no']) && Auth::user()->mb_type == "spasys") {
+                    $items->where('co_no', $validated['co_no']);
+                } else if (isset($validated['co_no']) && Auth::user()->mb_type == "shipper") {
+                    $items->where('co_no', $validated['co_no']);
+                }
             }
 
             if (isset($validated['keyword'])) {
@@ -421,15 +420,31 @@ class ItemController extends Controller
             //     });
             // }
             if($item){
-                $items = $items->orwhere(function ($query) use ($item) {
+                $items = $items->orwhere(function ($query) use ($item,$validated) {
                     $query->whereIn('item_no', $item);
+                    if (isset($validated['w_no'])) {
+                        $warehousing = Warehousing::where('w_no', $validated['w_no'])->first();
+                        $query->where('co_no', $warehousing->co_no);
+                    }else{
+                        if (isset($validated['co_no']) && Auth::user()->mb_type == "shop") {
+                            $query->where('co_no', $validated['co_no']);
+                        } else if (isset($validated['co_no']) && Auth::user()->mb_type == "spasys") {
+                            $query->where('co_no', $validated['co_no']);
+                        } else if (isset($validated['co_no']) && Auth::user()->mb_type == "shipper") {
+                            $query->where('co_no', $validated['co_no']);
+                        }
+                    }
                 });
+
+                $orderedIds = implode(',', $item);
+            
+                $items = $items->orderByRaw(\DB::raw("FIELD(item_no, ".$orderedIds." ) desc"));
+
+            }else{
+                $items = $items->orderBy('item_no', 'DESC');
             }
            
-            $orderedIds = implode(',', $item);
-
-            $items = $items->orderByRaw(\DB::raw("FIELD(item_no, ".$orderedIds." ) desc"));
-
+            
             $items = $items->paginate($per_page, ['*'], 'page', $page);
 
             // $sortedResult = $items->getCollection()->sortBy('item_no')->values();
