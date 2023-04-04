@@ -1393,11 +1393,11 @@ class BannerController extends Controller
             // $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
             //     ->groupBy(['tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number']);
 
-            $sub_4 = Export::select('te_logistic_manage_number', 'te_carry_in_number', 'te_carry_out_number')
+            $sub_4 = Export::select('te_logistic_manage_number', 'te_carry_in_number', 'te_carry_out_number','te_e_date')
 
                 ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
 
-            $sub_5 = Export::select('te_logistic_manage_number', 'te_carry_in_number', 'te_carry_out_number')
+            $sub_5 = Export::select('te_logistic_manage_number', 'te_carry_in_number', 'te_carry_out_number','te_e_date')
                 ->groupBy(['te_logistic_manage_number', 'te_e_confirm_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
 
             $warehousinga = $this->subquery($sub, $sub_2, $sub_4);
@@ -1444,11 +1444,11 @@ class BannerController extends Controller
             // $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
             //     ->groupBy(['tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number']);
 
-            $sub_4 = Export::select('te_logistic_manage_number', 'te_carry_in_number', 'te_carry_out_number')
+            $sub_4 = Export::select('te_logistic_manage_number', 'te_carry_in_number', 'te_carry_out_number','te_e_date')
 
                 ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
 
-            $sub_5 = Export::select('te_logistic_manage_number', 'te_carry_in_number', 'te_carry_out_number')
+            $sub_5 = Export::select('te_logistic_manage_number', 'te_carry_in_number', 'te_carry_out_number','te_e_date')
                 ->groupBy(['te_logistic_manage_number', 'te_e_confirm_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
 
             $warehousinga = $this->subquery($sub, $sub_2, $sub_4);
@@ -1490,10 +1490,10 @@ class BannerController extends Controller
             // $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
             //     ->groupBy(['tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number']);
 
-            $sub_4 = Export::select('te_logistic_manage_number', 'te_carry_in_number', 'te_carry_out_number')
+            $sub_4 = Export::select('te_logistic_manage_number', 'te_carry_in_number', 'te_carry_out_number','te_e_date')
                 ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
 
-            $sub_5 = Export::select('te_logistic_manage_number', 'te_carry_in_number', 'te_carry_out_number')
+            $sub_5 = Export::select('te_logistic_manage_number', 'te_carry_in_number', 'te_carry_out_number','te_e_date')
                 ->groupBy(['te_logistic_manage_number', 'te_e_confirm_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
 
 
@@ -1543,13 +1543,13 @@ class BannerController extends Controller
 
         if ($request->time1 == 'day') {
             $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereBetween('bbb.ti_i_date', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get()->count();
-            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('aaa.tie_is_date', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get()->count();
+            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('ddd.te_e_date', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get()->count();
         } elseif ($request->time1 == 'week') {
             $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereBetween('bbb.ti_i_date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get()->count();
-            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('aaa.tie_is_date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get()->count();
+            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('ddd.te_e_date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get()->count();
         } elseif ($request->time1 == 'month') {
             $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereBetween('bbb.ti_i_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get()->count();
-            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('aaa.tie_is_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get()->count();
+            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('ddd.te_e_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get()->count();
         }
 
         $counta = $warehousinga->whereNotNull('aaa.tie_logistic_manage_number')->whereNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->get()->count();
@@ -1569,9 +1569,9 @@ class BannerController extends Controller
                 return Carbon::parse($date->ti_i_date)->format('m'); // grouping by months
             });
 
-            $countchartd = $warehousingchartd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereDate('tie_is_date', '>', now()->subYear())->get()->groupBy(function ($date) {
+            $countchartd = $warehousingchartd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereDate('ddd.te_e_date', '>', now()->subYear())->get()->groupBy(function ($date) {
                 //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
-                return Carbon::parse($date->tie_is_date)->format('m'); // grouping by months
+                return Carbon::parse($date->te_e_date)->format('m'); // grouping by months
             });
         }
 
@@ -1660,11 +1660,11 @@ class BannerController extends Controller
                 })
                 ->groupBy(['ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number']);
 
-            $sub_4 = Export::select('te_logistic_manage_number', 'te_carry_in_number', 'te_carry_out_number')
+            $sub_4 = Export::select('te_logistic_manage_number', 'te_carry_in_number', 'te_carry_out_number','te_e_date')
 
                 ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
 
-            $sub_5 = Export::select('te_logistic_manage_number', 'te_carry_in_number', 'te_carry_out_number')
+            $sub_5 = Export::select('te_logistic_manage_number', 'te_carry_in_number', 'te_carry_out_number','te_e_date')
                 ->groupBy(['te_logistic_manage_number', 'te_e_confirm_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
 
             $warehousingb = $this->subquery($sub, $sub_2, $sub_4);
@@ -1679,9 +1679,9 @@ class BannerController extends Controller
                     return Carbon::parse($date->ti_i_date)->format('m'); // grouping by months
                 });
 
-                $countchartd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereDate('tie_is_date', '>', now()->subYear())->get()->groupBy(function ($date) {
+                $countchartd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereDate('te_e_date', '>', now()->subYear())->get()->groupBy(function ($date) {
                     //return Carbon::parse($date->created_at)->format('Y'); // grouping by years
-                    return Carbon::parse($date->tie_is_date)->format('m'); // grouping by months
+                    return Carbon::parse($date->te_e_date)->format('m'); // grouping by months
                 });
             }
         } elseif ($request->servicechart == "수입풀필먼트") {
