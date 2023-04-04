@@ -2568,36 +2568,41 @@ class ReceivingGoodsDeliveryController extends Controller
                     ]);
 
                     if ($ag->ag_auto_issue == 'y') {
-                        $tax_number = CommonFunc::generate_tax_number($rgd->rgd_no);
+                        
+                        $cbh = CancelBillHistory::where('rgd_no', $request->rgd_no)->where('cbh_type', 'tax')->first();
+                        if(!isset($cbh->cbh_no)){
+                            $tax_number = CommonFunc::generate_tax_number($rgd->rgd_no);
 
-                        $tid = TaxInvoiceDivide::updateOrCreate(
-                            [
-                                'rgd_no' => $rgd->rgd_no,
-                            ],
-                            [
-                                'tid_supply_price' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
-                                'tid_vat' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
-                                'tid_sum' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
+                            $tid = TaxInvoiceDivide::updateOrCreate(
+                                [
+                                    'rgd_no' => $rgd->rgd_no,
+                                ],
+                                [
+                                    'tid_supply_price' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
+                                    'tid_vat' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
+                                    'tid_sum' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
+                                    'mb_no' => $user->mb_no,
+                                    'co_license'  => $company->co_license,
+                                    'co_owner'  => $company->co_owner,
+                                    'co_name'  => $company->co_name,
+                                    'co_major'  => $company->co_major,
+                                    'co_address'  => $company->co_address,
+                                    'co_email'  => $ag->ag_email,
+                                    'co_email2'  => $ag->ag_email2,
+                                    'rgd_number' => $tax_number,
+                                ]
+                            );
+
+                            CancelBillHistory::insertGetId([
+                                'rgd_no' => $request->rgd_no,
+                                'tid_no' => $tid->tid_no,
                                 'mb_no' => $user->mb_no,
-                                'co_license'  => $company->co_license,
-                                'co_owner'  => $company->co_owner,
-                                'co_name'  => $company->co_name,
-                                'co_major'  => $company->co_major,
-                                'co_address'  => $company->co_address,
-                                'co_email'  => $ag->ag_email,
-                                'co_email2'  => $ag->ag_email2,
-                                'rgd_number' => $tax_number,
-                            ]
-                        );
-
-                        CancelBillHistory::insertGetId([
-                            'rgd_no' => $request->rgd_no,
-                            'tid_no' => $tid->tid_no,
-                            'mb_no' => $user->mb_no,
-                            'cbh_type' => 'tax',
-                            'cbh_status_before' => null,
-                            'cbh_status_after' => 'taxed'
-                        ]);
+                                'cbh_type' => 'tax',
+                                'cbh_status_before' => null,
+                                'cbh_status_after' => 'taxed'
+                            ]);
+                        }
+                      
                     }
                 } else {
                     ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
@@ -2634,35 +2639,40 @@ class ReceivingGoodsDeliveryController extends Controller
                         ]);
 
                         if ($ag->ag_auto_issue == 'y') {
-                            $tax_number = CommonFunc::generate_tax_number($rgd->rgd_no);
+                            
+                            $cbh = CancelBillHistory::where('rgd_no', $rgd->rgd_no)->where('cbh_type', 'tax')->first();
+                            if(!isset($cbh->cbh_no)){
+                                $tax_number = CommonFunc::generate_tax_number($rgd->rgd_no);
 
-                            $tid = TaxInvoiceDivide::updateOrCreate(
-                                [
+                                $tid = TaxInvoiceDivide::updateOrCreate(
+                                    [
+                                        'rgd_no' => $rgd->rgd_no,
+                                    ],
+                                    [
+                                        'tid_supply_price' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
+                                        'tid_vat' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
+                                        'tid_sum' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
+                                        'mb_no' => $user->mb_no,
+                                        'co_license'  => $company->co_license,
+                                        'co_owner'  => $company->co_owner,
+                                        'co_name'  => $company->co_name,
+                                        'co_major'  => $company->co_major,
+                                        'co_address'  => $company->co_address,
+                                        'co_email'  => $ag->ag_email,
+                                        'co_email2'  => $ag->ag_email2,
+                                        'rgd_number' => $tax_number,
+                                    ]
+                                );
+
+                                CancelBillHistory::insertGetId([
                                     'rgd_no' => $rgd->rgd_no,
-                                ],
-                                [
-                                    'tid_supply_price' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
-                                    'tid_vat' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
-                                    'tid_sum' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
+                                    'tid_no' => $tid->tid_no,
                                     'mb_no' => $user->mb_no,
-                                    'co_license'  => $company->co_license,
-                                    'co_owner'  => $company->co_owner,
-                                    'co_name'  => $company->co_name,
-                                    'co_major'  => $company->co_major,
-                                    'co_address'  => $company->co_address,
-                                    'co_email'  => $ag->ag_email,
-                                    'co_email2'  => $ag->ag_email2,
-                                    'rgd_number' => $tax_number,
-                                ]
-                            );
-                            CancelBillHistory::insertGetId([
-                                'rgd_no' => $request->rgd_no,
-                                'tid_no' => $tid->tid_no,
-                                'mb_no' => $user->mb_no,
-                                'cbh_type' => 'tax',
-                                'cbh_status_before' => null,
-                                'cbh_status_after' => 'taxed'
-                            ]);
+                                    'cbh_type' => 'tax',
+                                    'cbh_status_before' => null,
+                                    'cbh_status_after' => 'taxed'
+                                ]);
+                            }
                         }
                     } else {
                         ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
@@ -2698,35 +2708,40 @@ class ReceivingGoodsDeliveryController extends Controller
                         ]);
 
                         if ($ag->ag_auto_issue == 'y') {
-                            $tax_number = CommonFunc::generate_tax_number($rgd->rgd_no);
+                            
+                            $cbh = CancelBillHistory::where('rgd_no', $rgd->rgd_no)->where('cbh_type', 'tax')->first();
+                            if(!isset($cbh->cbh_no)){
+                                $tax_number = CommonFunc::generate_tax_number($rgd->rgd_no);
 
-                            $tid = TaxInvoiceDivide::updateOrCreate(
-                                [
+                                $tid = TaxInvoiceDivide::updateOrCreate(
+                                    [
+                                        'rgd_no' => $rgd->rgd_no,
+                                    ],
+                                    [
+                                        'tid_supply_price' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
+                                        'tid_vat' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
+                                        'tid_sum' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
+                                        'mb_no' => $user->mb_no,
+                                        'co_license'  => $company->co_license,
+                                        'co_owner'  => $company->co_owner,
+                                        'co_name'  => $company->co_name,
+                                        'co_major'  => $company->co_major,
+                                        'co_address'  => $company->co_address,
+                                        'co_email'  => $ag->ag_email,
+                                        'co_email2'  => $ag->ag_email2,
+                                        'rgd_number' => $tax_number,
+                                    ]
+                                );
+
+                                CancelBillHistory::insertGetId([
                                     'rgd_no' => $rgd->rgd_no,
-                                ],
-                                [
-                                    'tid_supply_price' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
-                                    'tid_vat' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
-                                    'tid_sum' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
+                                    'tid_no' => $tid->tid_no,
                                     'mb_no' => $user->mb_no,
-                                    'co_license'  => $company->co_license,
-                                    'co_owner'  => $company->co_owner,
-                                    'co_name'  => $company->co_name,
-                                    'co_major'  => $company->co_major,
-                                    'co_address'  => $company->co_address,
-                                    'co_email'  => $ag->ag_email,
-                                    'co_email2'  => $ag->ag_email2,
-                                    'rgd_number' => $tax_number,
-                                ]
-                            );
-                            CancelBillHistory::insertGetId([
-                                'rgd_no' => $request->rgd_no,
-                                'tid_no' => $tid->tid_no,
-                                'mb_no' => $user->mb_no,
-                                'cbh_type' => 'tax',
-                                'cbh_status_before' => null,
-                                'cbh_status_after' => 'taxed'
-                            ]);
+                                    'cbh_type' => 'tax',
+                                    'cbh_status_before' => null,
+                                    'cbh_status_after' => 'taxed'
+                                ]);
+                            }
                         }
                     } else {
                         ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
