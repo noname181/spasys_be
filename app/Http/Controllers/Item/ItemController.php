@@ -368,7 +368,7 @@ class ItemController extends Controller
                 $item[] = $value['item_no'];
             }
 
-            $items = Item::with(['item_channels', 'company', 'file'])->where('item_service_name', '유통가공')->orderBy('item_no', 'DESC');
+            $items = Item::with(['item_channels', 'company', 'file'])->whereNotIn('item_no', $item)->where('item_service_name', '유통가공')->orderBy('item_no', 'DESC');
 
             if (isset($validated['co_no']) && Auth::user()->mb_type == "shop") {
                 $items->where('co_no', $validated['co_no']);
@@ -416,6 +416,14 @@ class ItemController extends Controller
 
 
             $items = $items->paginate($per_page, ['*'], 'page', $page);
+            
+            $items->setCollection(
+                $items->getCollection()->map(function ($item) {
+
+                })
+            );
+
+
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'items' => $items,
