@@ -48,8 +48,8 @@ class Contract extends Model
     ];
 
     protected $casts = [
-        'c_start_date' => "date:Y.m.d H:i",
-        'c_end_date' => "date:Y.m.d H:i",
+        'c_start_date' => "date:Y.m.d",
+        'c_end_date' => "date:Y.m.d",
     ];
 
 }
