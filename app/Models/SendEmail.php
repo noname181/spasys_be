@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Models\Member;
 class SendEmail extends Model
 {
     use HasFactory;
@@ -37,4 +37,8 @@ class SendEmail extends Model
         'created_at' => "date:Y.m.d H:i",
         'updated_at' => "date:Y.m.d H:i",
     ];
+
+    public function member() {
+        return $this->hasOne(Member::class, 'mb_no', 'mb_no');
+    }
 }

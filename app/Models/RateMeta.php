@@ -42,7 +42,7 @@ class RateMeta extends Model
     ];
 
     public function send_email() {
-        return $this->hasOne(SendEmail::class, 'rm_no', 'rm_no')->orderBy('se_no','desc');
+        return $this->hasOne(SendEmail::class, 'rm_no', 'rm_no')->orderBy('se_no','desc')->with('member');
     }
 
 }
