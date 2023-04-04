@@ -2570,7 +2570,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     if ($ag->ag_auto_issue == 'y') {
                         $tax_number = CommonFunc::generate_tax_number($rgd->rgd_no);
 
-                        TaxInvoiceDivide::updateOrCreate(
+                        $tid = TaxInvoiceDivide::updateOrCreate(
                             [
                                 'rgd_no' => $rgd->rgd_no,
                             ],
@@ -2589,6 +2589,15 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'rgd_number' => $tax_number,
                             ]
                         );
+
+                        CancelBillHistory::insertGetId([
+                            'rgd_no' => $request->rgd_no,
+                            'tid_no' => $tid->tid_no,
+                            'mb_no' => $user->mb_no,
+                            'cbh_type' => 'tax',
+                            'cbh_status_before' => null,
+                            'cbh_status_after' => 'taxed'
+                        ]);
                     }
                 } else {
                     ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
@@ -2627,7 +2636,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         if ($ag->ag_auto_issue == 'y') {
                             $tax_number = CommonFunc::generate_tax_number($rgd->rgd_no);
 
-                            TaxInvoiceDivide::updateOrCreate(
+                            $tid = TaxInvoiceDivide::updateOrCreate(
                                 [
                                     'rgd_no' => $rgd->rgd_no,
                                 ],
@@ -2646,6 +2655,14 @@ class ReceivingGoodsDeliveryController extends Controller
                                     'rgd_number' => $tax_number,
                                 ]
                             );
+                            CancelBillHistory::insertGetId([
+                                'rgd_no' => $request->rgd_no,
+                                'tid_no' => $tid->tid_no,
+                                'mb_no' => $user->mb_no,
+                                'cbh_type' => 'tax',
+                                'cbh_status_before' => null,
+                                'cbh_status_after' => 'taxed'
+                            ]);
                         }
                     } else {
                         ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
@@ -2683,7 +2700,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         if ($ag->ag_auto_issue == 'y') {
                             $tax_number = CommonFunc::generate_tax_number($rgd->rgd_no);
 
-                            TaxInvoiceDivide::updateOrCreate(
+                            $tid = TaxInvoiceDivide::updateOrCreate(
                                 [
                                     'rgd_no' => $rgd->rgd_no,
                                 ],
@@ -2702,6 +2719,14 @@ class ReceivingGoodsDeliveryController extends Controller
                                     'rgd_number' => $tax_number,
                                 ]
                             );
+                            CancelBillHistory::insertGetId([
+                                'rgd_no' => $request->rgd_no,
+                                'tid_no' => $tid->tid_no,
+                                'mb_no' => $user->mb_no,
+                                'cbh_type' => 'tax',
+                                'cbh_status_before' => null,
+                                'cbh_status_after' => 'taxed'
+                            ]);
                         }
                     } else {
                         ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
