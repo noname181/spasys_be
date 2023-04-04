@@ -29,9 +29,7 @@ class ManagerUpdatePopupRequest extends BaseFormRequest
                 'int'
             ],
             'm_position' => [
-                'required',
-                'string',
-                'max:255',
+                '',
             ],
             'm_name' => [
                 'required',
@@ -45,9 +43,7 @@ class ManagerUpdatePopupRequest extends BaseFormRequest
                 '',
             ],            
             'm_hp' => [
-                'required',
-                'string',
-                'max:255',
+                '',
                 //'regex:/[0-9]{3}-[0-9]{4}-[0-9]{4}$/',
             ],
             'm_etc' => [
@@ -55,10 +51,7 @@ class ManagerUpdatePopupRequest extends BaseFormRequest
                 'nullable',
             ],
             'm_email' => [
-                'required',
-                'string',
-                'max:255',
-                'email',
+                '',
             ],
         ];
     }

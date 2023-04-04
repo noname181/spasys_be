@@ -25,9 +25,7 @@ class ManagerUpdateRequest extends BaseFormRequest
     {
         return [
             'm_position' => [
-                'required',
-                'string',
-                'max:255',
+                '',
             ],
             'm_name' => [
                 'required',
@@ -41,9 +39,7 @@ class ManagerUpdateRequest extends BaseFormRequest
                 '',
             ],            
             'm_hp' => [
-                'required',
-                'string',
-                'max:255',
+                '',
                 //'regex:/[0-9]{3}-[0-9]{4}-[0-9]{4}$/',
             ],
             'm_etc' => [
@@ -51,10 +47,7 @@ class ManagerUpdateRequest extends BaseFormRequest
                 'nullable',
             ],
             'm_email' => [
-                'required',
-                'string',
-                'max:255',
-                'email',
+                '',
             ],
         ];
     }

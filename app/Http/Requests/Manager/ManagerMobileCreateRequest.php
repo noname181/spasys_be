@@ -31,8 +31,7 @@ class ManagerMobileCreateRequest extends BaseFormRequest
                 'integer',
             ],
             'm_position' => [
-                'string',
-                'max:255',
+                '',
             ],
             'm_name' => [
                 'required',
@@ -46,9 +45,7 @@ class ManagerMobileCreateRequest extends BaseFormRequest
                 '',
             ],            
             'm_hp' => [
-                'required',
-                'string',
-                'max:255',
+                '',
                 //'regex:/[0-9]{3}-[0-9]{4}-[0-9]{4}$/',
             ],
             'm_etc' => [
@@ -56,9 +53,7 @@ class ManagerMobileCreateRequest extends BaseFormRequest
                 'nullable',
             ],
             'm_email' => [
-                'string',
-                'max:255',
-                'email',
+                '',
             ],
         ];
     }
