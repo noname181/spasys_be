@@ -2581,6 +2581,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                     'tid_supply_price' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
                                     'tid_vat' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
                                     'tid_sum' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
+                                    'tid_number' => $rgd['rgd_settlement_number'],
                                     'mb_no' => $user->mb_no,
                                     'co_license'  => $company->co_license,
                                     'co_owner'  => $company->co_owner,
@@ -2661,6 +2662,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                         'co_email'  => $ag->ag_email,
                                         'co_email2'  => $ag->ag_email2,
                                         'rgd_number' => $tax_number,
+                                        'tid_number' => $rgd['rgd_settlement_number'],
                                     ]
                                 );
 
@@ -2730,6 +2732,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                         'co_email'  => $ag->ag_email,
                                         'co_email2'  => $ag->ag_email2,
                                         'rgd_number' => $tax_number,
+                                        'tid_number' => $rgd['rgd_settlement_number'],
                                     ]
                                 );
 
