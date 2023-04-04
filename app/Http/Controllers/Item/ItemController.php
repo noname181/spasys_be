@@ -363,19 +363,20 @@ class ItemController extends Controller
 
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : '';
             $item = [];
-           
-            foreach($validated['item_data'] as $value){
-                if($value['item_no']){
-                    $item[] = $value['item_no'];
-                }   
-            }
-
-            if($item){
-                $items = Item::with(['item_channels', 'company', 'file'])->whereNotIn('item_no', $item)->where('item_service_name', '유통가공')->orderBy('item_no', 'DESC');
-            }else{
-                $items = Item::with(['item_channels', 'company', 'file'])->where('item_service_name', '유통가공')->orderBy('item_no', 'DESC');
+            $count = 0;
+            if(isset($validated['item_data'])){
+                foreach($validated['item_data'] as $value){
+                    if($value['item_no']){
+                        $item[] = $value['item_no'];
+                        $count++;
+                    }   
+                }
             }
             
+            $items = Item::with(['item_channels', 'company', 'file'])->where('item_service_name', '유통가공');
+
+            
+        
 
             if (isset($validated['co_no']) && Auth::user()->mb_type == "shop") {
                 $items->where('co_no', $validated['co_no']);
@@ -419,10 +420,20 @@ class ItemController extends Controller
             //         $query->whereIn(DB::raw('co_no'), $co_no);
             //     });
             // }
+            if($item){
+                $items = $items->orwhere(function ($query) use ($item) {
+                    $query->whereIn('item_no', $item);
+                });
+            }
+           
+            $orderedIds = implode(',', $item);
 
-
+            $items = $items->orderByRaw(\DB::raw("FIELD(item_no, ".$orderedIds." ) desc"));
 
             $items = $items->paginate($per_page, ['*'], 'page', $page);
+
+            // $sortedResult = $items->getCollection()->sortBy('item_no')->values();
+            // $items->setCollection($sortedResult);
             
             // $items->setCollection(
             //     $items->getCollection()->map(function ($val,$validated) {
@@ -432,16 +443,20 @@ class ItemController extends Controller
             //         return $val;
             //     })
             // );
-            foreach($validated['item_data'] as $value){
-                if($value['item_no']){
-                    $items->prepend($value);
-                }
-            }
+            
+            // if($page == 1){
+            //     foreach($validated['item_data'] as $value){
+            //         if($value['item_no']){
+            //             $items->prepend($value);
+            //         }
+            //     }
+            //     $items->total(22);
+            // }
 
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'items' => $items,
-                'item' => $validated['item_data'],
+                // 'item' => $items->total(),
                 'user' => Auth::user(),
                 'sql' => DB::getQueryLog()
             ]);
