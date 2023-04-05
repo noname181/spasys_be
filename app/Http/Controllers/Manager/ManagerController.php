@@ -160,14 +160,14 @@ class ManagerController extends Controller
             $validated = $request->validated();
             $m_no = Manager::insertGetId([
                 'mb_no' => $member->mb_no,
-                'm_position' => $validated['m_position'],
+                'm_position' => isset($validated['m_position']) ? $validated['m_position'] : '',
                 'co_no' => $validated['co_no'],
                 'm_name' => $validated['m_name'],
-                'm_duty1' => $validated['m_duty1'],
-                'm_duty2' => $validated['m_duty2'],
-                'm_hp' => $validated['m_hp'],
-                'm_email' => $validated['m_email'],
-                'm_etc' => $validated['m_etc'],
+                'm_duty1' => isset($validated['m_duty1']) ? $validated['m_duty1'] : '',
+                'm_duty2' => isset($validated['m_duty2']) ? $validated['m_duty2'] : '',
+                'm_hp' => isset($validated['m_hp']) ? $validated['m_hp'] : '',
+                'm_email' => isset($validated['m_email']) ? $validated['m_email'] : '',
+                'm_etc' => isset($validated['m_etc']) ? $validated['m_etc'] : '',
                 'created_at' => date('y-m-d h-i-s')
             ]);
             DB::commit();
