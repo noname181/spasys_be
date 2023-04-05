@@ -4058,7 +4058,7 @@ class WarehousingController extends Controller
                                 $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
                             })
                                 ->where(function ($q4) {
-                                    $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                                    $q4->whereNull('rgd_status6');
                                 })
                                 ->where(function ($q4) {
                                     $q4->where('rgd_status4', '추가청구서')->orWhere('rgd_status4', '확정청구서');
@@ -4253,7 +4253,7 @@ class WarehousingController extends Controller
                                 $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
                             })
                                 ->where(function ($q4) {
-                                    $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                                    $q4->whereNull('rgd_status6');
                                 })
                                 ->where(function ($q4) {
                                     $q4->where('rgd_status4', '추가청구서')->orWhere('rgd_status4', '확정청구서');
@@ -4473,7 +4473,7 @@ class WarehousingController extends Controller
                             $q3->where(function ($q4) {
                                 $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
                             })->where(function ($q4) {
-                                $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                                $q4->whereNull('rgd_status6');
                             })
                                 ->where(function ($q4) {
                                     $q4->where('rgd_status4', '추가청구서')->orWhere('rgd_status4', '확정청구서');
@@ -5504,7 +5504,7 @@ class WarehousingController extends Controller
                                 $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
                             })
                             ->where(function ($q4){
-                                $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                                $q4->whereNull('rgd_status6');
                             })
                                 ->where(function ($q4){
                                 $q4->where('rgd_status4','추가청구서')->orWhere('rgd_status4','확정청구서');
@@ -5762,7 +5762,7 @@ class WarehousingController extends Controller
                                 $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
                             })
                             ->where(function ($q4){
-                                $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                                $q4->whereNull('rgd_status6');
                             })
                                 ->where(function ($q4){
                                 $q4->where('rgd_status4','추가청구서')->orWhere('rgd_status4','확정청구서');
