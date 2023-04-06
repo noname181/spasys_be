@@ -35,14 +35,10 @@ class AdjustmentGroupCreateRequest extends BaseFormRequest
             '*.ag_auto_issue' => [
             ],
             '*.ag_manager' => [
-                'required',
-                'string',
-                'max:255',
+                '',
             ],
             '*.ag_hp' => [
-                'required',
-                'string',
-                'max:255',
+                '',
             ],
             '*.ag_email' => [
                 'required',
