@@ -558,17 +558,10 @@ class ItemController extends Controller
             if($item){
                 $items = $items->orwhere(function ($query) use ($item,$validated) {
                     $query->whereIn('item_no', $item);
-                    if (isset($validated['w_no'])) {
-                        $warehousing = Warehousing::where('w_no', $validated['w_no'])->first();
-                        $query->where('co_no', $warehousing->co_no);
-                    }else{
-                        if (isset($validated['co_no']) && Auth::user()->mb_type == "shop") {
-                            $query->where('co_no', $validated['co_no']);
-                        } else if (isset($validated['co_no']) && Auth::user()->mb_type == "spasys") {
-                            $query->where('co_no', $validated['co_no']);
-                        } else if (isset($validated['co_no']) && Auth::user()->mb_type == "shipper") {
-                            $query->where('co_no', $validated['co_no']);
-                        }
+                    if (isset($validated['co_no'])) {
+                        $query->whereHas('ContractWms.company', function ($q) use ($validated) {
+                            $q->where('co_no', $validated['co_no']);
+                        });
                     }
                 });
 
@@ -590,7 +583,7 @@ class ItemController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
