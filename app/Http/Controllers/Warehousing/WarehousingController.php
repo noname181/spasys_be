@@ -4220,6 +4220,7 @@ class WarehousingController extends Controller
                         $q->where(function ($q2) {
                             $q2->where('rgd_status4', '예상경비청구서')
                                 ->where('service_korean_name', '보세화물')
+                                ->where('rgd_bill_type', 'not like', '%'. 'month' . '%')
                                 ->where(function ($q4) {
                                     $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
                                 })
@@ -4247,6 +4248,7 @@ class WarehousingController extends Controller
                         $q->where(function ($q2) {
                             $q2->where('rgd_status4', '예상경비청구서')
                                 ->where('service_korean_name', '보세화물')
+                                ->where('rgd_bill_type', 'not like', '%'. 'month' . '%')
                                 ->where(function ($q4) {
                                     $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
                                 })
@@ -4272,6 +4274,7 @@ class WarehousingController extends Controller
                         $q->where(function ($q2) {
                             $q2->where('rgd_status4', '예상경비청구서')
                                 ->where('service_korean_name', '보세화물')
+                                ->where('rgd_bill_type', 'not like', '%'. 'month' . '%')
                                 ->where(function ($q4) {
                                     $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
                                 })
@@ -5373,6 +5376,7 @@ class WarehousingController extends Controller
                         $q->where(function($q2){
                             $q2->where('rgd_status4','예상경비청구서')
                             ->where('service_korean_name','보세화물')
+                            ->where('rgd_bill_type', 'not like', '%'. 'month' . '%')
                             ->where(function ($q4){
                                 $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
                             })
@@ -5639,6 +5643,7 @@ class WarehousingController extends Controller
                         $q->where(function($q2){
                             $q2->where('rgd_status4','예상경비청구서')
                             ->where('service_korean_name','보세화물')
+                            ->where('rgd_bill_type', 'not like', '%'. 'month' . '%')
                             ->where(function ($q4){
                                 $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
                             })
