@@ -2507,6 +2507,14 @@ class ReceivingGoodsDeliveryController extends Controller
                     'rgd_paid_date' => Carbon::now()->toDateTimeString()
                 ]);
 
+                CancelBillHistory::insertGetId([
+                    'rgd_no' => $request->rgd_no,
+                    'mb_no' => $user->mb_no,
+                    'cbh_type' => 'payment',
+                    'cbh_status_before' => $rgd->rgd_status8,
+                    'cbh_status_after' => 'payment_bill'
+                ]);
+
                 if($rgd->rgd_status8 != 'completed'){
                     CancelBillHistory::insertGetId([
                         'rgd_no' => $request->rgd_no,
