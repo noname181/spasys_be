@@ -494,7 +494,19 @@ class ItemController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
 
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : '';
-            $items = Item::with(['item_channels', 'ContractWms'])->where('item_service_name', '수입풀필먼트')->orderBy('item_no', 'DESC');
+
+            $item = [];
+            $count = 0;
+            if(isset($validated['item_data'])){
+                foreach($validated['item_data'] as $value){
+                    if($value['item_no']){
+                        $item[] = $value['item_no'];
+                        $count++;
+                    }   
+                }
+            }
+
+            $items = Item::with(['item_channels', 'ContractWms'])->where('item_service_name', '수입풀필먼트');
 
             if (isset($validated['co_no'])) {
                 $items->whereHas('ContractWms.company', function ($q) use ($validated) {
@@ -542,7 +554,31 @@ class ItemController extends Controller
             //         $query->whereIn(DB::raw('co_no'), $co_no);
             //     });
             // }
+            
+            if($item){
+                $items = $items->orwhere(function ($query) use ($item,$validated) {
+                    $query->whereIn('item_no', $item);
+                    if (isset($validated['w_no'])) {
+                        $warehousing = Warehousing::where('w_no', $validated['w_no'])->first();
+                        $query->where('co_no', $warehousing->co_no);
+                    }else{
+                        if (isset($validated['co_no']) && Auth::user()->mb_type == "shop") {
+                            $query->where('co_no', $validated['co_no']);
+                        } else if (isset($validated['co_no']) && Auth::user()->mb_type == "spasys") {
+                            $query->where('co_no', $validated['co_no']);
+                        } else if (isset($validated['co_no']) && Auth::user()->mb_type == "shipper") {
+                            $query->where('co_no', $validated['co_no']);
+                        }
+                    }
+                });
 
+                $orderedIds = implode(',', $item);
+            
+                $items = $items->orderByRaw(\DB::raw("FIELD(item_no, ".$orderedIds." ) desc"));
+
+            }else{
+                $items = $items->orderBy('item_no', 'DESC');
+            }
 
 
             $items = $items->paginate($per_page, ['*'], 'page', $page);
