@@ -9,7 +9,7 @@ use App\Models\SendEmail;
 use App\Utils\Messages;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-
+use Carbon\Carbon;
 class SendEmailController extends Controller
 {
    
@@ -34,7 +34,9 @@ class SendEmailController extends Controller
                 'se_name_receiver' => $validated['se_name_receiver'],
                 'se_title' => $validated['se_title'],
                 'se_content' => $validated['se_content'],
-                'se_rmd_number'=>$validated['rmd_number']
+                'se_rmd_number'=>$validated['rmd_number'],
+                'created_at'=>Carbon::now()->format('Y-m-d H:i:s'),
+                'updated_at'=>Carbon::now()->format('Y-m-d H:i:s')
             ]);
 
             return response()->json([
