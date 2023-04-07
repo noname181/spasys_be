@@ -2508,6 +2508,19 @@ class ReceivingGoodsDeliveryController extends Controller
                     'rgd_paid_date' => Carbon::now()->toDateTimeString()
                 ]);
 
+                Payment::updateOrCreate(
+                    [
+                        'rgd_no' => $request['rgd_no'],
+                    ],
+                    [
+                    // 'p_price' => $request->sumprice,
+                    // 'p_method' => $request->p_method,
+                    'p_success_yn' => 'y',
+                    'p_cancel_yn' => 'y',
+                    'p_cancel_time' => Carbon::now(),
+                    ]
+                );
+
                 CancelBillHistory::insertGetId([
                     'rgd_no' => $request->rgd_no,
                     'mb_no' => $user->mb_no,
@@ -2521,6 +2534,19 @@ class ReceivingGoodsDeliveryController extends Controller
                     'rgd_paid_date' => null,
                 ]);
 
+                Payment::updateOrCreate(
+                    [
+                        'rgd_no' => $request['rgd_no'],
+                    ],
+                    [
+                    // 'p_price' => $request->sumprice,
+                    // 'p_method' => $request->p_method,
+                    'p_success_yn' => null,
+                    'p_cancel_yn' => 'y',
+                    'p_cancel_time' => Carbon::now(),
+                    ]
+                );
+
                 CancelBillHistory::insertGetId([
                     'rgd_no' => $request->rgd_no,
                     'mb_no' => $user->mb_no,
@@ -2533,6 +2559,19 @@ class ReceivingGoodsDeliveryController extends Controller
                     'rgd_status6' => 'cancel',
                     'rgd_paid_date' => null
                 ]);
+
+                Payment::updateOrCreate(
+                    [
+                        'rgd_no' => $request['rgd_no'],
+                    ],
+                    [
+                    // 'p_price' => $request->sumprice,
+                    // 'p_method' => $request->p_method,
+                    'p_success_yn' => null,
+                    'p_cancel_yn' => 'y',
+                    'p_cancel_time' => Carbon::now(),
+                    ]
+                );
 
                 CancelBillHistory::insertGetId([
                     'rgd_no' => $request->rgd_no,
@@ -2551,6 +2590,19 @@ class ReceivingGoodsDeliveryController extends Controller
                     'rgd_status8' => 'completed',
                     'rgd_paid_date' => Carbon::now()->toDateTimeString()
                 ]);
+
+                Payment::updateOrCreate(
+                    [
+                        'rgd_no' => $request['rgd_no'],
+                    ],
+                    [
+                    // 'p_price' => $request->sumprice,
+                    // 'p_method' => $request->p_method,
+                    'p_success_yn' => 'y',
+                    'p_cancel_yn' => 'y',
+                    'p_cancel_time' => Carbon::now(),
+                    ]
+                );
 
                 CancelBillHistory::insertGetId([
                     'rgd_no' => $request->rgd_no,
