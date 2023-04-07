@@ -4337,10 +4337,14 @@ class WarehousingController extends Controller
                     $warehousing->where(function ($q) use ($validated) {
                         $q->where(function ($q) use ($validated) {
                             $q->where(function ($q) use ($validated) {
+                                $q->whereNull('rgd_status5')->orwhere('rgd_status5', '!=', 'cancel');
+                            })->where(function ($q) use ($validated) {
                                 $q->whereNull('rgd_status6')->orwhere('rgd_status6', '!=', 'paid');
                             });
                         })->orwhere(function ($q) use ($validated) {
                             $q->where(function ($q) use ($validated) {
+                                $q->whereNull('rgd_status5')->orwhere('rgd_status5', '!=', 'cancel');
+                            })->where(function ($q) use ($validated) {
                                 $q->whereNull('rgd_status7')->orwhere('rgd_status7', '!=', 'taxed');
                             });
                         });
@@ -4352,10 +4356,14 @@ class WarehousingController extends Controller
                     $warehousing_bonded->where(function ($q) use ($validated) {
                         $q->where(function ($q) use ($validated) {
                             $q->where(function ($q) use ($validated) {
+                                $q->whereNull('rgd_status5')->orwhere('rgd_status5', '!=', 'cancel');
+                            })->where(function ($q) use ($validated) {
                                 $q->whereNull('rgd_status6')->orwhere('rgd_status6', '!=', 'paid');
                             });
                         })->orwhere(function ($q) use ($validated) {
                             $q->where(function ($q) use ($validated) {
+                                $q->whereNull('rgd_status5')->orwhere('rgd_status5', '!=', 'cancel');
+                            })->where(function ($q) use ($validated) {
                                 $q->whereNull('rgd_status7')->orwhere('rgd_status7', '!=', 'taxed');
                             });
                         });
@@ -4367,10 +4375,14 @@ class WarehousingController extends Controller
                     $warehousing_fulfillment->where(function ($q) use ($validated) {
                         $q->where(function ($q) use ($validated) {
                             $q->where(function ($q) use ($validated) {
+                                $q->whereNull('rgd_status5')->orwhere('rgd_status5', '!=', 'cancel');
+                            })->where(function ($q) use ($validated) {
                                 $q->whereNull('rgd_status6')->orwhere('rgd_status6', '!=', 'paid');
                             });
                         })->orwhere(function ($q) use ($validated) {
                             $q->where(function ($q) use ($validated) {
+                                $q->whereNull('rgd_status5')->orwhere('rgd_status5', '!=', 'cancel');
+                            })->where(function ($q) use ($validated) {
                                 $q->whereNull('rgd_status7')->orwhere('rgd_status7', '!=', 'taxed');
                             });
                         });
@@ -5405,10 +5417,14 @@ class WarehousingController extends Controller
                     $warehousing->where(function ($q) use ($validated) {
                         $q->where(function ($q) use ($validated) {
                             $q->where(function ($q) use ($validated) {
+                                $q->whereNull('rgd_status5')->orwhere('rgd_status5', '!=', 'cancel');
+                            })->where(function ($q) use ($validated) {
                                 $q->whereNull('rgd_status6')->orwhere('rgd_status6', '!=', 'paid');
                             });
                         })->orwhere(function ($q) use ($validated) {
                             $q->where(function ($q) use ($validated) {
+                                $q->whereNull('rgd_status5')->orwhere('rgd_status5', '!=', 'cancel');
+                            })->where(function ($q) use ($validated) {
                                 $q->whereNull('rgd_status7')->orwhere('rgd_status7', '!=', 'taxed');
                             });
                         });
