@@ -1118,19 +1118,36 @@ class ReceivingGoodsDeliveryController extends Controller
                             'ss_no' => $request->ss_no,
                             'mb_no' => $member->mb_no,
                             'service_korean_name' => $request->w_category_name,
-                            'rgd_status1' => $location['rgd_status1'],
+                            'rgd_status1' => isset($location['rgd_status1']) ? $location['rgd_status1'] : null,
                             'rgd_status2' => isset($location['rgd_status2']) ? $location['rgd_status2'] : null,
                             'rgd_status3' => isset($location['rgd_status3']) ? $location['rgd_status3'] : null,
 
                             'rgd_delivery_company' => isset($location['rgd_delivery_company']) ? $location['rgd_delivery_company'] : null,
                             'rgd_tracking_code' => isset($location['rgd_tracking_code']) ? $location['rgd_tracking_code'] : null,
-                            'rgd_delivery_man' => $location['rgd_delivery_man'],
-                            'rgd_delivery_man_hp' => $location['rgd_delivery_man_hp'],
+                            'rgd_delivery_man' => isset($location['rgd_delivery_man']) ? $location['rgd_delivery_man'] : '',
+                            'rgd_delivery_man_hp' => isset($location['rgd_delivery_man_hp']) ? $location['rgd_delivery_man_hp'] : '',
 
-                            'rgd_delivery_schedule_day' => $location['rgd_delivery_schedule_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_delivery_schedule_day']) : null,
-                            'rgd_arrive_day' =>  $location['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']) : null,
+                            'rgd_delivery_schedule_day' => isset($location['rgd_delivery_schedule_day']) ? DateTime::createFromFormat('Y-m-d', $location['rgd_delivery_schedule_day']) : null,
+                            'rgd_arrive_day' =>  isset($location['rgd_arrive_day']) ? DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']) : null,
                         ]
                     );
+                }
+            }
+
+            if ($request->wr_contents) {
+                // WarehousingRequest::where('w_no', $request->w_no)->update([
+                //     'mb_no' => $member->mb_no,
+                //     'wr_contents' => $request->wr_contents,
+                //     'wr_type' => 'EW',
+                // ]);
+
+                if ($request->wr_contents) {
+                    WarehousingRequest::insert([
+                        'w_no' => $request->ss_no,
+                        'mb_no' => $member->mb_no,
+                        'wr_contents' => $request->wr_contents,
+                        'wr_type' => 'IW',
+                    ]);
                 }
             }
 
@@ -2705,6 +2722,16 @@ class ReceivingGoodsDeliveryController extends Controller
                         'cbh_status_after' => 'confirmed'
                     ]);
 
+                    if($rgd->rgd_calculate_deadline_yn == 'y'){
+                        CancelBillHistory::insertGetId([
+                            'rgd_no' => $request->rgd_no,
+                            'mb_no' => $user->mb_no,
+                            'cbh_type' => 'payment',
+                            'cbh_status_before' => null,
+                            'cbh_status_after' => 'request_bill'
+                        ]);
+                    }
+
                     if ($ag->ag_auto_issue == 'y') {
                         
                         $cbh = CancelBillHistory::where('rgd_no', $request->rgd_no)->where('cbh_type', 'tax')->first();
@@ -2777,6 +2804,16 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
                         ]);
 
+                        if($rgd['rgd_calculate_deadline_yn'] == 'y'){
+                            CancelBillHistory::insertGetId([
+                                'rgd_no' => $rgd['rgd_no'],
+                                'mb_no' => $user->mb_no,
+                                'cbh_type' => 'payment',
+                                'cbh_status_before' => null,
+                                'cbh_status_after' => 'request_bill'
+                            ]);
+                        }
+
                         if ($ag->ag_auto_issue == 'y') {
                             
                             $cbh = CancelBillHistory::where('rgd_no', $rgd->rgd_no)->where('cbh_type', 'tax')->first();
@@ -2835,6 +2872,17 @@ class ReceivingGoodsDeliveryController extends Controller
                         'cbh_status_before' => null,
                         'cbh_status_after' => 'confirmed'
                     ]);
+
+                    if($rgd['rgd_calculate_deadline_yn'] == 'y'){
+                        CancelBillHistory::insertGetId([
+                            'rgd_no' => $rgd['rgd_no'],
+                            'mb_no' => $user->mb_no,
+                            'cbh_type' => 'payment',
+                            'cbh_status_before' => null,
+                            'cbh_status_after' => 'request_bill'
+                        ]);
+                    }
+
 
                     if (isset($rate_data_general->ag_no)) {
                         $ag = AdjustmentGroup::where('ag_no', $rate_data_general->ag_no)->first();

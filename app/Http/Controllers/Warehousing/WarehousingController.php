@@ -4418,7 +4418,9 @@ class WarehousingController extends Controller
                         })
                         ->whereNull('rgd_status7');
                 } else {
-                    $warehousing->where('rgd_status7', '=', $validated['rgd_status1']);
+                    $warehousing->where(function ($q) {
+                        $q->where('rgd_status5', '!=', 'cancel')->orwhereNull('rgd_status5');
+                    })->where('rgd_status7', '=', $validated['rgd_status1']);
                 }
 
                 if ($validated['rgd_status1'] == 'waiting') {
@@ -4432,7 +4434,9 @@ class WarehousingController extends Controller
                         })
                         ->whereNull('rgd_status7');
                 } else
-                    $warehousing_bonded->where('rgd_status7', '=', $validated['rgd_status1']);
+                    $warehousing_bonded->where(function ($q) {
+                        $q->where('rgd_status5', '!=', 'cancel')->orwhereNull('rgd_status5');
+                    })->where('rgd_status7', '=', $validated['rgd_status1']);
 
                 if ($validated['rgd_status1'] == 'waiting') {
                     $warehousing_fulfillment->where(function ($q) {
@@ -4445,7 +4449,9 @@ class WarehousingController extends Controller
                         })
                         ->whereNull('rgd_status7');
                 } else {
-                    $warehousing_fulfillment->where('rgd_status7', '=', $validated['rgd_status1']);    
+                    $warehousing_fulfillment->where(function ($q) {
+                        $q->where('rgd_status5', '!=', 'cancel')->orwhereNull('rgd_status5');
+                    })->where('rgd_status7', '=', $validated['rgd_status1']);    
                 }
             }
            
