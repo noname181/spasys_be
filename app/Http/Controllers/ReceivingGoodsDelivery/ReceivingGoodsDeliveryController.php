@@ -2557,7 +2557,8 @@ class ReceivingGoodsDeliveryController extends Controller
             }else if($request->payment_status == '결제취소' && $rgd->rgd_status6 != 'cancel'){
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     'rgd_status6' => 'cancel',
-                    'rgd_paid_date' => null
+                    'rgd_paid_date' => null,
+                    'rgd_canceled_date' => Carbon::now(),
                 ]);
 
                 Payment::updateOrCreate(
