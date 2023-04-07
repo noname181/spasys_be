@@ -40,7 +40,7 @@ class ForwarderInfoController extends Controller
                         'fi_address_detail' => $value['fi_address_detail'],
                     ]);
                     $id = $fi->first()->fi_no;
-                }else {
+                }else if(isset($value['fi_name']) || isset($value['fi_hp']) ||isset($value['fi_manager']) ||isset($value['fi_address']) ||isset($value['fi_address_detail'])) {
                     $id = ForwarderInfo::insertGetId([
                         'mb_no' => $member->mb_no,
                         'co_no' => $co_no,
@@ -81,16 +81,18 @@ class ForwarderInfoController extends Controller
 
             foreach ($validated  as $value) {
 
-
-                $ForwarderInfo = ForwarderInfo::insertGetId([
-                    'mb_no' => $member->mb_no,
-                    'co_no' => $co_no,
-                    'fi_name' => $value['fi_name'],
-                    'fi_hp' => $value['fi_hp'],
-                    'fi_manager' => $value['fi_manager'],
-                    'fi_address' => $value['fi_address'],
-                    'fi_address_detail' => $value['fi_address_detail'],
-                ]);
+                if(isset($value['fi_name']) || isset($value['fi_hp']) ||isset($value['fi_manager']) ||isset($value['fi_address']) ||isset($value['fi_address_detail'])) {
+                    $ForwarderInfo = ForwarderInfo::insertGetId([
+                        'mb_no' => $member->mb_no,
+                        'co_no' => $co_no,
+                        'fi_name' => $value['fi_name'],
+                        'fi_hp' => $value['fi_hp'],
+                        'fi_manager' => $value['fi_manager'],
+                        'fi_address' => $value['fi_address'],
+                        'fi_address_detail' => $value['fi_address_detail'],
+                    ]);
+                }
+                
 
 
             }
