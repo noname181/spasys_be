@@ -361,6 +361,7 @@ class MemberController extends Controller
                 'mb_language' => $validated['mb_language'],
                 'mb_token' => $validated['mb_token'],
                 'warehouse_code' => $validated['warehouse_code'],
+                'mb_service_no_array' => '공통 보세화물 수입풀필먼트 유통가공'
             ]);
 
 

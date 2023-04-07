@@ -74,7 +74,8 @@ class CoAddressController extends Controller
                         'ca_is_default' => $value['ca_is_default'] == true ? 'y' : 'n',
                     ]);
                     $id = $ca->first()->ca_no;
-                }else {
+                }else if(isset($value['ca_name']) || isset($value['ca_hp']) ||isset($value['ca_manager']) ||isset($value['ca_address']) ||isset($value['ca_address_detail'])){
+                    
                     $id = CoAddress::insertGetId([
                         'mb_no' => $member->mb_no,
                         'co_no' => $co_no,
@@ -101,6 +102,7 @@ class CoAddressController extends Controller
         } catch (\Throwable $e) {
             DB::rollback();
             Log::error($e);
+            return $e;
             // return response()->json(['message' => Messages::MSG_0001], 500);
 
         }
@@ -116,16 +118,18 @@ class CoAddressController extends Controller
 
             foreach ($validated  as $value) {
 
-
-                $CoAddress = CoAddress::insertGetId([
-                    'mb_no' => $member->mb_no,
-                    'co_no' => $co_no,
-                    'ca_name' => $value['ca_name'],
-                    'ca_hp' => $value['ca_hp'],
-                    'ca_manager' => $value['ca_manager'],
-                    'ca_address' => $value['ca_address'],
-                    'ca_address_detail' => $value['ca_address_detail'],
-                ]);
+                if(isset($value['ca_name']) || isset($value['ca_hp']) ||isset($value['ca_manager']) ||isset($value['ca_address']) ||isset($value['ca_address_detail'])){
+                    $CoAddress = CoAddress::insertGetId([
+                        'mb_no' => $member->mb_no,
+                        'co_no' => $co_no,
+                        'ca_name' => $value['ca_name'],
+                        'ca_hp' => $value['ca_hp'],
+                        'ca_manager' => $value['ca_manager'],
+                        'ca_address' => $value['ca_address'],
+                        'ca_address_detail' => $value['ca_address_detail'],
+                    ]);
+                }
+                
 
 
             }
@@ -138,6 +142,7 @@ class CoAddressController extends Controller
         } catch (\Throwable $e) {
             DB::rollback();
             Log::error($e);
+            return $e;
             // return response()->json(['message' => Messages::MSG_0001], 500);
 
         }

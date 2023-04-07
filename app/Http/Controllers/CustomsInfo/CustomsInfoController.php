@@ -41,7 +41,7 @@ class CustomsInfoController extends Controller
                         'ci_address_detail' => $value['ci_address_detail'],
                     ]);
                     $id = $ci->first()->ci_no;
-                }else {
+                }else if(isset($value['ci_name']) || isset($value['ci_hp']) ||isset($value['ci_manager']) ||isset($value['ci_address']) ||isset($value['ci_address_detail'])){
                     $id = CustomsInfo::insertGetId([
                         'mb_no' => $member->mb_no,
                         'co_no' => $co_no,
@@ -81,16 +81,18 @@ class CustomsInfoController extends Controller
 
             foreach ($validated  as $value) {
 
-
-                $CustomsInfo = CustomsInfo::insertGetId([
-                    'mb_no' => $member->mb_no,
-                    'co_no' => $co_no,
-                    'ci_name' => $value['ci_name'],
-                    'ci_hp' => $value['ci_hp'],
-                    'ci_manager' => $value['ci_manager'],
-                    'ci_address' => $value['ci_address'],
-                    'ci_address_detail' => $value['ci_address_detail'],
-                ]);
+                if(isset($value['ci_name']) || isset($value['ci_hp']) ||isset($value['ci_manager']) ||isset($value['ci_address']) ||isset($value['ci_address_detail'])){
+                    $CustomsInfo = CustomsInfo::insertGetId([
+                        'mb_no' => $member->mb_no,
+                        'co_no' => $co_no,
+                        'ci_name' => $value['ci_name'],
+                        'ci_hp' => $value['ci_hp'],
+                        'ci_manager' => $value['ci_manager'],
+                        'ci_address' => $value['ci_address'],
+                        'ci_address_detail' => $value['ci_address_detail'],
+                    ]);
+                }
+                
 
 
             }
@@ -103,6 +105,7 @@ class CustomsInfoController extends Controller
         } catch (\Throwable $e) {
             DB::rollback();
             Log::error($e);
+            return $e;
             // return response()->json(['message' => Messages::MSG_0001], 500);
 
         }

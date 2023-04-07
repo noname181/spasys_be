@@ -222,7 +222,7 @@ class AdjustmentGroupController extends Controller
             return response()->json(['message' => Messages::MSG_0007,'user'=>Auth::user()->mb_no], 200);
         } catch (\Exception $e) {
             Log::error($e);
-            
+            return $e;
             return response()->json(['message' => Messages::MSG_0002], 500);
         }
     }
