@@ -2722,6 +2722,16 @@ class ReceivingGoodsDeliveryController extends Controller
                         'cbh_status_after' => 'confirmed'
                     ]);
 
+                    if($rgd->rgd_calculate_deadline_yn == 'y'){
+                        CancelBillHistory::insertGetId([
+                            'rgd_no' => $request->rgd_no,
+                            'mb_no' => $user->mb_no,
+                            'cbh_type' => 'payment',
+                            'cbh_status_before' => null,
+                            'cbh_status_after' => 'request_bill'
+                        ]);
+                    }
+
                     if ($ag->ag_auto_issue == 'y') {
                         
                         $cbh = CancelBillHistory::where('rgd_no', $request->rgd_no)->where('cbh_type', 'tax')->first();
@@ -2794,6 +2804,16 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
                         ]);
 
+                        if($rgd['rgd_calculate_deadline_yn'] == 'y'){
+                            CancelBillHistory::insertGetId([
+                                'rgd_no' => $rgd['rgd_no'],
+                                'mb_no' => $user->mb_no,
+                                'cbh_type' => 'payment',
+                                'cbh_status_before' => null,
+                                'cbh_status_after' => 'request_bill'
+                            ]);
+                        }
+
                         if ($ag->ag_auto_issue == 'y') {
                             
                             $cbh = CancelBillHistory::where('rgd_no', $rgd->rgd_no)->where('cbh_type', 'tax')->first();
@@ -2852,6 +2872,17 @@ class ReceivingGoodsDeliveryController extends Controller
                         'cbh_status_before' => null,
                         'cbh_status_after' => 'confirmed'
                     ]);
+
+                    if($rgd['rgd_calculate_deadline_yn'] == 'y'){
+                        CancelBillHistory::insertGetId([
+                            'rgd_no' => $rgd['rgd_no'],
+                            'mb_no' => $user->mb_no,
+                            'cbh_type' => 'payment',
+                            'cbh_status_before' => null,
+                            'cbh_status_after' => 'request_bill'
+                        ]);
+                    }
+
 
                     if (isset($rate_data_general->ag_no)) {
                         $ag = AdjustmentGroup::where('ag_no', $rate_data_general->ag_no)->first();
