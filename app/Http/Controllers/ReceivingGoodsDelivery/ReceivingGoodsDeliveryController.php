@@ -2524,6 +2524,16 @@ class ReceivingGoodsDeliveryController extends Controller
                         'cbh_status_after' => 'completed'
                     ]);
                 }
+            }else if($request->complete_status == '정산완료') {
+                if($rgd->rgd_status8 != 'completed'){
+                    CancelBillHistory::insertGetId([
+                        'rgd_no' => $request->rgd_no,
+                        'mb_no' => $user->mb_no,
+                        'cbh_type' => 'tax',
+                        'cbh_status_before' => $rgd->rgd_status8,
+                        'cbh_status_after' => 'completed'
+                    ]);
+                }
             }
 
             if ($request->complete_status == "진행중" && $rgd->rgd_status8 != '진행중') {
