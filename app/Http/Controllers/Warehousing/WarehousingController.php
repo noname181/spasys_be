@@ -5529,7 +5529,7 @@ class WarehousingController extends Controller
             $per_page = isset($$request['per_page']) ? $$request['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($$request['page']) ? $$request['page'] : 1;
-            $th = CancelBillHistory::with('member')->where('rgd_no', $request->rgd_no)->where('cbh_type', 'tax')->orderby('cbh_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
+            $th = CancelBillHistory::with('member')->where('rgd_no', $request->rgd_no)->where('cbh_type', 'tax')->orderby('created_at', 'DESC')->paginate($per_page, ['*'], 'page', $page);
 
             return response()->json($th);
         } catch (\Exception $e) {
@@ -6603,12 +6603,26 @@ class WarehousingController extends Controller
     }
     public function load_table_top_right($rgd_no)
     {
-        $data = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child', 'rate_data_general'])->find($rgd_no);
-        if (!empty($data)) {
+        $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child', 'rate_data_general'])->find($rgd_no);
+
+        $tax_history = CancelBillHistory::where('rgd_no', $rgd_no)->where('cbh_type', 'tax')->where('cbh_status_after', 'in_process')->first();
+
+        if(empty($tax_history->cbh_no)){
+            CancelBillHistory::insertGetId([
+                'rgd_no' => $rgd_no,
+                'mb_no' => $rgd->mb_no,
+                'cbh_type' => 'tax',
+                'cbh_status_after' => 'in_process',
+                'created_at' => $rgd->created_at,
+                'updated_at' => $rgd->updated_at,
+            ]);
+        }
+
+        if (!empty($rgd)) {
             return response()->json(
                 [
                     'message' => Messages::MSG_0007,
-                    'data' => $data
+                    'data' => $rgd
                 ],
                 200
             );

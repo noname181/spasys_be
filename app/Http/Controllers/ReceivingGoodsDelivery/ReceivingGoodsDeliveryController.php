@@ -2519,6 +2519,54 @@ class ReceivingGoodsDeliveryController extends Controller
 
             $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child'])->where('rgd_no', $request->rgd_no)->first();
 
+            if($request->cancel_status == '발행취소' && $rgd->rgd_status5 == null){
+                ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                    'rgd_status5' => 'cancel',
+                    'rgd_canceled_date' =>  Carbon::now(),
+                ]);
+
+            
+            }else if($request->cancel_status == '발행' && $rgd->rgd_status5 == 'cancel'){
+                ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                    'rgd_status5' => null,
+                    'rgd_canceled_date' => null,
+                ]);
+
+
+            }
+
+            $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child'])->where('rgd_no', $request->rgd_no)->first();
+
+            if($request->confirm_status == '요청중' && $rgd->rgd_status5 == 'confirmed'){
+                ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                    'rgd_status5' => null,
+                    'rgd_confirmed_date' => null
+                ]);
+
+                CancelBillHistory::insertGetId([
+                    'rgd_no' => $request->rgd_no,
+                    'mb_no' => $user->mb_no,
+                    'cbh_type' => 'revert_approval',
+                    'cbh_status_before' => 'confirmed',
+                    'cbh_status_after' => null
+                ]);
+            }else if($request->confirm_status == '승인완료' && $rgd->rgd_status5 == null){
+                ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                    'rgd_status5' => 'confirmed',
+                    'rgd_confirmed_date' => Carbon::now(),
+                ]);
+
+                CancelBillHistory::insertGetId([
+                    'rgd_no' => $request->rgd_no,
+                    'mb_no' => $user->mb_no,
+                    'cbh_type' => 'approval',
+                    'cbh_status_before' => null,
+                    'cbh_status_after' => 'confirmed'
+                ]);
+            }
+           
+            $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child'])->where('rgd_no', $request->rgd_no)->first();
+
             if ($request->payment_status == '결제완료' && $rgd->rgd_status6 != 'paid') {
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     'rgd_status6' => 'paid',
@@ -2643,7 +2691,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     'rgd_status8' => 'completed',
                 ]);
-            } else if ($request->complete_status == "진행중" && $rgd->rgd_status8 != '진행중') {
+            }else if ($request->complete_status == "진행중" && $rgd->rgd_status8 != 'in_process') {
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     'rgd_status8' => 'in_process',
                 ]);
