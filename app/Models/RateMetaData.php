@@ -45,7 +45,7 @@ class RateMetaData extends Model
     ];
 
     public function rate_meta() {
-        return $this->hasOne(RateMeta::class, 'rm_no', 'rm_no');
+        return $this->hasOne(RateMeta::class, 'rm_no', 'rm_no')->with('send_email');
     }
     public function rate_data(){
         return $this->hasMany(RateData::class, 'rmd_no', 'rmd_no');
