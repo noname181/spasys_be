@@ -65,7 +65,8 @@ class WarehousingRequestController extends Controller
 
             $warehousing_request = WarehousingRequest::with(['mb_no','warehousing'])->where('wr_type','<>','List')->orderBy('wr_no', 'DESC');
             if($warehousing){
-                $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no'])->orwhere('w_no', '=', $warehousing->w_import_no);
+                $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no']);
+                //->orwhere('w_no', '=', $warehousing->w_import_no);
             }else{
                 $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no']);
             }
