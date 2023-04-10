@@ -5872,6 +5872,20 @@ class WarehousingController extends Controller
                             'cbh_type' => 'tax',
                             'cbh_status_after' => 'taxed'
                         ]);
+
+                        if($rgd['rgd_status6'] == 'paid'){
+                            CancelBillHistory::insertGetId([
+                                'rgd_no' => $rgd['rgd_no'],
+                                'mb_no' => $user->mb_no,
+                                'cbh_type' => 'tax',
+                                'cbh_status_before' => $rgd['rgd_status8'],
+                                'cbh_status_after' => 'completed'
+                            ]);
+    
+                            ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
+                                'rgd_status8' => 'completed',
+                            ]);
+                        }
                     }
                     $ids[] = $id;
                 }
@@ -5943,6 +5957,20 @@ class WarehousingController extends Controller
                             'cbh_type' => 'tax',
                             'cbh_status_after' => 'taxed'
                         ]);
+
+                        if($rgd['rgd_status6'] == 'paid'){
+                            CancelBillHistory::insertGetId([
+                                'rgd_no' => $rgd['rgd_no'],
+                                'mb_no' => $user->mb_no,
+                                'cbh_type' => 'tax',
+                                'cbh_status_before' => $rgd['rgd_status8'],
+                                'cbh_status_after' => 'completed'
+                            ]);
+    
+                            ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
+                                'rgd_status8' => 'completed',
+                            ]);
+                        }
                     }
                     $ids[] = $id;
                 }
@@ -5988,6 +6016,20 @@ class WarehousingController extends Controller
                         'cbh_type' => 'tax',
                         'cbh_status_after' => 'taxed'
                     ]);
+
+                    if($rgd['rgd_status6'] == 'paid'){
+                        CancelBillHistory::insertGetId([
+                            'rgd_no' => $rgd['rgd_no'],
+                            'mb_no' => $user->mb_no,
+                            'cbh_type' => 'tax',
+                            'cbh_status_before' => $rgd['rgd_status8'],
+                            'cbh_status_after' => 'completed'
+                        ]);
+
+                        ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
+                            'rgd_status8' => 'completed',
+                        ]);
+                    }
                 }
                 DB::commit();
                 return response()->json([
@@ -6039,6 +6081,20 @@ class WarehousingController extends Controller
                         'cbh_type' => 'tax',
                         'cbh_status_after' => 'taxed'
                     ]);
+
+                    if($rgd['rgd_status6'] == 'paid'){
+                        CancelBillHistory::insertGetId([
+                            'rgd_no' => $rgd['rgd_no'],
+                            'mb_no' => $user->mb_no,
+                            'cbh_type' => 'tax',
+                            'cbh_status_before' => $rgd['rgd_status8'],
+                            'cbh_status_after' => 'completed'
+                        ]);
+
+                        ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
+                            'rgd_status8' => 'completed',
+                        ]);
+                    }
                 }
                 DB::commit();
                 return response()->json([
