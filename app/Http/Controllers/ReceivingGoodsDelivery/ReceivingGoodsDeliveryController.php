@@ -3143,6 +3143,7 @@ class ReceivingGoodsDeliveryController extends Controller
     {
         try {
             DB::beginTransaction();
+            $user = Auth::user();
             $check_payment = Payment::where('rgd_no', $request->rgd_no)->where('p_cancel_yn', 'y')->first();
             if (isset($request->sumprice) && $request->p_method == 'card') {
                 $p_method_fee = $request->sumprice / 100;
@@ -3216,13 +3217,6 @@ class ReceivingGoodsDeliveryController extends Controller
                     'rgd_paid_date' =>  Carbon::now(),
                 ]);
             }
-
-            CancelBillHistory::insertGetId([
-                'mb_no' => Auth::user()->mb_no,
-                'rgd_no' => $request->rgd_no,
-                'cbh_status_after' => 'payment_bill',
-                'cbh_type' => 'payment',
-            ]);
 
             DB::commit();
             return response()->json([
