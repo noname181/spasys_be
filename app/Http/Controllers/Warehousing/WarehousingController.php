@@ -5870,7 +5870,7 @@ class WarehousingController extends Controller
                             'rgd_no' => $request->rgd_no,
                             'mb_no' => $user->mb_no,
                             'cbh_type' => 'tax',
-                            'cbh_status_after' => 'issued'
+                            'cbh_status_after' => 'taxed'
                         ]);
                     }
                     $ids[] = $id;
@@ -5941,7 +5941,7 @@ class WarehousingController extends Controller
                             'rgd_no' => $request->rgd_no,
                             'mb_no' => $user->mb_no,
                             'cbh_type' => 'tax',
-                            'cbh_status_after' => 'issued'
+                            'cbh_status_after' => 'taxed'
                         ]);
                     }
                     $ids[] = $id;
