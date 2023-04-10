@@ -4542,11 +4542,11 @@ class WarehousingController extends Controller
                         $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum7 : '';
                     } else if ($item->service_korean_name == '수입풀필먼트') {
                         $item->discount = "";
-                        $item->sum_price_total2 = $item->rate_data_general->rdg_sum6;
+                        $item->sum_price_total2 =  isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum6 : '';
                         $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum6 : '';
                     } else {
                         $item->discount = "";
-                        $item->sum_price_total2 = $item->rate_data_general->rdg_sum4;
+                        $item->sum_price_total2 = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : '';
                         $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : '';
                     }
 
