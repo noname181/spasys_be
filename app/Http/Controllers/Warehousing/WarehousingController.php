@@ -6663,12 +6663,25 @@ class WarehousingController extends Controller
 
         $tax_history = CancelBillHistory::where('rgd_no', $rgd_no)->where('cbh_type', 'tax')->where('cbh_status_after', 'in_process')->first();
 
+        $approval_history = CancelBillHistory::where('rgd_no', $rgd_no)->whereIn('cbh_type', ['approval'])->first();
+
         if(empty($tax_history->cbh_no)){
             CancelBillHistory::insertGetId([
                 'rgd_no' => $rgd_no,
                 'mb_no' => $rgd->mb_no,
                 'cbh_type' => 'tax',
                 'cbh_status_after' => 'in_process',
+                'created_at' => $rgd->created_at,
+                'updated_at' => $rgd->updated_at,
+            ]);
+        }
+
+        if(empty($approval_history->cbh_no)){
+            CancelBillHistory::insertGetId([
+                'rgd_no' => $rgd_no,
+                'mb_no' => $rgd->mb_no,
+                'cbh_type' => 'approval',
+                'cbh_status_after' => 'request_approval',
                 'created_at' => $rgd->created_at,
                 'updated_at' => $rgd->updated_at,
             ]);
