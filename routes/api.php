@@ -112,6 +112,13 @@ Route::middleware('auth')->group(function () {
         Route::post('/create', [App\Http\Controllers\Push\PushController::class, 'createPush'])->name('create');
         Route::patch('/update/{push}', [App\Http\Controllers\Push\PushController::class, 'updatePush'])->name('update');
     });
+    Route::prefix('alarm_data')->name('alarm_data.')->group(function () {
+        Route::post('/', \App\Http\Controllers\AlarmData\AlarmDataController::class)->name('get_alarm_datas');
+        Route::post('/getalarm_data', [App\Http\Controllers\AlarmData\AlarmDataController::class, 'searchAlarmData'])->name('getAlarmData');
+        Route::get('/{alarm_data}', [App\Http\Controllers\AlarmData\AlarmDataController::class, 'getAlarmDataDetail'])->name('get_alarm_data_detail');
+        Route::post('/create', [App\Http\Controllers\AlarmData\AlarmDataController::class, 'createAlarmData'])->name('create');
+        Route::patch('/update/{alarm_data}', [App\Http\Controllers\AlarmData\AlarmDataController::class, 'updateAlarmData'])->name('update');
+    });
     Route::prefix('sendemail')->name('sendemail.')->group(function () {
         Route::post('/create', [App\Http\Controllers\SendEmail\SendEmailController::class, 'createSendEmail'])->name('create');
     });
