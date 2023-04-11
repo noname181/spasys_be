@@ -473,7 +473,7 @@ class ItemController extends Controller
                 'items' => $items,
                 // 'item' => $items->total(),
                 'user' => Auth::user(),
-                'orderedIds' => $orderedIds,
+                //'orderedIds' => $orderedIds,
                 'sql' => DB::getQueryLog()
             ]);
         } catch (\Exception $e) {
