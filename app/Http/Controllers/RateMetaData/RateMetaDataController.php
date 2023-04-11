@@ -224,7 +224,7 @@ class RateMetaDataController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $rmd = RateMetaData::with(['rate_meta', 'member:mb_no,co_no,mb_name', 'company','rate_data_general'])
+            $rmd = RateMetaData::with(['rate_meta', 'member:mb_no,co_no,mb_name', 'company','rate_data_general','send_email_rmd'])
             ->whereNotNull('co_no')->where(function($q){
                 $q->where('set_type','=','estimated_costs')
                 ->orWhere('set_type', 'precalculate');
@@ -300,6 +300,19 @@ class RateMetaDataController extends Controller
             Log::error($e);
      
             return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+    public function getMail($rmd_no)
+    {   
+       
+        try {
+            $get_mail = RateMetaData::with(['send_email_rmd'])->where('rmd_no', $rmd_no)->first();
+            return response()->json($get_mail);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
 

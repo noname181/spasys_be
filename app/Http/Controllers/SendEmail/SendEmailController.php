@@ -28,7 +28,8 @@ class SendEmailController extends Controller
         try {
             $push = SendEmail::insertGetId([
                 'mb_no' => Auth::user()->mb_no,
-                'rm_no' => $validated['rm_no'],
+                'rm_no' => isset($validated['rm_no']) ? $validated['rm_no'] : null,
+                'rmd_no' => isset($validated['rmd_no']) ? $validated['rmd_no'] : null,
                 'se_email_cc' => $validated['se_email_cc'],
                 'se_email_receiver' => $validated['se_email_receiver'],
                 'se_name_receiver' => $validated['se_name_receiver'],

@@ -57,6 +57,9 @@ class SendEmailRegisterRequest extends BaseFormRequest
             'rmd_number' => [
                 'string',
                 'nullable'
+            ],
+            'rmd_no' => [
+                '',
             ]
         ];
     }
