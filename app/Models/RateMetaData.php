@@ -67,5 +67,8 @@ class RateMetaData extends Model
     public function rate_data_one(){
         return $this->hasOne(RateData::class, 'rmd_no', 'rmd_no');
     }
+    public function send_email_rmd(){
+        return $this->hasOne(SendEmail::class, 'rmd_no', 'rmd_no')->orderBy('se_no','desc')->with('member');
+    }
 
 }

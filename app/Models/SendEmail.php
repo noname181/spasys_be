@@ -24,6 +24,7 @@ class SendEmail extends Model
         'se_no',
         'mb_no',
         'rm_no',
+        'rmd_no',
         'se_name_receiver',
         'se_email_receiver', 
         'se_email_cc',
