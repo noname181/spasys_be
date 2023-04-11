@@ -2683,7 +2683,6 @@ class ReceivingGoodsDeliveryController extends Controller
             if ($request->complete_status == '정산완료' && $rgd->rgd_status6 != 'paid') {
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     'rgd_status6' => 'paid',
-                    'rgd_status8' => 'completed',
                     'rgd_paid_date' => Carbon::now()->toDateTimeString()
                 ]);
 
@@ -2708,7 +2707,55 @@ class ReceivingGoodsDeliveryController extends Controller
                     'cbh_status_after' => 'payment_bill'
                 ]);
 
+                if($rgd->rgd_status7 != 'taxed'){
+                    $tax_number = CommonFunc::generate_tax_number($rgd['rgd_no']);
+
+                    ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
+                        'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
+                        'rgd_status7' => 'taxed',
+                        'rgd_tax_invoice_number' => $tax_number ? $tax_number : null,
+                    ]);
+
+                    $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general'])->where('rgd_no', $rgd['rgd_no'])->first();
+
+                    if ($user->mb_type == 'spasys' && $rgd->service_korean_name == '수입풀필먼트') {
+                        $company = Company::with(['co_parent', 'adjustment_group'])->where('co_no', $rgd['warehousing']['co_no'])->first();
+                    } else {
+                        $company = Company::with(['co_parent', 'adjustment_group'])->where('co_no', $rgd['warehousing']['company']['co_parent']['co_no'])->first();
+                    }
+
+                    $ag = AdjustmentGroup::where('ag_no', $rgd->rate_data_general->ag_no)->first();
+
+                    $id = TaxInvoiceDivide::insertGetId([
+                        'tid_supply_price' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : ($rgd['service_korean_name']  == '수입풀필먼트' ? $rgd['rate_data_general']['rdg_supply_price6'] : $rgd['rate_data_general']['rdg_supply_price4']),
+                        'tid_vat' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_vat7'] : ($rgd['service_korean_name']  == '수입풀필먼트' ? $rgd['rate_data_general']['rdg_vat6'] : $rgd['rate_data_general']['rdg_vat4']),
+                        'tid_sum' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_sum7'] : ($rgd['service_korean_name']  == '수입풀필먼트' ? $rgd['rate_data_general']['rdg_sum6'] : $rgd['rate_data_general']['rdg_sum4']),
+                        'rgd_no' => $rgd['rgd_no'],
+                        'tid_number' => $rgd['rgd_settlement_number'],
+                        'co_license' => $company['co_license'],
+                        'co_owner' => $company['co_owner'],
+                        'co_name' => $company['co_name'],
+                        'co_major' => $company['co_major'],
+                        'co_address' => $company['co_address'],
+                        'co_email' => $ag['ag_email'] ? $ag['ag_email'] : null,
+                        'co_email2' => $ag['ag_email2'] ? $ag['ag_email2'] : null,
+                        'rgd_number' => $tax_number ? $tax_number : null,
+                        'mb_no' => $user->mb_no,
+                    ]);
+
+                    $cbh = CancelBillHistory::insertGetId([
+                        'rgd_no' => $rgd['rgd_no'],
+                        'mb_no' => $user->mb_no,
+                        'cbh_type' => 'tax',
+                        'cbh_status_after' => 'taxed'
+                    ]);
+                }
+
                 if ($rgd->rgd_status8 != 'completed') {
+                    ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                        'rgd_status8' => 'completed',
+                    ]);
+
                     CancelBillHistory::insertGetId([
                         'rgd_no' => $request->rgd_no,
                         'mb_no' => $user->mb_no,
@@ -2717,9 +2764,16 @@ class ReceivingGoodsDeliveryController extends Controller
                         'cbh_status_after' => 'completed'
                     ]);
                 }
-            } else if ($request->complete_status == '정산완료') {
+            } else if ($request->complete_status == '정산완료' && $rgd->rgd_status8 != 'completed') {
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     'rgd_status8' => 'completed',
+                ]);
+                CancelBillHistory::insertGetId([
+                    'rgd_no' => $request->rgd_no,
+                    'mb_no' => $user->mb_no,
+                    'cbh_type' => 'tax',
+                    'cbh_status_before' => $rgd->rgd_status8,
+                    'cbh_status_after' => 'completed'
                 ]);
             }else if ($request->complete_status == "진행중" && $rgd->rgd_status8 != 'in_process') {
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
