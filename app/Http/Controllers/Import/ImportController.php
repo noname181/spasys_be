@@ -49,10 +49,15 @@ class ImportController extends Controller
                 $rgd = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->whereNull("rgd_parent_no")->whereHas('w_no', function ($q) use ($validated) {
                     return $q->where('w_no', $validated['w_no']);
                 })->get();
+
+                $rgds = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->whereNull("rgd_parent_no")->whereHas('w_no', function ($q) use ($validated) {
+                    return $q->where('w_import_no', $validated['w_no']);
+                })->get();
             } else {
                 $warehousing = [];
                 $warehousings = [];
                 $rgd = [];
+                $rgds = [];
                 $warehousing_import = [];
             }
 
@@ -144,9 +149,10 @@ class ImportController extends Controller
                     'datas' => $warehousings,
                     'warehousing_import' => $warehousing_import,
                     'rgd' => $rgd,
+                    'rgds' => $rgds,
                     'warehousing_request' => $warehousing_request,
                     'items' => $items,
-                    'sql' => DB::getQueryLog()
+                    //'sql' => DB::getQueryLog()
                 ],
 
 

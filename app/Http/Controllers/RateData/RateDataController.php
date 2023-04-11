@@ -8581,51 +8581,6 @@ class RateDataController extends Controller
         }
     }
 
-    public function tax_invoice_issue(request $request)
-    {
-        try {
-            DB::beginTransaction();
-            $user = Auth::user();
-            foreach ($request->rgds as $rgd) {
-                $tax_number = CommonFunc::generate_tax_number($request->rgds[0]['rgd_no']);
-                ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
-                    'rgd_status7' => 'taxed',
-                    'rgd_tax_invoice_number' => $tax_number ? $tax_number : null,
-                    'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
-                ]);
-
-                $cbh = CancelBillHistory::insertGetId([
-                    'rgd_no' => $rgd['rgd_no'],
-                    'mb_no' => $user->mb_no,
-                    'cbh_type' => 'tax',
-                    'cbh_status_before' => null,
-                    'cbh_status_after' => 'taxed'
-                ]);
-
-                $id = TaxInvoiceDivide::insertGetId([
-                    'tid_supply_price' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
-                    'tid_vat' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
-                    'tid_sum' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_supply_price7'] : $rgd['rate_data_general']['rdg_supply_price4'],
-                    'rgd_no' => $rgd['rgd_no'],
-                    'mb_no' => $user->mb_no,
-                ]);
-            }
-
-
-
-            DB::commit();
-            return response()->json([
-                'message' => Messages::MSG_0007,
-
-            ], 201);
-        } catch (\Exception $e) {
-            DB::rollback();
-            Log::error($e);
-            return $e;
-            return response()->json(['message' => Messages::MSG_0001], 500);
-        }
-    }
-
     public function get_tax_invoice_by_rgd_no(request $request)
     {
         try {
