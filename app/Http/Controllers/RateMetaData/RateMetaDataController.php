@@ -293,7 +293,7 @@ class RateMetaDataController extends Controller
     {
 
         try {
-            $rmd = RateMetaData::with(['member'])->where('rmd_no', $rmd_no)->first();
+            $rmd = RateMetaData::with(['member','send_email_rmd'])->where('rmd_no', $rmd_no)->first();
 
             return response()->json($rmd);
         } catch (\Exception $e) {

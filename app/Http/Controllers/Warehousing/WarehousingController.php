@@ -6666,6 +6666,10 @@ class WarehousingController extends Controller
         $approval_history = CancelBillHistory::where('rgd_no', $rgd_no)->whereIn('cbh_type', ['approval'])->first();
 
         if(empty($tax_history->cbh_no)){
+            ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                'rgd_status8' => 'in_process',
+            ]);
+
             CancelBillHistory::insertGetId([
                 'rgd_no' => $rgd_no,
                 'mb_no' => $rgd->mb_no,
