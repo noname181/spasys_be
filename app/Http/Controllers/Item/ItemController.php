@@ -435,9 +435,9 @@ class ItemController extends Controller
                         }
                     }
                 });
-
+                sort($item);
                 $orderedIds = implode(',', $item);
-            
+                
                 $items = $items->orderByRaw(\DB::raw("FIELD(item_no, ".$orderedIds." ) desc"));
 
             }else{
@@ -473,6 +473,7 @@ class ItemController extends Controller
                 'items' => $items,
                 // 'item' => $items->total(),
                 'user' => Auth::user(),
+                'orderedIds' => $orderedIds,
                 'sql' => DB::getQueryLog()
             ]);
         } catch (\Exception $e) {
