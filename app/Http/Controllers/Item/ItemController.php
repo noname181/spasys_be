@@ -438,7 +438,7 @@ class ItemController extends Controller
                 sort($item);
                 $orderedIds = implode(',', $item);
                 
-                $items = $items->orderByRaw(\DB::raw("FIELD(item_no, ".$orderedIds." ) desc"));
+                $items = $items->orderByRaw(\DB::raw("FIELD(item_no, ".$orderedIds." ) desc"))->orderBy('item_no', 'DESC');
 
             }else{
                 $items = $items->orderBy('item_no', 'DESC');
@@ -565,10 +565,10 @@ class ItemController extends Controller
                         });
                     }
                 });
-
+                sort($item);
                 $orderedIds = implode(',', $item);
             
-                $items = $items->orderByRaw(\DB::raw("FIELD(item_no, ".$orderedIds." ) desc"));
+                $items = $items->orderByRaw(\DB::raw("FIELD(item_no, ".$orderedIds." ) desc"))->orderBy('item_no', 'DESC');
 
             }else{
                 $items = $items->orderBy('item_no', 'DESC');
