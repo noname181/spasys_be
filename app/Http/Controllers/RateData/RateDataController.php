@@ -19,6 +19,8 @@ use App\Models\RateMeta;
 use App\Models\RateMetaData;
 use App\Models\ReceivingGoodsDelivery;
 use App\Models\Warehousing;
+use App\Models\AlarmData;
+use App\Models\Alarm;
 use App\Utils\CommonFunc;
 use App\Utils\Messages;
 use App\Models\TaxInvoiceDivide;
@@ -2735,6 +2737,22 @@ class RateDataController extends Controller
                 ]);
             }
 
+            //INSERT ALARM DATA TABLE
+
+            $alarm_content = AlarmData::where('ad_title', '[유통가공] 예상경비청구서 발송')->first()->ad_content;
+            $alarm_content = str_replace('aaaaa', $final_rgd->warehousing->w_schedule_number2 ,$alarm_content);
+            $alarm_content = str_replace('bbbbb', $final_rgd->rgd_settlement_number ,$alarm_content);
+            $alarm_content = str_replace('ccccc', $rdg->rdg_sum4 ,$alarm_content);
+            $alarm_content = str_replace('ddddd', str_contains($request->bill_type, 'month') ? '월별 확정청구서로 결제요청 예정입니다.' : '결제를 진행해주세요.' , $alarm_content);
+            Alarm::insertGetId(
+                [
+                    'w_no' => $rgd->w_no,
+                    'mb_no' => $user->mb_no,
+                    'alarm_content' => $alarm_content,
+                    'alarm_h_bl' => $rgd->warehousing->w_schedule_number2,
+                ]
+                );
+
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -4130,6 +4148,22 @@ class RateDataController extends Controller
                 ]);
 
             }
+
+           //INSERT ALARM DATA TABLE
+
+           $alarm_content = AlarmData::where('ad_title', '[보세화물] 예상경비청구서 발송')->first()->ad_content;
+           $alarm_content = str_replace('aaaaa', $final_rgd->t_import_expected->tie_h_bl ,$alarm_content);
+           $alarm_content = str_replace('bbbbb', $final_rgd->rgd_settlement_number ,$alarm_content);
+           $alarm_content = str_replace('ccccc', $rdg->rdg_sum7 ,$alarm_content);
+           $alarm_content = str_replace('ddddd', str_contains($request->bill_type, 'month') ? '월별 확정청구서로 결제요청 예정입니다.' : '결제를 진행해주세요.' , $alarm_content);
+           Alarm::insertGetId(
+               [
+                   'w_no' => $rgd->w_no,
+                   'mb_no' => $user->mb_no,
+                   'alarm_content' => $alarm_content,
+                   'alarm_h_bl' => $final_rgd->t_import_expected->tie_h_bl,
+               ]
+               );
 
             DB::commit();
             return response()->json([

@@ -4,7 +4,7 @@ namespace App\Http\Requests\AlarmData;
 
 use App\Http\Requests\BaseFormRequest;
 
-class AlarmDatatUpdateRequest extends BaseFormRequest
+class AlarmDataUpdateRequest extends BaseFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

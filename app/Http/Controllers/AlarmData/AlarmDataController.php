@@ -4,7 +4,7 @@ namespace App\Http\Controllers\AlarmData;
 
 use App\Http\Requests\AlarmData\AlarmDataRequest;
 use App\Http\Requests\AlarmData\AlarmDataRegisterRequest;
-use App\Http\Requests\AlarmData\AlarmDatatUpdateRequest;
+use App\Http\Requests\AlarmData\AlarmDataUpdateRequest;
 use App\Http\Controllers\Controller;
 use App\Models\AlarmData;
 use App\Utils\Messages;
@@ -37,8 +37,8 @@ class AlarmDataController extends Controller
     /**
      * Get AlarmData detail by id
      */
-    public function getAlarmDataDetail(AlarmData $alarmdata){
-        return response()->json($alarmdata);
+    public function getAlarmDataDetail(AlarmData $alarm_data){
+        return response()->json($alarm_data);
     }
 
     /**
@@ -72,10 +72,10 @@ class AlarmDataController extends Controller
 
     /**
      * Update AlarmData
-     * @param  App\Http\Requests\AlarmData\AlarmDatatUpdateRequest $request
+     * @param  App\Http\Requests\AlarmData\AlarmDataUpdateRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function updateAlarmData(AlarmDatatUpdateRequest $request, AlarmData $alarmdata)
+    public function updateAlarmData(AlarmDataUpdateRequest $request, AlarmData $alarm_data)
     {
         $validated = $request->validated();
         try {
@@ -88,11 +88,11 @@ class AlarmDataController extends Controller
                 'ad_use_yn' => $validated['ad_use_yn'],
             ];
 
-            $alarmdata = AlarmData::where(['ad_no' => $alarmdata->ad_no])
+            $alarm_data = AlarmData::where(['ad_no' => $alarm_data->ad_no])
                 ->update($update);
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'alarmdata' => $alarmdata,
+                'alarmdata' => $alarm_data,
             ]);
         } catch (\Exception $e) {
             Log::error($e);
