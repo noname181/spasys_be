@@ -76,19 +76,29 @@ class AlarmController extends Controller
                 //     //->orWhere('co_no', $user->company->co_parent->co_parent->co_no);
                 // })
                 $alarm = Alarm::with('warehousing','member','import_expect')->where(function($q) use($validated,$user) {
-                $q->whereHas('export.import_expected.company.co_parent',function ($q) use ($user){
-                    $q->where('co_no', $user->co_no);
-                })->orwhereHas('export.import_expected.company.co_parent',function ($q) use ($user){
-                    $q->where('co_parent_no', $user->co_no);
-                })->orwhereHas('import_expect.company.co_parent',function ($q) use ($user){
-                    $q->where('co_no', $user->co_no);
-                })->orwhereHas('import_expect.company_spasys',function ($q) use ($user){
-                    $q->where('co_no', $user->co_no);
-                })->orwhereHas('import.import_expected.company.co_parent',function ($q) use ($user){
-                    $q->where('co_no', $user->co_no);
-                })->orwhereHas('warehousing.co_no.co_parent',function ($q) use ($user){
-                    $q->where('co_no', $user->co_no);
-                });})->orderBy('alarm_no', 'DESC');
+                    $q->whereNull('alarm_type')->where(function($q) use($validated,$user) {
+                        $q->whereHas('export.import_expected.company.co_parent',function ($q) use ($user){
+                            $q->where('co_no', $user->co_no);
+                        })->orwhereHas('export.import_expected.company.co_parent',function ($q) use ($user){
+                            $q->where('co_parent_no', $user->co_no);
+                        })->orwhereHas('import_expect.company.co_parent',function ($q) use ($user){
+                            $q->where('co_no', $user->co_no);
+                        })->orwhereHas('import_expect.company_spasys',function ($q) use ($user){
+                            $q->where('co_no', $user->co_no);
+                        })->orwhereHas('import.import_expected.company.co_parent',function ($q) use ($user){
+                            $q->where('co_no', $user->co_no);
+                        })->orwhereHas('warehousing.co_no.co_parent',function ($q) use ($user){
+                            $q->where('co_no', $user->co_no);
+                        });
+                    })
+                    ->orwhere(function($q) use ($user) {
+                        $q->where('alarm_type', 'auto')->whereHas('warehousing.company.co_parent', function ($q) use ($user) {
+                            $q->where('co_no', $user->co_no);
+                        })->whereHas('member', function ($q) {
+                            $q->where('mb_type', 'spasys');
+                        });
+                    });
+                })->orderBy('alarm_no', 'DESC');
             }
             else if($user->mb_type == 'shipper'){
                 // ->whereHas('member.company',function($q) use ($user){
@@ -96,20 +106,36 @@ class AlarmController extends Controller
                 //     ->orWhere('co_no', $user->company->co_parent->co_parent->co_no);
                 // })
                 $alarm = Alarm::with('warehousing','member','import_expect')->where(function($q) use($validated,$user) {
-                    $q->whereHas('export.import_expected.company',function ($q) use ($user){
-                        $q->where('co_no', $user->co_no);
-                    })->orwhereHas('import_expect.company',function ($q) use ($user){
-                        $q->where('co_no', $user->co_no);
-                    })->orwhereHas('import.import_expected.company',function ($q) use ($user){
-                        $q->where('co_no', $user->co_no);
-                    })->orwhereHas('warehousing.co_no',function ($q) use ($user){
-                        $q->where('co_no', $user->co_no);
-                    });})->orderBy('alarm_no', 'DESC');
+                    $q->whereNull('alarm_type')->where(function($q) use($validated,$user) {
+                        $q->whereHas('export.import_expected.company',function ($q) use ($user){
+                            $q->where('co_no', $user->co_no);
+                        })->orwhereHas('import_expect.company',function ($q) use ($user){
+                            $q->where('co_no', $user->co_no);
+                        })->orwhereHas('import.import_expected.company',function ($q) use ($user){
+                            $q->where('co_no', $user->co_no);
+                        })->orwhereHas('warehousing.co_no',function ($q) use ($user){
+                            $q->where('co_no', $user->co_no);
+                        });
+                    })
+                    ->orwhere(function($q) use ($user) {
+                        $q->where('alarm_type', 'auto')->whereHas('warehousing.company', function ($q) use ($user) {
+                            $q->where('co_no', $user->co_no);
+                        })->whereHas('member', function ($q) {
+                            $q->where('mb_type', 'shop');
+                        });
+                    });
+                })
+                ->orderBy('alarm_no', 'DESC');
                
             } else if ($user->mb_type == 'spasys'){
-                $alarm = Alarm::with('warehousing','member','import_expect')->whereHas('member',function ($q) use ($user){
-                    $q->where('mb_no',$user->mb_no);
-                })->orderBy('alarm_no', 'DESC');
+                $alarm = Alarm::with('warehousing','member','import_expect')->where(function($q) use($validated,$user) {
+                    $q->whereNull('alarm_type')->where(function($q) use($validated,$user) {
+                        $q->whereHas('member',function ($q) use ($user){
+                            $q->where('mb_no',$user->mb_no);
+                        });
+                    });
+                })
+                ->orderBy('alarm_no', 'DESC');
             }
 
             
