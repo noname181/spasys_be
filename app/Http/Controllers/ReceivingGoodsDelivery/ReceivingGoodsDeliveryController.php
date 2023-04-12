@@ -3226,7 +3226,8 @@ class ReceivingGoodsDeliveryController extends Controller
                     'mb_no' => $user->mb_no,
                     'cbh_type' => 'payment',
                     'cbh_status_before' => $rgd->rgd_status6,
-                    'cbh_status_after' => 'payment_bill'
+                    'cbh_status_after' => 'payment_bill',
+                    'cbh_pay_method' => isset($request->p_method) ? $request->p_method : null
                 ]);
 
                 if($rgd->rgd_status7 == 'taxed'){
@@ -3235,7 +3236,8 @@ class ReceivingGoodsDeliveryController extends Controller
                         'mb_no' => $user->mb_no,
                         'cbh_type' => 'tax',
                         'cbh_status_before' => $rgd->rgd_status7,
-                        'cbh_status_after' => 'completed'
+                        'cbh_status_after' => 'completed',
+                        'cbh_pay_method' => isset($request->p_method) ? $request->p_method : null
                     ]);
                 }
 
@@ -3261,7 +3263,8 @@ class ReceivingGoodsDeliveryController extends Controller
                     'mb_no' => $user->mb_no,
                     'cbh_type' => 'payment',
                     'cbh_status_before' => $rgd->rgd_status6,
-                    'cbh_status_after' => 'payment_bill'
+                    'cbh_status_after' => 'payment_bill',
+                    'cbh_pay_method' => isset($request->p_method) ? $request->p_method : null
                 ]);
 
                 if($rgd->rgd_status7 == 'taxed'){
@@ -3270,7 +3273,8 @@ class ReceivingGoodsDeliveryController extends Controller
                         'mb_no' => $user->mb_no,
                         'cbh_type' => 'tax',
                         'cbh_status_before' => $rgd->rgd_status7,
-                        'cbh_status_after' => 'completed'
+                        'cbh_status_after' => 'completed',
+                        'cbh_pay_method' => isset($request->p_method) ? $request->p_method : null
                     ]);
                 }
                 
