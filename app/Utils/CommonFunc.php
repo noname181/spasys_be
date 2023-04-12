@@ -3,6 +3,7 @@
 namespace App\Utils;
 use App\Models\AlarmData;
 use App\Models\Alarm;
+use App\Models\Member;
 use DateTime;
 
 class CommonFunc
@@ -91,7 +92,23 @@ class CommonFunc
                 'mb_no' => $user->mb_no,
                 'alarm_content' => $alarm_content,
                 'alarm_h_bl' => $cargo_number,
+                'alarm_type' => 'auto',
             ]
-            );
+        );
+
+        if($user->mb_type == 'spasys'){
+            $receiver_company = $rgd->warehousing->company->co_parent;
+            $receiver_list = Member::where('co_no', $receiver_company->co_no)->where('mb_push_yn', 'y')->get();
+
+            //PUSH FUNCTION HERE
+
+        }else if($user->mb_type == 'shop'){
+            $receiver_company = $rgd->warehousing->company;
+            $receiver_list = Member::where('co_no', $receiver_company->co_no)->where('mb_push_yn', 'y')->get();
+
+            //PUSH FUNCTION HERE
+        }
+
+
     }
 }

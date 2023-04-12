@@ -2738,6 +2738,9 @@ class RateDataController extends Controller
             }
 
             //INSERT ALARM DATA TABLE
+            
+            $final_rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $final_rgd->rgd_no)->first();
+
             CommonFunc::insert_alarm('[유통가공] 예상경비청구서 발송', $final_rgd, $user);
 
             DB::commit();
@@ -4137,6 +4140,8 @@ class RateDataController extends Controller
             }
 
            //INSERT ALARM DATA TABLE
+
+           $final_rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $final_rgd->rgd_no)->first();
 
            CommonFunc::insert_alarm('[보세화물] 예상경비청구서 발송', $final_rgd, $user);
 
