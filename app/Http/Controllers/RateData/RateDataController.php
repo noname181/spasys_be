@@ -2746,10 +2746,10 @@ class RateDataController extends Controller
             $alarm_content = str_replace('ddddd', str_contains($request->bill_type, 'month') ? '월별 확정청구서로 결제요청 예정입니다.' : '결제를 진행해주세요.' , $alarm_content);
             Alarm::insertGetId(
                 [
-                    'w_no' => $rgd->w_no,
+                    'w_no' => $final_rgd->w_no,
                     'mb_no' => $user->mb_no,
                     'alarm_content' => $alarm_content,
-                    'alarm_h_bl' => $rgd->warehousing->w_schedule_number2,
+                    'alarm_h_bl' => $final_rgd->warehousing->w_schedule_number2,
                 ]
                 );
 
@@ -4158,7 +4158,7 @@ class RateDataController extends Controller
            $alarm_content = str_replace('ddddd', str_contains($request->bill_type, 'month') ? '월별 확정청구서로 결제요청 예정입니다.' : '결제를 진행해주세요.' , $alarm_content);
            Alarm::insertGetId(
                [
-                   'w_no' => $rgd->w_no,
+                   'w_no' => $final_rgd->w_no,
                    'mb_no' => $user->mb_no,
                    'alarm_content' => $alarm_content,
                    'alarm_h_bl' => $final_rgd->t_import_expected->tie_h_bl,
