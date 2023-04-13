@@ -5819,6 +5819,10 @@ class WarehousingController extends Controller
                     'rgd_status7' => 'taxed',
                 ]);
 
+                $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $request->rgd_no)->first();
+
+                CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $user);
+
                 foreach ($request->tid_list as $tid) {
                     if (isset($tid['tid_no'])) {
                         // if(false){
@@ -6010,6 +6014,10 @@ class WarehousingController extends Controller
                         'tid_no' => $id
                     ]);
 
+                    $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd['rgd_no'])->first();
+
+                    CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $user);
+
                     $cbh = CancelBillHistory::insertGetId([
                         'rgd_no' => $rgd['rgd_no'],
                         'mb_no' => $user->mb_no,
@@ -6047,6 +6055,10 @@ class WarehousingController extends Controller
                         'rgd_status7' => 'taxed',
                         'rgd_tax_invoice_number' => $tax_number ? $tax_number : null,
                     ]);
+
+                    $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd['rgd_no'])->first();
+
+                    CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $user);
 
                     $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general'])->where('rgd_no', $rgd['rgd_no'])->first();
 
