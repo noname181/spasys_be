@@ -358,7 +358,7 @@ class ReportController extends Controller
                 // })->orderBy('created_at', 'DESC')->orderBy('rp_parent_no', 'DESC');
 
 
-                $reports = Report::select('report.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with(['files','reports_child','warehousing','member'])->leftjoin('t_import_expected', function ($join) {
+                $reports = Report::select('t_import.ti_no','t_export.te_no','report.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with(['files','reports_child','warehousing','member'])->leftjoin('t_import_expected', function ($join) {
                     $join->on('report.rp_h_bl', '=', 't_import_expected.tie_h_bl');
                 })->leftjoin('company as company_spasys', function ($join) {
                     $join->on('company_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
@@ -368,6 +368,10 @@ class ReportController extends Controller
                     $join->on('company_spasys_parent.co_no', '=', 'company_spasys.co_parent_no');
                 })->leftjoin('company as company_shop_parent', function ($join) {
                     $join->on('company_shop_parent.co_no', '=', 'company_shop.co_parent_no');
+                })->leftjoin('t_export', function ($join) {
+                    $join->on('t_export.te_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
+                })->leftjoin('t_import', function ($join) {
+                    $join->on('t_import.ti_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
                 })->where(function($q) use($validated,$user) {
                 // $q->whereHas('import_expect.company.co_parent',function ($q) use ($user){
                 //     $q->where('co_no', $user->co_no);
@@ -399,7 +403,7 @@ class ReportController extends Controller
                 //         $q->where('co_no', $user->co_no);
                 //     });
                 // })->orderBy('created_at', 'DESC')->orderBy('rp_parent_no', 'DESC');
-                $reports = Report::select('report.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with(['files','reports_child','warehousing','member'])->leftjoin('t_import_expected', function ($join) {
+                $reports = Report::select('t_import.ti_no','t_export.te_no','report.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with(['files','reports_child','warehousing','member'])->leftjoin('t_import_expected', function ($join) {
                     $join->on('report.rp_h_bl', '=', 't_import_expected.tie_h_bl');
                 })->leftjoin('company as company_spasys', function ($join) {
                     $join->on('company_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
@@ -409,13 +413,17 @@ class ReportController extends Controller
                     $join->on('company_spasys_parent.co_no', '=', 'company_spasys.co_parent_no');
                 })->leftjoin('company as company_shop_parent', function ($join) {
                     $join->on('company_shop_parent.co_no', '=', 'company_shop.co_parent_no');
+                })->leftjoin('t_export', function ($join) {
+                    $join->on('t_export.te_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
+                })->leftjoin('t_import', function ($join) {
+                    $join->on('t_import.ti_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
                 })->where(function($q) use($validated,$user) {
                     $q->where('company_shop.co_no','=', $user->co_no)->orwhereHas('warehousing.co_no',function ($q) use ($user){
                         $q->where('co_no', $user->co_no);
                     });
                 })->orderBy('rp_parent_no', 'DESC');
             }else if($user->mb_type == 'spasys'){
-                $reports = Report::select('report.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with(['files','reports_child','warehousing','member'])->leftjoin('t_import_expected', function ($join) {
+                $reports = Report::select('t_import.ti_no','t_export.te_no','report.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with(['files','reports_child','warehousing','member'])->leftjoin('t_import_expected', function ($join) {
                     $join->on('report.rp_h_bl', '=', 't_import_expected.tie_h_bl');
                 })->leftjoin('company as company_spasys', function ($join) {
                     $join->on('company_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
@@ -425,6 +433,10 @@ class ReportController extends Controller
                     $join->on('company_spasys_parent.co_no', '=', 'company_spasys.co_parent_no');
                 })->leftjoin('company as company_shop_parent', function ($join) {
                     $join->on('company_shop_parent.co_no', '=', 'company_shop.co_parent_no');
+                })->leftjoin('t_export', function ($join) {
+                    $join->on('t_export.te_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
+                })->leftjoin('t_import', function ($join) {
+                    $join->on('t_import.ti_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
                 })->where(function($q) use($validated,$user) {
                 // $q->whereHas('import_expect.company.co_parent',function ($q) use ($user){
                 //     $q->where('co_no', $user->co_no);
@@ -449,6 +461,25 @@ class ReportController extends Controller
 
             if (isset($validated['rp_cate']) && $validated['rp_cate'] != '전체') {
                     $reports->where('rp_cate', '=', $validated['rp_cate']);
+
+            }
+            if (isset($validated['rp_cate1']) || isset($validated['rp_cate2']) || isset($validated['rp_cate3']) || isset($validated['rp_cate4'])) {
+                $wherein = '';
+
+                if(isset($validated['rp_cate1'])){
+                    $wherein .= $validated['rp_cate1'];
+                }
+                if(isset($validated['rp_cate2'])){
+                    $wherein .= $validated['rp_cate2'];
+                }
+                if(isset($validated['rp_cate3'])){
+                    $wherein .= $validated['rp_cate3'];
+                }
+                if(isset($validated['rp_cate4'])){
+                    $wherein .= $validated['rp_cate4'];
+                }
+                $wherein2 = [$wherein];
+                $reports->whereIn('rp_cate', $wherein2);
 
             }
             if (isset($validated['co_parent_name'])) {
@@ -518,6 +549,38 @@ class ReportController extends Controller
                         });
                     });
                 }
+            }
+            if (isset($validated['service_name1']) || isset($validated['service_name2']) || isset($validated['service_name3'])) {
+                    
+                    $wherein = '';
+
+                    if(isset($validated['service_name1'])){
+                        $wherein .= $validated['service_name1'];
+                    }
+                    if(isset($validated['service_name2'])){
+                        $wherein .= $validated['service_name2'];
+                    }
+                    if(isset($validated['service_name3'])){
+                        $wherein .= $validated['service_name3'];
+                    }
+                    $wherein2 = [$wherein];
+               
+                    if(isset($validated['service_name1'])){
+                    $reports->where(function($q) use($validated,$wherein2) {
+                        $q->whereHas('warehousing', function($q2) use($validated,$wherein2) {
+                            return $q2->whereIn('w_category_name',$wherein2);
+                        })->orwhereHas('import_expect', function($q3) use($validated) {
+                            return $q3->where('tie_h_bl', '!=', '')->orWhereNotNull('tie_h_bl');
+                        });
+                    });
+                    } else {
+                        $reports->where(function($q) use($validated,$wherein2) {
+                            $q->whereHas('warehousing', function($q2) use($validated,$wherein2) {
+                                return $q2->whereIn('w_category_name',$wherein2);
+                            });
+                        });
+                    }
+                
             }
 
             $reports = $reports->groupBy('rp_no')->paginate($per_page, ['*'], 'page', $page);
