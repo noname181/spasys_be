@@ -92,7 +92,8 @@ class CommonFunc
         }else if($rgd->service_korean_name == '수입풀필먼트'){
             $ccccc = $rgd->rate_data_general->rdg_sum6;
             $bbbbb = $rgd->rgd_settlement_number;
-            $aaaaa = Carbon::parse($rgd->created_at)->format('Y.m.d H:i');
+            $aaaaa = Carbon::parse($rgd->created_at)->format('Y.m');
+            $aaaaa = str_replace('.', '년 ', $aaaaa) .'월';
             $ddddd = str_contains($rgd->rgd_bill_type, 'month') ? '월별 확정청구서로 결제요청 예정입니다.' : '결제를 진행해주세요.';
             $cargo_number = $rgd->warehousing->w_schedule_number_settle;
         }

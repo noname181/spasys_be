@@ -2476,10 +2476,27 @@ class ReceivingGoodsDeliveryController extends Controller
     public function update_status7(Request $request)
     {
         try {
+            DB::beginTransaction();
             $user = Auth::user();
             if ($request->type == 'add_all') {
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
                 TaxInvoiceDivide::where('tid_no', $rgd->tid_no)->delete();
+
+                $rgds = ReceivingGoodsDelivery::where('tid_no', $rgd->tid_no)->get();
+
+                foreach($rgds as $rgd){
+                    CommonFunc::insert_alarm('[공통] 계산서취소 안내', $rgd, $user);
+
+
+                    $cbh = CancelBillHistory::insertGetId([
+                        'rgd_no' => $rgd['rgd_no'],
+                        'mb_no' => $user->mb_no,
+                        'cbh_type' => 'tax',
+                        'cbh_status_before' => 'taxed',
+                        'cbh_status_after' => 'cancel'
+                    ]);
+                }
+                
                 ReceivingGoodsDelivery::where('tid_no', $rgd->tid_no)->update([
                     'rgd_status7' => 'cancel',
                     'rgd_tax_invoice_date' => NULL,
@@ -2487,14 +2504,9 @@ class ReceivingGoodsDeliveryController extends Controller
                     'tid_no' => NULL,
                 ]);
 
+               
 
-                $cbh = CancelBillHistory::insertGetId([
-                    'rgd_no' => $request->rgd_no,
-                    'mb_no' => $user->mb_no,
-                    'cbh_type' => 'tax',
-                    'cbh_status_before' => 'taxed',
-                    'cbh_status_after' => 'cancel'
-                ]);
+                
             } else {
                 ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_status7' => 'cancel',
@@ -2503,6 +2515,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'tid_no' => NULL,
                 ]);
 
+                CommonFunc::insert_alarm('[공통] 계산서취소 안내', $rgd, $user);
 
                 $cbh = CancelBillHistory::insertGetId([
                     'rgd_no' => $request->rgd_no,
@@ -2519,12 +2532,13 @@ class ReceivingGoodsDeliveryController extends Controller
             $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child'])->where('rgd_no', $request->rgd_no)->first();
 
             TaxInvoiceDivide::where('rgd_no', $request->rgd_no)->delete();
-
+            DB::commit();
             return response()->json([
                 'message' => 'Success',
                 'rgd' => $rgd,
             ], 201);
         } catch (\Exception $e) {
+            DB::rollback();
             Log::error($e);
             return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
