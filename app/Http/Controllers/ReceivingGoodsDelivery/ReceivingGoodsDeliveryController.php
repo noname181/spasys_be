@@ -2835,7 +2835,7 @@ class ReceivingGoodsDeliveryController extends Controller
         try {
             $user = Auth::user();
             if ($request->bill_type == 'case') {
-                $rgd = ReceivingGoodsDelivery::with(['rate_data_general'])->where('rgd_no', $request->rgd_no)->first();
+                $rgd = ReceivingGoodsDelivery::with(['rate_data_general', 'warehousing'])->where('rgd_no', $request->rgd_no)->first();
 
                 $rate_data_general = RateDataGeneral::where('rgd_no', $request->rgd_no)->first();
 
@@ -2849,6 +2849,17 @@ class ReceivingGoodsDeliveryController extends Controller
                         'rgd_status7' => $ag->ag_auto_issue == 'y' ? 'taxed' : NULL,
                         'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
                     ]);
+
+                    $creater = Member::where('mb_no', $rgd->mb_no)->first();
+                    if($rgd->service_korean_name == '보세화물'){
+                        CommonFunc::insert_alarm('[보세화물] 결제요청', $rgd, $creater);
+                    }else if($rgd->service_korean_name == '수입풀필먼트'){
+                        CommonFunc::insert_alarm('[수입풀필먼트] 결제요청', $rgd, $creater);
+                    }else if($rgd->service_korean_name == '유통가공'){
+                        CommonFunc::insert_alarm('[유통가공] 결제요청', $rgd, $creater);
+                    }
+                    
+
 
                     $cbh = CancelBillHistory::insertGetId([
                         'rgd_no' => $request->rgd_no,
@@ -2912,11 +2923,23 @@ class ReceivingGoodsDeliveryController extends Controller
                     ]);
                 }
             } else if ($request->bill_type == 'monthly') {
+                $i = 0;
                 foreach ($request->rgds as $rgd) {
                     $rgd = ReceivingGoodsDelivery::where('rgd_parent_no', $rgd['rgd_no'])->where(function ($q) {
                         $q->where('rgd_status5', '!=', 'cancel')
                             ->orwhereNull('rgd_status5');
                     })->first();
+
+                    if($i == 0){
+                        $creater = Member::where('mb_no', $rgd->mb_no)->first();
+                        if($rgd->service_korean_name == '보세화물'){
+                            CommonFunc::insert_alarm('[보세화물] 결제요청', $rgd, $creater);
+                        }else if($rgd->service_korean_name == '수입풀필먼트'){
+                            CommonFunc::insert_alarm('[수입풀필먼트] 결제요청', $rgd, $creater);
+                        }else if($rgd->service_korean_name == '유통가공'){
+                            CommonFunc::insert_alarm('[유통가공] 결제요청', $rgd, $creater);
+                        }
+                    }
 
                     $rate_data_general = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->first();
 
@@ -2992,6 +3015,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
                         ]);
                     }
+                    $i++;
                 }
             } else if ($request->bill_type == 'multiple') {
                 foreach ($request->rgds as $rgd) {
@@ -3029,6 +3053,15 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_status7' => $ag->ag_auto_issue == 'y' ? 'taxed' : NULL,
                             'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
                         ]);
+
+                        $creater = Member::where('mb_no', $rgd->mb_no)->first();
+                        if($rgd->service_korean_name == '보세화물'){
+                            CommonFunc::insert_alarm('[보세화물] 결제요청', $rgd, $creater);
+                        }else if($rgd->service_korean_name == '수입풀필먼트'){
+                            CommonFunc::insert_alarm('[수입풀필먼트] 결제요청', $rgd, $creater);
+                        }else if($rgd->service_korean_name == '유통가공'){
+                            CommonFunc::insert_alarm('[유통가공] 결제요청', $rgd, $creater);
+                        }
 
                         if ($ag->ag_auto_issue == 'y') {
 
