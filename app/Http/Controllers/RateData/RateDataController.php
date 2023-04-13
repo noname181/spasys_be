@@ -2732,6 +2732,7 @@ class RateDataController extends Controller
                 // }
 
             } else {
+                $final_rgd = $is_exist;
                 RateDataGeneral::where('rdg_no', $rdg->rdg_no)->update([
                     'rgd_no' => $is_exist ? $is_exist->rgd_no : $rgd->rgd_no,
                 ]);
@@ -2739,10 +2740,12 @@ class RateDataController extends Controller
 
             //INSERT ALARM DATA TABLE
             
-            $final_rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $final_rgd->rgd_no)->first();
+            if(isset($final_rgd) && !str_contains($request->type, 'edit')){
+                $final_rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $final_rgd->rgd_no)->first();
 
-            CommonFunc::insert_alarm('[유통가공] 예상경비청구서 발송', $final_rgd, $user);
-
+                CommonFunc::insert_alarm('[유통가공] 예상경비청구서 발송', $final_rgd, $user);
+            }
+            
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -3528,6 +3531,12 @@ class RateDataController extends Controller
                             'rgd_no' => $final_rgd->rgd_no,
                         ]);
 
+                        if($i ==0){
+                            $final_rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $final_rgd->rgd_no)->first();
+    
+                            CommonFunc::insert_alarm('[유통가공] 확정청구서 발송', $final_rgd, $user);
+                        }
+
                     } else {
                         $expectation_rgd->rgd_status5 = 'issued';
                         $expectation_rgd->save();
@@ -3730,6 +3739,12 @@ class RateDataController extends Controller
                         'rgd_no' => $final_rgd->rgd_no,
                     ]);
 
+                    if($i ==0){
+                        $final_rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $final_rgd->rgd_no)->first();
+
+                        CommonFunc::insert_alarm('[보세화물] 확정청구서 발송', $final_rgd, $user);
+                    }
+
                 } else {
                     $expectation_rgd->rgd_status5 = 'issued';
                     $expectation_rgd->save();
@@ -3923,6 +3938,10 @@ class RateDataController extends Controller
                     'rgd_no' => $final_rgd->rgd_no,
                 ]);
 
+                $final_rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $final_rgd->rgd_no)->first();
+
+                CommonFunc::insert_alarm('[수입풀필먼트] 확정청구서 발송', $final_rgd, $user);
+
                 // ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                 //     'rgd_is_show' => 'y',
                 //     'rgd_status4' => $request->status,
@@ -4105,6 +4124,12 @@ class RateDataController extends Controller
                     'rgd_no' => $final_rgd->rgd_no,
                 ]);
 
+                //INSERT ALARM DATA TABLE
+
+                $final_rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $final_rgd->rgd_no)->first();
+
+                CommonFunc::insert_alarm('[보세화물] 예상경비청구서 발송', $final_rgd, $user);
+
 
             //Case of creating a final bill.
             } else if (!isset($is_exist->rdg_no) && isset($request->previous_bill_type) && !empty($previous_rgd)) {
@@ -4141,13 +4166,15 @@ class RateDataController extends Controller
                     'rgd_no' => $final_rgd->rgd_no,
                 ]);
 
+                //INSERT ALARM DATA TABLE
+                
+                $final_rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $final_rgd->rgd_no)->first();
+
+                CommonFunc::insert_alarm('[보세화물] 확정청구서 발송', $final_rgd, $user);
+
             }
 
-           //INSERT ALARM DATA TABLE
-
-           $final_rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $final_rgd->rgd_no)->first();
-
-           CommonFunc::insert_alarm('[보세화물] 예상경비청구서 발송', $final_rgd, $user);
+         
 
             DB::commit();
             return response()->json([
