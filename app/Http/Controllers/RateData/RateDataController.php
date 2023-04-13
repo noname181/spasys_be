@@ -3919,6 +3919,10 @@ class RateDataController extends Controller
                     'rgd_no' => $final_rgd->rgd_no,
                 ]);
 
+                RateMetaData::where('rgd_no', $previous_rgd->rgd_no)->update([
+                    'rgd_no' => $final_rgd->rgd_no,
+                ]);
+
                 // ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                 //     'rgd_is_show' => 'y',
                 //     'rgd_status4' => $request->status,
