@@ -422,6 +422,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 if ($status1 == "입고" && $status2 == "작업완료") {
                     $check_ex = Warehousing::where('w_import_no', '=', $w_no)->first();
                     if (!$check_ex) {
+                       
                         $w_schedule_amount = 0;
                         foreach ($validated['items'] as $item) {
                             $w_schedule_amount += $item['warehousing_item2'][0]['wi_number'];
@@ -446,9 +447,6 @@ class ReceivingGoodsDeliveryController extends Controller
                         ]);
 
                         foreach ($validated['location'] as $rgd) {
-
-
-
                             $rgd_no = ReceivingGoodsDelivery::insertGetId([
                                 'mb_no' => $member->mb_no,
                                 'w_no' => $w_no_ew,
@@ -460,7 +458,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'rgd_hp' => $rgd['rgd_hp'],
                                 'rgd_memo' => $rgd['rgd_memo'],
                                 'rgd_status1' => '출고예정',
-                                'rgd_status2' => '작업완료',
+                                'rgd_status2' => isset($rgd['rgd_status2']) ? $rgd['rgd_status2'] : null,
                                 'rgd_status3' => isset($rgd['rgd_status3']) ? $rgd['rgd_status3'] : null,
                                 'rgd_status4' => isset($rgd['rgd_status4']) ? $rgd['rgd_status4'] : null,
                                 'rgd_delivery_company' => isset($rgd['rgd_delivery_company']) ? $rgd['rgd_delivery_company'] : null,
@@ -487,6 +485,16 @@ class ReceivingGoodsDeliveryController extends Controller
                             'status' => '출고예정',
                             'w_category_name' => $request->w_category_name,
                         ]);
+                    } else {
+                        $check_ew = Warehousing::where('w_import_no', '=', $w_no)->get();
+                        foreach ($validated['location'] as $rgd) {
+                            foreach($check_ew as $w_no_ew){
+                                ReceivingGoodsDelivery::where('w_no', '=', $w_no_ew['w_no'])->whereNull('rgd_parent_no')->update([
+                                    'rgd_status2' => isset($rgd['rgd_status2']) ? $rgd['rgd_status2'] : null,
+                                ]);
+                            }
+                            
+                        }
                     }
                 }
             }
@@ -2519,25 +2527,21 @@ class ReceivingGoodsDeliveryController extends Controller
 
             $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child'])->where('rgd_no', $request->rgd_no)->first();
 
-            if($request->cancel_status == '발행취소' && $rgd->rgd_status5 == null){
+            if ($request->cancel_status == '발행취소' && $rgd->rgd_status5 == null) {
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     'rgd_status5' => 'cancel',
                     'rgd_canceled_date' =>  Carbon::now(),
                 ]);
-
-            
-            }else if($request->cancel_status == '발행' && $rgd->rgd_status5 == 'cancel'){
+            } else if ($request->cancel_status == '발행' && $rgd->rgd_status5 == 'cancel') {
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     'rgd_status5' => null,
                     'rgd_canceled_date' => null,
                 ]);
-
-
             }
 
             $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child'])->where('rgd_no', $request->rgd_no)->first();
 
-            if($request->confirm_status == '요청중' && $rgd->rgd_status5 == 'confirmed'){
+            if ($request->confirm_status == '요청중' && $rgd->rgd_status5 == 'confirmed') {
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     'rgd_status5' => null,
                     'rgd_confirmed_date' => null
@@ -2550,7 +2554,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'cbh_status_before' => 'confirmed',
                     'cbh_status_after' => null
                 ]);
-            }else if($request->confirm_status == '승인완료' && $rgd->rgd_status5 == null){
+            } else if ($request->confirm_status == '승인완료' && $rgd->rgd_status5 == null) {
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     'rgd_status5' => 'confirmed',
                     'rgd_confirmed_date' => Carbon::now(),
@@ -2564,7 +2568,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'cbh_status_after' => 'confirmed'
                 ]);
             }
-           
+
             $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child'])->where('rgd_no', $request->rgd_no)->first();
 
             if ($request->payment_status == '결제완료' && $rgd->rgd_status6 != 'paid') {
@@ -2594,7 +2598,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'cbh_status_after' => 'payment_bill'
                 ]);
 
-                if($rgd->rgd_status7 == 'taxed'){
+                if ($rgd->rgd_status7 == 'taxed') {
                     CancelBillHistory::insertGetId([
                         'rgd_no' => $request->rgd_no,
                         'mb_no' => $user->mb_no,
@@ -2630,7 +2634,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'cbh_status_after' => 'request_bill'
                 ]);
 
-                if($rgd->rgd_status8 == 'completed'){
+                if ($rgd->rgd_status8 == 'completed') {
                     CancelBillHistory::insertGetId([
                         'rgd_no' => $request->rgd_no,
                         'mb_no' => $user->mb_no,
@@ -2667,7 +2671,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'cbh_status_after' => 'cancel'
                 ]);
 
-                if($rgd->rgd_status8 == 'completed'){
+                if ($rgd->rgd_status8 == 'completed') {
                     CancelBillHistory::insertGetId([
                         'rgd_no' => $request->rgd_no,
                         'mb_no' => $user->mb_no,
@@ -2707,7 +2711,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'cbh_status_after' => 'payment_bill'
                 ]);
 
-                if($rgd->rgd_status7 != 'taxed'){
+                if ($rgd->rgd_status7 != 'taxed') {
                     $tax_number = CommonFunc::generate_tax_number($rgd['rgd_no']);
 
                     ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
@@ -2775,7 +2779,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'cbh_status_before' => $rgd->rgd_status8,
                     'cbh_status_after' => 'completed'
                 ]);
-            }else if ($request->complete_status == "진행중" && $rgd->rgd_status8 != 'in_process') {
+            } else if ($request->complete_status == "진행중" && $rgd->rgd_status8 != 'in_process') {
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     'rgd_status8' => 'in_process',
                 ]);
@@ -2831,7 +2835,7 @@ class ReceivingGoodsDeliveryController extends Controller
         try {
             $user = Auth::user();
             if ($request->bill_type == 'case') {
-                $rgd = ReceivingGoodsDelivery::with(['rate_data_general'])->where('rgd_no', $request->rgd_no)->first();
+                $rgd = ReceivingGoodsDelivery::with(['rate_data_general', 'warehousing'])->where('rgd_no', $request->rgd_no)->first();
 
                 $rate_data_general = RateDataGeneral::where('rgd_no', $request->rgd_no)->first();
 
@@ -2845,6 +2849,17 @@ class ReceivingGoodsDeliveryController extends Controller
                         'rgd_status7' => $ag->ag_auto_issue == 'y' ? 'taxed' : NULL,
                         'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
                     ]);
+
+                    $creater = Member::where('mb_no', $rgd->mb_no)->first();
+                    if($rgd->service_korean_name == '보세화물'){
+                        CommonFunc::insert_alarm('[보세화물] 결제요청', $rgd, $creater);
+                    }else if($rgd->service_korean_name == '수입풀필먼트'){
+                        CommonFunc::insert_alarm('[수입풀필먼트] 결제요청', $rgd, $creater);
+                    }else if($rgd->service_korean_name == '유통가공'){
+                        CommonFunc::insert_alarm('[유통가공] 결제요청', $rgd, $creater);
+                    }
+                    
+
 
                     $cbh = CancelBillHistory::insertGetId([
                         'rgd_no' => $request->rgd_no,
@@ -2908,11 +2923,23 @@ class ReceivingGoodsDeliveryController extends Controller
                     ]);
                 }
             } else if ($request->bill_type == 'monthly') {
+                $i = 0;
                 foreach ($request->rgds as $rgd) {
                     $rgd = ReceivingGoodsDelivery::where('rgd_parent_no', $rgd['rgd_no'])->where(function ($q) {
                         $q->where('rgd_status5', '!=', 'cancel')
                             ->orwhereNull('rgd_status5');
                     })->first();
+
+                    if($i == 0){
+                        $creater = Member::where('mb_no', $rgd->mb_no)->first();
+                        if($rgd->service_korean_name == '보세화물'){
+                            CommonFunc::insert_alarm('[보세화물] 결제요청', $rgd, $creater);
+                        }else if($rgd->service_korean_name == '수입풀필먼트'){
+                            CommonFunc::insert_alarm('[수입풀필먼트] 결제요청', $rgd, $creater);
+                        }else if($rgd->service_korean_name == '유통가공'){
+                            CommonFunc::insert_alarm('[유통가공] 결제요청', $rgd, $creater);
+                        }
+                    }
 
                     $rate_data_general = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->first();
 
@@ -2988,6 +3015,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
                         ]);
                     }
+                    $i++;
                 }
             } else if ($request->bill_type == 'multiple') {
                 foreach ($request->rgds as $rgd) {
@@ -3025,6 +3053,15 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_status7' => $ag->ag_auto_issue == 'y' ? 'taxed' : NULL,
                             'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
                         ]);
+
+                        $creater = Member::where('mb_no', $rgd->mb_no)->first();
+                        if($rgd->service_korean_name == '보세화물'){
+                            CommonFunc::insert_alarm('[보세화물] 결제요청', $rgd, $creater);
+                        }else if($rgd->service_korean_name == '수입풀필먼트'){
+                            CommonFunc::insert_alarm('[수입풀필먼트] 결제요청', $rgd, $creater);
+                        }else if($rgd->service_korean_name == '유통가공'){
+                            CommonFunc::insert_alarm('[유통가공] 결제요청', $rgd, $creater);
+                        }
 
                         if ($ag->ag_auto_issue == 'y') {
 
@@ -3201,12 +3238,12 @@ class ReceivingGoodsDeliveryController extends Controller
             $check_payment = Payment::where('rgd_no', $request->rgd_no)->where('p_cancel_yn', 'y')->first();
             if (isset($request->sumprice) && $request->p_method == 'card') {
                 $p_method_fee = $request->sumprice + round($request->sumprice * 0.029);
-            } else if(isset($request->sumprice) && $request->p_method == 'deposit_without_bankbook'){
+            } else if (isset($request->sumprice) && $request->p_method == 'deposit_without_bankbook') {
                 $p_method_fee = $request->sumprice;
-            } else if(isset($request->sumprice) && $request->p_method == 'virtual_account'){
-                 $p_method_fee = $request->sumprice + round($request->sumprice * 0.018);
-            } else if(isset($request->sumprice) && $request->p_method == 'kakao_pay'){
-                 $p_method_fee = $request->sumprice + round($request->sumprice * 0.029);
+            } else if (isset($request->sumprice) && $request->p_method == 'virtual_account') {
+                $p_method_fee = $request->sumprice + round($request->sumprice * 0.018);
+            } else if (isset($request->sumprice) && $request->p_method == 'kakao_pay') {
+                $p_method_fee = $request->sumprice + round($request->sumprice * 0.029);
             } else {
                 $p_method_fee = $request->sumprice;
             }
@@ -3220,7 +3257,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'p_cancel_yn' => null,
                     'p_cancel_time' => null,
                 ]);
-                
+
                 CancelBillHistory::insertGetId([
                     'rgd_no' => $request->rgd_no,
                     'mb_no' => $user->mb_no,
@@ -3230,7 +3267,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'cbh_pay_method' => isset($request->p_method) ? $request->p_method : null
                 ]);
 
-                if($rgd->rgd_status7 == 'taxed'){
+                if ($rgd->rgd_status7 == 'taxed') {
                     CancelBillHistory::insertGetId([
                         'rgd_no' => $request->rgd_no,
                         'mb_no' => $user->mb_no,
@@ -3241,7 +3278,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     ]);
                 }
 
-                
+
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     'rgd_status6' => isset($request->p_method) && $request->p_method == 'deposit_without_bankbook'  ? null : 'paid',
                     'rgd_paid_date' =>  Carbon::now(),
@@ -3267,7 +3304,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'cbh_pay_method' => isset($request->p_method) ? $request->p_method : null
                 ]);
 
-                if($rgd->rgd_status7 == 'taxed'){
+                if ($rgd->rgd_status7 == 'taxed') {
                     CancelBillHistory::insertGetId([
                         'rgd_no' => $request->rgd_no,
                         'mb_no' => $user->mb_no,
@@ -3277,7 +3314,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         'cbh_pay_method' => isset($request->p_method) ? $request->p_method : null
                     ]);
                 }
-                
+
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     'rgd_status6' => isset($request->p_method) && $request->p_method == 'deposit_without_bankbook'  ? null : 'paid',
                     'rgd_paid_date' =>  Carbon::now(),
@@ -3323,7 +3360,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'cbh_type' => 'cancel_payment',
                 ]);
 
-                if($rgd->rgd_status8 == 'completed'){
+                if ($rgd->rgd_status8 == 'completed') {
                     CancelBillHistory::insertGetId([
                         'rgd_no' => $request->rgd_no,
                         'mb_no' => Auth::user()->mb_no,
