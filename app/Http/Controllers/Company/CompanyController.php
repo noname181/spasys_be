@@ -23,6 +23,7 @@ use App\Models\CompanySettlement;
 use App\Models\Export;
 use App\Models\Import;
 use App\Models\ImportExpected;
+use App\Models\CompanyPayment;
 use App\Models\ExportConfirm;
 use Illuminate\Http\Request;
 
@@ -265,6 +266,7 @@ class CompanyController extends Controller
             $manager = Manager::where('co_no', $co_no)->first();
             $services = Service::where('service_use_yn', 'y')->where('service_no', '!=', 1)->get();
             $services_use = explode(" ",$company->co_service);
+            $company_payment = CompanyPayment::where('co_no', $co_no)->first();
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'company' => $company,
@@ -274,7 +276,8 @@ class CompanyController extends Controller
                 'customs_info' => $customs_info,
                 'manager' => $manager,
                 'services' => $services,
-                'services_use'=>$services_use
+                'services_use'=>$services_use,
+                'company_payment' => $company_payment
             ]);
         } catch (\Exception $e) {
             DB::rollback();
