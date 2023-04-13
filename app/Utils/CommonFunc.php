@@ -5,6 +5,7 @@ use App\Models\AlarmData;
 use App\Models\Alarm;
 use App\Models\Member;
 use DateTime;
+use \Carbon\Carbon;
 
 class CommonFunc
 {
@@ -68,26 +69,39 @@ class CommonFunc
 
     static function insert_alarm($ad_title, $rgd, $user)
     {
-        $price = 0;
+        $ccccc = 0;
+        $aaaaa = '';
+        $bbbbb = '';
+        $ddddd = '';
         $cargo_number = '';
 
         if($rgd->service_korean_name == '유통가공'){
-            $price = $rgd->rate_data_general->rdg_sum4;
+            $ccccc = $rgd->rate_data_general->rdg_sum4;
+            $bbbbb = $rgd->rgd_settlement_number;
+            $aaaaa = $rgd->warehousing->w_schedule_number2;
+            $ddddd = str_contains($rgd->rgd_bill_type, 'month') ? '월별 확정청구서로 결제요청 예정입니다.' : '결제를 진행해주세요.';
             $cargo_number = $rgd->warehousing->w_schedule_number2;
 
         }else if($rgd->service_korean_name == '보세화물'){
-            $price = $rgd->rate_data_general->rdg_sum7;
+            $ccccc = $rgd->rate_data_general->rdg_sum7;
+            $bbbbb = $rgd->rgd_settlement_number;
+            $aaaaa = $rgd->t_import_expected->tie_h_bl;
+            $ddddd = str_contains($rgd->rgd_bill_type, 'month') ? '월별 확정청구서로 결제요청 예정입니다.' : '결제를 진행해주세요.';
             $cargo_number = $rgd->t_import_expected->tie_h_bl;
+
         }else if($rgd->service_korean_name == '수입풀필먼트'){
-            $price = $rgd->rate_data_general->rdg_sum6;
-            $cargo_number = '0000년 00월';
+            $ccccc = $rgd->rate_data_general->rdg_sum6;
+            $bbbbb = $rgd->rgd_settlement_number;
+            $aaaaa = Carbon::parse($rgd->created_at)->format('Y.m.d H:i');
+            $ddddd = str_contains($rgd->rgd_bill_type, 'month') ? '월별 확정청구서로 결제요청 예정입니다.' : '결제를 진행해주세요.';
+            $cargo_number = $rgd->warehousing->w_schedule_number_settle;
         }
 
         $alarm_content = AlarmData::where('ad_title', $ad_title)->first()->ad_content;
-        $alarm_content = str_replace('aaaaa', $cargo_number ,$alarm_content);
-        $alarm_content = str_replace('bbbbb', $rgd->rgd_settlement_number ,$alarm_content);
-        $alarm_content = str_replace('ccccc', $price ,$alarm_content);
-        $alarm_content = str_replace('ddddd', str_contains($rgd->rgd_bill_type, 'month') ? '월별 확정청구서로 결제요청 예정입니다.' : '결제를 진행해주세요.' , $alarm_content);
+        $alarm_content = str_replace('aaaaa', $aaaaa ,$alarm_content);
+        $alarm_content = str_replace('bbbbb', $bbbbb ,$alarm_content);
+        $alarm_content = str_replace('ccccc', $ccccc ,$alarm_content);
+        $alarm_content = str_replace('ddddd', $ddddd , $alarm_content);
 
         Alarm::insertGetId(
             [
