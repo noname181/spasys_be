@@ -44,7 +44,35 @@ class ReportSearchRequest extends BaseFormRequest
                 'nullable',
                 'string',
             ],
+            'service_name1' => [
+                'nullable',
+                'string',
+            ],
+            'service_name2' => [
+                'nullable',
+                'string',
+            ],
+            'service_name3' => [
+                'nullable',
+                'string',
+            ],
             'rp_cate' => [
+                'nullable',
+                'string',
+            ],
+            'rp_cate1' => [
+                'nullable',
+                'string',
+            ],
+            'rp_cate2' => [
+                'nullable',
+                'string',
+            ],
+            'rp_cate3' => [
+                'nullable',
+                'string',
+            ],
+            'rp_cate4' => [
                 'nullable',
                 'string',
             ],
