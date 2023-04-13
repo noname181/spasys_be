@@ -496,6 +496,19 @@ class ReceivingGoodsDeliveryController extends Controller
                             
                         }
                     }
+                }else{
+                    $check_ex = Warehousing::where('w_import_no', '=', $w_no)->first();
+                    if ($check_ex) { 
+                        $check_ew = Warehousing::where('w_import_no', '=', $w_no)->get();
+                        foreach ($validated['location'] as $rgd) {
+                            foreach($check_ew as $w_no_ew){
+                                ReceivingGoodsDelivery::where('w_no', '=', $w_no_ew['w_no'])->whereNull('rgd_parent_no')->update([
+                                    'rgd_status2' => isset($rgd['rgd_status2']) ? $rgd['rgd_status2'] : null,
+                                ]);
+                            }
+                            
+                        }
+                    }
                 }
             }
 
@@ -950,7 +963,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                         'rgd_delivery_man' => $location['rgd_delivery_man'],
                                         'rgd_delivery_man_hp' => $location['rgd_delivery_man_hp'],
                                         'rgd_delivery_schedule_day' => $location['rgd_delivery_schedule_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_delivery_schedule_day']) : null,
-                                        'rgd_arrive_day' => $location['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']) : null,
+                                        'rgd_arrive_day' => $location['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']) : ($request->page_type == 'Page146' && $location['rgd_status3'] == "배송완료" ? Carbon::now()->toDateTimeString() : null),
                                     ]);
                                 }
 
@@ -1035,7 +1048,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                         'rgd_delivery_man' => $location['rgd_delivery_man'],
                                         'rgd_delivery_man_hp' => $location['rgd_delivery_man_hp'],
                                         'rgd_delivery_schedule_day' => $location['rgd_delivery_schedule_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_delivery_schedule_day']) : null,
-                                        'rgd_arrive_day' => $location['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']) : null,
+                                        'rgd_arrive_day' => $location['rgd_arrive_day'] ? DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']) : ($request->page_type == 'Page146' && $location['rgd_status3'] == "배송완료" ? Carbon::now()->toDateTimeString() : null),
                                     ]);
                                 }
 
@@ -2095,7 +2108,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         'rgd_delivery_man' => $rgd['rgd_delivery_man'],
                         'rgd_delivery_man_hp' => $rgd['rgd_delivery_man_hp'],
                         'rgd_delivery_schedule_day' => isset($rgd['rgd_delivery_schedule_day']) ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_delivery_schedule_day']) : null,
-                        'rgd_arrive_day' => isset($rgd['rgd_arrive_day']) ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']) : null,
+                        'rgd_arrive_day' => isset($rgd['rgd_arrive_day']) ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']) : (isset($validated['type']) && $rgd['rgd_status3'] == "배송완료" ? Carbon::now()->toDateTimeString() : null),
                         'rgd_confirmed_date' => $rgd['rgd_status3'] == '배송완료' ? Carbon::now()->toDateTimeString() : null,
 
                     ]);
@@ -2132,7 +2145,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         'rgd_delivery_man' => $rgd['rgd_delivery_man'],
                         'rgd_delivery_man_hp' => $rgd['rgd_delivery_man_hp'],
                         'rgd_delivery_schedule_day' => isset($rgd['rgd_delivery_schedule_day']) ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_delivery_schedule_day']) : null,
-                        'rgd_arrive_day' => isset($rgd['rgd_arrive_day']) ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']) : null,
+                        'rgd_arrive_day' => isset($rgd['rgd_arrive_day']) ? DateTime::createFromFormat('Y-m-d', $rgd['rgd_arrive_day']) : (isset($validated['type']) && $rgd['rgd_status3'] == "배송완료" ? Carbon::now()->toDateTimeString() : null),
                         'rgd_confirmed_date' => $rgd['rgd_status3'] == '배송완료' ? Carbon::now()->toDateTimeString() : null,
                     ]);
 
@@ -3547,8 +3560,8 @@ class ReceivingGoodsDeliveryController extends Controller
                         'rgd_delivery_man' => $dataSubmit['rgd_delivery_man'],
                         'rgd_delivery_man_hp' => $dataSubmit['rgd_delivery_man_hp'],
                         'rgd_delivery_schedule_day' => $dataSubmit['rgd_delivery_schedule_day'] ? $dataSubmit['rgd_delivery_schedule_day'] : null,
-                        'rgd_arrive_day' => $dataSubmit['rgd_arrive_day'] ? $dataSubmit['rgd_arrive_day'] : null,
-
+                        //'rgd_arrive_day' => $dataSubmit['rgd_arrive_day'] ? $dataSubmit['rgd_arrive_day'] : null,
+                        'rgd_arrive_day' => isset($dataSubmit['rgd_arrive_day']) ? DateTime::createFromFormat('Y-m-d', $dataSubmit['rgd_arrive_day']) : (isset($data['type']) && $dataSubmit['rgd_status3'] == "배송완료" ? Carbon::now()->toDateTimeString() : null),
                     ]
 
                 );

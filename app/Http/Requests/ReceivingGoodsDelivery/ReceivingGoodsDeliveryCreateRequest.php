@@ -30,7 +30,9 @@ class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
             'connection_number_old' => [
                 ''
             ], 
-             
+            'type' => [
+                '',
+            ],
             'connect_w' => [
                 ''
             ], 
