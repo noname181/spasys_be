@@ -92,10 +92,18 @@ class AlarmController extends Controller
                         });
                     })
                     ->orwhere(function($q) use ($user) {
-                        $q->where('alarm_type', 'auto')->whereHas('warehousing.company.co_parent', function ($q) use ($user) {
+                        $q->where('alarm_type', 'auto')
+                        ->whereHas('warehousing.company.co_parent', function ($q) use ($user) {
                             $q->where('co_no', $user->co_no);
                         })->whereHas('member', function ($q) {
                             $q->where('mb_type', 'spasys');
+                        })->orwhere(function($q) use($user){
+                            $q->where('alarm_type', 'auto')
+                            ->whereHas('warehousing', function($q) {
+                                $q->where('w_category_name', '수입풀필먼트');
+                            })->whereHas('warehousing.company', function($q) use ($user){
+                                $q->where('co_no', $user->co_no);
+                            });
                         });
                     });
                 })->orderBy('alarm_no', 'DESC');
@@ -122,6 +130,13 @@ class AlarmController extends Controller
                             $q->where('co_no', $user->co_no);
                         })->whereHas('member', function ($q) {
                             $q->where('mb_type', 'shop');
+                        })->orwhere(function($q) use($user){
+                            $q->where('alarm_type', 'auto')
+                            ->whereHas('warehousing', function($q) {
+                                $q->where('w_category_name', '수입풀필먼트');
+                            })->whereHas('warehousing.company', function($q) use ($user){
+                                $q->where('co_no', $user->co_no);
+                            });
                         });
                     });
                 })

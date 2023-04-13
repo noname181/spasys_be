@@ -78,6 +78,9 @@ class CommonFunc
         }else if($rgd->service_korean_name == '보세화물'){
             $price = $rgd->rate_data_general->rdg_sum7;
             $cargo_number = $rgd->t_import_expected->tie_h_bl;
+        }else if($rgd->service_korean_name == '수입풀필먼트'){
+            $price = $rgd->rate_data_general->rdg_sum6;
+            $cargo_number = $rgd->warehousing->w_schedule_number_settle;
         }
 
         $alarm_content = AlarmData::where('ad_title', $ad_title)->first()->ad_content;
