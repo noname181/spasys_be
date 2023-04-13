@@ -75,7 +75,8 @@ class AlarmController extends Controller
                 //     $q->where('co_no', $user->company->co_parent->co_no);
                 //     //->orWhere('co_no', $user->company->co_parent->co_parent->co_no);
                 // })
-                $alarm = Alarm::with('warehousing','member','import_expect')->where(function($q) use($validated,$user) {
+                $alarm = Alarm::with('warehousing','member','import_expect')
+                ->where(function($q) use($validated, $user) {
                     $q->whereNull('alarm_type')->where(function($q) use($validated,$user) {
                         $q->whereHas('export.import_expected.company.co_parent',function ($q) use ($user){
                             $q->where('co_no', $user->co_no);
@@ -93,18 +94,26 @@ class AlarmController extends Controller
                     })
                     ->orwhere(function($q) use ($user) {
                         $q->where('alarm_type', 'auto')
-                        ->whereHas('warehousing.company.co_parent', function ($q) use ($user) {
-                            $q->where('co_no', $user->co_no);
-                        })->whereHas('member', function ($q) {
-                            $q->where('mb_type', 'spasys');
-                        })->orwhere(function($q) use($user){
-                            $q->where('alarm_type', 'auto')
-                            ->whereHas('warehousing', function($q) {
-                                $q->where('w_category_name', '수입풀필먼트');
-                            })->whereHas('warehousing.company', function($q) use ($user){
-                                $q->where('co_no', $user->co_no);
-                            });
+                        ->where(function($q) use ($user) {
+                            if($user->mb_push_yn == 'y'){
+                                $q->whereHas('warehousing.company.co_parent', function ($q) use ($user) {
+                                    $q->where('co_no', $user->co_no);
+                                })->whereHas('member', function ($q) {
+                                    $q->where('mb_type', 'spasys');
+                                })->orwhere(function($q) use($user){
+                                    $q->where('alarm_type', 'auto')
+                                    ->whereHas('warehousing', function($q) {
+                                        $q->where('w_category_name', '수입풀필먼트');
+                                    })->whereHas('warehousing.company', function($q) use ($user){
+                                        $q->where('co_no', $user->co_no);
+                                    });
+                                });
+                            }else {
+                                $q->whereNull('alarm_no');
+                            }
+
                         });
+
                     });
                 })->orderBy('alarm_no', 'DESC');
             }
@@ -126,22 +135,31 @@ class AlarmController extends Controller
                         });
                     })
                     ->orwhere(function($q) use ($user) {
-                        $q->where('alarm_type', 'auto')->whereHas('warehousing.company', function ($q) use ($user) {
-                            $q->where('co_no', $user->co_no);
-                        })->whereHas('member', function ($q) {
-                            $q->where('mb_type', 'shop');
-                        })->orwhere(function($q) use($user){
-                            $q->where('alarm_type', 'auto')
-                            ->whereHas('warehousing', function($q) {
-                                $q->where('w_category_name', '수입풀필먼트');
-                            })->whereHas('warehousing.company', function($q) use ($user){
-                                $q->where('co_no', $user->co_no);
-                            });
+                        $q->where('alarm_type', 'auto')
+                        ->where(function($q) use ($user) {
+                            if($user->mb_push_yn == 'y'){
+                                $q->whereHas('warehousing.company.co_parent', function ($q) use ($user) {
+                                    $q->where('co_no', $user->co_no);
+                                })->whereHas('member', function ($q) {
+                                    $q->where('mb_type', 'spasys');
+                                })->orwhere(function($q) use($user){
+                                    $q->where('alarm_type', 'auto')
+                                    ->whereHas('warehousing', function($q) {
+                                        $q->where('w_category_name', '수입풀필먼트');
+                                    })->whereHas('warehousing.company', function($q) use ($user){
+                                        $q->where('co_no', $user->co_no);
+                                    });
+                                });
+                            }else {
+                                $q->whereNull('alarm_no');
+                            }
+
                         });
+
                     });
                 })
                 ->orderBy('alarm_no', 'DESC');
-               
+
             } else if ($user->mb_type == 'spasys'){
                 $alarm = Alarm::with('warehousing','member','import_expect')->where(function($q) use($validated,$user) {
                     $q->whereNull('alarm_type')->where(function($q) use($validated,$user) {
@@ -153,7 +171,7 @@ class AlarmController extends Controller
                 ->orderBy('alarm_no', 'DESC');
             }
 
-            
+
 
             if (isset($validated['w_no'])) {
                 $alarm->where('w_no', $validated['w_no']);
@@ -229,13 +247,13 @@ class AlarmController extends Controller
             }
             if (isset($validated['w_schedule_number'])) {
                 $alarm->where(function($q) use($validated) {
-                    
+
                     $q->whereHas('warehousing', function($q) use($validated) {
                         return $q->where(DB::raw('lower(w_schedule_number)'), 'like', '%' . strtolower($validated['w_schedule_number']) . '%')->orWhere(DB::raw('lower(w_schedule_number2)'), 'like', '%' . strtolower($validated['w_schedule_number']) . '%');
                     })->orWhereHas('import_expect', function ($q2) use ($validated){
                         $q2->where('tie_h_bl', 'like', '%' . $validated['w_schedule_number'] . '%');
                     });
-                
+
                 });
             }
             if (isset($validated['service_name'])) {
@@ -260,7 +278,7 @@ class AlarmController extends Controller
                         return $q->where('w_type','IW')->whereNull('w_schedule_number2');
                     });
                 }
-                
+
             }
             $alarm = $alarm->paginate($per_page, ['*'], 'page', $page);
 
@@ -287,12 +305,12 @@ class AlarmController extends Controller
             }
             else if($user->mb_type == 'shipper'){
                 $alarm = Alarm::with('warehousing','member','export')->where('alarm.mb_no','=',$user->mb_no)->orderBy('alarm_no', 'DESC');
-               
+
             } else if ($user->mb_type == 'spasys'){
                 $alarm = Alarm::with('warehousing','member','import_expect')->where('alarm.mb_no','=',$user->mb_no)->orderBy('alarm_no', 'DESC');
             }
 
-            
+
 
             if (isset($validated['w_no'])) {
                 $alarm->where('w_no', $validated['w_no']);
@@ -368,13 +386,13 @@ class AlarmController extends Controller
             }
             if (isset($validated['w_schedule_number'])) {
                 $alarm->where(function($q) use($validated) {
-                    
+
                     $q->whereHas('warehousing', function($q) use($validated) {
                         return $q->where(DB::raw('lower(w_schedule_number)'), 'like', '%' . strtolower($validated['w_schedule_number']) . '%')->orWhere(DB::raw('lower(w_schedule_number2)'), 'like', '%' . strtolower($validated['w_schedule_number']) . '%');
                     })->orWhereHas('import_expect', function ($q2) use ($validated){
                         $q2->where('tie_h_bl', 'like', '%' . $validated['w_schedule_number'] . '%');
                     });
-                
+
                 });
             }
             if (isset($validated['service_name'])) {
@@ -399,7 +417,7 @@ class AlarmController extends Controller
                         return $q->where('w_type','IW')->whereNull('w_schedule_number2');
                     });
                 }
-                
+
             }
             $alarm = $alarm->paginate($per_page, ['*'], 'page', $page);
 
@@ -415,7 +433,7 @@ class AlarmController extends Controller
     {
         $validated = $request->validated();
         try {
-           
+
             $alarm = Alarm::with('warehousing','member')->orderBy('alarm_no', 'DESC');
 
             if (isset($validated['w_no'])) {
