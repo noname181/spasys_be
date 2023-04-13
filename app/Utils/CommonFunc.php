@@ -39,7 +39,7 @@ class CommonFunc
         }else{
             $string = $string.'_'.date('Ymd').$data.'_'.$type;
         }
-        
+
         return $string;
     }
 
@@ -52,22 +52,22 @@ class CommonFunc
     static function generate_tax_number($data)
     {
         $string = 'TAX';
-      
+
         $string = $string.'_'.date('Ymd').$data;
-        
+
         return $string;
     }
 
     static function report_number($data)
     {
         $string = 'PHOTO';
-      
+
         $string = $string.'_'.date('Ymd').$data;
-        
+
         return $string;
     }
 
-    static function insert_alarm($ad_title, $rgd, $user)
+    static function insert_alarm($ad_title, $rgd, $sender, $w_no, $type)
     {
         $ccccc = 0;
         $aaaaa = '';
@@ -98,34 +98,55 @@ class CommonFunc
             $cargo_number = $rgd->warehousing->w_schedule_number_settle;
         }
 
-        $alarm_content = AlarmData::where('ad_title', $ad_title)->first()->ad_content;
+        $alarm_data = AlarmData::where('ad_title', $ad_title)->first();
+
+        $alarm_content = $alarm_data->ad_content;
         $alarm_content = str_replace('aaaaa', $aaaaa ,$alarm_content);
         $alarm_content = str_replace('bbbbb', $bbbbb ,$alarm_content);
         $alarm_content = str_replace('ccccc', $ccccc ,$alarm_content);
         $alarm_content = str_replace('ddddd', $ddddd , $alarm_content);
 
+        if($type == 'settle_payment'){
+            $alarm_type = 'auto';
+        }
+
         Alarm::insertGetId(
             [
                 'w_no' => $rgd->w_no,
-                'mb_no' => $user->mb_no,
+                'mb_no' => $sender->mb_no,
                 'alarm_content' => $alarm_content,
                 'alarm_h_bl' => $cargo_number,
-                'alarm_type' => 'auto',
+                'alarm_type' => $alarm_type,
+                'ad_no' => $alarm_data->ad_no,
             ]
         );
 
-        if($user->mb_type == 'spasys'){
-            $receiver_company = $rgd->warehousing->company->co_parent;
+        if($alarm_data->ad_must_yn == 'y'){
+            if($sender->mb_type == 'spasys'){
+                $receiver_company = $rgd->warehousing->company->co_parent;
+            }else if($sender->mb_type == 'shop'){
+                $receiver_company = $rgd->warehousing->company;
+            }
+            //ad_must_yn == 'y' send all members of receiver company
+            $receiver_list = Member::where('co_no', $receiver_company->co_no)->get();
+
+        }else if($alarm_data->ad_must_yn == 'n'){
+            if($sender->mb_type == 'spasys'){
+                $receiver_company = $rgd->warehousing->company->co_parent;
+            }else if($sender->mb_type == 'shop'){
+                $receiver_company = $rgd->warehousing->company;
+            }
+            //ad_must_yn == 'n' send only members who have mb_push_yn = 'y'
             $receiver_list = Member::where('co_no', $receiver_company->co_no)->where('mb_push_yn', 'y')->get();
+        }
 
-            //PUSH FUNCTION HERE
 
-        }else if($user->mb_type == 'shop'){
-            $receiver_company = $rgd->warehousing->company;
-            $receiver_list = Member::where('co_no', $receiver_company->co_no)->where('mb_push_yn', 'y')->get();
-
+        foreach($receiver_list as $receiver){
             //PUSH FUNCTION HERE
         }
+
+
+
 
 
     }

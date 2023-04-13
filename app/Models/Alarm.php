@@ -37,6 +37,7 @@ class Alarm extends Model
         'alarm_no',
         'mb_no',
         'w_no',
+        'ad_no',
         'alarm_content',
         'alarm_h_bl',
     ];
@@ -68,5 +69,10 @@ class Alarm extends Model
     public function import_expect()
     {
         return $this->belongsTo(ImportExpected::class, 'alarm_h_bl', 'tie_h_bl')->with(['company','company_spasys']);
+    }
+
+    public function alarm_data()
+    {
+        return $this->belongsTo(AlarmData::class, 'ad_no', 'ad_no');
     }
 }
