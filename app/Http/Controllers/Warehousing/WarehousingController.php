@@ -350,9 +350,25 @@ class WarehousingController extends Controller
                 }
 
                 if (isset($validated['rgd_status2'])) {
-                    $warehousing2->whereHas('receving_goods_delivery', function ($query) use ($validated) {
-                        $query->where('rgd_status2', '=', $validated['rgd_status2'])->whereNull('rgd_parent_no');
-                    });
+                    if (isset($validated['rgd_status1'])) {
+                        if ($validated['rgd_status1'] == "입고" || $validated['rgd_status1'] == "입고예정취소" || $validated['rgd_status1'] == "입고예정") {
+                            $warehousing2->whereHas('w_import_parent.receving_goods_delivery_parent', function ($q) use ($validated) {
+                                $q->where('rgd_status2', '=', $validated['rgd_status2'])->whereNull('rgd_parent_no');
+                            });
+                        } else {
+                            $warehousing2->whereHas('receving_goods_delivery', function ($query) use ($validated) {
+                                $query->where('rgd_status2', '=', $validated['rgd_status2'])->whereNull('rgd_parent_no');
+                            });
+                        }
+                    } else {
+                        $warehousing2->where(function ($q) use ($validated) {
+                            $q->whereHas('receving_goods_delivery', function ($query) use ($validated) {
+                                $query->where('rgd_status2', '=', $validated['rgd_status2'])->whereNull('rgd_parent_no');
+                            })->orwhereHas('w_import_parent.receving_goods_delivery_parent', function ($q) use ($validated) {
+                                $q->where('rgd_status2', '=', $validated['rgd_status2'])->whereNull('rgd_parent_no');
+                            });
+                        });
+                    }
                 }
 
                 if (isset($validated['rgd_status3'])) {
@@ -1862,10 +1878,10 @@ class WarehousingController extends Controller
                         ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                         ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-                    $sub_2 = Import::select('ti_h_bl','ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
+                    $sub_2 = Import::select('ti_h_bl', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
                         ->groupBy(['ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number']);
 
-                    $sub_4 = Export::select('te_h_bl','connection_number', 't_export.te_status_2', 'te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number')
+                    $sub_4 = Export::select('te_h_bl', 'connection_number', 't_export.te_status_2', 'te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number')
                         ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
                     $sub_5 = ReceivingGoodsDelivery::select('*')->groupBy('is_no');
 
@@ -1894,7 +1910,7 @@ class WarehousingController extends Controller
                         ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                         ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-                    $sub_2 = Import::select('ti_h_bl','ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
+                    $sub_2 = Import::select('ti_h_bl', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
                         ->groupBy(['ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number']);
 
                     // $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
@@ -1940,14 +1956,14 @@ class WarehousingController extends Controller
                         ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                         ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-                    $sub_2 = Import::select('ti_h_bl','ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
+                    $sub_2 = Import::select('ti_h_bl', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
 
                         ->groupBy(['ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number']);
 
                     // $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
                     //     ->groupBy(['tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number']);
 
-                    $sub_4 = Export::select('te_h_bl','connection_number', 't_export.te_status_2', 'te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number')
+                    $sub_4 = Export::select('te_h_bl', 'connection_number', 't_export.te_status_2', 'te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number')
                         // ->leftjoin('receiving_goods_delivery', function ($join) {
                         //     $join->on('t_export.te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
                         // })
@@ -1996,7 +2012,7 @@ class WarehousingController extends Controller
                 if (isset($validated['h_bl'])) {
                     $import_schedule->where(function ($query) use ($validated) {
                         $query->where(DB::raw('ddd.te_h_bl'), 'like', '%' . $validated['h_bl'] . '%')
-                        ->orWhere(DB::raw('aaa.tie_h_bl'), 'like', '%' . $validated['h_bl'] . '%');
+                            ->orWhere(DB::raw('aaa.tie_h_bl'), 'like', '%' . $validated['h_bl'] . '%');
                     });
                 }
 
@@ -2405,13 +2421,13 @@ class WarehousingController extends Controller
                         ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                         ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-                    $sub_2 = Import::select('ti_h_bl','ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
+                    $sub_2 = Import::select('ti_h_bl', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
                         ->groupBy(['ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number']);
 
                     // $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
                     //     ->groupBy(['tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number']);
 
-                    $sub_4 = Export::select('te_h_bl','connection_number', 't_export.te_status_2', 'te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number')
+                    $sub_4 = Export::select('te_h_bl', 'connection_number', 't_export.te_status_2', 'te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number')
                         // ->leftjoin('receiving_goods_delivery', function ($join) {
                         //     $join->on('t_export.te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
                         // })
@@ -2429,14 +2445,14 @@ class WarehousingController extends Controller
                         ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                         ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-                    $sub_2 = Import::select('ti_h_bl','ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
+                    $sub_2 = Import::select('ti_h_bl', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
 
                         ->groupBy(['ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number']);
 
                     // $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
                     //     ->groupBy(['tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number']);
 
-                    $sub_4 = Export::select('te_h_bl','connection_number', 't_export.te_status_2', 'te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number')
+                    $sub_4 = Export::select('te_h_bl', 'connection_number', 't_export.te_status_2', 'te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number')
                         // ->leftjoin('receiving_goods_delivery', function ($join) {
                         //     $join->on('t_export.te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
                         // })
@@ -2469,7 +2485,7 @@ class WarehousingController extends Controller
                         ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                         ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-                    $sub_2 = Import::select('ti_h_bl','ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
+                    $sub_2 = Import::select('ti_h_bl', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
                         // ->leftjoin('receiving_goods_delivery', function ($join) {
                         //     $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
                         // })
@@ -2478,7 +2494,7 @@ class WarehousingController extends Controller
                     // $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
                     //     ->groupBy(['tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number']);
 
-                    $sub_4 = Export::select('te_h_bl','connection_number', 't_export.te_status_2', 'te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number')
+                    $sub_4 = Export::select('te_h_bl', 'connection_number', 't_export.te_status_2', 'te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number')
                         // ->leftjoin('receiving_goods_delivery', function ($join) {
                         //     $join->on('t_export.te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
                         // })
@@ -2541,7 +2557,7 @@ class WarehousingController extends Controller
                 if (isset($validated['h_bl'])) {
                     $import_schedule->where(function ($query) use ($validated) {
                         $query->where(DB::raw('ddd.te_h_bl'), 'like', '%' . $validated['h_bl'] . '%')
-                        ->orWhere(DB::raw('aaa.tie_h_bl'), 'like', '%' . $validated['h_bl'] . '%');
+                            ->orWhere(DB::raw('aaa.tie_h_bl'), 'like', '%' . $validated['h_bl'] . '%');
                     });
                 }
                 if (isset($validated['w_schedule_number'])) {
@@ -4017,7 +4033,7 @@ class WarehousingController extends Controller
                 ->whereHas('warehousing', function ($query) {
                     $query->where('w_category_name', '=', '수입풀필먼트');
                 })
-                ->where('rgd_is_show', 'y'); 
+                ->where('rgd_is_show', 'y');
 
             // ====================BONDED======================
 
@@ -4066,7 +4082,7 @@ class WarehousingController extends Controller
 
 
             // ====================SEARCH PART======================
-            
+
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
                 $warehousing_bonded->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
@@ -4220,7 +4236,7 @@ class WarehousingController extends Controller
                         $q->where(function ($q2) {
                             $q2->where('rgd_status4', '예상경비청구서')
                                 ->where('service_korean_name', '보세화물')
-                                ->where('rgd_bill_type', 'not like', '%'. 'month' . '%')
+                                ->where('rgd_bill_type', 'not like', '%' . 'month' . '%')
                                 ->where(function ($q4) {
                                     $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
                                 })
@@ -4248,7 +4264,7 @@ class WarehousingController extends Controller
                         $q->where(function ($q2) {
                             $q2->where('rgd_status4', '예상경비청구서')
                                 ->where('service_korean_name', '보세화물')
-                                ->where('rgd_bill_type', 'not like', '%'. 'month' . '%')
+                                ->where('rgd_bill_type', 'not like', '%' . 'month' . '%')
                                 ->where(function ($q4) {
                                     $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
                                 })
@@ -4274,7 +4290,7 @@ class WarehousingController extends Controller
                         $q->where(function ($q2) {
                             $q2->where('rgd_status4', '예상경비청구서')
                                 ->where('service_korean_name', '보세화물')
-                                ->where('rgd_bill_type', 'not like', '%'. 'month' . '%')
+                                ->where('rgd_bill_type', 'not like', '%' . 'month' . '%')
                                 ->where(function ($q4) {
                                     $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
                                 })
@@ -4293,7 +4309,7 @@ class WarehousingController extends Controller
                     });
                 }
             }
-           
+
             if (isset($validated['rgd_status5_1'])) {
                 if ($validated['rgd_status5_1'] == '요청중') {
                     $warehousing->where(function ($q) {
@@ -4451,12 +4467,12 @@ class WarehousingController extends Controller
                 } else {
                     $warehousing_fulfillment->where(function ($q) {
                         $q->where('rgd_status5', '!=', 'cancel')->orwhereNull('rgd_status5');
-                    })->where('rgd_status7', '=', $validated['rgd_status1']);    
+                    })->where('rgd_status7', '=', $validated['rgd_status1']);
                 }
             }
-           
 
-           
+
+
             if (isset($validated['service']) && $validated['service'] != '전체') {
                 $warehousing->where('service_korean_name', '=', $validated['service']);
                 $warehousing_bonded->where('service_korean_name', '=', $validated['service']);
@@ -5320,7 +5336,7 @@ class WarehousingController extends Controller
                 ->whereHas('member', function ($q) use ($user) {
                     $q->where('mb_type', $user->mb_type);
                 })
-                ->where(function ($q4){
+                ->where(function ($q4) {
                     $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
                 })
                 // ->orderBy('rgd_tax_invoice_date', 'DESC')
@@ -5374,7 +5390,7 @@ class WarehousingController extends Controller
                             $q1->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%');
                         });
                     })->orwhereHas('t_import', function ($q) use ($validated) {
-                        $q->where('ti_h_bl', 'like', '%' .$validated['w_schedule_number2']. '%');
+                        $q->where('ti_h_bl', 'like', '%' . $validated['w_schedule_number2'] . '%');
                     });
                 });
             }
@@ -5386,34 +5402,32 @@ class WarehousingController extends Controller
             }
             if (isset($validated['rgd_status6'])) {
                 if ($validated['rgd_status6'] == 'cancel') {
-                    $warehousing->where('rgd_status6', '=','cancel');
+                    $warehousing->where('rgd_status6', '=', 'cancel');
                 } else if ($validated['rgd_status6'] == 'paid') {
-                    $warehousing->where('rgd_status6', '=','paid');
-                } else if($validated['rgd_status6'] == '진행중'){
-                    $warehousing->where(function($q){
-                        $q->where(function($q2){
-                            $q2->where('rgd_status4','예상경비청구서')
-                            ->where('service_korean_name','보세화물')
-                            ->where('rgd_bill_type', 'not like', '%'. 'month' . '%')
-                            ->where(function ($q4){
+                    $warehousing->where('rgd_status6', '=', 'paid');
+                } else if ($validated['rgd_status6'] == '진행중') {
+                    $warehousing->where(function ($q) {
+                        $q->where(function ($q2) {
+                            $q2->where('rgd_status4', '예상경비청구서')
+                                ->where('service_korean_name', '보세화물')
+                                ->where('rgd_bill_type', 'not like', '%' . 'month' . '%')
+                                ->where(function ($q4) {
+                                    $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                                })
+                                ->whereNull('rgd_status6');
+                        })->orWhere(function ($q3) {
+                            $q3->where(function ($q4) {
                                 $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
                             })
-                            ->whereNull('rgd_status6');
-                        })->orWhere(function($q3){
-                            $q3->where(function ($q4){
-                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
-                            })
-                            ->where(function ($q4){
-                                $q4->whereNull('rgd_status6');
-                            })
-                                ->where(function ($q4){
-                                $q4->where('rgd_status4','추가청구서')->orWhere('rgd_status4','확정청구서');
-                            });
+                                ->where(function ($q4) {
+                                    $q4->whereNull('rgd_status6');
+                                })
+                                ->where(function ($q4) {
+                                    $q4->where('rgd_status4', '추가청구서')->orWhere('rgd_status4', '확정청구서');
+                                });
                         });
-
                     });
                 }
-
             }
 
             if (isset($validated['rgd_status67'])) {
@@ -5440,7 +5454,7 @@ class WarehousingController extends Controller
 
 
             if (isset($validated['service_korean_name'])) {
-                $warehousing->where('service_korean_name', 'like', '%'. $validated['service_korean_name']. '%');
+                $warehousing->where('service_korean_name', 'like', '%' . $validated['service_korean_name'] . '%');
             }
 
             if (isset($validated['co_close_yn'])) {
@@ -5590,7 +5604,7 @@ class WarehousingController extends Controller
                 ->where('rgd_calculate_deadline_yn', 'y')
                 ->whereNull('rgd_status6')
                 ->where('rgd_is_show', 'y')
-                ->where(function ($q4){
+                ->where(function ($q4) {
                     $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
                 })
                 ->whereHas('mb_no', function ($q) use ($user) {
@@ -5649,7 +5663,7 @@ class WarehousingController extends Controller
 
 
             if (isset($validated['service_korean_name'])) {
-                $warehousing->where('service_korean_name', 'like', '%' . $validated['service_korean_name']. '%');
+                $warehousing->where('service_korean_name', 'like', '%' . $validated['service_korean_name'] . '%');
             }
 
             if (isset($validated['rgd_settlement_number'])) {
@@ -5657,34 +5671,32 @@ class WarehousingController extends Controller
             }
             if (isset($validated['rgd_status6'])) {
                 if ($validated['rgd_status6'] == 'cancel') {
-                    $warehousing->where('rgd_status6', '=','cancel');
+                    $warehousing->where('rgd_status6', '=', 'cancel');
                 } else if ($validated['rgd_status6'] == 'paid') {
-                    $warehousing->where('rgd_status6', '=','paid');
-                } else if($validated['rgd_status6'] == '진행중'){
-                    $warehousing->where(function($q){
-                        $q->where(function($q2){
-                            $q2->where('rgd_status4','예상경비청구서')
-                            ->where('service_korean_name','보세화물')
-                            ->where('rgd_bill_type', 'not like', '%'. 'month' . '%')
-                            ->where(function ($q4){
+                    $warehousing->where('rgd_status6', '=', 'paid');
+                } else if ($validated['rgd_status6'] == '진행중') {
+                    $warehousing->where(function ($q) {
+                        $q->where(function ($q2) {
+                            $q2->where('rgd_status4', '예상경비청구서')
+                                ->where('service_korean_name', '보세화물')
+                                ->where('rgd_bill_type', 'not like', '%' . 'month' . '%')
+                                ->where(function ($q4) {
+                                    $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                                })
+                                ->whereNull('rgd_status6');
+                        })->orWhere(function ($q3) {
+                            $q3->where(function ($q4) {
                                 $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
                             })
-                            ->whereNull('rgd_status6');
-                        })->orWhere(function($q3){
-                            $q3->where(function ($q4){
-                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
-                            })
-                            ->where(function ($q4){
-                                $q4->whereNull('rgd_status6');
-                            })
-                                ->where(function ($q4){
-                                $q4->where('rgd_status4','추가청구서')->orWhere('rgd_status4','확정청구서');
-                            });
+                                ->where(function ($q4) {
+                                    $q4->whereNull('rgd_status6');
+                                })
+                                ->where(function ($q4) {
+                                    $q4->where('rgd_status4', '추가청구서')->orWhere('rgd_status4', '확정청구서');
+                                });
                         });
-
                     });
                 }
-
             }
 
             $warehousing_data = $warehousing->get();
@@ -5873,7 +5885,7 @@ class WarehousingController extends Controller
                             'cbh_status_after' => 'taxed'
                         ]);
 
-                        if($rgd['rgd_status6'] == 'paid'){
+                        if ($rgd['rgd_status6'] == 'paid') {
                             CancelBillHistory::insertGetId([
                                 'rgd_no' => $rgd['rgd_no'],
                                 'mb_no' => $user->mb_no,
@@ -5881,7 +5893,7 @@ class WarehousingController extends Controller
                                 'cbh_status_before' => $rgd['rgd_status8'],
                                 'cbh_status_after' => 'completed'
                             ]);
-    
+
                             ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
                                 'rgd_status8' => 'completed',
                             ]);
@@ -5958,7 +5970,7 @@ class WarehousingController extends Controller
                             'cbh_status_after' => 'taxed'
                         ]);
 
-                        if($rgd['rgd_status6'] == 'paid'){
+                        if ($rgd['rgd_status6'] == 'paid') {
                             CancelBillHistory::insertGetId([
                                 'rgd_no' => $rgd['rgd_no'],
                                 'mb_no' => $user->mb_no,
@@ -5966,7 +5978,7 @@ class WarehousingController extends Controller
                                 'cbh_status_before' => $rgd['rgd_status8'],
                                 'cbh_status_after' => 'completed'
                             ]);
-    
+
                             ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
                                 'rgd_status8' => 'completed',
                             ]);
@@ -6017,7 +6029,7 @@ class WarehousingController extends Controller
                         'cbh_status_after' => 'taxed'
                     ]);
 
-                    if($rgd['rgd_status6'] == 'paid'){
+                    if ($rgd['rgd_status6'] == 'paid') {
                         CancelBillHistory::insertGetId([
                             'rgd_no' => $rgd['rgd_no'],
                             'mb_no' => $user->mb_no,
@@ -6082,7 +6094,7 @@ class WarehousingController extends Controller
                         'cbh_status_after' => 'taxed'
                     ]);
 
-                    if($rgd['rgd_status6'] == 'paid'){
+                    if ($rgd['rgd_status6'] == 'paid') {
                         CancelBillHistory::insertGetId([
                             'rgd_no' => $rgd['rgd_no'],
                             'mb_no' => $user->mb_no,
@@ -6665,7 +6677,7 @@ class WarehousingController extends Controller
 
         $approval_history = CancelBillHistory::where('rgd_no', $rgd_no)->whereIn('cbh_type', ['approval'])->first();
 
-        if(empty($tax_history->cbh_no)){
+        if (empty($tax_history->cbh_no)) {
             ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                 'rgd_status8' => 'in_process',
             ]);
@@ -6680,7 +6692,7 @@ class WarehousingController extends Controller
             ]);
         }
 
-        if(empty($approval_history->cbh_no)){
+        if (empty($approval_history->cbh_no)) {
             CancelBillHistory::insertGetId([
                 'rgd_no' => $rgd_no,
                 'mb_no' => $rgd->mb_no,
