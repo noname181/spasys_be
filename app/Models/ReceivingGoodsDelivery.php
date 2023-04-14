@@ -91,7 +91,7 @@ class ReceivingGoodsDelivery extends Model
 
     public function warehousing()
     {
-        return $this->hasOne(Warehousing::class, 'w_no', 'w_no')->with(['warehousing_item','w_import_parent', 'warehousing_child', 'warehousing_request', 'company', 'settlement_cargo']);
+        return $this->hasOne(Warehousing::class, 'w_no', 'w_no')->with(['warehousing_item','w_import_parent', 'warehousing_child', 'warehousing_request', 'company', 'settlement_cargo','import_expect']);
     }
     public function rgd_child()
     {
