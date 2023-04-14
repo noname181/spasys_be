@@ -6737,6 +6737,22 @@ class WarehousingController extends Controller
 
         $approval_history = CancelBillHistory::where('rgd_no', $rgd_no)->whereIn('cbh_type', ['approval'])->first();
 
+        if($rgd->service_korean_name == '보세화물' && $rgd->rgd_status4 == '예상경비청구서' && !str_contains($rgd->rgd_bill_type, 'month')){
+            $payment_history = CancelBillHistory::where('rgd_no', $rgd_no)->where('cbh_type', 'payment')->where('cbh_status_after', 'request_bill')->first();
+
+            if (empty($payment_history->cbh_no)) {
+    
+                CancelBillHistory::insertGetId([
+                    'rgd_no' => $rgd_no,
+                    'mb_no' => $rgd->mb_no,
+                    'cbh_type' => 'payment',
+                    'cbh_status_after' => 'request_bill',
+                    'created_at' => $rgd->created_at,
+                    'updated_at' => $rgd->updated_at,
+                ]);
+            }
+        }
+
         if (empty($tax_history->cbh_no)) {
             ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                 'rgd_status8' => 'in_process',
