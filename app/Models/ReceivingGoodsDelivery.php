@@ -97,7 +97,7 @@ class ReceivingGoodsDelivery extends Model
     {
         return $this->hasOne(ReceivingGoodsDelivery::class, 'rgd_parent_no', 'rgd_no')->where(function($q) {
             $q->where('rgd_status5', '!=', 'cancel')->orWhereNull('rgd_status5');
-        })->select(['rgd_status5', 'rgd_status4', 'rgd_status6', 'rgd_no', 'rgd_parent_no']);
+        })->select(['rgd_status5', 'rgd_status4', 'rgd_status6', 'rgd_no', 'rgd_parent_no', 'rgd_paid_date', 'rgd_tax_invoice_date']);
     }
 
     public function rgd_parent()
