@@ -58,6 +58,9 @@ class PaymentRequest extends BaseFormRequest
             'p_method_fee' => [
                 '',
             ],
+            'p_card_name' => [
+                '',
+            ],
         ];
     }
 

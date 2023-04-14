@@ -3430,7 +3430,10 @@ class ReceivingGoodsDeliveryController extends Controller
                         'p_price' => $request->sumprice,
                         'p_method' => $request->p_method,
                         'p_success_yn' => 'y',
-                        'p_method_fee' => isset($p_method_fee) ? $p_method_fee : null
+                        'p_method_fee' => isset($p_method_fee) ? $p_method_fee : null,
+                        'p_method_name' => $request->p_method_name,
+                        'p_method_number' => $request->p_method_number,
+                        'p_card_name' => $request->p_card_name,
                     ]
                 );
                 CancelBillHistory::insertGetId([

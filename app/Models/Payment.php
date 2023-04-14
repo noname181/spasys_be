@@ -32,6 +32,7 @@ class Payment extends Model
         'p_method_number',
         'p_method_key',
         'p_method_fee',
+        'p_card_name',
         'created_at',
         'updated_at',
     ];
