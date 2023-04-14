@@ -422,7 +422,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 if ($status1 == "입고" && $status2 == "작업완료") {
                     $check_ex = Warehousing::where('w_import_no', '=', $w_no)->first();
                     if (!$check_ex) {
-                       
+
                         $w_schedule_amount = 0;
                         foreach ($validated['items'] as $item) {
                             $w_schedule_amount += $item['warehousing_item2'][0]['wi_number'];
@@ -493,12 +493,12 @@ class ReceivingGoodsDeliveryController extends Controller
                                     'rgd_status2' => isset($rgd['rgd_status2']) ? $rgd['rgd_status2'] : null,
                                 ]);
                             }
-                            
+
                         }
                     }
                 }else{
                     $check_ex = Warehousing::where('w_import_no', '=', $w_no)->first();
-                    if ($check_ex) { 
+                    if ($check_ex) {
                         $check_ew = Warehousing::where('w_import_no', '=', $w_no)->get();
                         foreach ($validated['location'] as $rgd) {
                             foreach($check_ew as $w_no_ew){
@@ -506,7 +506,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                     'rgd_status2' => isset($rgd['rgd_status2']) ? $rgd['rgd_status2'] : null,
                                 ]);
                             }
-                            
+
                         }
                     }
                 }
@@ -2485,7 +2485,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 $rgds = ReceivingGoodsDelivery::where('tid_no', $rgd->tid_no)->get();
 
                 foreach($rgds as $rgd){
-                    CommonFunc::insert_alarm('[공통] 계산서취소 안내', $rgd, $user);
+                    CommonFunc::insert_alarm('[공통] 계산서취소 안내', $rgd, $user, null, 'settle_payment');
 
 
                     $cbh = CancelBillHistory::insertGetId([
@@ -2496,7 +2496,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         'cbh_status_after' => 'cancel'
                     ]);
                 }
-                
+
                 ReceivingGoodsDelivery::where('tid_no', $rgd->tid_no)->update([
                     'rgd_status7' => 'cancel',
                     'rgd_tax_invoice_date' => NULL,
@@ -2504,9 +2504,9 @@ class ReceivingGoodsDeliveryController extends Controller
                     'tid_no' => NULL,
                 ]);
 
-               
 
-                
+
+
             } else {
                 ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_status7' => 'cancel',
@@ -2515,7 +2515,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'tid_no' => NULL,
                 ]);
 
-                CommonFunc::insert_alarm('[공통] 계산서취소 안내', $rgd, $user);
+                CommonFunc::insert_alarm('[공통] 계산서취소 안내', $rgd, $user, null, 'settle_payment');
 
                 $cbh = CancelBillHistory::insertGetId([
                     'rgd_no' => $request->rgd_no,
@@ -2879,13 +2879,13 @@ class ReceivingGoodsDeliveryController extends Controller
 
                     $creater = Member::where('mb_no', $rgd->mb_no)->first();
                     if($rgd->service_korean_name == '보세화물'){
-                        CommonFunc::insert_alarm('[보세화물] 결제요청', $rgd, $creater);
+                        CommonFunc::insert_alarm('[보세화물] 결제요청', $rgd, $creater, null, 'settle_payment');
                     }else if($rgd->service_korean_name == '수입풀필먼트'){
-                        CommonFunc::insert_alarm('[수입풀필먼트] 결제요청', $rgd, $creater);
+                        CommonFunc::insert_alarm('[수입풀필먼트] 결제요청', $rgd, $creater, null, 'settle_payment');
                     }else if($rgd->service_korean_name == '유통가공'){
-                        CommonFunc::insert_alarm('[유통가공] 결제요청', $rgd, $creater);
+                        CommonFunc::insert_alarm('[유통가공] 결제요청', $rgd, $creater, null, 'settle_payment');
                     }
-                    
+
 
 
                     $cbh = CancelBillHistory::insertGetId([
@@ -2960,11 +2960,11 @@ class ReceivingGoodsDeliveryController extends Controller
                     if($i == 0){
                         $creater = Member::where('mb_no', $rgd->mb_no)->first();
                         if($rgd->service_korean_name == '보세화물'){
-                            CommonFunc::insert_alarm('[보세화물] 결제요청', $rgd, $creater);
+                            CommonFunc::insert_alarm('[보세화물] 결제요청', $rgd, $creater, null, 'settle_payment');
                         }else if($rgd->service_korean_name == '수입풀필먼트'){
-                            CommonFunc::insert_alarm('[수입풀필먼트] 결제요청', $rgd, $creater);
+                            CommonFunc::insert_alarm('[수입풀필먼트] 결제요청', $rgd, $creater, null, 'settle_payment');
                         }else if($rgd->service_korean_name == '유통가공'){
-                            CommonFunc::insert_alarm('[유통가공] 결제요청', $rgd, $creater);
+                            CommonFunc::insert_alarm('[유통가공] 결제요청', $rgd, $creater, null, 'settle_payment');
                         }
                     }
 
@@ -3083,11 +3083,11 @@ class ReceivingGoodsDeliveryController extends Controller
 
                         $creater = Member::where('mb_no', $rgd->mb_no)->first();
                         if($rgd->service_korean_name == '보세화물'){
-                            CommonFunc::insert_alarm('[보세화물] 결제요청', $rgd, $creater);
+                            CommonFunc::insert_alarm('[보세화물] 결제요청', $rgd, $creater, null, 'settle_payment');
                         }else if($rgd->service_korean_name == '수입풀필먼트'){
-                            CommonFunc::insert_alarm('[수입풀필먼트] 결제요청', $rgd, $creater);
+                            CommonFunc::insert_alarm('[수입풀필먼트] 결제요청', $rgd, $creater, null, 'settle_payment');
                         }else if($rgd->service_korean_name == '유통가공'){
-                            CommonFunc::insert_alarm('[유통가공] 결제요청', $rgd, $creater);
+                            CommonFunc::insert_alarm('[유통가공] 결제요청', $rgd, $creater, null, 'settle_payment');
                         }
 
                         if ($ag->ag_auto_issue == 'y') {
