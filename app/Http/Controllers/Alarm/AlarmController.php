@@ -96,7 +96,7 @@ class AlarmController extends Controller
                         });
                     })
                     ->orwhere(function($q) use ($user) {
-                        $q->where('alarm_type', 'auto')
+                        $q->whereNotNull('alarm_type')
                         ->where(function($q) use ($user) {
                             if($user->mb_push_yn == 'y'){
                                 $q->whereHas('warehousing.company.co_parent', function ($q) use ($user) {
@@ -104,7 +104,7 @@ class AlarmController extends Controller
                                 })->whereHas('member', function ($q) {
                                     $q->where('mb_type', 'spasys');
                                 })->orwhere(function($q) use($user){
-                                    $q->where('alarm_type', 'auto')
+                                    $q->whereNotNull('alarm_type')
                                     ->whereHas('warehousing', function($q) {
                                         $q->where('w_category_name', '수입풀필먼트');
                                     })->whereHas('warehousing.company', function($q) use ($user){
@@ -146,7 +146,7 @@ class AlarmController extends Controller
                         });
                     })
                     ->orwhere(function($q) use ($user) {
-                        $q->where('alarm_type', 'auto')
+                        $q->whereNotNull('alarm_type')
                         ->where(function($q) use ($user) {
                             if($user->mb_push_yn == 'y'){
                                 $q->whereHas('warehousing.company.co_parent', function ($q) use ($user) {
@@ -154,7 +154,7 @@ class AlarmController extends Controller
                                 })->whereHas('member', function ($q) {
                                     $q->where('mb_type', 'spasys');
                                 })->orwhere(function($q) use($user){
-                                    $q->where('alarm_type', 'auto')
+                                    $q->whereNotNull('alarm_type')
                                     ->whereHas('warehousing', function($q) {
                                         $q->where('w_category_name', '수입풀필먼트');
                                     })->whereHas('warehousing.company', function($q) use ($user){
