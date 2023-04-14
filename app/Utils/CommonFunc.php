@@ -98,6 +98,10 @@ class CommonFunc
             $cargo_number = $rgd->warehousing->w_schedule_number_settle;
         }
 
+        if($ad_type == '[공통] 계산서발행 안내' || $ad_type == '[공통] 계산서취소 안내'){
+            $aaaaa = $rgd->rgd_settlement_number;
+        }
+
         $alarm_data = AlarmData::where('ad_title', $ad_title)->first();
 
         $alarm_content = $alarm_data->ad_content;
