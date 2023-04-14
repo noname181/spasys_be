@@ -77,6 +77,7 @@ class ReceivingGoodsDeliveryController extends Controller
             DB::beginTransaction();
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
+            $user = Auth::user();
 
             if (isset($validated['w_no'])) {
                 Warehousing::where('w_no', $validated['w_no'])->update([
@@ -511,7 +512,29 @@ class ReceivingGoodsDeliveryController extends Controller
                     }
                 }
             }
+            //Alert
 
+            if (isset($validated['page_type']) && $validated['page_type'] == 'Page130146') {
+                if (isset($validated['w_no'])){
+                    $w_no_alert = Warehousing::with(['receving_goods_delivery'])->where('w_no', $validated['w_no'])->first();
+
+                    $status2  = isset($w_no_alert->receving_goods_delivery[0]->rgd_status2) ? $w_no_alert->receving_goods_delivery[0]->rgd_status2 : null;
+
+                    if($status2 == "작업완료"){
+                        CommonFunc::insert_alarm_cargo('[유통가공] 작업완료', null, $user, $w_no_alert, 'cargo_IW');
+                    }else{
+                        CommonFunc::insert_alarm_cargo('[유통가공] 입고', null, $user, $w_no_alert, 'cargo_IW');
+                    }
+                    
+                }
+            }else{
+                if (!isset($validated['w_no'])){
+                    $w_no_alert = Warehousing::with(['receving_goods_delivery'])->where('w_no', $w_no)->first();
+                    CommonFunc::insert_alarm_cargo('[유통가공] 입고예정', null, $user, $w_no_alert, 'cargo_IW');
+                }
+            }
+            
+        
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -573,7 +596,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
         try {
             DB::beginTransaction();
-
+            $user = Auth::user();
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
 
@@ -1105,12 +1128,32 @@ class ReceivingGoodsDeliveryController extends Controller
                 }
             }
 
+             //Alert
+             if (isset($request->page_type) && $request->page_type == 'Page130146') {
+                if (isset($request->w_no)){
+                    $w_no_alert = Warehousing::with(['receving_goods_delivery','w_import_parent'])->where('w_no', $request->w_no)->first();
+
+                    $rgd_delivery_schedule_day  = isset($w_no_alert->receving_goods_delivery[0]->rgd_delivery_schedule_day) ? $w_no_alert->receving_goods_delivery[0]->rgd_delivery_schedule_day : null;
+
+                    if($rgd_delivery_schedule_day){
+                        CommonFunc::insert_alarm_cargo('[유통가공] 출고예정', null, $user, $w_no_alert, 'cargo_EW');
+                    }
+                    
+                    $rgdstatus1  = isset($w_no_alert->receving_goods_delivery[0]->rgd_status1) ? $w_no_alert->receving_goods_delivery[0]->rgd_status1 : null;
+
+                    if($rgdstatus1 == "출고"){
+                        CommonFunc::insert_alarm_cargo('[유통가공] 출고', null, $user, $w_no_alert, 'cargo_EW');
+                    }
+                }
+            }
+
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'w_schedule_number' =>  isset($w_schedule_number) ? $w_schedule_number : '',
                 'w_schedule_number2' => isset($w_schedule_number2) ? $w_schedule_number2 : '',
                 'w_no' => isset($w_no) ? $w_no :  $request->w_no,
+                'w_no_alert' => isset($w_no_alert) ? $w_no_alert : null,
             ], 201);
         } catch (\Throwable $e) {
             DB::rollback();
