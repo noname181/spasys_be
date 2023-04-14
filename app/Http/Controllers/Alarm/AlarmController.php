@@ -75,20 +75,23 @@ class AlarmController extends Controller
                 //     $q->where('co_no', $user->company->co_parent->co_no);
                 //     //->orWhere('co_no', $user->company->co_parent->co_parent->co_no);
                 // })
-                $alarm = Alarm::with('warehousing','member','import_expect')
-                ->where(function($q) use($validated, $user) {
+                $alarm = Alarm::select('t_import.ti_no','t_export.te_no','alarm.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with('warehousing','member')->leftjoin('t_import_expected', function ($join) {
+                    $join->on('alarm.alarm_h_bl', '=', 't_import_expected.tie_h_bl');
+                })->leftjoin('company as company_spasys', function ($join) {
+                    $join->on('company_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
+                })->leftjoin('company as company_shop', function ($join) {
+                    $join->on('company_shop.co_license', '=', 't_import_expected.tie_co_license');
+                })->leftjoin('company as company_spasys_parent', function ($join) {
+                    $join->on('company_spasys_parent.co_no', '=', 'company_spasys.co_parent_no');
+                })->leftjoin('company as company_shop_parent', function ($join) {
+                    $join->on('company_shop_parent.co_no', '=', 'company_shop.co_parent_no');
+                })->leftjoin('t_export', function ($join) {
+                    $join->on('t_export.te_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
+                })->leftjoin('t_import', function ($join) {
+                    $join->on('t_import.ti_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
+                })->where(function($q) use($validated, $user) {
                     $q->whereNull('alarm_type')->where(function($q) use($validated,$user) {
-                        $q->whereHas('export.import_expected.company.co_parent',function ($q) use ($user){
-                            $q->where('co_no', $user->co_no);
-                        })->orwhereHas('export.import_expected.company.co_parent',function ($q) use ($user){
-                            $q->where('co_parent_no', $user->co_no);
-                        })->orwhereHas('import_expect.company.co_parent',function ($q) use ($user){
-                            $q->where('co_no', $user->co_no);
-                        })->orwhereHas('import_expect.company_spasys',function ($q) use ($user){
-                            $q->where('co_no', $user->co_no);
-                        })->orwhereHas('import.import_expected.company.co_parent',function ($q) use ($user){
-                            $q->where('co_no', $user->co_no);
-                        })->orwhereHas('warehousing.co_no.co_parent',function ($q) use ($user){
+                        $q->where('company_shop_parent.co_no','=', $user->co_no)->orWhere('company_spasys.co_no','=', $user->co_no)->orwhereHas('warehousing.co_no.co_parent',function ($q) use ($user){
                             $q->where('co_no', $user->co_no);
                         });
                     })
@@ -122,15 +125,23 @@ class AlarmController extends Controller
                 //     $q->where('co_no', $user->company->co_parent->co_no)
                 //     ->orWhere('co_no', $user->company->co_parent->co_parent->co_no);
                 // })
-                $alarm = Alarm::with('warehousing','member','import_expect')->where(function($q) use($validated,$user) {
+                $alarm = Alarm::select('t_import.ti_no','t_export.te_no','alarm.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with('warehousing','member')->leftjoin('t_import_expected', function ($join) {
+                    $join->on('report.rp_h_bl', '=', 't_import_expected.tie_h_bl');
+                })->leftjoin('company as company_spasys', function ($join) {
+                    $join->on('company_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
+                })->leftjoin('company as company_shop', function ($join) {
+                    $join->on('company_shop.co_license', '=', 't_import_expected.tie_co_license');
+                })->leftjoin('company as company_spasys_parent', function ($join) {
+                    $join->on('company_spasys_parent.co_no', '=', 'company_spasys.co_parent_no');
+                })->leftjoin('company as company_shop_parent', function ($join) {
+                    $join->on('company_shop_parent.co_no', '=', 'company_shop.co_parent_no');
+                })->leftjoin('t_export', function ($join) {
+                    $join->on('t_export.te_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
+                })->leftjoin('t_import', function ($join) {
+                    $join->on('t_import.ti_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
+                })->where(function($q) use($validated,$user) {
                     $q->whereNull('alarm_type')->where(function($q) use($validated,$user) {
-                        $q->whereHas('export.import_expected.company',function ($q) use ($user){
-                            $q->where('co_no', $user->co_no);
-                        })->orwhereHas('import_expect.company',function ($q) use ($user){
-                            $q->where('co_no', $user->co_no);
-                        })->orwhereHas('import.import_expected.company',function ($q) use ($user){
-                            $q->where('co_no', $user->co_no);
-                        })->orwhereHas('warehousing.co_no',function ($q) use ($user){
+                        $q->where('company_shop.co_no','=', $user->co_no)->orwhereHas('warehousing.co_no',function ($q) use ($user){
                             $q->where('co_no', $user->co_no);
                         });
                     })
@@ -161,7 +172,21 @@ class AlarmController extends Controller
                 ->orderBy('alarm_no', 'DESC');
 
             } else if ($user->mb_type == 'spasys'){
-                $alarm = Alarm::with('warehousing','member','import_expect')->where(function($q) use($validated,$user) {
+                $alarm = Alarm::select('t_import.ti_no','t_export.te_no','alarm.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with('warehousing','member')->leftjoin('t_import_expected', function ($join) {
+                    $join->on('report.rp_h_bl', '=', 't_import_expected.tie_h_bl');
+                })->leftjoin('company as company_spasys', function ($join) {
+                    $join->on('company_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
+                })->leftjoin('company as company_shop', function ($join) {
+                    $join->on('company_shop.co_license', '=', 't_import_expected.tie_co_license');
+                })->leftjoin('company as company_spasys_parent', function ($join) {
+                    $join->on('company_spasys_parent.co_no', '=', 'company_spasys.co_parent_no');
+                })->leftjoin('company as company_shop_parent', function ($join) {
+                    $join->on('company_shop_parent.co_no', '=', 'company_shop.co_parent_no');
+                })->leftjoin('t_export', function ($join) {
+                    $join->on('t_export.te_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
+                })->leftjoin('t_import', function ($join) {
+                    $join->on('t_import.ti_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
+                })->where(function($q) use($validated,$user) {
                     $q->whereNull('alarm_type')->where(function($q) use($validated,$user) {
                         $q->whereHas('member',function ($q) use ($user){
                             $q->where('mb_no',$user->mb_no);
@@ -178,11 +203,11 @@ class AlarmController extends Controller
             }
 
             if (isset($validated['from_date'])) {
-                $alarm->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                $alarm->where('alarm.created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
 
             if (isset($validated['to_date'])) {
-                $alarm->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                $alarm->where('alarm.created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
             }
             // if (isset($validated['co_parent_name'])) {
             //     $alarm->whereHas('member.company.co_parent', function ($query) use ($validated) {
