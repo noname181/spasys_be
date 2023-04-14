@@ -5901,6 +5901,18 @@ class WarehousingController extends Controller
                             ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
                                 'rgd_status8' => 'completed',
                             ]);
+
+                            //UPDATE EST BILL
+                            ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_parent_no)->update([
+                                'rgd_status8' => 'completed',
+                            ]);
+                            CancelBillHistory::insertGetId([
+                                'rgd_no' => $rgd->rgd_parent_no,
+                                'mb_no' => $user->mb_no,
+                                'cbh_type' => 'tax',
+                                'cbh_status_before' => $rgd->rgd_status8,
+                                'cbh_status_after' => 'completed'
+                            ]);
                         }
                     }
                     $ids[] = $id;
@@ -5986,6 +5998,18 @@ class WarehousingController extends Controller
                             ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
                                 'rgd_status8' => 'completed',
                             ]);
+
+                            //UPDATE EST BILL
+                            ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_parent_no)->update([
+                                'rgd_status8' => 'completed',
+                            ]);
+                            CancelBillHistory::insertGetId([
+                                'rgd_no' => $rgd->rgd_parent_no,
+                                'mb_no' => $user->mb_no,
+                                'cbh_type' => 'tax',
+                                'cbh_status_before' => $rgd->rgd_status8,
+                                'cbh_status_after' => 'completed'
+                            ]);
                         }
                     }
                     $ids[] = $id;
@@ -6048,6 +6072,18 @@ class WarehousingController extends Controller
 
                         ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
                             'rgd_status8' => 'completed',
+                        ]);
+
+                        //UPDATE EST BILL
+                        ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_parent_no)->update([
+                            'rgd_status8' => 'completed',
+                        ]);
+                        CancelBillHistory::insertGetId([
+                            'rgd_no' => $rgd->rgd_parent_no,
+                            'mb_no' => $user->mb_no,
+                            'cbh_type' => 'tax',
+                            'cbh_status_before' => $rgd->rgd_status8,
+                            'cbh_status_after' => 'completed'
                         ]);
                     }
                 }
@@ -6117,6 +6153,18 @@ class WarehousingController extends Controller
 
                         ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
                             'rgd_status8' => 'completed',
+                        ]);
+
+                        //UPDATE EST BILL
+                        ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_parent_no)->update([
+                            'rgd_status8' => 'completed',
+                        ]);
+                        CancelBillHistory::insertGetId([
+                            'rgd_no' => $rgd->rgd_parent_no,
+                            'mb_no' => $user->mb_no,
+                            'cbh_type' => 'tax',
+                            'cbh_status_before' => $rgd->rgd_status8,
+                            'cbh_status_after' => 'completed'
                         ]);
                     }
                 }
