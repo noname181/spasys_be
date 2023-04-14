@@ -4348,9 +4348,13 @@ class WarehousingController extends Controller
             }
             if (isset($validated['rgd_status67'])) {
                 if ($validated['rgd_status67'] == '정산완료') {
-                    $warehousing->where('rgd_status7', '=', 'taxed')->where('rgd_status6', '=', 'paid');
+                    $warehousing->where(function ($q) use ($validated) {
+                        $q->where('rgd_status7', '=', 'taxed')->where('rgd_status6', '=', 'paid');
+                    })->orwhere('rgd_status8', 'completed');
                 } else if ($validated['rgd_status67'] == '진행중') {
                     $warehousing->where(function ($q) use ($validated) {
+                        $q->where('rgd_status8', '!=', 'completed')->orwhereNull('rgd_status8');
+                    })->where(function ($q) use ($validated) {
                         $q->where(function ($q) use ($validated) {
                             $q->where(function ($q) use ($validated) {
                                 $q->whereNull('rgd_status5')->orwhere('rgd_status5', '!=', 'cancel');
@@ -4367,9 +4371,13 @@ class WarehousingController extends Controller
                     });
                 }
                 if ($validated['rgd_status67'] == '정산완료') {
-                    $warehousing_bonded->where('rgd_status7', '=', 'taxed')->where('rgd_status6', '=', 'paid');
+                    $warehousing_bonded->where(function ($q) use ($validated) {
+                        $q->where('rgd_status7', '=', 'taxed')->where('rgd_status6', '=', 'paid');
+                    })->orwhere('rgd_status8', 'completed');
                 } else if ($validated['rgd_status67'] == '진행중') {
                     $warehousing_bonded->where(function ($q) use ($validated) {
+                        $q->where('rgd_status8', '!=', 'completed')->orwhereNull('rgd_status8');
+                    })->where(function ($q) use ($validated) {
                         $q->where(function ($q) use ($validated) {
                             $q->where(function ($q) use ($validated) {
                                 $q->whereNull('rgd_status5')->orwhere('rgd_status5', '!=', 'cancel');
@@ -4386,9 +4394,13 @@ class WarehousingController extends Controller
                     });
                 }
                 if ($validated['rgd_status67'] == '정산완료') {
-                    $warehousing_fulfillment->where('rgd_status7', '=', 'taxed')->where('rgd_status6', '=', 'paid');
+                    $warehousing_fulfillment->where(function ($q) use ($validated) {
+                        $q->where('rgd_status7', '=', 'taxed')->where('rgd_status6', '=', 'paid');
+                    })->orwhere('rgd_status8', 'completed');
                 } else if ($validated['rgd_status67'] == '진행중') {
                     $warehousing_fulfillment->where(function ($q) use ($validated) {
+                        $q->where('rgd_status8', '!=', 'completed')->orwhereNull('rgd_status8');
+                    })->where(function ($q) use ($validated) {
                         $q->where(function ($q) use ($validated) {
                             $q->where(function ($q) use ($validated) {
                                 $q->whereNull('rgd_status5')->orwhere('rgd_status5', '!=', 'cancel');
@@ -5432,9 +5444,13 @@ class WarehousingController extends Controller
 
             if (isset($validated['rgd_status67'])) {
                 if ($validated['rgd_status67'] == '정산완료') {
-                    $warehousing->where('rgd_status7', '=', 'taxed')->where('rgd_status6', '=', 'paid');
+                    $warehousing->where(function ($q) use ($validated) {
+                        $q->where('rgd_status7', '=', 'taxed')->where('rgd_status6', '=', 'paid');
+                    })->orwhere('rgd_status8', 'completed');
                 } else if ($validated['rgd_status67'] == '진행중') {
                     $warehousing->where(function ($q) use ($validated) {
+                        $q->where('rgd_status8', '!=', 'completed')->orwhereNull('rgd_status8');
+                    })->where(function ($q) use ($validated) {
                         $q->where(function ($q) use ($validated) {
                             $q->where(function ($q) use ($validated) {
                                 $q->whereNull('rgd_status5')->orwhere('rgd_status5', '!=', 'cancel');
