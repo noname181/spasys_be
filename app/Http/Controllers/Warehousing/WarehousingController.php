@@ -225,7 +225,7 @@ class WarehousingController extends Controller
                         $total_item = $item['warehousing_item']->count();
                         $final_total = (($total_item / 2)  - 1);
                         if ($final_total <= 0) {
-                            $item->first_item_name_total = $first_name_item . '외';
+                            $item->first_item_name_total = $first_name_item;
                         } else {
                             $item->first_item_name_total = $first_name_item . '외' . ' ' . $final_total . '건';
                         }
@@ -688,7 +688,7 @@ class WarehousingController extends Controller
                         $total_item = $item['warehousing_item']->count();
                         $final_total = (($total_item / 2)  - 1);
                         if ($final_total <= 0) {
-                            $item->first_item_name_total = $first_name_item . '외';
+                            $item->first_item_name_total = $first_name_item;
                         } else {
                             $item->first_item_name_total = $first_name_item . '외' . ' ' . $final_total . '건';
                         }
