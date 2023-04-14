@@ -305,7 +305,7 @@ class AlarmController extends Controller
                 }
 
             }
-            $alarm = $alarm->paginate($per_page, ['*'], 'page', $page);
+            $alarm = $alarm->groupBy('alarm_no')->paginate($per_page, ['*'], 'page', $page);
 
             return response()->json($alarm);
         } catch (\Exception $e) {
