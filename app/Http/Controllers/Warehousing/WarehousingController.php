@@ -5927,7 +5927,7 @@ class WarehousingController extends Controller
                             ]);
 
                             //UPDATE EST BILL
-                            ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_parent_no)->update([
+                            ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->update([
                                 'rgd_status8' => 'completed',
                             ]);
                             CancelBillHistory::insertGetId([
@@ -6024,7 +6024,7 @@ class WarehousingController extends Controller
                             ]);
 
                             //UPDATE EST BILL
-                            ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_parent_no)->update([
+                            ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->update([
                                 'rgd_status8' => 'completed',
                             ]);
                             CancelBillHistory::insertGetId([
@@ -6099,7 +6099,7 @@ class WarehousingController extends Controller
                         ]);
 
                         //UPDATE EST BILL
-                        ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_parent_no)->update([
+                        ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->update([
                             'rgd_status8' => 'completed',
                         ]);
                         CancelBillHistory::insertGetId([
@@ -6180,7 +6180,7 @@ class WarehousingController extends Controller
                         ]);
 
                         //UPDATE EST BILL
-                        ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_parent_no)->update([
+                        ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->update([
                             'rgd_status8' => 'completed',
                         ]);
                         CancelBillHistory::insertGetId([

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use DateTimeInterface;
 
 class TaxInvoiceDivide extends Model
 {
@@ -13,7 +14,12 @@ class TaxInvoiceDivide extends Model
 
     protected $primaryKey = 'tid_no';
 
-    public $timestamps = true;
+        public $timestamps = true;
+
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->timezone('Asia/seoul')->format('Y-m-d H:i:s');
+    }
     /**
      * The attributes that are mass assignable.
      *

@@ -6,6 +6,7 @@ use App\Models\Export;
 use App\Models\Company;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use DateTimeInterface;
 use App\Models\ReceivingGoodsDelivery;
 class ImportExpected extends Model
 {
@@ -15,7 +16,12 @@ class ImportExpected extends Model
 
     protected $primaryKey = 'tie_no';
 
-    public $timestamps = true;
+        public $timestamps = true;
+
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->timezone('Asia/seoul')->format('Y-m-d H:i:s');
+    }
 
     /**
      * The attributes that are mass assignable.
