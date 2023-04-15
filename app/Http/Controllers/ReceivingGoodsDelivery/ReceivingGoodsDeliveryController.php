@@ -2651,7 +2651,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                 //UPDATE EST BILL
                 // if($rgd->service_korean_name == '보세화물' && !str_contains($rgd->service_korean_name, 'month')){
-                //     ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_parent_no)->update([
+                //     ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->update([
                 //         'rgd_status6' => 'paid',
                 //         'rgd_paid_date' => Carbon::now()->toDateTimeString()
                 //     ]);
@@ -2857,7 +2857,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     ]);
 
                     //UPDATE EST BILL
-                    ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_parent_no)->update([
+                    ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->update([
                         'rgd_status8' => 'completed',
                     ]);
                     CancelBillHistory::insertGetId([
@@ -2881,7 +2881,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 ]);
 
                  //UPDATE EST BILL
-                ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_parent_no)->update([
+                ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->update([
                     'rgd_status8' => 'completed',
                 ]);
 
@@ -2907,7 +2907,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 ]);
 
                  //UPDATE EST BILL
-                ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_parent_no)->update([
+                ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->update([
                     'rgd_status8' => 'in_process',
                 ]);
                  CancelBillHistory::insertGetId([
@@ -2923,7 +2923,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 ]);
 
                 //UPDATE EST BILL
-                ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_parent_no)->update([
+                ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->update([
                     'rgd_status8' => 'completed',
                 ]);
                 CancelBillHistory::insertGetId([
