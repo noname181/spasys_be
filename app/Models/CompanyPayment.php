@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Http\Requests\ImportSchedule\ImportScheduleRequest;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use DateTimeInterface;
 
 class CompanyPayment extends Model
 {
@@ -14,7 +15,12 @@ class CompanyPayment extends Model
 
     protected $primaryKey = 'cp_no';
 
-    public $timestamps = true;
+        public $timestamps = true;
+
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->timezone('Asia/seoul')->format('Y-m-d H:i:s');
+    }
     /**
      * The attributes that are mass assignable.
      *

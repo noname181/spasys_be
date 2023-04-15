@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use DateTimeInterface;
 use App\Models\RateData;
 use App\Models\RateDataGeneral;
 class RateMetaData extends Model
@@ -15,7 +16,12 @@ class RateMetaData extends Model
 
     protected $primaryKey = 'rmd_no';
 
-    public $timestamps = true;
+        public $timestamps = true;
+
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->timezone('Asia/seoul')->format('Y-m-d H:i:s');
+    }
     /**
      * The attributes that are mass assignable.
      *
