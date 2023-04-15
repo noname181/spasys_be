@@ -69,7 +69,7 @@ class AlarmController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
 
             $user = Auth::user();
-
+            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
             if($user->mb_type == 'shop'){
                 // ->whereHas('member.company',function($q) use ($user){
                 //     $q->where('co_no', $user->company->co_parent->co_no);
@@ -306,7 +306,7 @@ class AlarmController extends Controller
 
             }
             $alarm = $alarm->groupBy('alarm_no')->paginate($per_page, ['*'], 'page', $page);
-
+            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
             return response()->json($alarm);
         } catch (\Exception $e) {
             Log::error($e);
@@ -445,7 +445,7 @@ class AlarmController extends Controller
 
             }
             $alarm = $alarm->paginate($per_page, ['*'], 'page', $page);
-
+            
             return response()->json($alarm);
         } catch (\Exception $e) {
             Log::error($e);
