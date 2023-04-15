@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use DateTimeInterface;
 use App\Models\Warehousing;
 use App\Models\ReceivingGoodsDelivery;
 class RateDataGeneral extends Model
@@ -15,7 +16,12 @@ class RateDataGeneral extends Model
 
     protected $primaryKey = 'rdg_no';
 
-    public $timestamps = true;
+        public $timestamps = true;
+
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->timezone('Asia/seoul')->format('Y-m-d H:i:s');
+    }
     /**
      * The attributes that are mass assignable.
      *

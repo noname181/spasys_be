@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use DateTimeInterface;
 use App\Models\Item;
 use App\Models\Warehousing;
 use App\Models\WarehousingItem;
@@ -20,14 +21,19 @@ class Alarm extends Model
 
     protected $primaryKey = 'alarm_no';
 
-    public $timestamps = true;
+        public $timestamps = true;
+
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->timezone('Asia/seoul')->format('Y-m-d H:i:s');
+    }
 
     protected $casts = [
         'created_at' => "date:Y.m.d H:i",
         'updated_at' => "date:Y.m.d H:i",
     ];
 
-    // public $timestamps = true;
+    //     public $timestamps = true;
     /**
      * The attributes that are mass assignable.
      *

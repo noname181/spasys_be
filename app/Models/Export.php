@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use DateTimeInterface;
 use App\Models\Import;
 use App\Models\ImportExpected;
 use App\Models\ExportConfirm;
@@ -15,7 +16,12 @@ class Export extends Model
 
     protected $primaryKey = 'te_no';
 
-    public $timestamps = true;
+        public $timestamps = true;
+
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->timezone('Asia/seoul')->format('Y-m-d H:i:s');
+    }
 
     /**
      * The attributes that are mass assignable.

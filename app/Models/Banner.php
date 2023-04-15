@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use DateTimeInterface;
 
 class Banner extends Model
 {
@@ -13,7 +14,12 @@ class Banner extends Model
 
     protected $primaryKey = 'banner_no';
 
-    public $timestamps = true;
+        public $timestamps = true;
+
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->timezone('Asia/seoul')->format('Y-m-d H:i:s');
+    }
 
     protected $casts = [
         'created_at' => "date:Y.m.d H:i",
@@ -22,7 +28,12 @@ class Banner extends Model
         'banner_end' => "date:Y.m.d",
     ];
 
-    // public $timestamps = true;
+    //     public $timestamps = true;
+
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->timezone('Asia/seoul')->format('Y-m-d H:i:s');
+    }
     /**
      * The attributes that are mass assignable.
      *
