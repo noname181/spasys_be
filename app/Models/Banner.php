@@ -27,13 +27,6 @@ class Banner extends Model
         'banner_start' => "date:Y.m.d",
         'banner_end' => "date:Y.m.d",
     ];
-
-    //     public $timestamps = true;
-
-    protected function serializeDate(DateTimeInterface $date)
-    {
-        return $date->timezone('Asia/seoul')->format('Y-m-d H:i:s');
-    }
     /**
      * The attributes that are mass assignable.
      *
