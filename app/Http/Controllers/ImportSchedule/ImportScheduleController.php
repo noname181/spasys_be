@@ -443,7 +443,7 @@ class ImportScheduleController extends Controller
                     $leftjoin->on('ddd.te_carry_out_number', '=', 'nnn.is_no')->where('ddd.te_carry_out_number', '!=', null);
                     $leftjoin->orOn('bbb.ti_carry_in_number', '=', 'nnn.is_no')->whereNull('ddd.te_carry_out_number');
                     $leftjoin->orOn('aaa.tie_logistic_manage_number', '=', 'nnn.is_no')->whereNull('ddd.te_carry_out_number')->whereNull('bbb.ti_carry_in_number');
-                })->orderBy('tie_is_date', 'DESC');
+                })->orderBy('tie_is_date', 'DESC')->orderBy('tie_h_bl', 'DESC');
             } else if ($user->mb_type == 'shipper') {
                
                 $sub = ImportExpected::select('company.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
@@ -487,7 +487,7 @@ class ImportScheduleController extends Controller
                     $leftjoin->on('ddd.te_carry_out_number', '=', 'nnn.is_no')->where('ddd.te_carry_out_number', '!=', null);
                     $leftjoin->orOn('bbb.ti_carry_in_number', '=', 'nnn.is_no')->whereNull('ddd.te_carry_out_number');
                     $leftjoin->orOn('aaa.tie_logistic_manage_number', '=', 'nnn.is_no')->whereNull('ddd.te_carry_out_number')->whereNull('bbb.ti_carry_in_number');
-                })->orderBy('tie_is_date', 'DESC');
+                })->orderBy('tie_is_date', 'DESC')->orderBy('tie_h_bl', 'DESC');
             } else if ($user->mb_type == 'spasys') {
                 
                 //FIX NOT WORK 'with'
@@ -548,7 +548,7 @@ class ImportScheduleController extends Controller
                     $leftjoin->on('ddd.te_carry_out_number', '=', 'nnn.is_no')->where('ddd.te_carry_out_number', '!=', null);
                     $leftjoin->orOn('bbb.ti_carry_in_number', '=', 'nnn.is_no')->whereNull('ddd.te_carry_out_number');
                     $leftjoin->orOn('aaa.tie_logistic_manage_number', '=', 'nnn.is_no')->whereNull('ddd.te_carry_out_number')->whereNull('bbb.ti_carry_in_number');
-                })->orderBy('tie_is_date', 'DESC');
+                })->orderBy('tie_is_date', 'DESC')->orderBy('tie_h_bl', 'DESC');
 
 
                 
