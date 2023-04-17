@@ -167,7 +167,7 @@ class CommonFunc
 
                 $bbbbb = $w_no->w_schedule_amount;
                 $ccccc = $w_no->w_amount;
-                $ddddd = $w_no->w_schedule_amount + $w_no->w_amount;
+                $ddddd = $w_no->w_schedule_amount - $w_no->w_amount;
 
                 $cargo_number = $w_no->w_schedule_number;
             } else {

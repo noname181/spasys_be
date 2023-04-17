@@ -13,6 +13,7 @@ use App\Models\ScheduleShipmentInfo;
 use App\Models\AdjustmentGroup;
 use App\Models\RateData;
 use App\Models\Member;
+use App\Models\Manager;
 class Company extends Model
 {
     use HasFactory;
@@ -131,5 +132,9 @@ class Company extends Model
     public function member()
     {
         return $this->belongsTo(Member::class, 'co_no', 'co_no');
+    }
+    public function manager()
+    {
+        return $this->hasOne(Manager::class, 'co_no', 'co_no');
     }
 }
