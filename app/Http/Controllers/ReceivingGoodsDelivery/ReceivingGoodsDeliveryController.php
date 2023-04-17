@@ -3125,7 +3125,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     //CHECK AUTO TAX INVOICE ISSUE
                     if ($ag->ag_auto_issue == 'y') {
 
-                        $cbh = CancelBillHistory::where('rgd_no', $request->rgd_no)->where('cbh_type', 'tax')->first();
+                        $cbh = CancelBillHistory::where('rgd_no', $request->rgd_no)->where('cbh_type', 'tax')->where('cbh_status_after', 'taxed')->first();
                         if (!isset($cbh->cbh_no)) {
                             $tax_number = CommonFunc::generate_tax_number($rgd->rgd_no);
 
@@ -3159,7 +3159,10 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'cbh_status_after' => 'taxed'
                             ]);
 
-                            CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $user, null, 'settle_payment');
+                            
+                            $sender = Member::where('mb_no', $rgd->mb_no)->first();
+                            CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $sender, null, 'settle_payment');
+                            
                         }
                     }
                 } else {
@@ -3223,7 +3226,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         //CHECK AUTO TAX INVOICE ISSUE
                         if ($ag->ag_auto_issue == 'y') {
 
-                            $cbh = CancelBillHistory::where('rgd_no', $rgd->rgd_no)->where('cbh_type', 'tax')->first();
+                            $cbh = CancelBillHistory::where('rgd_no', $rgd->rgd_no)->where('cbh_type', 'tax')->where('cbh_status_after', 'taxed')->first();
                             if (!isset($cbh->cbh_no)) {
                                 $tax_number = CommonFunc::generate_tax_number($rgd->rgd_no);
 
@@ -3256,8 +3259,10 @@ class ReceivingGoodsDeliveryController extends Controller
                                     'cbh_status_before' => null,
                                     'cbh_status_after' => 'taxed'
                                 ]);
-
-                                CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $user, null, 'settle_payment');
+                                if($rgd->rgd_is_show == 'y'){
+                                    $sender = Member::where('mb_no', $rgd->mb_no)->first();
+                                    CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $sender, null, 'settle_payment');
+                                }
                             }
                         }
                     } else {
@@ -3320,7 +3325,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         //CHECK AUTO TAX INVOICE ISSUE
                         if ($ag->ag_auto_issue == 'y') {
 
-                            $cbh = CancelBillHistory::where('rgd_no', $rgd->rgd_no)->where('cbh_type', 'tax')->first();
+                            $cbh = CancelBillHistory::where('rgd_no', $rgd->rgd_no)->where('cbh_type', 'tax')->where('cbh_status_after', 'taxed')->first();
                             if (!isset($cbh->cbh_no)) {
                                 $tax_number = CommonFunc::generate_tax_number($rgd->rgd_no);
 
@@ -3353,8 +3358,10 @@ class ReceivingGoodsDeliveryController extends Controller
                                     'cbh_status_before' => null,
                                     'cbh_status_after' => 'taxed'
                                 ]);
-
-                                CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $user, null, 'settle_payment');
+                                if($rgd->rgd_is_show == 'y'){
+                                    $sender = Member::where('mb_no', $rgd->mb_no)->first();
+                                    CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $sender, null, 'settle_payment');
+                                }
                             }
                         }
                     } else {

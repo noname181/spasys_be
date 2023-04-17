@@ -4708,7 +4708,7 @@ class WarehousingController extends Controller
                             foreach ($item->rgd_settlement as $row) {
                                 if (isset($row->rate_meta_data_parent[0])) {
                                     $rate_data = RateData::where('rmd_no', $row->rate_meta_data_parent[0]->rate_data[0]->rmd_no)->where('rd_cate2', '할인금액')->first();
-                                    $total_discount += $rate_data->rd_data4 ? $rate_data->rd_data4 : 0;
+                                    $total_discount += isset($rate_data->rd_data4) ? $rate_data->rd_data4 : 0;
                                 } else {
                                     $total_discount += 0;
                                 }
@@ -4719,7 +4719,7 @@ class WarehousingController extends Controller
                             $total_discount = 0;
 
                             $rate_data = RateData::where('rmd_no', $item->rate_meta_data[0]->rate_data[0]->rmd_no)->where('rd_cate2', '할인금액')->first();
-                            $total_discount += $rate_data->rd_data4 ? $rate_data->rd_data4 : 0;
+                            $total_discount += isset($rate_data->rd_data4) ? $rate_data->rd_data4 : 0;
 
                             $item->sum_price_total2 = $item->rate_data_general->rdg_sum7 + $total_discount;
                             $item->discount = $total_discount;
@@ -4727,21 +4727,21 @@ class WarehousingController extends Controller
                             $total_discount = 0;
 
                             $rate_data = RateData::where('rmd_no', $item->rate_meta_data_parent[0]->rate_data[0]->rmd_no)->where('rd_cate2', '할인금액')->first();
-                            $total_discount += $rate_data->rd_data4 ? $rate_data->rd_data4 : 0;
+                            $total_discount += isset($rate_data->rd_data4) ? $rate_data->rd_data4 : 0;
 
                             $item->sum_price_total2 = $item->rate_data_general->rdg_sum7 + $total_discount;
                             $item->discount = $total_discount;
                         }
 
-                        $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum7 : '';
+                        $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum7 : 0;
                     } else if ($item->service_korean_name == '수입풀필먼트') {
                         $item->discount = "";
-                        $item->sum_price_total2 =  isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum6 : '';
-                        $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum6 : '';
+                        $item->sum_price_total2 =  isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum6 : 0;
+                        $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum6 : 0;
                     } else {
                         $item->discount = "";
-                        $item->sum_price_total2 = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : '';
-                        $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : '';
+                        $item->sum_price_total2 = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : 0;
+                        $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : 0;
                     }
 
                     if (isset($item->rate_data_general->rdg_sum7)) {
