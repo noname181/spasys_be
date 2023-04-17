@@ -270,6 +270,7 @@ class AlarmController extends Controller
                                     $q->where('co_no', $user->co_no);
                                 })->whereHas('member', function ($q) {
                                     $q->where('mb_type', 'spasys');
+                                    $q->orwhere('mb_type', 'shipper');
                                 })->orwhere(function($q) use($user){
                                     $q->whereNotNull('alarm_type')
                                     ->whereHas('warehousing', function($q) {
@@ -340,6 +341,9 @@ class AlarmController extends Controller
                             if($user->mb_push_yn == 'y'){
                                 $q->whereHas('warehousing.company', function ($q) use ($user) {
                                     $q->where('co_no', $user->co_no);
+                                })->whereHas('member', function ($q) {
+                                    $q->where('mb_type', 'shop');
+                                    $q->orwhere('mb_type', 'spasys');
                                 })->orwhere(function($q) use($user){
                                     $q->whereNotNull('alarm_type')
                                     ->whereHas('warehousing', function($q) {
