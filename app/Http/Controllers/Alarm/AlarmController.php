@@ -262,7 +262,29 @@ class AlarmController extends Controller
 
                         });
 
-                    });
+                    })->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('alarm_type')
+                        ->where(function($q) use ($user) {
+                            if($user->mb_push_yn == 'y'){
+                                $q->whereHas('warehousing.company.co_parent', function ($q) use ($user) {
+                                    $q->where('co_no', $user->co_no);
+                                })->whereHas('member', function ($q) {
+                                    $q->where('mb_type', 'spasys');
+                                })->orwhere(function($q) use($user){
+                                    $q->whereNotNull('alarm_type')
+                                    ->whereHas('warehousing', function($q) {
+                                        $q->where('w_category_name', '수입풀필먼트');
+                                    })->whereHas('warehousing.company', function($q) use ($user){
+                                        $q->where('co_no', $user->co_no);
+                                    });
+                                });
+                            }else {
+                                $q->whereNull('alarm_no');
+                            }
+
+                        });
+
+                    });;
                 })->orderBy('alarm_no', 'DESC');
             }
             else if($user->mb_type == 'shipper'){
@@ -291,6 +313,28 @@ class AlarmController extends Controller
                         });
                     })
                     ->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('alarm_type')
+                        ->where(function($q) use ($user) {
+                            if($user->mb_push_yn == 'y'){
+                                $q->whereHas('warehousing.company', function ($q) use ($user) {
+                                    $q->where('co_no', $user->co_no);
+                                })->whereHas('member', function ($q) {
+                                    $q->where('mb_type', 'shop');
+                                })->orwhere(function($q) use($user){
+                                    $q->whereNotNull('alarm_type')
+                                    ->whereHas('warehousing', function($q) {
+                                        $q->where('w_category_name', '수입풀필먼트');
+                                    })->whereHas('warehousing.company', function($q) use ($user){
+                                        $q->where('co_no', $user->co_no);
+                                    });
+                                });
+                            }else {
+                                $q->whereNull('alarm_no');
+                            }
+
+                        });
+
+                    })->orwhere(function($q) use ($user) {
                         $q->whereNotNull('alarm_type')
                         ->where(function($q) use ($user) {
                             if($user->mb_push_yn == 'y'){
