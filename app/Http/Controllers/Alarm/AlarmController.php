@@ -360,7 +360,7 @@ class AlarmController extends Controller
 
             } else if ($user->mb_type == 'spasys'){
                 $alarm = Alarm::select('t_import.ti_no','t_export.te_no','alarm.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with('warehousing','member')->leftjoin('t_import_expected', function ($join) {
-                    $join->on('report.rp_h_bl', '=', 't_import_expected.tie_h_bl');
+                    $join->on('alarm.alarm_h_bl', '=', 't_import_expected.tie_h_bl');
                 })->leftjoin('company as company_spasys', function ($join) {
                     $join->on('company_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
                 })->leftjoin('company as company_shop', function ($join) {
