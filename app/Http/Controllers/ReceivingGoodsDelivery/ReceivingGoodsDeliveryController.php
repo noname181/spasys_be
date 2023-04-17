@@ -542,6 +542,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 'w_schedule_number' =>  $w_schedule_number,
                 'w_schedule_number2' => isset($w_schedule_number2) ? $w_schedule_number2 : '',
                 'w_no' => isset($w_no) ? $w_no :  $validated['w_no'],
+                'w_no_alert' => isset($w_no_alert) ? $w_no_alert :  null,
             ], 201);
         } catch (\Throwable $e) {
             DB::rollback();

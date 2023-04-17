@@ -212,17 +212,31 @@ class CommonFunc
                 $receiver_company = $w_no->company->co_parent;
             } else if ($sender->mb_type == 'shop') {
                 $receiver_company = $w_no->company;
+            } else if ($sender->mb_type == 'shipper') {
+                $receiver_company = $w_no->company;
+                $receiver_company_parent = $w_no->company->co_parent;
             }
             //ad_must_yn == 'y' send all members of receiver company
-            $receiver_list = Member::where('co_no', $receiver_company->co_no)->get();
+            if(isset($receiver_company_parent)){
+                $receiver_list = Member::where('co_no', $receiver_company->co_no)->orwhere('co_no', $receiver_company_parent->co_no)->get();
+            }else{
+                $receiver_list = Member::where('co_no', $receiver_company->co_no)->get();
+            }
         } else if ($alarm_data->ad_must_yn == 'n') {
             if ($sender->mb_type == 'spasys') {
                 $receiver_company = $w_no->company->co_parent;
             } else if ($sender->mb_type == 'shop') {
                 $receiver_company = $w_no->company;
+            } else if ($sender->mb_type == 'shipper') {
+                $receiver_company = $w_no->company;
+                $receiver_company_parent = $w_no->company->co_parent;
             }
             //ad_must_yn == 'n' send only members who have mb_push_yn = 'y'
-            $receiver_list = Member::where('co_no', $receiver_company->co_no)->where('mb_push_yn', 'y')->get();
+            if(isset($receiver_company_parent)){
+                $receiver_list = Member::where('co_no', $receiver_company->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_company_parent->co_no)->where('mb_push_yn', 'y')->get();
+            }else{
+                $receiver_list = Member::where('co_no', $receiver_company->co_no)->where('mb_push_yn', 'y')->get();
+            }
         }
 
 
