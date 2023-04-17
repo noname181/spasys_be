@@ -3159,8 +3159,10 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'cbh_status_after' => 'taxed'
                             ]);
 
+                            
                             $sender = Member::where('mb_no', $rgd->mb_no)->first();
                             CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $sender, null, 'settle_payment');
+                            
                         }
                     }
                 } else {
@@ -3257,9 +3259,10 @@ class ReceivingGoodsDeliveryController extends Controller
                                     'cbh_status_before' => null,
                                     'cbh_status_after' => 'taxed'
                                 ]);
-
-                                $sender = Member::where('mb_no', $rgd->mb_no)->first();
-                                CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $sender, null, 'settle_payment');
+                                if($rgd->rgd_is_show == 'y'){
+                                    $sender = Member::where('mb_no', $rgd->mb_no)->first();
+                                    CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $sender, null, 'settle_payment');
+                                }
                             }
                         }
                     } else {
@@ -3355,9 +3358,10 @@ class ReceivingGoodsDeliveryController extends Controller
                                     'cbh_status_before' => null,
                                     'cbh_status_after' => 'taxed'
                                 ]);
-
-                                $sender = Member::where('mb_no', $rgd->mb_no)->first();
-                                CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $sender, null, 'settle_payment');
+                                if($rgd->rgd_is_show == 'y'){
+                                    $sender = Member::where('mb_no', $rgd->mb_no)->first();
+                                    CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $sender, null, 'settle_payment');
+                                }
                             }
                         }
                     } else {
