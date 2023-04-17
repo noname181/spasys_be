@@ -58,7 +58,152 @@ class AlarmController extends Controller
             return response()->json(['message' => Messages::MSG_0019], 500);
         }
     }
+    public function newAlarms(AlarmSearchRequest $request)
+    {
+        $validated = $request->validated();
+        try {
+            // If per_page is null set default data = 15
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
 
+            $user = Auth::user();
+            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            if($user->mb_type == 'shop'){
+                // ->whereHas('member.company',function($q) use ($user){
+                //     $q->where('co_no', $user->company->co_parent->co_no);
+                //     //->orWhere('co_no', $user->company->co_parent->co_parent->co_no);
+                // })
+                $alarm = Alarm::select('t_import.ti_no','t_export.te_no','alarm.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with('warehousing','member')->leftjoin('t_import_expected', function ($join) {
+                    $join->on('alarm.alarm_h_bl', '=', 't_import_expected.tie_h_bl');
+                })->leftjoin('company as company_spasys', function ($join) {
+                    $join->on('company_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
+                })->leftjoin('company as company_shop', function ($join) {
+                    $join->on('company_shop.co_license', '=', 't_import_expected.tie_co_license');
+                })->leftjoin('company as company_spasys_parent', function ($join) {
+                    $join->on('company_spasys_parent.co_no', '=', 'company_spasys.co_parent_no');
+                })->leftjoin('company as company_shop_parent', function ($join) {
+                    $join->on('company_shop_parent.co_no', '=', 'company_shop.co_parent_no');
+                })->leftjoin('t_export', function ($join) {
+                    $join->on('t_export.te_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
+                })->leftjoin('t_import', function ($join) {
+                    $join->on('t_import.ti_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
+                })->where(function($q) use($validated, $user) {
+                    $q->whereNull('alarm_type')->where(function($q) use($validated,$user) {
+                        $q->where('company_shop_parent.co_no','=', $user->co_no)->orWhere('company_spasys.co_no','=', $user->co_no)->orwhereHas('warehousing.co_no.co_parent',function ($q) use ($user){
+                            $q->where('co_no', $user->co_no);
+                        });
+                    })
+                    ->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('alarm_type')
+                        ->where(function($q) use ($user) {
+                            if($user->mb_push_yn == 'y'){
+                                $q->whereHas('warehousing.company.co_parent', function ($q) use ($user) {
+                                    $q->where('co_no', $user->co_no);
+                                })->whereHas('member', function ($q) {
+                                    $q->where('mb_type', 'spasys');
+                                })->orwhere(function($q) use($user){
+                                    $q->whereNotNull('alarm_type')
+                                    ->whereHas('warehousing', function($q) {
+                                        $q->where('w_category_name', '수입풀필먼트');
+                                    })->whereHas('warehousing.company', function($q) use ($user){
+                                        $q->where('co_no', $user->co_no);
+                                    });
+                                });
+                            }else {
+                                $q->whereNull('alarm_no');
+                            }
+
+                        });
+
+                    });
+                })->orderBy('alarm_no', 'DESC');
+            }
+            else if($user->mb_type == 'shipper'){
+                // ->whereHas('member.company',function($q) use ($user){
+                //     $q->where('co_no', $user->company->co_parent->co_no)
+                //     ->orWhere('co_no', $user->company->co_parent->co_parent->co_no);
+                // })
+                $alarm = Alarm::select('t_import.ti_no','t_export.te_no','alarm.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with('warehousing','member')->leftjoin('t_import_expected', function ($join) {
+                    $join->on('alarm.alarm_h_bl', '=', 't_import_expected.tie_h_bl');
+                })->leftjoin('company as company_spasys', function ($join) {
+                    $join->on('company_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
+                })->leftjoin('company as company_shop', function ($join) {
+                    $join->on('company_shop.co_license', '=', 't_import_expected.tie_co_license');
+                })->leftjoin('company as company_spasys_parent', function ($join) {
+                    $join->on('company_spasys_parent.co_no', '=', 'company_spasys.co_parent_no');
+                })->leftjoin('company as company_shop_parent', function ($join) {
+                    $join->on('company_shop_parent.co_no', '=', 'company_shop.co_parent_no');
+                })->leftjoin('t_export', function ($join) {
+                    $join->on('t_export.te_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
+                })->leftjoin('t_import', function ($join) {
+                    $join->on('t_import.ti_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
+                })->where(function($q) use($validated,$user) {
+                    $q->whereNull('alarm_type')->where(function($q) use($validated,$user) {
+                        $q->where('company_shop.co_no','=', $user->co_no)->orwhereHas('warehousing.co_no',function ($q) use ($user){
+                            $q->where('co_no', $user->co_no);
+                        });
+                    })
+                    ->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('alarm_type')
+                        ->where(function($q) use ($user) {
+                            if($user->mb_push_yn == 'y'){
+                                $q->whereHas('warehousing.company', function ($q) use ($user) {
+                                    $q->where('co_no', $user->co_no);
+                                })->whereHas('member', function ($q) {
+                                    $q->where('mb_type', 'shop');
+                                })->orwhere(function($q) use($user){
+                                    $q->whereNotNull('alarm_type')
+                                    ->whereHas('warehousing', function($q) {
+                                        $q->where('w_category_name', '수입풀필먼트');
+                                    })->whereHas('warehousing.company', function($q) use ($user){
+                                        $q->where('co_no', $user->co_no);
+                                    });
+                                });
+                            }else {
+                                $q->whereNull('alarm_no');
+                            }
+
+                        });
+
+                    });
+                })
+                ->orderBy('alarm_no', 'DESC');
+
+            } else if ($user->mb_type == 'spasys'){
+                $alarm = Alarm::select('t_import.ti_no','t_export.te_no','alarm.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with('warehousing','member')->leftjoin('t_import_expected', function ($join) {
+                    $join->on('report.rp_h_bl', '=', 't_import_expected.tie_h_bl');
+                })->leftjoin('company as company_spasys', function ($join) {
+                    $join->on('company_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
+                })->leftjoin('company as company_shop', function ($join) {
+                    $join->on('company_shop.co_license', '=', 't_import_expected.tie_co_license');
+                })->leftjoin('company as company_spasys_parent', function ($join) {
+                    $join->on('company_spasys_parent.co_no', '=', 'company_spasys.co_parent_no');
+                })->leftjoin('company as company_shop_parent', function ($join) {
+                    $join->on('company_shop_parent.co_no', '=', 'company_shop.co_parent_no');
+                })->leftjoin('t_export', function ($join) {
+                    $join->on('t_export.te_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
+                })->leftjoin('t_import', function ($join) {
+                    $join->on('t_import.ti_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
+                })->where(function($q) use($validated,$user) {
+                    $q->whereNull('alarm_type')->where(function($q) use($validated,$user) {
+                        $q->whereHas('member',function ($q) use ($user){
+                            $q->where('mb_no',$user->mb_no);
+                        });
+                    });
+                })
+                ->orderBy('alarm_no', 'DESC');
+            }
+        
+            $alarm = $alarm->groupBy('alarm_no')->paginate($per_page, ['*'], 'page', $page);
+            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            return response()->json($alarm);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
     public function searchAlarms(AlarmSearchRequest $request)
     {
         $validated = $request->validated();
