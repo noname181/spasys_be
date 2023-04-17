@@ -8,6 +8,7 @@ use App\Http\Requests\Warehousing\WarehousingItemValidate;
 use App\Http\Requests\Warehousing\WarehousingRequest;
 use App\Http\Requests\Warehousing\WarehousingSearchRequest;
 use App\Models\StockHistory;
+use App\Models\ScheduleShipmentInfo;
 use App\Models\AdjustmentGroup;
 use App\Models\CompanySettlement;
 use App\Models\Company;
@@ -717,6 +718,7 @@ class WarehousingController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
+            if(isset($validated['status']) && $validated['status'] == '입고'){
             if ($user->mb_type == 'shop') {
                 $warehousing2 = Warehousing::join(
                     DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
@@ -793,7 +795,7 @@ class WarehousingController extends Controller
                     });
             }
             $warehousing->whereDoesntHave('rate_data_general');
-
+       
             if (isset($validated['connection_number_type'])) {
                 $warehousing->whereNull('connection_number');
             }
@@ -899,6 +901,164 @@ class WarehousingController extends Controller
                 })
             );
             return response()->json($warehousing);
+            } else {
+                if (isset($validated['status']) && $validated['status'] == '출고예정') {
+                    if ($user->mb_type == 'shop') {
+                        $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status','출고예정')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
+                            $q->where('co_no', $user->co_no);
+                        })->orderBy('ss_no', 'DESC');
+                    } else if ($user->mb_type == 'shipper') {
+                        $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status','출고예정')->whereHas('ContractWms.company', function ($q) use ($user) {
+                            $q->where('co_no', $user->co_no);
+                        })->orderBy('ss_no', 'DESC');
+                    } else if ($user->mb_type == 'spasys') {
+                        $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status','출고예정')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
+                            $q->where('co_no', $user->co_no);
+                        })->orderBy('ss_no', 'DESC');
+                    }
+                } else if(isset($validated['status']) && $validated['status'] == '출고') {
+                    if ($user->mb_type == 'shop') {
+                        $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status','출고')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
+                            $q->where('co_no', $user->co_no);
+                        })
+                        // ->where(function ($q) {
+                        //     $q->whereHas('receving_goods_delivery', function ($q1) {
+                        //         $q1->where('rgd_status3', '=',"배송완료");
+                        //     });
+                        // })
+                        ->orderBy('ss_no', 'DESC');
+                    } else if ($user->mb_type == 'shipper') {
+                        $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status','출고')->whereHas('ContractWms.company', function ($q) use ($user) {
+                            $q->where('co_no', $user->co_no);
+                        })
+                        // ->where(function ($q) {
+                        //     $q->whereHas('receving_goods_delivery', function ($q1) {
+                        //         $q1->where('rgd_status3', '=',"배송완료");
+                        //     });
+                        // })
+                        ->orderBy('ss_no', 'DESC');
+                    } else if ($user->mb_type == 'spasys') {
+                        $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status','출고')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
+                            $q->where('co_no', $user->co_no);
+                        })
+                        // ->where(function ($q) {
+                        //     $q->whereHas('receving_goods_delivery', function ($q1) {
+                        //         $q1->where('rgd_status3', '=',"배송완료");
+                        //     });
+                        // })
+                        ->orderBy('ss_no', 'DESC');
+                    }
+                }
+                //return DB::getQueryLog();
+    
+                if (isset($validated['from_date'])) {
+                    $schedule_shipment->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                }
+    
+                if (isset($validated['to_date'])) {
+                    $schedule_shipment->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                }
+    
+                if (isset($validated['co_parent_name'])) {
+                    $schedule_shipment->whereHas('ContractWms.company.co_parent', function ($query) use ($validated) {
+                        $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                    });
+                }
+    
+                if (isset($validated['co_name'])) {
+                    $schedule_shipment->whereHas('ContractWms.company', function ($q) use ($validated) {
+                        return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    });
+                }
+    
+                if (isset($validated['item_brand'])) {
+                    $schedule_shipment->whereHas('schedule_shipment_info.item', function ($q) use ($validated) {
+                        return $q->where(DB::raw('lower(item_brand)'), 'like', '%' . strtolower($validated['item_brand']) . '%');
+                    });
+                }
+    
+                if (isset($validated['item_channel_name'])) {
+                    $schedule_shipment->whereHas('schedule_shipment_info.item.item_channels', function ($q) use ($validated) {
+                        return $q->where(DB::raw('lower(item_channel_name)'), 'like', '%' . strtolower($validated['item_channel_name']) . '%');
+                    });
+                }
+    
+                if (isset($validated['item_name'])) {
+                    $schedule_shipment->whereHas('schedule_shipment_info.item', function ($q) use ($validated) {
+                        return $q->where(DB::raw('lower(item_name)'), 'like', '%' . strtolower($validated['item_name']) . '%');
+                    });
+                }
+    
+                if (isset($validated['status'])) {
+                    if ($validated['status'] == '배송준비') {
+                        $schedule_shipment->whereDoesntHave('receving_goods_delivery', function ($q) use ($validated) {
+                            $q->where(DB::raw('lower(rgd_status3)'), 'like', '%' . strtolower($validated['status']) . '%');
+                            $q->orWhere('rgd_status3', '!=', '배송준비');
+                        });
+                    } elseif ($validated['status'] == '배송중') {
+                        $schedule_shipment->whereHas('receving_goods_delivery', function ($q) use ($validated) {
+                            $q->where(DB::raw('lower(rgd_status3)'), 'like', '%' . strtolower($validated['status']) . '%');
+                        });
+                    } elseif ($validated['status'] == '배송완료') {
+                        $schedule_shipment->whereHas('receving_goods_delivery', function ($q) use ($validated) {
+                            $q->where(DB::raw('lower(rgd_status3)'), 'like', '%' . strtolower($validated['status']) . '%');
+                        });
+                    }
+                }
+    
+                if (isset($validated['order_id'])) {
+    
+                    $schedule_shipment->where(DB::raw('lower(order_id)'), 'like', '%' . strtolower($validated['order_id']) . '%');
+                }
+                if (isset($validated['recv_name'])) {
+                    $schedule_shipment->where(DB::raw('lower(recv_name)'), 'like', '%' . strtolower($validated['recv_name']) . '%');
+                }
+                if (isset($validated['name'])) {
+                    $schedule_shipment->whereHas('schedule_shipment_info', function ($q) use ($validated) {
+                        $q->where('name', 'like', '%' . $validated['name'] . '%');
+                    });
+                }
+                if (isset($validated['qty'])) {
+                    $schedule_shipment->whereHas('schedule_shipment_info', function ($q) use ($validated) {
+                        return $q->where(DB::raw('lower(qty)'), 'like', '%' . strtolower($validated['qty']) . '%');
+                    });
+                }
+                if (isset($validated['trans_corp'])) {
+                    $schedule_shipment->where(DB::raw('lower(trans_corp)'), 'like', '%' . strtolower($validated['trans_corp']) . '%');
+                }
+    
+                $schedule_shipment = $schedule_shipment->paginate($per_page, ['*'], 'page', $page);
+                $schedule_shipment->setCollection(
+                    $schedule_shipment->getCollection()->map(function ($q) {
+                        $schedule_shipment_item = DB::table('schedule_shipment_info')->where('schedule_shipment_info.ss_no', $q->ss_no)->get();
+                        $count_item = 0;
+                        foreach ($schedule_shipment_item as $item) {
+                            $q->total_amount += $item->qty;
+                            $count_item++;
+                        }
+                        $q->count_item = $count_item;
+    
+                        $scheduleshipment_info_ = ScheduleShipmentInfo::with(['item'])->where('ss_no', $q->ss_no)->first();
+                        $item_schedule_shipment = Item::where('product_id', $scheduleshipment_info_->product_id)->first();
+                        if (isset($item_schedule_shipment)) {
+                            $item_first_name = $item_schedule_shipment['item_name'];
+                            $total_item = $scheduleshipment_info_['item']->count() - 1;
+                            if ($total_item <= 0) {
+                                $q->first_item_name_total = $item_first_name . '외';
+                            } else {
+                                $q->first_item_name_total = $item_first_name . '외' . ' ' . $total_item . '건';
+                            }
+                        } else {
+                            $q->first_item_name_total = '';
+                        }
+    
+    
+                        return  $q;
+                    })
+                );
+                return response()->json($schedule_shipment);
+            }
+  
         } catch (\Exception $e) {
             Log::error($e);
             return $e;
