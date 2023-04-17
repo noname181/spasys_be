@@ -195,7 +195,7 @@ class AlarmController extends Controller
                 ->orderBy('alarm_no', 'DESC');
             }
         
-            $alarm = $alarm->groupBy('alarm_no')->paginate($per_page, ['*'], 'page', $page);
+            $alarm = $alarm->groupBy('alarm_no')->limit(3)->get();
             DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
             return response()->json($alarm);
         } catch (\Exception $e) {
