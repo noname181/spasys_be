@@ -241,7 +241,7 @@ class AlarmController extends Controller
                         });
                     })
                     ->orwhere(function($q) use ($user) {
-                        $q->whereNotNull('alarm_type')
+                        $q->where('alarm_type', 'auto')
                         ->where(function($q) use ($user) {
                             if($user->mb_push_yn == 'y'){
                                 $q->whereHas('warehousing.company.co_parent', function ($q) use ($user) {
@@ -263,7 +263,7 @@ class AlarmController extends Controller
                         });
 
                     })->orwhere(function($q) use ($user) {
-                        $q->whereNotNull('alarm_type')
+                        $q->where('alarm_type', 'like', '%cargo%')
                         ->where(function($q) use ($user) {
                             if($user->mb_push_yn == 'y'){
                                 $q->whereHas('warehousing.company.co_parent', function ($q) use ($user) {
@@ -313,7 +313,7 @@ class AlarmController extends Controller
                         });
                     })
                     ->orwhere(function($q) use ($user) {
-                        $q->whereNotNull('alarm_type')
+                        $q->where('alarm_type', 'auto')
                         ->where(function($q) use ($user) {
                             if($user->mb_push_yn == 'y'){
                                 $q->whereHas('warehousing.company', function ($q) use ($user) {
@@ -335,13 +335,11 @@ class AlarmController extends Controller
                         });
 
                     })->orwhere(function($q) use ($user) {
-                        $q->whereNotNull('alarm_type')
+                        $q->where('alarm_type', 'like', '%cargo%')
                         ->where(function($q) use ($user) {
                             if($user->mb_push_yn == 'y'){
                                 $q->whereHas('warehousing.company', function ($q) use ($user) {
                                     $q->where('co_no', $user->co_no);
-                                })->whereHas('member', function ($q) {
-                                    $q->where('mb_type', 'shop');
                                 })->orwhere(function($q) use($user){
                                     $q->whereNotNull('alarm_type')
                                     ->whereHas('warehousing', function($q) {
