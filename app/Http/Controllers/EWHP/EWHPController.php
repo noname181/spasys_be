@@ -9,6 +9,7 @@ use App\Models\Import;
 use App\Models\ExportConfirm;
 use App\Models\Export;
 use App\Utils\Messages;
+use App\Models\ReceivingGoodsDelivery;
 use App\Utils\CommonFunc;
 use Illuminate\Http\Request;
 use PhpParser\Node\Stmt\TryCatch;
@@ -129,6 +130,15 @@ class EWHPController extends Controller
                 if ($export >= 1) {
                     $count++;
                 }
+            
+                $is_no = $value['carry_out_number'];
+                if(isset($is_no)){
+                    ReceivingGoodsDelivery::insertGetId([
+                        'is_no' => $is_no,
+                        'service_korean_name' => '보세화물',
+                        'rgd_status3' => '배송준비',
+                    ]);
+                }  
             }
             DB::commit();
             return response()->json(['message' => 'ok', 'count' => $count]);
