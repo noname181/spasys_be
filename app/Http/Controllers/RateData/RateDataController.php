@@ -9,6 +9,7 @@ use App\Http\Requests\RateData\RateDataSendMailRequest;
 use App\Models\AdjustmentGroup;
 use App\Models\CancelBillHistory;
 use App\Models\Company;
+use App\Models\Payment;
 use App\Models\Member;
 use App\Models\Contract;
 use App\Models\Export;
@@ -2738,6 +2739,38 @@ class RateDataController extends Controller
                 ]);
             }
 
+            //UPDATE EST BILL WHEN ISSUE FINAL BILL
+            if($request->type == 'create_final'){
+                $est_rgd =  ReceivingGoodsDelivery::where('rgd_no', $final_rgd->rgd_parent_no)->first();
+
+                ReceivingGoodsDelivery::where('rgd_settlement_number', $est_rgd->rgd_settlement_number)->update([
+                    'rgd_status6' => 'paid',
+                    'is_expect_payment' => 'y', //NOT REAL PAID
+                    'rgd_paid_date' => Carbon::now()->toDateTimeString()
+                ]);
+
+                Payment::updateOrCreate(
+                    [
+                        'rgd_no' => $est_rgd['rgd_no'],
+                    ],
+                    [
+                        // 'p_price' => $request->sumprice,
+                        // 'p_method' => $request->p_method,
+                        'p_success_yn' => 'y',
+                        'p_cancel_yn' => 'y',
+                        'p_cancel_time' => Carbon::now(),
+                    ]
+                );
+
+                CancelBillHistory::insertGetId([
+                    'rgd_no' => $est_rgd->rgd_no,
+                    'mb_no' => $user->mb_no,
+                    'cbh_type' => 'payment',
+                    'cbh_status_before' => $est_rgd->rgd_status6,
+                    'cbh_status_after' => 'payment_bill'
+                ]);
+            }
+
             //INSERT ALARM DATA TABLE
 
             if(isset($final_rgd) && !str_contains($request->type, 'edit')){
@@ -3537,6 +3570,37 @@ class RateDataController extends Controller
                             CommonFunc::insert_alarm('[유통가공] 확정청구서 발송', $final_rgd, $user, null, 'settle_payment');
                         }
 
+                        //UPDATE EST BILL WHEN ISSUE FINAL BILL
+                        $est_rgd =  ReceivingGoodsDelivery::where('rgd_no', $final_rgd->rgd_parent_no)->first();
+
+                        ReceivingGoodsDelivery::where('rgd_settlement_number', $est_rgd->rgd_settlement_number)->update([
+                            'rgd_status6' => 'paid',
+                            'is_expect_payment' => 'y', //NOT REAL PAID
+                            'rgd_paid_date' => Carbon::now()->toDateTimeString()
+                        ]);
+
+                        Payment::updateOrCreate(
+                            [
+                                'rgd_no' => $est_rgd['rgd_no'],
+                            ],
+                            [
+                                // 'p_price' => $request->sumprice,
+                                // 'p_method' => $request->p_method,
+                                'p_success_yn' => 'y',
+                                'p_cancel_yn' => 'y',
+                                'p_cancel_time' => Carbon::now(),
+                            ]
+                        );
+
+                        CancelBillHistory::insertGetId([
+                            'rgd_no' => $est_rgd->rgd_no,
+                            'mb_no' => $user->mb_no,
+                            'cbh_type' => 'payment',
+                            'cbh_status_before' => $est_rgd->rgd_status6,
+                            'cbh_status_after' => 'payment_bill'
+                        ]);
+                        //END UPDATE EST BILL WHEN ISSUE FINAL BILL
+
                     } else {
                         $expectation_rgd->rgd_status5 = 'issued';
                         $expectation_rgd->save();
@@ -3553,6 +3617,9 @@ class RateDataController extends Controller
                     }
                     $i++;
                 }
+
+                
+            
             }
 
             DB::commit();
@@ -3744,6 +3811,37 @@ class RateDataController extends Controller
 
                         CommonFunc::insert_alarm('[보세화물] 확정청구서 발송', $final_rgd, $user, null, 'settle_payment');
                     }
+
+                    //UPDATE EST BILL WHEN ISSUE FINAL BILL
+                    $est_rgd =  ReceivingGoodsDelivery::where('rgd_no', $final_rgd->rgd_parent_no)->first();
+
+                    ReceivingGoodsDelivery::where('rgd_settlement_number', $est_rgd->rgd_settlement_number)->update([
+                        'rgd_status6' => 'paid',
+                        'is_expect_payment' => 'y', //NOT REAL PAID
+                        'rgd_paid_date' => Carbon::now()->toDateTimeString()
+                    ]);
+
+                    Payment::updateOrCreate(
+                        [
+                            'rgd_no' => $est_rgd['rgd_no'],
+                        ],
+                        [
+                            // 'p_price' => $request->sumprice,
+                            // 'p_method' => $request->p_method,
+                            'p_success_yn' => 'y',
+                            'p_cancel_yn' => 'y',
+                            'p_cancel_time' => Carbon::now(),
+                        ]
+                    );
+
+                    CancelBillHistory::insertGetId([
+                        'rgd_no' => $est_rgd->rgd_no,
+                        'mb_no' => $user->mb_no,
+                        'cbh_type' => 'payment',
+                        'cbh_status_before' => $est_rgd->rgd_status6,
+                        'cbh_status_after' => 'payment_bill'
+                    ]);
+                    //END UPDATE EST BILL WHEN ISSUE FINAL BILL
 
                 } else {
                     $expectation_rgd->rgd_status5 = 'issued';
@@ -3942,14 +4040,6 @@ class RateDataController extends Controller
 
                 CommonFunc::insert_alarm('[수입풀필먼트] 확정청구서 발송', $final_rgd, $user, null, 'settle_payment');
 
-                // ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-                //     'rgd_is_show' => 'y',
-                //     'rgd_status4' => $request->status,
-                //     'rgd_issue_date' => Carbon::now()->toDateTimeString(),
-                //     'rgd_bill_type' => $request->bill_type,
-                //     'rgd_settlement_number' => $request->settlement_number,
-                //     'rgd_calculate_deadline_yn' => $request->rgd_calculate_deadline_yn ? $request->rgd_calculate_deadline_yn : '',
-                // ]);
             } else if ($request->bill_type == 'additional' && $request->type != 'edit_additional') {
                 $previous_rgd->rgd_status5 = 'issued';
                 $previous_rgd->save();
@@ -4171,6 +4261,37 @@ class RateDataController extends Controller
                 $final_rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $final_rgd->rgd_no)->first();
 
                 CommonFunc::insert_alarm('[보세화물] 확정청구서 발송', $final_rgd, $user, null, 'settle_payment');
+
+                //UPDATE EST BILL WHEN ISSUE FINAL BILL
+                $est_rgd =  ReceivingGoodsDelivery::where('rgd_no', $final_rgd->rgd_parent_no)->first();
+
+                ReceivingGoodsDelivery::where('rgd_settlement_number', $est_rgd->rgd_settlement_number)->update([
+                    'rgd_status6' => 'paid',
+                    'is_expect_payment' => 'y', //NOT REAL PAID
+                    'rgd_paid_date' => Carbon::now()->toDateTimeString()
+                ]);
+
+                Payment::updateOrCreate(
+                    [
+                        'rgd_no' => $est_rgd['rgd_no'],
+                    ],
+                    [
+                        // 'p_price' => $request->sumprice,
+                        // 'p_method' => $request->p_method,
+                        'p_success_yn' => 'y',
+                        'p_cancel_yn' => 'y',
+                        'p_cancel_time' => Carbon::now(),
+                    ]
+                );
+
+                CancelBillHistory::insertGetId([
+                    'rgd_no' => $est_rgd->rgd_no,
+                    'mb_no' => $user->mb_no,
+                    'cbh_type' => 'payment',
+                    'cbh_status_before' => $est_rgd->rgd_status6,
+                    'cbh_status_after' => 'payment_bill'
+                ]);
+                //END UPDATE EST BILL WHEN ISSUE FINAL BILL
 
             }
 
