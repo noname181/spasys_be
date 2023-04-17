@@ -113,19 +113,12 @@ class CommonFunc
             $alarm_type = 'auto';
         }
 
-        Alarm::insertGetId(
-            [
-                'w_no' => $rgd->w_no,
-                'mb_no' => $sender->mb_no,
-                'alarm_content' => $alarm_content,
-                'alarm_h_bl' => $cargo_number,
-                'alarm_type' => $alarm_type,
-                'ad_no' => $alarm_data->ad_no,
-            ]
-        );
+
 
         if ($alarm_data->ad_must_yn == 'y') {
-            if ($sender->mb_type == 'spasys') {
+            if($rgd->service_korean_name == '수입풀필먼트'){
+                $receiver_company = $rgd->warehousing->company;
+            }else if ($sender->mb_type == 'spasys') {
                 $receiver_company = $rgd->warehousing->company->co_parent;
             } else if ($sender->mb_type == 'shop') {
                 $receiver_company = $rgd->warehousing->company;
@@ -133,7 +126,9 @@ class CommonFunc
             //ad_must_yn == 'y' send all members of receiver company
             $receiver_list = Member::where('co_no', $receiver_company->co_no)->get();
         } else if ($alarm_data->ad_must_yn == 'n') {
-            if ($sender->mb_type == 'spasys') {
+            if($rgd->service_korean_name == '수입풀필먼트'){
+                $receiver_company = $rgd->warehousing->company;
+            }else if ($sender->mb_type == 'spasys') {
                 $receiver_company = $rgd->warehousing->company->co_parent;
             } else if ($sender->mb_type == 'shop') {
                 $receiver_company = $rgd->warehousing->company;
@@ -144,6 +139,19 @@ class CommonFunc
 
 
         foreach ($receiver_list as $receiver) {
+            //INSERT ALARM
+            Alarm::insertGetId(
+                [
+                    'w_no' => $rgd->w_no,
+                    'mb_no' => $sender->mb_no,
+                    'receiver_no' => $receiver->mb_no,
+                    'alarm_content' => $alarm_content,
+                    'alarm_h_bl' => $cargo_number,
+                    'alarm_type' => $alarm_type,
+                    'ad_no' => $alarm_data->ad_no,
+                ]
+            );
+
             //PUSH FUNCTION HERE
         }
     }
@@ -171,11 +179,11 @@ class CommonFunc
 
                 $cargo_number = $w_no->w_schedule_number;
             } else {
-                
+
                 $aaaaa = $w_no->w_import_parent->w_schedule_number2;
-               
+
                 $bbbbb = $w_no->receving_goods_delivery[0]->rgd_delivery_schedule_day;
-             
+
                 $cargo_number = $w_no->w_schedule_number;
             }
         } else if ($w_no->w_category_name == '보세화물') {
@@ -196,16 +204,7 @@ class CommonFunc
             $alarm_type = 'cargo_EW';
         }
 
-        Alarm::insertGetId(
-            [
-                'w_no' => $w_no->w_no,
-                'mb_no' => $sender->mb_no,
-                'alarm_content' => $alarm_content,
-                'alarm_h_bl' => $cargo_number,
-                'alarm_type' => $alarm_type,
-                'ad_no' => $alarm_data->ad_no,
-            ]
-        );
+
 
         if ($alarm_data->ad_must_yn == 'y') {
             if ($sender->mb_type == 'spasys') {
@@ -241,6 +240,19 @@ class CommonFunc
 
 
         foreach ($receiver_list as $receiver) {
+
+            Alarm::insertGetId(
+                [
+                    'w_no' => $w_no->w_no,
+                    'mb_no' => $sender->mb_no,
+                    'receiver_no' => $receiver->mb_no,
+                    'alarm_content' => $alarm_content,
+                    'alarm_h_bl' => $cargo_number,
+                    'alarm_type' => $alarm_type,
+                    'ad_no' => $alarm_data->ad_no,
+                ]
+            );
+
             //PUSH FUNCTION HERE
         }
     }

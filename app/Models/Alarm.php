@@ -42,6 +42,7 @@ class Alarm extends Model
     protected $fillable = [
         'alarm_no',
         'mb_no',
+        'receiver_no',
         'w_no',
         'ad_no',
         'alarm_content',
