@@ -2087,7 +2087,7 @@ class ReceivingGoodsDeliveryController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $rgd = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->where('is_no', $is_no)->get();
+            $rgd = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->where('is_no', $is_no)->whereNull('rgd_parent_no')->get();
 
             return response()->json($rgd);
         } catch (\Exception $e) {
