@@ -139,7 +139,7 @@ class CommonFunc
 
 
         foreach ($receiver_list as $receiver) {
-            //INSERT ALARM
+            //INSERT ALARM FOR RECEIVER LIST USER
             Alarm::insertGetId(
                 [
                     'w_no' => $rgd->w_no,
@@ -241,6 +241,7 @@ class CommonFunc
 
         foreach ($receiver_list as $receiver) {
 
+            //INSERT ALARM FOR RECEIVER LIST USER
             Alarm::insertGetId(
                 [
                     'w_no' => $w_no->w_no,
