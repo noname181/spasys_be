@@ -3125,7 +3125,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     //CHECK AUTO TAX INVOICE ISSUE
                     if ($ag->ag_auto_issue == 'y') {
 
-                        $cbh = CancelBillHistory::where('rgd_no', $request->rgd_no)->where('cbh_type', 'tax')->first();
+                        $cbh = CancelBillHistory::where('rgd_no', $request->rgd_no)->where('cbh_type', 'tax')->where('cbh_status_after', 'taxed')->first();
                         if (!isset($cbh->cbh_no)) {
                             $tax_number = CommonFunc::generate_tax_number($rgd->rgd_no);
 
