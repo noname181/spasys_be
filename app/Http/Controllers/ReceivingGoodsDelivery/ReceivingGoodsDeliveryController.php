@@ -2972,6 +2972,8 @@ class ReceivingGoodsDeliveryController extends Controller
         DB::beginTransaction();
         try {
             $user = Auth::user();
+
+            //UPDATE FOR CASE BILL
             if ($request->bill_type == 'case') {
                 $rgd = ReceivingGoodsDelivery::with(['rate_data_general', 'warehousing'])->where('rgd_no', $request->rgd_no)->first();
 
@@ -3017,6 +3019,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         ]);
                     }
 
+                    //CHECK AUTO TAX INVOICE ISSUE
                     if ($ag->ag_auto_issue == 'y') {
 
                         $cbh = CancelBillHistory::where('rgd_no', $request->rgd_no)->where('cbh_type', 'tax')->first();
@@ -3052,6 +3055,8 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'cbh_status_before' => null,
                                 'cbh_status_after' => 'taxed'
                             ]);
+
+                            CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $user, null, 'settle_payment');
                         }
                     }
                 } else {
@@ -3060,6 +3065,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
                     ]);
                 }
+            //UPDATE FOR MONTH BILL
             } else if ($request->bill_type == 'monthly') {
                 $i = 0;
                 foreach ($request->rgds as $rgd) {
@@ -3110,6 +3116,8 @@ class ReceivingGoodsDeliveryController extends Controller
                             ]);
                         }
 
+                                    
+                        //CHECK AUTO TAX INVOICE ISSUE
                         if ($ag->ag_auto_issue == 'y') {
 
                             $cbh = CancelBillHistory::where('rgd_no', $rgd->rgd_no)->where('cbh_type', 'tax')->first();
@@ -3145,6 +3153,8 @@ class ReceivingGoodsDeliveryController extends Controller
                                     'cbh_status_before' => null,
                                     'cbh_status_after' => 'taxed'
                                 ]);
+
+                                CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $user, null, 'settle_payment');
                             }
                         }
                     } else {
@@ -3155,6 +3165,8 @@ class ReceivingGoodsDeliveryController extends Controller
                     }
                     $i++;
                 }
+                
+            //UPDATE FOR MANY BILLS FROM LIST PAGE
             } else if ($request->bill_type == 'multiple') {
                 foreach ($request->rgds as $rgd) {
                     // if ($rgd['rgd_bill_type'] == 'final') {
@@ -3201,6 +3213,8 @@ class ReceivingGoodsDeliveryController extends Controller
                             CommonFunc::insert_alarm('[유통가공] 결제요청', $rgd, $creater, null, 'settle_payment');
                         }
 
+                                    
+                        //CHECK AUTO TAX INVOICE ISSUE
                         if ($ag->ag_auto_issue == 'y') {
 
                             $cbh = CancelBillHistory::where('rgd_no', $rgd->rgd_no)->where('cbh_type', 'tax')->first();
@@ -3236,6 +3250,8 @@ class ReceivingGoodsDeliveryController extends Controller
                                     'cbh_status_before' => null,
                                     'cbh_status_after' => 'taxed'
                                 ]);
+
+                                CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $user, null, 'settle_payment');
                             }
                         }
                     } else {
