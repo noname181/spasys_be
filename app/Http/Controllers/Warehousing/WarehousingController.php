@@ -4573,15 +4573,15 @@ class WarehousingController extends Controller
                             $item->discount = $total_discount;
                         }
 
-                        $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum7 : '';
+                        $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum7 : 0;
                     } else if ($item->service_korean_name == '수입풀필먼트') {
                         $item->discount = "";
-                        $item->sum_price_total2 =  isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum6 : '';
-                        $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum6 : '';
+                        $item->sum_price_total2 =  isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum6 : 0;
+                        $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum6 : 0;
                     } else {
                         $item->discount = "";
-                        $item->sum_price_total2 = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : '';
-                        $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : '';
+                        $item->sum_price_total2 = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : 0;
+                        $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : 0;
                     }
 
                     if (isset($item->rate_data_general->rdg_sum7)) {
