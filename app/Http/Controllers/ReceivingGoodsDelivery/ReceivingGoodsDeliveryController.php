@@ -3547,6 +3547,29 @@ class ReceivingGoodsDeliveryController extends Controller
                     'rgd_status6' => isset($request->p_method) && $request->p_method == 'deposit_without_bankbook'  ? null : 'paid',
                     'rgd_paid_date' =>  isset($request->p_method) && $request->p_method == 'deposit_without_bankbook'  ? null : Carbon::now(),
                 ]);
+
+                if($rgd->service_korean_name == '보세화물'){
+                    $ad_tile = '[보세화물] 결제완료';
+                }else if($rgd->service_korean_name == '수입풀필먼트'){
+                    $ad_tile = '[수입풀필먼트] 결제완료';
+                }else if($rgd->service_korean_name == '유통가공'){
+                    $ad_tile = '[유통가공] 결제완료';
+                }
+
+                if($rgd->service_korean_name == '보세화물'){
+                    $ad_tile = '[보세화물] 결제완료';
+                }else if($rgd->service_korean_name == '수입풀필먼트'){
+                    $ad_tile = '[수입풀필먼트] 결제완료';
+                }else if($rgd->service_korean_name == '유통가공'){
+                    $ad_tile = '[유통가공] 결제완료';
+                }
+                
+                if($request->p_method != 'deposit_without_bankbook'){
+                    $sender = Member::where('mb_no', $rgd->mb_no)->first();
+                    CommonFunc::insert_alarm($ad_tile, $rgd, $sender, null, 'settle_payment');
+                }
+
+
             } else {
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
                 Payment::insertGetId(
@@ -3586,6 +3609,20 @@ class ReceivingGoodsDeliveryController extends Controller
                     'rgd_status6' => isset($request->p_method) && $request->p_method == 'deposit_without_bankbook'  ? null : 'paid',
                     'rgd_paid_date' =>  isset($request->p_method) && $request->p_method == 'deposit_without_bankbook'  ? null : Carbon::now(),
                 ]);
+
+                if($rgd->service_korean_name == '보세화물'){
+                    $ad_tile = '[보세화물] 결제완료';
+                }else if($rgd->service_korean_name == '수입풀필먼트'){
+                    $ad_tile = '[수입풀필먼트] 결제완료';
+                }else if($rgd->service_korean_name == '유통가공'){
+                    $ad_tile = '[유통가공] 결제완료';
+                }
+
+                if($request->p_method != 'deposit_without_bankbook'){
+                    $sender = Member::where('mb_no', $rgd->mb_no)->first();
+                    CommonFunc::insert_alarm($ad_tile, $rgd, $sender, null, 'settle_payment');
+                }
+              
             }
 
             DB::commit();
