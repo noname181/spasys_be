@@ -6017,7 +6017,7 @@ class WarehousingController extends Controller
 
                 $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $request->rgd_no)->first();
 
-                CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $user, null, 'settle_payment');
+                CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $user, null, 'settle_payment', null);
 
                 foreach ($request->tid_list as $tid) {
                     if (isset($tid['tid_no'])) {
@@ -6236,7 +6236,7 @@ class WarehousingController extends Controller
 
                     $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd['rgd_no'])->first();
 
-                    CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $user, null, 'settle_payment');
+                    CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $user, null, 'settle_payment', null);
 
                     $cbh = CancelBillHistory::insertGetId([
                         'rgd_no' => $rgd['rgd_no'],
@@ -6290,7 +6290,7 @@ class WarehousingController extends Controller
 
                     $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd['rgd_no'])->first();
 
-                    CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $user, null, 'settle_payment');
+                    CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $user, null, 'settle_payment', null);
 
                     $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general'])->where('rgd_no', $rgd['rgd_no'])->first();
 
