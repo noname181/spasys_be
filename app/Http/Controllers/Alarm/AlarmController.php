@@ -27,7 +27,8 @@ class AlarmController extends Controller
             if (!isset($alarm_no)) {
                 $alarm_no = Alarm::insertGetId([
                     'mb_no' => Auth::user()->mb_no,
-                    'w_no' => $validated['w_no'], // FIXME hard set
+                    'ss_no' => isset($validated['ss_no']) ? $validated['ss_no'] : null,
+                    'w_no' => isset($validated['w_no']) ? $validated['w_no'] : null, // FIXME hard set
                     'alarm_content' => $validated['alarm_content'],
                     'alarm_h_bl' => isset($validated['w_schedule_number']) ? $validated['w_schedule_number'] : $validated['alarm_h_bl'],
                 ]);
@@ -40,7 +41,8 @@ class AlarmController extends Controller
 
                 $update = [
                     'mb_no' => Auth::user()->mb_no,
-                    'w_no' => $validated['w_no'],
+                    'w_no' => isset($validated['w_no']) ? $validated['w_no'] : null,
+                    'ss_no' => isset($validated['ss_no']) ? $validated['ss_no'] : null,
                     'alarm_content' => $validated['alarm_content'],
                     'alarm_h_bl' => isset($validated['w_schedule_number']) ? $validated['w_schedule_number'] : $validated['alarm_h_bl'],
                 ];
