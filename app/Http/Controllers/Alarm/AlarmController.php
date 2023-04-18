@@ -201,7 +201,7 @@ class AlarmController extends Controller
                 //     $q->where('co_no', $user->company->co_parent->co_no);
                 //     //->orWhere('co_no', $user->company->co_parent->co_parent->co_no);
                 // })
-                $alarm = Alarm::select('t_import.ti_no','t_export.te_no','alarm.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with('warehousing','member')->leftjoin('t_import_expected', function ($join) {
+                $alarm = Alarm::select('t_import.ti_no','t_export.te_no','alarm.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with('schedule_shipment','warehousing','member')->leftjoin('t_import_expected', function ($join) {
                     $join->on('alarm.alarm_h_bl', '=', 't_import_expected.tie_h_bl');
                 })->leftjoin('company as company_spasys', function ($join) {
                     $join->on('company_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
@@ -219,54 +219,14 @@ class AlarmController extends Controller
                     $q->whereNull('alarm_type')->where(function($q) use($validated,$user) {
                         $q->where('company_shop_parent.co_no','=', $user->co_no)->orWhere('company_spasys.co_no','=', $user->co_no)->orwhereHas('warehousing.co_no.co_parent',function ($q) use ($user){
                             $q->where('co_no', $user->co_no);
+                        })->orwhereHas('schedule_shipment.ContractWms.company.co_parent',function ($q) use ($user){
+                            $q->where('co_no', $user->co_no);
                         });
                     })
                     ->orwhere(function($q) use ($user) {
-                        $q->where('alarm_type', 'auto')
-                        ->where(function($q) use ($user) {
-                            if($user->mb_push_yn == 'y'){
-                                $q->whereHas('warehousing.company.co_parent', function ($q) use ($user) {
-                                    $q->where('co_no', $user->co_no);
-                                })->whereHas('member', function ($q) {
-                                    $q->where('mb_type', 'spasys');
-                                })->orwhere(function($q) use($user){
-                                    $q->whereNotNull('alarm_type')
-                                    ->whereHas('warehousing', function($q) {
-                                        $q->where('w_category_name', '수입풀필먼트');
-                                    })->whereHas('warehousing.company', function($q) use ($user){
-                                        $q->where('co_no', $user->co_no);
-                                    });
-                                });
-                            }else {
-                                $q->whereNull('alarm_no');
-                            }
-
-                        });
-
-                    })->orwhere(function($q) use ($user) {
-                        $q->where('alarm_type', 'like', '%cargo%')
-                        ->where(function($q) use ($user) {
-                            if($user->mb_push_yn == 'y'){
-                                $q->whereHas('warehousing.company.co_parent', function ($q) use ($user) {
-                                    $q->where('co_no', $user->co_no);
-                                })->whereHas('member', function ($q) {
-                                    $q->where('mb_type', 'spasys');
-                                    $q->orwhere('mb_type', 'shipper');
-                                })->orwhere(function($q) use($user){
-                                    $q->whereNotNull('alarm_type')
-                                    ->whereHas('warehousing', function($q) {
-                                        $q->where('w_category_name', '수입풀필먼트');
-                                    })->whereHas('warehousing.company', function($q) use ($user){
-                                        $q->where('co_no', $user->co_no);
-                                    });
-                                });
-                            }else {
-                                $q->whereNull('alarm_no');
-                            }
-
-                        });
-
-                    });;
+                        $q->whereNotNull('receiver_no')
+                        ->where('receiver_no', $user->mb_no);
+                    });
                 })->orderBy('alarm_no', 'DESC');
             }
             else if($user->mb_type == 'shipper'){
@@ -274,7 +234,7 @@ class AlarmController extends Controller
                 //     $q->where('co_no', $user->company->co_parent->co_no)
                 //     ->orWhere('co_no', $user->company->co_parent->co_parent->co_no);
                 // })
-                $alarm = Alarm::select('t_import.ti_no','t_export.te_no','alarm.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with('warehousing','member')->leftjoin('t_import_expected', function ($join) {
+                $alarm = Alarm::select('t_import.ti_no','t_export.te_no','alarm.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with('schedule_shipment','warehousing','member')->leftjoin('t_import_expected', function ($join) {
                     $join->on('alarm.alarm_h_bl', '=', 't_import_expected.tie_h_bl');
                 })->leftjoin('company as company_spasys', function ($join) {
                     $join->on('company_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
@@ -292,59 +252,19 @@ class AlarmController extends Controller
                     $q->whereNull('alarm_type')->where(function($q) use($validated,$user) {
                         $q->where('company_shop.co_no','=', $user->co_no)->orwhereHas('warehousing.co_no',function ($q) use ($user){
                             $q->where('co_no', $user->co_no);
+                        })->orwhereHas('schedule_shipment.ContractWms.company',function ($q) use ($user){
+                            $q->where('co_no', $user->co_no);
                         });
                     })
                     ->orwhere(function($q) use ($user) {
-                        $q->where('alarm_type', 'auto')
-                        ->where(function($q) use ($user) {
-                            if($user->mb_push_yn == 'y'){
-                                $q->whereHas('warehousing.company', function ($q) use ($user) {
-                                    $q->where('co_no', $user->co_no);
-                                })->whereHas('member', function ($q) {
-                                    $q->where('mb_type', 'shop');
-                                })->orwhere(function($q) use($user){
-                                    $q->whereNotNull('alarm_type')
-                                    ->whereHas('warehousing', function($q) {
-                                        $q->where('w_category_name', '수입풀필먼트');
-                                    })->whereHas('warehousing.company', function($q) use ($user){
-                                        $q->where('co_no', $user->co_no);
-                                    });
-                                });
-                            }else {
-                                $q->whereNull('alarm_no');
-                            }
-
-                        });
-
-                    })->orwhere(function($q) use ($user) {
-                        $q->where('alarm_type', 'like', '%cargo%')
-                        ->where(function($q) use ($user) {
-                            if($user->mb_push_yn == 'y'){
-                                $q->whereHas('warehousing.company', function ($q) use ($user) {
-                                    $q->where('co_no', $user->co_no);
-                                })->whereHas('member', function ($q) {
-                                    $q->where('mb_type', 'shop');
-                                    $q->orwhere('mb_type', 'spasys');
-                                })->orwhere(function($q) use($user){
-                                    $q->whereNotNull('alarm_type')
-                                    ->whereHas('warehousing', function($q) {
-                                        $q->where('w_category_name', '수입풀필먼트');
-                                    })->whereHas('warehousing.company', function($q) use ($user){
-                                        $q->where('co_no', $user->co_no);
-                                    });
-                                });
-                            }else {
-                                $q->whereNull('alarm_no');
-                            }
-
-                        });
-
+                        $q->whereNotNull('receiver_no')
+                        ->where('receiver_no', $user->mb_no);
                     });
                 })
                 ->orderBy('alarm_no', 'DESC');
 
             } else if ($user->mb_type == 'spasys'){
-                $alarm = Alarm::select('t_import.ti_no','t_export.te_no','alarm.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with('warehousing','member')->leftjoin('t_import_expected', function ($join) {
+                $alarm = Alarm::select('t_import.ti_no','t_export.te_no','alarm.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with('schedule_shipment','warehousing','member')->leftjoin('t_import_expected', function ($join) {
                     $join->on('alarm.alarm_h_bl', '=', 't_import_expected.tie_h_bl');
                 })->leftjoin('company as company_spasys', function ($join) {
                     $join->on('company_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
@@ -456,7 +376,7 @@ class AlarmController extends Controller
                 ->orderBy('alarm_no', 'DESC');
 
             } else if ($user->mb_type == 'spasys'){
-                $alarm = Alarm::select('t_import.ti_no','t_export.te_no','alarm.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with('warehousing','member')->leftjoin('t_import_expected', function ($join) {
+                $alarm = Alarm::select('t_import.ti_no','t_export.te_no','alarm.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with('schedule_shipment','warehousing','member')->leftjoin('t_import_expected', function ($join) {
                     $join->on('alarm.alarm_h_bl', '=', 't_import_expected.tie_h_bl');
                 })->leftjoin('company as company_spasys', function ($join) {
                     $join->on('company_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
