@@ -597,13 +597,17 @@ class AlarmController extends Controller
                         return $q3->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
                     })->orwhereHas('import_expect.company_spasys', function($q4) use($validated) {
                         return $q4->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
-                    })->orwhereHas('warehousing.co_no.co_parent',function($query) use ($validated) {
+                    })->orwhereHas('warehousing.company.co_parent',function($query) use ($validated) {
+                    $query->where(DB::raw('lower(co_name)'), 'like','%'. strtolower($validated['co_parent_name']) .'%');
+                })->orwhereHas('schedule_shipment.ContractWms.company.co_parent',function($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like','%'. strtolower($validated['co_parent_name']) .'%');
                 });});
             }
             if (isset($validated['co_name'])) {
                 $alarm->where(function($q) use($validated,$user) {
-                    $q->whereHas('warehousing.co_no', function($q) use($validated) {
+                    $q->whereHas('warehousing.company', function($q) use($validated) {
+                        return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    })->orwhereHas('schedule_shipment.ContractWms.company', function($q) use($validated) {
                         return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
                     })->orwhereHas('import_expect.company', function($q3) use($validated) {
                         return $q3->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
@@ -614,6 +618,21 @@ class AlarmController extends Controller
                     }); });
             }
             if (isset($validated['service'])) {
+                // if($validated['service'] == '보세화물'){
+                //     $alarm->where(function($q) use($validated) {
+                //         $q->whereHas('warehousing', function($q2) use($validated) {
+                //             return $q2->where('w_category_name', '=', $validated['service']);
+                //         })->orwhereHas('import_expect', function($q3) use($validated) {
+                //             return $q3->where('tie_h_bl', '!=', '')->orWhereNotNull('tie_h_bl');
+                //         });
+                //     });
+                // } else {
+                //     $alarm->where(function($q) use($validated) {
+                //         $q->whereHas('warehousing', function($q2) use($validated) {
+                //             return $q2->where('w_category_name', '=', $validated['service']);
+                //         });
+                //     });
+                // }
                 if($validated['service'] == '보세화물'){
                     $alarm->where(function($q) use($validated) {
                         $q->whereHas('warehousing', function($q2) use($validated) {
@@ -621,6 +640,12 @@ class AlarmController extends Controller
                         })->orwhereHas('import_expect', function($q3) use($validated) {
                             return $q3->where('tie_h_bl', '!=', '')->orWhereNotNull('tie_h_bl');
                         });
+                    });
+                } if($validated['service'] == '수입풀필먼트'){
+                    $alarm->where(function($q) use($validated) {
+                        $q->whereHas('warehousing', function($q2) use($validated) {
+                            return $q2->where('w_category_name', '=', $validated['service']);
+                        })->orwhere('ss_no', '!=','')->orWhereNotNull('ss_no') ;
                     });
                 } else {
                     $alarm->where(function($q) use($validated) {
