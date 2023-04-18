@@ -3574,7 +3574,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 
                 if($request->p_method != 'deposit_without_bankbook'){
                     $sender = Member::where('mb_no', $rgd->mb_no)->first();
-                    CommonFunc::insert_alarm($ad_tile, $rgd, $sender, null, 'settle_payment', $request->sumprice);
+                    CommonFunc::insert_alarm($ad_tile, $rgd, $sender, null, 'settle_payment', $p_method_fee);
                 }
 
 
@@ -3632,7 +3632,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                 if($request->p_method != 'deposit_without_bankbook'){
                     $sender = Member::where('mb_no', $rgd->mb_no)->first();
-                    CommonFunc::insert_alarm($ad_tile, $rgd, $sender, null, 'settle_payment', $request->sumprice);
+                    CommonFunc::insert_alarm($ad_tile, $rgd, $sender, null, 'settle_payment', $p_method_fee);
                 }
               
             }
