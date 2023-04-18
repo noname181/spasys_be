@@ -103,6 +103,7 @@ class CommonFunc
 
         if($price != null){
             $ccccc = $price;
+            $aaaaa = $rgd->rgd_status4;
         }
 
         $alarm_data = AlarmData::where('ad_title', $ad_title)->first();
