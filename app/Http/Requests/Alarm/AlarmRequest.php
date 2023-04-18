@@ -25,7 +25,10 @@ class AlarmRequest extends BaseFormRequest
     {
         return [
             'w_no' => [
-                'required',
+                'nullable',
+            ],
+            'ss_no' => [
+                'nullable',
             ],
             'alarm_content' => [
                 'required',

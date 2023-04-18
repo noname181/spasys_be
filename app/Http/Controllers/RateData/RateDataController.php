@@ -2776,7 +2776,7 @@ class RateDataController extends Controller
             if(isset($final_rgd) && !str_contains($request->type, 'edit')){
                 $final_rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $final_rgd->rgd_no)->first();
 
-                CommonFunc::insert_alarm('[유통가공] 예상경비청구서 발송', $final_rgd, $user, null, 'settle_payment');
+                CommonFunc::insert_alarm('[유통가공] 예상경비청구서 발송', $final_rgd, $user, null, 'settle_payment', null);
             }
 
             DB::commit();
@@ -3567,7 +3567,7 @@ class RateDataController extends Controller
                         if($i ==0){
                             $final_rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $final_rgd->rgd_no)->first();
 
-                            CommonFunc::insert_alarm('[유통가공] 확정청구서 발송', $final_rgd, $user, null, 'settle_payment');
+                            CommonFunc::insert_alarm('[유통가공] 확정청구서 발송', $final_rgd, $user, null, 'settle_payment', null);
                         }
 
                         //UPDATE EST BILL WHEN ISSUE FINAL BILL
@@ -3809,7 +3809,7 @@ class RateDataController extends Controller
                     if($i ==0){
                         $final_rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $final_rgd->rgd_no)->first();
 
-                        CommonFunc::insert_alarm('[보세화물] 확정청구서 발송', $final_rgd, $user, null, 'settle_payment');
+                        CommonFunc::insert_alarm('[보세화물] 확정청구서 발송', $final_rgd, $user, null, 'settle_payment', null);
                     }
 
                     //UPDATE EST BILL WHEN ISSUE FINAL BILL
@@ -4038,7 +4038,7 @@ class RateDataController extends Controller
 
                 $final_rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $final_rgd->rgd_no)->first();
 
-                CommonFunc::insert_alarm('[수입풀필먼트] 확정청구서 발송', $final_rgd, $user, null, 'settle_payment');
+                CommonFunc::insert_alarm('[수입풀필먼트] 확정청구서 발송', $final_rgd, $user, null, 'settle_payment', null);
 
             } else if ($request->bill_type == 'additional' && $request->type != 'edit_additional') {
                 $previous_rgd->rgd_status5 = 'issued';
@@ -4218,7 +4218,7 @@ class RateDataController extends Controller
 
                 $final_rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $final_rgd->rgd_no)->first();
 
-                CommonFunc::insert_alarm('[보세화물] 예상경비청구서 발송', $final_rgd, $user, null, 'settle_payment');
+                CommonFunc::insert_alarm('[보세화물] 예상경비청구서 발송', $final_rgd, $user, null, 'settle_payment', null);
 
 
             //Case of creating a final bill.
@@ -4260,7 +4260,7 @@ class RateDataController extends Controller
 
                 $final_rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $final_rgd->rgd_no)->first();
 
-                CommonFunc::insert_alarm('[보세화물] 확정청구서 발송', $final_rgd, $user, null, 'settle_payment');
+                CommonFunc::insert_alarm('[보세화물] 확정청구서 발송', $final_rgd, $user, null, 'settle_payment', null);
 
                 //UPDATE EST BILL WHEN ISSUE FINAL BILL
                 $est_rgd =  ReceivingGoodsDelivery::where('rgd_no', $final_rgd->rgd_parent_no)->first();

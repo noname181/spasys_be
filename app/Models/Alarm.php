@@ -12,7 +12,7 @@ use App\Models\Member;
 use App\Models\Export;
 use App\Models\ImportExpected;
 use App\Models\Import;
-
+use App\Models\ScheduleShipment;
 class Alarm extends Model
 {
     use HasFactory;
@@ -81,5 +81,9 @@ class Alarm extends Model
     public function alarm_data()
     {
         return $this->belongsTo(AlarmData::class, 'ad_no', 'ad_no');
+    }
+    public function schedule_shipment()
+    {
+        return $this->belongsTo(ScheduleShipment::class, 'ss_no', 'ss_no')->with(['ContractWms']);
     }
 }
