@@ -68,7 +68,7 @@ class CommonFunc
         return $string;
     }
 
-    static function insert_alarm($ad_title, $rgd, $sender, $w_no, $type)
+    static function insert_alarm($ad_title, $rgd, $sender, $w_no, $type, $price)
     {
         $ccccc = 0;
         $aaaaa = '';
@@ -99,6 +99,10 @@ class CommonFunc
 
         if($ad_title == '[공통] 계산서발행 안내' || $ad_title == '[공통] 계산서취소 안내'){
             $aaaaa = $rgd->rgd_settlement_number;
+        }
+
+        if($price != null){
+            $ccccc = $price;
         }
 
         $alarm_data = AlarmData::where('ad_title', $ad_title)->first();
