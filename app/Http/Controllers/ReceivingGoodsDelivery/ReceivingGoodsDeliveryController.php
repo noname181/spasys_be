@@ -2539,6 +2539,12 @@ class ReceivingGoodsDeliveryController extends Controller
                         'cbh_status_before' => 'taxed',
                         'cbh_status_after' => 'cancel'
                     ]);
+
+                    if ($rgd->rgd_status6 == 'paid') {
+                        ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                            'rgd_status8' =>  'completed',
+                        ]);
+                    }
                 }
 
                 ReceivingGoodsDelivery::where('tid_no', $rgd->tid_no)->update([
@@ -2570,6 +2576,12 @@ class ReceivingGoodsDeliveryController extends Controller
                     'cbh_status_before' => 'taxed',
                     'cbh_status_after' => 'cancel'
                 ]);
+
+                if ($rgd->rgd_status6 == 'paid') {
+                    ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                        'rgd_status8' =>  'completed',
+                    ]);
+                }
             }
 
 
@@ -3540,6 +3552,10 @@ class ReceivingGoodsDeliveryController extends Controller
                         'cbh_status_after' => 'completed',
                         'cbh_pay_method' => isset($request->p_method) ? $request->p_method : null
                     ]);
+
+                    ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                        'rgd_status8' => isset($request->p_method) && $request->p_method == 'deposit_without_bankbook'  ? 'in_process' : 'completed',
+                    ]);
                 }
 
 
@@ -3558,7 +3574,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 
                 if($request->p_method != 'deposit_without_bankbook'){
                     $sender = Member::where('mb_no', $rgd->mb_no)->first();
-                    CommonFunc::insert_alarm($ad_tile, $rgd, $sender, null, 'settle_payment', $request->sumprice);
+                    CommonFunc::insert_alarm($ad_tile, $rgd, $sender, null, 'settle_payment', $p_method_fee);
                 }
 
 
@@ -3595,6 +3611,10 @@ class ReceivingGoodsDeliveryController extends Controller
                         'cbh_status_after' => 'completed',
                         'cbh_pay_method' => isset($request->p_method) ? $request->p_method : null
                     ]);
+
+                    ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                        'rgd_status8' => isset($request->p_method) && $request->p_method == 'deposit_without_bankbook'  ? 'in_process' : 'completed',
+                    ]);
                 }
 
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
@@ -3612,7 +3632,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                 if($request->p_method != 'deposit_without_bankbook'){
                     $sender = Member::where('mb_no', $rgd->mb_no)->first();
-                    CommonFunc::insert_alarm($ad_tile, $rgd, $sender, null, 'settle_payment', $request->sumprice);
+                    CommonFunc::insert_alarm($ad_tile, $rgd, $sender, null, 'settle_payment', $p_method_fee);
                 }
               
             }
