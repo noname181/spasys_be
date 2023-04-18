@@ -537,6 +537,9 @@ class AlarmController extends Controller
 
                         });
 
+                    })->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('receiver_no')
+                        ->where('receiver_no', $user->mb_no);
                     });
                 })
                 ->orderBy('alarm_no', 'DESC');
