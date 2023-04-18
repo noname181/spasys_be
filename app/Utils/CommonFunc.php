@@ -184,6 +184,8 @@ class CommonFunc
 
                 $bbbbb = $w_no->receving_goods_delivery[0]->rgd_delivery_schedule_day;
 
+                $bbbbb = str_replace('-', '.', $bbbbb);
+
                 $cargo_number = $w_no->w_schedule_number;
             }
         } else if ($w_no->w_category_name == '보세화물') {
