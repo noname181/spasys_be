@@ -462,10 +462,7 @@ class AlarmController extends Controller
 
                         });
 
-                    })->orwhere(function($q) use ($user) {
-                        $q->whereNotNull('receiver_no')
-                        ->where('receiver_no', $user->mb_no);
-                    });
+                    })->orwhere('receiver_no', $user->mb_no);
                 })->orderBy('alarm_no', 'DESC');
             }
             else if($user->mb_type == 'shipper'){
@@ -541,10 +538,7 @@ class AlarmController extends Controller
 
                         });
 
-                    })->orwhere(function($q) use ($user) {
-                        $q->whereNotNull('receiver_no')
-                        ->where('receiver_no', $user->mb_no);
-                    });
+                    })->orwhere('receiver_no', $user->mb_no);
                 })
                 ->orderBy('alarm_no', 'DESC');
 
