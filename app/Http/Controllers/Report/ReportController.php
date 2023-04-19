@@ -31,6 +31,7 @@ class ReportController extends Controller
             $i = 0;
             $parent_no;
             DB::beginTransaction();
+            $user = Auth::user();
             if (!$request->rp_no) {
                 foreach ($request->rp_content as $rp_content) {
                     $report_no = Report::insertGetId([
@@ -81,6 +82,14 @@ class ReportController extends Controller
                     }
                     $i++;
                 }
+
+                $title = "[보세화물] 사진등록";
+                $title = "[수입풀필먼트]";
+                $title = "[유통가공]";
+
+
+                CommonFunc::insert_alarm_photo($title, null, $user, $request, 'photo');
+
             } else {
                 $rp_file_no = [];
                 foreach ($request->rp_content as $rp_content) {
@@ -231,6 +240,7 @@ class ReportController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'rp_no' => isset($rp_parent_new) ? $rp_parent_new : $report_no,
+                'user' => $user
             ]);
         } catch (\Exception $e) {
             DB::rollback();

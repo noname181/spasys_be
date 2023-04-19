@@ -4746,12 +4746,14 @@ class WarehousingController extends Controller
 
                     if (isset($item->rate_data_general->rdg_sum7)) {
                         $item->sum_price_total3 = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum7 : 0;
+                    } else if (isset($item->rate_data_general->rdg_sum6)) {
+                        $item->sum_price_total3 = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum6 : 0;
                     } else if (isset($item->rate_data_general->rdg_sum4)) {
                         $item->sum_price_total3 = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : 0;
+                    } 
+                     else {
+                        $item->sum_price_total3 = 0;
                     }
-                    //  else {
-                    //     $item->sum_price_total3 = 0;
-                    // }
 
 
                     if ($i == $k) {
