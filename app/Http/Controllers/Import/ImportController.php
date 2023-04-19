@@ -300,7 +300,6 @@ class ImportController extends Controller
             // ]);
 
             //THUONG ADDED
-            $warehousing = Warehousing::where('logistic_manage_number', $request->ti_logistic_manage_number)->first();
 
             $rgd = ReceivingGoodsDelivery::whereHas('warehousing', function($q) use($request){
                 $q->where('logistic_manage_number', $request->ti_logistic_manage_number);
