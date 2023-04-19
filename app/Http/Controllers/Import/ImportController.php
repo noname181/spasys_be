@@ -299,6 +299,22 @@ class ImportController extends Controller
             //     'co_name' => $request->company_name,
             // ]);
 
+            //THUONG ADDED
+
+            $rgd = ReceivingGoodsDelivery::whereHas('warehousing', function($q) use($request){
+                $q->where('logistic_manage_number', $request->ti_logistic_manage_number);
+            })->whereNull('rgd_status4')->whereNull('rgd_status5')->first();
+
+            if(isset($rgd->rgd_no)){
+                Warehousing::where('logistic_manage_number', $request->ti_logistic_manage_number)->update(
+                    [
+                        'co_no' => $company->co_no
+                    ]
+                    );
+    
+            }
+            //END THUONG ADDED
+            
             DB::commit();
             return response()->json(['message' => 'ok']);
         } catch (\Exception $e) {
