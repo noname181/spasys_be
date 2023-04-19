@@ -2524,12 +2524,17 @@ class RateDataController extends Controller
                     $co_no = $co_no->co_parent->co_no;
                 }
 
-            } else {
+            }else if ($user->mb_type == 'shop') {
                 if($is_check_page){
                     $co_no = $co_no->co_parent->co_no;
                 }else {
                     $co_no = $warehousing->co_no;
                 }
+
+            } else {
+              
+                $co_no = $warehousing->co_no;
+                
             }
 
             $ag_name = AdjustmentGroup::where('co_no', $co_no)->get();
