@@ -3761,6 +3761,24 @@ class ReceivingGoodsDeliveryController extends Controller
                         'cbh_status_before' => $rgd->rgd_status8,
                         'cbh_status_after' => 'in_process'
                     ]);
+
+                    ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                        'rgd_status8' =>  'in_process',
+                    ]);
+                   
+                    //UPDATE EST BILL
+                    $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
+                    ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
+                        'rgd_status8' => 'in_process',
+                    ]);
+                    CancelBillHistory::insertGetId([
+                        'rgd_no' => $est_rgd->rgd_no,
+                        'mb_no' => $user->mb_no,
+                        'cbh_type' => 'tax',
+                        'cbh_status_before' => $est_rgd->rgd_status8,
+                        'cbh_status_after' => 'in_process'
+                    ]);
+                
                 }
             }
 
