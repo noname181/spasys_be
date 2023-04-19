@@ -270,4 +270,32 @@ class CommonFunc
             //PUSH FUNCTION HERE
         }
     }
+
+    static function insert_alarm_photo($ad_title, $rgd, $sender, $w_no, $type)
+    {
+        $ccccc = 0;
+        $aaaaa = '';
+        $bbbbb = '';
+        $ddddd = '';
+        $cargo_number = '';
+
+        if ($w_no->w_category_name == '유통가공') {
+        } else if ($w_no->w_category_name == '보세화물') {
+        } else if ($w_no->w_category_name == '수입풀필먼트') {
+        }
+
+        $alarm_data = AlarmData::where('ad_title', $ad_title)->first();
+
+        $alarm_content = $alarm_data->ad_content;
+        $alarm_content = str_replace('aaaaa', $aaaaa, $alarm_content);
+        $alarm_content = str_replace('bbbbb', $bbbbb, $alarm_content);
+        $alarm_content = str_replace('ccccc', $ccccc, $alarm_content);
+        $alarm_content = str_replace('ddddd', $ddddd, $alarm_content);
+
+        if ($type == 'photo') {
+            $alarm_type = 'photo';
+        }
+
+        
+    }
 }
