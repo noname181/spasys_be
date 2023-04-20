@@ -576,7 +576,7 @@ class ImportScheduleController extends Controller
                 //     $query->where('rgd_status1', '=', $validated['status']);
                 // });
 
-                $import_schedule->where('aaa.rgd_status1', '=', $validated['status']);
+                $import_schedule->where('rgd_status1', '=', $validated['status']);
             }
             if (isset($validated['from_date'])) {
                 $import_schedule->where('aaa.tie_is_date', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
@@ -864,7 +864,7 @@ class ImportScheduleController extends Controller
             if (isset($validated['status'])) {
 
 
-                $import_schedule->where('aaa.rgd_status1', '=', $validated['status']);
+                $import_schedule->where('rgd_status1', '=', $validated['status']);
             }
             if (isset($validated['from_date'])) {
                 $import_schedule->where('aaa.tie_is_date', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
