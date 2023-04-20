@@ -5,6 +5,8 @@ namespace App\Utils;
 use App\Models\AlarmData;
 use App\Models\Alarm;
 use App\Models\Member;
+use App\Models\Company;
+use App\Models\Warehousing;
 use DateTime;
 use \Carbon\Carbon;
 
@@ -97,11 +99,11 @@ class CommonFunc
             $cargo_number = $rgd->warehousing->w_schedule_number_settle;
         }
 
-        if($ad_title == '[공통] 계산서발행 안내' || $ad_title == '[공통] 계산서취소 안내'){
+        if ($ad_title == '[공통] 계산서발행 안내' || $ad_title == '[공통] 계산서취소 안내') {
             $aaaaa = $rgd->rgd_settlement_number;
         }
 
-        if($price != null){
+        if ($price != null) {
             $ccccc = $price;
             $aaaaa = $rgd->rgd_status4;
         }
@@ -121,9 +123,9 @@ class CommonFunc
 
 
         if ($alarm_data->ad_must_yn == 'y') {
-            if($rgd->service_korean_name == '수입풀필먼트'){
+            if ($rgd->service_korean_name == '수입풀필먼트') {
                 $receiver_company = $rgd->warehousing->company;
-            }else if ($sender->mb_type == 'spasys') {
+            } else if ($sender->mb_type == 'spasys') {
                 $receiver_company = $rgd->warehousing->company->co_parent;
             } else if ($sender->mb_type == 'shop') {
                 $receiver_company = $rgd->warehousing->company;
@@ -131,9 +133,9 @@ class CommonFunc
             //ad_must_yn == 'y' send all members of receiver company
             $receiver_list = Member::where('co_no', $receiver_company->co_no)->get();
         } else if ($alarm_data->ad_must_yn == 'n') {
-            if($rgd->service_korean_name == '수입풀필먼트'){
+            if ($rgd->service_korean_name == '수입풀필먼트') {
                 $receiver_company = $rgd->warehousing->company;
-            }else if ($sender->mb_type == 'spasys') {
+            } else if ($sender->mb_type == 'spasys') {
                 $receiver_company = $rgd->warehousing->company->co_parent;
             } else if ($sender->mb_type == 'shop') {
                 $receiver_company = $rgd->warehousing->company;
@@ -183,7 +185,7 @@ class CommonFunc
                 $ddddd = $w_no->w_schedule_amount - $w_no->w_amount;
 
                 $cargo_number = $w_no->w_schedule_number;
-            } else {
+            } else if ($type == 'cargo_EW') {
 
                 $aaaaa = $w_no->w_import_parent->w_schedule_number2;
 
@@ -207,47 +209,47 @@ class CommonFunc
 
         if ($type == 'cargo_IW') {
             $alarm_type = 'cargo_IW';
-        }else{
+        } else if ($type == 'cargo_EW') {
             $alarm_type = 'cargo_EW';
         }
 
-
-
-        if ($alarm_data->ad_must_yn == 'y') {
-            if ($sender->mb_type == 'spasys') {
-                $receiver_spasys = $w_no->company->co_parent->co_parent;
-                $receiver_shop = $w_no->company->co_parent;
-                $receiver_shipper = $w_no->company;
-            } else if ($sender->mb_type == 'shop') {
-                $receiver_shipper = $w_no->company;
-                $receiver_shop = $w_no->company->co_parent;
-            } else if ($sender->mb_type == 'shipper') {
-                $receiver_shipper = $w_no->company;
-                $receiver_shop = $w_no->company->co_parent;
-            }
-            //ad_must_yn == 'n' send only members who have mb_push_yn = 'y'
-            if(isset($receiver_spasys)){
-                $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->orwhere('co_no', $receiver_shop->co_no)->orwhere('co_no', $receiver_shipper->co_no)->get();
-            }else{
-                $receiver_list = Member::where('co_no', $receiver_shop->co_no)->orwhere('co_no', $receiver_shipper->co_no)->get();
-            }
-        } else if ($alarm_data->ad_must_yn == 'n') {
-            if ($sender->mb_type == 'spasys') {
-                $receiver_spasys = $w_no->company->co_parent->co_parent;
-                $receiver_shop = $w_no->company->co_parent;
-                $receiver_shipper = $w_no->company;
-            } else if ($sender->mb_type == 'shop') {
-                $receiver_shipper = $w_no->company;
-                $receiver_shop = $w_no->company->co_parent;
-            } else if ($sender->mb_type == 'shipper') {
-                $receiver_shipper = $w_no->company;
-                $receiver_shop = $w_no->company->co_parent;
-            }
-            //ad_must_yn == 'n' send only members who have mb_push_yn = 'y'
-            if(isset($receiver_spasys)){
-                $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shop->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shipper->co_no)->where('mb_push_yn', 'y')->get();
-            }else{
-                $receiver_list = Member::where('co_no', $receiver_shop->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shipper->co_no)->where('mb_push_yn', 'y')->get();
+        if ($type == 'cargo_IW' ||  $alarm_type == 'cargo_EW') {
+            if ($alarm_data->ad_must_yn == 'y') {
+                if ($sender->mb_type == 'spasys') {
+                    $receiver_spasys = $w_no->company->co_parent->co_parent;
+                    $receiver_shop = $w_no->company->co_parent;
+                    $receiver_shipper = $w_no->company;
+                } else if ($sender->mb_type == 'shop') {
+                    $receiver_shipper = $w_no->company;
+                    $receiver_shop = $w_no->company->co_parent;
+                } else if ($sender->mb_type == 'shipper') {
+                    $receiver_shipper = $w_no->company;
+                    $receiver_shop = $w_no->company->co_parent;
+                }
+                //ad_must_yn == 'n' send only members who have mb_push_yn = 'y'
+                if (isset($receiver_spasys)) {
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->orwhere('co_no', $receiver_shop->co_no)->orwhere('co_no', $receiver_shipper->co_no)->get();
+                } else {
+                    $receiver_list = Member::where('co_no', $receiver_shop->co_no)->orwhere('co_no', $receiver_shipper->co_no)->get();
+                }
+            } else if ($alarm_data->ad_must_yn == 'n') {
+                if ($sender->mb_type == 'spasys') {
+                    $receiver_spasys = $w_no->company->co_parent->co_parent;
+                    $receiver_shop = $w_no->company->co_parent;
+                    $receiver_shipper = $w_no->company;
+                } else if ($sender->mb_type == 'shop') {
+                    $receiver_shipper = $w_no->company;
+                    $receiver_shop = $w_no->company->co_parent;
+                } else if ($sender->mb_type == 'shipper') {
+                    $receiver_shipper = $w_no->company;
+                    $receiver_shop = $w_no->company->co_parent;
+                }
+                //ad_must_yn == 'n' send only members who have mb_push_yn = 'y'
+                if (isset($receiver_spasys)) {
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shop->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shipper->co_no)->where('mb_push_yn', 'y')->get();
+                } else {
+                    $receiver_list = Member::where('co_no', $receiver_shop->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shipper->co_no)->where('mb_push_yn', 'y')->get();
+                }
             }
         }
 
@@ -271,7 +273,7 @@ class CommonFunc
         }
     }
 
-    static function insert_alarm_photo($ad_title, $rgd, $sender, $w_no, $type)
+    static function insert_alarm_photo($ad_title, $rgd, $sender, $request, $type)
     {
         $ccccc = 0;
         $aaaaa = '';
@@ -279,23 +281,64 @@ class CommonFunc
         $ddddd = '';
         $cargo_number = '';
 
-        if ($w_no->w_category_name == '유통가공') {
-        } else if ($w_no->w_category_name == '보세화물') {
-        } else if ($w_no->w_category_name == '수입풀필먼트') {
+        // if ($request->type == '유통가공') {
+        // } else if ($request->type == '보세화물') {
+        // } else if ($request->type == '수입풀필먼트') {
+        // }
+
+        foreach ($request->rp_content as $rp_content) {
+            $aaaaa = $request->w_schedule_number;
+            $bbbbb = $request->rp_cate;
+            $ccccc = $rp_content;
+
+            $alarm_data = AlarmData::where('ad_title', $ad_title)->first();
+
+            $alarm_content = $alarm_data->ad_content;
+            $alarm_content = str_replace('aaaaa', $aaaaa, $alarm_content);
+            $alarm_content = str_replace('bbbbb', $bbbbb, $alarm_content);
+            $alarm_content = str_replace('ccccc', $ccccc, $alarm_content);
+            $alarm_content = str_replace('ddddd', $ddddd, $alarm_content);
+            $cargo_number = $request->w_schedule_number;
+
+            if ($type == 'photo') {
+                $alarm_type = 'photo';
+            }
+
+            if ($sender->mb_type == 'spasys') {
+                if ($request->type == '보세화물') {
+                    $receiver = Member::where('co_no', $request->co_no)->first();
+                    $receiver_spasys = $receiver->company->co_parent->co_parent;
+                    $receiver_shop = $receiver->company->co_parent;
+                    $receiver_shipper = $receiver->company;
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shop->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shipper->co_no)->where('mb_push_yn', 'y')->get();
+                } else {
+                    $receiver = Warehousing::with('mb_no')
+                    ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->where('w_no', $request->w_no)
+                    ->orderBy('w_completed_day', 'DESC')->first();
+                    $receiver_spasys = $receiver->company->co_parent->co_parent;
+                    $receiver_shop = $receiver->company->co_parent;
+                    $receiver_shipper = $receiver->company;
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shop->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shipper->co_no)->where('mb_push_yn', 'y')->get();
+                }
+            }
+
+            foreach ($receiver_list as $receiver) {
+
+                //INSERT ALARM FOR RECEIVER LIST USER
+                Alarm::insertGetId(
+                    [
+                        'w_no' => $request->w_no,
+                        'mb_no' => $sender->mb_no,
+                        'receiver_no' => $receiver->mb_no,
+                        'alarm_content' => $alarm_content,
+                        'alarm_h_bl' => $cargo_number,
+                        'alarm_type' => $alarm_type,
+                        'ad_no' => $alarm_data->ad_no,
+                    ]
+                );
+    
+                //PUSH FUNCTION HERE
+            }
         }
-
-        $alarm_data = AlarmData::where('ad_title', $ad_title)->first();
-
-        $alarm_content = $alarm_data->ad_content;
-        $alarm_content = str_replace('aaaaa', $aaaaa, $alarm_content);
-        $alarm_content = str_replace('bbbbb', $bbbbb, $alarm_content);
-        $alarm_content = str_replace('ccccc', $ccccc, $alarm_content);
-        $alarm_content = str_replace('ddddd', $ddddd, $alarm_content);
-
-        if ($type == 'photo') {
-            $alarm_type = 'photo';
-        }
-
-        
     }
 }

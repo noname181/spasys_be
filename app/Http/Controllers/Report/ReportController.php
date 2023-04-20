@@ -32,6 +32,7 @@ class ReportController extends Controller
             $parent_no;
             DB::beginTransaction();
             $user = Auth::user();
+        
             if (!$request->rp_no) {
                 foreach ($request->rp_content as $rp_content) {
                     $report_no = Report::insertGetId([
@@ -82,12 +83,15 @@ class ReportController extends Controller
                     }
                     $i++;
                 }
-
-                $title = "[보세화물] 사진등록";
-                $title = "[수입풀필먼트]";
-                $title = "[유통가공]";
-
-
+                
+                if($request->type == "보세화물"){
+                    $title = "[보세화물] 사진등록";
+                }elseif($request->type == "수입풀필먼트"){
+                    $title = "[수입풀필먼트]";
+                }else{
+                    $title = "[유통가공]";
+                }
+            
                 CommonFunc::insert_alarm_photo($title, null, $user, $request, 'photo');
 
             } else {
