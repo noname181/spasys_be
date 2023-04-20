@@ -6090,16 +6090,18 @@ class WarehousingController extends Controller
 
                             //UPDATE EST BILL
                             $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
-                            ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
-                                'rgd_status8' => 'completed',
-                            ]);
-                            CancelBillHistory::insertGetId([
-                                'rgd_no' => $est_rgd->rgd_no,
-                                'mb_no' => $user->mb_no,
-                                'cbh_type' => 'tax',
-                                'cbh_status_before' => $est_rgd->rgd_status8,
-                                'cbh_status_after' => 'completed'
-                            ]);
+                            if($est_rgd->rgd_status8 != 'completed'){
+                                ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
+                                    'rgd_status8' => 'completed',
+                                ]);
+                                CancelBillHistory::insertGetId([
+                                    'rgd_no' => $est_rgd->rgd_no,
+                                    'mb_no' => $user->mb_no,
+                                    'cbh_type' => 'tax',
+                                    'cbh_status_before' => $est_rgd->rgd_status8,
+                                    'cbh_status_after' => 'completed'
+                                ]);
+                            }
                         }
                     }
                     $ids[] = $id;
@@ -6188,16 +6190,18 @@ class WarehousingController extends Controller
 
                             //UPDATE EST BILL
                             $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
-                            ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
-                                'rgd_status8' => 'completed',
-                            ]);
-                            CancelBillHistory::insertGetId([
-                                'rgd_no' => $est_rgd->rgd_no,
-                                'mb_no' => $user->mb_no,
-                                'cbh_type' => 'tax',
-                                'cbh_status_before' => $est_rgd->rgd_status8,
-                                'cbh_status_after' => 'completed'
-                            ]);
+                            if($est_rgd->rgd_status8 != 'completed'){
+                                ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
+                                    'rgd_status8' => 'completed',
+                                ]);
+                                CancelBillHistory::insertGetId([
+                                    'rgd_no' => $est_rgd->rgd_no,
+                                    'mb_no' => $user->mb_no,
+                                    'cbh_type' => 'tax',
+                                    'cbh_status_before' => $est_rgd->rgd_status8,
+                                    'cbh_status_after' => 'completed'
+                                ]);
+                            }
                         }
                     }
                     $ids[] = $id;
@@ -6264,16 +6268,18 @@ class WarehousingController extends Controller
 
                         //UPDATE EST BILL
                         $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
-                        ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
-                            'rgd_status8' => 'completed',
-                        ]);
-                        CancelBillHistory::insertGetId([
-                            'rgd_no' => $est_rgd->rgd_no,
-                            'mb_no' => $user->mb_no,
-                            'cbh_type' => 'tax',
-                            'cbh_status_before' => $est_rgd->rgd_status8,
-                            'cbh_status_after' => 'completed'
-                        ]);
+                        if($est_rgd->rgd_status8 != 'completed'){
+                            ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
+                                'rgd_status8' => 'completed',
+                            ]);
+                            CancelBillHistory::insertGetId([
+                                'rgd_no' => $est_rgd->rgd_no,
+                                'mb_no' => $user->mb_no,
+                                'cbh_type' => 'tax',
+                                'cbh_status_before' => $est_rgd->rgd_status8,
+                                'cbh_status_after' => 'completed'
+                            ]);
+                        }
                     }
                 }
                 DB::commit();
@@ -6346,16 +6352,18 @@ class WarehousingController extends Controller
 
                        //UPDATE EST BILL
                        $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
-                       ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
-                           'rgd_status8' => 'completed',
-                       ]);
-                       CancelBillHistory::insertGetId([
-                           'rgd_no' => $est_rgd->rgd_no,
-                           'mb_no' => $user->mb_no,
-                           'cbh_type' => 'tax',
-                           'cbh_status_before' => $est_rgd->rgd_status8,
-                           'cbh_status_after' => 'completed'
-                       ]);
+                       if($est_rgd->rgd_status8 != 'completed'){
+                            ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
+                                'rgd_status8' => 'completed',
+                            ]);
+                            CancelBillHistory::insertGetId([
+                                'rgd_no' => $est_rgd->rgd_no,
+                                'mb_no' => $user->mb_no,
+                                'cbh_type' => 'tax',
+                                'cbh_status_before' => $est_rgd->rgd_status8,
+                                'cbh_status_after' => 'completed'
+                            ]);
+                        }
                     }
                 }
                 DB::commit();
