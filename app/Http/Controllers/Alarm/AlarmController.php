@@ -561,7 +561,21 @@ class AlarmController extends Controller
                 $alarm = Alarm::with('warehousing','member','export')->where('alarm.mb_no','=',$user->mb_no)->orderBy('alarm_no', 'DESC');
 
             } else if ($user->mb_type == 'spasys'){
-                $alarm = Alarm::with('warehousing','member','import_expect','schedule_shipment')->where('alarm.mb_no','=',$user->mb_no)->orderBy('alarm_no', 'DESC');
+                $alarm = Alarm::select('t_import.ti_no','t_export.te_no','alarm.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with('warehousing','member','schedule_shipment')->leftjoin('t_import_expected', function ($join) {
+                    $join->on('alarm.alarm_h_bl', '=', 't_import_expected.tie_h_bl');
+                })->leftjoin('company as company_spasys', function ($join) {
+                    $join->on('company_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
+                })->leftjoin('company as company_shop', function ($join) {
+                    $join->on('company_shop.co_license', '=', 't_import_expected.tie_co_license');
+                })->leftjoin('company as company_spasys_parent', function ($join) {
+                    $join->on('company_spasys_parent.co_no', '=', 'company_spasys.co_parent_no');
+                })->leftjoin('company as company_shop_parent', function ($join) {
+                    $join->on('company_shop_parent.co_no', '=', 'company_shop.co_parent_no');
+                })->leftjoin('t_export', function ($join) {
+                    $join->on('t_export.te_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
+                })->leftjoin('t_import', function ($join) {
+                    $join->on('t_import.ti_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
+                })->where('alarm.mb_no','=',$user->mb_no)->orderBy('alarm_no', 'DESC');
             }
 
 
@@ -571,11 +585,11 @@ class AlarmController extends Controller
             }
 
             if (isset($validated['from_date'])) {
-                $alarm->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                $alarm->where('alarm.created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
 
             if (isset($validated['to_date'])) {
-                $alarm->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                $alarm->where('alarm.created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
             }
             // if (isset($validated['co_parent_name'])) {
             //     $alarm->whereHas('member.company.co_parent', function ($query) use ($validated) {
