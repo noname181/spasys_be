@@ -575,7 +575,7 @@ class AlarmController extends Controller
                     $join->on('t_export.te_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
                 })->leftjoin('t_import', function ($join) {
                     $join->on('t_import.ti_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
-                })->where('alarm.mb_no','=',$user->mb_no)->orderBy('alarm_no', 'DESC');
+                })->where('alarm.mb_no','=',$user->mb_no)->whereNull('alarm.alarm_type')->orderBy('alarm_no', 'DESC');
             }
 
 
