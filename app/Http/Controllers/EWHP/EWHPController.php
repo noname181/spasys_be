@@ -138,6 +138,7 @@ class EWHPController extends Controller
                         ReceivingGoodsDelivery::insertGetId([
                             'is_no' => $is_no,
                             'service_korean_name' => '보세화물',
+                            'rgd_status1' => '반출',
                             'rgd_status3' => '배송준비',
                         ]);
                     }
