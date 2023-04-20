@@ -2785,7 +2785,7 @@ class RateDataController extends Controller
             if(isset($final_rgd) && !str_contains($request->type, 'edit')){
                 $final_rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $final_rgd->rgd_no)->first();
 
-                CommonFunc::insert_alarm('[유통가공] 예상경비청구서 발송', $final_rgd, $user, null, 'settle_payment', null);
+                CommonFunc::insert_alarm($request->type == 'create_final' ? '[유통가공] 확정청구서 발송' : '[유통가공] 예상경비청구서 발송', $final_rgd, $user, null, 'settle_payment', null);
             }
 
             DB::commit();
