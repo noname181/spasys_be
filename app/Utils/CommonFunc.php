@@ -78,27 +78,37 @@ class CommonFunc
         $ddddd = '';
         $cargo_number = '';
 
-        if ($rgd->service_korean_name == '유통가공') {
-            $ccccc = $rgd->rate_data_general->rdg_sum4;
-            $bbbbb = $rgd->rgd_settlement_number;
-            $aaaaa = $rgd->warehousing->w_schedule_number2;
-            $ddddd = str_contains($rgd->rgd_bill_type, 'month') ? '월별 확정청구서로 결제요청 예정입니다.' : '결제를 진행해주세요.';
-            $cargo_number = $rgd->warehousing->w_schedule_number2;
-        } else if ($rgd->service_korean_name == '보세화물') {
-            $ccccc = $rgd->rate_data_general->rdg_sum7;
-            $bbbbb = $rgd->rgd_settlement_number;
-            $aaaaa = $rgd->t_import_expected->tie_h_bl;
-            $ddddd = str_contains($rgd->rgd_bill_type, 'month') ? '월별 확정청구서로 결제요청 예정입니다.' : '결제를 진행해주세요.';
-            $cargo_number = $rgd->t_import_expected->tie_h_bl;
-        } else if ($rgd->service_korean_name == '수입풀필먼트') {
-            $ccccc = $rgd->rate_data_general->rdg_sum6;
-            $bbbbb = $rgd->rgd_settlement_number;
-            $aaaaa = Carbon::parse($rgd->created_at)->format('Y.m');
-            $aaaaa = str_replace('.', '년 ', $aaaaa) . '월';
-            $ddddd = str_contains($rgd->rgd_bill_type, 'month') ? '월별 확정청구서로 결제요청 예정입니다.' : '결제를 진행해주세요.';
-            $cargo_number = $rgd->warehousing->w_schedule_number_settle;
+        if($type == 'settle_payment'){
+            $alarm_type = 'auto';
+            if ($rgd->service_korean_name == '유통가공') {
+                $ccccc = $rgd->rate_data_general->rdg_sum4;
+                $bbbbb = $rgd->rgd_settlement_number;
+                $aaaaa = $rgd->warehousing->w_schedule_number2;
+                $ddddd = str_contains($rgd->rgd_bill_type, 'month') ? '월별 확정청구서로 결제요청 예정입니다.' : '결제를 진행해주세요.';
+                $cargo_number = $rgd->warehousing->w_schedule_number2;
+            } else if ($rgd->service_korean_name == '보세화물') {
+                $ccccc = $rgd->rate_data_general->rdg_sum7;
+                $bbbbb = $rgd->rgd_settlement_number;
+                $aaaaa = $rgd->t_import_expected->tie_h_bl;
+                $ddddd = str_contains($rgd->rgd_bill_type, 'month') ? '월별 확정청구서로 결제요청 예정입니다.' : '결제를 진행해주세요.';
+                $cargo_number = $rgd->t_import_expected->tie_h_bl;
+            } else if ($rgd->service_korean_name == '수입풀필먼트') {
+                $ccccc = $rgd->rate_data_general->rdg_sum6;
+                $bbbbb = $rgd->rgd_settlement_number;
+                $aaaaa = Carbon::parse($rgd->created_at)->format('Y.m');
+                $aaaaa = str_replace('.', '년 ', $aaaaa) . '월';
+                $ddddd = str_contains($rgd->rgd_bill_type, 'month') ? '월별 확정청구서로 결제요청 예정입니다.' : '결제를 진행해주세요.';
+                $cargo_number = $rgd->warehousing->w_schedule_number_settle;
+            }
+        }else if($type == 'update_company'){
+            $alarm_type = 'update_company';
+            $aaaaa = $rgd->co_name;
+            $bbbbb = $rgd->co_license;
+            $ccccc = '휴폐업';
         }
+       
 
+        //SPECIFIC CASE
         if ($ad_title == '[공통] 계산서발행 안내' || $ad_title == '[공통] 계산서취소 안내') {
             $aaaaa = $rgd->rgd_settlement_number;
         }
@@ -108,6 +118,8 @@ class CommonFunc
             $aaaaa = $rgd->rgd_status4;
         }
 
+        //END SPECIFIC CASE
+
         $alarm_data = AlarmData::where('ad_title', $ad_title)->first();
 
         $alarm_content = $alarm_data->ad_content;
@@ -116,48 +128,94 @@ class CommonFunc
         $alarm_content = str_replace('ccccc', $ccccc, $alarm_content);
         $alarm_content = str_replace('ddddd', $ddddd, $alarm_content);
 
-        if ($type == 'settle_payment') {
-            $alarm_type = 'auto';
+
+        if($type == 'settle_payment'){
+            if ($alarm_data->ad_must_yn == 'y') {
+                if ($rgd->service_korean_name == '수입풀필먼트') {
+                    $receiver_company = $rgd->warehousing->company;
+                } else if ($sender->mb_type == 'spasys') {
+                    $receiver_company = $rgd->warehousing->company->co_parent;
+                } else if ($sender->mb_type == 'shop') {
+                    $receiver_company = $rgd->warehousing->company;
+                }
+                //ad_must_yn == 'y' send all members of receiver company
+                $receiver_list = Member::where('co_no', $receiver_company->co_no)->get();
+            } else if ($alarm_data->ad_must_yn == 'n') {
+                if ($rgd->service_korean_name == '수입풀필먼트') {
+                    $receiver_company = $rgd->warehousing->company;
+                } else if ($sender->mb_type == 'spasys') {
+                    $receiver_company = $rgd->warehousing->company->co_parent;
+                } else if ($sender->mb_type == 'shop') {
+                    $receiver_company = $rgd->warehousing->company;
+                }
+                //ad_must_yn == 'n' send only members who have mb_push_yn = 'y'
+                $receiver_list = Member::where('co_no', $receiver_company->co_no)->where('mb_push_yn', 'y')->get();
+            }
+        }else if($type == 'update_company' && $rgd->contract->c_transaction_yn == 'c'){
+            
+            //SPASYS UPDATE SHOP
+            if($sender->mb_type == 'spasys' && $rgd->co_type == 'shop'){
+                $receiver_list = Member::where(function ($q) use($sender, $rgd) {
+                    $q->where('co_no', $sender->co_no)
+                    ->orwhere('co_no', $rgd->co_no)
+                    ->orwherehas('company.co_parent', function($q) use($sender, $rgd) {
+                        $q->where('co_no', $rgd->co_no);
+                    });
+                });
+            //SPASYS UPDATE SHIPPER
+            }else if($sender->mb_type == 'spasys' && $rgd->co_type == 'shipper'){
+                $receiver_list = Member::where(function ($q) use($sender, $rgd) {
+                    $q->where('co_no', $sender->co_no)
+                    ->orwhere('co_no', $rgd->co_no)
+                    ->orwhere('co_no', $rgd->co_parent_no);
+                });
+            //SHOP UPDATE SHIPPER
+            }else if($sender->mb_type == 'shop' && $rgd->co_type == 'shipper'){
+                $receiver_list = Member::where(function ($q) use($sender, $rgd) {
+                    $shop = Company::with(['co_parent'])->where('co_no', $sender->co_no)->first();
+
+                    $q->where('co_no', $sender->co_no)
+                    ->orwhere('co_no', $rgd->co_no)
+                    ->orwhere('co_no', $shop->co_parent_no);
+                });
+            }
+
+            if ($alarm_data->ad_must_yn == 'y') {
+                $receiver_list =  $receiver_list->get();
+            }else {
+                $receiver_list = $receiver_list->where('co_push_yn', 'y')->get();
+            }
+            
         }
 
-
-
-        if ($alarm_data->ad_must_yn == 'y') {
-            if ($rgd->service_korean_name == '수입풀필먼트') {
-                $receiver_company = $rgd->warehousing->company;
-            } else if ($sender->mb_type == 'spasys') {
-                $receiver_company = $rgd->warehousing->company->co_parent;
-            } else if ($sender->mb_type == 'shop') {
-                $receiver_company = $rgd->warehousing->company;
-            }
-            //ad_must_yn == 'y' send all members of receiver company
-            $receiver_list = Member::where('co_no', $receiver_company->co_no)->get();
-        } else if ($alarm_data->ad_must_yn == 'n') {
-            if ($rgd->service_korean_name == '수입풀필먼트') {
-                $receiver_company = $rgd->warehousing->company;
-            } else if ($sender->mb_type == 'spasys') {
-                $receiver_company = $rgd->warehousing->company->co_parent;
-            } else if ($sender->mb_type == 'shop') {
-                $receiver_company = $rgd->warehousing->company;
-            }
-            //ad_must_yn == 'n' send only members who have mb_push_yn = 'y'
-            $receiver_list = Member::where('co_no', $receiver_company->co_no)->where('mb_push_yn', 'y')->get();
-        }
-
-
+       
         foreach ($receiver_list as $receiver) {
             //INSERT ALARM FOR RECEIVER LIST USER
-            Alarm::insertGetId(
-                [
-                    'w_no' => $rgd->w_no,
-                    'mb_no' => $sender->mb_no,
-                    'receiver_no' => $receiver->mb_no,
-                    'alarm_content' => $alarm_content,
-                    'alarm_h_bl' => $cargo_number,
-                    'alarm_type' => $alarm_type,
-                    'ad_no' => $alarm_data->ad_no,
-                ]
-            );
+            if($type == 'settle_payment'){
+                Alarm::insertGetId(
+                    [
+                        'w_no' => $rgd->w_no,
+                        'mb_no' => $sender->mb_no,
+                        'receiver_no' => $receiver->mb_no,
+                        'alarm_content' => $alarm_content,
+                        'alarm_h_bl' => $cargo_number,
+                        'alarm_type' => $alarm_type,
+                        'ad_no' => $alarm_data->ad_no,
+                    ]
+                );
+            }else if($type == 'update_company'){
+                Alarm::insertGetId(
+                    [
+                        'w_no' => null,
+                        'mb_no' => $sender->mb_no,
+                        'receiver_no' => $receiver->mb_no,
+                        'alarm_content' => $alarm_content,
+                        'alarm_h_bl' => null,
+                        'alarm_type' => $alarm_type,
+                        'ad_no' => $alarm_data->ad_no,
+                    ]
+                );
+            }
 
             //PUSH FUNCTION HERE
         }

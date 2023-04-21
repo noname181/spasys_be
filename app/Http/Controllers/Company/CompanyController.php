@@ -26,7 +26,7 @@ use App\Models\ImportExpected;
 use App\Models\CompanyPayment;
 use App\Models\ExportConfirm;
 use Illuminate\Http\Request;
-
+use App\Utils\CommonFunc;
 class CompanyController extends Controller
 {
     /**
@@ -332,8 +332,17 @@ class CompanyController extends Controller
     public function updateCompany(InvokeRequest $request, Company $company)
     {
         $validated = $request->validated();
+        $user = Auth::user();
         try {
             DB::beginTransaction();
+
+            //INSERT ALARM
+            $company = Company::with(['contract'])->where('co_no', $company->co_no)->first();
+            if($company->co_close_yn == 'y' && $validated['co_close_yn'] == 'n'){
+                CommonFunc::insert_alarm('휴페업 안내', $company, $user, null, 'update_company', null);
+            }
+
+            //END INSERT ALARM
 
             $comp = Company::where('co_no', $company->co_no)
                 // ->where('mb_no', Auth::user()->mb_no)
@@ -361,6 +370,8 @@ class CompanyController extends Controller
             //         'ca_address_detail' => $validated['co_address_detail']
             //     ]);
 
+            
+
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -370,6 +381,7 @@ class CompanyController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0002], 500);
         }
     }
