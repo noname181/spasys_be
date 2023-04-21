@@ -3524,7 +3524,7 @@ class WarehousingController extends Controller
             $check_paid = 0;
             $user = Auth::user();
             if ($type == 'monthly') {
-                $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing'])->where('rgd_no', $rgd_no)->first();
+                $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing', 'rgd_parent_payment', 'rate_data_general'])->where('rgd_no', $rgd_no)->first();
                 $contract = Contract::where('co_no',  $user->co_no)->first();
                 if (isset($contract->c_calculate_deadline_yn)) {
                     $rgd['c_calculate_deadline_yn'] = $contract->c_calculate_deadline_yn;
@@ -3600,7 +3600,7 @@ class WarehousingController extends Controller
                 $time = str_replace('-', '.', $start_date) . ' ~ ' . str_replace('-', '.', $end_date);
             }
             if ($type == 'monthly_edit') {
-                $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing'])->where('rgd_no', $rgd_no)->first();
+                $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing' , 'rgd_parent_payment', 'rate_data_general'])->where('rgd_no', $rgd_no)->first();
                 $contract = Contract::where('co_no',  $user->co_no)->first();
                 if (isset($contract->c_calculate_deadline_yn)) {
                     $rgd['c_calculate_deadline_yn'] = $contract->c_calculate_deadline_yn;
@@ -3716,7 +3716,7 @@ class WarehousingController extends Controller
                     $rgd['c_calculate_deadline_yn'] = 'n';
                 }
             } else {
-                $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing'])->where('rgd_no', $rgd_no)->first();
+                $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing', 'rgd_parent_payment', 'rate_data_general'])->where('rgd_no', $rgd_no)->first();
 
                 $contract = Contract::where('co_no',  $user->co_no)->first();
                 if (isset($contract->c_calculate_deadline_yn)) {
