@@ -1415,7 +1415,7 @@ class ImportScheduleController extends Controller
             $import_schedule = $import_schedule->paginate($per_page, ['*'], 'page', $page);
 
             $import_schedule->setCollection(
-                $import_schedule->getCollection()->map(function ($item) {
+                $import_schedule->getCollection()->map(function ($item) use($validated) {
                     if (isset($item->te_e_number)) {
                       $item->number = $item->te_e_number;
                       } else if (isset($item->ti_i_number)) {
@@ -1423,7 +1423,9 @@ class ImportScheduleController extends Controller
                       } else if (isset($item->tie_is_number)) {
                          $item->number =  $item->tie_is_number;
                       }
-
+                      if(isset($validated['tie_status'])){
+                        $item->status_services1 = $validated['tie_status'];
+                      }
                     return $item;
                 })
             );
