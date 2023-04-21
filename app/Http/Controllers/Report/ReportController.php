@@ -87,9 +87,9 @@ class ReportController extends Controller
                 if($request->type == "보세화물"){
                     $title = "[보세화물] 사진등록";
                 }elseif($request->type == "수입풀필먼트"){
-                    $title = "[수입풀필먼트]";
+                    $title = "[수입풀필먼트] 사진등록";
                 }else{
-                    $title = "[유통가공]";
+                    $title = "[유통가공] 사진등록";
                 }
             
                 CommonFunc::insert_alarm_photo($title, null, $user, $request, 'photo');
