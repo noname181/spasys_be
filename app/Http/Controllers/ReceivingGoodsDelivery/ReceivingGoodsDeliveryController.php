@@ -78,7 +78,7 @@ class ReceivingGoodsDeliveryController extends Controller
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
             $user = Auth::user();
-
+           
             if (isset($validated['w_no'])) {
                 Warehousing::where('w_no', $validated['w_no'])->update([
                     'w_schedule_amount' => $validated['w_schedule_amount'],
@@ -531,6 +531,10 @@ class ReceivingGoodsDeliveryController extends Controller
                 if (!isset($validated['w_no'])){
                     $w_no_alert = Warehousing::with(['receving_goods_delivery'])->where('w_no', $w_no)->first();
                     CommonFunc::insert_alarm_cargo('[유통가공] 입고예정', null, $user, $w_no_alert, 'cargo_IW');
+                }
+                if($user->mb_type != 'spasys'){
+                    $w_no_alert = Warehousing::with(['receving_goods_delivery'])->where('w_no', $w_no)->first();
+                    //CommonFunc::insert_alarm_cargo_request('[유통가공]', null, $user, $w_no_alert, 'cargo_request');
                 }
             }
             
