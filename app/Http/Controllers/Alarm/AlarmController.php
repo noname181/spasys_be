@@ -549,6 +549,7 @@ class AlarmController extends Controller
     public function searchAlarms_send(AlarmSearchRequest $request)
     {
         $validated = $request->validated();
+         DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
         try {
             // If per_page is null set default data = 15
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
@@ -696,7 +697,8 @@ class AlarmController extends Controller
                 }
 
             }
-            $alarm = $alarm->paginate($per_page, ['*'], 'page', $page);
+            $alarm = $alarm->groupBy('alarm_no')->paginate($per_page, ['*'], 'page', $page);
+            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
 
             return response()->json($alarm);
         } catch (\Exception $e) {
