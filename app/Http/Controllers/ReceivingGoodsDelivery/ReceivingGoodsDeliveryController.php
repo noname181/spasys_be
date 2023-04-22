@@ -532,9 +532,9 @@ class ReceivingGoodsDeliveryController extends Controller
                     $w_no_alert = Warehousing::with(['receving_goods_delivery'])->where('w_no', $w_no)->first();
                     CommonFunc::insert_alarm_cargo('[유통가공] 입고예정', null, $user, $w_no_alert, 'cargo_IW');
                 }
-                if($user->mb_type != 'spasys'){
+                if($user->mb_type != 'spasys' && $validated['wr_contents']){
                     $w_no_alert = Warehousing::with(['receving_goods_delivery'])->where('w_no', $w_no)->first();
-                    //CommonFunc::insert_alarm_cargo_request('[유통가공]', null, $user, $w_no_alert, 'cargo_request');
+                    $aaaa = CommonFunc::insert_alarm_cargo_request('[유통가공]', $validated['wr_contents'], $user, $w_no_alert, 'cargo_request');
                 }
             }
             
@@ -547,6 +547,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 'w_schedule_number2' => isset($w_schedule_number2) ? $w_schedule_number2 : '',
                 'w_no' => isset($w_no) ? $w_no :  $validated['w_no'],
                 'w_no_alert' => isset($w_no_alert) ? $w_no_alert :  null,
+                'aaaa' => $aaaa
             ], 201);
         } catch (\Throwable $e) {
             DB::rollback();
