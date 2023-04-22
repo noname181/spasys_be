@@ -208,6 +208,7 @@ class CommonFunc
                     [
                         'w_no' => null,
                         'mb_no' => $sender->mb_no,
+                        'co_no' => $rgd->co_no,
                         'receiver_no' => $receiver->mb_no,
                         'alarm_content' => $alarm_content,
                         'alarm_h_bl' => null,
