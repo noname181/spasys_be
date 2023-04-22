@@ -1151,6 +1151,11 @@ class ReceivingGoodsDeliveryController extends Controller
                         CommonFunc::insert_alarm_cargo('[유통가공] 출고', null, $user, $w_no_alert, 'cargo_EW');
                     }
                 }
+            }else{
+                if($user->mb_type != 'spasys' && $request->wr_contents){
+                    $w_no_alert = Warehousing::with(['receving_goods_delivery'])->where('w_no', isset($request->w_no) ? $request->w_no : $w_no)->first();
+                    $aaaa = CommonFunc::insert_alarm_cargo_request('[유통가공]', $request->wr_contents, $user, $w_no_alert, 'cargo_request');
+                }
             }
 
             DB::commit();
