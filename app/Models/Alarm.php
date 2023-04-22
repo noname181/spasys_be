@@ -54,11 +54,15 @@ class Alarm extends Model
     // }
     public function warehousing()
     {
-        return $this->belongsTo(Warehousing::class, 'w_no', 'w_no')->with(['warehousing_item','company']);;
+        return $this->belongsTo(Warehousing::class, 'w_no', 'w_no')->with(['warehousing_item','company']);
     }
     public function member()
     {
-        return $this->hasOne(Member::class, 'mb_no', 'mb_no');;
+        return $this->hasOne(Member::class, 'mb_no', 'mb_no');
+    }
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'co_no', 'co_no')->with(['co_parent']);
     }
     // public function export()
     // {

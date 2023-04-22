@@ -72,7 +72,7 @@ class AdjustmentGroupController extends Controller
                         'ag_hp' => $value['ag_hp'],
                         'ag_manager' => $value['ag_manager'],
                         'ag_email' => $value['ag_email'],
-                        'ag_email2' => isset($value['ag_email2']) ? $value['ag_email2'] : 'n',
+                        'ag_email2' => isset($value['ag_email2']) ? $value['ag_email2'] : null,
                         'ag_auto_issue' => isset($value['ag_auto_issue']) ? $value['ag_auto_issue'] : 'n',
                     ]);
                     $id = $ag->first()->ag_no;
@@ -84,7 +84,7 @@ class AdjustmentGroupController extends Controller
                         'ag_hp' => $value['ag_hp'],
                         'ag_manager' => $value['ag_manager'],
                         'ag_email' => $value['ag_email'],
-                        'ag_email2' => isset($value['ag_email2']) ? $value['ag_email2'] : 'n',
+                        'ag_email2' => isset($value['ag_email2']) ? $value['ag_email2'] : null,
                         'ag_auto_issue' => isset($value['ag_auto_issue']) ? $value['ag_auto_issue'] : 'n',
                     ]);
                 }
@@ -127,7 +127,7 @@ class AdjustmentGroupController extends Controller
                     'ag_hp' => $value['ag_hp'],
                     'ag_manager' => $value['ag_manager'],
                     'ag_email' => $value['ag_email'],
-                    'ag_email2' => isset($value['ag_email2']) ? $value['ag_email2'] : "n",
+                    'ag_email2' => isset($value['ag_email2']) ? $value['ag_email2'] : null,
                     'ag_auto_issue' => isset($value['ag_auto_issue']) ? $value['ag_auto_issue'] : '',
                 ]);
 
@@ -162,7 +162,7 @@ class AdjustmentGroupController extends Controller
 				'ag_hp' => $validated['ag_hp'],
 				'ag_manager' => $validated['ag_manager'],
 				'ag_email' => $validated['ag_email'],
-                'ag_email2' => isset($validated['ag_email2']) ? $validated['ag_email2'] : 'n',
+                'ag_email2' => isset($validated['ag_email2']) ? $validated['ag_email2'] : null,
                 'ag_auto_issue' => isset($validated['ag_auto_issue']) ? $validated['ag_auto_issue'] : 'n',
 			]);
 
@@ -196,7 +196,7 @@ class AdjustmentGroupController extends Controller
                 'ag_hp' => $validated['ag_hp'],
                 'ag_manager' => $validated['ag_manager'],
                 'ag_email' => $validated['ag_email'],
-                'ag_email2' => isset($validated['ag_email2']) ? $validated['ag_email2'] : 'n',
+                'ag_email2' => isset($validated['ag_email2']) ? $validated['ag_email2'] : null,
                 'ag_regtime' =>  date('Y-m-d')
             ]);
             return response()->json(['message' => Messages::MSG_0007], 200);
@@ -216,7 +216,7 @@ class AdjustmentGroupController extends Controller
                 'ag_hp' => $validated['ag_hp'],
                 'ag_manager' => $validated['ag_manager'],
                 'ag_email' => $validated['ag_email'],
-                'ag_email2' => isset($validated['ag_email2']) ? $validated['ag_email2'] : 'n',
+                'ag_email2' => isset($validated['ag_email2']) ? $validated['ag_email2'] : null,
                 'ag_auto_issue' => isset($validated['ag_auto_issue']) ? $validated['ag_auto_issue'] : 'n',
             ]);
             return response()->json(['message' => Messages::MSG_0007,'user'=>Auth::user()->mb_no], 200);
