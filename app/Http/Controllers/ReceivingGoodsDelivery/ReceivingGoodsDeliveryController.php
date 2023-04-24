@@ -3588,7 +3588,7 @@ class ReceivingGoodsDeliveryController extends Controller
             } else if (isset($request->sumprice) && $request->p_method == 'deposit_without_bankbook') {
                 $p_method_fee = $request->sumprice;
             } else if (isset($request->sumprice) && $request->p_method == 'virtual_account') {
-                $p_method_fee = $request->sumprice + round($request->sumprice * 0.018);
+                $p_method_fee = $request->sumprice;
             } else if (isset($request->sumprice) && $request->p_method == 'kakao_pay') {
                 $p_method_fee = $request->sumprice + round($request->sumprice * 0.029);
             } else {
