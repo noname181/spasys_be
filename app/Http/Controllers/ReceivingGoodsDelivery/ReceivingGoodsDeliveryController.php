@@ -13,6 +13,7 @@ use App\Models\WarehousingItem;
 use App\Models\WarehousingSettlement;
 use App\Models\AdjustmentGroup;
 use App\Models\Alarm;
+use App\Models\ScheduleShipment;
 use App\Models\Package;
 use App\Models\ItemChannel;
 use App\Models\Company;
@@ -39,6 +40,8 @@ use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryCreateApiRequ
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryCreateMobileRequest;
 use App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryFileRequest;
 use App\Models\Export;
+use App\Models\Import;
+use App\Models\ImportExpected;
 use \Carbon\Carbon;
 
 class ReceivingGoodsDeliveryController extends Controller
@@ -532,7 +535,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 }
                 if ($user->mb_type != 'spasys' && $validated['wr_contents']) {
                     $w_no_alert = Warehousing::with(['receving_goods_delivery'])->where('w_no', $w_no)->first();
-                    $aaaa = CommonFunc::insert_alarm_cargo_request('[유통가공]', $validated['wr_contents'], $user, $w_no_alert, 'cargo_request');
+                    CommonFunc::insert_alarm_cargo_request('[유통가공]', $validated['wr_contents'], $user, $w_no_alert, 'cargo_request');
                 }
             }
 
@@ -545,7 +548,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 'w_schedule_number2' => isset($w_schedule_number2) ? $w_schedule_number2 : '',
                 'w_no' => isset($w_no) ? $w_no :  $validated['w_no'],
                 'w_no_alert' => isset($w_no_alert) ? $w_no_alert :  null,
-                'aaaa' => $aaaa
+
             ], 201);
         } catch (\Throwable $e) {
             DB::rollback();
@@ -802,11 +805,10 @@ class ReceivingGoodsDeliveryController extends Controller
                     }
                     //}
                 }
-
             } else {
                 //Page141
                 $warehousing_data = Warehousing::where('w_no', $request->w_no)->first();
-                
+
                 if ($warehousing_data->w_type == 'IW') {
                     foreach ($request->data as $key => $data) {
                         $w_no = Warehousing::insertGetId([
@@ -1150,14 +1152,14 @@ class ReceivingGoodsDeliveryController extends Controller
                         CommonFunc::insert_alarm_cargo('[유통가공] 출고', null, $user, $w_no_alert, 'cargo_EW');
                     }
 
-                    $check_alarm_first = Alarm::with(['alarm_data'])->where('w_no', isset($request->w_no) ? $request->w_no : $w_no)->whereHas('alarm_data',function($query) {
-                        $query->where(DB::raw('lower(ad_title)'), 'like','%'. strtolower('[유통가공] 배송중') .'%');
+                    $check_alarm_first = Alarm::with(['alarm_data'])->where('w_no', isset($request->w_no) ? $request->w_no : $w_no)->whereHas('alarm_data', function ($query) {
+                        $query->where(DB::raw('lower(ad_title)'), 'like', '%' . strtolower('[유통가공] 배송중') . '%');
                     })->first();
 
                     $rgd_status3  = isset($w_no_alert->receving_goods_delivery[0]->rgd_status3) ? $w_no_alert->receving_goods_delivery[0]->rgd_status3 : null;
 
-                    if($check_alarm_first === null && $rgd_status3 == '배송중')
-                    CommonFunc::insert_alarm_cargo('[유통가공] 배송중', null, $user, $w_no_alert, 'cargo_delivery');
+                    if ($check_alarm_first === null && $rgd_status3 == '배송중')
+                        CommonFunc::insert_alarm_cargo('[유통가공] 배송중', null, $user, $w_no_alert, 'cargo_delivery');
                 }
             } else {
                 if ($user->mb_type != 'spasys' && $request->wr_contents) {
@@ -1165,16 +1167,16 @@ class ReceivingGoodsDeliveryController extends Controller
                     CommonFunc::insert_alarm_cargo_request('[유통가공]', $request->wr_contents, $user, $w_no_alert, 'cargo_request');
                 }
 
-                if($request->page_type == 'Page146'){
+                if ($request->page_type == 'Page146') {
                     $w_no_alert = Warehousing::with(['receving_goods_delivery'])->where('w_no', isset($request->w_no) ? $request->w_no : $w_no)->first();
-                    $check_alarm_first = Alarm::with(['alarm_data'])->where('w_no', isset($request->w_no) ? $request->w_no : $w_no)->whereHas('alarm_data',function($query) {
-                        $query->where(DB::raw('lower(ad_title)'), 'like','%'. strtolower('[유통가공] 배송중') .'%');
+                    $check_alarm_first = Alarm::with(['alarm_data'])->where('w_no', isset($request->w_no) ? $request->w_no : $w_no)->whereHas('alarm_data', function ($query) {
+                        $query->where(DB::raw('lower(ad_title)'), 'like', '%' . strtolower('[유통가공] 배송중') . '%');
                     })->first();
 
                     $rgd_status3  = isset($w_no_alert->receving_goods_delivery[0]->rgd_status3) ? $w_no_alert->receving_goods_delivery[0]->rgd_status3 : null;
 
-                    if($check_alarm_first === null && $rgd_status3 == '배송중')
-                    CommonFunc::insert_alarm_cargo('[유통가공] 배송중', null, $user, $w_no_alert, 'cargo_delivery');
+                    if ($check_alarm_first === null && $rgd_status3 == '배송중')
+                        CommonFunc::insert_alarm_cargo('[유통가공] 배송중', null, $user, $w_no_alert, 'cargo_delivery');
                 }
             }
 
@@ -1203,6 +1205,8 @@ class ReceivingGoodsDeliveryController extends Controller
 
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
+            $user = Auth::user();
+
             foreach ($request->location as $location) {
                 if ($request->ss_no) {
 
@@ -1217,7 +1221,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_status1' => isset($location['rgd_status1']) ? $location['rgd_status1'] : null,
                             'rgd_status2' => isset($location['rgd_status2']) ? $location['rgd_status2'] : null,
                             'rgd_status3' => isset($location['rgd_status3']) ? $location['rgd_status3'] : null,
-
+                            'rgd_contents' => isset($location['rgd_contents']) ? $location['rgd_contents'] : null,
                             'rgd_delivery_company' => isset($location['rgd_delivery_company']) ? $location['rgd_delivery_company'] : null,
                             'rgd_tracking_code' => isset($location['rgd_tracking_code']) ? $location['rgd_tracking_code'] : null,
                             'rgd_delivery_man' => isset($location['rgd_delivery_man']) ? $location['rgd_delivery_man'] : '',
@@ -1247,10 +1251,25 @@ class ReceivingGoodsDeliveryController extends Controller
                 }
             }
 
+            //alert
+            $w_no_alert = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('ss_no', $request->ss_no)->first();
+
+            $check_alarm_first = Alarm::with(['alarm_data'])->where('w_no', $request->ss_no)->whereHas('alarm_data', function ($query) {
+                $query->where(DB::raw('lower(ad_title)'), 'like', '%' . strtolower('[수입풀필먼트] 배송중') . '%');
+            })->first();
+
+            $rgd_status3  = isset($w_no_alert->receving_goods_delivery[0]->rgd_status3) ? $w_no_alert->receving_goods_delivery[0]->rgd_status3 : null;
+
+            if ($check_alarm_first === null && $rgd_status3 == '배송중')
+                CommonFunc::insert_alarm_cargo('[수입풀필먼트] 배송중', null, $user, $w_no_alert, 'cargo_delivery');
+
+
+
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'ss_no' => isset($ss_no) ? $ss_no :  $request->ss_no,
+                'w_no_alert' => isset($w_no_alert) ? $w_no_alert : null,
             ], 201);
         } catch (\Throwable $e) {
             DB::rollback();
@@ -3959,6 +3978,10 @@ class ReceivingGoodsDeliveryController extends Controller
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
             $data = $request->data;
             $dataSubmit = $request->dataSubmit;
+
+            $user = Auth::user();
+
+
             if ($dataSubmit) {
                 $rgd = ReceivingGoodsDelivery::updateOrCreate(
 
@@ -4019,17 +4042,26 @@ class ReceivingGoodsDeliveryController extends Controller
                     Package::where('rgd_no', $remove['rgd_no'])->delete();
                 }
             }
-            // if ($request->is_no){
-            //     if (isset($package)) {
-            //         foreach ($package['location'] as $packages) {
 
-            //         }
+            //alert
+            $w_no_alert = Export::with(['import', 'import_expected', 't_export_confirm'])->where('te_carry_out_number', $request->w_no)->first();
 
-            //     }
-            // }
+            $rgd_status3  = isset($w_no_alert->receving_goods_delivery[0]->rgd_status3) ? $w_no_alert->receving_goods_delivery[0]->rgd_status3 : null;
+
+            if ($check_alarm_first === null && $rgd_status3 == '배송중')
+                //CommonFunc::insert_alarm_cargo('[보세화물] 배송중', null, $user, $w_no_alert, 'cargo_delivery');
+
+                // if ($request->is_no){
+                //     if (isset($package)) {
+                //         foreach ($package['location'] as $packages) {
+
+                //         }
+
+                //     }
+                // }
 
 
-            DB::commit();
+                DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'is_no' => isset($dataSubmit['is_no']) ? $dataSubmit['is_no'] :  null,
