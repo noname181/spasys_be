@@ -501,7 +501,7 @@ class CompanyController extends Controller
     {
         if($request->type_page == "te_carry_out_number"){
             $export = Export::with(['import', 'import_expected', 't_export_confirm'])->where('te_carry_out_number', $request->is_no)->first();
-            $company = Company::where('co_license', $export->import_expected->tie_co_license)->first();
+            $company = Company::with(['co_parent'])->where('co_license', $export->import_expected->tie_co_license)->first();
             if (isset($company->co_no)) {
                 $adjustment_group = AdjustmentGroup::where('co_no', '=', $company->co_no)->first();
             } else {
@@ -512,7 +512,7 @@ class CompanyController extends Controller
             $import = Import::with(['import_expected', 'export_confirm'])->where('ti_carry_in_number', $request->is_no)->first();
             $export['import'] = $import;
             $export['import_expected'] = $import->import_expected;
-            $company = Company::where('co_license', $import->import_expect->tie_co_license)->first();
+            $company = Company::with(['co_parent'])->where('co_license', $import->import_expect->tie_co_license)->first();
             if (isset($company->co_no)) {
                 $adjustment_group = AdjustmentGroup::where('co_no', '=', $company->co_no)->first();
             } else {
@@ -521,7 +521,7 @@ class CompanyController extends Controller
         }else{
             $import_expected = ImportExpected::where('tie_logistic_manage_number', $request->is_no)->first();
             $export['import_expected'] = $import_expected;
-            $company = Company::where('co_license', $import_expected->tie_co_license)->first();
+            $company = Company::with(['co_parent'])->where('co_license', $import_expected->tie_co_license)->first();
             if (isset($company->co_no)) {
                 $adjustment_group = AdjustmentGroup::where('co_no', '=', $company->co_no)->first();
             } else {

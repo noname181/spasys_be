@@ -43,6 +43,7 @@ use App\Models\Export;
 use App\Models\Import;
 use App\Models\ImportExpected;
 use \Carbon\Carbon;
+use PhpParser\Node\Expr\Cast\Object_;
 
 class ReceivingGoodsDeliveryController extends Controller
 {
@@ -548,7 +549,6 @@ class ReceivingGoodsDeliveryController extends Controller
                 'w_schedule_number2' => isset($w_schedule_number2) ? $w_schedule_number2 : '',
                 'w_no' => isset($w_no) ? $w_no :  $validated['w_no'],
                 'w_no_alert' => isset($w_no_alert) ? $w_no_alert :  null,
-
             ], 201);
         } catch (\Throwable $e) {
             DB::rollback();
@@ -4035,6 +4035,24 @@ class ReceivingGoodsDeliveryController extends Controller
                     ]
 
                 );
+
+                //alert
+                
+                $w_no_alert = (object)$dataSubmit;
+                $w_no_alert->w_category_name = '보세화물';
+
+                $w_no_alert->company = (object)$request->company;
+                $w_no_alert->company->co_parent = (object)$request->company['co_parent'];
+                $w_no_alert->company->co_parent->co_parent = (object)$w_no_alert->company->co_parent->co_parent;
+              
+                $rgd_status3  = isset($dataSubmit['rgd_status3']) ? $dataSubmit['rgd_status3'] : null;
+
+                $check_alarm_first = Alarm::with(['alarm_data'])->where('w_no', $request->w_no)->whereHas('alarm_data', function ($query) {
+                    $query->where(DB::raw('lower(ad_title)'), 'like', '%' . strtolower('[보세화물] 배송중') . '%');
+                })->first();
+
+                if ($check_alarm_first === null && $rgd_status3 == '배송중')
+                   CommonFunc::insert_alarm_cargo('[보세화물] 배송중', null, $user, $w_no_alert, 'cargo_delivery');
             }
             if (isset($data['remove'])) {
                 foreach ($data['remove'] as $remove) {
@@ -4043,28 +4061,23 @@ class ReceivingGoodsDeliveryController extends Controller
                 }
             }
 
-            //alert
-            $w_no_alert = Export::with(['import', 'import_expected', 't_export_confirm'])->where('te_carry_out_number', $request->w_no)->first();
-
-            $rgd_status3  = isset($w_no_alert->receving_goods_delivery[0]->rgd_status3) ? $w_no_alert->receving_goods_delivery[0]->rgd_status3 : null;
-
-            if ($check_alarm_first === null && $rgd_status3 == '배송중')
-                //CommonFunc::insert_alarm_cargo('[보세화물] 배송중', null, $user, $w_no_alert, 'cargo_delivery');
-
-                // if ($request->is_no){
-                //     if (isset($package)) {
-                //         foreach ($package['location'] as $packages) {
-
-                //         }
-
-                //     }
-                // }
 
 
-                DB::commit();
+            // if ($request->is_no){
+            //     if (isset($package)) {
+            //         foreach ($package['location'] as $packages) {
+
+            //         }
+
+            //     }
+            // }
+
+
+            DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'is_no' => isset($dataSubmit['is_no']) ? $dataSubmit['is_no'] :  null,
+                'w_no_alert' => isset($w_no_alert) ? $w_no_alert :  null,
             ], 201);
         } catch (\Throwable $e) {
             DB::rollback();
