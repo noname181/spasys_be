@@ -46,6 +46,7 @@ class ScheduleShipment extends Model
         'product_name',
         'options',
         'qty',
+        'w_category_name',
         'order_name',
         'order_mobile',
         'order_tel',
