@@ -528,11 +528,34 @@ class QnaController extends Controller
                 });
             }
 
+     
+            $count_qna_question = Qna::where('depth_level',0)->count();
+
+
+         
+
             $members = Member::where('mb_no', '!=', 0)->get();
 
             $qna = $qna->paginate($per_page, ['*'], 'page', $page);
+            $count_qna_per_page = 0;
+ 
+             $test =  $qna->getCollection()->map(function ($q) use ($count_qna_per_page) {
+                    
+                    if($q->depth_level == 0){
+                        $count_qna_per_page++;
+                    }
+                 
+                    return ['total_question_per_page'=>$count_qna_per_page];
+                });
+            
+            
+            $custom =  collect([
+                'total_question_per_page' => $test->sum('total_question_per_page'),
+                'total_question' => $count_qna_question,
+            ]);
+            $data = $custom->merge($qna);
 
-            return response()->json($qna);
+            return response()->json($data);
         } catch (\Exception $e) {
             Log::error($e);
             return $e;
