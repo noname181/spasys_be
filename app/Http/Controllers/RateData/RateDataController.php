@@ -2055,7 +2055,7 @@ class RateDataController extends Controller
             $import = Import::with(['export_confirm', 'export', 'import_expect'])->where('ti_carry_in_number', $rgd->rgd_ti_carry_in_number)->first();
 
 
-            $company = Company::where('co_no', $rgd->warehousing->co_no)->first();
+            $company = Company::where('co_no', $user->mb_type == 'spasys' ? $rgd->warehousing->company->co_parent->co_no : $rgd->warehousing->co_no)->first();
 
             $company_shipper = $company;
 
@@ -2063,16 +2063,16 @@ class RateDataController extends Controller
 
             $rate_data = RateData::where('rd_cate_meta1', '보세화물');
 
-            $rmd = RateMetaData::where('co_no', $user->mb_type == 'spasys' ? $company->co_parent_no : $company->co_no)->whereNull('set_type')->orderBy('rmd_no', 'DESC')->first();
-            $rate_data = $rate_data->where('rd_co_no', $user->mb_type == 'spasys' ? $company->co_parent_no : $company->co_no);
+            $rmd = RateMetaData::where('co_no', $company->co_no)->whereNull('set_type')->orderBy('rmd_no', 'DESC')->first();
+            $rate_data = $rate_data->where('rd_co_no', $company->co_no);
             if (isset($rmd->rmd_no)) {
                 $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
             }
 
             $rate_data = $rate_data->get();
 
-            $adjustment_group = AdjustmentGroup::where('co_no', '=', $user->mb_type == 'spasys' ? $company->co_parent_no : $company->co_no)->first();
-            $adjustment_group_all = AdjustmentGroup::where('co_no', '=', $user->mb_type == 'spasys' ? $company->co_parent_no : $company->co_no)->get();
+            $adjustment_group = AdjustmentGroup::where('co_no', '=', $company->co_no)->first();
+            $adjustment_group_all = AdjustmentGroup::where('co_no', '=', $company->co_no)->get();
 
             $export = Export::with(['import', 'import_expected', 't_export_confirm'])->where('te_carry_out_number', $rgd->rgd_te_carry_out_number)->first();
 
@@ -2090,7 +2090,8 @@ class RateDataController extends Controller
                 'rate_data' => $rate_data,
                 'rgd'=>$rgd,
                 'export' => $export,
-                'company_shipper' => $company_shipper,
+                //CLIENT CHANGE NOT ONLY SHOW SHIPPER, SO WE USER RECERVER COMPANY
+                'company_shipper' => $company,
                 'adjustment_group' => $adjustment_group,
             ], 200);
         } catch (\Exception $e) {
@@ -2114,7 +2115,7 @@ class RateDataController extends Controller
             $import = Import::with(['export_confirm', 'export', 'import_expect'])->where('ti_carry_in_number', $rgd->rgd_ti_carry_in_number)->first();
 
 
-            $company = Company::where('co_no', $rgd->warehousing->co_no)->first();
+            $company = Company::where('co_no', $user->mb_type == 'shop' ?$rgd->warehousing->company->co_parent->co_no :  $rgd->warehousing->co_no)->first();
 
             $company_shipper = $company;
 
@@ -2122,16 +2123,16 @@ class RateDataController extends Controller
 
             $rate_data = RateData::where('rd_cate_meta1', '보세화물');
 
-            $rmd = RateMetaData::where('co_no', $user->mb_type == 'shop' ? $company->co_parent_no : $company->co_no)->whereNull('set_type')->orderBy('rmd_no', 'DESC')->first();
-            $rate_data = $rate_data->where('rd_co_no', $user->mb_type == 'shop' ? $company->co_parent_no : $company->co_no);
+            $rmd = RateMetaData::where('co_no', $company->co_no)->whereNull('set_type')->orderBy('rmd_no', 'DESC')->first();
+            $rate_data = $rate_data->where('rd_co_no', $company->co_no);
             if (isset($rmd->rmd_no)) {
                 $rate_data = $rate_data->where('rmd_no', $rmd->rmd_no);
             }
 
             $rate_data = $rate_data->get();
 
-            $adjustment_group = AdjustmentGroup::where('co_no', '=', $user->mb_type == 'shop' ? $company->co_parent_no : $company->co_no)->first();
-            $adjustment_group_all = AdjustmentGroup::where('co_no', '=', $user->mb_type == 'shop' ? $company->co_parent_no : $company->co_no)->get();
+            $adjustment_group = AdjustmentGroup::where('co_no', '=', $company->co_no)->first();
+            $adjustment_group_all = AdjustmentGroup::where('co_no', '=', $company->co_no)->get();
 
             $export = Export::with(['import', 'import_expected', 't_export_confirm'])->where('te_carry_out_number', $rgd->rgd_te_carry_out_number)->first();
 
@@ -4480,9 +4481,9 @@ class RateDataController extends Controller
                 'te_e_price' => isset($request->te_e_price) ? $request->te_e_price : null,
             ]);
 
-            Warehousing::where('logistic_manage_number', $request->ti_logistic_manage_number)->update([
-                'co_no' => isset($request->co_no) ? $request->co_no : null,
-            ]);
+            // Warehousing::where('logistic_manage_number', $request->ti_logistic_manage_number)->update([
+            //     'co_no' => isset($request->co_no) ? $request->co_no : null,
+            // ]);
 
             DB::commit();
             return response()->json([
