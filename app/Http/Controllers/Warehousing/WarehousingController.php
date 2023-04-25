@@ -3517,12 +3517,15 @@ class WarehousingController extends Controller
         }
     }
 
-    public function getWarehousingByRgd($rgd_no, $type)
+    public function getWarehousingByRgd($rgd_no, $type, Request $request)
     {
         try {
             $check_cofirm = 0;
             $check_paid = 0;
             $user = Auth::user();
+            $pathname = $request->header('Pathname');
+            $is_check_page = str_contains($pathname, '_check');
+            
             if ($type == 'monthly') {
                 $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing', 'rgd_parent_payment', 'rate_data_general'])->where('rgd_no', $rgd_no)->first();
                 $contract = Contract::where('co_no',  $user->co_no)->first();
@@ -3594,8 +3597,8 @@ class WarehousingController extends Controller
                         },
                     ]);
                 }, 'co_no', 'warehousing_request', 'w_import_parent', 'warehousing_child'])->withSum('warehousing_item_IW_spasys_confirm', 'wi_number')->find($w_no);
-                $adjustment_group = AdjustmentGroup::where('co_no', '=', $warehousing->co_no)->first();
-                $adjustment_group2 = AdjustmentGroup::select(['ag_name'])->where('co_no', '=', $warehousing->co_no)->get();
+                $adjustment_group = AdjustmentGroup::where('co_no', '=', $user->mb_type == 'spasys' || ($is_check_page == true && $user->mb_type == 'shop') ? $warehousing->company->co_parent->co_no : $warehousing->co_no)->first();
+                $adjustment_group2 = AdjustmentGroup::select(['ag_name'])->where('co_no', '=', $user->mb_type == 'spasys' || ($is_check_page == true && $user->mb_type == 'shop') ? $warehousing->company->co_parent->co_no : $warehousing->co_no)->get();
 
                 $time = str_replace('-', '.', $start_date) . ' ~ ' . str_replace('-', '.', $end_date);
             }
@@ -3650,8 +3653,8 @@ class WarehousingController extends Controller
                         },
                     ]);
                 }, 'co_no', 'warehousing_request', 'w_import_parent', 'warehousing_child'])->withSum('warehousing_item_IW_spasys_confirm', 'wi_number')->find($w_no);
-                $adjustment_group = AdjustmentGroup::where('co_no', '=', $warehousing->co_no)->first();
-                $adjustment_group2 = AdjustmentGroup::select(['ag_name'])->where('co_no', '=', $warehousing->co_no)->get();
+                $adjustment_group = AdjustmentGroup::where('co_no', '=', $user->mb_type == 'spasys' || ($is_check_page == true && $user->mb_type == 'shop') ? $warehousing->company->co_parent->co_no : $warehousing->co_no)->first();
+                $adjustment_group2 = AdjustmentGroup::select(['ag_name'])->where('co_no', '=', $user->mb_type == 'spasys' || ($is_check_page == true && $user->mb_type == 'shop') ? $warehousing->company->co_parent->co_no : $warehousing->co_no)->get();
 
                 $time = str_replace('-', '.', $start_date) . ' ~ ' . str_replace('-', '.', $end_date);
             } else if ($type == 'additional_monthly') {
@@ -3704,8 +3707,8 @@ class WarehousingController extends Controller
                         },
                     ]);
                 }, 'co_no', 'warehousing_request', 'w_import_parent', 'warehousing_child'])->withSum('warehousing_item_IW_spasys_confirm', 'wi_number')->find($w_no);
-                $adjustment_group = AdjustmentGroup::where('co_no', '=', $warehousing->co_no)->first();
-                $adjustment_group2 = AdjustmentGroup::select(['ag_name'])->where('co_no', '=', $warehousing->co_no)->get();
+                $adjustment_group = AdjustmentGroup::where('co_no', '=', $user->mb_type == 'spasys' || ($is_check_page == true && $user->mb_type == 'shop') ? $warehousing->company->co_parent->co_no : $warehousing->co_no)->first();
+                $adjustment_group2 = AdjustmentGroup::select(['ag_name'])->where('co_no', '=', $user->mb_type == 'spasys' || ($is_check_page == true && $user->mb_type == 'shop') ? $warehousing->company->co_parent->co_no : $warehousing->co_no)->get();
 
                 $time = str_replace('-', '.', $start_date) . ' ~ ' . str_replace('-', '.', $end_date);
                 $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing'])->where('rgd_no', $rgd_no)->first();
@@ -3747,13 +3750,13 @@ class WarehousingController extends Controller
                     ]);
                 }, 'co_no', 'warehousing_request', 'w_import_parent', 'warehousing_child'])->withSum('warehousing_item_IW_spasys_confirm', 'wi_number')->find($w_no);
 
-                $adjustment_group2 = AdjustmentGroup::select(['ag_name'])->where('co_no', '=', $warehousing->co_no)->get();
-                $adjustment_group = AdjustmentGroup::where('co_no', '=', $warehousing->co_no)->first();
+                $adjustment_group2 = AdjustmentGroup::select(['ag_name'])->where('co_no', '=', $user->mb_type == 'spasys' || ($is_check_page == true && $user->mb_type == 'shop') ? $warehousing->company->co_parent->co_no : $warehousing->co_no)->get();
+                $adjustment_group = AdjustmentGroup::where('co_no', '=', $user->mb_type == 'spasys' || ($is_check_page == true && $user->mb_type == 'shop') ? $warehousing->company->co_parent->co_no : $warehousing->co_no)->first();
             }
             $adjustment_group_choose = '';
             $rdg = RateDataGeneral::with(['rgd_no_final'])->where('rgd_no', $rgd_no)->first();
             if ($rdg) {
-                $adjustment_group_choose = AdjustmentGroup::where('co_no', '=', $warehousing->co_no)->where('ag_name', '=', $rdg->rdg_set_type)->first();
+                $adjustment_group_choose = AdjustmentGroup::where('co_no', '=', $user->mb_type == 'spasys' || ($is_check_page == true && $user->mb_type == 'shop') ? $warehousing->company->co_parent->co_no : $warehousing->co_no)->where('ag_name', '=', $rdg->rdg_set_type)->first();
             }
             return response()->json(
                 [
@@ -4039,13 +4042,17 @@ class WarehousingController extends Controller
                     } else {
                         $co_no = $user->co_no;
                     }
-                    $service_no = Service::where('service_name', $service_name)->first()->service_no;
+                    $service = Service::where('service_name', $service_name)->first();
 
-                    $company_settlement = CompanySettlement::where([
-                        'co_no' => $co_no,
-                        'service_no' => $service_no,
-                    ])->first();
-                    $item->settlement_cycle = $company_settlement ? $company_settlement->cs_payment_cycle : "";
+                    if(isset($service->service_no)){
+                        $company_settlement = CompanySettlement::where([
+                            'co_no' => $co_no,
+                            'service_no' => $service->service_no,
+                        ])->first();
+                        $item->settlement_cycle = $company_settlement ? $company_settlement->cs_payment_cycle : "";
+                    }
+
+                  
 
                     //CHECK SHIPPER COMPANY IS SENT RATE DATA YET
 
