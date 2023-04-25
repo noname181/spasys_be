@@ -4047,7 +4047,7 @@ class ReceivingGoodsDeliveryController extends Controller
               
                 $rgd_status3  = isset($dataSubmit['rgd_status3']) ? $dataSubmit['rgd_status3'] : null;
 
-                $check_alarm_first = Alarm::with(['alarm_data'])->where('w_no', $request->w_no)->whereHas('alarm_data', function ($query) {
+                $check_alarm_first = Alarm::with(['alarm_data'])->where('w_no', $dataSubmit['is_no'])->whereHas('alarm_data', function ($query) {
                     $query->where(DB::raw('lower(ad_title)'), 'like', '%' . strtolower('[보세화물] 배송중') . '%');
                 })->first();
 
