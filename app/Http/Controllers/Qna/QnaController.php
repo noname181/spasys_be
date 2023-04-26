@@ -539,7 +539,7 @@ class QnaController extends Controller
             $qna = $qna->paginate($per_page, ['*'], 'page', $page);
             $count_qna_per_page = 0;
  
-             $test =  $qna->getCollection()->map(function ($q) use ($count_qna_per_page) {
+             $qna_get_total_pp =  $qna->getCollection()->map(function ($q) use ($count_qna_per_page) {
                     
                     if($q->depth_level == 0){
                         $count_qna_per_page++;
@@ -550,7 +550,7 @@ class QnaController extends Controller
             
             
             $custom =  collect([
-                'total_question_per_page' => $test->sum('total_question_per_page'),
+                'total_question_per_page' => $qna_get_total_pp->sum('total_question_per_page'),
                 'total_question' => $count_qna_question,
             ]);
             $data = $custom->merge($qna);
