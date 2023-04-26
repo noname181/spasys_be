@@ -6966,7 +6966,7 @@ class WarehousingController extends Controller
             }
         }
 
-        if (empty($tax_history->cbh_no) && $rgd->rgd_calculate_deadline_yn == 'y') {
+        if (empty($tax_history->cbh_no)) {
             ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                 'rgd_status8' => 'in_process',
             ]);
