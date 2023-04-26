@@ -4410,7 +4410,7 @@ class WarehousingController extends Controller
                                 ->whereNull('rgd_status6');
                         })->orWhere(function ($q3) {
                             $q3->where(function ($q4) {
-                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                                $q4->Where('rgd_status5', 'confirmed');
                             })
                                 ->where(function ($q4) {
                                     $q4->whereNull('rgd_status6');
@@ -4438,7 +4438,7 @@ class WarehousingController extends Controller
                                 ->whereNull('rgd_status6');
                         })->orWhere(function ($q3) {
                             $q3->where(function ($q4) {
-                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                                $q4->Where('rgd_status5', 'confirmed');
                             })->where(function ($q4) {
                                 $q4->whereNull('rgd_status6');
                             })
@@ -4464,7 +4464,7 @@ class WarehousingController extends Controller
                                 ->whereNull('rgd_status6');
                         })->orWhere(function ($q3) {
                             $q3->where(function ($q4) {
-                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                                $q4->Where('rgd_status5', 'confirmed');
                             })
                                 ->where(function ($q4) {
                                     $q4->whereNull('rgd_status6');

@@ -3237,10 +3237,22 @@ class ReceivingGoodsDeliveryController extends Controller
                             'cbh_status_before' => null,
                             'cbh_status_after' => 'request_bill'
                         ]);
+                    } else {
+                        ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                            'rgd_status8' => 'completed',
+                        ]);
+    
+                        CancelBillHistory::insertGetId([
+                            'rgd_no' => $rgd->rgd_no,
+                            'mb_no' => $user->mb_no,
+                            'cbh_type' => 'tax',
+                            'cbh_status_before' => $rgd->rgd_status8,
+                            'cbh_status_after' => 'completed'
+                        ]);
                     }
 
                     //CHECK AUTO TAX INVOICE ISSUE
-                    if ($ag->ag_auto_issue == 'y') {
+                    if ($ag->ag_auto_issue == 'y' && $rgd->rgd_calculate_deadline_yn == 'y') {
 
                         $cbh = CancelBillHistory::where('rgd_no', $request->rgd_no)->where('cbh_type', 'tax')->where('cbh_status_after', 'taxed')->first();
                         if (!isset($cbh->cbh_no)) {
@@ -3336,11 +3348,23 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'cbh_status_before' => null,
                                 'cbh_status_after' => 'request_bill'
                             ]);
+                        }else {
+                            ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd['rgd_settlement_number'])->update([
+                                'rgd_status8' => 'completed',
+                            ]);
+        
+                            CancelBillHistory::insertGetId([
+                                'rgd_no' => $rgd['rgd_no'],
+                                'mb_no' => $user->mb_no,
+                                'cbh_type' => 'tax',
+                                'cbh_status_before' => $rgd->rgd_status8,
+                                'cbh_status_after' => 'completed'
+                            ]);
                         }
 
 
                         //CHECK AUTO TAX INVOICE ISSUE
-                        if ($ag->ag_auto_issue == 'y') {
+                        if ($ag->ag_auto_issue == 'y' && $rgd->rgd_calculate_deadline_yn == 'y') {
 
                             $cbh = CancelBillHistory::where('rgd_no', $rgd->rgd_no)->where('cbh_type', 'tax')->where('cbh_status_after', 'taxed')->first();
                             if (!isset($cbh->cbh_no)) {
@@ -3414,7 +3438,20 @@ class ReceivingGoodsDeliveryController extends Controller
                             'cbh_status_before' => null,
                             'cbh_status_after' => 'request_bill'
                         ]);
+                    }else {
+                        ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd['rgd_settlement_number'])->update([
+                            'rgd_status8' => 'completed',
+                        ]);
+    
+                        CancelBillHistory::insertGetId([
+                            'rgd_no' => $rgd['rgd_no'],
+                            'mb_no' => $user->mb_no,
+                            'cbh_type' => 'tax',
+                            'cbh_status_before' => $rgd->rgd_status8,
+                            'cbh_status_after' => 'completed'
+                        ]);
                     }
+
 
 
                     if (isset($rate_data_general->ag_no)) {
@@ -3439,7 +3476,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
 
                         //CHECK AUTO TAX INVOICE ISSUE
-                        if ($ag->ag_auto_issue == 'y') {
+                        if ($ag->ag_auto_issue == 'y' && $rgd->rgd_calculate_deadline_yn == 'y') {
 
                             $cbh = CancelBillHistory::where('rgd_no', $rgd->rgd_no)->where('cbh_type', 'tax')->where('cbh_status_after', 'taxed')->first();
                             if (!isset($cbh->cbh_no)) {
