@@ -915,9 +915,7 @@ class ReceivingGoodsDeliveryController extends Controller
                        
 
                         foreach ($request->data as $key => $data) {
-                            
-                            
-                           
+                                    
                             if ($data['w_no'] != "") {
 
                                 $w_no = Warehousing::where('w_no', $request->w_no)->update([
@@ -2833,6 +2831,37 @@ class ReceivingGoodsDeliveryController extends Controller
                         'cbh_status_before' => $rgd->rgd_status8,
                         'cbh_status_after' => 'completed'
                     ]);
+
+                    if ($rgd->rgd_status8 != 'completed') {
+                        ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                            'rgd_status8' => 'completed',
+                        ]);
+    
+                        CancelBillHistory::insertGetId([
+                            'rgd_no' => $rgd->rgd_no,
+                            'mb_no' => $user->mb_no,
+                            'cbh_type' => 'tax',
+                            'cbh_status_before' => $rgd->rgd_status8,
+                            'cbh_status_after' => 'completed'
+                        ]);
+    
+                        //UPDATE EST BILL
+                        $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
+                        if ($est_rgd->rgd_status8 != 'completed') {
+                            ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
+                                'rgd_status8' => 'completed',
+                            ]);
+                            CancelBillHistory::insertGetId([
+                                'rgd_no' => $est_rgd->rgd_no,
+                                'mb_no' => $user->mb_no,
+                                'cbh_type' => 'tax',
+                                'cbh_status_before' => $est_rgd->rgd_status8,
+                                'cbh_status_after' => 'completed'
+                            ]);
+                        }
+
+                        $request->complete_status = null;
+                    }
                 }
             } else if ($request->payment_status == '진행중' && $rgd->rgd_status6 != null) {
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
