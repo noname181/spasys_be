@@ -84,6 +84,7 @@ class ScheduleShipment extends Model
         'updated_at' => "date:Y.m.d H:i",
         'trans_date' => "date:Y.m.d",
         'order_date' => "date:Y.m.d",
+        'collect_date' => "date: Y.m.d H:i"
     ];
    
     public function item_channels()
