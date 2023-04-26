@@ -2861,6 +2861,8 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'cbh_status_after' => 'completed'
                             ]);
                         }
+
+                        $request->complete_status = null;
                     }
                 }
             } else if ($request->payment_status == '진행중' && $rgd->rgd_status6 != null) {
