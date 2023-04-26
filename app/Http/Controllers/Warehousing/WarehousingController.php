@@ -4115,7 +4115,7 @@ class WarehousingController extends Controller
 
             // ====================DISTRIBUTION======================
 
-            $warehousing = ReceivingGoodsDelivery::with(['rate_meta_data', 'rate_meta_data_parent', 'rate_data_general', 'payment', 't_import','t_export' ,'cancel_bill_history']);
+            $warehousing = ReceivingGoodsDelivery::with(['rate_meta_data', 'rate_meta_data_parent', 'rate_data_general', 'payment', 't_import' ,'cancel_bill_history']);
             if ($user->mb_type == 'shop' && $request->type == 'check_list') {
                 $warehousing->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent', function ($q) use ($user) {
@@ -4410,7 +4410,7 @@ class WarehousingController extends Controller
                                 ->whereNull('rgd_status6');
                         })->orWhere(function ($q3) {
                             $q3->where(function ($q4) {
-                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                                $q4->Where('rgd_status5', 'confirmed');
                             })
                                 ->where(function ($q4) {
                                     $q4->whereNull('rgd_status6');
@@ -4438,7 +4438,7 @@ class WarehousingController extends Controller
                                 ->whereNull('rgd_status6');
                         })->orWhere(function ($q3) {
                             $q3->where(function ($q4) {
-                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                                $q4->Where('rgd_status5', 'confirmed');
                             })->where(function ($q4) {
                                 $q4->whereNull('rgd_status6');
                             })
@@ -4464,7 +4464,7 @@ class WarehousingController extends Controller
                                 ->whereNull('rgd_status6');
                         })->orWhere(function ($q3) {
                             $q3->where(function ($q4) {
-                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                                $q4->Where('rgd_status5', 'confirmed');
                             })
                                 ->where(function ($q4) {
                                     $q4->whereNull('rgd_status6');
@@ -6945,7 +6945,7 @@ class WarehousingController extends Controller
         if($rgd->rgd_status4 == '예상경비청구서' && $rgd->service_korean_name != '수입풀필먼트'){
             $payment_history = CancelBillHistory::where('rgd_no', $rgd_no)->where('cbh_type', 'payment')->where('cbh_status_after', 'request_bill')->first();
 
-            if (empty($payment_history->cbh_no)) {
+            if (empty($payment_history->cbh_no) && $rgd->rgd_calculate_deadline_yn == 'y') {
     
                 CancelBillHistory::insertGetId([
                     'rgd_no' => $rgd_no,
@@ -6958,7 +6958,7 @@ class WarehousingController extends Controller
             }
         }
 
-        if (empty($tax_history->cbh_no)) {
+        if (empty($tax_history->cbh_no) && $rgd->rgd_calculate_deadline_yn == 'y') {
             ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                 'rgd_status8' => 'in_process',
             ]);
