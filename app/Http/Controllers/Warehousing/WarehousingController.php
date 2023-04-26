@@ -4395,12 +4395,12 @@ class WarehousingController extends Controller
             }
             if (isset($validated['rgd_status6'])) {
                 if ($validated['rgd_status6'] == 'cancel') {
-                    $warehousing->where('rgd_status6', '=', 'cancel');
+                    $warehousing->where('rgd_status6', '=', 'cancel')->where('rgd_calculate_deadline_yn', 'y');
                 } else if ($validated['rgd_status6'] == 'paid') {
-                    $warehousing->where('rgd_status6', '=', 'paid');
+                    $warehousing->where('rgd_status6', '=', 'paid')->where('rgd_calculate_deadline_yn', 'y');
                 } else if ($validated['rgd_status6'] == '진행중') {
                     $warehousing->where(function ($q) {
-                        $q->where(function ($q2) {
+                        $q->where('rgd_calculate_deadline_yn', 'y')->where(function ($q2) {
                             $q2->where('rgd_status4', '예상경비청구서')
                                 ->where('service_korean_name', '보세화물')
                                 ->where('rgd_bill_type', 'not like', '%' . 'month' . '%')
@@ -4409,7 +4409,7 @@ class WarehousingController extends Controller
                                 })
                                 ->whereNull('rgd_status6');
                         })->orWhere(function ($q3) {
-                            $q3->where(function ($q4) {
+                            $q3->where('rgd_calculate_deadline_yn', 'y')->where(function ($q4) {
                                 $q4->Where('rgd_status5', 'confirmed');
                             })
                                 ->where(function ($q4) {
@@ -4423,12 +4423,12 @@ class WarehousingController extends Controller
                 }
 
                 if ($validated['rgd_status6'] == 'cancel') {
-                    $warehousing_bonded->where('rgd_status6', '=', 'cancel');
+                    $warehousing_bonded->where('rgd_status6', '=', 'cancel')->where('rgd_calculate_deadline_yn', 'y');
                 } else if ($validated['rgd_status6'] == 'paid') {
-                    $warehousing_bonded->where('rgd_status6', '=', 'paid');
+                    $warehousing_bonded->where('rgd_status6', '=', 'paid')->where('rgd_calculate_deadline_yn', 'y');
                 } else if ($validated['rgd_status6'] == '진행중') {
                     $warehousing_bonded->where(function ($q) {
-                        $q->where(function ($q2) {
+                        $q->where('rgd_calculate_deadline_yn', 'y')->where(function ($q2) {
                             $q2->where('rgd_status4', '예상경비청구서')
                                 ->where('service_korean_name', '보세화물')
                                 ->where('rgd_bill_type', 'not like', '%' . 'month' . '%')
@@ -4437,7 +4437,7 @@ class WarehousingController extends Controller
                                 })
                                 ->whereNull('rgd_status6');
                         })->orWhere(function ($q3) {
-                            $q3->where(function ($q4) {
+                            $q3->where('rgd_calculate_deadline_yn', 'y')->where(function ($q4) {
                                 $q4->Where('rgd_status5', 'confirmed');
                             })->where(function ($q4) {
                                 $q4->whereNull('rgd_status6');
@@ -4449,12 +4449,12 @@ class WarehousingController extends Controller
                     });
                 }
                 if ($validated['rgd_status6'] == 'cancel') {
-                    $warehousing_fulfillment->where('rgd_status6', '=', 'cancel');
+                    $warehousing_fulfillment->where('rgd_status6', '=', 'cancel')->where('rgd_calculate_deadline_yn', 'y');
                 } else if ($validated['rgd_status6'] == 'paid') {
-                    $warehousing_fulfillment->where('rgd_status6', '=', 'paid');
+                    $warehousing_fulfillment->where('rgd_status6', '=', 'paid')->where('rgd_calculate_deadline_yn', 'y');
                 } else if ($validated['rgd_status6'] == '진행중') {
                     $warehousing_fulfillment->where(function ($q) {
-                        $q->where(function ($q2) {
+                        $q->where('rgd_calculate_deadline_yn', 'y')->where(function ($q2) {
                             $q2->where('rgd_status4', '예상경비청구서')
                                 ->where('service_korean_name', '보세화물')
                                 ->where('rgd_bill_type', 'not like', '%' . 'month' . '%')
@@ -4463,7 +4463,7 @@ class WarehousingController extends Controller
                                 })
                                 ->whereNull('rgd_status6');
                         })->orWhere(function ($q3) {
-                            $q3->where(function ($q4) {
+                            $q3->where('rgd_calculate_deadline_yn', 'y')->where(function ($q4) {
                                 $q4->Where('rgd_status5', 'confirmed');
                             })
                                 ->where(function ($q4) {
@@ -4591,14 +4591,22 @@ class WarehousingController extends Controller
                 }
             }
             if (isset($validated['rgd_status7']) && $validated['rgd_status7'] != '전체') {
+
+                $warehousing->where('rgd_calculate_deadline_yn', 'y')->where('rgd_status4', '확정청구서');
+                $warehousing_bonded->where('rgd_calculate_deadline_yn', 'y')->where('rgd_status4', '확정청구서');
+                $warehousing_fulfillment->where('rgd_calculate_deadline_yn', 'y')->where('rgd_status4', '확정청구서');
+
                 if ($validated['rgd_status7'] == 'waiting') {
                     $warehousing->whereNull('rgd_status7');
-                } else
+                } else {
                     $warehousing->where('rgd_status7', '=', $validated['rgd_status7']);
+                }
+
                 if ($validated['rgd_status7'] == 'waiting') {
                     $warehousing_bonded->whereNull('rgd_status7');
-                } else
+                } else {
                     $warehousing_bonded->where('rgd_status7', '=', $validated['rgd_status7']);
+                }
 
                 if ($validated['rgd_status7'] == 'waiting') {
                     $warehousing_fulfillment->whereNull('rgd_status7');
