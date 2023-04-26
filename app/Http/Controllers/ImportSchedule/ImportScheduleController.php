@@ -428,6 +428,7 @@ class ImportScheduleController extends Controller
                     // })
                     ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
                 $sub_5 = ReceivingGoodsDelivery::select('is_no', 'rgd_status3', 'rgd_status1')->groupBy('is_no');
+                $sub_6 = File::select('file_no', 'file_url','file_table_key');
 
                 $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
                     $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
@@ -443,6 +444,10 @@ class ImportScheduleController extends Controller
                     $leftjoin->on('ddd.te_carry_out_number', '=', 'nnn.is_no')->where('ddd.te_carry_out_number', '!=', null);
                     $leftjoin->orOn('bbb.ti_carry_in_number', '=', 'nnn.is_no')->whereNull('ddd.te_carry_out_number');
                     $leftjoin->orOn('aaa.tie_logistic_manage_number', '=', 'nnn.is_no')->whereNull('ddd.te_carry_out_number')->whereNull('bbb.ti_carry_in_number');
+                })->leftJoinSub($sub_6, 'mmm', function ($leftjoin) {
+                    $leftjoin->on('ddd.te_carry_out_number', '=', 'mmm.file_table_key')->where('ddd.te_carry_out_number', '!=', null);
+                    $leftjoin->orOn('bbb.ti_carry_in_number', '=', 'mmm.file_table_key')->whereNull('ddd.te_carry_out_number');
+                    $leftjoin->orOn('aaa.tie_logistic_manage_number', '=', 'mmm.file_table_key')->whereNull('ddd.te_carry_out_number')->whereNull('bbb.ti_carry_in_number');
                 })->orderBy('tie_is_date', 'DESC')->orderBy('tie_h_bl', 'DESC');
             } else if ($user->mb_type == 'shipper') {
                
@@ -472,6 +477,7 @@ class ImportScheduleController extends Controller
                     // })
                     ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
                 $sub_5 = ReceivingGoodsDelivery::select('is_no', 'rgd_status3', 'rgd_status1')->groupBy('is_no');
+                $sub_6 = File::select('file_no', 'file_url','file_table_key');
 
                 $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
                     $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
@@ -487,6 +493,10 @@ class ImportScheduleController extends Controller
                     $leftjoin->on('ddd.te_carry_out_number', '=', 'nnn.is_no')->where('ddd.te_carry_out_number', '!=', null);
                     $leftjoin->orOn('bbb.ti_carry_in_number', '=', 'nnn.is_no')->whereNull('ddd.te_carry_out_number');
                     $leftjoin->orOn('aaa.tie_logistic_manage_number', '=', 'nnn.is_no')->whereNull('ddd.te_carry_out_number')->whereNull('bbb.ti_carry_in_number');
+                })->leftJoinSub($sub_6, 'mmm', function ($leftjoin) {
+                    $leftjoin->on('ddd.te_carry_out_number', '=', 'mmm.file_table_key')->where('ddd.te_carry_out_number', '!=', null);
+                    $leftjoin->orOn('bbb.ti_carry_in_number', '=', 'mmm.file_table_key')->whereNull('ddd.te_carry_out_number');
+                    $leftjoin->orOn('aaa.tie_logistic_manage_number', '=', 'mmm.file_table_key')->whereNull('ddd.te_carry_out_number')->whereNull('bbb.ti_carry_in_number');
                 })->orderBy('tie_is_date', 'DESC')->orderBy('tie_h_bl', 'DESC');
             } else if ($user->mb_type == 'spasys') {
                 
@@ -532,6 +542,7 @@ class ImportScheduleController extends Controller
                     ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
 
                 $sub_5 = ReceivingGoodsDelivery::select('is_no', 'rgd_status3', 'rgd_status1')->groupBy('is_no');
+                $sub_6 = File::select('file_no', 'file_url','file_table_key');
 
 
                 $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
@@ -548,6 +559,10 @@ class ImportScheduleController extends Controller
                     $leftjoin->on('ddd.te_carry_out_number', '=', 'nnn.is_no')->where('ddd.te_carry_out_number', '!=', null);
                     $leftjoin->orOn('bbb.ti_carry_in_number', '=', 'nnn.is_no')->whereNull('ddd.te_carry_out_number');
                     $leftjoin->orOn('aaa.tie_logistic_manage_number', '=', 'nnn.is_no')->whereNull('ddd.te_carry_out_number')->whereNull('bbb.ti_carry_in_number');
+                })->leftJoinSub($sub_6, 'mmm', function ($leftjoin) {
+                    $leftjoin->on('ddd.te_carry_out_number', '=', 'mmm.file_table_key')->where('ddd.te_carry_out_number', '!=', null);
+                    $leftjoin->orOn('bbb.ti_carry_in_number', '=', 'mmm.file_table_key')->whereNull('ddd.te_carry_out_number');
+                    $leftjoin->orOn('aaa.tie_logistic_manage_number', '=', 'mmm.file_table_key')->whereNull('ddd.te_carry_out_number')->whereNull('bbb.ti_carry_in_number');
                 })->orderBy('tie_is_date', 'DESC')->orderBy('tie_h_bl', 'DESC');
 
 
