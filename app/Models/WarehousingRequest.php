@@ -49,6 +49,6 @@ class WarehousingRequest extends Model
 
     public function warehousing()
     {
-        return $this->belongsTo(Warehousing::class, 'w_no', 'w_no');
+        return $this->belongsTo(Warehousing::class, 'w_no', 'w_no')->with('w_import_parent');
     }
 }

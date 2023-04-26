@@ -900,8 +900,24 @@ class ReceivingGoodsDeliveryController extends Controller
                     }
                 } else {
                     if (isset($request->data)) {
-                        foreach ($request->data as $key => $data) {
+                        $data_request = [];
 
+                        foreach ($request->data as $key => $data) {
+                            if ($data['w_no'] != ""){
+                                $warehousing_request = WarehousingRequest::with('warehousing')->where('w_no', $data['w_no'])->whereHas('warehousing.w_import_parent',function ($q) use ($data){
+                                    $q->where('w_no',$data['w_import_no']);
+                                })->get();         
+                            }
+                        }
+
+                        $data_request = isset($warehousing_request) ? $warehousing_request : null;
+
+                       
+
+                        foreach ($request->data as $key => $data) {
+                            
+                            
+                           
                             if ($data['w_no'] != "") {
 
                                 $w_no = Warehousing::where('w_no', $request->w_no)->update([
@@ -912,13 +928,16 @@ class ReceivingGoodsDeliveryController extends Controller
                                     'w_type' => 'EW',
                                     'w_category_name' => '유통가공',
                                 ]);
+
                                 Warehousing::where('w_no', $warehousing_data->w_import_no)->update([
                                     'w_children_yn' => "y"
                                 ]);
+
                                 $w_schedule_number = CommonFunc::generate_w_schedule_number($request->w_no, 'EW', $key);
                                 Warehousing::where('w_no', $request->w_no)->update([
                                     'w_schedule_number' =>   CommonFunc::generate_w_schedule_number($request->w_no, 'EW', $key)
                                 ]);
+
                                 if (isset($request->page_type) && $request->page_type == 'Page130146') {
                                     $w_schedule_number2 = CommonFunc::generate_w_schedule_number($request->w_no, 'EWC', $key);
                                     Warehousing::where('w_no', $request->w_no)->update([
@@ -926,20 +945,22 @@ class ReceivingGoodsDeliveryController extends Controller
                                         'w_completed_day' => Carbon::now()->toDateTimeString()
                                     ]);
                                 }
+
+
                                 if ($request->wr_contents) {
-                                    if ($request->wr_contents) {
-                                        WarehousingRequest::insert([
-                                            'w_no' => $request->w_no,
-                                            'mb_no' => $member->mb_no,
-                                            'wr_contents' => $request->wr_contents,
-                                            'wr_type' => 'EW',
-                                        ]);
-                                    }
+                                    WarehousingRequest::insert([
+                                        'w_no' => $request->w_no,
+                                        'mb_no' => $member->mb_no,
+                                        'wr_contents' => $request->wr_contents,
+                                        'wr_type' => 'EW',
+                                    ]);
                                 }
+
 
                                 foreach ($data['remove_items'] as $remove) {
                                     WarehousingItem::where('item_no', $remove['item_no'])->where('w_no', $request->w_no)->delete();
                                 }
+
                                 if ($request->page_type != 'Page146') {
                                     foreach ($data['items'] as $item) {
                                         WarehousingItem::where('w_no', $request->w_no)->where('item_no', $item['item_no'])->where('wi_type', '=', '출고_shipper')->update([
@@ -1005,6 +1026,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                         'w_category_name' => '유통가공',
                                     ]);
                                 }
+
                                 // if ($warehousing_status3) {
                                 //     WarehousingStatus::insert([
                                 //         'w_no' => $w_no,
@@ -1046,6 +1068,18 @@ class ReceivingGoodsDeliveryController extends Controller
                                         'wr_type' => 'EW',
                                     ]);
                                 }
+
+                                if(isset($data_request)){
+                                    foreach ($data_request as $warehousing_r) {
+                                        WarehousingRequest::insert([
+                                            'w_no' => $w_no,
+                                            'mb_no' => $member->mb_no,
+                                            'wr_contents' => $warehousing_r->wr_contents,
+                                            'wr_type' => 'EW',
+                                        ]);
+                                    }
+                                }
+                                
 
                                 foreach ($data['items'] as $item) {
                                     WarehousingItem::insert([
@@ -4037,14 +4071,14 @@ class ReceivingGoodsDeliveryController extends Controller
                 );
 
                 //alert
-                
+
                 $w_no_alert = (object)$dataSubmit;
                 $w_no_alert->w_category_name = '보세화물';
 
                 $w_no_alert->company = (object)$request->company;
                 $w_no_alert->company->co_parent = (object)$request->company['co_parent'];
                 $w_no_alert->company->co_parent->co_parent = (object)$w_no_alert->company->co_parent->co_parent;
-              
+
                 $rgd_status3  = isset($dataSubmit['rgd_status3']) ? $dataSubmit['rgd_status3'] : null;
 
                 $check_alarm_first = Alarm::with(['alarm_data'])->where('w_no', $dataSubmit['is_no'])->whereHas('alarm_data', function ($query) {
@@ -4052,7 +4086,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 })->first();
 
                 if ($check_alarm_first === null && $rgd_status3 == '배송중')
-                   CommonFunc::insert_alarm_cargo('[보세화물] 배송중', null, $user, $w_no_alert, 'cargo_delivery');
+                    CommonFunc::insert_alarm_cargo('[보세화물] 배송중', null, $user, $w_no_alert, 'cargo_delivery');
             }
             if (isset($data['remove'])) {
                 foreach ($data['remove'] as $remove) {
