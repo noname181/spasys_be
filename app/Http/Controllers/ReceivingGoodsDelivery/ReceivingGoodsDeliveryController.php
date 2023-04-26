@@ -915,9 +915,7 @@ class ReceivingGoodsDeliveryController extends Controller
                        
 
                         foreach ($request->data as $key => $data) {
-                            
-                            
-                           
+                                    
                             if ($data['w_no'] != "") {
 
                                 $w_no = Warehousing::where('w_no', $request->w_no)->update([

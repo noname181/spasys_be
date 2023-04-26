@@ -255,7 +255,7 @@ class CommonFunc
                 $cargo_number = $w_no->w_schedule_number;
             } else if ($type == 'cargo_delivery') {
 
-                $aaaaa = $w_no->w_import_parent->w_schedule_number2;
+                $aaaaa = $w_no->w_schedule_number2;
 
                 $bbbbb = $w_no->receving_goods_delivery[0]->rgd_contents;
 
@@ -467,7 +467,7 @@ class CommonFunc
                     //INSERT ALARM FOR RECEIVER LIST USER
                     Alarm::insertGetId(
                         [
-                            'w_no' => $w_no->ss_no,
+                            'ss_no' => $w_no->ss_no,
                             'mb_no' => $sender->mb_no,
                             'receiver_no' => $receiver->mb_no,
                             'alarm_content' => $alarm_content,
