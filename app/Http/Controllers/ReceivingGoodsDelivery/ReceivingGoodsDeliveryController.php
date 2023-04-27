@@ -2824,13 +2824,6 @@ class ReceivingGoodsDeliveryController extends Controller
                 ]);
 
                 if ($rgd->rgd_status7 == 'taxed') {
-                    CancelBillHistory::insertGetId([
-                        'rgd_no' => $request->rgd_no,
-                        'mb_no' => $user->mb_no,
-                        'cbh_type' => 'tax',
-                        'cbh_status_before' => $rgd->rgd_status8,
-                        'cbh_status_after' => 'completed'
-                    ]);
 
                     if ($rgd->rgd_status8 != 'completed') {
                         ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
@@ -2927,6 +2920,14 @@ class ReceivingGoodsDeliveryController extends Controller
                     'cbh_status_after' => 'cancel'
                 ]);
 
+                CancelBillHistory::insertGetId([
+                    'rgd_no' => $request->rgd_no,
+                    'mb_no' => $user->mb_no,
+                    'cbh_type' => 'payment',
+                    'cbh_status_before' => $rgd->rgd_status6,
+                    'cbh_status_after' => 'request_bill'
+                ]);
+
                 if ($rgd->rgd_status8 == 'completed') {
                     CancelBillHistory::insertGetId([
                         'rgd_no' => $request->rgd_no,
@@ -2935,6 +2936,25 @@ class ReceivingGoodsDeliveryController extends Controller
                         'cbh_status_before' => $rgd->rgd_status8,
                         'cbh_status_after' => 'in_process'
                     ]);
+
+                    ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                        'rgd_status8' =>  'in_process',
+                    ]);
+
+                    //UPDATE EST BILL
+                    $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
+                    if ($est_rgd->rgd_status8 != 'in_process') {
+                        ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
+                            'rgd_status8' => 'in_process',
+                        ]);
+                        CancelBillHistory::insertGetId([
+                            'rgd_no' => $est_rgd->rgd_no,
+                            'mb_no' => $user->mb_no,
+                            'cbh_type' => 'tax',
+                            'cbh_status_before' => $est_rgd->rgd_status8,
+                            'cbh_status_after' => 'in_process'
+                        ]);
+                    }
                 }
             }
 
@@ -3269,8 +3289,6 @@ class ReceivingGoodsDeliveryController extends Controller
                     ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                         'rgd_status5' => 'confirmed',
                         'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
-                        'rgd_status7' => $ag->ag_auto_issue == 'y' ? 'taxed' : NULL,
-                        'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
                     ]);
 
                     $creater = Member::where('mb_no', $rgd->mb_no)->first();
@@ -3312,6 +3330,22 @@ class ReceivingGoodsDeliveryController extends Controller
                             'cbh_status_before' => $rgd->rgd_status8,
                             'cbh_status_after' => 'completed'
                         ]);
+
+                        //UPDATE EST BILL
+                        $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
+                        if ($est_rgd->rgd_status8 != 'completed') {
+                            ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
+                                'rgd_status8' => 'completed',
+                            ]);
+                            CancelBillHistory::insertGetId([
+                                'rgd_no' => $est_rgd->rgd_no,
+                                'mb_no' => $user->mb_no,
+                                'cbh_type' => 'tax',
+                                'cbh_status_before' => $est_rgd->rgd_status8,
+                                'cbh_status_after' => 'completed'
+                            ]);
+                        }
+
                     }
 
                     //CHECK AUTO TAX INVOICE ISSUE
@@ -3319,6 +3353,11 @@ class ReceivingGoodsDeliveryController extends Controller
 
                         $cbh = CancelBillHistory::where('rgd_no', $request->rgd_no)->where('cbh_type', 'tax')->where('cbh_status_after', 'taxed')->first();
                         if (!isset($cbh->cbh_no)) {
+                            ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                                'rgd_status7' => $ag->ag_auto_issue == 'y' ? 'taxed' : NULL,
+                                'rgd_tax_invoice_date' =>  Carbon::now()->toDateTimeString(),
+                            ]);
+
                             $tax_number = CommonFunc::generate_tax_number($rgd->rgd_no);
 
                             $tid = TaxInvoiceDivide::updateOrCreate(
@@ -3399,8 +3438,6 @@ class ReceivingGoodsDeliveryController extends Controller
                         ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                             'rgd_status5' => 'confirmed',
                             'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
-                            'rgd_status7' => $ag->ag_auto_issue == 'y' ? 'taxed' : NULL,
-                            'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
                         ]);
 
                         if ($rgd['rgd_calculate_deadline_yn'] == 'y') {
@@ -3423,6 +3460,22 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'cbh_status_before' => $rgd->rgd_status8,
                                 'cbh_status_after' => 'completed'
                             ]);
+
+                            //UPDATE EST BILL
+                            $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_parent_no'])->first();
+                            if ($est_rgd->rgd_status8 != 'completed') {
+                                ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
+                                    'rgd_status8' => 'completed',
+                                ]);
+                                CancelBillHistory::insertGetId([
+                                    'rgd_no' => $est_rgd->rgd_no,
+                                    'mb_no' => $user->mb_no,
+                                    'cbh_type' => 'tax',
+                                    'cbh_status_before' => $est_rgd->rgd_status8,
+                                    'cbh_status_after' => 'completed'
+                                ]);
+                            }
+
                         }
 
 
@@ -3431,6 +3484,11 @@ class ReceivingGoodsDeliveryController extends Controller
 
                             $cbh = CancelBillHistory::where('rgd_no', $rgd->rgd_no)->where('cbh_type', 'tax')->where('cbh_status_after', 'taxed')->first();
                             if (!isset($cbh->cbh_no)) {
+                                ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                                    'rgd_status7' => $ag->ag_auto_issue == 'y' ? 'taxed' : NULL,
+                                    'rgd_tax_invoice_date' =>  Carbon::now()->toDateTimeString(),
+                                ]);
+
                                 $tax_number = CommonFunc::generate_tax_number($rgd->rgd_no);
 
                                 $tid = TaxInvoiceDivide::updateOrCreate(
@@ -3513,6 +3571,21 @@ class ReceivingGoodsDeliveryController extends Controller
                             'cbh_status_before' => $rgd->rgd_status8,
                             'cbh_status_after' => 'completed'
                         ]);
+
+                        //UPDATE EST BILL
+                        $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_parent_no'])->first();
+                        if ($est_rgd->rgd_status8 != 'completed') {
+                            ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
+                                'rgd_status8' => 'completed',
+                            ]);
+                            CancelBillHistory::insertGetId([
+                                'rgd_no' => $est_rgd->rgd_no,
+                                'mb_no' => $user->mb_no,
+                                'cbh_type' => 'tax',
+                                'cbh_status_before' => $est_rgd->rgd_status8,
+                                'cbh_status_after' => 'completed'
+                            ]);
+                        }
                     }
 
 
@@ -3524,8 +3597,6 @@ class ReceivingGoodsDeliveryController extends Controller
                         ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                             'rgd_status5' => 'confirmed',
                             'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
-                            'rgd_status7' => $ag->ag_auto_issue == 'y' ? 'taxed' : NULL,
-                            'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
                         ]);
 
                         $creater = Member::where('mb_no', $rgd->mb_no)->first();
@@ -3543,6 +3614,11 @@ class ReceivingGoodsDeliveryController extends Controller
 
                             $cbh = CancelBillHistory::where('rgd_no', $rgd->rgd_no)->where('cbh_type', 'tax')->where('cbh_status_after', 'taxed')->first();
                             if (!isset($cbh->cbh_no)) {
+                                ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                                    'rgd_status7' => $ag->ag_auto_issue == 'y' ? 'taxed' : NULL,
+                                    'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
+                                ]);
+
                                 $tax_number = CommonFunc::generate_tax_number($rgd->rgd_no);
 
                                 $tid = TaxInvoiceDivide::updateOrCreate(
@@ -3585,6 +3661,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_status5' => 'confirmed',
                             'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
                         ]);
+                        
                     }
                     // } else if ($rgd['rgd_bill_type'] == 'final_monthly') {
                     //     $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $rgd['rgd_no'])->first();
@@ -3909,6 +3986,14 @@ class ReceivingGoodsDeliveryController extends Controller
                     'cbh_status_before' => 'paid',
                     'cbh_status_after' => 'cancel',
                     'cbh_type' => 'cancel_payment',
+                ]);
+
+                CancelBillHistory::insertGetId([
+                    'mb_no' => Auth::user()->mb_no,
+                    'rgd_no' => $request->rgd_no,
+                    'cbh_status_before' => 'cancel',
+                    'cbh_status_after' => 'request_bill',
+                    'cbh_type' => 'payment',
                 ]);
 
                 if ($rgd->rgd_status8 == 'completed') {

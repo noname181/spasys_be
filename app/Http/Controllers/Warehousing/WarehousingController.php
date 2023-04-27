@@ -4759,14 +4759,15 @@ class WarehousingController extends Controller
                         $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : 0;
                     }
 
-                    if (isset($item->rate_data_general->rdg_sum7)) {
-                        $item->sum_price_total3 = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum7 : 0;
-                    } else if (isset($item->rate_data_general->rdg_sum6)) {
-                        $item->sum_price_total3 = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum6 : 0;
-                    } else if (isset($item->rate_data_general->rdg_sum4)) {
-                        $item->sum_price_total3 = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : 0;
-                    } 
-                     else {
+                    if(isset($item->rate_data_general)){
+                        if ($item->rate_data_general->rdg_sum7) {
+                            $item->sum_price_total3 = $item->rate_data_general->rdg_sum7;
+                        } else if ($item->rate_data_general->rdg_sum6) {
+                            $item->sum_price_total3 = $item->rate_data_general->rdg_sum6;
+                        } else if ($item->rate_data_general->rdg_sum4) {
+                            $item->sum_price_total3 = $item->rate_data_general->rdg_sum4;
+                        }
+                    } else {
                         $item->sum_price_total3 = 0;
                     }
 
@@ -5744,7 +5745,7 @@ class WarehousingController extends Controller
             $per_page = isset($$request['per_page']) ? $$request['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($$request['page']) ? $$request['page'] : 1;
-            $th = CancelBillHistory::with('member')->where('rgd_no', $request->rgd_no)->where('cbh_type', 'tax')->orderby('created_at', 'DESC')->orderby('cbh_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
+            $th = CancelBillHistory::with('member')->where('rgd_no', $request->rgd_no)->where('cbh_status_after', '!=', 'taxed')->where('cbh_status_after', '!=', 'cancel')->where('cbh_status_after', '!=', 'edited')->where('cbh_type', 'tax')->orderby('created_at', 'DESC')->orderby('cbh_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
 
             return response()->json($th);
         } catch (\Exception $e) {
