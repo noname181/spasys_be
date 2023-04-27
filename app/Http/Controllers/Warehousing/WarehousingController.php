@@ -4597,19 +4597,19 @@ class WarehousingController extends Controller
                 $warehousing_fulfillment->where('rgd_calculate_deadline_yn', 'y')->where('rgd_status4', '확정청구서');
 
                 if ($validated['rgd_status7'] == 'waiting') {
-                    $warehousing->whereNull('rgd_status7');
+                    $warehousing->whereNull('rgd_status7')->where('rgd_status5', 'confirmed');
                 } else {
                     $warehousing->where('rgd_status7', '=', $validated['rgd_status7']);
                 }
 
                 if ($validated['rgd_status7'] == 'waiting') {
-                    $warehousing_bonded->whereNull('rgd_status7');
+                    $warehousing_bonded->whereNull('rgd_status7')->where('rgd_status5', 'confirmed');
                 } else {
                     $warehousing_bonded->where('rgd_status7', '=', $validated['rgd_status7']);
                 }
 
                 if ($validated['rgd_status7'] == 'waiting') {
-                    $warehousing_fulfillment->whereNull('rgd_status7');
+                    $warehousing_fulfillment->whereNull('rgd_status7')->where('rgd_status5', 'confirmed');
                 } else {
                     $warehousing_fulfillment->where('rgd_status7', '=', $validated['rgd_status7']);
                 }
