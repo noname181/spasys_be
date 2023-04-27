@@ -3134,9 +3134,15 @@ class RateDataController extends Controller
                 }else {
                     $co_no = $rgd->warehousing->company->co_parent->co_no;
                 }
-            }else {
+            }else if($user->mb_type == 'shop'){
                 if($bill_type == 'check'){
                     $co_no = $rgd->warehousing->company->co_parent->co_no;
+                }else {
+                    $co_no = $rgd->warehousing->co_no;
+                }
+            }else if($user->mb_type == 'shipper'){
+                if($bill_type == 'check'){
+                    $co_no = $rgd->warehousing->co_no;
                 }else {
                     $co_no = $rgd->warehousing->co_no;
                 }
