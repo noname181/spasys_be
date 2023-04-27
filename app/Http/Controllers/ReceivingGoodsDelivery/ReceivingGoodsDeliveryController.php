@@ -2824,13 +2824,6 @@ class ReceivingGoodsDeliveryController extends Controller
                 ]);
 
                 if ($rgd->rgd_status7 == 'taxed') {
-                    CancelBillHistory::insertGetId([
-                        'rgd_no' => $request->rgd_no,
-                        'mb_no' => $user->mb_no,
-                        'cbh_type' => 'tax',
-                        'cbh_status_before' => $rgd->rgd_status8,
-                        'cbh_status_after' => 'completed'
-                    ]);
 
                     if ($rgd->rgd_status8 != 'completed') {
                         ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
