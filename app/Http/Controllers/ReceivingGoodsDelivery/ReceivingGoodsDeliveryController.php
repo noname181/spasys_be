@@ -2927,6 +2927,14 @@ class ReceivingGoodsDeliveryController extends Controller
                     'cbh_status_after' => 'cancel'
                 ]);
 
+                CancelBillHistory::insertGetId([
+                    'rgd_no' => $request->rgd_no,
+                    'mb_no' => $user->mb_no,
+                    'cbh_type' => 'payment',
+                    'cbh_status_before' => $rgd->rgd_status6,
+                    'cbh_status_after' => 'request_bill'
+                ]);
+
                 if ($rgd->rgd_status8 == 'completed') {
                     CancelBillHistory::insertGetId([
                         'rgd_no' => $request->rgd_no,
@@ -2935,6 +2943,25 @@ class ReceivingGoodsDeliveryController extends Controller
                         'cbh_status_before' => $rgd->rgd_status8,
                         'cbh_status_after' => 'in_process'
                     ]);
+
+                    ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                        'rgd_status8' =>  'in_process',
+                    ]);
+
+                    //UPDATE EST BILL
+                    $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
+                    if ($est_rgd->rgd_status8 != 'in_process') {
+                        ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
+                            'rgd_status8' => 'in_process',
+                        ]);
+                        CancelBillHistory::insertGetId([
+                            'rgd_no' => $est_rgd->rgd_no,
+                            'mb_no' => $user->mb_no,
+                            'cbh_type' => 'tax',
+                            'cbh_status_before' => $est_rgd->rgd_status8,
+                            'cbh_status_after' => 'in_process'
+                        ]);
+                    }
                 }
             }
 
@@ -3966,6 +3993,14 @@ class ReceivingGoodsDeliveryController extends Controller
                     'cbh_status_before' => 'paid',
                     'cbh_status_after' => 'cancel',
                     'cbh_type' => 'cancel_payment',
+                ]);
+
+                CancelBillHistory::insertGetId([
+                    'mb_no' => Auth::user()->mb_no,
+                    'rgd_no' => $request->rgd_no,
+                    'cbh_status_before' => 'cancel',
+                    'cbh_status_after' => 'request_bill',
+                    'cbh_type' => 'payment',
                 ]);
 
                 if ($rgd->rgd_status8 == 'completed') {
