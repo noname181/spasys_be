@@ -268,7 +268,7 @@ class CommonFunc
         } else if ($w_no->w_category_name == '보세화물') {
             if ($type == 'cargo_delivery') {
 
-                $aaaaa = $w_no->is_no;
+                $aaaaa = $w_no->order_number;
 
                 $bbbbb = $w_no->rgd_contents;
 
