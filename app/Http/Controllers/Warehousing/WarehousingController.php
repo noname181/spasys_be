@@ -4766,6 +4766,8 @@ class WarehousingController extends Controller
                             $item->sum_price_total3 = $item->rate_data_general->rdg_sum6;
                         } else if ($item->rate_data_general->rdg_sum4) {
                             $item->sum_price_total3 = $item->rate_data_general->rdg_sum4;
+                        }   else {
+                            $item->sum_price_total3 = 0;
                         }
                     } else {
                         $item->sum_price_total3 = 0;
