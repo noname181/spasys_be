@@ -3779,7 +3779,7 @@ class ReceivingGoodsDeliveryController extends Controller
             );
 
             ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
-                'rgd_status6' => $left_fee < 0 ? null : 'paid',
+                'rgd_status6' => $left_fee < 0 ? 'deposit_without_bankbook' : 'paid',
                 'rgd_paid_date' =>   $left_fee < 0 ? null : Carbon::now(),
             ]);
 
@@ -3979,7 +3979,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 }
 
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
-                    'rgd_status6' => isset($request->p_method) && $request->p_method == 'deposit_without_bankbook'  ? null : 'paid',
+                    'rgd_status6' => isset($request->p_method) && $request->p_method == 'deposit_without_bankbook'  ? 'deposit_without_bankbook' : 'paid',
                     'rgd_paid_date' =>  isset($request->p_method) && $request->p_method == 'deposit_without_bankbook'  ? null : Carbon::now(),
                 ]);
 
