@@ -2680,10 +2680,10 @@ class RateDataController extends Controller
                     'rdg_sum2' => isset($request->workData['sum']) ? $request->workData['sum'] : 0,
                     'rdg_sum3' => isset($request->domesticData['sum']) ? $request->domesticData['sum'] : 0,
                     'rdg_sum4' => isset($request->total['sum']) ? $request->total['sum'] : 0,
-                    'rdg_etc1' => isset($request->storageData['etc']) ? $request->storageData['etc'] : 0,
-                    'rdg_etc2' => isset($request->workData['etc']) ? $request->workData['etc'] : 0,
-                    'rdg_etc3' => isset($request->domesticData['etc']) ? $request->domesticData['etc'] : 0,
-                    'rdg_etc4' => isset($request->total['etc']) ? $request->total['etc'] : 0,
+                    'rdg_etc1' => isset($request->storageData['etc']) ? $request->storageData['etc'] : '',
+                    'rdg_etc2' => isset($request->workData['etc']) ? $request->workData['etc'] : '',
+                    'rdg_etc3' => isset($request->domesticData['etc']) ? $request->domesticData['etc'] : '',
+                    'rdg_etc4' => isset($request->total['etc']) ? $request->total['etc'] : '',
                     'rdg_count_work' => isset($request->workData['count_work']) ? $request->workData['count_work'] : 0,
                 ]
             );
@@ -4185,13 +4185,13 @@ class RateDataController extends Controller
                     'rdg_sum5' => isset($request->bonded5['sum']) ? $request->bonded5['sum'] : 0,
                     'rdg_sum6' => isset($request->bonded6['sum']) ? $request->bonded1['sum'] : 0,
                     'rdg_sum7' => isset($request->total['sum']) ? $request->total['sum'] : 0,
-                    'rdg_etc1' => isset($request->bonded1['etc']) ? $request->bonded1['etc'] : 0,
-                    'rdg_etc2' => isset($request->bonded2['etc']) ? $request->bonded2['etc'] : 0,
-                    'rdg_etc3' => isset($request->bonded3['etc']) ? $request->bonded3['etc'] : 0,
-                    'rdg_etc4' => isset($request->bonded4['etc']) ? $request->bonded4['etc'] : 0,
-                    'rdg_etc5' => isset($request->bonded5['etc']) ? $request->bonded5['etc'] : 0,
-                    'rdg_etc6' => isset($request->bonded6['etc']) ? $request->bonded6['etc'] : 0,
-                    'rdg_etc7' => isset($request->total['etc']) ? $request->total['etc'] : 0,
+                    'rdg_etc1' => isset($request->bonded1['etc']) ? $request->bonded1['etc'] : '',
+                    'rdg_etc2' => isset($request->bonded2['etc']) ? $request->bonded2['etc'] : '',
+                    'rdg_etc3' => isset($request->bonded3['etc']) ? $request->bonded3['etc'] : '',
+                    'rdg_etc4' => isset($request->bonded4['etc']) ? $request->bonded4['etc'] : '',
+                    'rdg_etc5' => isset($request->bonded5['etc']) ? $request->bonded5['etc'] : '',
+                    'rdg_etc6' => isset($request->bonded6['etc']) ? $request->bonded6['etc'] : '',
+                    'rdg_etc7' => isset($request->total['etc']) ? $request->total['etc'] : '',
                 ]
             );
             $previous_rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->where('rgd_bill_type', '=', $request->previous_bill_type)->first();

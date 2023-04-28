@@ -3749,38 +3749,86 @@ class ReceivingGoodsDeliveryController extends Controller
     public function payment_from_est(Request $request)
     {
         try {
-            $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+            DB::beginTransaction();
+
+            $user = Auth::user();
+            $rgd = ReceivingGoodsDelivery::with(['rgd_parent_payment', 'rate_data_general'])->where('rgd_no', $request->rgd_no)->first();
             $est_payment = Payment::where('rgd_no', $rgd->rgd_parent_no)->where('p_success_yn', 'y')->first();
+
+            $left_fee = 0;
+            if(isset($rgd->rgd_parent_payment)){
+                if ($rgd->rgd_parent_payment->rgd_status6 == 'paid' && $rgd->rgd_parent_payment->is_expect_payment == 'n') {
+                    $est_fee = (int)$rgd->rgd_parent_payment->rate_data_general->rdg_sum7;
+                    $final_fee = (int)$rgd->rate_data_general->rdg_sum7;
+                    $left_fee =  $final_fee - $est_fee;
+    
+                }else {
+                    $final_fee = (int)$rgd->rate_data_general->rdg_sum7;
+                }
+            }
 
             Payment::insertGetId(
                 [
-                    'mb_no' => Auth::user()->mb_no,
+                    'mb_no' => $user->mb_no,
                     'rgd_no' => $request->rgd_no,
-                    'p_price' => 0,
-                    'p_method' => $est_payment->p_method,
+                    'p_price' =>  $rgd->service_korean_name == '보세화물' ? $rgd->rate_data_general->rdg_sum7 : $rgd->rate_data_general->rdg_sum4,
+                    'p_method' => $left_fee < 0 ? 'deposit_without_bankbook' : $est_payment->p_method,
                     'p_success_yn' => 'y',
-                    'p_method_fee' => $est_payment->p_method_fee,
+                    'p_method_fee' => $left_fee,
                 ]
             );
 
             ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
-                'rgd_status6' => 'paid',
-                'rgd_paid_date' =>  Carbon::now(),
+                'rgd_status6' => $left_fee < 0 ? 'deposit_without_bankbook' : 'paid',
+                'rgd_paid_date' =>   $left_fee < 0 ? null : Carbon::now(),
             ]);
 
 
             CancelBillHistory::insertGetId([
-                'mb_no' => Auth::user()->mb_no,
+                'mb_no' => $user->mb_no,
                 'rgd_no' => $request->rgd_no,
                 'cbh_status_after' => 'payment_bill',
                 'cbh_type' => 'payment',
+                'cbh_pay_method' => $left_fee < 0 ? 'deposit_without_bankbook' : $est_payment->p_method,
             ]);
 
+            if ($rgd->rgd_status7 == 'taxed') {
+                CancelBillHistory::insertGetId([
+                    'rgd_no' => $request->rgd_no,
+                    'mb_no' => $user->mb_no,
+                    'cbh_type' => 'tax',
+                    'cbh_status_before' => $rgd->rgd_status7,
+                    'cbh_status_after' => 'completed',
+                ]);
+
+                ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                    'rgd_status8' => $left_fee < 0 ? 'in_process' : 'completed',
+                ]);
+
+                if ($request->p_method != 'deposit_without_bankbook') {
+                    //UPDATE EST BILL
+                    $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
+                    if ($est_rgd->rgd_status8 != 'completed') {
+                        ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
+                            'rgd_status8' => 'completed',
+                        ]);
+                        CancelBillHistory::insertGetId([
+                            'rgd_no' => $est_rgd->rgd_no,
+                            'mb_no' => $user->mb_no,
+                            'cbh_type' => 'tax',
+                            'cbh_status_before' => $est_rgd->rgd_status8,
+                            'cbh_status_after' => 'completed'
+                        ]);
+                    }
+                }
+            }
+            DB::commit();
             return response()->json([
                 'message' => 'Success',
                 //'check_payment' =>$check_payment->rgd_no
             ]);
         } catch (\Exception $e) {
+            DB::rollback();
             Log::error($e);
             return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
@@ -3831,7 +3879,6 @@ class ReceivingGoodsDeliveryController extends Controller
                         'cbh_type' => 'tax',
                         'cbh_status_before' => $rgd->rgd_status7,
                         'cbh_status_after' => 'completed',
-                        'cbh_pay_method' => isset($request->p_method) ? $request->p_method : null
                     ]);
 
                     ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
@@ -3858,6 +3905,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
 
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                    'is_expect_payment' => isset($request->p_method) && $request->p_method == 'deposit_without_bankbook'  ? 'y' : 'n',
                     'rgd_status6' => isset($request->p_method) && $request->p_method == 'deposit_without_bankbook'  ? null : 'paid',
                     'rgd_paid_date' =>  isset($request->p_method) && $request->p_method == 'deposit_without_bankbook'  ? null : Carbon::now(),
                 ]);
@@ -3931,7 +3979,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 }
 
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
-                    'rgd_status6' => isset($request->p_method) && $request->p_method == 'deposit_without_bankbook'  ? null : 'paid',
+                    'rgd_status6' => isset($request->p_method) && $request->p_method == 'deposit_without_bankbook'  ? 'deposit_without_bankbook' : 'paid',
                     'rgd_paid_date' =>  isset($request->p_method) && $request->p_method == 'deposit_without_bankbook'  ? null : Carbon::now(),
                 ]);
 
@@ -4041,7 +4089,7 @@ class ReceivingGoodsDeliveryController extends Controller
     {
         try {
             DB::beginTransaction();
-            $data = Payment::where('rgd_no', '=', $request->rgd_no)->first();
+            $data = Payment::where('rgd_no', '=', $request->rgd_no)->orderBy('p_no', 'desc')->first();
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,

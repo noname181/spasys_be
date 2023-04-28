@@ -4597,19 +4597,19 @@ class WarehousingController extends Controller
                 $warehousing_fulfillment->where('rgd_calculate_deadline_yn', 'y')->where('rgd_status4', '확정청구서');
 
                 if ($validated['rgd_status7'] == 'waiting') {
-                    $warehousing->whereNull('rgd_status7');
+                    $warehousing->whereNull('rgd_status7')->where('rgd_status5', 'confirmed');
                 } else {
                     $warehousing->where('rgd_status7', '=', $validated['rgd_status7']);
                 }
 
                 if ($validated['rgd_status7'] == 'waiting') {
-                    $warehousing_bonded->whereNull('rgd_status7');
+                    $warehousing_bonded->whereNull('rgd_status7')->where('rgd_status5', 'confirmed');
                 } else {
                     $warehousing_bonded->where('rgd_status7', '=', $validated['rgd_status7']);
                 }
 
                 if ($validated['rgd_status7'] == 'waiting') {
-                    $warehousing_fulfillment->whereNull('rgd_status7');
+                    $warehousing_fulfillment->whereNull('rgd_status7')->where('rgd_status5', 'confirmed');
                 } else {
                     $warehousing_fulfillment->where('rgd_status7', '=', $validated['rgd_status7']);
                 }
@@ -4766,6 +4766,8 @@ class WarehousingController extends Controller
                             $item->sum_price_total3 = $item->rate_data_general->rdg_sum6;
                         } else if ($item->rate_data_general->rdg_sum4) {
                             $item->sum_price_total3 = $item->rate_data_general->rdg_sum4;
+                        }   else {
+                            $item->sum_price_total3 = 0;
                         }
                     } else {
                         $item->sum_price_total3 = 0;
@@ -5745,7 +5747,7 @@ class WarehousingController extends Controller
             $per_page = isset($$request['per_page']) ? $$request['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($$request['page']) ? $$request['page'] : 1;
-            $th = CancelBillHistory::with('member')->where('rgd_no', $request->rgd_no)->where('cbh_status_after', '!=', 'taxed')->where('cbh_status_after', '!=', 'cancel')->where('cbh_status_after', '!=', 'edited')->where('cbh_type', 'tax')->orderby('created_at', 'DESC')->orderby('cbh_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
+            $th = CancelBillHistory::with('member')->where('rgd_no', $request->rgd_no)->where('cbh_status_after', '!=', 'taxed')->where('cbh_status_after', '!=', 'cancel')->where('cbh_status_after', '!=', 'edited')->where('cbh_type', 'tax')->orderby('cbh_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
 
             return response()->json($th);
         } catch (\Exception $e) {
@@ -6037,6 +6039,7 @@ class WarehousingController extends Controller
 
                 CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $user, null, 'settle_payment', null);
 
+                $i = 0;
                 foreach ($request->tid_list as $tid) {
                     if (isset($tid['tid_no'])) {
                         // if(false){
@@ -6091,7 +6094,7 @@ class WarehousingController extends Controller
                             'cbh_status_after' => 'taxed'
                         ]);
 
-                        if ($rgd['rgd_status6'] == 'paid') {
+                        if ($rgd['rgd_status6'] == 'paid' && $i == 0) {
                             CancelBillHistory::insertGetId([
                                 'rgd_no' => $rgd['rgd_no'],
                                 'mb_no' => $user->mb_no,
@@ -6119,6 +6122,7 @@ class WarehousingController extends Controller
                                 ]);
                             }
                         }
+                        $i++;
                     }
                     $ids[] = $id;
                 }
