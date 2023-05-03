@@ -6955,7 +6955,7 @@ class WarehousingController extends Controller
 
         $approval_history = CancelBillHistory::where('rgd_no', $rgd_no)->whereIn('cbh_type', ['approval'])->first();
 
-        if($rgd->rgd_status4 == '예상경비청구서' && $rgd->service_korean_name != '수입풀필먼트'){
+        if($rgd->rgd_status4 == '예상경비청구서' && $rgd->service_korean_name != '수입풀필먼트' && !str_contains($rgd->rgd_bill_type, 'month')){
             $payment_history = CancelBillHistory::where('rgd_no', $rgd_no)->where('cbh_type', 'payment')->where('cbh_status_after', 'request_bill')->first();
 
             if (empty($payment_history->cbh_no) && $rgd->rgd_calculate_deadline_yn == 'y') {

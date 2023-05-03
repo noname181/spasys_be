@@ -4012,7 +4012,9 @@ class ReceivingGoodsDeliveryController extends Controller
     public function cancel_payment(Request $request)
     {
         try {
+            DB::beginTransaction();
             $check_payment = Payment::where('rgd_no', $request->rgd_no)->where('p_success_yn', 'y')->first();
+            $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
             if (isset($check_payment)) {
                 Payment::where('rgd_no', $check_payment->rgd_no)->update([
                     // 'p_price' => $request->sumprice,
@@ -4075,13 +4077,13 @@ class ReceivingGoodsDeliveryController extends Controller
             }
 
 
-
+            DB::commit();
             return response()->json([
                 'message' => 'Success'
             ]);
         } catch (\Exception $e) {
+            DB::rollback();
             Log::error($e);
-            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
