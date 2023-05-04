@@ -6949,7 +6949,7 @@ class WarehousingController extends Controller
     }
     public function load_table_top_right($rgd_no)
     {
-        $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child', 'rate_data_general'])->find($rgd_no);
+        $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child', 'rate_data_general', 'payment'])->find($rgd_no);
 
         $tax_history = CancelBillHistory::where('rgd_no', $rgd_no)->where('cbh_type', 'tax')->where('cbh_status_after', 'in_process')->first();
 
