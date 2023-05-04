@@ -2776,6 +2776,19 @@ class ReceivingGoodsDeliveryController extends Controller
                     'cbh_status_before' => null,
                     'cbh_status_after' => 'confirmed'
                 ]);
+
+                $payment_history = CancelBillHistory::where('rgd_no', $request->rgd_no)->where('cbh_type', 'payment')->where('cbh_status_after', 'request_bill')->first();
+
+                if (empty($payment_history->cbh_no) && $rgd->rgd_calculate_deadline_yn == 'y') {
+                    CancelBillHistory::insertGetId([
+                        'rgd_no' => $request->rgd_no,
+                        'mb_no' => $rgd->mb_no,
+                        'cbh_type' => 'payment',
+                        'cbh_status_after' => 'request_bill',
+                        'created_at' => $rgd->created_at,
+                        'updated_at' => $rgd->updated_at,
+                    ]);
+                }
             }
 
             $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child'])->where('rgd_no', $request->rgd_no)->first();
@@ -4093,7 +4106,7 @@ class ReceivingGoodsDeliveryController extends Controller
             DB::beginTransaction();
 
             $last_payment_history = CancelBillHistory::where('rgd_no', $request->rgd_no)->where('cbh_type', 'like', '%payment%')->orderBy('cbh_no', 'desc')->first();
-            if($last_payment_history->cbh_status_after == 'payment_bill'){
+            if(isset($last_payment_history->cbh_status_after) && $last_payment_history->cbh_status_after == 'payment_bill'){
                 $data = Payment::where('rgd_no', '=', $request->rgd_no)->orderBy('p_no', 'desc')->first();
             }else {
                 $data = Payment::whereNull('rgd_no')->first();
