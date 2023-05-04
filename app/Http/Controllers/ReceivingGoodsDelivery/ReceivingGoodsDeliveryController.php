@@ -3313,7 +3313,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     if ($rgd->rgd_calculate_deadline_yn == 'y') {
                         CancelBillHistory::insertGetId([
                             'rgd_no' => $request->rgd_no,
-                            'mb_no' => $user->mb_no,
+                            'mb_no' => $rgd->mb_no,
                             'cbh_type' => 'payment',
                             'cbh_status_before' => null,
                             'cbh_status_after' => 'request_bill'
@@ -3325,7 +3325,7 @@ class ReceivingGoodsDeliveryController extends Controller
     
                         CancelBillHistory::insertGetId([
                             'rgd_no' => $rgd->rgd_no,
-                            'mb_no' => $user->mb_no,
+                            'mb_no' => $rgd->mb_no,
                             'cbh_type' => 'tax',
                             'cbh_status_before' => $rgd->rgd_status8,
                             'cbh_status_after' => 'completed'
@@ -3339,7 +3339,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             ]);
                             CancelBillHistory::insertGetId([
                                 'rgd_no' => $est_rgd->rgd_no,
-                                'mb_no' => $user->mb_no,
+                                'mb_no' => $rgd->mb_no,
                                 'cbh_type' => 'tax',
                                 'cbh_status_before' => $est_rgd->rgd_status8,
                                 'cbh_status_after' => 'completed'
@@ -3443,7 +3443,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         if ($rgd['rgd_calculate_deadline_yn'] == 'y') {
                             CancelBillHistory::insertGetId([
                                 'rgd_no' => $rgd['rgd_no'],
-                                'mb_no' => $user->mb_no,
+                                'mb_no' => $rgd['mb_no'],
                                 'cbh_type' => 'payment',
                                 'cbh_status_before' => null,
                                 'cbh_status_after' => 'request_bill'
@@ -3455,7 +3455,7 @@ class ReceivingGoodsDeliveryController extends Controller
         
                             CancelBillHistory::insertGetId([
                                 'rgd_no' => $rgd['rgd_no'],
-                                'mb_no' => $user->mb_no,
+                                'mb_no' => $rgd['mb_no'],
                                 'cbh_type' => 'tax',
                                 'cbh_status_before' => $rgd->rgd_status8,
                                 'cbh_status_after' => 'completed'
@@ -3469,7 +3469,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                 ]);
                                 CancelBillHistory::insertGetId([
                                     'rgd_no' => $est_rgd->rgd_no,
-                                    'mb_no' => $user->mb_no,
+                                    'mb_no' => $rgd['mb_no'],
                                     'cbh_type' => 'tax',
                                     'cbh_status_before' => $est_rgd->rgd_status8,
                                     'cbh_status_after' => 'completed'
@@ -3554,7 +3554,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     if ($rgd['rgd_calculate_deadline_yn'] == 'y') {
                         CancelBillHistory::insertGetId([
                             'rgd_no' => $rgd['rgd_no'],
-                            'mb_no' => $user->mb_no,
+                            'mb_no' => $rgd['mb_no'],
                             'cbh_type' => 'payment',
                             'cbh_status_before' => null,
                             'cbh_status_after' => 'request_bill'
@@ -3566,7 +3566,7 @@ class ReceivingGoodsDeliveryController extends Controller
     
                         CancelBillHistory::insertGetId([
                             'rgd_no' => $rgd['rgd_no'],
-                            'mb_no' => $user->mb_no,
+                            'mb_no' => $rgd['mb_no'],
                             'cbh_type' => 'tax',
                             'cbh_status_before' => $rgd->rgd_status8,
                             'cbh_status_after' => 'completed'
@@ -3580,7 +3580,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             ]);
                             CancelBillHistory::insertGetId([
                                 'rgd_no' => $est_rgd->rgd_no,
-                                'mb_no' => $user->mb_no,
+                                'mb_no' => $rgd['mb_no'],
                                 'cbh_type' => 'tax',
                                 'cbh_status_before' => $est_rgd->rgd_status8,
                                 'cbh_status_after' => 'completed'
@@ -3887,7 +3887,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 if ($rgd->rgd_status7 == 'taxed') {
                     CancelBillHistory::insertGetId([
                         'rgd_no' => $request->rgd_no,
-                        'mb_no' => $user->mb_no,
+                        'mb_no' => $rgd->mb_no,
                         'cbh_type' => 'tax',
                         'cbh_status_before' => $rgd->rgd_status7,
                         'cbh_status_after' => 'completed',
@@ -3906,7 +3906,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             ]);
                             CancelBillHistory::insertGetId([
                                 'rgd_no' => $est_rgd->rgd_no,
-                                'mb_no' => $user->mb_no,
+                                'mb_no' => $rgd->mb_no,
                                 'cbh_type' => 'tax',
                                 'cbh_status_before' => $est_rgd->rgd_status8,
                                 'cbh_status_after' => 'completed'
@@ -3961,7 +3961,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 if ($rgd->rgd_status7 == 'taxed') {
                     CancelBillHistory::insertGetId([
                         'rgd_no' => $request->rgd_no,
-                        'mb_no' => $user->mb_no,
+                        'mb_no' => $rgd->mb_no,
                         'cbh_type' => 'tax',
                         'cbh_status_before' => $rgd->rgd_status7,
                         'cbh_status_after' => 'completed',
@@ -3981,7 +3981,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             ]);
                             CancelBillHistory::insertGetId([
                                 'rgd_no' => $est_rgd->rgd_no,
-                                'mb_no' => $user->mb_no,
+                                'mb_no' => $rgd->mb_no,
                                 'cbh_type' => 'tax',
                                 'cbh_status_before' => $est_rgd->rgd_status8,
                                 'cbh_status_after' => 'completed'
@@ -4024,7 +4024,9 @@ class ReceivingGoodsDeliveryController extends Controller
     public function cancel_payment(Request $request)
     {
         try {
+            DB::beginTransaction();
             $check_payment = Payment::where('rgd_no', $request->rgd_no)->where('p_success_yn', 'y')->first();
+            $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
             if (isset($check_payment)) {
                 Payment::where('rgd_no', $check_payment->rgd_no)->update([
                     // 'p_price' => $request->sumprice,
@@ -4087,13 +4089,13 @@ class ReceivingGoodsDeliveryController extends Controller
             }
 
 
-
+            DB::commit();
             return response()->json([
                 'message' => 'Success'
             ]);
         } catch (\Exception $e) {
+            DB::rollback();
             Log::error($e);
-            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -4101,7 +4103,15 @@ class ReceivingGoodsDeliveryController extends Controller
     {
         try {
             DB::beginTransaction();
-            $data = Payment::where('rgd_no', '=', $request->rgd_no)->orderBy('p_no', 'desc')->first();
+
+            $last_payment_history = CancelBillHistory::where('rgd_no', $request->rgd_no)->where('cbh_type', 'like', '%payment%')->orderBy('cbh_no', 'desc')->first();
+            if($last_payment_history->cbh_status_after == 'payment_bill'){
+                $data = Payment::where('rgd_no', '=', $request->rgd_no)->orderBy('p_no', 'desc')->first();
+            }else {
+                $data = Payment::whereNull('rgd_no')->first();
+            }
+            
+
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,

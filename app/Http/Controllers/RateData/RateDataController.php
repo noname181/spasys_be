@@ -4467,11 +4467,13 @@ class RateDataController extends Controller
         try {
             DB::beginTransaction();
             //Check is there already RateDataGeneral with rdg_no yet
-            $company = Company::where('co_no', $request->co_no)->first();
-            $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+            
+            $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $request->rgd_no)->update([
                 'rgd_storage_days' => $request->storage_days,
                 'rgd_e_price' => $request->te_e_price ? $request->te_e_price : null,
             ]);
+
+            $company = Company::where('co_no', $rgd->warehousing->co_no)->first();
 
             Import::where('ti_logistic_manage_number', $request->ti_logistic_manage_number)->update([
                 'ti_co_license' => isset($company->co_license) ? $company->co_license : null,
