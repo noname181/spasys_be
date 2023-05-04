@@ -3855,14 +3855,26 @@ class ReceivingGoodsDeliveryController extends Controller
             if (isset($check_payment)) {
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
 
-                Payment::where('rgd_no', $check_payment->rgd_no)->update([
-                    'p_price' => $request->sumprice,
-                    'p_method' => $request->p_method,
-                    'p_success_yn' => 'y',
-                    'p_cancel_yn' => null,
-                    'p_cancel_time' => null,
-                ]);
-
+                // Payment::where('rgd_no', $check_payment->rgd_no)->update([
+                //     'p_price' => $request->sumprice,
+                //     'p_method' => $request->p_method,
+                //     'p_success_yn' => 'y',
+                //     'p_cancel_yn' => null,
+                //     'p_cancel_time' => null,
+                // ]);
+                Payment::insertGetId(
+                    [
+                        'mb_no' => Auth::user()->mb_no,
+                        'rgd_no' => $check_payment->rgd_no,
+                        'p_price' => $request->sumprice,
+                        'p_method' => $request->p_method,
+                        'p_success_yn' => 'y',
+                        'p_method_fee' => isset($p_method_fee) ? $p_method_fee : null,
+                        'p_method_name' => $request->p_method_name,
+                        'p_method_number' => $request->p_method_number,
+                        'p_card_name' => $request->p_card_name,
+                    ]
+                );
                 CancelBillHistory::insertGetId([
                     'rgd_no' => $request->rgd_no,
                     'mb_no' => $user->mb_no,
