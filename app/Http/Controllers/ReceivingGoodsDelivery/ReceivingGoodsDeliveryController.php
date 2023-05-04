@@ -4091,7 +4091,15 @@ class ReceivingGoodsDeliveryController extends Controller
     {
         try {
             DB::beginTransaction();
-            $data = Payment::where('rgd_no', '=', $request->rgd_no)->orderBy('p_no', 'desc')->first();
+
+            $last_payment_history = CancelBillHistory::where('rgd_no', $request->rgd_no)->where('cbh_type', 'like', '%payment%')->orderBy('cbh_no', 'desc')->first();
+            if($last_payment_history->cbh_status_after == 'payment_bill'){
+                $data = Payment::where('rgd_no', '=', $request->rgd_no)->orderBy('p_no', 'desc')->first();
+            }else {
+                $data = Payment::whereNull('rgd_no')->first();
+            }
+            
+
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
