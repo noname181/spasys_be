@@ -3908,25 +3908,25 @@ class ReceivingGoodsDeliveryController extends Controller
                     ]);
 
                     ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
-                        'rgd_status8' => isset($request->p_method) && $request->p_method == 'deposit_without_bankbook'  ? 'in_process' : 'completed',
+                        'rgd_status8' => 'completed',
                     ]);
 
-                    if ($request->p_method != 'deposit_without_bankbook') {
-                        //UPDATE EST BILL
-                        $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
-                        if ($est_rgd->rgd_status8 != 'completed') {
-                            ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
-                                'rgd_status8' => 'completed',
-                            ]);
-                            CancelBillHistory::insertGetId([
-                                'rgd_no' => $est_rgd->rgd_no,
-                                'mb_no' => $rgd->mb_no,
-                                'cbh_type' => 'tax',
-                                'cbh_status_before' => $est_rgd->rgd_status8,
-                                'cbh_status_after' => 'completed'
-                            ]);
-                        }
+                   
+                    //UPDATE EST BILL
+                    $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
+                    if ($est_rgd->rgd_status8 != 'completed') {
+                        ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
+                            'rgd_status8' => 'completed',
+                        ]);
+                        CancelBillHistory::insertGetId([
+                            'rgd_no' => $est_rgd->rgd_no,
+                            'mb_no' => $rgd->mb_no,
+                            'cbh_type' => 'tax',
+                            'cbh_status_before' => $est_rgd->rgd_status8,
+                            'cbh_status_after' => 'completed'
+                        ]);
                     }
+                    
                 }
 
 
@@ -3983,25 +3983,25 @@ class ReceivingGoodsDeliveryController extends Controller
                     ]);
 
                     ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
-                        'rgd_status8' => isset($request->p_method) && $request->p_method == 'deposit_without_bankbook'  ? 'in_process' : 'completed',
+                        'rgd_status8' => 'completed',
                     ]);
 
-                    if ($request->p_method != 'deposit_without_bankbook') {
-                        //UPDATE EST BILL
-                        $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
-                        if ($est_rgd->rgd_status8 != 'completed') {
-                            ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
-                                'rgd_status8' => 'completed',
-                            ]);
-                            CancelBillHistory::insertGetId([
-                                'rgd_no' => $est_rgd->rgd_no,
-                                'mb_no' => $rgd->mb_no,
-                                'cbh_type' => 'tax',
-                                'cbh_status_before' => $est_rgd->rgd_status8,
-                                'cbh_status_after' => 'completed'
-                            ]);
-                        }
+              
+                    //UPDATE EST BILL
+                    $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
+                    if ($est_rgd->rgd_status8 != 'completed') {
+                        ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
+                            'rgd_status8' => 'completed',
+                        ]);
+                        CancelBillHistory::insertGetId([
+                            'rgd_no' => $est_rgd->rgd_no,
+                            'mb_no' => $rgd->mb_no,
+                            'cbh_type' => 'tax',
+                            'cbh_status_before' => $est_rgd->rgd_status8,
+                            'cbh_status_after' => 'completed'
+                        ]);
                     }
+                    
                 }
 
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
