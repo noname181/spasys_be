@@ -2791,8 +2791,9 @@ class ReceivingGoodsDeliveryController extends Controller
                 }
             }
 
-            $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child'])->where('rgd_no', $request->rgd_no)->first();
-
+            $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child', 'payment' => function ($q) {
+                $q->orderBy('p_no', 'desc');
+              }])->where('rgd_no', $request->rgd_no)->first();
             if ($request->payment_status == '결제완료' && $rgd->rgd_status6 != 'paid') {
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     'rgd_status6' => 'paid',
@@ -2869,7 +2870,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         $request->complete_status = null;
                     }
                 }
-            } else if ($request->payment_status == '진행중' && $rgd->rgd_status6 != null) {
+            } else if ($request->payment_status == '진행중' && $rgd->rgd_status6 != null  && isset($rgd->payment->p_method) && $rgd->payment->p_method != 'deposit_without_bankbook') {
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     'rgd_status6' => null,
                     'rgd_paid_date' => null,
