@@ -800,31 +800,28 @@ class BannerController extends Controller
 
         $warehousingh = $warehousing_distribution;
 
-        if ($request->time3 == 'day') {
-            $warehousinga = $warehousinga->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
-            $warehousingb = $warehousingb->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get();
-            $warehousingc = $warehousingc->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
-            $warehousingd = $warehousingd->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get();
-            $warehousinge = $warehousinge->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
-            $warehousingf = $warehousingf->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
+        if ($request->time3 == 'day') {  
+            $warehousingb = $warehousingb->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get();    
+            $warehousingd = $warehousingd->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get(); 
             $warehousingg = $warehousingg->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get();
         } elseif ($request->time3 == 'week') {
-            $warehousinga = $warehousinga->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
             $warehousingb = $warehousingb->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get();
-            $warehousingc = $warehousingc->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
             $warehousingd = $warehousingd->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get();
-            $warehousinge = $warehousinge->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
-            $warehousingf = $warehousingf->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
             $warehousingg = $warehousingg->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get();
-        } else {
-            $warehousinga = $warehousinga->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
+        } elseif ($request->time3 == 'month') { 
             $warehousingb = $warehousingb->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get();
-            $warehousingc = $warehousingc->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
             $warehousingd = $warehousingd->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get();
-            $warehousinge = $warehousinge->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
-            $warehousingf = $warehousingf->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
             $warehousingg = $warehousingg->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get();
+        } elseif ($request->time3 == '6month') { 
+            $warehousingb = $warehousingb->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->subMonths(5)->startOfMonth(), Carbon::now()->endOfMonth()])->get();
+            $warehousingd = $warehousingd->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->subMonths(5)->startOfMonth(), Carbon::now()->endOfMonth()])->get();
+            $warehousingg = $warehousingg->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->subMonths(5)->startOfMonth(), Carbon::now()->endOfMonth()])->get();
         }
+
+        $warehousinga = $warehousinga->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
+        $warehousingc = $warehousingc->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
+        $warehousinge = $warehousinge->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
+        $warehousingf = $warehousingf->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
 
         $counta = 0;
         $countb = 0;
@@ -1551,8 +1548,8 @@ class BannerController extends Controller
             $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereBetween('bbb.ti_i_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get()->count();
             $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('ddd.te_e_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get()->count();
         } elseif ($request->time1 == '6month') {
-            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->where('bbb.ti_i_date', ">", Carbon::now()->subMonths(6))->get()->count();
-            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->where('ddd.te_e_date', ">", Carbon::now()->subMonths(6))->get()->count();
+            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereBetween('bbb.ti_i_date', [Carbon::now()->subMonths(5)->startOfMonth(), Carbon::now()->endOfMonth()])->get()->count();
+            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('ddd.te_e_date', [Carbon::now()->subMonths(5)->startOfMonth(), Carbon::now()->endOfMonth()])->get()->count();
         }
 
         $counta = $warehousinga->whereNotNull('aaa.tie_logistic_manage_number')->whereNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->get()->count();
@@ -1633,7 +1630,7 @@ class BannerController extends Controller
         }
 
         return [
-            'date' => Carbon::now()->subMonths(6),'warehousingb2' => $warehousingb2, 'warehousingd2' => $warehousingd2, 'countcharta' => $userArrb, 'countchartb' => $userArrd, 'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'countg' => $countg, 'countg_2' => $countg_2
+            'date' => Carbon::now()->subMonths(5)->startOfMonth(),'warehousingb2' => $warehousingb2, 'warehousingd2' => $warehousingd2, 'countcharta' => $userArrb, 'countchartb' => $userArrd, 'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'countg' => $countg, 'countg_2' => $countg_2
         ];
 
         DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
