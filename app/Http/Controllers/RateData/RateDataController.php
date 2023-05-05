@@ -2263,7 +2263,7 @@ class RateDataController extends Controller
     public function getRateDataByRgd($rgd_no, $service, Request $request)
     {
         $user = Auth::user();
-        $pathname = $request->header('Pathname');
+        $pathname = $request->header('pathname');
         $is_check_page = str_contains($pathname, '_check');
 
 
