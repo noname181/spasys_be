@@ -2263,7 +2263,7 @@ class RateDataController extends Controller
     public function getRateDataByRgd($rgd_no, $service, Request $request)
     {
         $user = Auth::user();
-        $pathname = $request->header('Pathname');
+        $pathname = $request->header('pathname');
         $is_check_page = str_contains($pathname, '_check');
 
 
@@ -2279,7 +2279,12 @@ class RateDataController extends Controller
             } else if ($user->mb_type == 'shop' && !$is_check_page) {
                 $co_no = $rgd->warehousing->co_no;
             } else if ($user->mb_type == 'shop' && $is_check_page) {
-                $co_no = $rgd->warehousing->company->co_parent->co_no;
+                if($service_korean_name == '수입풀필먼트'){
+                    $co_no = $rgd->warehousing->co_no;
+                }else {
+                    $co_no = $rgd->warehousing->company->co_parent->co_no;
+                }
+                
             } else if ($user->mb_type == 'shipper' && $is_check_page){
                 $co_no = $rgd->warehousing->co_no;
             }
