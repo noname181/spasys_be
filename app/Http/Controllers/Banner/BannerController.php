@@ -1550,6 +1550,9 @@ class BannerController extends Controller
         } elseif ($request->time1 == 'month') {
             $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereBetween('bbb.ti_i_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get()->count();
             $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('ddd.te_e_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get()->count();
+        } elseif ($request->time1 == '6month') {
+            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->where('bbb.ti_i_date', ">", Carbon::now()->subMonths(6))->get()->count();
+            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->where('ddd.te_e_date', ">", Carbon::now()->subMonths(6))->get()->count();
         }
 
         $counta = $warehousinga->whereNotNull('aaa.tie_logistic_manage_number')->whereNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->get()->count();
@@ -1630,7 +1633,7 @@ class BannerController extends Controller
         }
 
         return [
-            'warehousingb2' => $warehousingb2, 'warehousingd2' => $warehousingd2, 'countcharta' => $userArrb, 'countchartb' => $userArrd, 'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'countg' => $countg, 'countg_2' => $countg_2
+            'date' => Carbon::now()->subMonths(6),'warehousingb2' => $warehousingb2, 'warehousingd2' => $warehousingd2, 'countcharta' => $userArrb, 'countchartb' => $userArrd, 'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'countg' => $countg, 'countg_2' => $countg_2
         ];
 
         DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
