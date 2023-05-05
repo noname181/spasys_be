@@ -2279,7 +2279,12 @@ class RateDataController extends Controller
             } else if ($user->mb_type == 'shop' && !$is_check_page) {
                 $co_no = $rgd->warehousing->co_no;
             } else if ($user->mb_type == 'shop' && $is_check_page) {
-                $co_no = $rgd->warehousing->company->co_parent->co_no;
+                if($service_korean_name == '수입풀필먼트'){
+                    $co_no = $rgd->warehousing->co_no;
+                }else {
+                    $co_no = $rgd->warehousing->company->co_parent->co_no;
+                }
+                
             } else if ($user->mb_type == 'shipper' && $is_check_page){
                 $co_no = $rgd->warehousing->co_no;
             }
