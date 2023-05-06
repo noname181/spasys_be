@@ -2737,10 +2737,57 @@ class ReceivingGoodsDeliveryController extends Controller
             $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child'])->where('rgd_no', $request->rgd_no)->first();
 
             if ($request->cancel_status == '발행취소' && $rgd->rgd_status5 == null) {
-                ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
-                    'rgd_status5' => 'cancel',
-                    'rgd_canceled_date' =>  Carbon::now(),
-                ]);
+              
+
+                $parent_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
+
+                if($rgd->rgd_status4 == '예상경비청구서' || $rgd->service_korean_name == '수입풀필먼트'){
+                    ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                        'rgd_status5' => 'cancel',
+                        'rgd_canceled_date' =>  Carbon::now(),
+                    ]);
+                    CancelBillHistory::insertGetId([
+                        'mb_no' => Auth::user()->mb_no,
+                        'rgd_no' => $rgd['rgd_no'],
+                        'cbh_status_after' => 'cancel',
+                        'cbh_type' => 'cancel',
+                    ]);
+                    ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->update(
+                        $user->mb_type == 'spasys' ? [
+                            'rgd_status5' => NULL,
+                            'rgd_issued_date' => NULL,
+                        ] : [
+                            'rgd_status4' => NULL,
+                            'rgd_issued_date' => NULL,
+                        ]
+                    );
+                }else if($rgd->rgd_status4 == '확정청구서') {
+                    $rgds = ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->get();
+
+                    foreach ($rgds as $rgd) {
+                        $rgd_update = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
+                            'rgd_status5' => 'cancel',
+                            'rgd_canceled_date' => Carbon::now()->toDateTimeString(),
+                        ]);
+                        CancelBillHistory::insertGetId([
+                            'mb_no' => Auth::user()->mb_no,
+                            'rgd_no' => $rgd['rgd_no'],
+                            'cbh_status_after' => 'cancel',
+                            'cbh_type' => 'cancel',
+                        ]);
+                        ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_parent_no'])->update([
+                            'rgd_status5' => null,
+                            'rgd_issued_date' => NULL,
+                        ]);
+                        CancelBillHistory::insertGetId([
+                            'mb_no' => Auth::user()->mb_no,
+                            'rgd_no' => $rgd['rgd_parent_no'],
+                            'cbh_status_after' => 'revert',
+                            'cbh_type' => 'revert',
+                        ]);
+                    }
+                }
+
             } else if ($request->cancel_status == '발행' && $rgd->rgd_status5 == 'cancel') {
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     'rgd_status5' => null,
@@ -3261,6 +3308,7 @@ class ReceivingGoodsDeliveryController extends Controller
             ], 201);
         } catch (\Exception $e) {
             DB::rollback();
+            return $e;
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0018], 500);
         }

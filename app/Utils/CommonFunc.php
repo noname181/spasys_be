@@ -631,6 +631,11 @@ class CommonFunc
         $alarm_content = str_replace('ccccc', $ccccc, $alarm_content);
         $alarm_content = str_replace('ddddd', $ddddd, $alarm_content);
 
+        if($w_no->receving_goods_delivery[0]->rgd_status1 && $w_no->w_schedule_number){
+            $alarm_content = '['.$w_no->receving_goods_delivery[0]->rgd_status1.']'.' '.$w_no->w_schedule_number.' '.$alarm_content;
+        }
+        
+         
         if ($type == 'cargo_request') {
             $alarm_type = 'cargo_request';
         }
