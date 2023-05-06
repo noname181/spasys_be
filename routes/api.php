@@ -42,10 +42,10 @@ Route::middleware('auth')->group(function () {
             Route::delete('/delete_member/{mb_no}',[\App\Http\Controllers\Member\MemberController::class, 'deleteMember'])->name('delete_member');
         });
 
-        Route::patch('/update', [\App\Http\Controllers\Member\MemberController::class, 'updateProfile'])->name('update');
+        Route::post('/update_push', [\App\Http\Controllers\Member\MemberController::class, 'updatePush'])->name('updatePush');
         Route::get('/profile', [\App\Http\Controllers\Member\MemberController::class, 'getProfile'])->name('profile');
         Route::put('/change_password', \App\Http\Controllers\Auth\ChangePasswordController::class)->name('change_password');
-
+        Route::patch('/update', [\App\Http\Controllers\Member\MemberController::class, 'updateProfile'])->name('update');
         Route::post('/list_members', [\App\Http\Controllers\Member\MemberController::class, 'list_members'])->name('list_members');
         Route::post('/list_members_chart', [\App\Http\Controllers\Member\MemberController::class, 'list_members_chart'])->name('list_members_chart');
         Route::post('/all', [\App\Http\Controllers\Member\MemberController::class, 'getMembers'])->name('members');

@@ -65,6 +65,7 @@ class AuthController extends Controller
                 'role_no' => $member['role_no'],
                 'co_no' => $member['co_no'],
                 'mb_no' => $member['mb_no'],
+                'mb_push_yn' => $member['mb_push_yn'],
             ]);
         } catch (\Exception $error) {
             Log::error($error);
