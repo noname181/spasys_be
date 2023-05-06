@@ -2737,14 +2737,21 @@ class ReceivingGoodsDeliveryController extends Controller
             $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child'])->where('rgd_no', $request->rgd_no)->first();
 
             if ($request->cancel_status == '발행취소' && $rgd->rgd_status5 == null) {
-                ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
-                    'rgd_status5' => 'cancel',
-                    'rgd_canceled_date' =>  Carbon::now(),
-                ]);
+              
 
                 $parent_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
 
                 if($rgd->rgd_status4 == '예상경비청구서' || $rgd->service_korean_name == '수입풀필먼트'){
+                    ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                        'rgd_status5' => 'cancel',
+                        'rgd_canceled_date' =>  Carbon::now(),
+                    ]);
+                    CancelBillHistory::insertGetId([
+                        'mb_no' => Auth::user()->mb_no,
+                        'rgd_no' => $rgd['rgd_no'],
+                        'cbh_status_after' => 'cancel',
+                        'cbh_type' => 'cancel',
+                    ]);
                     ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->update(
                         $user->mb_type == 'spasys' ? [
                             'rgd_status5' => NULL,
