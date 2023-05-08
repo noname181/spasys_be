@@ -8663,7 +8663,7 @@ class RateDataController extends Controller
                 if($rgd_parent->rgd_status6 == 'paid' && $rgd_parent->is_expect_payment == 'y'){
 
                     $check_payment = Payment::where('rgd_no', $rgd->rgd_parent_no)->where('p_success_yn', 'y')->orderBy('p_no', 'desc')->first();
-                    $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
+
                     if (isset($check_payment)) {
                         Payment::where('p_no', $check_payment->p_no)->update([
                             // 'p_price' => $request->sumprice,
@@ -8731,7 +8731,7 @@ class RateDataController extends Controller
                     if($rgd_parent->rgd_status6 == 'paid' && $rgd_parent->is_expect_payment == 'y'){
 
                         $check_payment = Payment::where('rgd_no', $rgd['rgd_parent_no'])->where('p_success_yn', 'y')->orderBy('p_no', 'desc')->first();
-                        $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_parent_no'])->first();
+
                         if (isset($check_payment)) {
                             Payment::where('p_no', $check_payment->p_no)->update([
                                 // 'p_price' => $request->sumprice,
@@ -8796,7 +8796,7 @@ class RateDataController extends Controller
                 if($rgd_parent->rgd_status6 == 'paid' && $rgd_parent->is_expect_payment == 'y'){
 
                     $check_payment = Payment::where('rgd_no', $rgd->rgd_parent_no)->where('p_success_yn', 'y')->orderBy('p_no', 'desc')->first();
-                    $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
+
                     if (isset($check_payment)) {
                         Payment::where('p_no', $check_payment->p_no)->update([
                             // 'p_price' => $request->sumprice,
