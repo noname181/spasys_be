@@ -1382,9 +1382,7 @@ class BannerController extends Controller
                 ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
             $sub_2 = Import::select('ti_logistic_manage_number', 'ti_carry_in_number', 'ti_i_date')
-                // ->leftjoin('receiving_goods_delivery', function ($join) {
-                //     $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
-                // })
+               
                 ->groupBy(['ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number']);
 
             // $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
@@ -1536,7 +1534,7 @@ class BannerController extends Controller
         $countg_2 = 0;
         $tie_logistic_manage_number = $this->SQL();
         $warehousingb2 = $this->subquery($sub, $sub_2, $sub_4)->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->get()->count();
-        $warehousingd2 = $this->subquery($sub, $sub_2, $sub_4)->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->get()->count();
+        // $warehousingd2 = $this->subquery($sub, $sub_2, $sub_4)->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->get()->count();
 
         if ($request->time1 == 'day') {
             $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereBetween('bbb.ti_i_date', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get()->count();
@@ -1630,7 +1628,7 @@ class BannerController extends Controller
         }
 
         return [
-            'date' => Carbon::now()->subMonths(5)->startOfMonth(),'warehousingb2' => $warehousingb2, 'warehousingd2' => $warehousingd2, 'countcharta' => $userArrb, 'countchartb' => $userArrd, 'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'countg' => $countg, 'countg_2' => $countg_2
+            'data' => $tie_logistic_manage_number, 'countcharta' => $userArrb, 'countchartb' => $userArrd, 'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'countg' => $countg, 'countg_2' => $countg_2
         ];
 
         DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
@@ -3087,13 +3085,13 @@ class BannerController extends Controller
         }
     }
 
-    public function SQL($validated = null)
+    public function SQL()
     {
         //DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
         $user = Auth::user();
         if ($user->mb_type == 'shop') {
 
-            $sub = ImportExpected::select('company.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
+            $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number')
                 ->leftjoin('company', function ($join) {
                     $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
                 })->leftjoin('company as parent_shop', function ($join) {
@@ -3104,10 +3102,7 @@ class BannerController extends Controller
                 ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                 ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-            $sub_2 = Import::select('receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
-                ->leftjoin('receiving_goods_delivery', function ($join) {
-                    $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
-                })
+            $sub_2 = Import::select('ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
                 ->groupBy(['ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number']);
 
             $sub_4 = Export::select('connection_number', 't_export.te_status_2', 'te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number')
@@ -3125,7 +3120,7 @@ class BannerController extends Controller
                 });
         } else if ($user->mb_type == 'shipper') {
 
-            $sub = ImportExpected::select('company.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
+            $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number')
                 ->leftjoin('company', function ($join) {
                     $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
                 })->leftjoin('company as parent_shop', function ($join) {
@@ -3136,10 +3131,7 @@ class BannerController extends Controller
                 ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                 ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-            $sub_2 = Import::select('receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
-                ->leftjoin('receiving_goods_delivery', function ($join) {
-                    $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
-                })
+            $sub_2 = Import::select('ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
                 ->groupBy(['ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number']);
 
 
@@ -3161,7 +3153,7 @@ class BannerController extends Controller
         } else if ($user->mb_type == 'spasys') {
 
             //FIX NOT WORK 'with'
-            $sub = ImportExpected::select('company.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
+            $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number')
                 ->leftjoin('company as parent_spasys', function ($join) {
                     $join->on('parent_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
                 })
@@ -3176,10 +3168,8 @@ class BannerController extends Controller
                 ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
                 ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
-            $sub_2 = Import::select('receiving_goods_delivery.rgd_address', 'receiving_goods_delivery.rgd_status1', 'ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
-                ->leftjoin('receiving_goods_delivery', function ($join) {
-                    $join->on('t_import.ti_carry_in_number', '=', 'receiving_goods_delivery.is_no');
-                })
+            $sub_2 = Import::select('ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
+                
                 ->groupBy(['ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number']);
 
             $sub_4 = Export::select('connection_number', 't_export.te_status_2', 'te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number')
