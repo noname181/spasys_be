@@ -619,6 +619,7 @@ class CommonFunc
 
         if ($w_no->w_category_name == '유통가공') {
             $aaaaa = $content;
+            $cargo_number = $w_no->w_schedule_number;
         } else if ($w_no->w_category_name == '보세화물') {
         } else if ($w_no->w_category_name == '수입풀필먼트') {
         }
