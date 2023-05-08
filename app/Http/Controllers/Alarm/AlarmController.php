@@ -297,7 +297,20 @@ class AlarmController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
-
+    
+    public function updatePushRead(){
+        try{
+            $user = Auth::user();
+            Alarm::where('receiver_no',$user->mb_no)->update(['alarm_read_yn'=>'y']);
+            return response()->json([
+                'message' => Messages::MSG_0007
+            ]);
+        }catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
     public function searchAlarms(AlarmSearchRequest $request)
     {
         $validated = $request->validated();
