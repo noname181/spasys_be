@@ -11,6 +11,7 @@ use App\Models\Menu;
 use App\Models\Manual;
 use App\Models\Service;
 use App\Models\Company;
+use App\Models\Alarm;
 
 use App\Utils\Messages;
 use App\Utils\CommonFunc;
@@ -214,13 +215,16 @@ class MenuController extends Controller
     {
         try {
             $user = Member::where('mb_no', Auth::user()->mb_no)->first();
+            $alarm = Alarm::where('receiver_no',Auth::user()->mb_no)->where(function($q) use($user) {
+                $q->where('alarm_read_yn','!=','y')->orwhereNull('alarm_read_yn');
+            })->count('alarm_no');
             if($menu_path != 'dashboard'){
             $menu = Menu::with('manual')->where('menu_url', $menu_path)->first();
             } else {
                 $menu = Menu::with('manual')->where('menu_url', '대시보드')->first();
             }
 
-            return response()->json(['menu' => $menu,'user'=>$user]);
+            return response()->json(['menu' => $menu,'user'=>$user,'alarm'=>$alarm]);
         } catch (\Exception $e) {
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0002], 500);
