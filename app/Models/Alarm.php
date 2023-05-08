@@ -47,6 +47,7 @@ class Alarm extends Model
         'ad_no',
         'alarm_content',
         'alarm_h_bl',
+        'alarm_read_yn',
     ];
     // public function item()
     // {
