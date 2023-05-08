@@ -2810,6 +2810,14 @@ class ReceivingGoodsDeliveryController extends Controller
                     'cbh_status_before' => 'confirmed',
                     'cbh_status_after' => null
                 ]);
+
+                if($rgd->rgd_status6 == 'deposit_without_bankbook'){
+                    ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                        'rgd_status6' => null,
+                    ]);
+                }
+
+
             } else if ($request->confirm_status == '승인완료' && $rgd->rgd_status5 == null) {
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     'rgd_status5' => 'confirmed',
