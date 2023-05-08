@@ -213,13 +213,14 @@ class MenuController extends Controller
     public function get_menu_by_path($menu_path)
     {
         try {
+            $user = Member::where('mb_no', Auth::user()->mb_no)->first();
             if($menu_path != 'dashboard'){
             $menu = Menu::with('manual')->where('menu_url', $menu_path)->first();
             } else {
                 $menu = Menu::with('manual')->where('menu_url', '대시보드')->first();
             }
 
-            return response()->json(['menu' => $menu]);
+            return response()->json(['menu' => $menu,'user'=>$user]);
         } catch (\Exception $e) {
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0002], 500);

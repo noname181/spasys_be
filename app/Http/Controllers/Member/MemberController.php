@@ -9,6 +9,7 @@ use App\Http\Requests\Member\MemberSearchRequest;
 use App\Http\Requests\Member\MemberSpasysSearchRequest;
 use App\Http\Requests\Member\MemberSpasysUpdateRequest;
 use App\Http\Requests\Member\MemberUpdate\MemberUpdateByIdRequest;
+use App\Http\Requests\Member\MemberUpdate\MemberUpdatePush;
 use App\Http\Requests\Member\MemberUpdate\MemberUpdateRequest;
 use App\Models\Company;
 use App\Models\Member;
@@ -116,6 +117,23 @@ class MemberController extends Controller
         } catch (\Exception $e) {
             Log::error($e);
 
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+    public function updatePush(MemberUpdatePush $request)
+    {
+        try {
+            $validated = $request->validated();
+            $user = Member::where('mb_no', Auth::user()->mb_no)->first();
+            $user['mb_push_yn'] = $validated['mb_push_yn'];
+            $user->save();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
