@@ -10,7 +10,10 @@ use App\Models\AlarmData;
 use App\Utils\Messages;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-
+use Illuminate\Support\Facades\DB;
+use \Carbon\Carbon;
+use App\Utils\CommonFunc;
+use App\Models\Company;
 class AlarmDataController extends Controller
 {
     /**
@@ -127,6 +130,33 @@ class AlarmDataController extends Controller
         } catch (\Exception $e) {
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function insertDailyAlarm()
+    {
+        try {
+            DB::beginTransaction();
+           
+            $companies = Company::with(['contract', 'co_parent', 'company_settlement', 'company_payment', 'mb_no'])
+                ->whereHas('contract', function ($q) {
+                    $q->whereBetween('c_end_date', [Carbon::now()->startOfDay(), Carbon::now()->subDays(7)->endOfDay()]);
+                })
+                ->where('co_type', '!=', 'spasys')
+                ->orderBy('co_no', 'DESC')->get();
+            return $companies;
+            CommonFunc::insert_alarm_company_daily('계약 종료일', null, null, $companies, 'alarm_daily');
+
+            DB::commit();
+            return response()->json([
+                'companies' => $companies,
+                'message' => Messages::MSG_0007,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
 }
