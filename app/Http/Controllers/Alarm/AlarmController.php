@@ -6,6 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Alarm\AlarmSearchRequest;
 use App\Http\Requests\Alarm\AlarmRequest;
 use App\Models\Alarm;
+use App\Models\Member;
+use App\Models\Warehousing;
+use App\Models\ImportExpected;
+use App\Models\ScheduleShipment;
 use App\Utils\Messages;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -24,14 +28,60 @@ class AlarmController extends Controller
         try {
             DB::beginTransaction();
             $alarm_no = $request->get('alarm_no');
+            $w_no_alert = FALSE;
+            if(isset($validated['w_no'])){
+            $w_no_alert = Warehousing::with(['receving_goods_delivery'])->where('w_no', $validated['w_no'])->first();
+            }
+            if($w_no_alert){
+                    $receiver_spasys = $w_no_alert->company->co_parent->co_parent;
+                    $receiver_shop = $w_no_alert->company->co_parent;
+                    $receiver_shipper = $w_no_alert->company;
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->orwhere('co_no', $receiver_shop->co_no)->orwhere('co_no', $receiver_shipper->co_no)->get();
+            } else {
+                if(isset($validated['ss_no'])){
+                    $schedule_shipment = ScheduleShipment::with(['ContractWms'])->where('ss_no',$validated['ss_no'])->first();
+                    $receiver_spasys = $schedule_shipment->ContractWms->company->co_parent->co_parent;
+                    $receiver_shop = $schedule_shipment->ContractWms->company->co_parent;
+                    $receiver_shipper = $schedule_shipment->ContractWms->company;
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->orwhere('co_no', $receiver_shop->co_no)->orwhere('co_no', $receiver_shipper->co_no)->get();
+                } else {
+                $schedule_number = isset($validated['w_schedule_number']) ? $validated['w_schedule_number'] : $validated['alarm_h_bl'];
+                $import_expected = ImportExpected::with(['company','company_spasys'])->where('tie_h_bl',$schedule_number)->first();
+                $receiver_spasys = isset($import_expected->company->co_parent->co_parent) ? $import_expected->company->co_parent->co_parent : $import_expected->company_spasys;
+                $receiver_shop = isset($import_expected->company->co_parent) ? $import_expected->company->co_parent : '';
+                $receiver_shipper = isset($import_expected->company) ?  $import_expected->company : '';
+                if($receiver_shop != '' && $receiver_shipper != ''){
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->orwhere('co_no', $receiver_shop->co_no)->orwhere('co_no', $receiver_shipper->co_no)->get();
+                } else {
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->get();
+                }
+                }
+            }
+
+            
             if (!isset($alarm_no)) {
-                $alarm_no = Alarm::insertGetId([
-                    'mb_no' => Auth::user()->mb_no,
-                    'ss_no' => isset($validated['ss_no']) ? $validated['ss_no'] : null,
-                    'w_no' => isset($validated['w_no']) ? $validated['w_no'] : null, // FIXME hard set
-                    'alarm_content' => $validated['alarm_content'],
-                    'alarm_h_bl' => isset($validated['w_schedule_number']) ? $validated['w_schedule_number'] : $validated['alarm_h_bl'],
-                ]);
+       
+                foreach ($receiver_list as $receiver) {
+                    Alarm::insertGetId(
+                        [
+                            'receiver_no' => $receiver->mb_no,
+                            'mb_no' => Auth::user()->mb_no,
+                            'ss_no' => isset($validated['ss_no']) ? $validated['ss_no'] : null,
+                            'w_no' => isset($validated['w_no']) ? $validated['w_no'] : null, // FIXME hard set
+                            'alarm_content' => $validated['alarm_content'],
+                            'alarm_h_bl' => isset($validated['w_schedule_number']) ? $validated['w_schedule_number'] : $validated['alarm_h_bl'],
+                        ]
+                    );
+    
+               
+                }
+                // $alarm_no = Alarm::insertGetId([
+                //     'mb_no' => Auth::user()->mb_no,
+                //     'ss_no' => isset($validated['ss_no']) ? $validated['ss_no'] : null,
+                //     'w_no' => isset($validated['w_no']) ? $validated['w_no'] : null, // FIXME hard set
+                //     'alarm_content' => $validated['alarm_content'],
+                //     'alarm_h_bl' => isset($validated['w_schedule_number']) ? $validated['w_schedule_number'] : $validated['alarm_h_bl'],
+                // ]);
             } else {
                 // Update data
                 $alarm = Alarm::where('alarm_no', $alarm_no)->first();
@@ -51,7 +101,8 @@ class AlarmController extends Controller
 
             DB::commit();
             return response()->json([
-                'message' => Messages::MSG_0007
+                'message' => Messages::MSG_0007,
+        
             ]);
         } catch (\Exception $e) {
             DB::rollback();
@@ -297,7 +348,20 @@ class AlarmController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
-
+    
+    public function updatePushRead(){
+        try{
+            $user = Auth::user();
+            Alarm::where('receiver_no',$user->mb_no)->update(['alarm_read_yn'=>'y']);
+            return response()->json([
+                'message' => Messages::MSG_0007
+            ]);
+        }catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
     public function searchAlarms(AlarmSearchRequest $request)
     {
         $validated = $request->validated();
@@ -330,11 +394,7 @@ class AlarmController extends Controller
                     $join->on('t_import.ti_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
                 })->where(function($q) use($validated, $user) {
                     $q->whereNull('alarm_type')->where(function($q) use($validated,$user) {
-                        $q->where('company_shop_parent.co_no','=', $user->co_no)->orWhere('company_spasys.co_no','=', $user->co_no)->orwhereHas('warehousing.co_no.co_parent',function ($q) use ($user){
-                            $q->where('co_no', $user->co_no);
-                        })->orwhereHas('schedule_shipment.ContractWms.company.co_parent',function ($q) use ($user){
-                            $q->where('co_no', $user->co_no);
-                        });
+                        $q->where('receiver_no','=', $user->mb_no);
                     })
                     ->orwhere(function($q) use ($user) {
                         $q->whereNotNull('receiver_no')
@@ -369,11 +429,7 @@ class AlarmController extends Controller
                     $join->on('t_import.ti_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
                 })->where(function($q) use($validated,$user) {
                     $q->whereNull('alarm_type')->where(function($q) use($validated,$user) {
-                        $q->where('company_shop.co_no','=', $user->co_no)->orwhereHas('warehousing.co_no',function ($q) use ($user){
-                            $q->where('co_no', $user->co_no);
-                        })->orwhereHas('schedule_shipment.ContractWms.company',function ($q) use ($user){
-                            $q->where('co_no', $user->co_no);
-                        });
+                        $q->where('receiver_no','=', $user->mb_no);
                     })
                     ->orwhere(function($q) use ($user) {
                         $q->whereNotNull('receiver_no')
@@ -408,9 +464,8 @@ class AlarmController extends Controller
                     $join->on('t_import.ti_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
                 })->where(function($q) use($validated,$user) {
                     $q->whereNull('alarm_type')->where(function($q) use($validated,$user) {
-                        $q->whereHas('member',function ($q) use ($user){
-                            $q->where('mb_no',$user->mb_no);
-                        });
+                        
+                            $q->where('receiver_no',$user->mb_no);
                     })->orwhere(function($q) use ($user) {
                         $q->whereNotNull('receiver_no')->where('alarm_type','like','%photo%')
                         ->where('receiver_no', $user->mb_no);
@@ -819,7 +874,7 @@ class AlarmController extends Controller
                     $join->on('t_export.te_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
                 })->leftjoin('t_import', function ($join) {
                     $join->on('t_import.ti_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
-                })->where('alarm.mb_no','=',$user->mb_no)->whereNull('alarm.alarm_type')->orderBy('alarm_no', 'DESC');
+                })->where('alarm.receiver_no','=',$user->mb_no)->whereNull('alarm.alarm_type')->orderBy('alarm_no', 'DESC');
             }
 
 

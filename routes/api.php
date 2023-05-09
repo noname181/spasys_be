@@ -565,6 +565,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/search_send', [App\Http\Controllers\Alarm\AlarmController::class, 'searchAlarms_send'])->name('search_send');
         Route::post('/search_mobile', [App\Http\Controllers\Alarm\AlarmController::class, 'searchAlarmsMobile'])->name('searchmobile');
         Route::post('/new_alarm', [App\Http\Controllers\Alarm\AlarmController::class, 'newAlarms'])->name('newalarm');
+        Route::post('/update_push_read', [App\Http\Controllers\Alarm\AlarmController::class, 'updatePushRead'])->name('update_push_read');
     });
 
 
