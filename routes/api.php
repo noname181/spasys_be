@@ -29,7 +29,10 @@ Route::get('/api_schedule_cron_nologin', [App\Http\Controllers\ScheduleShipment\
 Route::get('/api_stock_list_nologin', [App\Http\Controllers\Item\ItemController::class, 'updateStockItemsApiNoLogin'])->name('api_stock_list_nologin');
 Route::get('/stock_history', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'stock_history'])->name('stock_history');
 Route::post('/banner_load', [App\Http\Controllers\Banner\BannerController::class, 'banner_load'])->name('banner_load');
-Route::get('/daily_alarm', [App\Http\Controllers\AlarmData\AlarmDataController::class, 'insertDailyAlarm'])->name('insertDailyAlarm');
+Route::get('/daily_alarm7', [App\Http\Controllers\AlarmData\AlarmDataController::class, 'insertDailyAlarm7'])->name('insertDailyAlarm7');
+Route::get('/daily_alarm30', [App\Http\Controllers\AlarmData\AlarmDataController::class, 'insertDailyAlarm30'])->name('insertDailyAlarm30');
+Route::get('/daily_alarm_insulace7', [App\Http\Controllers\AlarmData\AlarmDataController::class, 'insertDailyAlarmInsulace7'])->name('insertDailyAlarmInsulace7');
+Route::get('/daily_alarm_insulace30', [App\Http\Controllers\AlarmData\AlarmDataController::class, 'insertDailyAlarmInsulace30'])->name('insertDailyAlarmInsulace30');
 Route::get('/api_item_cargo_list', [App\Http\Controllers\Item\ItemController::class, 'apiItemsCargoList'])->name('api_item_cargo_list');
 
 Route::middleware('auth')->group(function () {

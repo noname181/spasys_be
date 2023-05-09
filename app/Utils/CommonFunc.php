@@ -690,6 +690,14 @@ class CommonFunc
         $ddddd = '';
         $cargo_number = '';
 
+        $co_no = isset($company->co_no) ? $company->co_no : '';
+
+        if ($type == 'alarm_daily7') {
+            $aaaaa = 7;
+        }elseif($type == 'alarm_daily30'){
+            $aaaaa = 30;
+        }
+        
         $alarm_data = AlarmData::where('ad_title', $ad_title)->first();
 
         $alarm_content = $alarm_data->ad_content;
@@ -697,30 +705,88 @@ class CommonFunc
         $alarm_content = str_replace('bbbbb', $bbbbb, $alarm_content);
         $alarm_content = str_replace('ccccc', $ccccc, $alarm_content);
         $alarm_content = str_replace('ddddd', $ddddd, $alarm_content);
-         
-        if ($type == 'cargo_request') {
-            $alarm_type = 'cargo_request';
+
+        if ($type == 'alarm_daily7') {
+            $alarm_type = 'alarm_daily7';
+        }elseif($type == 'alarm_daily30'){
+            $alarm_type = 'alarm_daily30';
         }
 
 
         if ($alarm_data->ad_must_yn == 'y') {
-            if ($sender->mb_type == 'shop') {
-                $receiver_spasys = $company->co_parent->co_parent;
-            } else if ($sender->mb_type == 'shipper') {
-                $receiver_spasys = $company->co_parent->co_parent;
-            }
-            //ad_must_yn == 'n' send only members who have mb_push_yn = 'y'
+            
+            if(isset($company->co_type) && $company->co_type == "spasys"){
+                $receiver_spasys = $company;
+                $receiver_shop = $company->co_childen;
+                $receiver_shipper = $company->co_childen;
+               
+                if(isset($receiver_shipper)){
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->orwhere('co_no', $receiver_shop->co_no)->orwhere('co_no', $receiver_shipper->co_no)->get();
+                }elseif(isset($receiver_shop)){
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->orwhere('co_no', $receiver_shop->co_no)->get();
+                }else{
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->get();
+                }
+            } else if(isset($company->co_type) && $company->co_type == "shop"){
+                $receiver_spasys = $company->co_parent;
+                $receiver_shop = $company;
+                $receiver_shipper = $company->co_childen;
 
-            $receiver_list = Member::where('co_type', '!=', 'spasys')->get();
+                if(isset($receiver_shipper)){
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->orwhere('co_no', $receiver_shop->co_no)->orwhere('co_no', $receiver_shipper->co_no)->get();
+                }elseif(isset($receiver_shop)){
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->orwhere('co_no', $receiver_shop->co_no)->get();
+                }else{
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->get();
+                }
+                
+            } else if(isset($company->co_type) && $company->co_type == "shipper"){
+                $receiver_spasys = $company->co_parent->co_parent;
+                $receiver_shop = $company->co_parent;
+                $receiver_shipper = $company;
+                if(isset($receiver_shipper)){
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->orwhere('co_no', $receiver_shop->co_no)->orwhere('co_no', $receiver_shipper->co_no)->get();
+                }elseif(isset($receiver_shop)){
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->orwhere('co_no', $receiver_shop->co_no)->get();
+                }else{
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->get();
+                }
+            }
         } else if ($alarm_data->ad_must_yn == 'n') {
-            if ($sender->mb_type == 'shop') {
+            if(isset($company->co_type) && $company->co_type == "spasys"){
+                $receiver_spasys = $company;
+                $receiver_shop = $company->co_childen;
+                $receiver_shipper = $company->co_childen;
+                if(isset($receiver_shipper)){
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shop->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shipper->co_no)->where('mb_push_yn', 'y')->get();
+                }elseif(isset($receiver_shop)){
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shop->co_no)->where('mb_push_yn', 'y')->get();
+                }else{
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->where('mb_push_yn', 'y')->get();
+                }
+            } else if(isset($company->co_type) && $company->co_type == "shop"){
+                $receiver_spasys = $company->co_parent;
+                $receiver_shop = $company;
+                $receiver_shipper = $company->co_childen;
+                if(isset($receiver_shipper)){
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shop->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shipper->co_no)->where('mb_push_yn', 'y')->get();
+                }elseif(isset($receiver_shop)){
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shop->co_no)->where('mb_push_yn', 'y')->get();
+                }else{
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->where('mb_push_yn', 'y')->get();
+                }
+            } else if(isset($company->co_type) && $company->co_type == "shipper"){
                 $receiver_spasys = $company->co_parent->co_parent;
-            } else if ($sender->mb_type == 'shipper') {
-                $receiver_spasys = $company->co_parent->co_parent;
+                $receiver_shop = $company->co_parent;
+                $receiver_shipper = $company;
+                if(isset($receiver_shipper)){
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shop->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shipper->co_no)->where('mb_push_yn', 'y')->get();
+                }elseif(isset($receiver_shop)){
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shop->co_no)->where('mb_push_yn', 'y')->get();
+                }else{
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->where('mb_push_yn', 'y')->get();
+                }
             }
-            //ad_must_yn == 'n' send only members who have mb_push_yn = 'y'
-
-            $receiver_list = Member::where('mb_push_yn', 'y')->where('co_type', '!=', 'spasys')->get();
         }
 
 
@@ -730,7 +796,133 @@ class CommonFunc
             Alarm::insertGetId(
                 [
                     'w_no' => null,
-                    'mb_no' => $sender->mb_no,
+                    'mb_no' => null,
+                    'co_no' => $co_no,
+                    'receiver_no' => $receiver->mb_no,
+                    'alarm_content' => $alarm_content,
+                    'alarm_h_bl' => $cargo_number,
+                    'alarm_type' => $alarm_type,
+                    'ad_no' => $alarm_data->ad_no,
+                ]
+            );
+
+            //PUSH FUNCTION HERE
+        }
+    }
+
+    static function insert_alarm_insulace_company_daily($ad_title, $content, $sender, $company, $type)
+    {
+        $ccccc = 0;
+        $aaaaa = '';
+        $bbbbb = '';
+        $ddddd = '';
+        $cargo_number = '';
+
+        $co_no = isset($company->co_no) ? $company->co_no : '';
+
+        if ($type == 'alarm_daily_insulace7') {
+            $aaaaa = 7;
+        }elseif($type == 'alarm_daily_insulace30'){
+            $aaaaa = 30;
+        }
+        
+        $alarm_data = AlarmData::where('ad_title', $ad_title)->first();
+
+        $alarm_content = $alarm_data->ad_content;
+        $alarm_content = str_replace('aaaaa', $aaaaa, $alarm_content);
+        $alarm_content = str_replace('bbbbb', $bbbbb, $alarm_content);
+        $alarm_content = str_replace('ccccc', $ccccc, $alarm_content);
+        $alarm_content = str_replace('ddddd', $ddddd, $alarm_content);
+
+        if ($type == 'alarm_daily_insulace7') {
+            $alarm_type = 'alarm_daily_insulace7';
+        }elseif($type == 'alarm_daily_insulace30'){
+            $alarm_type = 'alarm_daily_insulace30';
+        }
+
+
+        if ($alarm_data->ad_must_yn == 'y') {
+            
+            if(isset($company->co_type) && $company->co_type == "spasys"){
+                $receiver_spasys = $company;
+                $receiver_shop = $company->co_childen;
+                $receiver_shipper = $company->co_childen->co_childen;
+                if(isset($receiver_shipper)){
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->orwhere('co_no', $receiver_shop->co_no)->orwhere('co_no', $receiver_shipper->co_no)->get();
+                }elseif(isset($receiver_shop)){
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->orwhere('co_no', $receiver_shop->co_no)->get();
+                }else{
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->get();
+                }
+            } else if(isset($company->co_type) && $company->co_type == "shop"){
+                $receiver_spasys = $company->co_parent;
+                $receiver_shop = $company;
+                $receiver_shipper = $company->co_childen;
+                if(isset($receiver_shipper)){
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->orwhere('co_no', $receiver_shop->co_no)->orwhere('co_no', $receiver_shipper->co_no)->get();
+                }elseif(isset($receiver_shop)){
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->orwhere('co_no', $receiver_shop->co_no)->get();
+                }else{
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->get();
+                }
+            } else if(isset($company->co_type) && $company->co_type == "shipper"){
+                $receiver_spasys = $company->co_parent->co_parent;
+                $receiver_shop = $company->co_parent;
+                $receiver_shipper = $company;
+                if(isset($receiver_shipper)){
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->orwhere('co_no', $receiver_shop->co_no)->orwhere('co_no', $receiver_shipper->co_no)->get();
+                }elseif(isset($receiver_shop)){
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->orwhere('co_no', $receiver_shop->co_no)->get();
+                }else{
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->get();
+                }
+            }
+        } else if ($alarm_data->ad_must_yn == 'n') {
+            if(isset($company->co_type) && $company->co_type == "spasys"){
+                $receiver_spasys = $company;
+                $receiver_shop = $company->co_childen;
+                $receiver_shipper = $company->co_childen;
+                if(isset($receiver_shipper)){
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shop->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shipper->co_no)->where('mb_push_yn', 'y')->get();
+                }elseif(isset($receiver_shop)){
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shop->co_no)->where('mb_push_yn', 'y')->get();
+                }else{
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->where('mb_push_yn', 'y')->get();
+                }
+            } else if(isset($company->co_type) && $company->co_type == "shop"){
+                $receiver_spasys = $company->co_parent;
+                $receiver_shop = $company;
+                $receiver_shipper = $company->co_childen;
+                if(isset($receiver_shipper)){
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shop->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shipper->co_no)->where('mb_push_yn', 'y')->get();
+                }elseif(isset($receiver_shop)){
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shop->co_no)->where('mb_push_yn', 'y')->get();
+                }else{
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->where('mb_push_yn', 'y')->get();
+                }
+            } else if(isset($company->co_type) && $company->co_type == "shipper"){
+                $receiver_spasys = $company->co_parent->co_parent;
+                $receiver_shop = $company->co_parent;
+                $receiver_shipper = $company;
+                if(isset($receiver_shipper)){
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shop->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shipper->co_no)->where('mb_push_yn', 'y')->get();
+                }elseif(isset($receiver_shop)){
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shop->co_no)->where('mb_push_yn', 'y')->get();
+                }else{
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->where('mb_push_yn', 'y')->get();
+                }
+            }
+        }
+
+
+        foreach ($receiver_list as $receiver) {
+
+            //INSERT ALARM FOR RECEIVER LIST USER
+            Alarm::insertGetId(
+                [
+                    'w_no' => null,
+                    'mb_no' => null,
+                    'co_no' => $co_no,
                     'receiver_no' => $receiver->mb_no,
                     'alarm_content' => $alarm_content,
                     'alarm_h_bl' => $cargo_number,
