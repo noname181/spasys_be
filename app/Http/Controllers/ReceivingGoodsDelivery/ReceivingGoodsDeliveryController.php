@@ -3889,8 +3889,8 @@ class ReceivingGoodsDeliveryController extends Controller
             );
 
             ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
-                'rgd_status6' => $left_fee <= 0 ? 'deposit_without_bankbook' : 'paid',
-                'rgd_paid_date' =>   $left_fee <= 0 ? null : Carbon::now(),
+                'rgd_status6' => 'paid',
+                'rgd_paid_date' =>  Carbon::now(),
             ]);
 
 
@@ -3899,7 +3899,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 'rgd_no' => $request->rgd_no,
                 'cbh_status_after' => 'payment_bill',
                 'cbh_type' => 'payment',
-                'cbh_pay_method' => $left_fee <= 0 ? 'deposit_without_bankbook' : $est_payment->p_method,
+                'cbh_pay_method' => 'payment_from_est',
             ]);
 
             if ($rgd->rgd_status7 == 'taxed') {
