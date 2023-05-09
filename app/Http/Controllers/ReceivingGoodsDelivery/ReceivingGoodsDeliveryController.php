@@ -2678,7 +2678,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'cbh_status_after' => 'cancel'
                 ]);
 
-                if ($rgd->rgd_status6 == 'paid') {
+                if ($rgd->rgd_status8 == 'completed') {
                     ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                         'rgd_status8' => 'in_process',
                     ]);
