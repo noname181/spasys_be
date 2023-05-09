@@ -2649,6 +2649,12 @@ class RateDataController extends Controller
         try {
             DB::beginTransaction();
 
+             //CHECK EXIST IN DOUBLE CLICK CASE
+            $check_settlement_number = ReceivingGoodsDelivery::where('rgd_settlement_number', $request->settlement_number)->first();
+            if(isset($check_settlement_number->rgd_no) && !str_contains($request->type, 'edit')){
+                return;
+            }
+
             $user = Auth::user();
 
             //Check is there already RateDataGeneral with rdg_no and bill_type from request yet
@@ -2803,7 +2809,6 @@ class RateDataController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
@@ -3040,8 +3045,7 @@ class RateDataController extends Controller
 
             $rgds = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent'])
                 ->whereHas('w_no', function ($q) use ($rgd) {
-                    $q->where('co_no', $rgd->warehousing->co_no)
-                        ->where('w_category_name', '유통가공');
+                    $q->where('w_category_name', '유통가공');
                 })->whereHas('mb_no', function ($q) {
                 if (Auth::user()->mb_type == 'spasys') {
                     $q->where('mb_type', 'spasys');
@@ -3160,8 +3164,7 @@ class RateDataController extends Controller
 
             $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent'])
                 ->whereHas('w_no', function ($q) use ($rgd) {
-                    $q->where('co_no', $rgd->warehousing->co_no)
-                        ->where('w_category_name', '유통가공');
+                    $q->where('w_category_name', '유통가공');
                 })
             // ->doesntHave('rgd_child')
                 ->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
@@ -3254,8 +3257,7 @@ class RateDataController extends Controller
 
             $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 't_export', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent','t_import','t_import_expected'])
                 ->whereHas('w_no', function ($q) use ($co_no) {
-                    $q->where('co_no', $co_no)
-                        ->where('w_category_name', '보세화물');
+                    $q->where('w_category_name', '보세화물');
                 })
                 ->whereHas('rate_data_general', function($q) use($rgd){
                     $q->where('ag_no', $rgd->rate_data_general->ag_no);
@@ -3333,8 +3335,7 @@ class RateDataController extends Controller
 
             $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent', 't_export','t_import','t_import_expected'])
                 ->whereHas('w_no', function ($q) use ($co_no) {
-                    $q->where('co_no', $co_no)
-                        ->where('w_category_name', '보세화물');
+                    $q->where('w_category_name', '보세화물');
                 })
             // ->doesntHave('rgd_child')
                 ->where('rgd_settlement_number', $rgd->rgd_settlement_number)
@@ -3394,6 +3395,13 @@ class RateDataController extends Controller
     {
         try {
             DB::beginTransaction();
+
+            //CHECK EXIST IN DOUBLE CLICK CASE
+            $check_settlement_number = ReceivingGoodsDelivery::where('rgd_settlement_number', $request->settlement_number)->first();
+            if(isset($check_settlement_number->rgd_no) && !str_contains($request->is_edit, 'edit')){
+                return;
+            }
+
             $user = Auth::user();
 
             $i = 0;
@@ -3665,6 +3673,13 @@ class RateDataController extends Controller
     {
         try {
             DB::beginTransaction();
+
+            //CHECK EXIST IN DOUBLE CLICK CASE
+            $check_settlement_number = ReceivingGoodsDelivery::where('rgd_settlement_number', $request->settlement_number)->first();
+            if(isset($check_settlement_number->rgd_no) && !str_contains($request->type, 'edit')){
+                return;
+            }
+            
             $user = Auth::user();
 
             $i = 0;
@@ -3980,6 +3995,13 @@ class RateDataController extends Controller
     {
         try {
             DB::beginTransaction();
+
+            //CHECK EXIST IN DOUBLE CLICK CASE
+            $check_settlement_number = ReceivingGoodsDelivery::where('rgd_settlement_number', $request->settlement_number)->first();
+            if(isset($check_settlement_number->rgd_no) && $request->type != 'edit_final'){
+                return;
+            }
+
             $user = Auth::user();
             //Check is there already RateDataGeneral with rdg_no yet
             $is_exist = RateDataGeneral::where('rgd_no', $request->rgd_no)->where('rdg_bill_type', $request->bill_type)->first();
@@ -4147,6 +4169,14 @@ class RateDataController extends Controller
     {
         try {
             DB::beginTransaction();
+
+            //CHECK EXIST IN DOUBLE CLICK CASE
+            $check_settlement_number = ReceivingGoodsDelivery::where('rgd_settlement_number', $request->rgd_settlement_number)->first();
+            if(isset($check_settlement_number->rgd_no)  && str_contains($request->type, 'create')){
+                return;
+            }
+
+
             $user = Auth::user();
             //Check is there already RateDataGeneral with rgd_no yet
             $is_exist = RateDataGeneral::where('rgd_no', $request->rgd_no)->where('rdg_bill_type', $request->bill_type)->first();
