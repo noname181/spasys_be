@@ -3217,7 +3217,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
 
 
-                if ($rgd->rgd_status7 != 'paid') {
+                if ($rgd->rgd_status6 != 'paid') {
                     ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                         'rgd_status6' => 'paid',
                         'rgd_paid_date' => Carbon::now()->toDateTimeString()
