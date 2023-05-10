@@ -128,7 +128,7 @@ class CommonFunc
         $alarm_content = str_replace('ccccc', $ccccc, $alarm_content);
         $alarm_content = str_replace('ddddd', $ddddd, $alarm_content);
 
-
+        $receiver_list = null;
         if ($type == 'settle_payment') {
             if ($alarm_data->ad_must_yn == 'y') {
                 if ($rgd->service_korean_name == '수입풀필먼트') {
@@ -187,7 +187,7 @@ class CommonFunc
             }
         }
 
-
+        
         foreach ($receiver_list as $receiver) {
             //INSERT ALARM FOR RECEIVER LIST USER
             if ($type == 'settle_payment') {
