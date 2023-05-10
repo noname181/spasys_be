@@ -3347,7 +3347,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 }
             }
 
-            $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child'])->where('rgd_no', $request->rgd_no)->first();
+            $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child', 'warehousing'])->where('rgd_no', $request->rgd_no)->first();
 
             DB::commit();
             return response()->json([
