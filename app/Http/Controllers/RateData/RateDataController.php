@@ -8627,6 +8627,13 @@ class RateDataController extends Controller
                     'mb_no' => Auth::user()->mb_no,
                     'rgd_no' => $request->rgd_no,
                     'cbh_status_before' => 'confirmed',
+                    'cbh_status_after' =>  'cancel_approval',
+                    'cbh_type' => 'cancel_approval',
+                ]);
+                $insert_cancel_bill = CancelBillHistory::insertGetId([
+                    'mb_no' => Auth::user()->mb_no,
+                    'rgd_no' => $request->rgd_no,
+                    'cbh_status_before' => 'cancel_approval',
                     'cbh_status_after' =>  NULL,
                     'cbh_type' => 'revert_approval',
                 ]);
@@ -8642,10 +8649,17 @@ class RateDataController extends Controller
                         'rgd_status5' => null,
                         'rgd_confirmed_date' => null,
                     ]);
+                    $insert_cancel_bill = CancelBillHistory::insertGetId([
+                        'mb_no' => Auth::user()->mb_no,
+                        'rgd_no' => $request->rgd_no,
+                        'cbh_status_before' => 'confirmed',
+                        'cbh_status_after' =>  'cancel_approval',
+                        'cbh_type' => 'cancel_approval',
+                    ]);
                     CancelBillHistory::insertGetId([
                         'mb_no' => Auth::user()->mb_no,
                         'rgd_no' => $rgd['rgd_no'],
-                        'cbh_status_before' => 'confirmed',
+                        'cbh_status_before' => 'cancel_approval',
                         'cbh_status_after' =>  null,
                         'cbh_type' => 'revert_approval',
                     ]);
@@ -8920,7 +8934,7 @@ class RateDataController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $list = CancelBillHistory::with(['member', 'rgd'])->where('rgd_no', '=', $request->rgd_no)->whereIn('cbh_type', ['approval', 'revert_approval'])->orderBy('cbh_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
+            $list = CancelBillHistory::with(['member', 'rgd'])->where('rgd_no', '=', $request->rgd_no)->whereIn('cbh_type', ['approval', 'cancel_approval', 'revert_approval'])->orderBy('cbh_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
 
             return response()->json($list);
         } catch (\Exception $e) {
