@@ -4068,7 +4068,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'cbh_pay_method' => isset($request->p_method) ? $request->p_method : null
                 ]);
 
-                if ($rgd->rgd_status7 == 'taxed') {
+                if ($rgd->rgd_status7 == 'taxed' && $request->p_method != 'deposit_without_bankbook') {
                     CancelBillHistory::insertGetId([
                         'rgd_no' => $request->rgd_no,
                         'mb_no' => $rgd->mb_no,
