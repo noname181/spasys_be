@@ -8651,7 +8651,7 @@ class RateDataController extends Controller
                     ]);
                     $insert_cancel_bill = CancelBillHistory::insertGetId([
                         'mb_no' => Auth::user()->mb_no,
-                        'rgd_no' => $request->rgd_no,
+                        'rgd_no' => $rgd->rgd_no,
                         'cbh_status_before' => 'confirmed',
                         'cbh_status_after' =>  'cancel_approval',
                         'cbh_type' => 'cancel_approval',
