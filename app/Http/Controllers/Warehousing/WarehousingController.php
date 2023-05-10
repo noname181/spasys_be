@@ -3549,7 +3549,7 @@ class WarehousingController extends Controller
 
                 $rgds = ReceivingGoodsDelivery::with(['mb_no', 'w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent'])
                     ->whereHas('w_no', function ($q) use ($co_no) {
-                        $q->where('co_no', $co_no)
+                        $q
                             ->where('w_category_name', '유통가공');
                     })->whereHas('mb_no', function ($q) {
                         if (Auth::user()->mb_type == 'spasys') {
@@ -3625,7 +3625,7 @@ class WarehousingController extends Controller
 
                 $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general'])
                     ->whereHas('w_no', function ($q) use ($co_no) {
-                        $q->where('co_no', $co_no)
+                        $q
                             ->where('w_category_name', '유통가공');
                     })
                     ->where('rgd_settlement_number', $rgd->rgd_settlement_number)
@@ -3676,7 +3676,7 @@ class WarehousingController extends Controller
 
                 $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general'])
                     ->whereHas('w_no', function ($q) use ($co_no) {
-                        $q->where('co_no', $co_no)
+                        $q
                             ->where('w_category_name', '유통가공');
                     })
                     ->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
@@ -5505,7 +5505,7 @@ class WarehousingController extends Controller
                     })->whereHas('company.contract', function ($q) use ($user) {
                         $q->where('c_calculate_deadline_yn', 'y');
                     });
-                })->orderBy('rgd_tax_invoice_date', 'DESC')->orderBy('rgd_no', 'DESC');
+                });
             } else if ($user->mb_type == 'shipper') {
                 $warehousing = ReceivingGoodsDelivery::with(['member', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('company', function ($q) use ($user) {
@@ -5513,7 +5513,7 @@ class WarehousingController extends Controller
                     })->whereHas('company.contract', function ($q) use ($user) {
                         $q->where('c_calculate_deadline_yn', 'y');
                     });
-                })->orderBy('rgd_tax_invoice_date', 'DESC')->orderBy('rgd_no', 'DESC');
+                });
             } else if ($user->mb_type == 'spasys') {
                 $warehousing = ReceivingGoodsDelivery::with(['member', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('company.co_parent.co_parent', function ($q) use ($user) {

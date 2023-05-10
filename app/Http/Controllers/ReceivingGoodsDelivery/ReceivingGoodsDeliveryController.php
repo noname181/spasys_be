@@ -3347,7 +3347,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 }
             }
 
-            $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child'])->where('rgd_no', $request->rgd_no)->first();
+            $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child', 'warehousing'])->where('rgd_no', $request->rgd_no)->first();
 
             DB::commit();
             return response()->json([
@@ -4068,7 +4068,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     'cbh_pay_method' => isset($request->p_method) ? $request->p_method : null
                 ]);
 
-                if ($rgd->rgd_status7 == 'taxed') {
+                if ($rgd->rgd_status7 == 'taxed' && $request->p_method != 'deposit_without_bankbook') {
                     CancelBillHistory::insertGetId([
                         'rgd_no' => $request->rgd_no,
                         'mb_no' => $rgd->mb_no,

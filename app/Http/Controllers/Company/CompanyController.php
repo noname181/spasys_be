@@ -338,8 +338,8 @@ class CompanyController extends Controller
 
             //INSERT ALARM
             $company = Company::with(['contract'])->where('co_no', $company->co_no)->first();
-            if($company->co_close_yn == 'y' && $validated['co_close_yn'] == 'n'){
-                CommonFunc::insert_alarm('휴폐업 안내', $company, $user, null, 'update_company', null);
+            if($company->co_close_yn == 'n' && $validated['co_close_yn'] == 'y'){
+               CommonFunc::insert_alarm('휴폐업 안내', $company, $user, null, 'update_company', null);
             }
 
             //END INSERT ALARM

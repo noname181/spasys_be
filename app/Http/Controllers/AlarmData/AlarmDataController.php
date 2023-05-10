@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use \Carbon\Carbon;
 use App\Utils\CommonFunc;
 use App\Models\Company;
+
 class AlarmDataController extends Controller
 {
     /**
@@ -21,7 +22,7 @@ class AlarmDataController extends Controller
      */
     public function __invoke(AlarmDataRequest $request)
     {
-        
+
         try {
             $validated = $request->validated();
             // If per_page is null set default data = 15
@@ -40,7 +41,8 @@ class AlarmDataController extends Controller
     /**
      * Get AlarmData detail by id
      */
-    public function getAlarmDataDetail(AlarmData $alarm_data){
+    public function getAlarmDataDetail(AlarmData $alarm_data)
+    {
         return response()->json($alarm_data);
     }
 
@@ -112,20 +114,20 @@ class AlarmDataController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
 
             $alarmdata = AlarmData::whereRaw('1 = 1');
-            if(isset($validated['ad_category'])) {
-                $alarmdata->where('ad_category', 'like', '%'.$validated['ad_category'].'%');
+            if (isset($validated['ad_category'])) {
+                $alarmdata->where('ad_category', 'like', '%' . $validated['ad_category'] . '%');
             }
-            if(isset($validated['ad_title'])) {
-                $alarmdata->where('ad_title', 'like', '%'.$validated['ad_title'].'%');
+            if (isset($validated['ad_title'])) {
+                $alarmdata->where('ad_title', 'like', '%' . $validated['ad_title'] . '%');
             }
-            if(isset($validated['ad_must_yn'])) {
-                $alarmdata->where('ad_must_yn', 'like', '%'.$validated['ad_must_yn'].'%');
+            if (isset($validated['ad_must_yn'])) {
+                $alarmdata->where('ad_must_yn', 'like', '%' . $validated['ad_must_yn'] . '%');
             }
-            if(isset($validated['ad_use_yn'])) {
-                $alarmdata->where('ad_use_yn', 'like', '%'.$validated['ad_use_yn'].'%');
+            if (isset($validated['ad_use_yn'])) {
+                $alarmdata->where('ad_use_yn', 'like', '%' . $validated['ad_use_yn'] . '%');
             }
             $alarmdata = $alarmdata->orderBy('ad_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
-            
+
             return response()->json($alarmdata);
         } catch (\Exception $e) {
             Log::error($e);
@@ -133,19 +135,108 @@ class AlarmDataController extends Controller
         }
     }
 
-    public function insertDailyAlarm()
+    public function insertDailyAlarm7()
     {
         try {
             DB::beginTransaction();
-           
-            $companies = Company::with(['contract', 'co_parent', 'company_settlement', 'company_payment', 'mb_no'])
+
+            $companies = Company::with(['contract', 'co_parent', 'co_childen', 'mb_no'])
                 ->whereHas('contract', function ($q) {
-                    $q->whereBetween('c_end_date', [Carbon::now()->startOfDay(), Carbon::now()->subDays(7)->endOfDay()]);
+                    $q->whereBetween('c_end_date', [Carbon::now()->startOfDay(), Carbon::now()->addDays(7)->endOfDay()]);
                 })
                 ->where('co_type', '!=', 'spasys')
                 ->orderBy('co_no', 'DESC')->get();
-            return $companies;
-            CommonFunc::insert_alarm_company_daily('계약 종료일', null, null, $companies, 'alarm_daily');
+
+            foreach ($companies as $company) {
+                CommonFunc::insert_alarm_company_daily('계약 종료일', null, null, $company, 'alarm_daily7');
+            }
+
+            DB::commit();
+            return response()->json([
+                'companies' => $companies,
+                'message' => Messages::MSG_0007,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0001], 500);
+        }
+    }
+
+    public function insertDailyAlarm30()
+    {
+        try {
+            DB::beginTransaction();
+
+            $companies = Company::with(['contract', 'co_parent', 'co_childen', 'mb_no'])
+                ->whereHas('contract', function ($q) {
+                    $q->whereBetween('c_end_date', [Carbon::now()->addDays(8)->startOfDay(), Carbon::now()->addDays(30)->endOfDay()]);
+                })
+                ->where('co_type', '!=', 'spasys')
+                ->orderBy('co_no', 'DESC')->get();
+
+            foreach ($companies as $company) {
+                CommonFunc::insert_alarm_company_daily('계약 종료일', null, null, $company, 'alarm_daily30');
+            }
+
+            DB::commit();
+            return response()->json([
+                'companies' => $companies,
+                'message' => Messages::MSG_0007,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0001], 500);
+        }
+    }
+
+    public function insertDailyAlarmInsulace7()
+    {
+        try {
+            DB::beginTransaction();
+
+            $companies = Company::with(['contract', 'co_parent', 'co_childen', 'mb_no'])
+                ->whereHas('contract', function ($q) {
+                    $q->whereBetween('c_deposit_return_expiry_date', [Carbon::now()->startOfDay(), Carbon::now()->addDays(7)->endOfDay()]);
+                })
+                ->where('co_type', '!=', 'spasys')
+                ->orderBy('co_no', 'DESC')->get();
+
+            foreach ($companies as $company) {
+                CommonFunc::insert_alarm_insulace_company_daily('보증보험 만료일', null, null, $company, 'alarm_daily_insulace7');
+            }
+
+            DB::commit();
+            return response()->json([
+                'companies' => $companies,
+                'message' => Messages::MSG_0007,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0001], 500);
+        }
+    }
+
+    public function insertDailyAlarmInsulace30()
+    {
+        try {
+            DB::beginTransaction();
+
+            $companies = Company::with(['contract', 'co_parent', 'co_childen', 'mb_no'])
+                ->whereHas('contract', function ($q) {
+                    $q->whereBetween('c_deposit_return_expiry_date', [Carbon::now()->addDays(8)->startOfDay(), Carbon::now()->addDays(30)->endOfDay()]);
+                })
+                ->where('co_type', '!=', 'spasys')
+                ->orderBy('co_no', 'DESC')->get();
+
+            foreach ($companies as $company) {
+                CommonFunc::insert_alarm_insulace_company_daily('보증보험 만료일', null, null, $company, 'alarm_daily_insulace30');
+            }
 
             DB::commit();
             return response()->json([
