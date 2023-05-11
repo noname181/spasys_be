@@ -183,18 +183,23 @@ class ScheduleShipmentController extends Controller
 
                     $scheduleshipment_info_ = ScheduleShipmentInfo::with(['item'])->where('ss_no', $q->ss_no)->first();
                     $item_schedule_shipment = Item::where('product_id', $scheduleshipment_info_->product_id)->first();
-                    if (isset($item_schedule_shipment)) {
-                        $item_first_name = $item_schedule_shipment['item_name'];
-                        $total_item = $scheduleshipment_info_['item']->count() - 1;
+                    if (isset($schedule_shipment_item[0]->name)) {
+                        // $item_first_name = $item_schedule_shipment['item_name'];
+                        $item_first_name = $schedule_shipment_item[0]->name;
+
+                        // $total_item = $scheduleshipment_info_['item']->count() - 1;
+
+                        $total_item = $count_item - 1;
+
                         if ($total_item <= 0) {
-                            $q->first_item_name_total = $item_first_name . '외';
+                            $q->first_item_name_total = $item_first_name;
                         } else {
                             $q->first_item_name_total = $item_first_name . '외' . ' ' . $total_item . '건';
                         }
                     } else {
                         $q->first_item_name_total = '';
                     }
-
+                    //$q->test = $total_item;
 
                     return  $q;
                 })
