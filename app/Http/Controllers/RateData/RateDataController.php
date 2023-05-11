@@ -3576,6 +3576,7 @@ class RateDataController extends Controller
                         $final_rgd->rgd_is_show = ($i == 0 ? 'y' : 'n');
                         $final_rgd->rgd_parent_no = $expectation_rgd->rgd_no;
                         $final_rgd->rgd_settlement_number = $request->settlement_number;
+                        $final_rgd->mb_no = $user->mb_no;
                         $final_rgd->save();
 
                         $ag = AdjustmentGroup::where('ag_no', $request->rdg_set_type)->first();
@@ -3823,6 +3824,7 @@ class RateDataController extends Controller
                     $final_rgd->rgd_is_show = ($i == 0 ? 'y' : 'n');
                     $final_rgd->rgd_parent_no = $expectation_rgd->rgd_no;
                     $final_rgd->rgd_settlement_number = $request->settlement_number;
+                    $final_rgd->mb_no = $user->mb_no;
                     $final_rgd->save();
 
                     $ag = AdjustmentGroup::where('ag_no', $request->rdg_set_type)->first();
@@ -4075,6 +4077,7 @@ class RateDataController extends Controller
                 $final_rgd->rgd_parent_no = $previous_rgd->rgd_no;
                 $final_rgd->rgd_settlement_number = $request->settlement_number;
                 $final_rgd->rgd_calculate_deadline_yn = $request->rgd_calculate_deadline_yn ? $request->rgd_calculate_deadline_yn : $previous_rgd->rgd_calculate_deadline_yn;
+                $final_rgd->mb_no = $user->mb_no;
                 $final_rgd->save();
 
                 RateDataGeneral::where('rgd_no_expectation', $previous_rgd->rgd_no)->update([

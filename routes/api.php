@@ -33,6 +33,7 @@ Route::get('/daily_alarm7', [App\Http\Controllers\AlarmData\AlarmDataController:
 Route::get('/daily_alarm30', [App\Http\Controllers\AlarmData\AlarmDataController::class, 'insertDailyAlarm30'])->name('insertDailyAlarm30');
 Route::get('/daily_alarm_insulace7', [App\Http\Controllers\AlarmData\AlarmDataController::class, 'insertDailyAlarmInsulace7'])->name('insertDailyAlarmInsulace7');
 Route::get('/daily_alarm_insulace30', [App\Http\Controllers\AlarmData\AlarmDataController::class, 'insertDailyAlarmInsulace30'])->name('insertDailyAlarmInsulace30');
+Route::get('/alarm_pw_30day', [App\Http\Controllers\AlarmData\AlarmDataController::class, 'alarmPw30day'])->name('alarmPw30day');
 Route::get('/api_item_cargo_list', [App\Http\Controllers\Item\ItemController::class, 'apiItemsCargoList'])->name('api_item_cargo_list');
 
 Route::middleware('auth')->group(function () {

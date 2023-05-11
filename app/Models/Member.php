@@ -58,6 +58,7 @@ class Member extends Authenticatable
         'mb_name',
         'mb_email',
         'mb_pw',
+        'mb_pw_update_time',
         'mb_language',
         'mb_use_yn',
         'mb_push_yn',
