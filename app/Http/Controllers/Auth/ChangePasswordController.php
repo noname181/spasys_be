@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Utils\Messages;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class ChangePasswordController extends Controller
 {
@@ -36,6 +37,7 @@ class ChangePasswordController extends Controller
             }
 
             $member['mb_pw'] = Hash::make($input['mb_new_pw']);
+            $member['mb_pw_update_time'] = Carbon::now();
             // After change password . Remove token -> Login again
             $member->mb_token = '';
             $member->save();

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use \Carbon\Carbon;
 use App\Utils\CommonFunc;
 use App\Models\Company;
+use App\Models\Member;
 
 class AlarmDataController extends Controller
 {
@@ -236,6 +237,29 @@ class AlarmDataController extends Controller
 
             foreach ($companies as $company) {
                 CommonFunc::insert_alarm_insulace_company_daily('보증보험 만료일', null, null, $company, 'alarm_daily_insulace30');
+            }
+
+            DB::commit();
+            return response()->json([
+                'companies' => $companies,
+                'message' => Messages::MSG_0007,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0001], 500);
+        }
+    }
+
+    public function alarmPw30day()
+    {
+        try {
+            DB::beginTransaction();
+
+            $companies = Member::with(['company'])->get();
+            foreach ($companies as $company) {
+                //CommonFunc::insert_alarm_insulace_company_daily('보증보험 만료일', null, null, $company, 'alarm_daily_insulace30');
             }
 
             DB::commit();
