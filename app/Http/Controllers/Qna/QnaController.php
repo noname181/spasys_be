@@ -533,9 +533,35 @@ class QnaController extends Controller
             }
 
      
-            $count_qna_question = Qna::where('depth_level',0)->count();
+            // $count_qna_question = Qna::where('depth_level',0)->count();
 
-
+            if($member_type->mb_type == 'spasys'){
+                $count_qna_question = Qna::with(['member','company','member_question'])->where('depth_level',0)->where('qna_status','!=','삭제')->where(function ($query) use ($member_type){
+                    $query->where('co_no_target', '=', Auth::user()->co_no)->orwhere('spasys_no',$member_type->co_no)
+                        ->orWhereHas('member',function ($query) use ($member_type){
+                            $query->where('co_no','=',$member_type->co_no);
+                        })->orWhereHas('company',function ($query) use ($member_type){
+                            $query->where('co_no','=',$member_type->co_no);
+                        });
+                })->count();
+            }else if($member_type->mb_type == 'shop'){
+                $count_qna_question = Qna::with(['member','company','member_question'])->where('depth_level',0)->where('qna_status','!=','삭제')->where(function ($query) use ($member_type) {
+                    $query->where('co_no_target', '=', Auth::user()->co_no)->orWhere('mb_no_question',$member_type->mb_no)->orWhere('co_no_target', '=', $member_type->company->co_parent->co_no)
+                        ->orWhereHas('member',function ($query) use ($member_type){
+                            $query->where('co_no','=',$member_type->co_no);
+                            
+                        })->orwhereHas('company.co_parent',function ($query2) use ($member_type){
+                            $query2->where('co_no','=',$member_type->co_no);
+                        });
+                })->count();
+            } else if($member_type->mb_type == 'shipper') {
+                $count_qna_question = Qna::with(['member','company','member_question'])->where('depth_level',0)->where('qna_status','!=','삭제')->where(function ($query) use ($member_type) {
+                    $query->where('co_no_target', '=', Auth::user()->co_no)->orWhere('mb_no_question',$member_type->mb_no)
+                        ->orWhereHas('member',function ($query) use ($member_type){
+                            $query->where('co_no','=',$member_type->co_no);
+                        });
+                })->count();
+            }
          
 
             $members = Member::where('mb_no', '!=', 0)->get();
