@@ -2793,7 +2793,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                             $check_payment = Payment::where('rgd_no', $rgd['rgd_parent_no'])->where('p_success_yn', 'y')->orderBy('p_no', 'desc')->first();
 
-                            if (isset($check_payment)) {
+                            if (isset($check_payment) && $rgd_parent->is_expect_payment == 'y') {
                                 Payment::where('p_no', $check_payment->p_no)->update([
                                     // 'p_price' => $request->sumprice,
                                     // 'p_method' => $request->p_method,
@@ -2803,7 +2803,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                 ]);
                 
                                 ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_parent_no'])->update([
-                                    'rgd_status6' => 'cancel',
+                                    'rgd_status6' => null,
                                     'rgd_paid_date' => null,
                                     'rgd_canceled_date' => Carbon::now(),
                                 ]);

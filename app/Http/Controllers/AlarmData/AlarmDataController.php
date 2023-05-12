@@ -154,13 +154,11 @@ class AlarmDataController extends Controller
 
             DB::commit();
             return response()->json([
-                'companies' => $companies,
                 'message' => Messages::MSG_0007,
             ]);
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error($e);
-            return $e;
+            
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -183,13 +181,10 @@ class AlarmDataController extends Controller
 
             DB::commit();
             return response()->json([
-                'companies' => $companies,
                 'message' => Messages::MSG_0007,
             ]);
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error($e);
-            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -212,13 +207,10 @@ class AlarmDataController extends Controller
 
             DB::commit();
             return response()->json([
-                'companies' => $companies,
                 'message' => Messages::MSG_0007,
             ]);
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error($e);
-            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -259,18 +251,19 @@ class AlarmDataController extends Controller
 
             $companies = Member::with(['company'])->get();
             foreach ($companies as $company) {
-                //CommonFunc::insert_alarm_insulace_company_daily('보증보험 만료일', null, null, $company, 'alarm_daily_insulace30');
+                if(isset($company->mb_pw_update_time)){
+                    if(Carbon::now() >= Carbon::parse($company->mb_pw_update_time)->addMonth(3)->endOfDay()){
+                        CommonFunc::insert_alarm_pw_company_30('PW 변경', null, null, $company, 'alarm_pw_company_30');
+                    }
+                }
             }
 
             DB::commit();
             return response()->json([
-                'companies' => $companies,
                 'message' => Messages::MSG_0007,
             ]);
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error($e);
-            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }

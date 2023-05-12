@@ -934,4 +934,54 @@ class CommonFunc
             //PUSH FUNCTION HERE
         }
     }
+
+    static function insert_alarm_pw_company_30($ad_title, $content, $sender, $company, $type)
+    {
+        $ccccc = 0;
+        $aaaaa = '';
+        $bbbbb = '';
+        $ddddd = '';
+        $cargo_number = '';
+
+        $co_no = isset($company->co_no) ? $company->co_no : '';
+        
+        $alarm_data = AlarmData::where('ad_title', $ad_title)->first();
+
+        $alarm_content = $alarm_data->ad_content;
+        $alarm_content = str_replace('aaaaa', $aaaaa, $alarm_content);
+        $alarm_content = str_replace('bbbbb', $bbbbb, $alarm_content);
+        $alarm_content = str_replace('ccccc', $ccccc, $alarm_content);
+        $alarm_content = str_replace('ddddd', $ddddd, $alarm_content);
+
+        if ($type == 'alarm_pw_company_30') {
+            $alarm_type = 'alarm_pw_company_30';
+        }
+
+
+        if ($alarm_data->ad_must_yn == 'y') {
+            $receiver_list = Member::where('mb_no', $company->mb_no)->get();
+        } else if ($alarm_data->ad_must_yn == 'n') {
+            $receiver_list = Member::where('mb_no', $company->mb_no)->where('mb_push_yn', 'y')->get();
+        }
+
+
+        foreach ($receiver_list as $receiver) {
+
+            //INSERT ALARM FOR RECEIVER LIST USER
+            Alarm::insertGetId(
+                [
+                    'w_no' => null,
+                    'mb_no' => null,
+                    'co_no' => $co_no,
+                    'receiver_no' => $receiver->mb_no,
+                    'alarm_content' => $alarm_content,
+                    'alarm_h_bl' => $cargo_number,
+                    'alarm_type' => $alarm_type,
+                    'ad_no' => $alarm_data->ad_no,
+                ]
+            );
+
+            //PUSH FUNCTION HERE
+        }
+    }
 }

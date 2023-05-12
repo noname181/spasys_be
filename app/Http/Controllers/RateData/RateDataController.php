@@ -2760,7 +2760,7 @@ class RateDataController extends Controller
             if($request->type == 'create_final'){
                 $est_rgd =  ReceivingGoodsDelivery::where('rgd_no', $final_rgd->rgd_parent_no)->first();
 
-                if($est_rgd->rgd_status6 != 'paid' && $est_rgd->service_korean_name == '보세화물' && $est_rgd->rgd_calculate_deadline_yn == 'y' && !str_contains($est_rgd->rgd_bill_type, 'month')){
+                if($est_rgd->rgd_status6 != 'paid' && $est_rgd->service_korean_name == '유통가공' && $est_rgd->rgd_calculate_deadline_yn == 'y' && !str_contains($est_rgd->rgd_bill_type, 'month')){
                     ReceivingGoodsDelivery::where('rgd_settlement_number', $est_rgd->rgd_settlement_number)->update([
                         'rgd_status6' => 'paid',
                         'is_expect_payment' => 'y', //NOT REAL PAID
@@ -3603,7 +3603,7 @@ class RateDataController extends Controller
                         //UPDATE EST BILL WHEN ISSUE FINAL BILL
                         $est_rgd =  ReceivingGoodsDelivery::where('rgd_no', $final_rgd->rgd_parent_no)->first();
 
-                        if($est_rgd->rgd_status6 != 'paid' && $est_rgd->service_korean_name == '보세화물' && $est_rgd->rgd_calculate_deadline_yn == 'y' && !str_contains($est_rgd->rgd_bill_type, 'month')){
+                        if($est_rgd->rgd_status6 != 'paid' && $est_rgd->service_korean_name == '유통가공' && $est_rgd->rgd_calculate_deadline_yn == 'y' && !str_contains($est_rgd->rgd_bill_type, 'month')){
 
                             ReceivingGoodsDelivery::where('rgd_settlement_number', $est_rgd->rgd_settlement_number)->update([
                                 'rgd_status6' => 'paid',
@@ -8711,7 +8711,7 @@ class RateDataController extends Controller
 
                     $check_payment = Payment::where('rgd_no', $rgd->rgd_parent_no)->where('p_success_yn', 'y')->orderBy('p_no', 'desc')->first();
 
-                    if (isset($check_payment)) {
+                    if (isset($check_payment) && $rgd_parent->is_expect_payment == 'y') {
                         Payment::where('p_no', $check_payment->p_no)->update([
                             // 'p_price' => $request->sumprice,
                             // 'p_method' => $request->p_method,
@@ -8721,7 +8721,7 @@ class RateDataController extends Controller
                         ]);
         
                         ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->update([
-                            'rgd_status6' => 'cancel',
+                            'rgd_status6' => null,
                             'rgd_paid_date' => null,
                             'rgd_canceled_date' => Carbon::now(),
                         ]);
@@ -8779,7 +8779,7 @@ class RateDataController extends Controller
 
                         $check_payment = Payment::where('rgd_no', $rgd['rgd_parent_no'])->where('p_success_yn', 'y')->orderBy('p_no', 'desc')->first();
 
-                        if (isset($check_payment)) {
+                        if (isset($check_payment) && $rgd_parent->is_expect_payment == 'y') {
                             Payment::where('p_no', $check_payment->p_no)->update([
                                 // 'p_price' => $request->sumprice,
                                 // 'p_method' => $request->p_method,
@@ -8789,7 +8789,7 @@ class RateDataController extends Controller
                             ]);
             
                             ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_parent_no'])->update([
-                                'rgd_status6' => 'cancel',
+                                'rgd_status6' => null,
                                 'rgd_paid_date' => null,
                                 'rgd_canceled_date' => Carbon::now(),
                             ]);
@@ -8844,7 +8844,7 @@ class RateDataController extends Controller
 
                     $check_payment = Payment::where('rgd_no', $rgd->rgd_parent_no)->where('p_success_yn', 'y')->orderBy('p_no', 'desc')->first();
 
-                    if (isset($check_payment)) {
+                    if (isset($check_payment) && $rgd_parent->is_expect_payment == 'y') {
                         Payment::where('p_no', $check_payment->p_no)->update([
                             // 'p_price' => $request->sumprice,
                             // 'p_method' => $request->p_method,
@@ -8854,7 +8854,7 @@ class RateDataController extends Controller
                         ]);
         
                         ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->update([
-                            'rgd_status6' => 'cancel',
+                            'rgd_status6' => null,
                             'rgd_paid_date' => null,
                             'rgd_canceled_date' => Carbon::now(),
                         ]);
