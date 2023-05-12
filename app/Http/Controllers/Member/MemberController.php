@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class MemberController extends Controller
 {
@@ -67,6 +68,7 @@ class MemberController extends Controller
 
             $validated['mb_token'] = '';
             $validated['mb_pw'] = Hash::make($validated['mb_pw']);
+            $validated['mb_pw_update_time'] = Carbon::now();
 
             if (empty($validated['co_no'])) {
                 $validated['co_no'] = Auth::user()->co_no;
