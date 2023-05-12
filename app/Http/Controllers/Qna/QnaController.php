@@ -449,6 +449,9 @@ class QnaController extends Controller
                     $query->where('co_no_target', '=', Auth::user()->co_no)->orWhere('mb_no_question',$member_type->mb_no)->orWhere('co_no_target', '=', $member_type->company->co_parent->co_no)
                         ->orWhereHas('member',function ($query) use ($member_type){
                             $query->where('co_no','=',$member_type->co_no);
+                            
+                        })->orwhereHas('company.co_parent',function ($query2) use ($member_type){
+                            $query2->where('co_no','=',$member_type->co_no);
                         });
                 })->with(['mb_no'=>function($query){
                     $query->select(['mb_name','mb_no']);
