@@ -25,7 +25,7 @@ class Kernel extends ConsoleKernel
         $schedule->call('App\Http\Controllers\AlarmData\AlarmDataController@insertDailyAlarm30')->cron('02 9 * * *');
         $schedule->call('App\Http\Controllers\AlarmData\AlarmDataController@insertDailyAlarmInsulace7')->cron('03 9 * * *');
         $schedule->call('App\Http\Controllers\AlarmData\AlarmDataController@insertDailyAlarmInsulace30')->cron('04 9 * * *');
-        $schedule->call('App\Http\Controllers\AlarmData\AlarmDataController@alarmPw30day')->cron('05 9 * * *');
+        $schedule->call('App\Http\Controllers\AlarmData\AlarmDataController@alarmPw90d')->cron('05 9 * * *');
     }
 
     /**
