@@ -943,7 +943,7 @@ class CommonFunc
         $ddddd = '';
         $cargo_number = '';
 
-        $co_no = isset($company->co_no) ? $company->co_no : '';
+        $co_no = isset($company->co_no) ? $company->co_no : null;
         
         $alarm_data = AlarmData::where('ad_title', $ad_title)->first();
 

@@ -249,10 +249,14 @@ class AlarmDataController extends Controller
         try {
             DB::beginTransaction();
 
-            $companies = Member::with(['company'])->get();
+            $companies = Member::with(['company'])->whereNotNull('co_no')->get();
             foreach ($companies as $company) {
                 if(isset($company->mb_pw_update_time)){
                     if(Carbon::now() >= Carbon::parse($company->mb_pw_update_time)->addDays(90)->endOfDay()){
+                        CommonFunc::insert_alarm_pw_company_90('PW 변경', null, null, $company, 'alarm_pw_company_90');
+                    }
+                }else{
+                    if(Carbon::now() >= Carbon::parse($company->updated_at)->addDays(90)->endOfDay()){
                         CommonFunc::insert_alarm_pw_company_90('PW 변경', null, null, $company, 'alarm_pw_company_90');
                     }
                 }
@@ -264,6 +268,7 @@ class AlarmDataController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollback();
+            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
