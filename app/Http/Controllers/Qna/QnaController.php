@@ -53,9 +53,10 @@ class QnaController extends Controller
      */
     public function getById(Qna $qna)
     {
-        $qna['files'] = $qna->files()->get();
-        $qna['mb_no_target'] = $qna->mb_no_target()->first();
-        $qna['mb_no'] = $qna->mb_no()->first();
+        // $qna['files'] = $qna->files()->get();
+        // $qna['mb_no_target'] = $qna->mb_no_target()->first();
+        // $qna['mb_no'] = $qna->mb_no()->first();
+        $qna = Qna::with(['member','company','member_question','files','childQna','mb_no_target','mb_no'])->where('qna_no',$qna->qna_no)->first();
         return response()->json($qna);
     }
 
