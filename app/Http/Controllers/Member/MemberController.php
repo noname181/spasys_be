@@ -565,7 +565,10 @@ class MemberController extends Controller
                         $q->WhereHas('co_parent', function ($q) use ($user) {
                             $q->where('co_no', $user->co_no);
                         });
-
+                        // $q->where('co_no', $user->company->co_parent->co_no)
+                        // ->orWhereHas('co_parent', function ($q) use ($user) {
+                        //     $q->where('co_no', $user->co_no);
+                        // });
 
                         // $q->whereHas('co_parent', function($q) use($co_no){
                         //     $q->where('co_no', $co_no);
