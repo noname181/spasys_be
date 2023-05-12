@@ -935,7 +935,7 @@ class CommonFunc
         }
     }
 
-    static function insert_alarm_pw_company_30($ad_title, $content, $sender, $company, $type)
+    static function insert_alarm_pw_company_3m($ad_title, $content, $sender, $company, $type)
     {
         $ccccc = 0;
         $aaaaa = '';
@@ -953,8 +953,8 @@ class CommonFunc
         $alarm_content = str_replace('ccccc', $ccccc, $alarm_content);
         $alarm_content = str_replace('ddddd', $ddddd, $alarm_content);
 
-        if ($type == 'alarm_pw_company_30') {
-            $alarm_type = 'alarm_pw_company_30';
+        if ($type == 'alarm_pw_company_3m') {
+            $alarm_type = 'alarm_pw_company_3m';
         }
 
 

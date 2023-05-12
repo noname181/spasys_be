@@ -244,7 +244,7 @@ class AlarmDataController extends Controller
         }
     }
 
-    public function alarmPw30day()
+    public function alarmPw3m()
     {
         try {
             DB::beginTransaction();
@@ -253,7 +253,7 @@ class AlarmDataController extends Controller
             foreach ($companies as $company) {
                 if(isset($company->mb_pw_update_time)){
                     if(Carbon::now() >= Carbon::parse($company->mb_pw_update_time)->addMonth(3)->endOfDay()){
-                        CommonFunc::insert_alarm_pw_company_30('PW 변경', null, null, $company, 'alarm_pw_company_30');
+                        CommonFunc::insert_alarm_pw_company_3m('PW 변경', null, null, $company, 'alarm_pw_company_3m');
                     }
                 }
             }
