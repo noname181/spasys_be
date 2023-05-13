@@ -3322,7 +3322,13 @@ class WarehousingController extends Controller
                     $item->total_item = WarehousingItem::where('w_no', $item->w_no)->where('wi_type', '입고_shipper')->sum('wi_number');
                     if (!empty($item['warehousing']['warehousing_item'][0]) && isset($item['warehousing']['warehousing_item'][0]['item'])) {
                         $first_name_item = $item['warehousing']['warehousing_item'][0]['item']['item_name'];
-                        $total_item = $item['warehousing']['warehousing_item']->count();
+                        // $total_item = $item['warehousing']['warehousing_item']->count();
+                        $total_item = 0;
+                        foreach($item['warehousing']['warehousing_item'] as $a){
+                            if($a['wi_type'] == "출고_shipper"){
+                                $total_item++;
+                            }
+                        }
                         $final_total = ($total_item   - 1);
                         if ($final_total <= 0) {
                             $item->first_item_name_total = $first_name_item ;
