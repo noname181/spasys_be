@@ -2284,7 +2284,7 @@ class RateDataController extends Controller
                 }else {
                     $co_no = $rgd->warehousing->company->co_parent->co_no;
                 }
-                
+
             } else if ($user->mb_type == 'shipper' && $is_check_page){
                 $co_no = $rgd->warehousing->co_no;
             }
@@ -2538,9 +2538,9 @@ class RateDataController extends Controller
                 }
 
             } else {
-              
+
                 $co_no = $warehousing->co_no;
-                
+
             }
 
             $ag_name = AdjustmentGroup::where('co_no', $co_no)->get();
@@ -2770,7 +2770,7 @@ class RateDataController extends Controller
                         'is_expect_payment' => 'y', //NOT REAL PAID
                         'rgd_paid_date' => Carbon::now()->toDateTimeString()
                     ]);
-    
+
                     Payment::updateOrCreate(
                         [
                             'rgd_no' => $est_rgd['rgd_no'],
@@ -2783,7 +2783,7 @@ class RateDataController extends Controller
                             'p_cancel_time' => Carbon::now(),
                         ]
                     );
-    
+
                     CancelBillHistory::insertGetId([
                         'rgd_no' => $est_rgd->rgd_no,
                         'mb_no' => $user->mb_no,
@@ -2793,7 +2793,7 @@ class RateDataController extends Controller
                     ]);
                 }
 
-              
+
             }
 
             //INSERT ALARM DATA TABLE
@@ -3655,8 +3655,8 @@ class RateDataController extends Controller
                     $i++;
                 }
 
-                
-            
+
+
             }
 
             DB::commit();
@@ -3684,7 +3684,7 @@ class RateDataController extends Controller
             if(isset($check_settlement_number->rgd_no) && !str_contains($request->type, 'edit')){
                 return;
             }
-            
+
             $user = Auth::user();
 
             $i = 0;
@@ -4509,7 +4509,7 @@ class RateDataController extends Controller
         try {
             DB::beginTransaction();
             //Check is there already RateDataGeneral with rdg_no yet
-            
+
             $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $request->rgd_no)->update([
                 'rgd_storage_days' => $request->storage_days,
                 'rgd_e_price' => $request->te_e_price ? $request->te_e_price : null,
@@ -5253,23 +5253,25 @@ class RateDataController extends Controller
 
         $spreadsheet = new Spreadsheet();
         $spreadsheet->getDefaultStyle()->getFont()->setSize(10);
-        $sheet = $spreadsheet->getActiveSheet(0); 
+        $sheet = $spreadsheet->getActiveSheet(0);
 
         $sheet->getProtection()->setSheet(true);
-        $sheet->getDefaultColumnDimension()->setWidth(5);
+        $sheet->getDefaultColumnDimension()->setWidth(4.5);
+        $sheet->getDefaultRowDimension()->setRowHeight(24);
+        $sheet->getStyle('A1:Z100')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
         $sheet->setTitle('보세화물 예상경비(건별,월별)');
-        
+
 
         $sheet->mergeCells('B2:Z6');
         $sheet->setCellValue('B2', '가맹점(화주) 회사명');
-        $sheet->getStyle('B2')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('B2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle('B2')->getFont()->setSize(22)->setBold(true);
 
-        $sheet->getStyle('Z8')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('Z8')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
         $sheet->setCellValue('Z8', '사업자번호 : 111-1111-111');
-        $sheet->getStyle('Z9')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('Z9')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
         $sheet->setCellValue('Z9', '사업장 주소 : 서울특별시 성동구 뚝섬로11길 45 1256호');
-        $sheet->getStyle('Z10')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('Z10')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
         $sheet->setCellValue('Z10', '수신자명 : 오이연 (G@gmail.com)');
 
         $sheet->getStyle('B12:B17')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
@@ -5292,51 +5294,52 @@ class RateDataController extends Controller
         $sheet->mergeCells('B19:Z19');
         $sheet->setCellValue('B19', '  ∙ 항목별 청구 금액');
 
-        $sheet->getStyle('B20:Z21')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('E3E6EB');
+        $sheet->getStyle('B20:Z27')->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+        $sheet->getStyle('B20:Z21')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
         $sheet->getStyle('B20:Z21')->getFont()->setBold(true);
         $sheet->mergeCells('B20:E21');
-        $sheet->getStyle('B20')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('B20')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->setCellValue('B20', '항목');
 
         $sheet->mergeCells('F20:N20');
-        $sheet->getStyle('F20')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('F20')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->setCellValue('F20', '세금계산서 발행');
 
         $sheet->mergeCells('O20:W20');
-        $sheet->getStyle('O20')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('O20')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->setCellValue('O20', '세금계산서 미발행');
 
         $sheet->mergeCells('X20:Z21');
-        $sheet->getStyle('X20')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('X20')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->setCellValue('X20', '비고');
 
         $sheet->mergeCells('F21:H21');
-        $sheet->getStyle('F21')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('F21')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->setCellValue('F21', '공급가');
 
         $sheet->mergeCells('I21:K21');
-        $sheet->getStyle('I21')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('I21')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->setCellValue('I21', '부가세');
 
         $sheet->mergeCells('L21:N21');
-        $sheet->getStyle('L21')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('L21')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->setCellValue('L21', '합계');
 
         $sheet->mergeCells('O21:Q21');
-        $sheet->getStyle('O21')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('O21')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->setCellValue('O21', '공급가');
 
         $sheet->mergeCells('R21:T21');
-        $sheet->getStyle('R21')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('R21')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->setCellValue('R21', '부가세');
 
         $sheet->mergeCells('U21:W21');
-        $sheet->getStyle('U21')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('U21')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->setCellValue('U21', '합계');
 
-        $sheet->getStyle('B22:E27')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('E3E6EB');
+        $sheet->getStyle('B22:E27')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
         $sheet->getStyle('B22:E27')->getFont()->setBold(true);
-        $sheet->getStyle('F22:Z27')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('B22:Z27')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
         $sheet->mergeCells('B22:E22');
         $sheet->setCellValue('B22', 'BLP센터비용');
@@ -5391,8 +5394,8 @@ class RateDataController extends Controller
         $sheet->setCellValue('I27', '6000');
         $sheet->mergeCells('L27:N27');
         $sheet->setCellValue('L27', '66000');
-        
-        
+
+
         $Excel_writer = new Xlsx($spreadsheet);
         if (isset($user->mb_no)) {
             $path = '../storage/download/' . $user->mb_no . '/';
@@ -5419,7 +5422,7 @@ class RateDataController extends Controller
         Log::error($rgd_no);
         DB::beginTransaction();
 
-        
+
         $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'additional')->first();
 
         Log::error($rgd_no);
@@ -8911,13 +8914,13 @@ class RateDataController extends Controller
                             'p_cancel_yn' => 'y',
                             'p_cancel_time' => Carbon::now(),
                         ]);
-        
+
                         ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->update([
                             'rgd_status6' => null,
                             'rgd_paid_date' => null,
                             'rgd_canceled_date' => Carbon::now(),
                         ]);
-        
+
                         CancelBillHistory::insertGetId([
                             'mb_no' => Auth::user()->mb_no,
                             'rgd_no' => $rgd->rgd_parent_no,
@@ -8925,7 +8928,7 @@ class RateDataController extends Controller
                             'cbh_status_after' => 'cancel',
                             'cbh_type' => 'cancel_payment',
                         ]);
-        
+
                         CancelBillHistory::insertGetId([
                             'mb_no' => Auth::user()->mb_no,
                             'rgd_no' => $rgd->rgd_parent_no,
@@ -8979,13 +8982,13 @@ class RateDataController extends Controller
                                 'p_cancel_yn' => 'y',
                                 'p_cancel_time' => Carbon::now(),
                             ]);
-            
+
                             ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_parent_no'])->update([
                                 'rgd_status6' => null,
                                 'rgd_paid_date' => null,
                                 'rgd_canceled_date' => Carbon::now(),
                             ]);
-            
+
                             CancelBillHistory::insertGetId([
                                 'mb_no' => Auth::user()->mb_no,
                                 'rgd_no' => $rgd['rgd_parent_no'],
@@ -8993,7 +8996,7 @@ class RateDataController extends Controller
                                 'cbh_status_after' => 'cancel',
                                 'cbh_type' => 'cancel_payment',
                             ]);
-            
+
                             CancelBillHistory::insertGetId([
                                 'mb_no' => Auth::user()->mb_no,
                                 'rgd_no' => $rgd['rgd_parent_no'],
@@ -9003,7 +9006,7 @@ class RateDataController extends Controller
                             ]);
                         }
                     }
-    
+
                 }
             } else { //est_case_bill, est_monthly_bill, final_month_bill_fulfill
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
@@ -9044,13 +9047,13 @@ class RateDataController extends Controller
                             'p_cancel_yn' => 'y',
                             'p_cancel_time' => Carbon::now(),
                         ]);
-        
+
                         ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->update([
                             'rgd_status6' => null,
                             'rgd_paid_date' => null,
                             'rgd_canceled_date' => Carbon::now(),
                         ]);
-        
+
                         CancelBillHistory::insertGetId([
                             'mb_no' => Auth::user()->mb_no,
                             'rgd_no' => $rgd->rgd_parent_no,
@@ -9058,7 +9061,7 @@ class RateDataController extends Controller
                             'cbh_status_after' => 'cancel',
                             'cbh_type' => 'cancel_payment',
                         ]);
-        
+
                         CancelBillHistory::insertGetId([
                             'mb_no' => Auth::user()->mb_no,
                             'rgd_no' => $rgd->rgd_parent_no,
