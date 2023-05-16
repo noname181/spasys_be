@@ -159,11 +159,20 @@ class QnaController extends Controller
             // FIXME hard set mb_no = 1
             $depth_level = Qna::where('qna_no' ,'=' ,$validated['qna_no'])->first()['depth_level'];
             $answer_for = Qna::where('qna_no' ,'=' ,$validated['qna_no'])->first()['answer_for'];
+            $answer_for2 = Qna::where('answer_for' ,'=' ,$answer_for)->get();
             $mb_no_target = Qna::where('qna_no' ,'=' ,$validated['qna_no'])->first()['mb_no'];
             $co_no_target = Qna::where('qna_no' ,'=' ,$validated['qna_no'])->first()['co_no_target'];
-            $update_status = Qna::where('qna_no', $validated['qna_no'])->update([
+            $update_status = Qna::where('qna_no', $answer_for)->update([
                 'qna_status' => $validated['qna_status']
             ]);
+            if(isset($answer_for2)){
+                foreach($answer_for2 as $asw){
+                    $update_status2 = Qna::where('qna_no', $asw->qna_no)->update([
+                        'qna_status' => $validated['qna_status']
+                    ]);
+                }
+            }
+            
             //$member = Member::where('mb_id', Auth::user()->mb_id)->first();
             $member2 = Company::where('co_no', $co_no_target)->first();
             $member = Member::with('company')->where('mb_id', Auth::user()->mb_id)->first();
@@ -182,7 +191,7 @@ class QnaController extends Controller
             $qna_no = Qna::insertGetId([
                 'mb_no' => $member->mb_no,
                 'spasys_no'=>$spasys_no,
-                'qna_status' => 'receipt',
+                'qna_status' => $validated['qna_status'],
                 'co_no_target' => $co_no_target,
                 'qna_title' => $validated['qna_title'],
                 'qna_content' => $validated['qna_content'],
@@ -194,7 +203,7 @@ class QnaController extends Controller
             } else {
                 $qna_no = Qna::insertGetId([
                     'mb_no' => $member->mb_no,
-                    'qna_status' => 'receipt',
+                    'qna_status' => $validated['qna_status'],
                     'co_no_target' => $co_no_target,
                     'qna_title' => $validated['qna_title'],
                     'qna_content' => $validated['qna_content'],
@@ -240,7 +249,7 @@ class QnaController extends Controller
             File::insert($files);
 
             DB::commit();
-            return response()->json(['message' => Messages::MSG_0007, 'qna_no' => $qna_no], 201);
+            return response()->json(['message' => Messages::MSG_0007, 'qna_no' => $qna_no,'answer_for2' => $answer_for2], 201);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
@@ -267,6 +276,15 @@ class QnaController extends Controller
                     'qna_status' => $validated['qna_status']
             ]);
 
+            $answer_for = Qna::where('qna_no' ,'=' ,$validated['qna_no'])->first()['answer_for'];
+            $answer_for2 = Qna::where('answer_for' ,'=' ,$answer_for)->get();
+            if(isset($answer_for2)){
+                foreach($answer_for2 as $asw){
+                    $update_status2 = Qna::where('qna_no', $asw->qna_no)->update([
+                        'qna_status' => $validated['qna_status']
+                    ]);
+                }
+            }
             $qna_parent_no = Qna::where('qna_no', $validated['qna_no'])->first()->answer_for;
 
             if($qna_parent_no != 0){

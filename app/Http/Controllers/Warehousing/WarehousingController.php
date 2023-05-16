@@ -535,7 +535,7 @@ class WarehousingController extends Controller
                     ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')->where('w_category_name', '=', '수입풀필먼트')
                     ->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    });
+                    })->orderby('w_completed_day', 'DESC');
             } else if ($user->mb_type == 'shipper') {
                 $warehousing2 = Warehousing::join(
                     DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
@@ -557,7 +557,7 @@ class WarehousingController extends Controller
                     ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')->where('w_category_name', '=', '수입풀필먼트')
                     ->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    });
+                    })->orderby('w_completed_day','DESC');
             } else if ($user->mb_type == 'spasys') {
 
                 $warehousing2 = Warehousing::join(
@@ -581,7 +581,7 @@ class WarehousingController extends Controller
                     ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent', 'warehousing_child', 'rate_data_general'])->where('w_category_name', '=', '수입풀필먼트')->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')
                     ->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    });
+                    })->orderby('w_completed_day','DESC');
             }
             $warehousing->whereDoesntHave('rate_data_general');
 
@@ -3322,7 +3322,13 @@ class WarehousingController extends Controller
                     $item->total_item = WarehousingItem::where('w_no', $item->w_no)->where('wi_type', '입고_shipper')->sum('wi_number');
                     if (!empty($item['warehousing']['warehousing_item'][0]) && isset($item['warehousing']['warehousing_item'][0]['item'])) {
                         $first_name_item = $item['warehousing']['warehousing_item'][0]['item']['item_name'];
-                        $total_item = $item['warehousing']['warehousing_item']->count();
+                        // $total_item = $item['warehousing']['warehousing_item']->count();
+                        $total_item = 0;
+                        foreach($item['warehousing']['warehousing_item'] as $a){
+                            if($a['wi_type'] == "출고_shipper"){
+                                $total_item++;
+                            }
+                        }
                         $final_total = ($total_item   - 1);
                         if ($final_total <= 0) {
                             $item->first_item_name_total = $first_name_item ;
