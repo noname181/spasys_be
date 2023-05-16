@@ -521,11 +521,22 @@ class ReceivingGoodsDeliveryController extends Controller
                 if (isset($validated['w_no'])) {
                     $w_no_alert = Warehousing::with(['receving_goods_delivery'])->where('w_no', $validated['w_no'])->first();
 
+                    $status1  = isset($w_no_alert->receving_goods_delivery[0]->rgd_status1) ? $w_no_alert->receving_goods_delivery[0]->rgd_status1 : null;
                     $status2  = isset($w_no_alert->receving_goods_delivery[0]->rgd_status2) ? $w_no_alert->receving_goods_delivery[0]->rgd_status2 : null;
 
-                    if ($status2 == "작업완료") {
+                    $check_alarm_firstIW = Alarm::with(['alarm_data'])->where('w_no', $validated['w_no'])->whereHas('alarm_data', function ($query) {
+                        $query->where(DB::raw('lower(ad_title)'), 'like', '' . strtolower('[유통가공] 작업완료') . '');
+                    })->first();
+
+                    $check_alarm_firstIW2 = Alarm::with(['alarm_data'])->where('w_no', $validated['w_no'])->whereHas('alarm_data', function ($query) {
+                        $query->where(DB::raw('lower(ad_title)'), 'like', '' . strtolower('[유통가공] 입고') . '');
+                    })->first();
+
+                    if ($check_alarm_firstIW == null && $status2 == "작업완료") {
                         CommonFunc::insert_alarm_cargo('[유통가공] 작업완료', null, $user, $w_no_alert, 'cargo_IW');
-                    } else {
+                    } 
+                    
+                    if ($check_alarm_firstIW2 == null && $status1 == "입고") {
                         CommonFunc::insert_alarm_cargo('[유통가공] 입고', null, $user, $w_no_alert, 'cargo_IW');
                     }
                 }
@@ -1194,15 +1205,28 @@ class ReceivingGoodsDeliveryController extends Controller
                         CommonFunc::insert_alarm_cargo('[유통가공] 출고', null, $user, $w_no_alert, 'cargo_EW');
                     }
 
+                    $rgd_status3  = isset($w_no_alert->receving_goods_delivery[0]->rgd_status3) ? $w_no_alert->receving_goods_delivery[0]->rgd_status3 : null;
+
                     $check_alarm_first = Alarm::with(['alarm_data'])->where('w_no', isset($request->w_no) ? $request->w_no : $w_no)->whereHas('alarm_data', function ($query) {
-                        $query->where(DB::raw('lower(ad_title)'), 'like', '%' . strtolower('[유통가공] 배송중') . '%');
+                        $query->where(DB::raw('lower(ad_title)'), 'like', '' . strtolower('[유통가공] 배송중') . '');
                     })->first();
 
                     $rgd_status3  = isset($w_no_alert->receving_goods_delivery[0]->rgd_status3) ? $w_no_alert->receving_goods_delivery[0]->rgd_status3 : null;
 
                     //CHECK 1 TIME
-                    if ($check_alarm_first === null && $rgd_status3 == '배송중')
+                    if ($check_alarm_first === null && $rgd_status3 == '배송중'){
                         CommonFunc::insert_alarm_cargo('[유통가공] 배송중', null, $user, $w_no_alert, 'cargo_delivery');
+                    }
+
+                    $check_alarm_first_completed = Alarm::with(['alarm_data'])->where('w_no', isset($request->w_no) ? $request->w_no : $w_no)->whereHas('alarm_data', function ($query) {
+                        $query->where(DB::raw('lower(ad_title)'), 'like', '' . strtolower('[유통가공] 배송완료') . '');
+                    })->first();
+
+                    //CHECK 1 TIME
+                    if ($check_alarm_first_completed === null && $rgd_status3 == '배송완료'){
+                        CommonFunc::insert_alarm_cargo('[유통가공] 배송완료', null, $user, $w_no_alert, 'cargo_status3_EW');
+                    }
+                    
                 }
             } else {
                 if ($user->mb_type != 'spasys' && $request->wr_contents) {
@@ -1229,7 +1253,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 'w_schedule_number' =>  isset($w_schedule_number) ? $w_schedule_number : '',
                 'w_schedule_number2' => isset($w_schedule_number2) ? $w_schedule_number2 : '',
                 'w_no' => isset($w_no) ? $w_no :  $request->w_no,
-                //'w_no_alert' => isset($w_no_alert) ? $w_no_alert : null,
+                'w_no_alert' => isset($w_no_alert) ? $w_no_alert : null,
                 //'check_alarm_first' => isset($check_alarm_first) ? $check_alarm_first : null,
             ], 201);
         } catch (\Throwable $e) {

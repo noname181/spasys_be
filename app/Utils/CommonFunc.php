@@ -253,6 +253,11 @@ class CommonFunc
                 $bbbbb = str_replace('-', '.', $bbbbb);
 
                 $cargo_number = $w_no->w_schedule_number;
+            } else if ($type == 'cargo_status3_EW') {
+
+                $aaaaa = $w_no->w_schedule_number2;
+
+                $cargo_number = $w_no->w_schedule_number;
             } else if ($type == 'cargo_delivery') {
 
                 $aaaaa = $w_no->w_schedule_number2;
@@ -305,11 +310,13 @@ class CommonFunc
             $alarm_type = 'cargo_IW';
         } else if ($type == 'cargo_EW') {
             $alarm_type = 'cargo_EW';
-        } else if ($type == 'cargo_delivery') {
+        } else if ($type == 'cargo_status3_EW') {
+            $alarm_type = 'cargo_status3_EW';
+        }else if ($type == 'cargo_delivery') {
             $alarm_type = 'cargo_delivery';
         }
 
-        if ($type == 'cargo_IW' ||  $type == 'cargo_EW') {
+        if ($type == 'cargo_IW' ||  $type == 'cargo_EW' || $type == 'cargo_status3_EW') {
             if ($alarm_data->ad_must_yn == 'y') {
                 if ($sender->mb_type == 'spasys') {
                     $receiver_spasys = $w_no->company->co_parent->co_parent;
