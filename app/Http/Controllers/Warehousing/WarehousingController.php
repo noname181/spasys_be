@@ -535,7 +535,7 @@ class WarehousingController extends Controller
                     ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')->where('w_category_name', '=', '수입풀필먼트')
                     ->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    });
+                    })->orderby('w_completed_day', 'DESC');
             } else if ($user->mb_type == 'shipper') {
                 $warehousing2 = Warehousing::join(
                     DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
@@ -557,7 +557,7 @@ class WarehousingController extends Controller
                     ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')->where('w_category_name', '=', '수입풀필먼트')
                     ->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    });
+                    })->orderby('w_completed_day','DESC');
             } else if ($user->mb_type == 'spasys') {
 
                 $warehousing2 = Warehousing::join(
@@ -581,7 +581,7 @@ class WarehousingController extends Controller
                     ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent', 'warehousing_child', 'rate_data_general'])->where('w_category_name', '=', '수입풀필먼트')->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')
                     ->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    });
+                    })->orderby('w_completed_day','DESC');
             }
             $warehousing->whereDoesntHave('rate_data_general');
 
@@ -5587,6 +5587,7 @@ class WarehousingController extends Controller
                     $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
                 })
                 ->orderBy('rgd_tax_invoice_date', 'ASC')
+                ->orderBy('rgd_tax_invoice_date', 'DESC')
                 ->orderBy('rgd_no', 'DESC');
 
             if (isset($validated['status'])) {

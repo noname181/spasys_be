@@ -1174,13 +1174,23 @@ class ReceivingGoodsDeliveryController extends Controller
 
                     $rgd_delivery_schedule_day  = isset($w_no_alert->receving_goods_delivery[0]->rgd_delivery_schedule_day) ? $w_no_alert->receving_goods_delivery[0]->rgd_delivery_schedule_day : null;
 
-                    if ($rgd_delivery_schedule_day) {
+                    $check_alarm_firstEW = Alarm::with(['alarm_data'])->where('w_no', isset($request->w_no) ? $request->w_no : $w_no)->whereHas('alarm_data', function ($query) {
+                        $query->where(DB::raw('lower(ad_title)'), 'like', '' . strtolower('[유통가공] 출고예정') . '');
+                    })->first();
+
+                    //CHECK 1 TIME
+                    if ($check_alarm_firstEW == null && $rgd_delivery_schedule_day) {
                         CommonFunc::insert_alarm_cargo('[유통가공] 출고예정', null, $user, $w_no_alert, 'cargo_EW');
                     }
 
                     $rgdstatus1  = isset($w_no_alert->receving_goods_delivery[0]->rgd_status1) ? $w_no_alert->receving_goods_delivery[0]->rgd_status1 : null;
 
-                    if ($rgdstatus1 == "출고") {
+                    $check_alarm_firstEWC = Alarm::with(['alarm_data'])->where('w_no', isset($request->w_no) ? $request->w_no : $w_no)->whereHas('alarm_data', function ($query) {
+                        $query->where(DB::raw('lower(ad_title)'), 'like', '' . strtolower('[유통가공] 출고') . '');
+                    })->first();
+
+                    //CHECK 1 TIME
+                    if ($check_alarm_firstEWC == null && $rgdstatus1 == "출고") {
                         CommonFunc::insert_alarm_cargo('[유통가공] 출고', null, $user, $w_no_alert, 'cargo_EW');
                     }
 
@@ -1190,6 +1200,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                     $rgd_status3  = isset($w_no_alert->receving_goods_delivery[0]->rgd_status3) ? $w_no_alert->receving_goods_delivery[0]->rgd_status3 : null;
 
+                    //CHECK 1 TIME
                     if ($check_alarm_first === null && $rgd_status3 == '배송중')
                         CommonFunc::insert_alarm_cargo('[유통가공] 배송중', null, $user, $w_no_alert, 'cargo_delivery');
                 }
