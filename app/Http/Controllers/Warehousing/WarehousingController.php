@@ -5581,6 +5581,7 @@ class WarehousingController extends Controller
                     $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
                 })
                 ->orderBy('rgd_tax_invoice_date', 'ASC')
+                ->orderBy('rgd_tax_invoice_date', 'DESC')
                 ->orderBy('rgd_no', 'DESC');
 
             if (isset($validated['status'])) {
