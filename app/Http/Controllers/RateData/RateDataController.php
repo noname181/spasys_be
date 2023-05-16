@@ -5236,12 +5236,200 @@ class RateDataController extends Controller
     {
         Log::error($rgd_no);
         DB::beginTransaction();
+
+
         $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'additional')->first();
 
         Log::error($rgd_no);
         Log::error($rdg);
         if (!isset($rdg->rdg_no)) {
             $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'final')->first();
+        }
+
+        if (!isset($rdg->rdg_no)) {
+            $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'expectation_spasys')->first();
+        }
+        $user = Auth::user();
+
+        $spreadsheet = new Spreadsheet();
+        $spreadsheet->getDefaultStyle()->getFont()->setSize(10);
+        $sheet = $spreadsheet->getActiveSheet(0); 
+
+        $sheet->getProtection()->setSheet(true);
+        $sheet->getDefaultColumnDimension()->setWidth(5);
+        $sheet->setTitle('보세화물 예상경비(건별,월별)');
+        
+
+        $sheet->mergeCells('B2:Z6');
+        $sheet->setCellValue('B2', '가맹점(화주) 회사명');
+        $sheet->getStyle('B2')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('B2')->getFont()->setSize(22)->setBold(true);
+
+        $sheet->getStyle('Z8')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->setCellValue('Z8', '사업자번호 : 111-1111-111');
+        $sheet->getStyle('Z9')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->setCellValue('Z9', '사업장 주소 : 서울특별시 성동구 뚝섬로11길 45 1256호');
+        $sheet->getStyle('Z10')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->setCellValue('Z10', '수신자명 : 오이연 (G@gmail.com)');
+
+        $sheet->getStyle('B12:B17')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
+        $sheet->getStyle('B12:B17')->getFont()->setBold(true);
+        $sheet->mergeCells('B12:Z12');
+        $sheet->setCellValue('B12', ' ∙ 서   비  스 : 보세화물');
+        $sheet->mergeCells('B13:Z13');
+        $sheet->setCellValue('B13', ' ∙ H-BL  No : AAAAAAAAAAA');
+        $sheet->mergeCells('B14:Z14');
+        $sheet->setCellValue('B14', ' ∙ 청구서 No : 예상경비청구서 202304_00038_C');
+        $sheet->mergeCells('B15:Z15');
+        $sheet->setCellValue('B15', ' ∙ 청구서 발행일 : 2023.04.25');
+        $sheet->mergeCells('B16:Z16');
+        $sheet->setCellValue('B16', ' ∙ 예상 청구금액 : 4,456,200원');
+        $sheet->mergeCells('B17:Z17');
+        $sheet->setCellValue('B17', ' ∙ 계좌  정보 : ㈜스페이시스원 xxxx-xxx-xxxxx (스페이시스원)');
+
+        $sheet->getStyle('B19')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
+        $sheet->getStyle('B19')->getFont()->setBold(true);
+        $sheet->mergeCells('B19:Z19');
+        $sheet->setCellValue('B19', '  ∙ 항목별 청구 금액');
+
+        $sheet->getStyle('B20:Z21')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('E3E6EB');
+        $sheet->getStyle('B20:Z21')->getFont()->setBold(true);
+        $sheet->mergeCells('B20:E21');
+        $sheet->getStyle('B20')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->setCellValue('B20', '항목');
+
+        $sheet->mergeCells('F20:N20');
+        $sheet->getStyle('F20')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->setCellValue('F20', '세금계산서 발행');
+
+        $sheet->mergeCells('O20:W20');
+        $sheet->getStyle('O20')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->setCellValue('O20', '세금계산서 미발행');
+
+        $sheet->mergeCells('X20:Z21');
+        $sheet->getStyle('X20')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->setCellValue('X20', '비고');
+
+        $sheet->mergeCells('F21:H21');
+        $sheet->getStyle('F21')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->setCellValue('F21', '공급가');
+
+        $sheet->mergeCells('I21:K21');
+        $sheet->getStyle('I21')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->setCellValue('I21', '부가세');
+
+        $sheet->mergeCells('L21:N21');
+        $sheet->getStyle('L21')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->setCellValue('L21', '합계');
+
+        $sheet->mergeCells('O21:Q21');
+        $sheet->getStyle('O21')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->setCellValue('O21', '공급가');
+
+        $sheet->mergeCells('R21:T21');
+        $sheet->getStyle('R21')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->setCellValue('R21', '부가세');
+
+        $sheet->mergeCells('U21:W21');
+        $sheet->getStyle('U21')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->setCellValue('U21', '합계');
+
+        $sheet->getStyle('B22:E27')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('E3E6EB');
+        $sheet->getStyle('B22:E27')->getFont()->setBold(true);
+        $sheet->getStyle('F22:Z27')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        $sheet->mergeCells('B22:E22');
+        $sheet->setCellValue('B22', 'BLP센터비용');
+        $sheet->mergeCells('F22:H22');
+        $sheet->setCellValue('F22', '12000');
+        $sheet->mergeCells('I22:K22');
+        $sheet->setCellValue('I22', '1200');
+        $sheet->mergeCells('L22:N22');
+        $sheet->setCellValue('L22', '13200');
+
+        $sheet->mergeCells('B23:E23');
+        $sheet->setCellValue('B23', '관세사비용');
+        $sheet->mergeCells('F23:H23');
+        $sheet->setCellValue('F23', '12000');
+        $sheet->mergeCells('I23:K23');
+        $sheet->setCellValue('I23', '1200');
+        $sheet->mergeCells('L23:N23');
+        $sheet->setCellValue('L23', '13200');
+
+        $sheet->mergeCells('B24:E24');
+        $sheet->setCellValue('B24', '포워더비용');
+        $sheet->mergeCells('F24:H24');
+        $sheet->setCellValue('F24', '12000');
+        $sheet->mergeCells('I24:K24');
+        $sheet->setCellValue('I24', '1200');
+        $sheet->mergeCells('L24:N24');
+        $sheet->setCellValue('L24', '13200');
+
+        $sheet->mergeCells('B25:E25');
+        $sheet->setCellValue('B25', '국내운송비');
+        $sheet->mergeCells('F25:H25');
+        $sheet->setCellValue('F25', '12000');
+        $sheet->mergeCells('I25:K25');
+        $sheet->setCellValue('I25', '1200');
+        $sheet->mergeCells('L25:N25');
+        $sheet->setCellValue('L25', '13200');
+
+        $sheet->mergeCells('B26:E26');
+        $sheet->setCellValue('B26', '요건비용');
+        $sheet->mergeCells('F26:H26');
+        $sheet->setCellValue('F26', '12000');
+        $sheet->mergeCells('I26:K26');
+        $sheet->setCellValue('I26', '1200');
+        $sheet->mergeCells('L26:N26');
+        $sheet->setCellValue('L26', '13200');
+
+        $sheet->mergeCells('B27:E27');
+        $sheet->setCellValue('B27', '합계');
+        $sheet->mergeCells('F27:H27');
+        $sheet->setCellValue('F27', '60000');
+        $sheet->mergeCells('I27:K27');
+        $sheet->setCellValue('I27', '6000');
+        $sheet->mergeCells('L27:N27');
+        $sheet->setCellValue('L27', '66000');
+        
+        
+        $Excel_writer = new Xlsx($spreadsheet);
+        if (isset($user->mb_no)) {
+            $path = '../storage/download/' . $user->mb_no . '/';
+        } else {
+            $path = '../storage/download/no-name/';
+        }
+        if (!is_dir($path)) {
+            File::makeDirectory($path, $mode = 0777, true, true);
+        }
+        $mask = $path . 'Rate-Data-CaseBill-Edit-*.*';
+        array_map('unlink', glob($mask) ?: []);
+        $file_name_download = $path . 'Rate-Data-CaseBill-Edit-' . date('YmdHis') . '.Xlsx';
+        $check_status = $Excel_writer->save($file_name_download);
+        return response()->json([
+            'status' => 1,
+            'link_download' => $file_name_download,
+            'message' => 'Download File',
+        ], 500);
+        ob_end_clean();
+    }
+
+    public function download_data_casebill_edit_backup($rgd_no)
+    {
+        Log::error($rgd_no);
+        DB::beginTransaction();
+
+        
+        $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'additional')->first();
+
+        Log::error($rgd_no);
+        Log::error($rdg);
+        if (!isset($rdg->rdg_no)) {
+            $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'final')->first();
+        }
+
+        if (!isset($rdg->rdg_no)) {
+            $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->where('rdg_bill_type', 'expectation_spasys')->first();
         }
         $user = Auth::user();
 
