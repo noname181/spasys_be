@@ -244,6 +244,7 @@ class CommonFunc
                 $ddddd = $w_no->w_schedule_amount - $w_no->w_amount;
 
                 $cargo_number = $w_no->w_schedule_number;
+                
             } else if ($type == 'cargo_EW') {
 
                 $aaaaa = $w_no->w_import_parent->w_schedule_number2;
@@ -305,7 +306,7 @@ class CommonFunc
         $alarm_content = str_replace('bbbbb', $bbbbb, $alarm_content);
         $alarm_content = str_replace('ccccc', $ccccc, $alarm_content);
         $alarm_content = str_replace('ddddd', $ddddd, $alarm_content);
-        //return $alarm_content;
+        
         if ($type == 'cargo_IW') {
             $alarm_type = 'cargo_IW';
         } else if ($type == 'cargo_EW') {
@@ -560,10 +561,10 @@ class CommonFunc
         // } else if ($request->type == '수입풀필먼트') {
         // }
 
-        foreach ($request->rp_content as $rp_content) {
+       //foreach ($request->rp_content as $rp_content) {
             $aaaaa = $request->w_schedule_number;
             $bbbbb = $request->rp_cate;
-            $ccccc = $rp_content;
+            $ccccc = isset($request->rp_content[0]) ? $request->rp_content[0] : '';
 
             $alarm_data = AlarmData::where('ad_title', $ad_title)->first();
 
@@ -613,7 +614,7 @@ class CommonFunc
 
                 //PUSH FUNCTION HERE
             }
-        }
+        //}
     }
 
     static function insert_alarm_cargo_request($ad_title, $content, $sender, $w_no, $type)
