@@ -1223,7 +1223,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     $w_no_alert = Warehousing::with(['receving_goods_delivery'])->where('w_no', isset($request->w_no) ? $request->w_no : $w_no)->first();
                     CommonFunc::insert_alarm_cargo_request('[유통가공]', $request->wr_contents, $user, $w_no_alert, 'cargo_request');
                 }
-
+                //DELIVERY LIST
                 if ($request->page_type == 'Page146') {
                     $w_no_alert = Warehousing::with(['receving_goods_delivery'])->where('w_no', isset($request->w_no) ? $request->w_no : $w_no)->first();
                     $check_alarm_first = Alarm::with(['alarm_data'])->where('w_no', isset($request->w_no) ? $request->w_no : $w_no)->whereHas('alarm_data', function ($query) {
@@ -1232,6 +1232,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                     $rgd_status3  = isset($w_no_alert->receving_goods_delivery[0]->rgd_status3) ? $w_no_alert->receving_goods_delivery[0]->rgd_status3 : null;
 
+                    //CHECK 1 TIME
                     if ($check_alarm_first === null && $rgd_status3 == '배송중')
                         CommonFunc::insert_alarm_cargo('[유통가공] 배송중', null, $user, $w_no_alert, 'cargo_delivery');
 
