@@ -5875,7 +5875,30 @@ class WarehousingController extends Controller
                 else if ($validated['settlement_cycle'] == '월별')
                     $warehousing->where(DB::raw('lower(rgd_bill_type)'), 'like', '%' . 'monthly' . '%');
             }
+            if(isset($validated['settlement_cycle1']) && isset($validated['settlement_cycle2'])){
+                $warehousing->where(function ($q) use ($validated) {
+                    $q->where(DB::raw('lower(rgd_bill_type)'), 'like', '%' . '' . '%');
+                });
+            }else if (isset($validated['settlement_cycle1'])) {
+                $warehousing->where(function ($q) use ($validated) {
+                    $q->where(DB::raw('lower(rgd_bill_type)'), 'not like', '%' . 'monthly' . '%');
 
+                });
+            }else if(isset($validated['settlement_cycle2'])){
+                $warehousing->where(function ($q) use ($validated) {
+                    $q->where(DB::raw('lower(rgd_bill_type)'), 'like', '%' . 'monthly' . '%');
+                });
+            }
+            if (isset($validated['service_1']) || isset($validated['service_2']) || isset($validated['service_3']) || isset($validated['service_4']) || isset($validated['service_5']) || isset($validated['service_6'])) {
+                $warehousing->where(function ($q) use ($validated) {
+                    $q->Where('service_korean_name', '=', $validated['service_1'] ? $validated['service_1'] : "")
+                        ->orWhere('service_korean_name', '=', $validated['service_2'] ? $validated['service_2'] : "")
+                        ->orWhere('service_korean_name', '=', $validated['service_3'] ? $validated['service_3'] : "")
+                        ->orWhere('service_korean_name', '=', $validated['service_4'] ? $validated['service_4'] : "")
+                        ->orWhere('service_korean_name', '=', $validated['service_5'] ? $validated['service_5'] : "")
+                        ->orWhere('service_korean_name', '=', $validated['service_6'] ? $validated['service_6'] : "");
+                });
+            }
             if (isset($validated['w_schedule_number2'])) {
                 $warehousing->where(function ($q) use ($validated) {
                     $q->whereHas('warehousing', function ($q) use ($validated) {
@@ -5900,12 +5923,12 @@ class WarehousingController extends Controller
 
             if (isset($validated['co_parent_name'])) {
                 $warehousing->whereHas('warehousing.company.co_parent', function ($query) use ($validated) {
-                    $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                    $query->where(DB::raw('lower(co_name)'), 'like', '%' . $validated['co_parent_name'] . '%');
                 });
             }
             if (isset($validated['co_name'])) {
                 $warehousing->whereHas('warehousing.company', function ($q) use ($validated) {
-                    $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    $q->where(DB::raw('lower(co_name)'), 'like', '%' . $validated['co_name'] . '%');
                 });
             }
             if (isset($validated['rgd_status4'])) {
