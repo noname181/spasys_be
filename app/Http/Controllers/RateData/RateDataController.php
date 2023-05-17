@@ -347,7 +347,9 @@ class RateDataController extends Controller
 
         $user = Auth::user();
         $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
-        $previous_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
+        $previous_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->where(function($q) {
+            $q->where('rgd_status5', '!=', 'cancel')->orWhereNull('rgd_status5');
+        })->first();
 
         $rdg = RateDataGeneral::where('rgd_no', $rgd_no)->first();
 
@@ -5449,21 +5451,21 @@ class RateDataController extends Controller
         $sheet->mergeCells('X'.(31).':Z'.(31));
         $sheet->setCellValue('X'.(31), '');
 
-      
+
         $is_first = true;
         $count_row = 0;
         $current_row = 32;
 
         foreach($rate_data_bonded1 as $key => $rate_data){
-           
+
             if($rate_data['rd_cate1'] == '하역비용'){
                 if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_bonded1[$key - 1]['rd_cate1'])){
-                   
-                   
+
+
                     $sheet->setCellValue('B'.($current_row + $count_row), '하역비용');
                     $count_row = 0;
                 }else {
-                   
+
 
                     $sheet->mergeCells('C'.($current_row + $count_row).':E'.($current_row + $count_row));
                     $sheet->setCellValue('C'.($current_row + $count_row), $rate_data['rd_cate2']);
@@ -5484,7 +5486,7 @@ class RateDataController extends Controller
 
                     $count_row += 1;
                 }
-                
+
 
             }
             else if($rate_data['rd_cate1'] == '센터 작업료'){
@@ -5499,7 +5501,7 @@ class RateDataController extends Controller
                     $count_row = 0;
                 }
                 else {
-       
+
 
                     $sheet->mergeCells('C'.($current_row + $count_row).':E'.($current_row + $count_row));
                     $sheet->setCellValue('C'.($current_row + $count_row), $rate_data['rd_cate2']);
@@ -5568,7 +5570,7 @@ class RateDataController extends Controller
                 $count_row = 0;
             }
 
-           
+
         }
 
 
