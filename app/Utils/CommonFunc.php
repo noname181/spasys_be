@@ -561,10 +561,10 @@ class CommonFunc
         // } else if ($request->type == '수입풀필먼트') {
         // }
 
-        foreach ($request->rp_content as $rp_content) {
+       //foreach ($request->rp_content as $rp_content) {
             $aaaaa = $request->w_schedule_number;
             $bbbbb = $request->rp_cate;
-            $ccccc = $rp_content;
+            $ccccc = isset($request->rp_content[0]) ? $request->rp_content[0] : '';
 
             $alarm_data = AlarmData::where('ad_title', $ad_title)->first();
 
@@ -614,7 +614,7 @@ class CommonFunc
 
                 //PUSH FUNCTION HERE
             }
-        }
+        //}
     }
 
     static function insert_alarm_cargo_request($ad_title, $content, $sender, $w_no, $type)
