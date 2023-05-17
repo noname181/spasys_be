@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Alarm;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Alarm\AlarmSearchRequest;
 use App\Http\Requests\Alarm\AlarmRequest;
+use App\Http\Requests\Alarm\AlarmHeaderRequest;
 use App\Models\Alarm;
 use App\Models\Member;
 use App\Models\Warehousing;
@@ -383,6 +384,184 @@ class AlarmController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007
             ]);
+        }catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+    public function AlarmHeaderList(AlarmHeaderRequest $request){
+        $validated = $request->validated();
+        try {
+            // If per_page is null set default data = 15
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+
+            $user = Auth::user();
+            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            if($user->mb_type == 'shop'){
+                // ->whereHas('member.company',function($q) use ($user){
+                //     $q->where('co_no', $user->company->co_parent->co_no);
+                //     //->orWhere('co_no', $user->company->co_parent->co_parent->co_no);
+                // })
+                $alarm = Alarm::select('t_import.ti_no','t_export.te_no','alarm.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with('schedule_shipment','warehousing','member', 'company','alarm_data')->leftjoin('t_import_expected', function ($join) {
+                    $join->on('alarm.alarm_h_bl', '=', 't_import_expected.tie_h_bl');
+                })->leftjoin('company as company_spasys', function ($join) {
+                    $join->on('company_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
+                })->leftjoin('company as company_shop', function ($join) {
+                    $join->on('company_shop.co_license', '=', 't_import_expected.tie_co_license');
+                })->leftjoin('company as company_spasys_parent', function ($join) {
+                    $join->on('company_spasys_parent.co_no', '=', 'company_spasys.co_parent_no');
+                })->leftjoin('company as company_shop_parent', function ($join) {
+                    $join->on('company_shop_parent.co_no', '=', 'company_shop.co_parent_no');
+                })->leftjoin('t_export', function ($join) {
+                    $join->on('t_export.te_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
+                })->leftjoin('t_import', function ($join) {
+                    $join->on('t_import.ti_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
+                })->where(function($q) use($validated, $user) {
+                    $q->whereNull('alarm_type')->where(function($q) use($validated,$user) {
+                        $q->where('receiver_no','=', $user->mb_no);
+                    })
+                    ->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('receiver_no')
+                        ->where('receiver_no', $user->mb_no);
+                    })->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('receiver_no')->where('alarm_type','like','%cargo_delivery%')
+                        ->where('receiver_no', $user->mb_no);
+                    })->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('receiver_no')->where('alarm_type','like','%cargo_request%')
+                        ->where('receiver_no', $user->mb_no);
+                    })->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('receiver_no')->where('alarm_type','like','%alarm_daily%')
+                        ->where('receiver_no', $user->mb_no);
+                    })->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('receiver_no')->where('alarm_type','like','%alarm_pw_company_3m%')
+                        ->where('receiver_no', $user->mb_no);
+                    })->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('receiver_no')->where('alarm_type','like','cargo_IW')
+                        ->where('receiver_no', $user->mb_no);
+                    })->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('receiver_no')->where('alarm_type','like','cargo_EW')
+                        ->where('receiver_no', $user->mb_no);
+                    })->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('receiver_no')->where('alarm_type','like','cargo_status3_EW')
+                        ->where('receiver_no', $user->mb_no);
+                    });
+                })->orderBy('alarm_no', 'DESC');
+            }
+            else if($user->mb_type == 'shipper'){
+                // ->whereHas('member.company',function($q) use ($user){
+                //     $q->where('co_no', $user->company->co_parent->co_no)
+                //     ->orWhere('co_no', $user->company->co_parent->co_parent->co_no);
+                // })
+                $alarm = Alarm::select('t_import.ti_no','t_export.te_no','alarm.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with('schedule_shipment','warehousing','member', 'company','alarm_data')->leftjoin('t_import_expected', function ($join) {
+                    $join->on('alarm.alarm_h_bl', '=', 't_import_expected.tie_h_bl');
+                })->leftjoin('company as company_spasys', function ($join) {
+                    $join->on('company_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
+                })->leftjoin('company as company_shop', function ($join) {
+                    $join->on('company_shop.co_license', '=', 't_import_expected.tie_co_license');
+                })->leftjoin('company as company_spasys_parent', function ($join) {
+                    $join->on('company_spasys_parent.co_no', '=', 'company_spasys.co_parent_no');
+                })->leftjoin('company as company_shop_parent', function ($join) {
+                    $join->on('company_shop_parent.co_no', '=', 'company_shop.co_parent_no');
+                })->leftjoin('t_export', function ($join) {
+                    $join->on('t_export.te_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
+                })->leftjoin('t_import', function ($join) {
+                    $join->on('t_import.ti_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
+                })->where(function($q) use($validated,$user) {
+                    $q->whereNull('alarm_type')->where(function($q) use($validated,$user) {
+                        $q->where('receiver_no','=', $user->mb_no);
+                    })
+                    ->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('receiver_no')
+                        ->where('receiver_no', $user->mb_no);
+                    })->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('receiver_no')->where('alarm_type','like','%cargo_delivery%')
+                        ->where('receiver_no', $user->mb_no);
+                    })->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('receiver_no')->where('alarm_type','like','%cargo_request%')
+                        ->where('receiver_no', $user->mb_no);
+                    })->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('receiver_no')->where('alarm_type','like','%alarm_daily%')
+                        ->where('receiver_no', $user->mb_no);
+                    })->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('receiver_no')->where('alarm_type','like','%alarm_pw_company_3m%')
+                        ->where('receiver_no', $user->mb_no);
+                    })->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('receiver_no')->where('alarm_type','like','cargo_IW')
+                        ->where('receiver_no', $user->mb_no);
+                    })->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('receiver_no')->where('alarm_type','like','cargo_EW')
+                        ->where('receiver_no', $user->mb_no);
+                    })->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('receiver_no')->where('alarm_type','like','cargo_status3_EW')
+                        ->where('receiver_no', $user->mb_no);
+                    });
+                })
+                ->orderBy('alarm_no', 'DESC');
+
+            } else if ($user->mb_type == 'spasys'){
+                $alarm = Alarm::select('t_import.ti_no','t_export.te_no','alarm.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with('schedule_shipment','warehousing','member', 'company','alarm_data')->leftjoin('t_import_expected', function ($join) {
+                    $join->on('alarm.alarm_h_bl', '=', 't_import_expected.tie_h_bl');
+                })->leftjoin('company as company_spasys', function ($join) {
+                    $join->on('company_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
+                })->leftjoin('company as company_shop', function ($join) {
+                    $join->on('company_shop.co_license', '=', 't_import_expected.tie_co_license');
+                })->leftjoin('company as company_spasys_parent', function ($join) {
+                    $join->on('company_spasys_parent.co_no', '=', 'company_spasys.co_parent_no');
+                })->leftjoin('company as company_shop_parent', function ($join) {
+                    $join->on('company_shop_parent.co_no', '=', 'company_shop.co_parent_no');
+                })->leftjoin('t_export', function ($join) {
+                    $join->on('t_export.te_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
+                })->leftjoin('t_import', function ($join) {
+                    $join->on('t_import.ti_logistic_manage_number', '=', 't_import_expected.tie_logistic_manage_number');
+                })->where(function($q) use($validated,$user) {
+                    $q->whereNull('alarm_type')->where(function($q) use($validated,$user) {
+                        
+                            $q->where('receiver_no',$user->mb_no);
+                    })->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('receiver_no')->where('alarm_type','like','%photo%')
+                        ->where('receiver_no', $user->mb_no);
+                    })->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('receiver_no')->where('alarm_type','like','%update_company%')
+                        ->where('receiver_no', $user->mb_no);
+                    })->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('receiver_no')->where('alarm_type','like','%cargo_delivery%')
+                        ->where('receiver_no', $user->mb_no);
+                    })->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('receiver_no')->where('alarm_type','like','%cargo_request%')
+                        ->where('receiver_no', $user->mb_no);
+                    })->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('receiver_no')->where('alarm_type','like','%alarm_daily%')
+                        ->where('receiver_no', $user->mb_no);
+                    })->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('receiver_no')->where('alarm_type','like','%alarm_pw_company_3m%')
+                        ->where('receiver_no', $user->mb_no);
+                    });
+                })
+                ->orderBy('alarm_no', 'DESC');
+            }
+
+
+
+           if(isset($validated['mb_push_yn'])){
+                if($validated['mb_push_yn'] == 'y'){
+                    $alarm->where(function($q) use($validated,$user) {
+                        $q->whereNull('ad_no')->orWhereHas('alarm_data',function ($query) use ($validated){
+                        $query->where('ad_must_yn','=','y');
+                    }); });
+                } else {
+                    $alarm->where(function($q) use($validated,$user) {
+                        $q->whereNull('ad_no')->orWhereHas('alarm_data',function ($query) use ($validated){
+                        $query->where('ad_must_yn','=','y')->orwhere('ad_must_yn','=','n')->orWhereNull('ad_must_yn');
+                    }); });
+                }
+           }
+
+            $alarm = $alarm->groupBy('alarm_no')->paginate($per_page, ['*'], 'page', $page);
+            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            return response()->json($alarm);
         }catch (\Exception $e) {
             Log::error($e);
             return $e;
