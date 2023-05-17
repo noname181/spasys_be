@@ -244,6 +244,7 @@ class CommonFunc
                 $ddddd = $w_no->w_schedule_amount - $w_no->w_amount;
 
                 $cargo_number = $w_no->w_schedule_number;
+                
             } else if ($type == 'cargo_EW') {
 
                 $aaaaa = $w_no->w_import_parent->w_schedule_number2;
@@ -305,7 +306,7 @@ class CommonFunc
         $alarm_content = str_replace('bbbbb', $bbbbb, $alarm_content);
         $alarm_content = str_replace('ccccc', $ccccc, $alarm_content);
         $alarm_content = str_replace('ddddd', $ddddd, $alarm_content);
-        //return $alarm_content;
+        
         if ($type == 'cargo_IW') {
             $alarm_type = 'cargo_IW';
         } else if ($type == 'cargo_EW') {

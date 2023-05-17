@@ -53,10 +53,11 @@ class EWHPController extends Controller
 
             $count = 0;
             foreach ($validated['import'] as $value) {
+                $ti_carry_in_number = 'in_'.$value['carry_in_number'];
                 $import = Import::insertGetId([
                     "ti_status" => $value['status'],
                     "ti_logistic_manage_number" => $value['logistic_manage_number'],
-                    "ti_carry_in_number" => $value['carry_in_number'],
+                    "ti_carry_in_number" => $ti_carry_in_number,
                     "ti_register_id" => $value['register_id'],
                     "ti_i_date" => $value['i_date'],
                     "ti_i_time" => $value['i_time'],
@@ -102,14 +103,16 @@ class EWHPController extends Controller
             DB::beginTransaction();
             $count = 0;
             foreach ($validated['export'] as $key => $value) {
+                $te_carry_in_number = 'in_'.$value['carry_in_number'];
+                $te_carry_out_number = 'out_'.$value['carry_out_number'];
                 $export = Export::insertGetId([
                     "te_status" => $value['status'],
                     "te_logistic_manage_number" => $value['logistic_manage_number'],
                     "te_e_confirm_number" => $value['e_confirm_number'],
                     "te_e_confirm_type" => $value['e_confirm_type'],
                     "te_e_confirm_date" => $value['e_confirm_date'],
-                    "te_carry_in_number" => $value['carry_in_number'],
-                    "te_carry_out_number" => $value['carry_out_number'],
+                    "te_carry_in_number" => $te_carry_in_number,
+                    "te_carry_out_number" => $te_carry_out_number,
                     "te_register_id" => $value['register_id'],
                     "te_e_date" => $value['e_date'],
                     "te_e_time" => $value['e_time'],
