@@ -584,7 +584,7 @@ class AlarmController extends Controller
                 //     $q->where('co_no', $user->company->co_parent->co_no);
                 //     //->orWhere('co_no', $user->company->co_parent->co_parent->co_no);
                 // })
-                $alarm = Alarm::select('t_import.ti_no','t_export.te_no','alarm.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with('schedule_shipment','warehousing','member', 'company')->leftjoin('t_import_expected', function ($join) {
+                $alarm = Alarm::select('t_import.ti_no','t_export.te_no','alarm.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with('schedule_shipment','warehousing','member', 'company','alarm_data')->leftjoin('t_import_expected', function ($join) {
                     $join->on('alarm.alarm_h_bl', '=', 't_import_expected.tie_h_bl');
                 })->leftjoin('company as company_spasys', function ($join) {
                     $join->on('company_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
@@ -634,7 +634,7 @@ class AlarmController extends Controller
                 //     $q->where('co_no', $user->company->co_parent->co_no)
                 //     ->orWhere('co_no', $user->company->co_parent->co_parent->co_no);
                 // })
-                $alarm = Alarm::select('t_import.ti_no','t_export.te_no','alarm.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with('schedule_shipment','warehousing','member', 'company')->leftjoin('t_import_expected', function ($join) {
+                $alarm = Alarm::select('t_import.ti_no','t_export.te_no','alarm.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with('schedule_shipment','warehousing','member', 'company','alarm_data')->leftjoin('t_import_expected', function ($join) {
                     $join->on('alarm.alarm_h_bl', '=', 't_import_expected.tie_h_bl');
                 })->leftjoin('company as company_spasys', function ($join) {
                     $join->on('company_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
@@ -681,7 +681,7 @@ class AlarmController extends Controller
                 ->orderBy('alarm_no', 'DESC');
 
             } else if ($user->mb_type == 'spasys'){
-                $alarm = Alarm::select('t_import.ti_no','t_export.te_no','alarm.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with('schedule_shipment','warehousing','member', 'company')->leftjoin('t_import_expected', function ($join) {
+                $alarm = Alarm::select('t_import.ti_no','t_export.te_no','alarm.*','t_import_expected.tie_h_bl','company_spasys.co_name as company_spasys_coname','company_shop.co_name as company_shop_coname','company_shop_parent.co_name as shop_parent_name','company_spasys_parent.co_name as spasys_parent_name')->with('schedule_shipment','warehousing','member', 'company','alarm_data')->leftjoin('t_import_expected', function ($join) {
                     $join->on('alarm.alarm_h_bl', '=', 't_import_expected.tie_h_bl');
                 })->leftjoin('company as company_spasys', function ($join) {
                     $join->on('company_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
@@ -868,6 +868,19 @@ class AlarmController extends Controller
                 }
 
             }
+            if(isset($validated['mb_push_yn'])){
+                if($validated['mb_push_yn'] == 'y'){
+                    $alarm->where(function($q) use($validated,$user) {
+                        $q->whereNull('ad_no')->orWhereHas('alarm_data',function ($query) use ($validated){
+                        $query->where('ad_must_yn','=','y');
+                    }); });
+                } else {
+                    $alarm->where(function($q) use($validated,$user) {
+                        $q->whereNull('ad_no')->orWhereHas('alarm_data',function ($query) use ($validated){
+                        $query->where('ad_must_yn','=','y')->orwhere('ad_must_yn','=','n')->orWhereNull('ad_must_yn');
+                    }); });
+                }
+           }
             $alarm = $alarm->groupBy('alarm_no')->paginate($per_page, ['*'], 'page', $page);
             DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
             return response()->json($alarm);

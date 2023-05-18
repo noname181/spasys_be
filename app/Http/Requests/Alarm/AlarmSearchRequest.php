@@ -63,6 +63,11 @@ class AlarmSearchRequest extends BaseFormRequest
             'w_schedule_number'=> [
                 'nullable',
             ],
+            'mb_push_yn' => [
+                'nullable',
+                'string',
+                'max:1'
+            ],
         ];
     }
 
