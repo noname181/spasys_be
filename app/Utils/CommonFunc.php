@@ -228,17 +228,20 @@ class CommonFunc
         $bbbbb = '';
         $ddddd = '';
         $cargo_number = '';
-
+        $w_no_save = '';
 
         if ($type == 'cargo_TIE') {
             $aaaaa = $w_no['h_bl'];
             $cargo_number = $w_no['h_bl'];
+            $w_no_save = $w_no['h_bl'];
         } else if ($type == 'cargo_TI') {
             $aaaaa = $w_no['h_bl'];
             $cargo_number = $w_no['h_bl'];
+            $w_no_save = 'in_' . $w_no['carry_in_number'];
         } else if ($type == 'cargo_TE') {
             $aaaaa = $w_no['h_bl'];
             $cargo_number = $w_no['h_bl'];
+            $w_no_save = 'out_' . $w_no['carry_out_number'];
         }
         $alarm_data = AlarmData::where('ad_title', $ad_title)->first();
 
@@ -276,7 +279,7 @@ class CommonFunc
                 //INSERT ALARM FOR RECEIVER LIST USER
                 Alarm::insertGetId(
                     [
-                        'w_no' => $w_no['logistic_manage_number'],
+                        'w_no' => $w_no_save,
                         'mb_no' => null,
                         'receiver_no' => $receiver->mb_no,
                         'alarm_content' => $alarm_content,
