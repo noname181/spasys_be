@@ -215,9 +215,22 @@ class MenuController extends Controller
     {
         try {
             $user = Member::where('mb_no', Auth::user()->mb_no)->first();
-            $alarm = Alarm::where('receiver_no',Auth::user()->mb_no)->where(function($q) use($user) {
-                $q->where('alarm_read_yn','!=','y')->orwhereNull('alarm_read_yn');
-            })->count('alarm_no');
+            if(Auth::user()->mb_push_yn == 'y'){
+                $alarm = Alarm::with('alarm_data')->where(function($q) use($user) {
+                    $q->whereNull('ad_no')->orWhereHas('alarm_data',function ($query){
+                    $query->where('ad_must_yn','=','y');
+                }); })->where('receiver_no',Auth::user()->mb_no)->where(function($q) use($user) {
+                    $q->where('alarm_read_yn','!=','y')->orwhereNull('alarm_read_yn');
+                })->count('alarm_no');
+            } else {
+                $alarm = Alarm::with('alarm_data')->where(function($q) use($user) {
+                    $q->whereNull('ad_no')->orWhereHas('alarm_data',function ($query){
+                    $query->where('ad_must_yn','=','y')->orwhere('ad_must_yn','=','n')->orWhereNull('ad_must_yn');
+                }); })->where('receiver_no',Auth::user()->mb_no)->where(function($q) use($user) {
+                    $q->where('alarm_read_yn','!=','y')->orwhereNull('alarm_read_yn');
+                })->count('alarm_no');
+            }
+          
             if($menu_path != 'dashboard'){
             $menu = Menu::with('manual')->where('menu_url', $menu_path)->first();
             } else {
