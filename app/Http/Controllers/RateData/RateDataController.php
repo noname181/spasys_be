@@ -5299,7 +5299,7 @@ class RateDataController extends Controller
         $spreadsheet->getDefaultStyle()->getFont()->setSize(10);
         $sheet = $spreadsheet->getActiveSheet(0);
 
-        // $sheet->getProtection()->setSheet(true);
+        $sheet->getProtection()->setSheet(true);
         $sheet->getDefaultColumnDimension()->setWidth(4.5);
         $sheet->getDefaultRowDimension()->setRowHeight(24);
         $sheet->getColumnDimension('B')->setWidth(16);
@@ -5487,7 +5487,7 @@ class RateDataController extends Controller
                         $current_row_bonded1 = $current_row_bonded1 + $count_row_bonded1;
                         $count_row_bonded1 = 0;
                     }
-                    else if($rate_data['rd_data4'] > 0 || $rate_data['rd_cate2'] == '할인율'){
+                    else if($rate_data['rd_data4'] > 0 && $rate_data['rd_cate2'] == '할인율'){
     
     
                         $sheet->mergeCells('C'.($current_row_bonded1 + $count_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1));
@@ -6217,7 +6217,7 @@ class RateDataController extends Controller
             $current_row += $count_row;
         }
         //END BONDED3
-
+        $sheet->setCellValue('B'. ($current_row), '');
         $sheet->setCellValue('B'. ($current_row + 1), '1. 보세화물 서비스의 예상경비 청구서는 BL번호 단위로 발송됩니다.(단 분할인 경우 반출단위)');
         $sheet->setCellValue('B'. ($current_row + 2), '2. 세금계산서 발행은 확정청구서와 함께 처리 됩니다.');
         $sheet->setCellValue('B'. ($current_row + 3), '3. 결제는 PC/Mobile에 접속하여서 결제하시면 되며, 월별 청구인 경우 매달 24일까지 결제가 되지 않으면 25일 등록 된 카드로 자동결제 됩니다.');
@@ -6239,9 +6239,9 @@ class RateDataController extends Controller
 
         $Excel_writer = new Xlsx($spreadsheet);
         if (isset($user->mb_no)) {
-            $path = '../storage/download/' . $user->mb_no . '/';
+            $path = 'storage/download/' . $user->mb_no . '/';
         } else {
-            $path = '../storage/download/no-name/';
+            $path = 'storage/download/no-name/';
         }
         if (!is_dir($path)) {
             File::makeDirectory($path, $mode = 0777, true, true);
@@ -6252,9 +6252,9 @@ class RateDataController extends Controller
         $check_status = $Excel_writer->save($file_name_download);
         return response()->json([
             'status' => 1,
-            'link_download' => $file_name_download,
+            'link_download' => '../'. $file_name_download,
             'message' => 'Download File',
-        ], 500);
+        ], 200);
         ob_end_clean();
     }
 
