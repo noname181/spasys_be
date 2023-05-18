@@ -356,7 +356,7 @@ class RateDataController extends Controller
         $rmd = RateMetaData::where(
             [
                 'rgd_no' => $rgd_no,
-                'set_type' => $set_type,
+                'set_type' => str_replace('_check', '', $set_type),
             ]
         )->first();
         if (!isset($rmd->rmd_no)){

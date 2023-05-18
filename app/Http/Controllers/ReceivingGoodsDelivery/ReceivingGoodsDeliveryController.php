@@ -537,7 +537,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     }
 
                     if ($check_alarm_firstIW2 == null && $status1 == "입고") {
-                        return CommonFunc::insert_alarm_cargo('[유통가공] 입고', null, $user, $w_no_alert, 'cargo_IW');
+                       CommonFunc::insert_alarm_cargo('[유통가공] 입고', null, $user, $w_no_alert, 'cargo_IW');
                     }
                 }
             } else {
