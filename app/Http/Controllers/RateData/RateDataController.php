@@ -3699,6 +3699,13 @@ class RateDataController extends Controller
             $rdg_supply_price5 = 0;
             $rdg_supply_price6 = 0;
             $rdg_supply_price7 = 0;
+            $rdg_supply_price8 = 0;
+            $rdg_supply_price9 = 0;
+            $rdg_supply_price10 = 0;
+            $rdg_supply_price11 = 0;
+            $rdg_supply_price12 = 0;
+            $rdg_supply_price13 = 0;
+            $rdg_supply_price14 = 0;
 
             $rdg_vat1 = 0;
             $rdg_vat2 = 0;
@@ -3707,6 +3714,13 @@ class RateDataController extends Controller
             $rdg_vat5 = 0;
             $rdg_vat6 = 0;
             $rdg_vat7 = 0;
+            $rdg_vat8 = 0;
+            $rdg_vat9 = 0;
+            $rdg_vat10 = 0;
+            $rdg_vat11 = 0;
+            $rdg_vat12 = 0;
+            $rdg_vat13 = 0;
+            $rdg_vat14 = 0;
 
             $rdg_sum1 = 0;
             $rdg_sum2 = 0;
@@ -3715,6 +3729,13 @@ class RateDataController extends Controller
             $rdg_sum5 = 0;
             $rdg_sum6 = 0;
             $rdg_sum7 = 0;
+            $rdg_sum8 = 0;
+            $rdg_sum9 = 0;
+            $rdg_sum10 = 0;
+            $rdg_sum11 = 0;
+            $rdg_sum12 = 0;
+            $rdg_sum13 = 0;
+            $rdg_sum14 = 0;
 
             foreach ($request->rgds as $key => $rgd) {
                 $is_exist = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
@@ -3725,6 +3746,13 @@ class RateDataController extends Controller
                 $rdg_supply_price5 = $rdg_supply_price5 + $is_exist['rdg_supply_price5'];
                 $rdg_supply_price6 = $rdg_supply_price6 + $is_exist['rdg_supply_price6'];
                 $rdg_supply_price7 = $rdg_supply_price7 + $is_exist['rdg_supply_price7'];
+                $rdg_supply_price8 = $rdg_supply_price8 + $is_exist['rdg_supply_price8'];
+                $rdg_supply_price9 = $rdg_supply_price9 + $is_exist['rdg_supply_price9'];
+                $rdg_supply_price10 = $rdg_supply_price10 + $is_exist['rdg_supply_price10'];
+                $rdg_supply_price11 = $rdg_supply_price11 + $is_exist['rdg_supply_price11'];
+                $rdg_supply_price12 = $rdg_supply_price12 + $is_exist['rdg_supply_price12'];
+                $rdg_supply_price13 = $rdg_supply_price13 + $is_exist['rdg_supply_price13'];
+                $rdg_supply_price14 = $rdg_supply_price14 + $is_exist['rdg_supply_price14'];
 
                 $rdg_vat1 = $rdg_vat1 + $is_exist['rdg_vat1'];
                 $rdg_vat2 = $rdg_vat2 + $is_exist['rdg_vat2'];
@@ -3733,6 +3761,13 @@ class RateDataController extends Controller
                 $rdg_vat5 = $rdg_vat5 + $is_exist['rdg_vat5'];
                 $rdg_vat6 = $rdg_vat6 + $is_exist['rdg_vat6'];
                 $rdg_vat7 = $rdg_vat7 + $is_exist['rdg_vat7'];
+                $rdg_vat8 = $rdg_vat8 + $is_exist['rdg_vat8'];
+                $rdg_vat2 = $rdg_vat9 + $is_exist['rdg_vat9'];
+                $rdg_vat3 = $rdg_vat10 + $is_exist['rdg_vat10'];
+                $rdg_vat4 = $rdg_vat11 + $is_exist['rdg_vat11'];
+                $rdg_vat5 = $rdg_vat12 + $is_exist['rdg_vat12'];
+                $rdg_vat6 = $rdg_vat13 + $is_exist['rdg_vat13'];
+                $rdg_vat7 = $rdg_vat14 + $is_exist['rdg_vat14'];
 
                 $rdg_sum1 = $rdg_sum1 + $is_exist['rdg_sum1'];
                 $rdg_sum2 = $rdg_sum2 + $is_exist['rdg_sum2'];
@@ -3741,6 +3776,13 @@ class RateDataController extends Controller
                 $rdg_sum5 = $rdg_sum5 + $is_exist['rdg_sum5'];
                 $rdg_sum6 = $rdg_sum6 + $is_exist['rdg_sum6'];
                 $rdg_sum7 = $rdg_sum7 + $is_exist['rdg_sum7'];
+                $rdg_sum8 = $rdg_sum8 + $is_exist['rdg_sum8'];
+                $rdg_sum9 = $rdg_sum9 + $is_exist['rdg_sum9'];
+                $rdg_sum10 = $rdg_sum10 + $is_exist['rdg_sum10'];
+                $rdg_sum11 = $rdg_sum11 + $is_exist['rdg_sum11'];
+                $rdg_sum12 = $rdg_sum12 + $is_exist['rdg_sum12'];
+                $rdg_sum13 = $rdg_sum13 + $is_exist['rdg_sum13'];
+                $rdg_sum14 = $rdg_sum14 + $is_exist['rdg_sum14'];
             }
 
             //Loop through  rgds from the request
@@ -3767,6 +3809,13 @@ class RateDataController extends Controller
                     $final_rdg->rdg_supply_price5 = $rdg_supply_price5;
                     $final_rdg->rdg_supply_price6 = $rdg_supply_price6;
                     $final_rdg->rdg_supply_price7 = $rdg_supply_price7;
+                    $final_rdg->rdg_supply_price8 = $rdg_supply_price8;
+                    $final_rdg->rdg_supply_price9 = $rdg_supply_price9;
+                    $final_rdg->rdg_supply_price10 = $rdg_supply_price10;
+                    $final_rdg->rdg_supply_price11 = $rdg_supply_price11;
+                    $final_rdg->rdg_supply_price12 = $rdg_supply_price12;
+                    $final_rdg->rdg_supply_price13 = $rdg_supply_price13;
+                    $final_rdg->rdg_supply_price14 = $rdg_supply_price14;
 
                     $final_rdg->rdg_vat1 = $rdg_vat1;
                     $final_rdg->rdg_vat2 = $rdg_vat2;
@@ -3775,6 +3824,13 @@ class RateDataController extends Controller
                     $final_rdg->rdg_vat5 = $rdg_vat5;
                     $final_rdg->rdg_vat6 = $rdg_vat6;
                     $final_rdg->rdg_vat7 = $rdg_vat7;
+                    $final_rdg->rdg_vat8 = $rdg_vat8;
+                    $final_rdg->rdg_vat9 = $rdg_vat9;
+                    $final_rdg->rdg_vat10 = $rdg_vat10;
+                    $final_rdg->rdg_vat11 = $rdg_vat11;
+                    $final_rdg->rdg_vat12 = $rdg_vat12;
+                    $final_rdg->rdg_vat13 = $rdg_vat13;
+                    $final_rdg->rdg_vat14 = $rdg_vat14;
 
                     $final_rdg->rdg_sum1 = $rdg_sum1;
                     $final_rdg->rdg_sum2 = $rdg_sum2;
@@ -3783,6 +3839,13 @@ class RateDataController extends Controller
                     $final_rdg->rdg_sum5 = $rdg_sum5;
                     $final_rdg->rdg_sum6 = $rdg_sum6;
                     $final_rdg->rdg_sum7 = $rdg_sum7;
+                    $final_rdg->rdg_sum8 = $rdg_sum8;
+                    $final_rdg->rdg_sum9 = $rdg_sum9;
+                    $final_rdg->rdg_sum10 = $rdg_sum10;
+                    $final_rdg->rdg_sum11 = $rdg_sum11;
+                    $final_rdg->rdg_sum12 = $rdg_sum12;
+                    $final_rdg->rdg_sum13 = $rdg_sum13;
+                    $final_rdg->rdg_sum14 = $rdg_sum14;
 
                     $final_rdg->save();
                 } else {
@@ -4215,6 +4278,14 @@ class RateDataController extends Controller
                     'rdg_supply_price5' => isset($request->bonded5['supply_price']) ? $request->bonded5['supply_price'] : 0,
                     'rdg_supply_price6' => isset($request->bonded6['supply_price']) ? $request->bonded6['supply_price'] : 0,
                     'rdg_supply_price7' => isset($request->total['supply_price']) ? $request->total['supply_price'] : 0,
+                    'rdg_supply_price8' => isset($request->bonded1['supply_price1']) ? $request->bonded1['supply_price1'] : 0,
+                    'rdg_supply_price9' => isset($request->bonded2['supply_price1']) ? $request->bonded2['supply_price1'] : 0,
+                    'rdg_supply_price10' => isset($request->bonded3['supply_price1']) ? $request->bonded3['supply_price1'] : 0,
+                    'rdg_supply_price11' => isset($request->bonded4['supply_price1']) ? $request->bonded4['supply_price1'] : 0,
+                    'rdg_supply_price12' => isset($request->bonded5['supply_price1']) ? $request->bonded5['supply_price1'] : 0,
+                    'rdg_supply_price13' => isset($request->bonded6['supply_price1']) ? $request->bonded6['supply_price1'] : 0,
+                    'rdg_supply_price14' => isset($request->total['supply_price1']) ? $request->total['supply_price1'] : 0,
+
                     'rdg_vat1' => isset($request->bonded1['taxes']) ? $request->bonded1['taxes'] : 0,
                     'rdg_vat2' => isset($request->bonded2['taxes']) ? $request->bonded2['taxes'] : 0,
                     'rdg_vat3' => isset($request->bonded3['taxes']) ? $request->bonded3['taxes'] : 0,
@@ -4222,6 +4293,15 @@ class RateDataController extends Controller
                     'rdg_vat5' => isset($request->bonded5['taxes']) ? $request->bonded5['taxes'] : 0,
                     'rdg_vat6' => isset($request->bonded6['taxes']) ? $request->bonded6['taxes'] : 0,
                     'rdg_vat7' => isset($request->total['taxes']) ? $request->total['taxes'] : 0,
+                    'rdg_vat8' => isset($request->bonded1['taxes1']) ? $request->bonded1['taxes1'] : 0,
+                    'rdg_vat9' => isset($request->bonded2['taxes1']) ? $request->bonded2['taxes1'] : 0,
+                    'rdg_vat10' => isset($request->bonded3['taxes1']) ? $request->bonded3['taxes1'] : 0,
+                    'rdg_vat11' => isset($request->bonded4['taxes1']) ? $request->bonded4['taxes1'] : 0,
+                    'rdg_vat12' => isset($request->bonded5['taxes1']) ? $request->bonded5['taxes1'] : 0,
+                    'rdg_vat13' => isset($request->bonded6['taxes1']) ? $request->bonded6['taxes1'] : 0,
+                    'rdg_vat14' => isset($request->total['taxes1']) ? $request->total['taxes1'] : 0,
+
+
                     'rdg_sum1' => isset($request->bonded1['sum']) ? $request->bonded1['sum'] : 0,
                     'rdg_sum2' => isset($request->bonded2['sum']) ? $request->bonded2['sum'] : 0,
                     'rdg_sum3' => isset($request->bonded3['sum']) ? $request->bonded3['sum'] : 0,
@@ -4229,6 +4309,14 @@ class RateDataController extends Controller
                     'rdg_sum5' => isset($request->bonded5['sum']) ? $request->bonded5['sum'] : 0,
                     'rdg_sum6' => isset($request->bonded6['sum']) ? $request->bonded1['sum'] : 0,
                     'rdg_sum7' => isset($request->total['sum']) ? $request->total['sum'] : 0,
+                    'rdg_sum8' => isset($request->bonded1['sum1']) ? $request->bonded1['sum1'] : 0,
+                    'rdg_sum9' => isset($request->bonded2['sum1']) ? $request->bonded2['sum1'] : 0,
+                    'rdg_sum10' => isset($request->bonded3['sum1']) ? $request->bonded3['sum1'] : 0,
+                    'rdg_sum11' => isset($request->bonded4['sum1']) ? $request->bonded4['sum1'] : 0,
+                    'rdg_sum12' => isset($request->bonded5['sum1']) ? $request->bonded5['sum1'] : 0,
+                    'rdg_sum13' => isset($request->bonded6['sum1']) ? $request->bonded1['sum1'] : 0,
+                    'rdg_sum14' => isset($request->total['sum1']) ? $request->total['sum1'] : 0,
+
                     'rdg_etc1' => isset($request->bonded1['etc']) ? $request->bonded1['etc'] : '',
                     'rdg_etc2' => isset($request->bonded2['etc']) ? $request->bonded2['etc'] : '',
                     'rdg_etc3' => isset($request->bonded3['etc']) ? $request->bonded3['etc'] : '',
