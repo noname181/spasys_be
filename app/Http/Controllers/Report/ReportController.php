@@ -103,7 +103,8 @@ class ReportController extends Controller
                         'rp_cate' => $request->rp_cate,
                         'rp_h_bl' => $request->w_schedule_number,
                         'rp_content' => $request->rp_content[$i],
-                        'updated_at'=>Carbon::now()->format('Y-m-d H:i:s')
+                        'updated_at'=>Carbon::now()->format('Y-m-d H:i:s'),
+                        'rp_update' => 'y'
                     ]);
                     $rp_file_no[] = $request->rp_file_no[$i];
                     $files = [];
