@@ -5444,6 +5444,15 @@ class RateDataController extends Controller
     
             $count_row_bonded1 = 0;
             $current_row_bonded1 = $current_row;
+
+            $rd_cate1 = [];
+            $rd_sum = [];
+            foreach($rate_data_bonded1 as $key => $rate_data){
+                if(!in_array($rate_data['rd_cate1'], $rd_cate1)){
+                    $rd_cate1[] = $rate_data['rd_cate1'];
+                    $rd_sum[] = $rate_data_bonded1[$key + 1]['rd_data4'];
+                }
+            }
     
             foreach($rate_data_bonded1 as $key => $rate_data){
     
@@ -5487,7 +5496,7 @@ class RateDataController extends Controller
                         $current_row_bonded1 = $current_row_bonded1 + $count_row_bonded1;
                         $count_row_bonded1 = 0;
                     }
-                    else if($rate_data['rd_data4'] > 0 && $rate_data['rd_cate2'] == '할인율'){
+                    else if($rate_data['rd_data4'] > 0 || (($rate_data['rd_cate2'] == '할인율') && $rd_sum[1] > 0)){
     
     
                         $sheet->mergeCells('C'.($current_row_bonded1 + $count_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1));
@@ -6236,6 +6245,8 @@ class RateDataController extends Controller
         $sheet->setCellValue('B'. ($current_row + 9), '전화');
         $sheet->mergeCells('B'. ($current_row + 10). ':Z'. ($current_row + 10));
         $sheet->setCellValue('B'. ($current_row + 10), '메일');
+
+        $sheet->getDefaultRowDimension()->setRowHeight(24);
 
         $Excel_writer = new Xlsx($spreadsheet);
         if (isset($user->mb_no)) {
