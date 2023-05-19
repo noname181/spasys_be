@@ -167,6 +167,7 @@ class EWHPController extends Controller
             return response()->json(['message' => 'ok', 'count' => $count]);
         } catch (\Exception $e) {
             Log::error($e);
+            return $e;
             return response()->json(['message' => "no"], 500);
         }
     }
