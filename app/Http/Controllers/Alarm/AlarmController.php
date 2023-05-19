@@ -626,6 +626,9 @@ class AlarmController extends Controller
                     })->orwhere(function($q) use ($user) {
                         $q->whereNotNull('receiver_no')->where('alarm_type','like','cargo_status3_EW')
                         ->where('receiver_no', $user->mb_no);
+                    })->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('receiver_no')->where('alarm_type','like','cargo_TIE')
+                        ->where('receiver_no', $user->mb_no);
                     });
                 })->orderBy('alarm_no', 'DESC');
             }
@@ -675,6 +678,9 @@ class AlarmController extends Controller
                         ->where('receiver_no', $user->mb_no);
                     })->orwhere(function($q) use ($user) {
                         $q->whereNotNull('receiver_no')->where('alarm_type','like','cargo_status3_EW')
+                        ->where('receiver_no', $user->mb_no);
+                    })->orwhere(function($q) use ($user) {
+                        $q->whereNotNull('receiver_no')->where('alarm_type','like','cargo_TIE')
                         ->where('receiver_no', $user->mb_no);
                     });
                 })
@@ -932,6 +938,11 @@ class AlarmController extends Controller
                     })->orwhere(function($q) use ($validated,$user) {
                         $q->whereNotNull('receiver_no')->where('alarm_type','like','cargo_EW')->where('w_no',$validated['w_no'])
                         ->where('receiver_no', $user->mb_no);
+                    })->orwhere(function($q) use ($validated,$user) {
+                        $q->whereNotNull('receiver_no')->where('alarm_type','like','cargo_TIE')->where('w_no',$validated['w_no'])
+                        ->where('receiver_no', $user->mb_no)->whereHas('alarm_data', function ($query) {
+                            $query->where('ad_no','!=',31);
+                        });
                     });
                 })->orderBy('alarm_no', 'DESC');
             }
@@ -965,6 +976,11 @@ class AlarmController extends Controller
                     })->orwhere(function($q) use ($validated,$user) {
                         $q->whereNotNull('receiver_no')->where('alarm_type','like','cargo_EW')->where('w_no',$validated['w_no'])
                         ->where('receiver_no', $user->mb_no);
+                    })->orwhere(function($q) use ($validated,$user) {
+                        $q->whereNotNull('receiver_no')->where('alarm_type','like','cargo_TIE')->where('w_no',$validated['w_no'])
+                        ->where('receiver_no', $user->mb_no)->whereHas('alarm_data', function ($query) {
+                            $query->where('ad_no','!=',31);
+                        });
                     });
                 })->orderBy('alarm_no', 'DESC');
 

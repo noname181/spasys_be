@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Filesystem\Filesystem;
-
+use App\Models\Alarm;
 use App\Models\File;
 use App\Models\Item;
 
@@ -33,7 +33,7 @@ class EWHPController extends Controller
      * @param  \App\Http\Requests\ReceivingGoodsDelivery\ReceivingGoodsDeliveryRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function import_schedule(ReceivingGoodsDeliveryRequest $request)
+    public function import_schedule($request)
     {
         try {
 
@@ -53,7 +53,7 @@ class EWHPController extends Controller
 
             $count = 0;
             foreach ($validated['import'] as $value) {
-                $ti_carry_in_number = 'in_'.$value['carry_in_number'];
+                $ti_carry_in_number = 'in_' . $value['carry_in_number'];
                 $import = Import::insertGetId([
                     "ti_status" => $value['status'],
                     "ti_logistic_manage_number" => $value['logistic_manage_number'],
@@ -82,6 +82,14 @@ class EWHPController extends Controller
                     ImportExpected::where('tie_logistic_manage_number', $value['logistic_manage_number'])->update([
                         'tie_co_license' => isset($value['co_license']) ? $value['co_license'] : null,
                     ]);
+
+                    $check_alarm = Alarm::with(['alarm_data'])->where('w_no', 'in_' . $value['carry_in_number'])->where('alarm_h_bl', $value['h_bl'])->whereHas('alarm_data', function ($query) {
+                        $query->where(DB::raw('lower(ad_title)'), 'like', '' . strtolower('[보세화물] 반입') . '');
+                    })->first();
+
+                    if ($check_alarm == null) {
+                        CommonFunc::insert_alarm_cargo_api_service1('[보세화물] 반입', null, null, $value, 'cargo_TI');
+                    }
                 }
                 if ($import >= 1) {
                     $count++;
@@ -91,7 +99,7 @@ class EWHPController extends Controller
             return response()->json(['message' => 'ok', 'count' => $count]);
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => "no"], 500);
         }
     }
@@ -103,8 +111,8 @@ class EWHPController extends Controller
             DB::beginTransaction();
             $count = 0;
             foreach ($validated['export'] as $key => $value) {
-                $te_carry_in_number = 'in_'.$value['carry_in_number'];
-                $te_carry_out_number = 'out_'.$value['carry_out_number'];
+                $te_carry_in_number = 'in_' . $value['carry_in_number'];
+                $te_carry_out_number = 'out_' . $value['carry_out_number'];
                 $export = Export::insertGetId([
                     "te_status" => $value['status'],
                     "te_logistic_manage_number" => $value['logistic_manage_number'],
@@ -133,11 +141,11 @@ class EWHPController extends Controller
                 if ($export >= 1) {
                     $count++;
                 }
-            
+
                 $is_no = $value['carry_out_number'];
-                if(isset($is_no)){
-                    $check = ReceivingGoodsDelivery::where('is_no',$is_no)->first();
-                    if($check === null){
+                if (isset($is_no)) {
+                    $check = ReceivingGoodsDelivery::where('is_no', $is_no)->first();
+                    if ($check === null) {
                         ReceivingGoodsDelivery::insertGetId([
                             'is_no' => $is_no,
                             'service_korean_name' => '보세화물',
@@ -145,7 +153,15 @@ class EWHPController extends Controller
                             'rgd_status3' => '배송준비',
                         ]);
                     }
-                }  
+
+                    $check_alarm = Alarm::with(['alarm_data'])->where('w_no', 'out_' . $value['carry_out_number'])->where('alarm_h_bl', $value['h_bl'])->whereHas('alarm_data', function ($query) {
+                        $query->where(DB::raw('lower(ad_title)'), 'like', '' . strtolower('[보세화물] 반출') . '');
+                    })->first();
+
+                    if ($check_alarm == null) {
+                        CommonFunc::insert_alarm_cargo_api_service1('[보세화물] 반출', null, null, $value, 'cargo_TE');
+                    }
+                }
             }
             DB::commit();
             return response()->json(['message' => 'ok', 'count' => $count]);
@@ -185,6 +201,14 @@ class EWHPController extends Controller
                             'tie_co_license' => isset($import->ti_co_license) ? $import->ti_co_license : null,
                         ]);
                     }
+
+                    $check_alarm = Alarm::with(['alarm_data'])->where('w_no', $value['logistic_manage_number'])->where('alarm_h_bl', $value['h_bl'])->whereHas('alarm_data', function ($query) {
+                        $query->where(DB::raw('lower(ad_title)'), 'like', '' . strtolower('[보세화물] 입항예정') . '');
+                    })->first();
+
+                    if ($check_alarm == null) {
+                        CommonFunc::insert_alarm_cargo_api_service1('[보세화물] 입항예정', null, null, $value, 'cargo_TIE');
+                    }
                 }
                 if ($import_expected >= 1) {
                     $count++;
@@ -194,10 +218,10 @@ class EWHPController extends Controller
             return response()->json(['message' => 'ok', 'count' => $count]);
         } catch (\Exception $e) {
             Log::error($e);
+            return $e;
             return response()->json(['message' => "no"], 500);
         }
     }
-
 
     public function export_confirm(EWHPRequest $request)
     {
