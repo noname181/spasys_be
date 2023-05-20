@@ -215,7 +215,39 @@ class MenuController extends Controller
     {
         try {
             $user = Member::where('mb_no', Auth::user()->mb_no)->first();
-            if(Auth::user()->mb_push_yn == 'y'){
+            if(Auth::user()->mb_push_yn == 'n'){
+                $alarm = Alarm::with('alarm_data')->where(function($q) use($user) {
+                    $q->whereNull('ad_no')->orWhereHas('alarm_data',function ($query){
+                    $query->where('ad_must_yn','=','y');
+                }); })->where('receiver_no',Auth::user()->mb_no)->where(function($q) use($user) {
+                    $q->where('alarm_read_yn','!=','y')->orwhereNull('alarm_read_yn');
+                })->count('alarm_no');
+            } else {
+                $alarm = Alarm::with('alarm_data')->where(function($q) use($user) {
+                    $q->whereNull('ad_no')->orWhereHas('alarm_data',function ($query){
+                    $query->where('ad_must_yn','=','y')->orwhere('ad_must_yn','=','n')->orWhereNull('ad_must_yn');
+                }); })->where('receiver_no',Auth::user()->mb_no)->where(function($q) use($user) {
+                    $q->where('alarm_read_yn','!=','y')->orwhereNull('alarm_read_yn');
+                })->count('alarm_no');
+            }
+          
+            if($menu_path != 'dashboard'){
+            $menu = Menu::with('manual')->where('menu_url', $menu_path)->first();
+            } else {
+                $menu = Menu::with('manual')->where('menu_url', '대시보드')->first();
+            }
+
+            return response()->json(['menu' => $menu,'user'=>$user,'alarm'=>$alarm]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0002], 500);
+        }
+    }
+    public function get_menu_by_path2($menu_path,$alarm_push_yn)
+    {
+        try {
+            $user = Member::where('mb_no', Auth::user()->mb_no)->first();
+            if($alarm_push_yn == 'n'){
                 $alarm = Alarm::with('alarm_data')->where(function($q) use($user) {
                     $q->whereNull('ad_no')->orWhereHas('alarm_data',function ($query){
                     $query->where('ad_must_yn','=','y');

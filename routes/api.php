@@ -306,6 +306,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/menu', [\App\Http\Controllers\Menu\MenuController::class, 'menu']);
     Route::get('/menu/{menu_no}', [\App\Http\Controllers\Menu\MenuController::class, 'get_menu']);
     Route::get('/getmenubypath/{menu_path}', [\App\Http\Controllers\Menu\MenuController::class, 'get_menu_by_path']);
+    Route::get('/getmenubypath/{menu_path}/{alarm_push_yn}', [\App\Http\Controllers\Menu\MenuController::class, 'get_menu_by_path2']);
     Route::post('/update_menu', [\App\Http\Controllers\Menu\MenuController::class, 'update_menu']);
     Route::delete('/delete_menu/{menu_no}', [\App\Http\Controllers\Menu\MenuController::class, 'delete_menu']);
     Route::get('/menu_main', [\App\Http\Controllers\Menu\MenuController::class, 'get_menu_main']);

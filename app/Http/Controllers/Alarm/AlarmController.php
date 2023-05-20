@@ -541,13 +541,12 @@ class AlarmController extends Controller
 
 
 
-            if (isset($validated['mb_push_yn'])) {
-                if ($validated['mb_push_yn'] == 'y') {
-                    $alarm->where(function ($q) use ($validated, $user) {
-                        $q->whereNull('ad_no')->orWhereHas('alarm_data', function ($query) use ($validated) {
-                            $query->where('ad_must_yn', '=', 'y');
-                        });
-                    });
+           if(isset($validated['mb_push_yn'])){
+                if($validated['mb_push_yn'] == 'n'){
+                    $alarm->where(function($q) use($validated,$user) {
+                        $q->whereNull('ad_no')->orWhereHas('alarm_data',function ($query) use ($validated){
+                        $query->where('ad_must_yn','=','y');
+                    }); });
                 } else {
                     $alarm->where(function ($q) use ($validated, $user) {
                         $q->whereNull('ad_no')->orWhereHas('alarm_data', function ($query) use ($validated) {
@@ -627,6 +626,15 @@ class AlarmController extends Controller
                         })->orwhere(function ($q) use ($user) {
                             $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_TIE')
                                 ->where('receiver_no', $user->mb_no);
+                        })->orwhere(function ($q) use ($user) {
+                            $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_TE')
+                                ->where('receiver_no', $user->mb_no);
+                        })->orwhere(function ($q) use ($user) {
+                            $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_TI')
+                                ->where('receiver_no', $user->mb_no);
+                        })->orwhere(function ($q) use ($user) {
+                            $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_api_status2')
+                                ->where('receiver_no', $user->mb_no);
                         });
                 })->orderBy('alarm_no', 'DESC');
             } else if ($user->mb_type == 'shipper') {
@@ -678,6 +686,15 @@ class AlarmController extends Controller
                                 ->where('receiver_no', $user->mb_no);
                         })->orwhere(function ($q) use ($user) {
                             $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_TIE')
+                                ->where('receiver_no', $user->mb_no);
+                        })->orwhere(function ($q) use ($user) {
+                            $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_TE')
+                                ->where('receiver_no', $user->mb_no);
+                        })->orwhere(function ($q) use ($user) {
+                            $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_TI')
+                                ->where('receiver_no', $user->mb_no);
+                        })->orwhere(function ($q) use ($user) {
+                            $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_api_status2')
                                 ->where('receiver_no', $user->mb_no);
                         });
                 })
@@ -869,13 +886,12 @@ class AlarmController extends Controller
                     });
                 }
             }
-            if (isset($validated['mb_push_yn'])) {
-                if ($validated['mb_push_yn'] == 'y') {
-                    $alarm->where(function ($q) use ($validated, $user) {
-                        $q->whereNull('ad_no')->orWhereHas('alarm_data', function ($query) use ($validated) {
-                            $query->where('ad_must_yn', '=', 'y');
-                        });
-                    });
+            if(isset($validated['mb_push_yn'])){
+                if($validated['mb_push_yn'] == 'n'){
+                    $alarm->where(function($q) use($validated,$user) {
+                        $q->whereNull('ad_no')->orWhereHas('alarm_data',function ($query) use ($validated){
+                        $query->where('ad_must_yn','=','y');
+                    }); });
                 } else {
                     $alarm->where(function ($q) use ($validated, $user) {
                         $q->whereNull('ad_no')->orWhereHas('alarm_data', function ($query) use ($validated) {
@@ -938,17 +954,22 @@ class AlarmController extends Controller
                             ->where('receiver_no', $user->mb_no);
                     })->orwhere(function ($q) use ($validated, $user) {
                         if ($validated['page_type'] != 'delivery') {
-                            $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_TIE')->where('w_no', $validated['w_no'])
+                            $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_TIE')->where('alarm_h_bl', $validated['hbl'])
                                 ->where('receiver_no', $user->mb_no);
                         }
                     })->orwhere(function ($q) use ($validated, $user) {
                         if ($validated['page_type'] != 'delivery') {
-                            $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_TI')->where('w_no', $validated['w_no'])
+                            $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_TI')->where('alarm_h_bl', $validated['hbl'])
                                 ->where('receiver_no', $user->mb_no);
                         }
                     })->orwhere(function ($q) use ($validated, $user) {
                         if ($validated['page_type'] != 'delivery') {
-                            $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_TE')->where('w_no', $validated['w_no'])
+                            $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_TE')->where('alarm_h_bl', $validated['hbl'])
+                                ->where('receiver_no', $user->mb_no);
+                        }
+                    })->orwhere(function ($q) use ($validated, $user) {
+                        if ($validated['page_type'] != 'delivery') {
+                            $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_api_status2')->where('alarm_h_bl', $validated['hbl'])
                                 ->where('receiver_no', $user->mb_no);
                         }
                     });
@@ -985,17 +1006,22 @@ class AlarmController extends Controller
                             ->where('receiver_no', $user->mb_no);
                     })->orwhere(function ($q) use ($validated, $user) {
                         if ($validated['page_type'] != 'delivery') {
-                            $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_TIE')->where('w_no', $validated['w_no'])
+                            $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_TIE')->where('alarm_h_bl', $validated['hbl'])
                                 ->where('receiver_no', $user->mb_no);
                         }
                     })->orwhere(function ($q) use ($validated, $user) {
                         if ($validated['page_type'] != 'delivery') {
-                            $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_TI')->where('w_no', $validated['w_no'])
+                            $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_TI')->where('alarm_h_bl', $validated['hbl'])
                                 ->where('receiver_no', $user->mb_no);
                         }
                     })->orwhere(function ($q) use ($validated, $user) {
                         if ($validated['page_type'] != 'delivery') {
-                            $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_TE')->where('w_no', $validated['w_no'])
+                            $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_TE')->where('alarm_h_bl', $validated['hbl'])
+                                ->where('receiver_no', $user->mb_no);
+                        }
+                    })->orwhere(function ($q) use ($validated, $user) {
+                        if ($validated['page_type'] != 'delivery') {
+                            $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_api_status2')->where('alarm_h_bl', $validated['hbl'])
                                 ->where('receiver_no', $user->mb_no);
                         }
                     });
@@ -1032,17 +1058,22 @@ class AlarmController extends Controller
                             ->where('receiver_no', $user->mb_no);
                     })->orwhere(function ($q) use ($validated, $user) {
                         if ($validated['page_type'] != 'delivery') {
-                            $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_TIE')->where('w_no', $validated['w_no'])
+                            $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_TIE')->where('alarm_h_bl', $validated['hbl'])
                                 ->where('receiver_no', $user->mb_no);
                         }
                     })->orwhere(function ($q) use ($validated, $user) {
                         if ($validated['page_type'] != 'delivery') {
-                            $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_TI')->where('w_no', $validated['w_no'])
+                            $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_TI')->where('alarm_h_bl', $validated['hbl'])
                                 ->where('receiver_no', $user->mb_no);
                         }
                     })->orwhere(function ($q) use ($validated, $user) {
                         if ($validated['page_type'] != 'delivery') {
-                            $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_TE')->where('w_no', $validated['w_no'])
+                            $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_TE')->where('alarm_h_bl', $validated['hbl'])
+                                ->where('receiver_no', $user->mb_no);
+                        }
+                    })->orwhere(function ($q) use ($validated, $user) {
+                        if ($validated['page_type'] != 'delivery') {
+                            $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_api_status2')->where('alarm_h_bl', $validated['hbl'])
                                 ->where('receiver_no', $user->mb_no);
                         }
                     });
@@ -1053,7 +1084,7 @@ class AlarmController extends Controller
 
 
             if (isset($validated['w_no'])) {
-                $alarm->where('w_no', $validated['w_no']);
+                //$alarm->where('w_no', $validated['w_no']);
             }
 
             if (isset($validated['from_date'])) {

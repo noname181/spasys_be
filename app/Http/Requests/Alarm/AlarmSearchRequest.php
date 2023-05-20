@@ -35,6 +35,9 @@ class AlarmSearchRequest extends BaseFormRequest
             'page_type' => [
                 'nullable',
             ],
+            'hbl' => [
+                'nullable',
+            ],
             'from_date' => [
                 'string',
                 'date_format:Y-m-d',
