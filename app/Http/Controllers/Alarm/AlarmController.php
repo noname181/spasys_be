@@ -546,7 +546,7 @@ class AlarmController extends Controller
 
 
            if(isset($validated['mb_push_yn'])){
-                if($validated['mb_push_yn'] == 'y'){
+                if($validated['mb_push_yn'] == 'n'){
                     $alarm->where(function($q) use($validated,$user) {
                         $q->whereNull('ad_no')->orWhereHas('alarm_data',function ($query) use ($validated){
                         $query->where('ad_must_yn','=','y');
@@ -869,7 +869,7 @@ class AlarmController extends Controller
 
             }
             if(isset($validated['mb_push_yn'])){
-                if($validated['mb_push_yn'] == 'y'){
+                if($validated['mb_push_yn'] == 'n'){
                     $alarm->where(function($q) use($validated,$user) {
                         $q->whereNull('ad_no')->orWhereHas('alarm_data',function ($query) use ($validated){
                         $query->where('ad_must_yn','=','y');
