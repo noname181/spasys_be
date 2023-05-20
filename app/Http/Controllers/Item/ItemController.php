@@ -29,7 +29,9 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use \Carbon\Carbon;
+use App\Utils\CommonFunc;
 use Illuminate\Support\Facades\Http;
+use App\Models\Alarm;
 
 class ItemController extends Controller
 {
@@ -2541,7 +2543,7 @@ class ItemController extends Controller
 
             DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
 
-            $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number', 't_import_expected.update_api_time', 't_import_expected.tie_h_bl')
+            $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number', 't_import_expected.update_api_time', 't_import_expected.tie_h_bl', 't_import_expected.tie_co_license')
 
                 ->where('tie_is_date', '>=', '2022-01-04')
                 ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
@@ -2636,6 +2638,15 @@ class ItemController extends Controller
                                                 'te_status_2' => $status1
                                             ]);
                                     }
+                                    
+                                    $check_alarm = Alarm::with(['alarm_data'])->where('alarm_h_bl', $value->tie_h_bl)->whereHas('alarm_data', function ($query) {
+                                        $query->where(DB::raw('lower(ad_title)'), 'like', '' . strtolower('[보세화물] 수입신고정정신고완료') . '');
+                                    })->first();
+                
+                                    if ($check_alarm == null) {
+                                        CommonFunc::insert_alarm_cargo_api_status2_service1('[보세화물] 수입신고정정신고완료', null, null, $value, 'cargo_api_status2');
+                                    }
+
                                     break;
                             }else if($status == '수입신고 수리후 정정 접수'){
                                 
@@ -2661,6 +2672,15 @@ class ItemController extends Controller
                                                 'te_status_2' => $status1
                                             ]);
                                     }
+
+                                    $check_alarm = Alarm::with(['alarm_data'])->where('alarm_h_bl', $value->tie_h_bl)->whereHas('alarm_data', function ($query) {
+                                        $query->where(DB::raw('lower(ad_title)'), 'like', '' . strtolower('[보세화물] 수입신고정정접수') . '');
+                                    })->first();
+                
+                                    if ($check_alarm == null) {
+                                        CommonFunc::insert_alarm_cargo_api_status2_service1('[보세화물] 수입신고정정접수', null, null, $value, 'cargo_api_status2');
+                                    }
+
                                     break;
                             }else if($status == '수입신고수리'){
                                 
@@ -2687,6 +2707,15 @@ class ItemController extends Controller
                                                 'te_status_2' => $status1
                                             ]);
                                     }
+
+                                    $check_alarm = Alarm::with(['alarm_data'])->where('alarm_h_bl', $value->tie_h_bl)->whereHas('alarm_data', function ($query) {
+                                        $query->where(DB::raw('lower(ad_title)'), 'like', '' . strtolower('[보세화물] 수입신고수리완료') . '');
+                                    })->first();
+                
+                                    if ($check_alarm == null) {
+                                        CommonFunc::insert_alarm_cargo_api_status2_service1('[보세화물] 수입신고수리완료', null, null, $value, 'cargo_api_status2');
+                                    }
+
                                     break;
                                 }else if ($status == '수입신고'){
                                 
@@ -2712,6 +2741,15 @@ class ItemController extends Controller
                                                 'te_status_2' => $status1
                                             ]);
                                     }
+
+                                    $check_alarm = Alarm::with(['alarm_data'])->where('alarm_h_bl', $value->tie_h_bl)->whereHas('alarm_data', function ($query) {
+                                        $query->where(DB::raw('lower(ad_title)'), 'like', '' . strtolower('[보세화물] 수입신고접수') . '');
+                                    })->first();
+                
+                                    if ($check_alarm == null) {
+                                        CommonFunc::insert_alarm_cargo_api_status2_service1('[보세화물] 수입신고접수', null, null, $value, 'cargo_api_status2');
+                                    }
+
                                     break;
                                 }       
                             }
@@ -2734,7 +2772,7 @@ class ItemController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            //return $e;
+            return $e;
             return response()->json(['message' => Messages::MSG_0019], 500);
         }
     }
