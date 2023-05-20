@@ -188,21 +188,21 @@ class RateDataController extends Controller
                 $w_no = null;
             }
 
-            if (isset($validated['type'])) {
-                if (
-                    $validated['type'] == 'domestic_additional_edit' ||
-                    $validated['type'] == 'work_additional_edit' ||
-                    $validated['type'] == 'storage_additional_edit' ||
-                    $validated['type'] == 'work_monthly_additional_edit' ||
-                    $validated['type'] == 'storage_monthly_additional_edit' ||
-                    $validated['type'] == 'domestic_monthly_additional_edit' ||
-                    $validated['type'] == 'edit' ||
-                    $validated['set_type'] == 'work_final_edit' ||
-                    $validated['set_type'] == 'storage_final_edit'
-                ) {
-                    $validated['rgd_no'] = $rgd->rgd_parent_no;
-                }
-            }
+            // if (isset($validated['type'])) {
+            //     if (
+            //         $validated['type'] == 'domestic_additional_edit' ||
+            //         $validated['type'] == 'work_additional_edit' ||
+            //         $validated['type'] == 'storage_additional_edit' ||
+            //         $validated['type'] == 'work_monthly_additional_edit' ||
+            //         $validated['type'] == 'storage_monthly_additional_edit' ||
+            //         $validated['type'] == 'domestic_monthly_additional_edit' ||
+            //         $validated['type'] == 'edit' ||
+            //         $validated['set_type'] == 'work_final_edit' ||
+            //         $validated['set_type'] == 'storage_final_edit'
+            //     ) {
+            //         $validated['rgd_no'] = $rgd->rgd_parent_no;
+            //     }
+            // }
 
             if (isset($w_no)) {
                 $is_new = RateMetaData::where(['rgd_no' => $validated['rgd_no'],
@@ -372,7 +372,7 @@ class RateDataController extends Controller
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
                     [
-                        'rgd_no' => $rgd->rgd_parent_no,
+                        'rgd_no' => $rgd->rgd_no,
                         'set_type' => $user->mb_type == 'spasys' ? 'work_spasys' : 'work_shop',
                     ]
                 )->first();
@@ -414,7 +414,7 @@ class RateDataController extends Controller
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
                     [
-                        'rgd_no' => $rgd->rgd_parent_no,
+                        'rgd_no' => $rgd->rgd_no,
                         'set_type' => $user->mb_type == 'spasys' ? 'storage_spasys' : 'storage_shop',
                     ]
                 )->first();
@@ -449,7 +449,7 @@ class RateDataController extends Controller
             if (empty($rmd)) {
                 $rmd = RateMetaData::where(
                     [
-                        'rgd_no' => $rgd->rgd_parent_no,
+                        'rgd_no' => $rgd->rgd_no,
                         'set_type' => $user->mb_type == 'spasys' ? 'domestic_spasys' : 'domestic_shop',
                     ]
                 )->first();
@@ -2653,9 +2653,9 @@ class RateDataController extends Controller
 
              //CHECK EXIST IN DOUBLE CLICK CASE
             $check_settlement_number = ReceivingGoodsDelivery::where('rgd_settlement_number', $request->settlement_number)->first();
-            if(isset($check_settlement_number->rgd_no) && !str_contains($request->type, 'edit')){
-                return;
-            }
+            // if(isset($check_settlement_number->rgd_no) && !str_contains($request->type, 'edit')){
+            //     return;
+            // }
 
             $user = Auth::user();
 
@@ -2734,6 +2734,16 @@ class RateDataController extends Controller
                     'rgd_no' => $final_rgd->rgd_no,
                 ]);
 
+                if($request->type != 'create_final'){
+                    //Update rgd_no for rateMetaData
+                    RateMetaData::where('rgd_no', $request->rgd_no)
+                    ->where('set_type', 'LIKE', '%' . ($user->mb_type == 'spasys' ? '_spasys' : '_shop') . '%')
+                    ->update([
+                        'rgd_no' => $final_rgd->rgd_no,
+                    ]);
+                }
+                
+
                 // if ($request->bill_type == 'final') {
                 //     $settlement_number = explode('_', $final_rgd->rgd_settlement_number);
                 //     $settlement_number[2] = str_replace("C", "CF", $settlement_number[2]);
@@ -2758,11 +2768,41 @@ class RateDataController extends Controller
                 ]);
             }
 
+            //Rate Data
+            foreach(['work','storage','domestic'] as $index){
+                if($request->type == 'create_final'){
+                    $set_type = $index.'_final';
+
+                    $rmd = RateMetaData::where('rgd_no', $final_rgd->rgd_no)->where('set_type', $set_type)->first();
+                    
+                    if(!isset($rmd->rmd_no)){
+                        $set_type = $user->mb_type == 'spasys' ? ($index.'_spasys') : ($index.'_shop');
+
+                        $rmd = RateMetaData::where('rgd_no', $rgd->rgd_no)->where('set_type', $set_type)->first();
+                        if(isset($rmd->rmd_no)){
+                            $rmd_expectation = $rmd->replicate();
+                            $rmd_expectation->rgd_no = $final_rgd->rgd_no;
+                            $rmd_expectation->set_type = $index.'_final';
+                            $rmd_expectation->save();
+            
+                            $rds = RateData::where('rmd_no', $rmd->rmd_no)->get();
+                            foreach($rds as $index=>$rd){
+                                $rd_expectation = $rd->replicate();
+                                $rd_expectation->rmd_no = $rmd_expectation->rmd_no;
+                                $rd_expectation->save();
+                            }
+                        }
+                    }
+                }
+    
+               
+            }
+
             //UPDATE EST BILL WHEN ISSUE FINAL BILL
             if($request->type == 'create_final'){
-                RateMetaData::where('rgd_no', $request->rgd_no)->update([
-                    'rgd_no' => $final_rgd->rgd_no,
-                ]);
+                // RateMetaData::where('rgd_no', $request->rgd_no)->update([
+                //     'rgd_no' => $final_rgd->rgd_no,
+                // ]);
 
                 $est_rgd =  ReceivingGoodsDelivery::where('rgd_no', $final_rgd->rgd_parent_no)->first();
 
@@ -4326,6 +4366,8 @@ class RateDataController extends Controller
                     'rdg_etc7' => isset($request->total['etc']) ? $request->total['etc'] : '',
                 ]
             );
+          
+
             $previous_rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->where('rgd_bill_type', '=', $request->previous_bill_type)->first();
             //Case of creating a est bill.
             if ($request->type == 'create_expectation' || $request->type == 'create_expectation_monthly') {
@@ -4449,6 +4491,36 @@ class RateDataController extends Controller
                 }
                 //END UPDATE EST BILL WHEN ISSUE FINAL BILL
 
+            }
+
+            //Rate Data
+            foreach([1,2,3,4,5] as $index){
+                if($request->type == 'create_final'){
+                    $set_type = 'bonded'.$index.'_final';
+
+                    $rmd = RateMetaData::where('rgd_no', $final_rgd->rgd_no)->where('set_type', $set_type)->first();
+                    
+                    if(!isset($rmd->rmd_no)){
+                        $set_type = $user->mb_type == 'spasys' ? ('bonded'.$index.'_spasys') : ('bonded'.$index.'_shop');
+
+                        $rmd = RateMetaData::where('rgd_no', $rgd->rgd_no)->where('set_type', $set_type)->first();
+                        if(isset($rmd->rmd_no)){
+                            $rmd_expectation = $rmd->replicate();
+                            $rmd_expectation->rgd_no = $final_rgd->rgd_no;
+                            $rmd_expectation->set_type ='bonded'.$index.'_final';
+                            $rmd_expectation->save();
+            
+                            $rds = RateData::where('rmd_no', $rmd->rmd_no)->get();
+                            foreach($rds as $index=>$rd){
+                                $rd_expectation = $rd->replicate();
+                                $rd_expectation->rmd_no = $rmd_expectation->rmd_no;
+                                $rd_expectation->save();
+                            }
+                        }
+                    }
+                }
+    
+               
             }
 
 
@@ -5396,7 +5468,7 @@ class RateDataController extends Controller
         $spreadsheet->getDefaultStyle()->getFont()->setSize(10);
         $sheet = $spreadsheet->getActiveSheet(0);
 
-        $sheet->getProtection()->setSheet(true);
+        // $sheet->getProtection()->setSheet(true);
         $sheet->getDefaultColumnDimension()->setWidth(4.5);
         $sheet->getDefaultRowDimension()->setRowHeight(24);
         $sheet->getColumnDimension('B')->setWidth(16);
