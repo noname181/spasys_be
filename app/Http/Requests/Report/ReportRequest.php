@@ -42,6 +42,9 @@ class ReportRequest extends BaseFormRequest
                 'required',
                 'max:300'
             ],
+            'rp_update' => [
+                '',
+            ],
             // 'reports.*.files' => [
             //     'array',
             //     'required',

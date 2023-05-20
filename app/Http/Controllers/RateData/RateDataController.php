@@ -3699,6 +3699,13 @@ class RateDataController extends Controller
             $rdg_supply_price5 = 0;
             $rdg_supply_price6 = 0;
             $rdg_supply_price7 = 0;
+            $rdg_supply_price8 = 0;
+            $rdg_supply_price9 = 0;
+            $rdg_supply_price10 = 0;
+            $rdg_supply_price11 = 0;
+            $rdg_supply_price12 = 0;
+            $rdg_supply_price13 = 0;
+            $rdg_supply_price14 = 0;
 
             $rdg_vat1 = 0;
             $rdg_vat2 = 0;
@@ -3707,6 +3714,13 @@ class RateDataController extends Controller
             $rdg_vat5 = 0;
             $rdg_vat6 = 0;
             $rdg_vat7 = 0;
+            $rdg_vat8 = 0;
+            $rdg_vat9 = 0;
+            $rdg_vat10 = 0;
+            $rdg_vat11 = 0;
+            $rdg_vat12 = 0;
+            $rdg_vat13 = 0;
+            $rdg_vat14 = 0;
 
             $rdg_sum1 = 0;
             $rdg_sum2 = 0;
@@ -3715,6 +3729,13 @@ class RateDataController extends Controller
             $rdg_sum5 = 0;
             $rdg_sum6 = 0;
             $rdg_sum7 = 0;
+            $rdg_sum8 = 0;
+            $rdg_sum9 = 0;
+            $rdg_sum10 = 0;
+            $rdg_sum11 = 0;
+            $rdg_sum12 = 0;
+            $rdg_sum13 = 0;
+            $rdg_sum14 = 0;
 
             foreach ($request->rgds as $key => $rgd) {
                 $is_exist = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
@@ -3725,6 +3746,13 @@ class RateDataController extends Controller
                 $rdg_supply_price5 = $rdg_supply_price5 + $is_exist['rdg_supply_price5'];
                 $rdg_supply_price6 = $rdg_supply_price6 + $is_exist['rdg_supply_price6'];
                 $rdg_supply_price7 = $rdg_supply_price7 + $is_exist['rdg_supply_price7'];
+                $rdg_supply_price8 = $rdg_supply_price8 + $is_exist['rdg_supply_price8'];
+                $rdg_supply_price9 = $rdg_supply_price9 + $is_exist['rdg_supply_price9'];
+                $rdg_supply_price10 = $rdg_supply_price10 + $is_exist['rdg_supply_price10'];
+                $rdg_supply_price11 = $rdg_supply_price11 + $is_exist['rdg_supply_price11'];
+                $rdg_supply_price12 = $rdg_supply_price12 + $is_exist['rdg_supply_price12'];
+                $rdg_supply_price13 = $rdg_supply_price13 + $is_exist['rdg_supply_price13'];
+                $rdg_supply_price14 = $rdg_supply_price14 + $is_exist['rdg_supply_price14'];
 
                 $rdg_vat1 = $rdg_vat1 + $is_exist['rdg_vat1'];
                 $rdg_vat2 = $rdg_vat2 + $is_exist['rdg_vat2'];
@@ -3733,6 +3761,13 @@ class RateDataController extends Controller
                 $rdg_vat5 = $rdg_vat5 + $is_exist['rdg_vat5'];
                 $rdg_vat6 = $rdg_vat6 + $is_exist['rdg_vat6'];
                 $rdg_vat7 = $rdg_vat7 + $is_exist['rdg_vat7'];
+                $rdg_vat8 = $rdg_vat8 + $is_exist['rdg_vat8'];
+                $rdg_vat2 = $rdg_vat9 + $is_exist['rdg_vat9'];
+                $rdg_vat3 = $rdg_vat10 + $is_exist['rdg_vat10'];
+                $rdg_vat4 = $rdg_vat11 + $is_exist['rdg_vat11'];
+                $rdg_vat5 = $rdg_vat12 + $is_exist['rdg_vat12'];
+                $rdg_vat6 = $rdg_vat13 + $is_exist['rdg_vat13'];
+                $rdg_vat7 = $rdg_vat14 + $is_exist['rdg_vat14'];
 
                 $rdg_sum1 = $rdg_sum1 + $is_exist['rdg_sum1'];
                 $rdg_sum2 = $rdg_sum2 + $is_exist['rdg_sum2'];
@@ -3741,6 +3776,13 @@ class RateDataController extends Controller
                 $rdg_sum5 = $rdg_sum5 + $is_exist['rdg_sum5'];
                 $rdg_sum6 = $rdg_sum6 + $is_exist['rdg_sum6'];
                 $rdg_sum7 = $rdg_sum7 + $is_exist['rdg_sum7'];
+                $rdg_sum8 = $rdg_sum8 + $is_exist['rdg_sum8'];
+                $rdg_sum9 = $rdg_sum9 + $is_exist['rdg_sum9'];
+                $rdg_sum10 = $rdg_sum10 + $is_exist['rdg_sum10'];
+                $rdg_sum11 = $rdg_sum11 + $is_exist['rdg_sum11'];
+                $rdg_sum12 = $rdg_sum12 + $is_exist['rdg_sum12'];
+                $rdg_sum13 = $rdg_sum13 + $is_exist['rdg_sum13'];
+                $rdg_sum14 = $rdg_sum14 + $is_exist['rdg_sum14'];
             }
 
             //Loop through  rgds from the request
@@ -3767,6 +3809,13 @@ class RateDataController extends Controller
                     $final_rdg->rdg_supply_price5 = $rdg_supply_price5;
                     $final_rdg->rdg_supply_price6 = $rdg_supply_price6;
                     $final_rdg->rdg_supply_price7 = $rdg_supply_price7;
+                    $final_rdg->rdg_supply_price8 = $rdg_supply_price8;
+                    $final_rdg->rdg_supply_price9 = $rdg_supply_price9;
+                    $final_rdg->rdg_supply_price10 = $rdg_supply_price10;
+                    $final_rdg->rdg_supply_price11 = $rdg_supply_price11;
+                    $final_rdg->rdg_supply_price12 = $rdg_supply_price12;
+                    $final_rdg->rdg_supply_price13 = $rdg_supply_price13;
+                    $final_rdg->rdg_supply_price14 = $rdg_supply_price14;
 
                     $final_rdg->rdg_vat1 = $rdg_vat1;
                     $final_rdg->rdg_vat2 = $rdg_vat2;
@@ -3775,6 +3824,13 @@ class RateDataController extends Controller
                     $final_rdg->rdg_vat5 = $rdg_vat5;
                     $final_rdg->rdg_vat6 = $rdg_vat6;
                     $final_rdg->rdg_vat7 = $rdg_vat7;
+                    $final_rdg->rdg_vat8 = $rdg_vat8;
+                    $final_rdg->rdg_vat9 = $rdg_vat9;
+                    $final_rdg->rdg_vat10 = $rdg_vat10;
+                    $final_rdg->rdg_vat11 = $rdg_vat11;
+                    $final_rdg->rdg_vat12 = $rdg_vat12;
+                    $final_rdg->rdg_vat13 = $rdg_vat13;
+                    $final_rdg->rdg_vat14 = $rdg_vat14;
 
                     $final_rdg->rdg_sum1 = $rdg_sum1;
                     $final_rdg->rdg_sum2 = $rdg_sum2;
@@ -3783,6 +3839,13 @@ class RateDataController extends Controller
                     $final_rdg->rdg_sum5 = $rdg_sum5;
                     $final_rdg->rdg_sum6 = $rdg_sum6;
                     $final_rdg->rdg_sum7 = $rdg_sum7;
+                    $final_rdg->rdg_sum8 = $rdg_sum8;
+                    $final_rdg->rdg_sum9 = $rdg_sum9;
+                    $final_rdg->rdg_sum10 = $rdg_sum10;
+                    $final_rdg->rdg_sum11 = $rdg_sum11;
+                    $final_rdg->rdg_sum12 = $rdg_sum12;
+                    $final_rdg->rdg_sum13 = $rdg_sum13;
+                    $final_rdg->rdg_sum14 = $rdg_sum14;
 
                     $final_rdg->save();
                 } else {
@@ -4215,6 +4278,14 @@ class RateDataController extends Controller
                     'rdg_supply_price5' => isset($request->bonded5['supply_price']) ? $request->bonded5['supply_price'] : 0,
                     'rdg_supply_price6' => isset($request->bonded6['supply_price']) ? $request->bonded6['supply_price'] : 0,
                     'rdg_supply_price7' => isset($request->total['supply_price']) ? $request->total['supply_price'] : 0,
+                    'rdg_supply_price8' => isset($request->bonded1['supply_price1']) ? $request->bonded1['supply_price1'] : 0,
+                    'rdg_supply_price9' => isset($request->bonded2['supply_price1']) ? $request->bonded2['supply_price1'] : 0,
+                    'rdg_supply_price10' => isset($request->bonded3['supply_price1']) ? $request->bonded3['supply_price1'] : 0,
+                    'rdg_supply_price11' => isset($request->bonded4['supply_price1']) ? $request->bonded4['supply_price1'] : 0,
+                    'rdg_supply_price12' => isset($request->bonded5['supply_price1']) ? $request->bonded5['supply_price1'] : 0,
+                    'rdg_supply_price13' => isset($request->bonded6['supply_price1']) ? $request->bonded6['supply_price1'] : 0,
+                    'rdg_supply_price14' => isset($request->total['supply_price1']) ? $request->total['supply_price1'] : 0,
+
                     'rdg_vat1' => isset($request->bonded1['taxes']) ? $request->bonded1['taxes'] : 0,
                     'rdg_vat2' => isset($request->bonded2['taxes']) ? $request->bonded2['taxes'] : 0,
                     'rdg_vat3' => isset($request->bonded3['taxes']) ? $request->bonded3['taxes'] : 0,
@@ -4222,6 +4293,15 @@ class RateDataController extends Controller
                     'rdg_vat5' => isset($request->bonded5['taxes']) ? $request->bonded5['taxes'] : 0,
                     'rdg_vat6' => isset($request->bonded6['taxes']) ? $request->bonded6['taxes'] : 0,
                     'rdg_vat7' => isset($request->total['taxes']) ? $request->total['taxes'] : 0,
+                    'rdg_vat8' => isset($request->bonded1['taxes1']) ? $request->bonded1['taxes1'] : 0,
+                    'rdg_vat9' => isset($request->bonded2['taxes1']) ? $request->bonded2['taxes1'] : 0,
+                    'rdg_vat10' => isset($request->bonded3['taxes1']) ? $request->bonded3['taxes1'] : 0,
+                    'rdg_vat11' => isset($request->bonded4['taxes1']) ? $request->bonded4['taxes1'] : 0,
+                    'rdg_vat12' => isset($request->bonded5['taxes1']) ? $request->bonded5['taxes1'] : 0,
+                    'rdg_vat13' => isset($request->bonded6['taxes1']) ? $request->bonded6['taxes1'] : 0,
+                    'rdg_vat14' => isset($request->total['taxes1']) ? $request->total['taxes1'] : 0,
+
+
                     'rdg_sum1' => isset($request->bonded1['sum']) ? $request->bonded1['sum'] : 0,
                     'rdg_sum2' => isset($request->bonded2['sum']) ? $request->bonded2['sum'] : 0,
                     'rdg_sum3' => isset($request->bonded3['sum']) ? $request->bonded3['sum'] : 0,
@@ -4229,6 +4309,14 @@ class RateDataController extends Controller
                     'rdg_sum5' => isset($request->bonded5['sum']) ? $request->bonded5['sum'] : 0,
                     'rdg_sum6' => isset($request->bonded6['sum']) ? $request->bonded1['sum'] : 0,
                     'rdg_sum7' => isset($request->total['sum']) ? $request->total['sum'] : 0,
+                    'rdg_sum8' => isset($request->bonded1['sum1']) ? $request->bonded1['sum1'] : 0,
+                    'rdg_sum9' => isset($request->bonded2['sum1']) ? $request->bonded2['sum1'] : 0,
+                    'rdg_sum10' => isset($request->bonded3['sum1']) ? $request->bonded3['sum1'] : 0,
+                    'rdg_sum11' => isset($request->bonded4['sum1']) ? $request->bonded4['sum1'] : 0,
+                    'rdg_sum12' => isset($request->bonded5['sum1']) ? $request->bonded5['sum1'] : 0,
+                    'rdg_sum13' => isset($request->bonded6['sum1']) ? $request->bonded1['sum1'] : 0,
+                    'rdg_sum14' => isset($request->total['sum1']) ? $request->total['sum1'] : 0,
+
                     'rdg_etc1' => isset($request->bonded1['etc']) ? $request->bonded1['etc'] : '',
                     'rdg_etc2' => isset($request->bonded2['etc']) ? $request->bonded2['etc'] : '',
                     'rdg_etc3' => isset($request->bonded3['etc']) ? $request->bonded3['etc'] : '',
@@ -5242,23 +5330,32 @@ class RateDataController extends Controller
 
 
         $rgd = ReceivingGoodsDelivery::with(['rate_data_general', 'warehousing'])->where('rgd_no', $rgd_no)->first();
+        $is_month_bill = str_contains($rgd->rgd_bill_type, 'month') ? '_monthly' : '';
+        $is_final_bill = str_contains($rgd->rgd_bill_type, 'final');
 
         if($user->mb_type == 'shop'){
             $company = $rgd->warehousing->company;
 
-            $rmd_no_bonded1 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded1_shop')->first();
-            $rmd_no_bonded2 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded2_shop')->first();
-            $rmd_no_bonded3 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded3_shop')->first();
-            $rmd_no_bonded4 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded4_shop')->first();
-            $rmd_no_bonded5 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded5_shop')->first();
+            $rmd_no_bonded1 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded1'. $is_month_bill . ($is_final_bill ? '_final' : '_shop'))->first();
+            $rmd_no_bonded2 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded2'. $is_month_bill . ($is_final_bill ? '_final' : '_shop'))->first();
+            $rmd_no_bonded3 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded3'. $is_month_bill . ($is_final_bill ? '_final' : '_shop'))->first();
+            $rmd_no_bonded4 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded4'. $is_month_bill . ($is_final_bill ? '_final' : '_shop'))->first();
+            $rmd_no_bonded5 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded5'. $is_month_bill . ($is_final_bill ? '_final' : '_shop'))->first();
 
         }else if($user->mb_type == 'spasys') {
             $company = $rgd->warehousing->company->co_parent;
-            $rmd_no_bonded1 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded1_spasys')->first();
-            $rmd_no_bonded2 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded2_spasys')->first();
-            $rmd_no_bonded3 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded3_spasys')->first();
-            $rmd_no_bonded4 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded4_spasys')->first();
-            $rmd_no_bonded5 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded5_spasys')->first();
+            $rmd_no_bonded1 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded1'. $is_month_bill . ($is_final_bill ? '_final' : '_spasys'))->first();
+            $rmd_no_bonded2 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded2'. $is_month_bill . ($is_final_bill ? '_final' : '_spasys'))->first();
+            $rmd_no_bonded3 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded3'. $is_month_bill . ($is_final_bill ? '_final' : '_spasys'))->first();
+            $rmd_no_bonded4 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded4'. $is_month_bill . ($is_final_bill ? '_final' : '_spasys'))->first();
+            $rmd_no_bonded5 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded5'. $is_month_bill . ($is_final_bill ? '_final' : '_spasys'))->first();
+        }else if($user->mb_type == 'shipper') {
+            $company = $rgd->warehousing->company;
+            $rmd_no_bonded1 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded1'. $is_month_bill . ($is_final_bill ? '_final' : '_shop'))->first();
+            $rmd_no_bonded2 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded2'. $is_month_bill . ($is_final_bill ? '_final' : '_shop'))->first();
+            $rmd_no_bonded3 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded3'. $is_month_bill . ($is_final_bill ? '_final' : '_shop'))->first();
+            $rmd_no_bonded4 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded4'. $is_month_bill . ($is_final_bill ? '_final' : '_shop'))->first();
+            $rmd_no_bonded5 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded5'. $is_month_bill . ($is_final_bill ? '_final' : '_shop'))->first();
         }
 
         $rate_data_bonded1 = $rate_data = RateData::where('rmd_no', isset($rmd_no_bonded1->rmd_no) ? $rmd_no_bonded1->rmd_no : 0)->where(function ($q) {
@@ -5369,13 +5466,13 @@ class RateDataController extends Controller
                 $sheet->mergeCells('L'.($current_row + $count_row).':N'.($current_row + $count_row));
                 $sheet->setCellValue('L'.($current_row + $count_row), $rgd->rate_data_general['rdg_sum' . ($key  == 5 ? ($key + 2) : ($key + 1))]);
                 $sheet->mergeCells('O'.($current_row + $count_row).':Q'.($current_row + $count_row));
-                $sheet->setCellValue('O'.($current_row + $count_row), '');
+                $sheet->setCellValue('O'.($current_row + $count_row), $rgd->rate_data_general['rdg_supply_price' . ($key  == 5 ? ($key + 9) : ($key + 8))]);
                 $sheet->mergeCells('R'.($current_row + $count_row).':T'.($current_row + $count_row));
-                $sheet->setCellValue('R'.($current_row + $count_row), '');
+                $sheet->setCellValue('R'.($current_row + $count_row), $rgd->rate_data_general['rdg_vat' . ($key  == 5 ? ($key + 9) : ($key + 8))]);
                 $sheet->mergeCells('U'.($current_row + $count_row).':W'.($current_row + $count_row));
-                $sheet->setCellValue('U'.($current_row + $count_row), '');
+                $sheet->setCellValue('U'.($current_row + $count_row), $rgd->rate_data_general['rdg_sum' . ($key  == 5 ? ($key + 9) : ($key + 8))]);
                 $sheet->mergeCells('X'.($current_row + $count_row).':Z'.($current_row + $count_row));
-                $sheet->setCellValue('X'.($current_row + $count_row), '');
+                $sheet->setCellValue('X'.($current_row + $count_row), $rgd->rate_data_general['rdg_etc' . ($key  == 5 ? ($key + 9) : ($key + 8))]);
 
                 $count_row += 1;
             }
@@ -5444,6 +5541,15 @@ class RateDataController extends Controller
     
             $count_row_bonded1 = 0;
             $current_row_bonded1 = $current_row;
+
+            $rd_cate1 = [];
+            $rd_sum = [];
+            foreach($rate_data_bonded1 as $key => $rate_data){
+                if(!in_array($rate_data['rd_cate1'], $rd_cate1)){
+                    $rd_cate1[] = $rate_data['rd_cate1'];
+                    $rd_sum[] = $rate_data_bonded1[$key + 1]['rd_data4'];
+                }
+            }
     
             foreach($rate_data_bonded1 as $key => $rate_data){
     
@@ -5462,13 +5568,13 @@ class RateDataController extends Controller
                         $sheet->mergeCells('L'.($current_row_bonded1 + $count_row_bonded1).':N'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('L'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data4']);
                         $sheet->mergeCells('O'.($current_row_bonded1 + $count_row_bonded1).':Q'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('O'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('O'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data5']);
                         $sheet->mergeCells('R'.($current_row_bonded1 + $count_row_bonded1).':T'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('R'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('R'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data6']);
                         $sheet->mergeCells('U'.($current_row_bonded1 + $count_row_bonded1).':W'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data7']);
                         $sheet->mergeCells('X'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data8']);
     
                         $count_row_bonded1 += 1;
                         $count_row += 1;
@@ -5487,7 +5593,7 @@ class RateDataController extends Controller
                         $current_row_bonded1 = $current_row_bonded1 + $count_row_bonded1;
                         $count_row_bonded1 = 0;
                     }
-                    else if($rate_data['rd_data4'] > 0 && $rate_data['rd_cate2'] == '할인율'){
+                    else if($rate_data['rd_data4'] > 0 || (($rate_data['rd_cate2'] == '할인율') && $rd_sum[1] > 0)){
     
     
                         $sheet->mergeCells('C'.($current_row_bonded1 + $count_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1));
@@ -5499,13 +5605,13 @@ class RateDataController extends Controller
                         $sheet->mergeCells('L'.($current_row_bonded1 + $count_row_bonded1).':N'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('L'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data4']);
                         $sheet->mergeCells('O'.($current_row_bonded1 + $count_row_bonded1).':Q'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('O'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('O'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data5']);
                         $sheet->mergeCells('R'.($current_row_bonded1 + $count_row_bonded1).':T'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('R'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('R'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data6']);
                         $sheet->mergeCells('U'.($current_row_bonded1 + $count_row_bonded1).':W'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data7']);
                         $sheet->mergeCells('X'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data8']);
     
                         $count_row_bonded1 += 1;
                         $count_row += 1;
@@ -5535,13 +5641,13 @@ class RateDataController extends Controller
                         $sheet->mergeCells('L'.($current_row_bonded1 + $count_row_bonded1).':N'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('L'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data4']);
                         $sheet->mergeCells('O'.($current_row_bonded1 + $count_row_bonded1).':Q'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('O'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('O'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data5']);
                         $sheet->mergeCells('R'.($current_row_bonded1 + $count_row_bonded1).':T'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('R'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('R'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data6']);
                         $sheet->mergeCells('U'.($current_row_bonded1 + $count_row_bonded1).':W'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data7']);
                         $sheet->mergeCells('X'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data8']);
     
                         $count_row_bonded1 += 1;
                         $count_row += 1;
@@ -5607,19 +5713,19 @@ class RateDataController extends Controller
             $sheet->setCellValue('B'. ($current_row), '관세사비용');
     
             $sheet->mergeCells('F'.($current_row).':H'.($current_row));
-            $sheet->setCellValue('F'.($current_row), $rgd->rate_data_general['rdg_supply_price1']);
+            $sheet->setCellValue('F'.($current_row), $rgd->rate_data_general['rdg_supply_price2']);
             $sheet->mergeCells('I'.($current_row).':K'.($current_row));
-            $sheet->setCellValue('I'.($current_row), $rgd->rate_data_general['rdg_vat1']);
+            $sheet->setCellValue('I'.($current_row), $rgd->rate_data_general['rdg_vat2']);
             $sheet->mergeCells('L'.($current_row).':N'.($current_row));
-            $sheet->setCellValue('L'.($current_row), $rgd->rate_data_general['rdg_sum1']);
+            $sheet->setCellValue('L'.($current_row), $rgd->rate_data_general['rdg_sum2']);
             $sheet->mergeCells('O'.($current_row).':Q'.($current_row));
-            $sheet->setCellValue('O'.($current_row), '');
+            $sheet->setCellValue('O'.($current_row), $rgd->rate_data_general['rdg_supply_price9']);
             $sheet->mergeCells('R'.($current_row).':T'.($current_row));
-            $sheet->setCellValue('R'.($current_row), '');
+            $sheet->setCellValue('R'.($current_row), $rgd->rate_data_general['rdg_vat9']);
             $sheet->mergeCells('U'.($current_row).':W'.($current_row));
-            $sheet->setCellValue('U'.($current_row), '');
+            $sheet->setCellValue('U'.($current_row), $rgd->rate_data_general['rdg_sum9']);
             $sheet->mergeCells('X'.($current_row).':Z'.($current_row));
-            $sheet->setCellValue('X'.($current_row), '');
+            $sheet->setCellValue('X'.($current_row), $rgd->rate_data_general['rdg_etc9']);
     
     
             $count_row = 0;
@@ -5656,13 +5762,13 @@ class RateDataController extends Controller
                         $sheet->mergeCells('L'.($current_row_bonded1 + $count_row_bonded1).':N'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('L'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data4']);
                         $sheet->mergeCells('O'.($current_row_bonded1 + $count_row_bonded1).':Q'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('O'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('O'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data5']);
                         $sheet->mergeCells('R'.($current_row_bonded1 + $count_row_bonded1).':T'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('R'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('R'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data6']);
                         $sheet->mergeCells('U'.($current_row_bonded1 + $count_row_bonded1).':W'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data7']);
                         $sheet->mergeCells('X'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data8']);
     
                         $count_row_bonded1 += 1;
                         $count_row += 1;
@@ -5693,13 +5799,13 @@ class RateDataController extends Controller
                         $sheet->mergeCells('L'.($current_row_bonded1 + $count_row_bonded1).':N'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('L'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data4']);
                         $sheet->mergeCells('O'.($current_row_bonded1 + $count_row_bonded1).':Q'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('O'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('O'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data5']);
                         $sheet->mergeCells('R'.($current_row_bonded1 + $count_row_bonded1).':T'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('R'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('R'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data6']);
                         $sheet->mergeCells('U'.($current_row_bonded1 + $count_row_bonded1).':W'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data7']);
                         $sheet->mergeCells('X'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data8']);
     
                         $count_row_bonded1 += 1;
                         $count_row += 1;
@@ -5764,19 +5870,19 @@ class RateDataController extends Controller
             $sheet->setCellValue('B'. ($current_row), '포워더비용');
     
             $sheet->mergeCells('F'.($current_row).':H'.($current_row));
-            $sheet->setCellValue('F'.($current_row), $rgd->rate_data_general['rdg_supply_price1']);
+            $sheet->setCellValue('F'.($current_row), $rgd->rate_data_general['rdg_supply_price3']);
             $sheet->mergeCells('I'.($current_row).':K'.($current_row));
-            $sheet->setCellValue('I'.($current_row), $rgd->rate_data_general['rdg_vat1']);
+            $sheet->setCellValue('I'.($current_row), $rgd->rate_data_general['rdg_vat3']);
             $sheet->mergeCells('L'.($current_row).':N'.($current_row));
-            $sheet->setCellValue('L'.($current_row), $rgd->rate_data_general['rdg_sum1']);
+            $sheet->setCellValue('L'.($current_row), $rgd->rate_data_general['rdg_sum3']);
             $sheet->mergeCells('O'.($current_row).':Q'.($current_row));
-            $sheet->setCellValue('O'.($current_row), '');
+            $sheet->setCellValue('O'.($current_row), $rgd->rate_data_general['rdg_supply_price10']);
             $sheet->mergeCells('R'.($current_row).':T'.($current_row));
-            $sheet->setCellValue('R'.($current_row), '');
+            $sheet->setCellValue('R'.($current_row), $rgd->rate_data_general['rdg_vat10']);
             $sheet->mergeCells('U'.($current_row).':W'.($current_row));
-            $sheet->setCellValue('U'.($current_row), '');
+            $sheet->setCellValue('U'.($current_row), $rgd->rate_data_general['rdg_sum10']);
             $sheet->mergeCells('X'.($current_row).':Z'.($current_row));
-            $sheet->setCellValue('X'.($current_row), '');
+            $sheet->setCellValue('X'.($current_row), $rgd->rate_data_general['rdg_etc10']);
     
     
             $count_row = 0;
@@ -5813,13 +5919,13 @@ class RateDataController extends Controller
                         $sheet->mergeCells('L'.($current_row_bonded1 + $count_row_bonded1).':N'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('L'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data4']);
                         $sheet->mergeCells('O'.($current_row_bonded1 + $count_row_bonded1).':Q'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('O'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('O'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data5']);
                         $sheet->mergeCells('R'.($current_row_bonded1 + $count_row_bonded1).':T'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('R'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('R'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data6']);
                         $sheet->mergeCells('U'.($current_row_bonded1 + $count_row_bonded1).':W'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data7']);
                         $sheet->mergeCells('X'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data8']);
     
                         $count_row_bonded1 += 1;
                         $count_row += 1;
@@ -5850,13 +5956,13 @@ class RateDataController extends Controller
                         $sheet->mergeCells('L'.($current_row_bonded1 + $count_row_bonded1).':N'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('L'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data4']);
                         $sheet->mergeCells('O'.($current_row_bonded1 + $count_row_bonded1).':Q'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('O'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('O'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data5']);
                         $sheet->mergeCells('R'.($current_row_bonded1 + $count_row_bonded1).':T'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('R'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('R'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data6']);
                         $sheet->mergeCells('U'.($current_row_bonded1 + $count_row_bonded1).':W'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data7']);
                         $sheet->mergeCells('X'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data8']);
     
                         $count_row_bonded1 += 1;
                         $count_row += 1;
@@ -5921,19 +6027,19 @@ class RateDataController extends Controller
             $sheet->setCellValue('B'. ($current_row), '포워더비용');
     
             $sheet->mergeCells('F'.($current_row).':H'.($current_row));
-            $sheet->setCellValue('F'.($current_row), $rgd->rate_data_general['rdg_supply_price1']);
+            $sheet->setCellValue('F'.($current_row), $rgd->rate_data_general['rdg_supply_price4']);
             $sheet->mergeCells('I'.($current_row).':K'.($current_row));
-            $sheet->setCellValue('I'.($current_row), $rgd->rate_data_general['rdg_vat1']);
+            $sheet->setCellValue('I'.($current_row), $rgd->rate_data_general['rdg_vat4']);
             $sheet->mergeCells('L'.($current_row).':N'.($current_row));
-            $sheet->setCellValue('L'.($current_row), $rgd->rate_data_general['rdg_sum1']);
+            $sheet->setCellValue('L'.($current_row), $rgd->rate_data_general['rdg_sum4']);
             $sheet->mergeCells('O'.($current_row).':Q'.($current_row));
-            $sheet->setCellValue('O'.($current_row), '');
+            $sheet->setCellValue('O'.($current_row), $rgd->rate_data_general['rdg_supply_price11']);
             $sheet->mergeCells('R'.($current_row).':T'.($current_row));
-            $sheet->setCellValue('R'.($current_row), '');
+            $sheet->setCellValue('R'.($current_row), $rgd->rate_data_general['rdg_vat11']);
             $sheet->mergeCells('U'.($current_row).':W'.($current_row));
-            $sheet->setCellValue('U'.($current_row), '');
+            $sheet->setCellValue('U'.($current_row), $rgd->rate_data_general['rdg_sum11']);
             $sheet->mergeCells('X'.($current_row).':Z'.($current_row));
-            $sheet->setCellValue('X'.($current_row), '');
+            $sheet->setCellValue('X'.($current_row), $rgd->rate_data_general['rdg_etc11']);
     
     
             $count_row = 0;
@@ -5970,13 +6076,13 @@ class RateDataController extends Controller
                         $sheet->mergeCells('L'.($current_row_bonded1 + $count_row_bonded1).':N'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('L'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data4']);
                         $sheet->mergeCells('O'.($current_row_bonded1 + $count_row_bonded1).':Q'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('O'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('O'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data5']);
                         $sheet->mergeCells('R'.($current_row_bonded1 + $count_row_bonded1).':T'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('R'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('R'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data6']);
                         $sheet->mergeCells('U'.($current_row_bonded1 + $count_row_bonded1).':W'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data7']);
                         $sheet->mergeCells('X'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data8']);
     
                         $count_row_bonded1 += 1;
                         $count_row += 1;
@@ -6007,13 +6113,13 @@ class RateDataController extends Controller
                         $sheet->mergeCells('L'.($current_row_bonded1 + $count_row_bonded1).':N'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('L'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data4']);
                         $sheet->mergeCells('O'.($current_row_bonded1 + $count_row_bonded1).':Q'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('O'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('O'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data5']);
                         $sheet->mergeCells('R'.($current_row_bonded1 + $count_row_bonded1).':T'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('R'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('R'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data6']);
                         $sheet->mergeCells('U'.($current_row_bonded1 + $count_row_bonded1).':W'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data7']);
                         $sheet->mergeCells('X'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data8']);
     
                         $count_row_bonded1 += 1;
                         $count_row += 1;
@@ -6078,19 +6184,19 @@ class RateDataController extends Controller
             $sheet->setCellValue('B'. ($current_row), '포워더비용');
     
             $sheet->mergeCells('F'.($current_row).':H'.($current_row));
-            $sheet->setCellValue('F'.($current_row), $rgd->rate_data_general['rdg_supply_price1']);
+            $sheet->setCellValue('F'.($current_row), $rgd->rate_data_general['rdg_supply_price5']);
             $sheet->mergeCells('I'.($current_row).':K'.($current_row));
-            $sheet->setCellValue('I'.($current_row), $rgd->rate_data_general['rdg_vat1']);
+            $sheet->setCellValue('I'.($current_row), $rgd->rate_data_general['rdg_vat5']);
             $sheet->mergeCells('L'.($current_row).':N'.($current_row));
-            $sheet->setCellValue('L'.($current_row), $rgd->rate_data_general['rdg_sum1']);
+            $sheet->setCellValue('L'.($current_row), $rgd->rate_data_general['rdg_sum5']);
             $sheet->mergeCells('O'.($current_row).':Q'.($current_row));
-            $sheet->setCellValue('O'.($current_row), '');
+            $sheet->setCellValue('O'.($current_row), $rgd->rate_data_general['rdg_supply_price12']);
             $sheet->mergeCells('R'.($current_row).':T'.($current_row));
-            $sheet->setCellValue('R'.($current_row), '');
+            $sheet->setCellValue('R'.($current_row), $rgd->rate_data_general['rdg_vat12']);
             $sheet->mergeCells('U'.($current_row).':W'.($current_row));
-            $sheet->setCellValue('U'.($current_row), '');
+            $sheet->setCellValue('U'.($current_row), $rgd->rate_data_general['rdg_sum12']);
             $sheet->mergeCells('X'.($current_row).':Z'.($current_row));
-            $sheet->setCellValue('X'.($current_row), '');
+            $sheet->setCellValue('X'.($current_row), $rgd->rate_data_general['rdg_etc12']);
     
     
             $count_row = 0;
@@ -6127,13 +6233,13 @@ class RateDataController extends Controller
                         $sheet->mergeCells('L'.($current_row_bonded1 + $count_row_bonded1).':N'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('L'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data4']);
                         $sheet->mergeCells('O'.($current_row_bonded1 + $count_row_bonded1).':Q'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('O'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('O'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data5']);
                         $sheet->mergeCells('R'.($current_row_bonded1 + $count_row_bonded1).':T'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('R'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('R'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data6']);
                         $sheet->mergeCells('U'.($current_row_bonded1 + $count_row_bonded1).':W'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data7']);
                         $sheet->mergeCells('X'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data8']);
     
                         $count_row_bonded1 += 1;
                         $count_row += 1;
@@ -6164,13 +6270,13 @@ class RateDataController extends Controller
                         $sheet->mergeCells('L'.($current_row_bonded1 + $count_row_bonded1).':N'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('L'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data4']);
                         $sheet->mergeCells('O'.($current_row_bonded1 + $count_row_bonded1).':Q'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('O'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('O'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data5']);
                         $sheet->mergeCells('R'.($current_row_bonded1 + $count_row_bonded1).':T'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('R'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('R'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data6']);
                         $sheet->mergeCells('U'.($current_row_bonded1 + $count_row_bonded1).':W'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data7']);
                         $sheet->mergeCells('X'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1));
-                        $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), '');
+                        $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data8']);
     
                         $count_row_bonded1 += 1;
                         $count_row += 1;
@@ -6237,6 +6343,8 @@ class RateDataController extends Controller
         $sheet->mergeCells('B'. ($current_row + 10). ':Z'. ($current_row + 10));
         $sheet->setCellValue('B'. ($current_row + 10), '메일');
 
+        $sheet->getDefaultRowDimension()->setRowHeight(24);
+
         $Excel_writer = new Xlsx($spreadsheet);
         if (isset($user->mb_no)) {
             $path = 'storage/download/' . $user->mb_no . '/';
@@ -6246,9 +6354,18 @@ class RateDataController extends Controller
         if (!is_dir($path)) {
             File::makeDirectory($path, $mode = 0777, true, true);
         }
-        $mask = $path . 'Rate-Data-CaseBill-Edit-*.*';
+
+        if($rgd->service_korean_nam == '보세화물' && !str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
+            $name = 'bonded_est_casebill_';
+        }else if($rgd->service_korean_nam == '보세화물' && str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
+            $name = 'bonded_est_monthbill_';
+        }else {
+            $name = 'bonded_est_monthbill_';
+        }
+
+        $mask = $path . $name .'*.*';
         array_map('unlink', glob($mask) ?: []);
-        $file_name_download = $path . 'Rate-Data-CaseBill-Edit-' . date('YmdHis') . '.Xlsx';
+        $file_name_download = $path . $name . date('YmdHis') . '.Xlsx';
         $check_status = $Excel_writer->save($file_name_download);
         return response()->json([
             'status' => 1,

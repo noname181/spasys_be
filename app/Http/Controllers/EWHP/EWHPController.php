@@ -83,7 +83,7 @@ class EWHPController extends Controller
                         'tie_co_license' => isset($value['co_license']) ? $value['co_license'] : null,
                     ]);
 
-                    $check_alarm = Alarm::with(['alarm_data'])->where('w_no', $value['logistic_manage_number'])->where('alarm_h_bl', $value['h_bl'])->whereHas('alarm_data', function ($query) {
+                    $check_alarm = Alarm::with(['alarm_data'])->where('w_no', 'in_' . $value['carry_in_number'])->where('alarm_h_bl', $value['h_bl'])->whereHas('alarm_data', function ($query) {
                         $query->where(DB::raw('lower(ad_title)'), 'like', '' . strtolower('[보세화물] 반입') . '');
                     })->first();
 
@@ -99,7 +99,7 @@ class EWHPController extends Controller
             return response()->json(['message' => 'ok', 'count' => $count]);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+           
             return response()->json(['message' => "no"], 500);
         }
     }
@@ -154,7 +154,7 @@ class EWHPController extends Controller
                         ]);
                     }
 
-                    $check_alarm = Alarm::with(['alarm_data'])->where('w_no', $value['logistic_manage_number'])->where('alarm_h_bl', $value['h_bl'])->whereHas('alarm_data', function ($query) {
+                    $check_alarm = Alarm::with(['alarm_data'])->where('w_no', 'out_' . $value['carry_out_number'])->where('alarm_h_bl', $value['h_bl'])->whereHas('alarm_data', function ($query) {
                         $query->where(DB::raw('lower(ad_title)'), 'like', '' . strtolower('[보세화물] 반출') . '');
                     })->first();
 
@@ -167,6 +167,7 @@ class EWHPController extends Controller
             return response()->json(['message' => 'ok', 'count' => $count]);
         } catch (\Exception $e) {
             Log::error($e);
+            
             return response()->json(['message' => "no"], 500);
         }
     }
@@ -218,7 +219,7 @@ class EWHPController extends Controller
             return response()->json(['message' => 'ok', 'count' => $count]);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+            
             return response()->json(['message' => "no"], 500);
         }
     }

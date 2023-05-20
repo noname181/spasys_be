@@ -228,17 +228,20 @@ class CommonFunc
         $bbbbb = '';
         $ddddd = '';
         $cargo_number = '';
-
+        $w_no_save = '';
 
         if ($type == 'cargo_TIE') {
             $aaaaa = $w_no['h_bl'];
             $cargo_number = $w_no['h_bl'];
+            $w_no_save = $w_no['logistic_manage_number'];
         } else if ($type == 'cargo_TI') {
             $aaaaa = $w_no['h_bl'];
             $cargo_number = $w_no['h_bl'];
+            $w_no_save = 'in_' . $w_no['carry_in_number'];
         } else if ($type == 'cargo_TE') {
             $aaaaa = $w_no['h_bl'];
             $cargo_number = $w_no['h_bl'];
+            $w_no_save = 'out_' . $w_no['carry_out_number'];
         }
         $alarm_data = AlarmData::where('ad_title', $ad_title)->first();
 
@@ -260,34 +263,168 @@ class CommonFunc
             $receiver_shipper = Company::with(['co_parent'])->where('co_license', $w_no['co_license'])->first();
 
             if (isset($receiver_shipper)) {
-                $receiver_list = Member::where('co_no', $receiver_shipper->co_no)->orwhere('co_no', $receiver_shipper->co_parent->co_no)->get();
+                $receiver_list = Member::where('co_no', $receiver_shipper->co_no)->orwhere('co_no', $receiver_shipper->co_parent->co_no)->orwhere('co_no', $receiver_shipper->co_parent->co_parent->co_no)->get();
             }
         } else if ($alarm_data->ad_must_yn == 'n') {
             $receiver_shipper = Company::with(['co_parent'])->where('co_license', $w_no['co_license'])->first();
 
             if (isset($receiver_shipper)) {
-                $receiver_list = Member::where('co_no', $receiver_shipper->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shipper->co_parent->co_no)->where('mb_push_yn', 'y')->get();
+                $receiver_list = Member::where('co_no', $receiver_shipper->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shipper->co_parent->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shipper->co_parent->co_parent->co_no)->where('mb_push_yn', 'y')->get();
             }
         }
 
-        if (isset($receiver_list)) {
-            foreach ($receiver_list as $receiver) {
+        if ($type == 'cargo_TIE') {
+            if (isset($receiver_list)) {
+                foreach ($receiver_list as $receiver) {
+    
+                    //INSERT ALARM FOR RECEIVER LIST USER
+                    Alarm::insertGetId(
+                        [
+                            'w_no' => $w_no_save,
+                            'mb_no' => null,
+                            'receiver_no' => $receiver->mb_no,
+                            'alarm_content' => $alarm_content,
+                            'alarm_h_bl' => $cargo_number,
+                            'alarm_type' => $alarm_type,
+                            'ad_no' => $alarm_data->ad_no,
+                        ]
+                    );
+                }
+                //PUSH FUNCTION HERE
+            }
+        } else if ($type == 'cargo_TI') {
+            if (isset($receiver_list)) {
+                foreach ($receiver_list as $receiver) {
+    
+                    //INSERT ALARM FOR RECEIVER LIST USER
+                    Alarm::insertGetId(
+                        [
+                            'w_no' => $w_no_save,
+                            'mb_no' => null,
+                            'receiver_no' => $receiver->mb_no,
+                            'alarm_content' => $alarm_content,
+                            'alarm_h_bl' => $cargo_number,
+                            'alarm_type' => $alarm_type,
+                            'ad_no' => $alarm_data->ad_no,
+                        ]
+                    );
+                }
+                //PUSH FUNCTION HERE
 
-                //INSERT ALARM FOR RECEIVER LIST USER
-                Alarm::insertGetId(
+                Alarm::where('alarm_type','cargo_TIE')->where('alarm_h_bl', $w_no['h_bl'])->where('w_no', $w_no['logistic_manage_number'])->update(
                     [
-                        'w_no' => $w_no['logistic_manage_number'],
-                        'mb_no' => null,
-                        'receiver_no' => $receiver->mb_no,
-                        'alarm_content' => $alarm_content,
-                        'alarm_h_bl' => $cargo_number,
-                        'alarm_type' => $alarm_type,
-                        'ad_no' => $alarm_data->ad_no,
+                        'w_no' => $w_no_save,
                     ]
                 );
             }
-            //PUSH FUNCTION HERE
+        } else if ($type == 'cargo_TE') {
+            if (isset($receiver_list)) {
+                foreach ($receiver_list as $receiver) {
+    
+                    //INSERT ALARM FOR RECEIVER LIST USER
+                    Alarm::insertGetId(
+                        [
+                            'w_no' => $w_no_save,
+                            'mb_no' => null,
+                            'receiver_no' => $receiver->mb_no,
+                            'alarm_content' => $alarm_content,
+                            'alarm_h_bl' => $cargo_number,
+                            'alarm_type' => $alarm_type,
+                            'ad_no' => $alarm_data->ad_no,
+                        ]
+                    );
+                }
+                //PUSH FUNCTION HERE
+
+                Alarm::where('alarm_type','cargo_TI')->where('alarm_h_bl', $w_no['h_bl'])->where('w_no', 'in_' . $w_no['carry_in_number'])->update(
+                    [
+                        'w_no' => $w_no_save,
+                    ]
+                );
+                Alarm::where('alarm_type','cargo_TIE')->where('alarm_h_bl', $w_no['h_bl'])->where('w_no', 'in_' . $w_no['carry_in_number'])->update(
+                    [
+                        'w_no' => $w_no_save,
+                    ]
+                );
+            }
         }
+        
+    }
+
+    static function insert_alarm_cargo_api_status2_service1($ad_title, $rgd, $sender, $w_no, $type)
+    {
+        $ccccc = 0;
+        $aaaaa = '';
+        $bbbbb = '';
+        $ddddd = '';
+        $cargo_number = '';
+        $w_no_save = '';
+
+        if ($type == 'cargo_api_status2') {
+            $aaaaa = $w_no->tie_h_bl;
+            $cargo_number = $w_no->tie_h_bl;
+            $w_no_save = $w_no->tie_logistic_manage_number;
+        }
+
+        $alarm_data = AlarmData::where('ad_title', $ad_title)->first();
+
+        $alarm_content = $alarm_data->ad_content;
+        $alarm_content = str_replace('aaaaa', $aaaaa, $alarm_content);
+        $alarm_content = str_replace('bbbbb', $bbbbb, $alarm_content);
+        $alarm_content = str_replace('ccccc', $ccccc, $alarm_content);
+        $alarm_content = str_replace('ddddd', $ddddd, $alarm_content);
+
+        if ($type == 'cargo_api_status2') {
+            $alarm_type = 'cargo_api_status2';
+        }
+
+        if ($alarm_data->ad_must_yn == 'y') {
+            $receiver_shipper = Company::with(['co_parent'])->where('co_license', $w_no->tie_co_license)->first();
+
+            if (isset($receiver_shipper)) {
+                if(isset($receiver_shipper->co_parent->co_parent->co_no)){
+                    $receiver_list = Member::where('co_no', $receiver_shipper->co_no)->orwhere('co_no', $receiver_shipper->co_parent->co_no)->orwhere('co_no', $receiver_shipper->co_parent->co_parent->co_no)->get();
+                }elseif(isset($receiver_shipper->co_parent->co_no)){
+                    $receiver_list = Member::where('co_no', $receiver_shipper->co_no)->orwhere('co_no', $receiver_shipper->co_parent->co_no)->get();
+                }else{
+                    $receiver_list = Member::where('co_no', $receiver_shipper->co_no)->get();
+                }  
+            }
+        } else if ($alarm_data->ad_must_yn == 'n') {
+            $receiver_shipper = Company::with(['co_parent'])->where('co_license', $w_no->tie_co_license)->first();
+
+            if (isset($receiver_shipper)) {
+                if(isset($receiver_shipper->co_parent->co_parent->co_no)){
+                    $receiver_list = Member::where('co_no', $receiver_shipper->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shipper->co_parent->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shipper->co_parent->co_parent->co_no)->where('mb_push_yn', 'y')->get();
+                }elseif(isset($receiver_shipper->co_parent->co_no)){
+                    $receiver_list = Member::where('co_no', $receiver_shipper->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shipper->co_parent->co_no)->where('mb_push_yn', 'y')->get();
+                }else{
+                    $receiver_list = Member::where('co_no', $receiver_shipper->co_no)->where('mb_push_yn', 'y')->get();
+                }  
+            }
+        }
+
+        if ($type == 'cargo_api_status2') {
+            if (isset($receiver_list)) {
+                foreach ($receiver_list as $receiver) {
+    
+                    //INSERT ALARM FOR RECEIVER LIST USER
+                    Alarm::insertGetId(
+                        [
+                            'w_no' => $w_no_save,
+                            'mb_no' => null,
+                            'receiver_no' => $receiver->mb_no,
+                            'alarm_content' => $alarm_content,
+                            'alarm_h_bl' => $cargo_number,
+                            'alarm_type' => $alarm_type,
+                            'ad_no' => $alarm_data->ad_no,
+                        ]
+                    );
+                }
+                //PUSH FUNCTION HERE
+            }
+        }
+        
     }
 
     static function insert_alarm_cargo($ad_title, $rgd, $sender, $w_no, $type)
