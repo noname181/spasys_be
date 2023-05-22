@@ -33,6 +33,7 @@ class AuthController extends Controller
                 return response()->json([
                     'message' => Messages::MSG_0008,
                 ], 401);
+                
             }
 
             $token = "";
@@ -42,6 +43,7 @@ class AuthController extends Controller
                 return response()->json([
                     'message' => Messages::MSG_0008,
                 ], 401);
+              
             }
 
             $member->mb_otp = null;
