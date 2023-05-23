@@ -91,7 +91,7 @@ class RateMetaDataSearchRequest extends BaseFormRequest
             'files.*' => [
                 'file',
                 'max:5000',
-                'mimes:jpg,jpeg,png,pdf',
+                'mimes:jpg,jpeg,png,pdf,webp,gif',
             ],
         ];
     }

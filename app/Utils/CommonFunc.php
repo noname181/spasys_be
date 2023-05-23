@@ -767,7 +767,7 @@ class CommonFunc
 
     static function insert_alarm_photo($ad_title, $rgd, $sender, $request, $type)
     {
-        $ccccc = 0;
+        $ccccc = '';
         $aaaaa = '';
         $bbbbb = '';
         $ddddd = '';
@@ -781,7 +781,15 @@ class CommonFunc
         //foreach ($request->rp_content as $rp_content) {
         $aaaaa = $request->w_schedule_number;
         $bbbbb = $request->rp_cate;
-        $ccccc = isset($request->rp_content[0]) ? $request->rp_content[0] : '';
+        foreach ($request->rp_content as $key => $rp_content) {
+            if($key == 0){
+                $ccccc .= isset($rp_content) ? $rp_content : '';
+            }else{
+                $ccccc .= isset($rp_content) ? ','.$rp_content : '';
+            }
+            
+        }
+        
 
         $alarm_data = AlarmData::where('ad_title', $ad_title)->first();
 
