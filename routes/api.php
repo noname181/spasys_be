@@ -470,11 +470,13 @@ Route::middleware('auth')->group(function () {
         Route::post('/get_tax_invoice_by_rgd_no', [\App\Http\Controllers\RateData\RateDataController::class, 'get_tax_invoice_by_rgd_no']);
 
 
-        //distribution_est_casebill_edit
+        //distribution_casebill_edit
         Route::get('/download_data_general/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_data_general']);
-        //distribution_add_casebill
-        Route::get('/download_data_casebill_edit/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_data_casebill_edit']);
-        //distribution_add_monthbill_edit
+        //distribution
+        Route::get('/download_bonded_casebill_excel/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_bonded_casebill_excel']);
+        //fulfillment
+        Route::get('/download_fulfill_excel/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_fulfill_excel']);
+        //distribution
         Route::get('/download_bonded_monthbill_excel/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_bonded_monthbill_excel']);
         //distribution_final_casebill
         Route::get('/download_final_case_bill/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_final_case_bill']);
