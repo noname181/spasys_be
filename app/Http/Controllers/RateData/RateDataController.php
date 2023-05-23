@@ -9,6 +9,7 @@ use App\Http\Requests\RateData\RateDataSendMailRequest;
 use App\Models\AdjustmentGroup;
 use App\Models\CancelBillHistory;
 use App\Models\Company;
+use App\Models\CompanyPayment;
 use App\Models\Payment;
 use App\Models\Member;
 use App\Models\Contract;
@@ -5453,6 +5454,8 @@ class RateDataController extends Controller
             $rmd_no_bonded5 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded5'. $is_month_bill . ($is_final_bill ? '_final' : '_shop'))->first();
         }
 
+        $company->company_payment = CompanyPayment::where('co_no', $company->co_no)->first();
+
         $rate_data_bonded1 = $rate_data = RateData::where('rmd_no', isset($rmd_no_bonded1->rmd_no) ? $rmd_no_bonded1->rmd_no : 0)->where(function ($q) {
             $q->where('rd_cate_meta1', '유통가공')
                 ->orWhere('rd_cate_meta1', '수입풀필먼트')
@@ -5527,7 +5530,7 @@ class RateDataController extends Controller
         $sheet->mergeCells('B16:Z16');
         $sheet->setCellValue('B16', ' ∙ 예상 청구금액 : '. $rgd->rate_data_general->rdg_sum7 . '원');
         $sheet->mergeCells('B17:Z17');
-        $sheet->setCellValue('B17', ' ∙ 계좌  정보 : ㈜스페이시스원 xxxx-xxx-xxxxx (스페이시스원)');
+        $sheet->setCellValue('B17', ' ∙ 계좌  정보 : ㈜'. $company->company_payment->cp_bank_name .' ' . $company->company_payment->cp_bank_number . ' ('. $company->company_payment->cp_card_name. ')');
 
         //GENERAL TABLE
         $sheet->getStyle('B19')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
@@ -6499,6 +6502,8 @@ class RateDataController extends Controller
             $company = $rgd->warehousing->company;
         }
 
+        $company->company_payment = CompanyPayment::where('co_no', $company->co_no)->first();
+
         // return response()->json([
         //     'status' => $rate_data_bonded4,
         // ], 200);
@@ -6541,7 +6546,7 @@ class RateDataController extends Controller
         $sheet->mergeCells('B16:R16');
         $sheet->setCellValue('B16', ' ∙ 예상 청구금액 : '. $rgd->rate_data_general->rdg_sum7 . '원');
         $sheet->mergeCells('B17:R17');
-        $sheet->setCellValue('B17', ' ∙ 계좌  정보 : ㈜스페이시스원 xxxx-xxx-xxxxx (스페이시스원)');
+        $sheet->setCellValue('B17', ' ∙ 계좌  정보 : ㈜'. $company->company_payment->cp_bank_name .' ' . $company->company_payment->cp_bank_number . ' ('. $company->company_payment->cp_card_name. ')');
 
         //GENERAL TABLE
         $sheet->getStyle('B19')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
