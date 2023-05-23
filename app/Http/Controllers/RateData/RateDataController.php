@@ -3803,12 +3803,12 @@ class RateDataController extends Controller
                 $rdg_vat6 = $rdg_vat6 + $is_exist['rdg_vat6'];
                 $rdg_vat7 = $rdg_vat7 + $is_exist['rdg_vat7'];
                 $rdg_vat8 = $rdg_vat8 + $is_exist['rdg_vat8'];
-                $rdg_vat2 = $rdg_vat9 + $is_exist['rdg_vat9'];
-                $rdg_vat3 = $rdg_vat10 + $is_exist['rdg_vat10'];
-                $rdg_vat4 = $rdg_vat11 + $is_exist['rdg_vat11'];
-                $rdg_vat5 = $rdg_vat12 + $is_exist['rdg_vat12'];
-                $rdg_vat6 = $rdg_vat13 + $is_exist['rdg_vat13'];
-                $rdg_vat7 = $rdg_vat14 + $is_exist['rdg_vat14'];
+                $rdg_vat9 = $rdg_vat9 + $is_exist['rdg_vat9'];
+                $rdg_vat10 = $rdg_vat10 + $is_exist['rdg_vat10'];
+                $rdg_vat11 = $rdg_vat11 + $is_exist['rdg_vat11'];
+                $rdg_vat12 = $rdg_vat12 + $is_exist['rdg_vat12'];
+                $rdg_vat13 = $rdg_vat13 + $is_exist['rdg_vat13'];
+                $rdg_vat14 = $rdg_vat14 + $is_exist['rdg_vat14'];
 
                 $rdg_sum1 = $rdg_sum1 + $is_exist['rdg_sum1'];
                 $rdg_sum2 = $rdg_sum2 + $is_exist['rdg_sum2'];
@@ -3899,6 +3899,13 @@ class RateDataController extends Controller
                         'rdg_supply_price5' => $rdg_supply_price5,
                         'rdg_supply_price6' => $rdg_supply_price6,
                         'rdg_supply_price7' => $rdg_supply_price7,
+                        'rdg_supply_price8' => $rdg_supply_price8,
+                        'rdg_supply_price9' => $rdg_supply_price9,
+                        'rdg_supply_price10' => $rdg_supply_price10,
+                        'rdg_supply_price11' => $rdg_supply_price11,
+                        'rdg_supply_price12' => $rdg_supply_price12,
+                        'rdg_supply_price13' => $rdg_supply_price13,
+                        'rdg_supply_price14' => $rdg_supply_price14,
 
                         'rdg_vat1' => $rdg_vat1,
                         'rdg_vat2' => $rdg_vat2,
@@ -3907,6 +3914,13 @@ class RateDataController extends Controller
                         'rdg_vat5' => $rdg_vat5,
                         'rdg_vat6' => $rdg_vat6,
                         'rdg_vat7' => $rdg_vat7,
+                        'rdg_vat8' => $rdg_vat8,
+                        'rdg_vat9' => $rdg_vat9,
+                        'rdg_vat10' => $rdg_vat10,
+                        'rdg_vat11' => $rdg_vat11,
+                        'rdg_vat12' => $rdg_vat12,
+                        'rdg_vat13' => $rdg_vat13,
+                        'rdg_vat14' => $rdg_vat14,
 
                         'rdg_sum1' => $rdg_sum1,
                         'rdg_sum2' => $rdg_sum2,
@@ -3915,6 +3929,13 @@ class RateDataController extends Controller
                         'rdg_sum5' => $rdg_sum5,
                         'rdg_sum6' => $rdg_sum6,
                         'rdg_sum7' => $rdg_sum7,
+                        'rdg_sum8' => $rdg_sum8,
+                        'rdg_sum9' => $rdg_sum9,
+                        'rdg_sum10' => $rdg_sum10,
+                        'rdg_sum11' => $rdg_sum11,
+                        'rdg_sum12' => $rdg_sum12,
+                        'rdg_sum13' => $rdg_sum13,
+                        'rdg_sum14' => $rdg_sum14,
                     ]);
                 }
                 $expectation_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->where('rgd_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
@@ -5395,12 +5416,13 @@ class RateDataController extends Controller
 
     }
 
-    public function download_data_casebill_edit($rgd_no)
+    public function download_data_casebill_edit($rgd_no, Request $request)
     {
         Log::error($rgd_no);
         DB::beginTransaction();
         $user = Auth::user();
-
+        $pathname = $request->header('pathname');
+        $is_check_page = str_contains($pathname, 'check');
 
         $rgd = ReceivingGoodsDelivery::with(['rate_data_general', 'warehousing'])->where('rgd_no', $rgd_no)->first();
         $is_month_bill = str_contains($rgd->rgd_bill_type, 'month') ? '_monthly' : '';
@@ -5409,11 +5431,11 @@ class RateDataController extends Controller
         if($user->mb_type == 'shop'){
             $company = $rgd->warehousing->company;
 
-            $rmd_no_bonded1 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded1'. $is_month_bill . ($is_final_bill ? '_final' : '_shop'))->first();
-            $rmd_no_bonded2 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded2'. $is_month_bill . ($is_final_bill ? '_final' : '_shop'))->first();
-            $rmd_no_bonded3 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded3'. $is_month_bill . ($is_final_bill ? '_final' : '_shop'))->first();
-            $rmd_no_bonded4 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded4'. $is_month_bill . ($is_final_bill ? '_final' : '_shop'))->first();
-            $rmd_no_bonded5 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded5'. $is_month_bill . ($is_final_bill ? '_final' : '_shop'))->first();
+            $rmd_no_bonded1 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded1'. $is_month_bill . ($is_final_bill ? '_final' : ($is_check_page ? '_spasys' : '_shop')))->first();
+            $rmd_no_bonded2 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded2'. $is_month_bill . ($is_final_bill ? '_final' : ($is_check_page ? '_spasys' : '_shop')))->first();
+            $rmd_no_bonded3 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded3'. $is_month_bill . ($is_final_bill ? '_final' : ($is_check_page ? '_spasys' : '_shop')))->first();
+            $rmd_no_bonded4 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded4'. $is_month_bill . ($is_final_bill ? '_final' : ($is_check_page ? '_spasys' : '_shop')))->first();
+            $rmd_no_bonded5 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded5'. $is_month_bill . ($is_final_bill ? '_final' : ($is_check_page ? '_spasys' : '_shop')))->first();
 
         }else if($user->mb_type == 'spasys') {
             $company = $rgd->warehousing->company->co_parent;
@@ -6414,6 +6436,257 @@ class RateDataController extends Controller
         $sheet->mergeCells('B'. ($current_row + 9). ':Z'. ($current_row + 9));
         $sheet->setCellValue('B'. ($current_row + 9), '전화');
         $sheet->mergeCells('B'. ($current_row + 10). ':Z'. ($current_row + 10));
+        $sheet->setCellValue('B'. ($current_row + 10), '메일');
+
+        $sheet->getDefaultRowDimension()->setRowHeight(24);
+
+        $Excel_writer = new Xlsx($spreadsheet);
+        if (isset($user->mb_no)) {
+            $path = 'storage/download/' . $user->mb_no . '/';
+        } else {
+            $path = 'storage/download/no-name/';
+        }
+        if (!is_dir($path)) {
+            File::makeDirectory($path, $mode = 0777, true, true);
+        }
+
+        if($rgd->service_korean_nam == '보세화물' && !str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
+            $name = 'bonded_est_casebill_';
+        }else if($rgd->service_korean_nam == '보세화물' && str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
+            $name = 'bonded_est_monthbill_';
+        }else {
+            $name = 'bonded_est_monthbill_';
+        }
+
+        $mask = $path . $name .'*.*';
+        array_map('unlink', glob($mask) ?: []);
+        $file_name_download = $path . $name . date('YmdHis') . '.Xlsx';
+        $check_status = $Excel_writer->save($file_name_download);
+        return response()->json([
+            'status' => 1,
+            'link_download' => '../'. $file_name_download,
+            'message' => 'Download File',
+        ], 200);
+        ob_end_clean();
+    }
+
+    public function download_bonded_monthbill_excel($rgd_no, Request $request)
+    {
+        Log::error($rgd_no);
+        DB::beginTransaction();
+        $user = Auth::user();
+        $pathname = $request->header('pathname');
+        $is_check_page = str_contains($pathname, 'check');
+
+        $rgd = ReceivingGoodsDelivery::with(['rate_data_general', 'warehousing'])->where('rgd_no', $rgd_no)->first();
+
+        $rgds = ReceivingGoodsDelivery::with(['rate_data_general', 'warehousing', 't_import_expected'])->whereHas('rgd_child', function($q) use($rgd) {
+            $q->where('rgd_settlement_number',  $rgd->rgd_settlement_number);
+        })->get();
+
+        $rgds[] = $rgd;
+
+        $is_month_bill = str_contains($rgd->rgd_bill_type, 'month') ? '_monthly' : '';
+        $is_final_bill = str_contains($rgd->rgd_bill_type, 'final');
+
+        if($user->mb_type == 'shop'){
+            $company = $rgd->warehousing->company;
+
+        }else if($user->mb_type == 'spasys') {
+            $company = $rgd->warehousing->company->co_parent;
+        
+        }else if($user->mb_type == 'shipper') {
+            $company = $rgd->warehousing->company;
+        }
+
+        // return response()->json([
+        //     'status' => $rate_data_bonded4,
+        // ], 200);
+
+        $spreadsheet = new Spreadsheet();
+        $spreadsheet->getDefaultStyle()->getFont()->setSize(10);
+        $sheet = $spreadsheet->getActiveSheet(0);
+
+        // $sheet->getProtection()->setSheet(true);
+        $sheet->getDefaultColumnDimension()->setWidth(4.5);
+        $sheet->getDefaultRowDimension()->setRowHeight(24);
+        $sheet->getStyle('A1:S200')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+        $sheet->getStyle('A1:CT200')->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FFFFFF'));
+        $sheet->setTitle('보세화물 예상경비(건별,월별)');
+
+
+        $sheet->mergeCells('B2:R6');
+        $sheet->getStyle('B2:R6')->getBorders()->getOutline()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+        $sheet->setCellValue('B2', '가맹점(화주) 회사명');
+        $sheet->getStyle('B2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('B2')->getFont()->setSize(22)->setBold(true);
+
+        $sheet->getStyle('R8')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->setCellValue('R8', '사업자번호 : '. $company->co_license);
+        $sheet->getStyle('R9')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->setCellValue('R9', '사업장 주소 : '. $company->co_address. ' ' . $company->co_address_detail);
+        $sheet->getStyle('R10')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->setCellValue('R10', '수신자명 : '. $company->co_owner . ' (' . $company->co_email . ')');
+
+        $sheet->getStyle('B12:B17')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
+        $sheet->getStyle('B12:B17')->getFont()->setBold(true);
+        $sheet->mergeCells('B12:R12');
+        $sheet->setCellValue('B12', ' ∙ 서   비  스 : 보세화물');
+        $sheet->mergeCells('B13:R13');
+        $sheet->setCellValue('B13', ' ∙ H-BL  건수 :' . count($rgds));
+        $sheet->mergeCells('B14:R14');
+        $sheet->setCellValue('B14', ' ∙ 청구서 No : '. $rgd->rgd_status4 . ' ' . $rgd->rgd_settlement_number);
+        $sheet->mergeCells('B15:R15');
+        $sheet->setCellValue('B15', ' ∙ 청구서 발행일 : '. $rgd->created_at);
+        $sheet->mergeCells('B16:R16');
+        $sheet->setCellValue('B16', ' ∙ 예상 청구금액 : '. $rgd->rate_data_general->rdg_sum7 . '원');
+        $sheet->mergeCells('B17:R17');
+        $sheet->setCellValue('B17', ' ∙ 계좌  정보 : ㈜스페이시스원 xxxx-xxx-xxxxx (스페이시스원)');
+
+        //GENERAL TABLE
+        $sheet->getStyle('B19')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
+        $sheet->getStyle('B19')->getFont()->setBold(true);
+        $sheet->mergeCells('B19:R19');
+        $sheet->setCellValue('B19', '∙ 화물별 청구 금액');
+
+        
+        $sheet->getStyle('B20:R21')->getFont()->setBold(true);
+        $sheet->getStyle('B20:R21')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+
+        $sheet->mergeCells('B20:E20');
+        $sheet->setCellValue('B20', '구분');
+
+        $sheet->mergeCells('F20:H20');
+        $sheet->setCellValue('F20', '세금계산서 발행');
+
+        $sheet->mergeCells('I20:K20');
+        $sheet->setCellValue('I20', '세금계산서 미발행');
+
+        $headers = ['NO', '정산번호', '화물관리번호', 'H-BL', '공급가', '부가세', '합계', '공급가', '부가세', '합계', '합계 (VAT포함)', 'BLP 센터비용', '관세사 비용', '포워더 비용', '국내운송료', '요건 비용', '기타'];
+        $col_start = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R'];
+
+
+        foreach($headers as $key => $header){
+            if($key == 0){
+                $sheet->getColumnDimension($col_start[$key])->setWidth(8);
+                $sheet->getStyle($col_start[$key].'21')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $sheet->setCellValue($col_start[$key].'21', $header);
+            }
+            else if($key < 4){
+                $sheet->getColumnDimension($col_start[$key])->setWidth(20);
+                $sheet->getStyle($col_start[$key].'21')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $sheet->setCellValue($col_start[$key].'21', $header);
+            }
+            else if($key < 10){
+                $sheet->getColumnDimension($col_start[$key])->setWidth(14);
+                $sheet->getStyle($col_start[$key].'21')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $sheet->setCellValue($col_start[$key].'21', $header);
+            }else if($key >= 10){
+                $sheet->getColumnDimension($col_start[$key])->setWidth(14);
+                $sheet->mergeCells($col_start[$key].'20'.':'.$col_start[$key].'21');
+                $sheet->getStyle($col_start[$key].'20')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $sheet->setCellValue($col_start[$key].'20', $header);
+            }
+            
+        }
+
+        $current_row = 22;
+        $count_row = 0;
+
+        // return $rgds;
+
+        foreach($rgds as $key => $rgd){
+            foreach($headers as $key_col => $header){
+
+                $sheet->getStyle($col_start[$key_col].$current_row + $key)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+                if($key_col == 0 && ($key != count($rgds) - 1)){
+                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $key + 1);
+                    $sheet->getStyle($col_start[$key_col].$current_row + $key)->getFont()->setBold(true);
+                    $sheet->getStyle($col_start[$key_col].$current_row + $key)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                }
+                else if($key_col == 0 && ($key == count($rgds) - 1)){
+                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, '합계');
+                    $sheet->getStyle($col_start[$key_col].$current_row + $key)->getFont()->setBold(true);
+                    $sheet->getStyle($col_start[$key_col].$current_row + $key)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                }
+                else if($key_col == 1 && ($key != count($rgds) - 1)){
+                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['rgd_settlement_number']);
+                }
+                else if($key_col == 2 && ($key != count($rgds) - 1)){
+                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['warehousing']['logistic_manage_number']);
+                }
+                else if($key_col == 3 && ($key != count($rgds) - 1)){
+                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['t_import_expected']['tie_h_bl']);
+                }
+                else if($key_col == 4){
+                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['rate_data_general']['rdg_supply_price7'] ? $rgd['rate_data_general']['rdg_supply_price7'] : 0);
+                }
+                else if($key_col == 5){
+                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['rate_data_general']['rdg_vat7'] ? $rgd['rate_data_general']['rdg_vat7'] : 0);
+                }
+                else if($key_col == 6){
+                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['rate_data_general']['rdg_sum7'] ? $rgd['rate_data_general']['rdg_sum7'] : 0);
+                }
+                else if($key_col == 7){
+                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['rate_data_general']['rdg_supply_price14'] ? $rgd['rate_data_general']['rdg_supply_price14'] : 0);
+                }
+                else if($key_col == 8){
+                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['rate_data_general']['rdg_vat14'] ? $rgd['rate_data_general']['rdg_vat14'] : 0);
+                }
+                else if($key_col == 9){
+                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['rate_data_general']['rdg_sum14'] ? $rgd['rate_data_general']['rdg_sum14'] : 0);
+                }
+                else if($key_col == 10){
+                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['rate_data_general']['rdg_sum7'] ? $rgd['rate_data_general']['rdg_sum7'] : 0);
+                }
+                else if($key_col == 11){
+                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['rate_data_general']['rdg_supply_price7'] ? $rgd['rate_data_general']['rdg_supply_price7'] : 0);
+                }
+                else if($key_col == 12){
+                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['rate_data_general']['rdg_supply_price2'] ? $rgd['rate_data_general']['rdg_supply_price2'] : 0);
+                }
+                else if($key_col == 13){
+                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['rate_data_general']['rdg_supply_price3'] ? $rgd['rate_data_general']['rdg_supply_price3'] : 0);
+                }
+                else if($key_col == 14){
+                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['rate_data_general']['rdg_supply_price4'] ? $rgd['rate_data_general']['rdg_supply_price4'] : 0);
+                }
+                else if($key_col == 15){
+                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['rate_data_general']['rdg_supply_price5'] ? $rgd['rate_data_general']['rdg_supply_price5'] : 0);
+                }
+                else if($key_col == 16){
+                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, '');
+                }
+                 
+             }
+             $count_row = $key;
+         }
+
+         $current_row += $count_row;
+         $sheet->getStyle('B20:R'.$current_row)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+         $sheet->getStyle('B20:R'.$current_row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+         $current_row += 1;
+         //END PART
+        $sheet->setCellValue('B'. ($current_row), '');
+        $sheet->setCellValue('B'. ($current_row + 1), '1. 보세화물 서비스의 예상경비 청구서는 BL번호 단위로 발송됩니다.(단 분할인 경우 반출단위)');
+        $sheet->setCellValue('B'. ($current_row + 2), '2. 세금계산서 발행은 확정청구서와 함께 처리 됩니다.');
+        $sheet->setCellValue('B'. ($current_row + 3), '3. 결제는 PC/Mobile에 접속하여서 결제하시면 되며, 월별 청구인 경우 매달 24일까지 결제가 되지 않으면 25일 등록 된 카드로 자동결제 됩니다.');
+        $sheet->setCellValue('B'. ($current_row + 4), '4. 결제수단에 따라 수수료가 추가 청구 됩니다.(카드/카카오페이 2.9%, 실시간계좌이체 1.8% 등)');
+
+
+        $sheet->getStyle('B'. ($current_row + 6). ':R'. ($current_row + 10))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('B'. ($current_row + 6). ':R'. ($current_row + 10))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
+        $sheet->mergeCells('B'. ($current_row + 6). ':R'. ($current_row + 6));
+        $sheet->setCellValue('B'. ($current_row + 6), '가맹점(센터) 회사명');
+        $sheet->mergeCells('B'. ($current_row + 7). ':R'. ($current_row + 7));
+        $sheet->setCellValue('B'. ($current_row + 7), '가맹점(센터) 주소');
+        $sheet->mergeCells('B'. ($current_row + 8). ':R'. ($current_row + 8));
+        $sheet->setCellValue('B'. ($current_row + 8), '담당부서');
+        $sheet->mergeCells('B'. ($current_row + 9). ':R'. ($current_row + 9));
+        $sheet->setCellValue('B'. ($current_row + 9), '전화');
+        $sheet->mergeCells('B'. ($current_row + 10). ':R'. ($current_row + 10));
         $sheet->setCellValue('B'. ($current_row + 10), '메일');
 
         $sheet->getDefaultRowDimension()->setRowHeight(24);

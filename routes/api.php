@@ -472,9 +472,11 @@ Route::middleware('auth')->group(function () {
 
         //distribution_est_casebill_edit
         Route::get('/download_data_general/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_data_general']);
-        //distribution_add_casebill_edit
+        //distribution_add_casebill
         Route::get('/download_data_casebill_edit/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_data_casebill_edit']);
-        //distribution_final_casebill_edit
+        //distribution_add_monthbill_edit
+        Route::get('/download_bonded_monthbill_excel/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_bonded_monthbill_excel']);
+        //distribution_final_casebill
         Route::get('/download_final_case_bill/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_final_case_bill']);
         //distribution_final_monthbill_edit
         Route::get('/download_final_month_bill/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_final_month_bill']);
