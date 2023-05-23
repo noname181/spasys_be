@@ -2654,9 +2654,9 @@ class RateDataController extends Controller
 
              //CHECK EXIST IN DOUBLE CLICK CASE
             $check_settlement_number = ReceivingGoodsDelivery::where('rgd_settlement_number', $request->settlement_number)->first();
-            // if(isset($check_settlement_number->rgd_no) && !str_contains($request->type, 'edit')){
-            //     return;
-            // }
+            if(isset($check_settlement_number->rgd_no) && !str_contains($request->type, 'edit')){
+                return;
+            }
 
             $user = Auth::user();
 
