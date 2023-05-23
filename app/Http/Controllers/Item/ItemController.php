@@ -236,7 +236,7 @@ class ItemController extends Controller
                 });
 
                 $sql_count = WarehousingItem::where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고_spasys')->get()->count();
-               
+
                 if ($sql_count != 0) {
                     $items->with(['warehousing_item2' => function ($query) use ($validated) {
                         $query->where('w_no', '=', $validated['w_no'])->where('wi_type', '=', '입고_spasys');
@@ -366,23 +366,23 @@ class ItemController extends Controller
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : '';
             $item = [];
             $count = 0;
-            if(isset($validated['item_data'])){
-                foreach($validated['item_data'] as $value){
-                    if($value['item_no']){
+            if (isset($validated['item_data'])) {
+                foreach ($validated['item_data'] as $value) {
+                    if ($value['item_no']) {
                         $item[] = $value['item_no'];
                         $count++;
-                    }   
+                    }
                 }
             }
-            
+
             $items = Item::with(['item_channels', 'company', 'file'])->where('item_service_name', '유통가공');
 
-           
+
 
             if (isset($validated['w_no'])) {
                 $warehousing = Warehousing::where('w_no', $validated['w_no'])->first();
                 $items->where('co_no', $warehousing->co_no);
-            }else{
+            } else {
                 if (isset($validated['co_no']) && Auth::user()->mb_type == "shop") {
                     $items->where('co_no', $validated['co_no']);
                 } else if (isset($validated['co_no']) && Auth::user()->mb_type == "spasys") {
@@ -421,13 +421,13 @@ class ItemController extends Controller
             //         $query->whereIn(DB::raw('co_no'), $co_no);
             //     });
             // }
-            if($item){
-                $items = $items->orwhere(function ($query) use ($item,$validated) {
+            if ($item) {
+                $items = $items->orwhere(function ($query) use ($item, $validated) {
                     $query->whereIn('item_no', $item);
                     if (isset($validated['w_no'])) {
                         $warehousing = Warehousing::where('w_no', $validated['w_no'])->first();
                         $query->where('co_no', $warehousing->co_no);
-                    }else{
+                    } else {
                         if (isset($validated['co_no']) && Auth::user()->mb_type == "shop") {
                             $query->where('co_no', $validated['co_no']);
                         } else if (isset($validated['co_no']) && Auth::user()->mb_type == "spasys") {
@@ -439,28 +439,27 @@ class ItemController extends Controller
                 });
                 sort($item);
                 $orderedIds = implode(',', $item);
-                
-                $items = $items->orderByRaw(\DB::raw("FIELD(item_no, ".$orderedIds." ) desc"))->orderBy('item_no', 'DESC');
 
-            }else{
+                $items = $items->orderByRaw(\DB::raw("FIELD(item_no, " . $orderedIds . " ) desc"))->orderBy('item_no', 'DESC');
+            } else {
                 $items = $items->orderBy('item_no', 'DESC');
             }
-           
-            
+
+
             $items = $items->paginate($per_page, ['*'], 'page', $page);
 
             // $sortedResult = $items->getCollection()->sortBy('item_no')->values();
             // $items->setCollection($sortedResult);
-            
+
             // $items->setCollection(
             //     $items->getCollection()->map(function ($val,$validated) {
-                    
+
             //         $val->push($validated['item_data']);
-                    
+
             //         return $val;
             //     })
             // );
-            
+
             // if($page == 1){
             //     foreach($validated['item_data'] as $value){
             //         if($value['item_no']){
@@ -500,12 +499,12 @@ class ItemController extends Controller
 
             $item = [];
             $count = 0;
-            if(isset($validated['item_data'])){
-                foreach($validated['item_data'] as $value){
-                    if($value['item_no']){
+            if (isset($validated['item_data'])) {
+                foreach ($validated['item_data'] as $value) {
+                    if ($value['item_no']) {
                         $item[] = $value['item_no'];
                         $count++;
-                    }   
+                    }
                 }
             }
 
@@ -557,9 +556,9 @@ class ItemController extends Controller
             //         $query->whereIn(DB::raw('co_no'), $co_no);
             //     });
             // }
-            
-            if($item){
-                $items = $items->orwhere(function ($query) use ($item,$validated) {
+
+            if ($item) {
+                $items = $items->orwhere(function ($query) use ($item, $validated) {
                     $query->whereIn('item_no', $item);
                     if (isset($validated['co_no'])) {
                         $query->whereHas('ContractWms.company', function ($q) use ($validated) {
@@ -569,10 +568,9 @@ class ItemController extends Controller
                 });
                 sort($item);
                 $orderedIds = implode(',', $item);
-            
-                $items = $items->orderByRaw(\DB::raw("FIELD(item_no, ".$orderedIds." ) desc"))->orderBy('item_no', 'DESC');
 
-            }else{
+                $items = $items->orderByRaw(\DB::raw("FIELD(item_no, " . $orderedIds . " ) desc"))->orderBy('item_no', 'DESC');
+            } else {
                 $items = $items->orderBy('item_no', 'DESC');
             }
 
@@ -1119,7 +1117,7 @@ class ItemController extends Controller
             $item2 = $item->get();
 
             $count_check = 0;
-            
+
             $item3 = collect($item2)->map(function ($q) {
                 $item4 = Item::with(['item_info'])->where('item.item_no', $q->item_no)->first();
                 if (isset($item4['item_info']['stock'])) {
@@ -1219,9 +1217,9 @@ class ItemController extends Controller
             $item['company'] = $company;
             $item['item_info'] = $item_info;
             $item_api = Item::with(['item_info'])->where('item.item_no', $item->item_no)->first();
-            if(isset($item->option_id)){
+            if (isset($item->option_id)) {
                 $status_0 = StockStatusBad::where('product_id', $item->product_id)->where('option_id', $item->option_id)->where('status', 0)->first();
-            }else {
+            } else {
                 $status_0 = StockStatusBad::where('product_id', $item->product_id)->where('status', 0)->first();
             }
             if (isset($status_0->stock)) {
@@ -1243,10 +1241,10 @@ class ItemController extends Controller
             }
 
             return response()->json([
-            'item' => $item,
-            'stock_0' => isset($stock_0) ? $stock_0 : '',
-            'stock_1' =>isset($stock_1) ? $stock_1 : '',
-            'stock_total' => isset($stock_total) ? $stock_total: ''
+                'item' => $item,
+                'stock_0' => isset($stock_0) ? $stock_0 : '',
+                'stock_1' => isset($stock_1) ? $stock_1 : '',
+                'stock_total' => isset($stock_total) ? $stock_total : ''
             ]);
         } catch (\Exception $e) {
             Log::error($e);
@@ -2136,7 +2134,7 @@ class ItemController extends Controller
         try {
             DB::beginTransaction();
             $data_select = !empty($request->data) ? $request->data : array();
-            //return $data_select;
+            
             foreach ($data_select as $i_item => $item) {
                 $item_no_all = Item::updateOrCreate(
                     [
@@ -2145,15 +2143,15 @@ class ItemController extends Controller
                     [
                         'mb_no' => Auth::user()->mb_no,
                         'co_no' => isset($item->co_no) ? $item->co_no : Auth::user()->co_no,
-                        'item_name' => $item->name,
-                        'supply_code' => $item->supply_code,
-                        'item_brand' => $item->brand,
-                        'item_origin' => $item->origin,
-                        'item_weight' => $item->weight,
-                        'item_price1' => $item->org_price,
-                        'item_price2' => $item->shop_price,
-                        'item_price3' => $item->supply_price,
-                        'item_url' => $item->img_500,
+                        'item_name' => isset($item->name) ? $item->name : null,
+                        'supply_code' => isset($item->supply_code) ? $item->name : null,
+                        'item_brand' => isset($item->brand) ? $item->brand : null,
+                        'item_origin' => isset($item->origin) ? $item->origin : null,
+                        'item_weight' => isset($item->weight) ? $item->weight : null,
+                        'item_price1' => isset($item->org_price) ? $item->org_price : null,
+                        'item_price2' => isset($item->shop_price) ? $item->shop_price : null,
+                        'item_price3' => isset($item->supply_price) ? $item->supply_price : null,
+                        'item_url' => isset($item->img_500) ? $item->img_500 : null,
                         'item_service_name' => '수입풀필먼트',
                     ]
                 );
@@ -2233,7 +2231,9 @@ class ItemController extends Controller
                                     }
                                 }
                             }
+                            
                         } else {
+                            
                             $item_no = Item::updateOrCreate(
                                 [
                                     'product_id' => $item->product_id
@@ -2323,14 +2323,13 @@ class ItemController extends Controller
 
             DB::commit();
             return response()->json([
-                'param' => $url_api,
                 'message' => '완료되었습니다.',
                 'status' => 1,
             ], 200);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+            
             return response()->json([
                 'message' => '오류가 발생하였습니다.',
             ], 500);
@@ -2550,7 +2549,7 @@ class ItemController extends Controller
                 ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
             $sub_2 = Import::select('ti_logistic_manage_number', 'ti_carry_in_number', 'ti_i_confirm_number')
-               
+
                 ->groupBy(['ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number']);
 
 
@@ -2593,7 +2592,7 @@ class ItemController extends Controller
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // Return data inplace of echoing on screen
                     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0); // Skip SSL Verification
                     curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-            
+
                     //$xmlString = simplexml_load_string(file_get_contents($url));
                     $data = curl_exec($ch);
                     if ($data === false) {
@@ -2601,7 +2600,7 @@ class ItemController extends Controller
                     } else {
                         $result = $data;
                     }
-                    curl_close($ch);  
+                    curl_close($ch);
                     $result = simplexml_load_string($result);
                     $json = json_encode($result);
                     $array = json_decode($json, TRUE);
@@ -2615,152 +2614,152 @@ class ItemController extends Controller
                             // if($status == '수입신고'){
                             //     return $key;
                             // }
-                            if($status == '수입신고 수리후 정정 완료'){
-                                    $status1 = '수입신고정정완료';
-                                    if (isset($value->tie_logistic_manage_number)) {
-                                        ImportExpected::where('tie_logistic_manage_number', $value->tie_logistic_manage_number)
-                                            ->update([
-                                                'tie_status_2' => $status1,
-                                                'update_api_time' => Carbon::now(),
-                                            ]);
-                                    }
+                            if ($status == '수입신고 수리후 정정 완료') {
+                                $status1 = '수입신고정정완료';
+                                if (isset($value->tie_logistic_manage_number)) {
+                                    ImportExpected::where('tie_logistic_manage_number', $value->tie_logistic_manage_number)
+                                        ->update([
+                                            'tie_status_2' => $status1,
+                                            'update_api_time' => Carbon::now(),
+                                        ]);
+                                }
 
-                                    if (isset($value->ti_logistic_manage_number) && isset($value->ti_i_confirm_number)) {
-                                        Import::where('ti_logistic_manage_number', $value->ti_logistic_manage_number)->where('ti_i_confirm_number', $value->ti_i_confirm_number)
-                                            ->update([
-                                                'ti_status_2' => $status1
-                                            ]);
-                                    }
+                                if (isset($value->ti_logistic_manage_number) && isset($value->ti_i_confirm_number)) {
+                                    Import::where('ti_logistic_manage_number', $value->ti_logistic_manage_number)->where('ti_i_confirm_number', $value->ti_i_confirm_number)
+                                        ->update([
+                                            'ti_status_2' => $status1
+                                        ]);
+                                }
 
-                                    if (isset($value->te_logistic_manage_number) && isset($value->te_carry_out_number)) {
-                                        Export::where('te_logistic_manage_number', $value->te_logistic_manage_number)->where('te_carry_out_number', $value->te_carry_out_number)
-                                            ->update([
-                                                'te_status_2' => $status1
-                                            ]);
-                                    }
-                                    
-                                    $check_alarm = Alarm::with(['alarm_data'])->where('alarm_h_bl', $value->tie_h_bl)->whereHas('alarm_data', function ($query) {
-                                        $query->where(DB::raw('lower(ad_title)'), 'like', '' . strtolower('[보세화물] 수입신고정정신고완료') . '');
-                                    })->first();
-                
-                                    if ($check_alarm == null) {
-                                        CommonFunc::insert_alarm_cargo_api_status2_service1('[보세화물] 수입신고정정신고완료', null, null, $value, 'cargo_api_status2');
-                                    }
+                                if (isset($value->te_logistic_manage_number) && isset($value->te_carry_out_number)) {
+                                    Export::where('te_logistic_manage_number', $value->te_logistic_manage_number)->where('te_carry_out_number', $value->te_carry_out_number)
+                                        ->update([
+                                            'te_status_2' => $status1
+                                        ]);
+                                }
 
-                                    break;
-                            }else if($status == '수입신고 수리후 정정 접수'){
-                                
-                                    $status1 = '수입신고정정접수';
-                                    if (isset($value->tie_logistic_manage_number)) {
-                                        ImportExpected::where('tie_logistic_manage_number', $value->tie_logistic_manage_number)
-                                            ->update([
-                                                'tie_status_2' => $status1,
-                                                'update_api_time' => Carbon::now(),
-                                            ]);
-                                    }
+                                $check_alarm = Alarm::with(['alarm_data'])->where('alarm_h_bl', $value->tie_h_bl)->whereHas('alarm_data', function ($query) {
+                                    $query->where(DB::raw('lower(ad_title)'), 'like', '' . strtolower('[보세화물] 수입신고정정신고완료') . '');
+                                })->first();
 
-                                    if (isset($value->ti_logistic_manage_number) && isset($value->ti_i_confirm_number)) {
-                                        Import::where('ti_logistic_manage_number', $value->ti_logistic_manage_number)->where('ti_i_confirm_number', $value->ti_i_confirm_number)
-                                            ->update([
-                                                'ti_status_2' => $status1
-                                            ]);
-                                    }
+                                if ($check_alarm == null) {
+                                    CommonFunc::insert_alarm_cargo_api_status2_service1('[보세화물] 수입신고정정신고완료', null, null, $value, 'cargo_api_status2');
+                                }
 
-                                    if (isset($value->te_logistic_manage_number) && isset($value->te_carry_out_number)) {
-                                        Export::where('te_logistic_manage_number', $value->te_logistic_manage_number)->where('te_carry_out_number', $value->te_carry_out_number)
-                                            ->update([
-                                                'te_status_2' => $status1
-                                            ]);
-                                    }
+                                break;
+                            } else if ($status == '수입신고 수리후 정정 접수') {
 
-                                    $check_alarm = Alarm::with(['alarm_data'])->where('alarm_h_bl', $value->tie_h_bl)->whereHas('alarm_data', function ($query) {
-                                        $query->where(DB::raw('lower(ad_title)'), 'like', '' . strtolower('[보세화물] 수입신고정정접수') . '');
-                                    })->first();
-                
-                                    if ($check_alarm == null) {
-                                        CommonFunc::insert_alarm_cargo_api_status2_service1('[보세화물] 수입신고정정접수', null, null, $value, 'cargo_api_status2');
-                                    }
+                                $status1 = '수입신고정정접수';
+                                if (isset($value->tie_logistic_manage_number)) {
+                                    ImportExpected::where('tie_logistic_manage_number', $value->tie_logistic_manage_number)
+                                        ->update([
+                                            'tie_status_2' => $status1,
+                                            'update_api_time' => Carbon::now(),
+                                        ]);
+                                }
 
-                                    break;
-                            }else if($status == '수입신고수리'){
-                                
-                                    $status1 = '수입신고수리';
-                                    
-                                    if (isset($value->tie_logistic_manage_number)) {
-                                        ImportExpected::where('tie_logistic_manage_number', $value->tie_logistic_manage_number)
-                                            ->update([
-                                                'tie_status_2' => $status1,
-                                                'update_api_time' => Carbon::now(),
-                                            ]);
-                                    }
+                                if (isset($value->ti_logistic_manage_number) && isset($value->ti_i_confirm_number)) {
+                                    Import::where('ti_logistic_manage_number', $value->ti_logistic_manage_number)->where('ti_i_confirm_number', $value->ti_i_confirm_number)
+                                        ->update([
+                                            'ti_status_2' => $status1
+                                        ]);
+                                }
 
-                                    if (isset($value->ti_logistic_manage_number) && isset($value->ti_i_confirm_number)) {
-                                        Import::where('ti_logistic_manage_number', $value->ti_logistic_manage_number)->where('ti_i_confirm_number', $value->ti_i_confirm_number)
-                                            ->update([
-                                                'ti_status_2' => $status1
-                                            ]);
-                                    }
+                                if (isset($value->te_logistic_manage_number) && isset($value->te_carry_out_number)) {
+                                    Export::where('te_logistic_manage_number', $value->te_logistic_manage_number)->where('te_carry_out_number', $value->te_carry_out_number)
+                                        ->update([
+                                            'te_status_2' => $status1
+                                        ]);
+                                }
 
-                                    if (isset($value->te_logistic_manage_number) && isset($value->te_carry_out_number)) {
-                                        Export::where('te_logistic_manage_number', $value->te_logistic_manage_number)->where('te_carry_out_number', $value->te_carry_out_number)
-                                            ->update([
-                                                'te_status_2' => $status1
-                                            ]);
-                                    }
+                                $check_alarm = Alarm::with(['alarm_data'])->where('alarm_h_bl', $value->tie_h_bl)->whereHas('alarm_data', function ($query) {
+                                    $query->where(DB::raw('lower(ad_title)'), 'like', '' . strtolower('[보세화물] 수입신고정정접수') . '');
+                                })->first();
 
-                                    $check_alarm = Alarm::with(['alarm_data'])->where('alarm_h_bl', $value->tie_h_bl)->whereHas('alarm_data', function ($query) {
-                                        $query->where(DB::raw('lower(ad_title)'), 'like', '' . strtolower('[보세화물] 수입신고수리완료') . '');
-                                    })->first();
-                
-                                    if ($check_alarm == null) {
-                                        CommonFunc::insert_alarm_cargo_api_status2_service1('[보세화물] 수입신고수리완료', null, null, $value, 'cargo_api_status2');
-                                    }
+                                if ($check_alarm == null) {
+                                    CommonFunc::insert_alarm_cargo_api_status2_service1('[보세화물] 수입신고정정접수', null, null, $value, 'cargo_api_status2');
+                                }
 
-                                    break;
-                                }else if ($status == '수입신고'){
-                                
-                                    $status1 = '수입신고접수';
-                                    if (isset($value->tie_logistic_manage_number)) {
-                                        ImportExpected::where('tie_logistic_manage_number', $value->tie_logistic_manage_number)
-                                            ->update([
-                                                'tie_status_2' => $status1,
-                                                'update_api_time' => Carbon::now(),
-                                            ]);
-                                    }
+                                break;
+                            } else if ($status == '수입신고수리') {
 
-                                    if (isset($value->ti_logistic_manage_number) && isset($value->ti_i_confirm_number)) {
-                                        Import::where('ti_logistic_manage_number', $value->ti_logistic_manage_number)->where('ti_i_confirm_number', $value->ti_i_confirm_number)
-                                            ->update([
-                                                'ti_status_2' => $status1
-                                            ]);
-                                    }
+                                $status1 = '수입신고수리';
 
-                                    if (isset($value->te_logistic_manage_number) && isset($value->te_carry_out_number)) {
-                                        Export::where('te_logistic_manage_number', $value->te_logistic_manage_number)->where('te_carry_out_number', $value->te_carry_out_number)
-                                            ->update([
-                                                'te_status_2' => $status1
-                                            ]);
-                                    }
+                                if (isset($value->tie_logistic_manage_number)) {
+                                    ImportExpected::where('tie_logistic_manage_number', $value->tie_logistic_manage_number)
+                                        ->update([
+                                            'tie_status_2' => $status1,
+                                            'update_api_time' => Carbon::now(),
+                                        ]);
+                                }
 
-                                    $check_alarm = Alarm::with(['alarm_data'])->where('alarm_h_bl', $value->tie_h_bl)->whereHas('alarm_data', function ($query) {
-                                        $query->where(DB::raw('lower(ad_title)'), 'like', '' . strtolower('[보세화물] 수입신고접수') . '');
-                                    })->first();
-                
-                                    if ($check_alarm == null) {
-                                        CommonFunc::insert_alarm_cargo_api_status2_service1('[보세화물] 수입신고접수', null, null, $value, 'cargo_api_status2');
-                                    }
+                                if (isset($value->ti_logistic_manage_number) && isset($value->ti_i_confirm_number)) {
+                                    Import::where('ti_logistic_manage_number', $value->ti_logistic_manage_number)->where('ti_i_confirm_number', $value->ti_i_confirm_number)
+                                        ->update([
+                                            'ti_status_2' => $status1
+                                        ]);
+                                }
 
-                                    break;
-                                }       
+                                if (isset($value->te_logistic_manage_number) && isset($value->te_carry_out_number)) {
+                                    Export::where('te_logistic_manage_number', $value->te_logistic_manage_number)->where('te_carry_out_number', $value->te_carry_out_number)
+                                        ->update([
+                                            'te_status_2' => $status1
+                                        ]);
+                                }
+
+                                $check_alarm = Alarm::with(['alarm_data'])->where('alarm_h_bl', $value->tie_h_bl)->whereHas('alarm_data', function ($query) {
+                                    $query->where(DB::raw('lower(ad_title)'), 'like', '' . strtolower('[보세화물] 수입신고수리완료') . '');
+                                })->first();
+
+                                if ($check_alarm == null) {
+                                    CommonFunc::insert_alarm_cargo_api_status2_service1('[보세화물] 수입신고수리완료', null, null, $value, 'cargo_api_status2');
+                                }
+
+                                break;
+                            } else if ($status == '수입신고') {
+
+                                $status1 = '수입신고접수';
+                                if (isset($value->tie_logistic_manage_number)) {
+                                    ImportExpected::where('tie_logistic_manage_number', $value->tie_logistic_manage_number)
+                                        ->update([
+                                            'tie_status_2' => $status1,
+                                            'update_api_time' => Carbon::now(),
+                                        ]);
+                                }
+
+                                if (isset($value->ti_logistic_manage_number) && isset($value->ti_i_confirm_number)) {
+                                    Import::where('ti_logistic_manage_number', $value->ti_logistic_manage_number)->where('ti_i_confirm_number', $value->ti_i_confirm_number)
+                                        ->update([
+                                            'ti_status_2' => $status1
+                                        ]);
+                                }
+
+                                if (isset($value->te_logistic_manage_number) && isset($value->te_carry_out_number)) {
+                                    Export::where('te_logistic_manage_number', $value->te_logistic_manage_number)->where('te_carry_out_number', $value->te_carry_out_number)
+                                        ->update([
+                                            'te_status_2' => $status1
+                                        ]);
+                                }
+
+                                $check_alarm = Alarm::with(['alarm_data'])->where('alarm_h_bl', $value->tie_h_bl)->whereHas('alarm_data', function ($query) {
+                                    $query->where(DB::raw('lower(ad_title)'), 'like', '' . strtolower('[보세화물] 수입신고접수') . '');
+                                })->first();
+
+                                if ($check_alarm == null) {
+                                    CommonFunc::insert_alarm_cargo_api_status2_service1('[보세화물] 수입신고접수', null, null, $value, 'cargo_api_status2');
+                                }
+
+                                break;
                             }
+                        }
 
 
 
-                            //return $array;
-                            // if ($status1 != null) {
-                            //     break;
-                            // }
-                        
+                        //return $array;
+                        // if ($status1 != null) {
+                        //     break;
+                        // }
+
                     }
                 }
             }
@@ -3143,35 +3142,56 @@ class ItemController extends Controller
         $url_api .= '&date_type=' . $filter['date_type'];
         $url_api .= '&start_date=' . $filter['start_date'];
         $url_api .= '&end_date=' . $filter['end_date'];
+        // if ($filter['limit'] != '') {
+        //     $url_api .= '&limit=' . $filter['limit'];
+        // }
+        // if ($filter['page'] != '') {
+        //     $url_api .= '&page=' . $filter['page'];
+        // }
         if ($filter['limit'] != '') {
             $url_api .= '&limit=' . $filter['limit'];
         }
-        if ($filter['page'] != '') {
-            $url_api .= '&page=' . $filter['page'];
-        }
+
         $response = file_get_contents($url_api);
         $api_data = json_decode($response);
+
         $total_data = 0;
         $pages = 0;
-        if (isset($api_data->api_data) && $api_data->api_data > 100) {
-            $total_data = $api_data->api_data;
+        if (isset($api_data->total) && $api_data->total) {
+            $total_data = $api_data->total;
             $pages = ceil($total_data / 100);
+
             for ($i = 1; $i <= $pages; $i++) {
-                $this->apiItemsRaw($api_data, $url_api);
-            }
-        } else {
-            if (!empty($api_data->data)) {
-                return $this->apiItemsRaw($api_data, $url_api);
-            } else {
-                return response()->json([
-                    'param' => $url_api,
-                    'message' => '완료되었습니다.',
-                    'status' => 1
-                ], 200);
+                
+                
+                $url_api1 = '&page=' . $i;
+                
+                $response = file_get_contents($url_api.$url_api1);
+                $api_data = json_decode($response);
+                
+                $this->apiItemsRaw($api_data, $url_api.$url_api1);
             }
         }
+        // } else {
+        //     if (!empty($api_data->data)) {
+        //         if ($filter['limit'] != '') {
+        //             $url_api .= '&limit=' . $filter['limit'];
+        //         }
+        //         if ($filter['page'] != '') {
+        //             $url_api .= '&page=' . $filter['page'];
+        //         }
+        //         $response = file_get_contents($url_api);
+        //         $api_data = json_decode($response);
+        //         return $this->apiItemsRaw($api_data, $url_api);
+        //     } else {
+        //         return response()->json([
+        //             'param' => $url_api,
+        //             'message' => '완료되었습니다.',
+        //             'status' => 1
+        //         ], 200);
+        //     }
+        // }
         return response()->json([
-            'param' => $url_api,
             'message' => '완료되었습니다.',
             'status' => 1
         ], 200);
@@ -3384,7 +3404,7 @@ class ItemController extends Controller
             $user = Auth::user();
 
             if ($user->mb_type == 'shop') {
-               
+
                 $sub = ImportExpected::select('company.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
                     ->leftjoin('company', function ($join) {
                         $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
@@ -3415,20 +3435,20 @@ class ItemController extends Controller
                 $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
                     $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
                 })
-                // ->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
-                //     $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
-                // })
-                ->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+                    // ->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
+                    //     $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
+                    // })
+                    ->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
 
-                    //$leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
-                    $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-                })->leftJoinSub($sub_5, 'nnn', function ($leftjoin) {
-                    $leftjoin->on('ddd.te_carry_out_number', '=', 'nnn.is_no')->where('ddd.te_carry_out_number', '!=', null);
-                    $leftjoin->orOn('bbb.ti_carry_in_number', '=', 'nnn.is_no')->whereNull('ddd.te_carry_out_number');
-                    $leftjoin->orOn('aaa.tie_logistic_manage_number', '=', 'nnn.is_no')->whereNull('ddd.te_carry_out_number')->whereNull('bbb.ti_carry_in_number');
-                })->orderBy('tie_is_date', 'DESC')->orderBy('tie_h_bl', 'DESC');
+                        //$leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
+                        $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+                    })->leftJoinSub($sub_5, 'nnn', function ($leftjoin) {
+                        $leftjoin->on('ddd.te_carry_out_number', '=', 'nnn.is_no')->where('ddd.te_carry_out_number', '!=', null);
+                        $leftjoin->orOn('bbb.ti_carry_in_number', '=', 'nnn.is_no')->whereNull('ddd.te_carry_out_number');
+                        $leftjoin->orOn('aaa.tie_logistic_manage_number', '=', 'nnn.is_no')->whereNull('ddd.te_carry_out_number')->whereNull('bbb.ti_carry_in_number');
+                    })->orderBy('tie_is_date', 'DESC')->orderBy('tie_h_bl', 'DESC');
             } else if ($user->mb_type == 'shipper') {
-               
+
                 $sub = ImportExpected::select('company.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
                     ->leftjoin('company', function ($join) {
                         $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
@@ -3459,26 +3479,26 @@ class ItemController extends Controller
                 $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
                     $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
                 })
-                // ->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
-                //     $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
-                // })
-                ->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+                    // ->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
+                    //     $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
+                    // })
+                    ->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
 
-                    //$leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
-                    $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-                })->leftJoinSub($sub_5, 'nnn', function ($leftjoin) {
-                    $leftjoin->on('ddd.te_carry_out_number', '=', 'nnn.is_no')->where('ddd.te_carry_out_number', '!=', null);
-                    $leftjoin->orOn('bbb.ti_carry_in_number', '=', 'nnn.is_no')->whereNull('ddd.te_carry_out_number');
-                    $leftjoin->orOn('aaa.tie_logistic_manage_number', '=', 'nnn.is_no')->whereNull('ddd.te_carry_out_number')->whereNull('bbb.ti_carry_in_number');
-                })->orderBy('tie_is_date', 'DESC')->orderBy('tie_h_bl', 'DESC');
+                        //$leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
+                        $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+                    })->leftJoinSub($sub_5, 'nnn', function ($leftjoin) {
+                        $leftjoin->on('ddd.te_carry_out_number', '=', 'nnn.is_no')->where('ddd.te_carry_out_number', '!=', null);
+                        $leftjoin->orOn('bbb.ti_carry_in_number', '=', 'nnn.is_no')->whereNull('ddd.te_carry_out_number');
+                        $leftjoin->orOn('aaa.tie_logistic_manage_number', '=', 'nnn.is_no')->whereNull('ddd.te_carry_out_number')->whereNull('bbb.ti_carry_in_number');
+                    })->orderBy('tie_is_date', 'DESC')->orderBy('tie_h_bl', 'DESC');
             } else if ($user->mb_type == 'spasys') {
-                
+
                 //FIX NOT WORK 'with'
                 $sub = ImportExpected::select('company.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
                     ->leftjoin('company as parent_spasys', function ($join) {
                         $join->on('parent_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
                     })
-                   ->leftjoin('company', function ($join) {
+                    ->leftjoin('company', function ($join) {
                         $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
                     })->leftjoin('company as parent_shop', function ($join) {
                         $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
@@ -3520,74 +3540,54 @@ class ItemController extends Controller
                 $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
                     $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
                 })
-                // ->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
-                //     $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
-                // })
-                ->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
+                    // ->leftJoinSub($sub_3, 'ccc', function ($leftjoin) {
+                    //     $leftjoin->on('bbb.ti_logistic_manage_number', '=', 'ccc.tec_logistic_manage_number');
+                    // })
+                    ->leftJoinSub($sub_4, 'ddd', function ($leftjoin) {
 
-                    //$leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
-                    $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
-                })->leftJoinSub($sub_5, 'nnn', function ($leftjoin) {
-                    $leftjoin->on('ddd.te_carry_out_number', '=', 'nnn.is_no')->where('ddd.te_carry_out_number', '!=', null);
-                    $leftjoin->orOn('bbb.ti_carry_in_number', '=', 'nnn.is_no')->whereNull('ddd.te_carry_out_number');
-                    $leftjoin->orOn('aaa.tie_logistic_manage_number', '=', 'nnn.is_no')->whereNull('ddd.te_carry_out_number')->whereNull('bbb.ti_carry_in_number');
-                })->orderBy('tie_is_date', 'DESC')->orderBy('tie_h_bl', 'DESC');
+                        //$leftjoin->on('ccc.tec_logistic_manage_number', '=', 'ddd.te_logistic_manage_number');
+                        $leftjoin->on('bbb.ti_carry_in_number', '=', 'ddd.te_carry_in_number');
+                    })->leftJoinSub($sub_5, 'nnn', function ($leftjoin) {
+                        $leftjoin->on('ddd.te_carry_out_number', '=', 'nnn.is_no')->where('ddd.te_carry_out_number', '!=', null);
+                        $leftjoin->orOn('bbb.ti_carry_in_number', '=', 'nnn.is_no')->whereNull('ddd.te_carry_out_number');
+                        $leftjoin->orOn('aaa.tie_logistic_manage_number', '=', 'nnn.is_no')->whereNull('ddd.te_carry_out_number')->whereNull('bbb.ti_carry_in_number');
+                    })->orderBy('tie_is_date', 'DESC')->orderBy('tie_h_bl', 'DESC');
 
 
-                
-               
+
+
                 //END FIX NOT WORK 'with'
             }
 
 
             foreach ($import_schedule->get() as $item) {
 
-                
-                    if ($item->te_carry_out_number) {
 
-                        $is_exist = Warehousing::where('ti_carry_in_number', $item->ti_carry_in_number)->first();
+                if ($item->te_carry_out_number) {
 
-                        if(isset($is_exist->w_no)){
-                            if($is_exist->te_carry_out_number == null){
-                                $warehousing = Warehousing::updateOrCreate(
-                                    [
-                                        'ti_carry_in_number' => $item->ti_carry_in_number,
-                                    ],
-                                    [
-                                        'logistic_manage_number' => $item->ti_logistic_manage_number ? $item->ti_logistic_manage_number : ($item->te_logistic_manage_number ? $item->te_logistic_manage_number : $item->tec_logistic_manage_number),
-                                        'w_category_name' => '보세화물',
-                                        'mb_no' => $user->mb_no,
-                                        // 'w_completed_day' => $item['import']['ti_i_date'] ? $item['import']['ti_i_date'] : NULL,
-                                        // 'w_schedule_day' => $item['tie_is_date'] ? $item['tie_is_date'] : NULL,
-                                        'tie_no' => $item->tie_no,
-                                        'w_schedule_amount' => $item->tie_is_number,
-                                        'w_amount' => $item->ti_i_number,
-                                        'w_type' => 'SET',
-                                        'co_no' => isset($item->co_no) ? $item->co_no : null,
-                                        'te_carry_out_number' => $item->te_carry_out_number,
-                                    ]
-                                );
-                            }else {
-                                $warehousing = Warehousing::updateOrCreate(
-                                    [
-                                        'te_carry_out_number' => $item->te_carry_out_number,
-                                    ],
-                                    [
-                                        'logistic_manage_number' => $item->ti_logistic_manage_number ? $item->ti_logistic_manage_number : ($item->te_logistic_manage_number ? $item->te_logistic_manage_number : $item->tec_logistic_manage_number),
-                                        'w_category_name' => '보세화물',
-                                        'mb_no' => $user->mb_no,
-                                        // 'w_completed_day' => $item['import']['ti_i_date'] ? $item['import']['ti_i_date'] : NULL,
-                                        // 'w_schedule_day' => $item['tie_is_date'] ? $item['tie_is_date'] : NULL,
-                                        'tie_no' => $item->tie_no,
-                                        'w_schedule_amount' => $item->tie_is_number,
-                                        'w_amount' => $item->ti_i_number,
-                                        'w_type' => 'SET',
-                                        'co_no' => isset($item->co_no) ? $item->co_no : $item->co_no,
-                                        'ti_carry_in_number' => $item->ti_carry_in_number,
-                                    ]
-                                );
-                            }
-                        }else {
+                    $is_exist = Warehousing::where('ti_carry_in_number', $item->ti_carry_in_number)->first();
+
+                    if (isset($is_exist->w_no)) {
+                        if ($is_exist->te_carry_out_number == null) {
+                            $warehousing = Warehousing::updateOrCreate(
+                                [
+                                    'ti_carry_in_number' => $item->ti_carry_in_number,
+                                ],
+                                [
+                                    'logistic_manage_number' => $item->ti_logistic_manage_number ? $item->ti_logistic_manage_number : ($item->te_logistic_manage_number ? $item->te_logistic_manage_number : $item->tec_logistic_manage_number),
+                                    'w_category_name' => '보세화물',
+                                    'mb_no' => $user->mb_no,
+                                    // 'w_completed_day' => $item['import']['ti_i_date'] ? $item['import']['ti_i_date'] : NULL,
+                                    // 'w_schedule_day' => $item['tie_is_date'] ? $item['tie_is_date'] : NULL,
+                                    'tie_no' => $item->tie_no,
+                                    'w_schedule_amount' => $item->tie_is_number,
+                                    'w_amount' => $item->ti_i_number,
+                                    'w_type' => 'SET',
+                                    'co_no' => isset($item->co_no) ? $item->co_no : null,
+                                    'te_carry_out_number' => $item->te_carry_out_number,
+                                ]
+                            );
+                        } else {
                             $warehousing = Warehousing::updateOrCreate(
                                 [
                                     'te_carry_out_number' => $item->te_carry_out_number,
@@ -3607,10 +3607,10 @@ class ItemController extends Controller
                                 ]
                             );
                         }
-                    } else if ($item->ti_carry_in_number) {
+                    } else {
                         $warehousing = Warehousing::updateOrCreate(
                             [
-                                'ti_carry_in_number' => $item->ti_carry_in_number,
+                                'te_carry_out_number' => $item->te_carry_out_number,
                             ],
                             [
                                 'logistic_manage_number' => $item->ti_logistic_manage_number ? $item->ti_logistic_manage_number : ($item->te_logistic_manage_number ? $item->te_logistic_manage_number : $item->tec_logistic_manage_number),
@@ -3622,30 +3622,49 @@ class ItemController extends Controller
                                 'w_schedule_amount' => $item->tie_is_number,
                                 'w_amount' => $item->ti_i_number,
                                 'w_type' => 'SET',
-                                'co_no' => isset($item->co_no) ? $item->co_no : null,
-                                'te_carry_out_number' => $item->te_carry_out_number,
+                                'co_no' => isset($item->co_no) ? $item->co_no : $item->co_no,
+                                'ti_carry_in_number' => $item->ti_carry_in_number,
                             ]
                         );
                     }
+                } else if ($item->ti_carry_in_number) {
+                    $warehousing = Warehousing::updateOrCreate(
+                        [
+                            'ti_carry_in_number' => $item->ti_carry_in_number,
+                        ],
+                        [
+                            'logistic_manage_number' => $item->ti_logistic_manage_number ? $item->ti_logistic_manage_number : ($item->te_logistic_manage_number ? $item->te_logistic_manage_number : $item->tec_logistic_manage_number),
+                            'w_category_name' => '보세화물',
+                            'mb_no' => $user->mb_no,
+                            // 'w_completed_day' => $item['import']['ti_i_date'] ? $item['import']['ti_i_date'] : NULL,
+                            // 'w_schedule_day' => $item['tie_is_date'] ? $item['tie_is_date'] : NULL,
+                            'tie_no' => $item->tie_no,
+                            'w_schedule_amount' => $item->tie_is_number,
+                            'w_amount' => $item->ti_i_number,
+                            'w_type' => 'SET',
+                            'co_no' => isset($item->co_no) ? $item->co_no : null,
+                            'te_carry_out_number' => $item->te_carry_out_number,
+                        ]
+                    );
+                }
 
 
-                    //THUONG EDIT TO MAKE SETTLEMENT
-                    if (isset($warehousing->w_no)) {
-                        ReceivingGoodsDelivery::updateOrCreate(
-                            [
-                                'w_no' => $warehousing->w_no,
-                            ],
-                            [
-                                'mb_no' => $user->mb_no,
-                                'service_korean_name' => '보세화물',
-                                'rgd_status1' => '입고',
-                                'rgd_tracking_code' => $warehousing->logistic_manage_number,
-                                'rgd_ti_carry_in_number' => $warehousing->ti_carry_in_number,
-                                'rgd_te_carry_out_number' => $warehousing->te_carry_out_number,
-                            ]
-                        );
-                    }
-            
+                //THUONG EDIT TO MAKE SETTLEMENT
+                if (isset($warehousing->w_no)) {
+                    ReceivingGoodsDelivery::updateOrCreate(
+                        [
+                            'w_no' => $warehousing->w_no,
+                        ],
+                        [
+                            'mb_no' => $user->mb_no,
+                            'service_korean_name' => '보세화물',
+                            'rgd_status1' => '입고',
+                            'rgd_tracking_code' => $warehousing->logistic_manage_number,
+                            'rgd_ti_carry_in_number' => $warehousing->ti_carry_in_number,
+                            'rgd_te_carry_out_number' => $warehousing->te_carry_out_number,
+                        ]
+                    );
+                }
             }
             DB::commit();
             return response()->json(['message' => 'Success']);
