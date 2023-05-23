@@ -2144,7 +2144,7 @@ class ItemController extends Controller
                         'mb_no' => Auth::user()->mb_no,
                         'co_no' => isset($item->co_no) ? $item->co_no : Auth::user()->co_no,
                         'item_name' => isset($item->name) ? $item->name : null,
-                        'supply_code' => isset($item->supply_code) ? $item->name : null,
+                        'supply_code' => isset($item->supply_code) ? $item->supply_code : null,
                         'item_brand' => isset($item->brand) ? $item->brand : null,
                         'item_origin' => isset($item->origin) ? $item->origin : null,
                         'item_weight' => isset($item->weight) ? $item->weight : null,
