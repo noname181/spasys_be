@@ -322,15 +322,17 @@ class RateMetaDataController extends Controller
         $validated = $request->validated();
         try {
 
-
             $path = join('/', ['files', 'rate_data', $request->rmd_no]);
 
             $files = [];
             if($request->remove_files){
                 foreach($request->remove_files as $key => $file_no) {
                     $file = File::where('file_no', $file_no)->get()->first();
-                    $url = Storage::disk('public')->delete($path. '/' . $file->file_name);
-                    $file->delete();
+                    if(isset($file)){
+                        $url = Storage::disk('public')->delete($path. '/' . $file->file_name);
+                        $file->delete();
+                    }
+                   
                 }
             }
             if(isset($validated['files'])){
@@ -340,7 +342,7 @@ class RateMetaDataController extends Controller
                         'file_table' => 'rate_data',
                         'file_table_key' => $request->rmd_no,
                         'file_name_old' => $file->getClientOriginalName(),
-                        'file_name' => basename($url),
+                        'file_name' => isset($url) ? basename($url) : null,
                         'file_size' => $file->getSize(),
                         'file_extension' => $file->extension(),
                         'file_position' => $key,
