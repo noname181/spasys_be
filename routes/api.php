@@ -531,6 +531,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/get_set_data_precalculate/{rmd_no}/{meta_cate}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_set_data_precalculate']);
         Route::get('/get_data_general_precalculate/{rmd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_data_general_precalculate']);
 
+        //file for rate data
+
         //GET RATE DATA
         Route::get('/get_set_data/{rmd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_set_data'])->name('get_set_data');
         Route::get('/get_set_data_mobile/{bill_type}/{rmd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_set_data_mobile'])->name('get_set_data2');
