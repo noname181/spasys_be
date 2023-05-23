@@ -320,18 +320,24 @@ class RateMetaDataController extends Controller
     public function file_rmd(RateMetaDataSearchRequest $request)
     {
         $validated = $request->validated();
-        return $validated['files'];
         try {
 
 
             $path = join('/', ['files', 'rate_data', $request->rmd_no]);
 
             $files = [];
+            if($request->remove_files){
+                foreach($request->remove_files as $key => $file_no) {
+                    $file = File::where('file_no', $file_no)->get()->first();
+                    $url = Storage::disk('public')->delete($path. '/' . $file->file_name);
+                    $file->delete();
+                }
+            }
             if(isset($validated['files'])){
                 foreach($validated['files'] as $key => $file) {
                     $url = Storage::disk('public')->put($path, $file);
                     $files[] = [
-                        'file_table' => 'notice',
+                        'file_table' => 'rate_data',
                         'file_table_key' => $request->rmd_no,
                         'file_name_old' => $file->getClientOriginalName(),
                         'file_name' => basename($url),
@@ -353,7 +359,7 @@ class RateMetaDataController extends Controller
             ], 201);
         } catch (\Throwable $e) {
             DB::rollback();
-            //return $e;
+            return $e;
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
