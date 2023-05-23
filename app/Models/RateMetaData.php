@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use DateTimeInterface;
 use App\Models\RateData;
 use App\Models\RateDataGeneral;
+use App\Models\File;
 class RateMetaData extends Model
 {
     use HasFactory;
@@ -76,5 +77,8 @@ class RateMetaData extends Model
     public function send_email_rmd(){
         return $this->hasOne(SendEmail::class, 'rmd_no', 'rmd_no')->orderBy('se_no','desc')->with('member');
     }
-
+    public function files()
+    {
+        return $this->hasMany(File::class, 'file_table_key', 'rmd_no')->where('file_table', 'rate_data');
+    }
 }

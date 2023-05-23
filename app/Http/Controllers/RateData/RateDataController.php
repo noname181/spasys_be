@@ -1380,7 +1380,8 @@ class RateDataController extends Controller
             })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
             $w_no = $rate_data[0]->w_no;
             $warehousing = Warehousing::with(['co_no', 'w_import_parent', 'w_ew'])->where('w_no', $w_no)->first();
-            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data, 'warehousing' => $warehousing], 200);
+            $files = RateMetaData::with('files')->where('rmd_no', '=', $rmd_no)->first();
+            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data, 'warehousing' => $warehousing,'files' => $files], 200);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
