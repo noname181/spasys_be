@@ -263,13 +263,25 @@ class CommonFunc
             $receiver_shipper = Company::with(['co_parent'])->where('co_license', $w_no['co_license'])->first();
 
             if (isset($receiver_shipper)) {
-                $receiver_list = Member::where('co_no', $receiver_shipper->co_no)->orwhere('co_no', $receiver_shipper->co_parent->co_no)->orwhere('co_no', $receiver_shipper->co_parent->co_parent->co_no)->get();
+                if(isset($receiver_shipper->co_parent->co_parent->co_no)){
+                    $receiver_list = Member::where('co_no', $receiver_shipper->co_no)->orwhere('co_no', $receiver_shipper->co_parent->co_no)->orwhere('co_no', $receiver_shipper->co_parent->co_parent->co_no)->get();
+                }elseif(isset($receiver_shipper->co_parent->co_no)){
+                    $receiver_list = Member::where('co_no', $receiver_shipper->co_no)->orwhere('co_no', $receiver_shipper->co_parent->co_no)->get();
+                }else{
+                    $receiver_list = Member::where('co_no', $receiver_shipper->co_no)->get();
+                }  
             }
         } else if ($alarm_data->ad_must_yn == 'n') {
             $receiver_shipper = Company::with(['co_parent'])->where('co_license', $w_no['co_license'])->first();
 
             if (isset($receiver_shipper)) {
-                $receiver_list = Member::where('co_no', $receiver_shipper->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shipper->co_parent->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shipper->co_parent->co_parent->co_no)->where('mb_push_yn', 'y')->get();
+                if(isset($receiver_shipper->co_parent->co_parent->co_no)){
+                    $receiver_list = Member::where('co_no', $receiver_shipper->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shipper->co_parent->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shipper->co_parent->co_parent->co_no)->where('mb_push_yn', 'y')->get();
+                }elseif(isset($receiver_shipper->co_parent->co_no)){
+                    $receiver_list = Member::where('co_no', $receiver_shipper->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shipper->co_parent->co_no)->where('mb_push_yn', 'y')->get();
+                }else{
+                    $receiver_list = Member::where('co_no', $receiver_shipper->co_no)->where('mb_push_yn', 'y')->get();
+                }  
             }
         }
 
