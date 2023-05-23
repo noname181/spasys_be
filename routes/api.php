@@ -419,6 +419,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/check', [App\Http\Controllers\RateMetaData\RateMetaDataController::class, 'checkCO'])->name('check_co');
         Route::post('/get_precalculate_details', [App\Http\Controllers\RateMetaData\RateMetaDataController::class, 'get_precalculate_details'])->name('get_all_co_precalculate_details');
         Route::post('/get_mail/{rmd_no}', [App\Http\Controllers\RateMetaData\RateMetaDataController::class, 'getMail'])->name('get_mail');
+        Route::post('/file_rmd',[\App\Http\Controllers\RateMetaData\RateMetaDataController::class, 'file_rmd']);
     });
 
     Route::prefix('rate_data')->name('rate_data.')->group(function () {
@@ -530,8 +531,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/register_data_general_precalculate',[\App\Http\Controllers\RateData\RateDataController::class, 'register_data_general_precalculate']);
         Route::get('/get_set_data_precalculate/{rmd_no}/{meta_cate}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_set_data_precalculate']);
         Route::get('/get_data_general_precalculate/{rmd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_data_general_precalculate']);
-
-        //file for rate data
 
         //GET RATE DATA
         Route::get('/get_set_data/{rmd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_set_data'])->name('get_set_data');

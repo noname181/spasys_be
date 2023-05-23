@@ -6,8 +6,10 @@ use App\Utils\Messages;
 use App\Models\RateData;
 use App\Models\RateMetaData;
 use App\Models\RateMeta;
+use App\Models\File;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -315,5 +317,53 @@ class RateMetaDataController extends Controller
             return response()->json(['message' => Messages::MSG_0020], 500);
         }
     }
+    public function file_rmd(RateMetaDataSearchRequest $request)
+    {
+        $validated = $request->validated();
+        try {
 
+            $path = join('/', ['files', 'rate_data', $request->rmd_no]);
+
+            $files = [];
+            if($request->remove_files){
+                foreach($request->remove_files as $key => $file_no) {
+                    $file = File::where('file_no', $file_no)->get()->first();
+                    if(isset($file)){
+                        $url = Storage::disk('public')->delete($path. '/' . $file->file_name);
+                        $file->delete();
+                    }
+                   
+                }
+            }
+            if(isset($validated['files'])){
+                foreach($validated['files'] as $key => $file) {
+                    $url = Storage::disk('public')->put($path, $file);
+                    $files[] = [
+                        'file_table' => 'rate_data',
+                        'file_table_key' => $request->rmd_no,
+                        'file_name_old' => $file->getClientOriginalName(),
+                        'file_name' => isset($url) ? basename($url) : null,
+                        'file_size' => $file->getSize(),
+                        'file_extension' => $file->extension(),
+                        'file_position' => $key,
+                        'file_url' => $url
+                    ];
+                }
+                File::insert($files);
+            }
+            
+
+
+            DB::commit();
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'file' => $files,
+            ], 201);
+        } catch (\Throwable $e) {
+            DB::rollback();
+            return $e;
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0001], 500);
+        }
+    }
 }
