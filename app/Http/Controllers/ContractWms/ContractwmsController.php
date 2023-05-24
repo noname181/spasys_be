@@ -55,9 +55,9 @@ class ContractwmsController extends Controller
                     if(isset($validated['contract_wms_tab1'])){
 
                         foreach ($validated['contract_wms_tab1'] as $ssi) {
-                            $contract_code_tab1 = ContractWms::where('cw_tab','=','판매처')->where('cw_code','=',$ssi['cw_code'])->where('mb_no', '!=', $user->mb_no)->first();
-
-                            if(!isset($contract_code_tab1->cw_no)){
+                            $contract_code_tab1 = ContractWms::where('cw_tab','=','판매처')->where('cw_code','=',$ssi['cw_code'])->first();
+                            
+                            if(!isset($contract_code_tab1->cw_no) || $contract_code_tab1->co_no == $user->co_no){
                                 $co_no = $request->get('co_no');
 
                                 $update = ContractWms::updateOrCreate(
