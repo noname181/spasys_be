@@ -4740,14 +4740,14 @@ class WarehousingController extends Controller
                                 }
                             }
                             $item->discount = $total_discount;
-                            $item->sum_price_total2 = $item->rate_data_general->rdg_sum7 + $total_discount;
+                            $item->sum_price_total2 = $item->rate_data_general->rdg_sum7 + $item->rate_data_general->rdg_sum14 + $total_discount;
                         } else if (count($item->rate_meta_data) > 0) {
                             $total_discount = 0;
 
                             $rate_data = RateData::where('rmd_no', $item->rate_meta_data[0]->rate_data[0]->rmd_no)->where('rd_cate2', '할인금액')->first();
                             $total_discount += isset($rate_data->rd_data4) ? (int)$rate_data->rd_data4 : 0;
 
-                            $item->sum_price_total2 = $item->rate_data_general->rdg_sum7 + $total_discount;
+                            $item->sum_price_total2 = $item->rate_data_general->rdg_sum7 + $item->rate_data_general->rdg_sum14 + $total_discount;
                             $item->discount = $total_discount;
                         } else if (count($item->rate_meta_data_parent) > 0) {
                             $total_discount = 0;
@@ -4755,11 +4755,11 @@ class WarehousingController extends Controller
                             $rate_data = RateData::where('rmd_no', $item->rate_meta_data_parent[0]->rate_data[0]->rmd_no)->where('rd_cate2', '할인금액')->first();
                             $total_discount += isset($rate_data->rd_data4) ? (int)$rate_data->rd_data4 : 0;
 
-                            $item->sum_price_total2 = $item->rate_data_general->rdg_sum7 + $total_discount;
+                            $item->sum_price_total2 = $item->rate_data_general->rdg_sum7 + $item->rate_data_general->rdg_sum14 + $total_discount;
                             $item->discount = $total_discount;
                         }
                       
-                        $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum7 : 0;
+                        $item->sum_price_total = isset($item->rate_data_general) ? ($item->rate_data_general->rdg_sum7 + $item->rate_data_general->rdg_sum14) : 0;
                         if($item->rgd_bill_type == 'final_monthly_shop' || $item->rgd_bill_type == 'final_monthly_spasys' || $item->rgd_bill_type == 'final_monthly'){
                         $created_at = Carbon::createFromFormat('Y.m.d H:i:s', $item->created_at->format('Y.m.d H:i:s'));
 
