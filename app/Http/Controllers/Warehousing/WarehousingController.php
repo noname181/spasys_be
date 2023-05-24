@@ -5586,7 +5586,7 @@ class WarehousingController extends Controller
                 ->where(function ($q4) {
                     $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
                 })
-                ->orderByRaw('-rgd_tax_invoice_date ASC')
+                ->orderBy('rgd_status7')
                 ->orderBy('rgd_no', 'DESC');
 
             if (isset($validated['status'])) {
