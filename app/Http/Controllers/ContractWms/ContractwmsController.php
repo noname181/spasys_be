@@ -55,22 +55,22 @@ class ContractwmsController extends Controller
                     if(isset($validated['contract_wms_tab1'])){
 
                         foreach ($validated['contract_wms_tab1'] as $ssi) {
-                            $contract_code_tab1 = ContractWms::where('cw_tab','=','판매처')->where('cw_code','=',$ssi['cw_code'])->where('mb_no', '!=', $user->mb_no)->first();
-
-                            if(!isset($contract_code_tab1->cw_no)){
+                            $contract_code_tab1 = ContractWms::where('cw_tab','=','판매처')->where('cw_code','=',$ssi['cw_code'])->first();
+                            
+                            if(!isset($contract_code_tab1->cw_no) || ($contract_code_tab1->co_no == $request->co_no && $ssi['cw_no'] == $contract_code_tab1->cw_no)){
                                 $co_no = $request->get('co_no');
 
                                 $update = ContractWms::updateOrCreate(
                                     [
-                                        //'cw_no' => $ssi['cw_no'] ?: null,
-                                        'cw_code' => ($ssi['cw_code'] && $ssi['cw_code'] !='null') ? $ssi['cw_code']  : null,
-                                        'mb_no' =>  $user->mb_no
+                                        'cw_no' => $ssi['cw_no'] ?: null,             
+                                        
                                     ],
                                     [
                                         'co_no' => $co_no,
                                         'cw_name' => ($ssi['cw_name'] && $ssi['cw_name'] !='null') ? $ssi['cw_name']  : null,
                                         'cw_tab' => '판매처',
-
+                                        'mb_no' =>  $user->mb_no,
+                                        'cw_code' => ($ssi['cw_code'] && $ssi['cw_code'] !='null') ? $ssi['cw_code']  : null,
                                     ]
                                 );
                                 //return $update;
@@ -84,19 +84,19 @@ class ContractwmsController extends Controller
                     }
                     if(isset($validated['contract_wms_tab2'])){
                         foreach ($validated['contract_wms_tab2'] as $ss) {
-                            $contract_code_tab2 = ContractWms::where('cw_tab','=','공급처')->where('cw_code','=',$ss['cw_code'])->where('mb_no', '!=', $user->mb_no)->first();
-                            if(!isset($contract_code_tab2->cw_no)){
+                            $contract_code_tab2 = ContractWms::where('cw_tab','=','공급처')->where('cw_code','=',$ss['cw_code'])->first();
+                            if(!isset($contract_code_tab2->cw_no) || ($contract_code_tab2->co_no == $request->co_no && $ss['cw_no'] == $contract_code_tab2->cw_no)){
                                 $co_no = $request->get('co_no');
                                 ContractWms::updateOrCreate(
                                     [
-                                        //'cw_no' => ($ss['cw_no'] &&  $ss['cw_no'] != 'undefined') ?  $ss['cw_no'] : null,
-                                        'cw_code' => ($ss['cw_code'] && $ss['cw_code'] !='null') ? $ss['cw_code']: null,
-                                        'mb_no' =>  $user->mb_no
+                                        'cw_no' => ($ss['cw_no'] &&  $ss['cw_no'] != 'undefined') ?  $ss['cw_no'] : null,
                                     ],
                                     [
                                         'co_no' => $co_no,
                                         'cw_name' => ($ss['cw_name'] && $ss['cw_name'] !='null') ? $ss['cw_name']: null,
                                         'cw_tab' => '공급처',
+                                        'cw_code' => ($ss['cw_code'] && $ss['cw_code'] !='null') ? $ss['cw_code']: null,
+                                        'mb_no' =>  $user->mb_no
 
                                     ]
                                 );

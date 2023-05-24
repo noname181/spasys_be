@@ -5045,7 +5045,7 @@ class WarehousingController extends Controller
                     $rmd = RateMetaData::where(
                         [
                             'rgd_no' => $item->rgd_no,
-                            'set_type' => 'fulfill1_final',
+                            'set_type' => $user->mb_type == 'spasys' ? 'fulfill1_final_spasys' : 'fulfill1_final_shop',
                         ]
                     )->first();
 
@@ -5586,7 +5586,7 @@ class WarehousingController extends Controller
                 ->where(function ($q4) {
                     $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
                 })
-                ->orderByRaw('-rgd_tax_invoice_date ASC')
+                ->orderBy('rgd_status7')
                 ->orderBy('rgd_no', 'DESC');
 
             if (isset($validated['status'])) {
@@ -5647,7 +5647,7 @@ class WarehousingController extends Controller
                 } else
                     $warehousing->where('rgd_status7', '=', $validated['rgd_status1']);
             }
-            if (isset($validated['rgd_status6'])) {
+            if (isset($validated['rgd_status6']) && $validated['rgd_status6'] != '전체') {
                 if ($validated['rgd_status6'] == 'cancel') {
                     $warehousing->where('rgd_status6', '=', 'cancel');
                 } else if ($validated['rgd_status6'] == 'paid') {
@@ -5677,7 +5677,7 @@ class WarehousingController extends Controller
                 }
             }
 
-            if (isset($validated['rgd_status67'])) {
+            if (isset($validated['rgd_status67']) && $validated['rgd_status67'] != '전체') {
                 if ($validated['rgd_status67'] == '정산완료') {
                     $warehousing->where(function ($q) use ($validated) {
                         $q->where(function ($q) use ($validated) {
@@ -5710,7 +5710,7 @@ class WarehousingController extends Controller
                 $warehousing->where('service_korean_name', 'like', '%' . $validated['service_korean_name'] . '%');
             }
 
-            if (isset($validated['co_close_yn'])) {
+            if (isset($validated['co_close_yn']) && $validated['co_close_yn'] != '전체') {
                 if ($user->mb_type == 'spasys') {
                     $warehousing->where(function ($q) use ($validated) {
                         $q->where(function ($q1) use ($validated) {
