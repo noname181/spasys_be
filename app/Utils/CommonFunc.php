@@ -803,24 +803,44 @@ class CommonFunc
         if ($type == 'photo') {
             $alarm_type = 'photo';
         }
-
-        if ($sender->mb_type == 'spasys') {
-            if ($request->type == '보세화물') {
-                $receiver = Member::where('co_no', $request->co_no)->first();
-                $receiver_spasys = $receiver->company->co_parent->co_parent;
-                $receiver_shop = $receiver->company->co_parent;
-                $receiver_shipper = $receiver->company;
-                $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shop->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shipper->co_no)->where('mb_push_yn', 'y')->get();
-            } else {
-                $receiver = Warehousing::with('mb_no')
-                    ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->where('w_no', $request->w_no)
-                    ->orderBy('w_completed_day', 'DESC')->first();
-                $receiver_spasys = $receiver->company->co_parent->co_parent;
-                $receiver_shop = $receiver->company->co_parent;
-                $receiver_shipper = $receiver->company;
-                $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shop->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shipper->co_no)->where('mb_push_yn', 'y')->get();
+        if ($alarm_data->ad_must_yn == 'y') {
+            if ($sender->mb_type == 'spasys') {
+                if ($request->type == '보세화물') {
+                    $receiver = Member::where('co_no', $request->co_no)->first();
+                    $receiver_spasys = $receiver->company->co_parent->co_parent;
+                    $receiver_shop = $receiver->company->co_parent;
+                    $receiver_shipper = $receiver->company;
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->orwhere('co_no', $receiver_shop->co_no)->orwhere('co_no', $receiver_shipper->co_no)->get();
+                } else {
+                    $receiver = Warehousing::with('mb_no')
+                        ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->where('w_no', $request->w_no)
+                        ->orderBy('w_completed_day', 'DESC')->first();
+                    $receiver_spasys = $receiver->company->co_parent->co_parent;
+                    $receiver_shop = $receiver->company->co_parent;
+                    $receiver_shipper = $receiver->company;
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->orwhere('co_no', $receiver_shop->co_no)->orwhere('co_no', $receiver_shipper->co_no)->get();
+                }
+            }
+        }else if ($alarm_data->ad_must_yn == 'n') {
+            if ($sender->mb_type == 'spasys') {
+                if ($request->type == '보세화물') {
+                    $receiver = Member::where('co_no', $request->co_no)->first();
+                    $receiver_spasys = $receiver->company->co_parent->co_parent;
+                    $receiver_shop = $receiver->company->co_parent;
+                    $receiver_shipper = $receiver->company;
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shop->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shipper->co_no)->where('mb_push_yn', 'y')->get();
+                } else {
+                    $receiver = Warehousing::with('mb_no')
+                        ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->where('w_no', $request->w_no)
+                        ->orderBy('w_completed_day', 'DESC')->first();
+                    $receiver_spasys = $receiver->company->co_parent->co_parent;
+                    $receiver_shop = $receiver->company->co_parent;
+                    $receiver_shipper = $receiver->company;
+                    $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shop->co_no)->where('mb_push_yn', 'y')->orwhere('co_no', $receiver_shipper->co_no)->where('mb_push_yn', 'y')->get();
+                }
             }
         }
+        
 
         foreach ($receiver_list as $receiver) {
 
