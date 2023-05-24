@@ -5045,7 +5045,7 @@ class WarehousingController extends Controller
                     $rmd = RateMetaData::where(
                         [
                             'rgd_no' => $item->rgd_no,
-                            'set_type' => 'fulfill1_final',
+                            'set_type' => $user->mb_type == 'spasys' ? 'fulfill1_final_spasys' : 'fulfill1_final_shop',
                         ]
                     )->first();
 
