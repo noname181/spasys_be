@@ -9,6 +9,7 @@ use App\Http\Requests\RateData\RateDataSendMailRequest;
 use App\Models\AdjustmentGroup;
 use App\Models\CancelBillHistory;
 use App\Models\Company;
+use App\Models\CompanyPayment;
 use App\Models\Payment;
 use App\Models\Member;
 use App\Models\Contract;
@@ -2654,9 +2655,9 @@ class RateDataController extends Controller
 
              //CHECK EXIST IN DOUBLE CLICK CASE
             $check_settlement_number = ReceivingGoodsDelivery::where('rgd_settlement_number', $request->settlement_number)->first();
-            // if(isset($check_settlement_number->rgd_no) && !str_contains($request->type, 'edit')){
-            //     return;
-            // }
+            if(isset($check_settlement_number->rgd_no) && !str_contains($request->type, 'edit')){
+                return;
+            }
 
             $user = Auth::user();
 
@@ -2743,7 +2744,7 @@ class RateDataController extends Controller
                         'rgd_no' => $final_rgd->rgd_no,
                     ]);
                 }
-                
+
 
                 // if ($request->bill_type == 'final') {
                 //     $settlement_number = explode('_', $final_rgd->rgd_settlement_number);
@@ -2775,7 +2776,7 @@ class RateDataController extends Controller
                     $set_type = $index.'_final';
 
                     $rmd = RateMetaData::where('rgd_no', $final_rgd->rgd_no)->where('set_type', $set_type)->first();
-                    
+
                     if(!isset($rmd->rmd_no)){
                         $set_type = $user->mb_type == 'spasys' ? ($index.'_spasys') : ($index.'_shop');
 
@@ -2785,7 +2786,7 @@ class RateDataController extends Controller
                             $rmd_expectation->rgd_no = $final_rgd->rgd_no;
                             $rmd_expectation->set_type = $index.'_final';
                             $rmd_expectation->save();
-            
+
                             $rds = RateData::where('rmd_no', $rmd->rmd_no)->get();
                             foreach($rds as $index=>$rd){
                                 $rd_expectation = $rd->replicate();
@@ -2795,8 +2796,8 @@ class RateDataController extends Controller
                         }
                     }
                 }
-    
-               
+
+
             }
 
             //UPDATE EST BILL WHEN ISSUE FINAL BILL
@@ -4388,7 +4389,7 @@ class RateDataController extends Controller
                     'rdg_etc7' => isset($request->total['etc']) ? $request->total['etc'] : '',
                 ]
             );
-          
+
 
             $previous_rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->where('rgd_bill_type', '=', $request->previous_bill_type)->first();
             //Case of creating a est bill.
@@ -4521,7 +4522,7 @@ class RateDataController extends Controller
                     $set_type = 'bonded'.$index.'_final';
 
                     $rmd = RateMetaData::where('rgd_no', $final_rgd->rgd_no)->where('set_type', $set_type)->first();
-                    
+
                     if(!isset($rmd->rmd_no)){
                         $set_type = $user->mb_type == 'spasys' ? ('bonded'.$index.'_spasys') : ('bonded'.$index.'_shop');
 
@@ -4531,7 +4532,7 @@ class RateDataController extends Controller
                             $rmd_expectation->rgd_no = $final_rgd->rgd_no;
                             $rmd_expectation->set_type ='bonded'.$index.'_final';
                             $rmd_expectation->save();
-            
+
                             $rds = RateData::where('rmd_no', $rmd->rmd_no)->get();
                             foreach($rds as $index=>$rd){
                                 $rd_expectation = $rd->replicate();
@@ -4541,8 +4542,8 @@ class RateDataController extends Controller
                         }
                     }
                 }
-    
-               
+
+
             }
 
 
@@ -5416,7 +5417,7 @@ class RateDataController extends Controller
 
     }
 
-    public function download_data_casebill_edit($rgd_no, Request $request)
+    public function download_bonded_casebill_excel($rgd_no, Request $request)
     {
         Log::error($rgd_no);
         DB::beginTransaction();
@@ -5452,6 +5453,8 @@ class RateDataController extends Controller
             $rmd_no_bonded4 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded4'. $is_month_bill . ($is_final_bill ? '_final' : '_shop'))->first();
             $rmd_no_bonded5 = RateMetaData::where('rgd_no', $rgd_no)->where('set_type', 'bonded5'. $is_month_bill . ($is_final_bill ? '_final' : '_shop'))->first();
         }
+
+        $company->company_payment = CompanyPayment::where('co_no', $company->co_no)->first();
 
         $rate_data_bonded1 = $rate_data = RateData::where('rmd_no', isset($rmd_no_bonded1->rmd_no) ? $rmd_no_bonded1->rmd_no : 0)->where(function ($q) {
             $q->where('rd_cate_meta1', '유통가공')
@@ -5527,7 +5530,7 @@ class RateDataController extends Controller
         $sheet->mergeCells('B16:Z16');
         $sheet->setCellValue('B16', ' ∙ 예상 청구금액 : '. $rgd->rate_data_general->rdg_sum7 . '원');
         $sheet->mergeCells('B17:Z17');
-        $sheet->setCellValue('B17', ' ∙ 계좌  정보 : ㈜스페이시스원 xxxx-xxx-xxxxx (스페이시스원)');
+        $sheet->setCellValue('B17', ' ∙ 계좌  정보 : ㈜'. $company->company_payment->cp_bank_name .' ' . $company->company_payment->cp_bank_number . ' ('. $company->company_payment->cp_card_name. ')');
 
         //GENERAL TABLE
         $sheet->getStyle('B19')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
@@ -5571,7 +5574,7 @@ class RateDataController extends Controller
 
                 $count_row += 1;
             }
-            
+
         }
 
         $sheet->getStyle('B'. ($current_row). ':E'. ($current_row - 1 + $count_row))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
@@ -5596,7 +5599,7 @@ class RateDataController extends Controller
         $sheet->mergeCells('X'. ($current_row - 2). ':Z'. ($current_row - 1));
         $sheet->getStyle('X'. ($current_row - 2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->setCellValue('X'. ($current_row - 2), '비고');
-        
+
         $current_row += $count_row;
 
         //BONDED1
@@ -5605,16 +5608,16 @@ class RateDataController extends Controller
             $sheet->getStyle('B'. $current_row)->getFont()->setBold(true);
             $sheet->mergeCells('B'. $current_row. ':Z'. $current_row);
             $sheet->setCellValue('B'. $current_row, ' ∙ BLP센터비용');
-    
+
             $current_row += 3;
-    
+
             $sheet->mergeCells('B'. ($current_row). ':E'. ($current_row));
-            
+
             $sheet->getStyle('B'. ($current_row). ':E'. ($current_row))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
             $sheet->getStyle('B'. ($current_row). ':Z'. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->getStyle('B'. ($current_row). ':E'. ($current_row))->getFont()->setBold(true);
             $sheet->setCellValue('B'. ($current_row), 'BLP센터비용');
-    
+
             $sheet->mergeCells('F'.($current_row).':H'.($current_row));
             $sheet->setCellValue('F'.($current_row), $rgd->rate_data_general['rdg_supply_price1']);
             $sheet->mergeCells('I'.($current_row).':K'.($current_row));
@@ -5629,11 +5632,11 @@ class RateDataController extends Controller
             $sheet->setCellValue('U'.($current_row), '');
             $sheet->mergeCells('X'.($current_row).':Z'.($current_row));
             $sheet->setCellValue('X'.($current_row), '');
-    
-    
+
+
             $count_row = 0;
             $current_row += 1;
-    
+
             $count_row_bonded1 = 0;
             $current_row_bonded1 = $current_row;
 
@@ -5645,15 +5648,15 @@ class RateDataController extends Controller
                     $rd_sum[] = $rate_data_bonded1[$key + 1]['rd_data4'];
                 }
             }
-    
+
             foreach($rate_data_bonded1 as $key => $rate_data){
-    
+
                 if($rate_data['rd_cate1'] == '하역비용'){
                     if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_bonded1[$key - 1]['rd_cate1'])){
                         $sheet->setCellValue('B'.($current_row_bonded1 + $count_row_bonded1), '하역비용');
                         $count_row_bonded1 = 0;
                     }else if($rate_data['rd_data4'] > 0) {
-    
+
                         $sheet->mergeCells('C'.($current_row_bonded1 + $count_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('C'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_cate2']);
                         $sheet->mergeCells('F'.($current_row_bonded1 + $count_row_bonded1).':H'.($current_row_bonded1 + $count_row_bonded1));
@@ -5670,12 +5673,12 @@ class RateDataController extends Controller
                         $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data7']);
                         $sheet->mergeCells('X'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data8']);
-    
+
                         $count_row_bonded1 += 1;
                         $count_row += 1;
                     }
-    
-    
+
+
                 }
                 else if($rate_data['rd_cate1'] == '센터 작업료'){
                     if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_bonded1[$key - 1]['rd_cate1'])){
@@ -5689,8 +5692,8 @@ class RateDataController extends Controller
                         $count_row_bonded1 = 0;
                     }
                     else if($rate_data['rd_data4'] > 0 || (($rate_data['rd_cate2'] == '할인율') && $rd_sum[1] > 0)){
-    
-    
+
+
                         $sheet->mergeCells('C'.($current_row_bonded1 + $count_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('C'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_cate2']);
                         $sheet->mergeCells('F'.($current_row_bonded1 + $count_row_bonded1).':H'.($current_row_bonded1 + $count_row_bonded1));
@@ -5707,11 +5710,11 @@ class RateDataController extends Controller
                         $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data7']);
                         $sheet->mergeCells('X'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data8']);
-    
+
                         $count_row_bonded1 += 1;
                         $count_row += 1;
                     }
-    
+
                 }
                 else if($rate_data['rd_cate1'] == '기타 비용'){
                     if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_bonded1[$key - 1]['rd_cate1'])){
@@ -5723,10 +5726,10 @@ class RateDataController extends Controller
                         $sheet->setCellValue('B'.($current_row_bonded1 + $count_row_bonded1), '기타 비용');
                         $current_row_bonded1 = $current_row_bonded1 + $count_row_bonded1;
                         $count_row_bonded1 = 0;
-    
+
                     }
                     else if($rate_data['rd_data4'] > 0){
-    
+
                         $sheet->mergeCells('C'.($current_row_bonded1 + $count_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('C'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_cate2']);
                         $sheet->mergeCells('F'.($current_row_bonded1 + $count_row_bonded1).':H'.($current_row_bonded1 + $count_row_bonded1));
@@ -5743,13 +5746,13 @@ class RateDataController extends Controller
                         $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data7']);
                         $sheet->mergeCells('X'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data8']);
-    
+
                         $count_row_bonded1 += 1;
                         $count_row += 1;
                     }
-    
+
                  }
-    
+
                 if(count($rate_data_bonded1) == $key + 1){
                     $sheet->mergeCells('B'.($current_row_bonded1).':B'.($current_row_bonded1 + $count_row_bonded1 - 1));
                     $sheet->getStyle('B'.($current_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1 - 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
@@ -5759,8 +5762,8 @@ class RateDataController extends Controller
                     $current_row_bonded1 = $current_row_bonded1 + $count_row_bonded1;
                     $count_row_bonded1 = 0;
                 }
-    
-                
+
+
             }
             $sheet->getStyle('B'. ($current_row - 3). ':Z'. ($current_row - 2 + 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
             $sheet->getStyle('B'. ($current_row - 3). ':Z'. ($current_row - 3 + 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
@@ -5768,25 +5771,25 @@ class RateDataController extends Controller
             $sheet->mergeCells('B'. ($current_row - 3). ':E'. ($current_row - 3 + 1));
             $sheet->getStyle('B'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->setCellValue('B'. ($current_row - 3), '항목');
-    
+
             $sheet->mergeCells('F'. ($current_row - 3). ':N'. ($current_row - 3));
             $sheet->getStyle('F'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->setCellValue('F'. ($current_row - 3), '세금계산서 발행');
-    
+
             $sheet->mergeCells('O'. ($current_row - 3). ':W'. ($current_row - 3));
             $sheet->getStyle('O'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->setCellValue('O'. ($current_row - 3), '세금계산서 미발행');
-    
+
             $sheet->mergeCells('X'. ($current_row - 3). ':Z'. ($current_row - 2));
             $sheet->getStyle('X'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->setCellValue('X'. ($current_row - 3), '비고');
-    
+
             foreach($headers as $key => $header){
                 $sheet->mergeCells($col_start[$key]. ($current_row - 2).':'.$col_end[$key]. ($current_row - 2));
                 $sheet->getStyle($col_start[$key]. ($current_row - 2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 $sheet->setCellValue($col_start[$key]. ($current_row - 2), $header);
             }
-            
+
             $current_row += $count_row;
         }
         //END BONDED1
@@ -5797,16 +5800,16 @@ class RateDataController extends Controller
             $sheet->getStyle('B'. $current_row)->getFont()->setBold(true);
             $sheet->mergeCells('B'. $current_row. ':Z'. $current_row);
             $sheet->setCellValue('B'. $current_row, ' ∙ 관세사비용');
-    
+
             $current_row += 3;
-    
+
             $sheet->mergeCells('B'. ($current_row). ':E'. ($current_row));
-            
+
             $sheet->getStyle('B'. ($current_row). ':E'. ($current_row))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
             $sheet->getStyle('B'. ($current_row). ':Z'. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->getStyle('B'. ($current_row). ':E'. ($current_row))->getFont()->setBold(true);
             $sheet->setCellValue('B'. ($current_row), '관세사비용');
-    
+
             $sheet->mergeCells('F'.($current_row).':H'.($current_row));
             $sheet->setCellValue('F'.($current_row), $rgd->rate_data_general['rdg_supply_price2']);
             $sheet->mergeCells('I'.($current_row).':K'.($current_row));
@@ -5821,11 +5824,11 @@ class RateDataController extends Controller
             $sheet->setCellValue('U'.($current_row), $rgd->rate_data_general['rdg_sum9']);
             $sheet->mergeCells('X'.($current_row).':Z'.($current_row));
             $sheet->setCellValue('X'.($current_row), $rgd->rate_data_general['rdg_etc9']);
-    
-    
+
+
             $count_row = 0;
             $current_row += 1;
-    
+
             $count_row_bonded1 = 0;
             $current_row_bonded1 = $current_row;
 
@@ -5837,17 +5840,17 @@ class RateDataController extends Controller
                     $rd_sum[] = $rate_data_bonded2[$key + 1]['rd_data4'];
                 }
             }
-    
+
             foreach($rate_data_bonded2 as $key => $rate_data){
 
 
-     
+
                 if($rate_data == $rd_cate1[0]){
                     if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_bonded2[$key - 1]['rd_cate1'])){
                         $sheet->setCellValue('B'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_cate1']);
                         $count_row_bonded1 = 0;
                     }else if($rate_data['rd_data4'] > 0) {
-    
+
                         $sheet->mergeCells('C'.($current_row_bonded1 + $count_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('C'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_cate2']);
                         $sheet->mergeCells('F'.($current_row_bonded1 + $count_row_bonded1).':H'.($current_row_bonded1 + $count_row_bonded1));
@@ -5864,12 +5867,12 @@ class RateDataController extends Controller
                         $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data7']);
                         $sheet->mergeCells('X'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data8']);
-    
+
                         $count_row_bonded1 += 1;
                         $count_row += 1;
                     }
-    
-    
+
+
                 }
                 else {
                     if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_bonded2[$key - 1]['rd_cate1'])){
@@ -5883,8 +5886,8 @@ class RateDataController extends Controller
                         $count_row_bonded1 = 0;
                     }
                     else if($rate_data['rd_data4'] > 0){
-    
-    
+
+
                         $sheet->mergeCells('C'.($current_row_bonded1 + $count_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('C'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_cate2']);
                         $sheet->mergeCells('F'.($current_row_bonded1 + $count_row_bonded1).':H'.($current_row_bonded1 + $count_row_bonded1));
@@ -5901,12 +5904,12 @@ class RateDataController extends Controller
                         $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data7']);
                         $sheet->mergeCells('X'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data8']);
-    
+
                         $count_row_bonded1 += 1;
                         $count_row += 1;
                     }
                 }
-    
+
                 if(count($rate_data_bonded2) == $key + 1){
                     $sheet->mergeCells('B'.($current_row_bonded1).':B'.($current_row_bonded1 + $count_row_bonded1 - 1));
                     $sheet->getStyle('B'.($current_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1 - 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
@@ -5916,8 +5919,8 @@ class RateDataController extends Controller
                     $current_row_bonded1 = $current_row_bonded1 + $count_row_bonded1;
                     $count_row_bonded1 = 0;
                 }
-                
-                
+
+
             }
             $sheet->getStyle('B'. ($current_row - 3). ':Z'. ($current_row - 2 + 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
             $sheet->getStyle('B'. ($current_row - 3). ':Z'. ($current_row - 3 + 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
@@ -5925,45 +5928,45 @@ class RateDataController extends Controller
             $sheet->mergeCells('B'. ($current_row - 3). ':E'. ($current_row - 3 + 1));
             $sheet->getStyle('B'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->setCellValue('B'. ($current_row - 3), '항목');
-    
+
             $sheet->mergeCells('F'. ($current_row - 3). ':N'. ($current_row - 3));
             $sheet->getStyle('F'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->setCellValue('F'. ($current_row - 3), '세금계산서 발행');
-    
+
             $sheet->mergeCells('O'. ($current_row - 3). ':W'. ($current_row - 3));
             $sheet->getStyle('O'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->setCellValue('O'. ($current_row - 3), '세금계산서 미발행');
-    
+
             $sheet->mergeCells('X'. ($current_row - 3). ':Z'. ($current_row - 2));
             $sheet->getStyle('X'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->setCellValue('X'. ($current_row - 3), '비고');
-    
+
             foreach($headers as $key => $header){
                 $sheet->mergeCells($col_start[$key]. ($current_row - 2).':'.$col_end[$key]. ($current_row - 2));
                 $sheet->getStyle($col_start[$key]. ($current_row - 2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 $sheet->setCellValue($col_start[$key]. ($current_row - 2), $header);
             }
-            
+
             $current_row += $count_row;
         }
         //END BONDED2
-       
+
         //BONDED3
         if($rgd->rate_data_general['rdg_sum3'] > 0) {
             $sheet->getStyle('B'. $current_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
             $sheet->getStyle('B'. $current_row)->getFont()->setBold(true);
             $sheet->mergeCells('B'. $current_row. ':Z'. $current_row);
             $sheet->setCellValue('B'. $current_row, ' ∙ 포워더비용');
-    
+
             $current_row += 3;
-    
+
             $sheet->mergeCells('B'. ($current_row). ':E'. ($current_row));
-            
+
             $sheet->getStyle('B'. ($current_row). ':E'. ($current_row))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
             $sheet->getStyle('B'. ($current_row). ':Z'. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->getStyle('B'. ($current_row). ':E'. ($current_row))->getFont()->setBold(true);
             $sheet->setCellValue('B'. ($current_row), '포워더비용');
-    
+
             $sheet->mergeCells('F'.($current_row).':H'.($current_row));
             $sheet->setCellValue('F'.($current_row), $rgd->rate_data_general['rdg_supply_price3']);
             $sheet->mergeCells('I'.($current_row).':K'.($current_row));
@@ -5978,11 +5981,11 @@ class RateDataController extends Controller
             $sheet->setCellValue('U'.($current_row), $rgd->rate_data_general['rdg_sum10']);
             $sheet->mergeCells('X'.($current_row).':Z'.($current_row));
             $sheet->setCellValue('X'.($current_row), $rgd->rate_data_general['rdg_etc10']);
-    
-    
+
+
             $count_row = 0;
             $current_row += 1;
-    
+
             $count_row_bonded1 = 0;
             $current_row_bonded1 = $current_row;
 
@@ -5994,17 +5997,17 @@ class RateDataController extends Controller
                     $rd_sum[] = $rate_data_bonded3[$key + 1]['rd_data4'];
                 }
             }
-    
+
             foreach($rate_data_bonded3 as $key => $rate_data){
 
 
-     
+
                 if($rate_data == $rd_cate1[0]){
                     if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_bonded3[$key - 1]['rd_cate1'])){
                         $sheet->setCellValue('B'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_cate1']);
                         $count_row_bonded1 = 0;
                     }else if($rate_data['rd_data4'] > 0) {
-    
+
                         $sheet->mergeCells('C'.($current_row_bonded1 + $count_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('C'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_cate2']);
                         $sheet->mergeCells('F'.($current_row_bonded1 + $count_row_bonded1).':H'.($current_row_bonded1 + $count_row_bonded1));
@@ -6021,12 +6024,12 @@ class RateDataController extends Controller
                         $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data7']);
                         $sheet->mergeCells('X'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data8']);
-    
+
                         $count_row_bonded1 += 1;
                         $count_row += 1;
                     }
-    
-    
+
+
                 }
                 else {
                     if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_bonded3[$key - 1]['rd_cate1'])){
@@ -6040,8 +6043,8 @@ class RateDataController extends Controller
                         $count_row_bonded1 = 0;
                     }
                     else if($rate_data['rd_data4'] > 0){
-    
-    
+
+
                         $sheet->mergeCells('C'.($current_row_bonded1 + $count_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('C'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_cate2']);
                         $sheet->mergeCells('F'.($current_row_bonded1 + $count_row_bonded1).':H'.($current_row_bonded1 + $count_row_bonded1));
@@ -6058,12 +6061,12 @@ class RateDataController extends Controller
                         $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data7']);
                         $sheet->mergeCells('X'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data8']);
-    
+
                         $count_row_bonded1 += 1;
                         $count_row += 1;
                     }
                 }
-    
+
                 if(count($rate_data_bonded3) == $key + 1){
                     $sheet->mergeCells('B'.($current_row_bonded1).':B'.($current_row_bonded1 + $count_row_bonded1 - 1));
                     $sheet->getStyle('B'.($current_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1 - 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
@@ -6073,8 +6076,8 @@ class RateDataController extends Controller
                     $current_row_bonded1 = $current_row_bonded1 + $count_row_bonded1;
                     $count_row_bonded1 = 0;
                 }
-                
-                
+
+
             }
             $sheet->getStyle('B'. ($current_row - 3). ':Z'. ($current_row - 2 + 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
             $sheet->getStyle('B'. ($current_row - 3). ':Z'. ($current_row - 3 + 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
@@ -6082,25 +6085,25 @@ class RateDataController extends Controller
             $sheet->mergeCells('B'. ($current_row - 3). ':E'. ($current_row - 3 + 1));
             $sheet->getStyle('B'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->setCellValue('B'. ($current_row - 3), '항목');
-    
+
             $sheet->mergeCells('F'. ($current_row - 3). ':N'. ($current_row - 3));
             $sheet->getStyle('F'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->setCellValue('F'. ($current_row - 3), '세금계산서 발행');
-    
+
             $sheet->mergeCells('O'. ($current_row - 3). ':W'. ($current_row - 3));
             $sheet->getStyle('O'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->setCellValue('O'. ($current_row - 3), '세금계산서 미발행');
-    
+
             $sheet->mergeCells('X'. ($current_row - 3). ':Z'. ($current_row - 2));
             $sheet->getStyle('X'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->setCellValue('X'. ($current_row - 3), '비고');
-    
+
             foreach($headers as $key => $header){
                 $sheet->mergeCells($col_start[$key]. ($current_row - 2).':'.$col_end[$key]. ($current_row - 2));
                 $sheet->getStyle($col_start[$key]. ($current_row - 2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 $sheet->setCellValue($col_start[$key]. ($current_row - 2), $header);
             }
-            
+
             $current_row += $count_row;
         }
         //END BONDED3
@@ -6111,16 +6114,16 @@ class RateDataController extends Controller
             $sheet->getStyle('B'. $current_row)->getFont()->setBold(true);
             $sheet->mergeCells('B'. $current_row. ':Z'. $current_row);
             $sheet->setCellValue('B'. $current_row, ' ∙ 포워더비용');
-    
+
             $current_row += 3;
-    
+
             $sheet->mergeCells('B'. ($current_row). ':E'. ($current_row));
-            
+
             $sheet->getStyle('B'. ($current_row). ':E'. ($current_row))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
             $sheet->getStyle('B'. ($current_row). ':Z'. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->getStyle('B'. ($current_row). ':E'. ($current_row))->getFont()->setBold(true);
             $sheet->setCellValue('B'. ($current_row), '포워더비용');
-    
+
             $sheet->mergeCells('F'.($current_row).':H'.($current_row));
             $sheet->setCellValue('F'.($current_row), $rgd->rate_data_general['rdg_supply_price4']);
             $sheet->mergeCells('I'.($current_row).':K'.($current_row));
@@ -6135,11 +6138,11 @@ class RateDataController extends Controller
             $sheet->setCellValue('U'.($current_row), $rgd->rate_data_general['rdg_sum11']);
             $sheet->mergeCells('X'.($current_row).':Z'.($current_row));
             $sheet->setCellValue('X'.($current_row), $rgd->rate_data_general['rdg_etc11']);
-    
-    
+
+
             $count_row = 0;
             $current_row += 1;
-    
+
             $count_row_bonded1 = 0;
             $current_row_bonded1 = $current_row;
 
@@ -6151,17 +6154,17 @@ class RateDataController extends Controller
                     $rd_sum[] = $rate_data_bonded4[$key + 1]['rd_data4'];
                 }
             }
-    
+
             foreach($rate_data_bonded4 as $key => $rate_data){
 
 
-     
+
                 if($rate_data == $rd_cate1[0]){
                     if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_bonded4[$key - 1]['rd_cate1'])){
                         $sheet->setCellValue('B'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_cate1']);
                         $count_row_bonded1 = 0;
                     }else if($rate_data['rd_data4'] > 0) {
-    
+
                         $sheet->mergeCells('C'.($current_row_bonded1 + $count_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('C'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_cate2']);
                         $sheet->mergeCells('F'.($current_row_bonded1 + $count_row_bonded1).':H'.($current_row_bonded1 + $count_row_bonded1));
@@ -6178,12 +6181,12 @@ class RateDataController extends Controller
                         $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data7']);
                         $sheet->mergeCells('X'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data8']);
-    
+
                         $count_row_bonded1 += 1;
                         $count_row += 1;
                     }
-    
-    
+
+
                 }
                 else {
                     if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_bonded4[$key - 1]['rd_cate1'])){
@@ -6197,8 +6200,8 @@ class RateDataController extends Controller
                         $count_row_bonded1 = 0;
                     }
                     else if($rate_data['rd_data4'] > 0){
-    
-    
+
+
                         $sheet->mergeCells('C'.($current_row_bonded1 + $count_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('C'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_cate2']);
                         $sheet->mergeCells('F'.($current_row_bonded1 + $count_row_bonded1).':H'.($current_row_bonded1 + $count_row_bonded1));
@@ -6215,12 +6218,12 @@ class RateDataController extends Controller
                         $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data7']);
                         $sheet->mergeCells('X'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data8']);
-    
+
                         $count_row_bonded1 += 1;
                         $count_row += 1;
                     }
                 }
-    
+
                 if(count($rate_data_bonded4) == $key + 1){
                     $sheet->mergeCells('B'.($current_row_bonded1).':B'.($current_row_bonded1 + $count_row_bonded1 - 1));
                     $sheet->getStyle('B'.($current_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1 - 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
@@ -6230,8 +6233,8 @@ class RateDataController extends Controller
                     $current_row_bonded1 = $current_row_bonded1 + $count_row_bonded1;
                     $count_row_bonded1 = 0;
                 }
-                
-                
+
+
             }
             $sheet->getStyle('B'. ($current_row - 3). ':Z'. ($current_row - 2 + 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
             $sheet->getStyle('B'. ($current_row - 3). ':Z'. ($current_row - 3 + 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
@@ -6239,25 +6242,25 @@ class RateDataController extends Controller
             $sheet->mergeCells('B'. ($current_row - 3). ':E'. ($current_row - 3 + 1));
             $sheet->getStyle('B'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->setCellValue('B'. ($current_row - 3), '항목');
-    
+
             $sheet->mergeCells('F'. ($current_row - 3). ':N'. ($current_row - 3));
             $sheet->getStyle('F'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->setCellValue('F'. ($current_row - 3), '세금계산서 발행');
-    
+
             $sheet->mergeCells('O'. ($current_row - 3). ':W'. ($current_row - 3));
             $sheet->getStyle('O'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->setCellValue('O'. ($current_row - 3), '세금계산서 미발행');
-    
+
             $sheet->mergeCells('X'. ($current_row - 3). ':Z'. ($current_row - 2));
             $sheet->getStyle('X'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->setCellValue('X'. ($current_row - 3), '비고');
-    
+
             foreach($headers as $key => $header){
                 $sheet->mergeCells($col_start[$key]. ($current_row - 2).':'.$col_end[$key]. ($current_row - 2));
                 $sheet->getStyle($col_start[$key]. ($current_row - 2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 $sheet->setCellValue($col_start[$key]. ($current_row - 2), $header);
             }
-            
+
             $current_row += $count_row;
         }
         //END BONDED4
@@ -6268,16 +6271,16 @@ class RateDataController extends Controller
             $sheet->getStyle('B'. $current_row)->getFont()->setBold(true);
             $sheet->mergeCells('B'. $current_row. ':Z'. $current_row);
             $sheet->setCellValue('B'. $current_row, ' ∙ 포워더비용');
-    
+
             $current_row += 3;
-    
+
             $sheet->mergeCells('B'. ($current_row). ':E'. ($current_row));
-            
+
             $sheet->getStyle('B'. ($current_row). ':E'. ($current_row))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
             $sheet->getStyle('B'. ($current_row). ':Z'. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->getStyle('B'. ($current_row). ':E'. ($current_row))->getFont()->setBold(true);
             $sheet->setCellValue('B'. ($current_row), '포워더비용');
-    
+
             $sheet->mergeCells('F'.($current_row).':H'.($current_row));
             $sheet->setCellValue('F'.($current_row), $rgd->rate_data_general['rdg_supply_price5']);
             $sheet->mergeCells('I'.($current_row).':K'.($current_row));
@@ -6292,11 +6295,11 @@ class RateDataController extends Controller
             $sheet->setCellValue('U'.($current_row), $rgd->rate_data_general['rdg_sum12']);
             $sheet->mergeCells('X'.($current_row).':Z'.($current_row));
             $sheet->setCellValue('X'.($current_row), $rgd->rate_data_general['rdg_etc12']);
-    
-    
+
+
             $count_row = 0;
             $current_row += 1;
-    
+
             $count_row_bonded1 = 0;
             $current_row_bonded1 = $current_row;
 
@@ -6308,17 +6311,17 @@ class RateDataController extends Controller
                     $rd_sum[] = $rate_data_bonded5[$key + 1]['rd_data4'];
                 }
             }
-    
+
             foreach($rate_data_bonded5 as $key => $rate_data){
 
 
-     
+
                 if($rate_data == $rd_cate1[0]){
                     if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_bonded5[$key - 1]['rd_cate1'])){
                         $sheet->setCellValue('B'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_cate1']);
                         $count_row_bonded1 = 0;
                     }else if($rate_data['rd_data4'] > 0) {
-    
+
                         $sheet->mergeCells('C'.($current_row_bonded1 + $count_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('C'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_cate2']);
                         $sheet->mergeCells('F'.($current_row_bonded1 + $count_row_bonded1).':H'.($current_row_bonded1 + $count_row_bonded1));
@@ -6335,12 +6338,12 @@ class RateDataController extends Controller
                         $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data7']);
                         $sheet->mergeCells('X'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data8']);
-    
+
                         $count_row_bonded1 += 1;
                         $count_row += 1;
                     }
-    
-    
+
+
                 }
                 else {
                     if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_bonded5[$key - 1]['rd_cate1'])){
@@ -6354,8 +6357,8 @@ class RateDataController extends Controller
                         $count_row_bonded1 = 0;
                     }
                     else if($rate_data['rd_data4'] > 0){
-    
-    
+
+
                         $sheet->mergeCells('C'.($current_row_bonded1 + $count_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('C'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_cate2']);
                         $sheet->mergeCells('F'.($current_row_bonded1 + $count_row_bonded1).':H'.($current_row_bonded1 + $count_row_bonded1));
@@ -6372,12 +6375,12 @@ class RateDataController extends Controller
                         $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data7']);
                         $sheet->mergeCells('X'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1));
                         $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data8']);
-    
+
                         $count_row_bonded1 += 1;
                         $count_row += 1;
                     }
                 }
-    
+
                 if(count($rate_data_bonded5) == $key + 1){
                     $sheet->mergeCells('B'.($current_row_bonded1).':B'.($current_row_bonded1 + $count_row_bonded1 - 1));
                     $sheet->getStyle('B'.($current_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1 - 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
@@ -6387,8 +6390,8 @@ class RateDataController extends Controller
                     $current_row_bonded1 = $current_row_bonded1 + $count_row_bonded1;
                     $count_row_bonded1 = 0;
                 }
-                
-                
+
+
             }
             $sheet->getStyle('B'. ($current_row - 3). ':Z'. ($current_row - 2 + 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
             $sheet->getStyle('B'. ($current_row - 3). ':Z'. ($current_row - 3 + 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
@@ -6396,25 +6399,25 @@ class RateDataController extends Controller
             $sheet->mergeCells('B'. ($current_row - 3). ':E'. ($current_row - 3 + 1));
             $sheet->getStyle('B'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->setCellValue('B'. ($current_row - 3), '항목');
-    
+
             $sheet->mergeCells('F'. ($current_row - 3). ':N'. ($current_row - 3));
             $sheet->getStyle('F'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->setCellValue('F'. ($current_row - 3), '세금계산서 발행');
-    
+
             $sheet->mergeCells('O'. ($current_row - 3). ':W'. ($current_row - 3));
             $sheet->getStyle('O'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->setCellValue('O'. ($current_row - 3), '세금계산서 미발행');
-    
+
             $sheet->mergeCells('X'. ($current_row - 3). ':Z'. ($current_row - 2));
             $sheet->getStyle('X'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->setCellValue('X'. ($current_row - 3), '비고');
-    
+
             foreach($headers as $key => $header){
                 $sheet->mergeCells($col_start[$key]. ($current_row - 2).':'.$col_end[$key]. ($current_row - 2));
                 $sheet->getStyle($col_start[$key]. ($current_row - 2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 $sheet->setCellValue($col_start[$key]. ($current_row - 2), $header);
             }
-            
+
             $current_row += $count_row;
         }
         //END BONDED3
@@ -6494,10 +6497,12 @@ class RateDataController extends Controller
 
         }else if($user->mb_type == 'spasys') {
             $company = $rgd->warehousing->company->co_parent;
-        
+
         }else if($user->mb_type == 'shipper') {
             $company = $rgd->warehousing->company;
         }
+
+        $company->company_payment = CompanyPayment::where('co_no', $company->co_no)->first();
 
         // return response()->json([
         //     'status' => $rate_data_bonded4,
@@ -6541,7 +6546,7 @@ class RateDataController extends Controller
         $sheet->mergeCells('B16:R16');
         $sheet->setCellValue('B16', ' ∙ 예상 청구금액 : '. $rgd->rate_data_general->rdg_sum7 . '원');
         $sheet->mergeCells('B17:R17');
-        $sheet->setCellValue('B17', ' ∙ 계좌  정보 : ㈜스페이시스원 xxxx-xxx-xxxxx (스페이시스원)');
+        $sheet->setCellValue('B17', ' ∙ 계좌  정보 : ㈜'. $company->company_payment->cp_bank_name .' ' . $company->company_payment->cp_bank_number . ' ('. $company->company_payment->cp_card_name. ')');
 
         //GENERAL TABLE
         $sheet->getStyle('B19')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
@@ -6549,7 +6554,7 @@ class RateDataController extends Controller
         $sheet->mergeCells('B19:R19');
         $sheet->setCellValue('B19', '∙ 화물별 청구 금액');
 
-        
+
         $sheet->getStyle('B20:R21')->getFont()->setBold(true);
         $sheet->getStyle('B20:R21')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
 
@@ -6587,7 +6592,7 @@ class RateDataController extends Controller
                 $sheet->getStyle($col_start[$key].'20')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 $sheet->setCellValue($col_start[$key].'20', $header);
             }
-            
+
         }
 
         $current_row = 22;
@@ -6658,7 +6663,7 @@ class RateDataController extends Controller
                 else if($key_col == 16){
                     $sheet->setCellValue($col_start[$key_col].$current_row + $key, '');
                 }
-                 
+
              }
              $count_row = $key;
          }
@@ -6687,6 +6692,855 @@ class RateDataController extends Controller
         $sheet->mergeCells('B'. ($current_row + 9). ':R'. ($current_row + 9));
         $sheet->setCellValue('B'. ($current_row + 9), '전화');
         $sheet->mergeCells('B'. ($current_row + 10). ':R'. ($current_row + 10));
+        $sheet->setCellValue('B'. ($current_row + 10), '메일');
+
+        $sheet->getDefaultRowDimension()->setRowHeight(24);
+
+        $Excel_writer = new Xlsx($spreadsheet);
+        if (isset($user->mb_no)) {
+            $path = 'storage/download/' . $user->mb_no . '/';
+        } else {
+            $path = 'storage/download/no-name/';
+        }
+        if (!is_dir($path)) {
+            File::makeDirectory($path, $mode = 0777, true, true);
+        }
+
+        if($rgd->service_korean_nam == '보세화물' && !str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
+            $name = 'bonded_est_casebill_';
+        }else if($rgd->service_korean_nam == '보세화물' && str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
+            $name = 'bonded_est_monthbill_';
+        }else {
+            $name = 'bonded_est_monthbill_';
+        }
+
+        $mask = $path . $name .'*.*';
+        array_map('unlink', glob($mask) ?: []);
+        $file_name_download = $path . $name . date('YmdHis') . '.Xlsx';
+        $check_status = $Excel_writer->save($file_name_download);
+        return response()->json([
+            'status' => 1,
+            'link_download' => '../'. $file_name_download,
+            'message' => 'Download File',
+        ], 200);
+        ob_end_clean();
+    }
+
+    public function download_fulfill_excel($rgd_no, Request $request)
+    {
+        Log::error($rgd_no);
+        DB::beginTransaction();
+        $user = Auth::user();
+        $pathname = $request->header('pathname');
+        $is_check_page = str_contains($pathname, 'check');
+
+        $rgd = ReceivingGoodsDelivery::with(['rate_data_general', 'warehousing'])->where('rgd_no', $rgd_no)->first();
+        $is_month_bill = str_contains($rgd->rgd_bill_type, 'month') ? '_monthly' : '';
+        $is_final_bill = str_contains($rgd->rgd_bill_type, 'final');
+
+        if($user->mb_type == 'shop'){
+            $company = $rgd->warehousing->company;
+
+            $rmd_no_fulfill1 = $this->get_rmd_no_fulfill_raw($rgd_no, $is_check_page ? 'fulfill1_final_spasys': 'fulfill1_final_shop', 'fulfill1');
+            $rmd_no_fulfill2 = $this->get_rmd_no_fulfill_raw($rgd_no, $is_check_page ? 'fulfill2_final_spasys': 'fulfill2_final_shop', 'fulfill2');
+            $rmd_no_fulfill3 = $this->get_rmd_no_fulfill_raw($rgd_no, $is_check_page ? 'fulfill3_final_spasys': 'fulfill3_final_shop', 'fulfill3');
+            $rmd_no_fulfill4 = $this->get_rmd_no_fulfill_raw($rgd_no, $is_check_page ? 'fulfill4_final_spasys': 'fulfill4_final_shop', 'fulfill4');
+            $rmd_no_fulfill5 = $this->get_rmd_no_fulfill_raw($rgd_no, $is_check_page ? 'fulfill5_final_spasys': 'fulfill5_final_shop', 'fulfill5');
+
+        }else if($user->mb_type == 'spasys') {
+            $company = $rgd->warehousing->company->co_parent;
+            $rmd_no_fulfill1 = $this->get_rmd_no_fulfill_raw($rgd_no, 'fulfill1_final_spasys', 'fulfill1');
+            $rmd_no_fulfill2 = $this->get_rmd_no_fulfill_raw($rgd_no, 'fulfill2_final_spasys', 'fulfill2');
+            $rmd_no_fulfill3 = $this->get_rmd_no_fulfill_raw($rgd_no, 'fulfill3_final_spasys', 'fulfill3');
+            $rmd_no_fulfill4 = $this->get_rmd_no_fulfill_raw($rgd_no, 'fulfill4_final_spasys', 'fulfill4');
+            $rmd_no_fulfill5 = $this->get_rmd_no_fulfill_raw($rgd_no, 'fulfill5_final_spasys', 'fulfill5');
+        }else if($user->mb_type == 'shipper') {
+            $company = $rgd->warehousing->company;
+            $rmd_no_fulfill1 = $this->get_rmd_no_fulfill_raw($rgd_no, 'fulfill1_final_shop', 'fulfill1');
+            $rmd_no_fulfill2 = $this->get_rmd_no_fulfill_raw($rgd_no, 'fulfill2_final_shop', 'fulfill2');
+            $rmd_no_fulfill3 = $this->get_rmd_no_fulfill_raw($rgd_no, 'fulfill3_final_shop', 'fulfill3');
+            $rmd_no_fulfill4 = $this->get_rmd_no_fulfill_raw($rgd_no, 'fulfill4_final_shop', 'fulfill4');
+            $rmd_no_fulfill5 = $this->get_rmd_no_fulfill_raw($rgd_no, 'fulfill5_final_shop', 'fulfill5');
+        }
+
+        $company->company_payment = CompanyPayment::where('co_no', $company->co_no)->first();
+
+        $rate_data_fulfill1 = $rate_data = RateData::where('rmd_no', isset($rmd_no_fulfill1) ? $rmd_no_fulfill1 : 0)->where(function ($q) {
+        })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
+
+        $rate_data_fulfill2 = $rate_data = RateData::where('rmd_no', isset($rmd_no_fulfill2) ? $rmd_no_fulfill2 : 0)->where(function ($q) {
+        })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
+
+        $rate_data_fulfill3 = $rate_data = RateData::where('rmd_no', isset($rmd_no_fulfill3) ? $rmd_no_fulfill3 : 0)->where(function ($q) {
+        })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
+
+        $rate_data_fulfill4 = $rate_data = RateData::where('rmd_no', isset($rmd_no_fulfill4) ? $rmd_no_fulfill4 : 0)->where(function ($q) {
+        })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
+
+        $rate_data_fulfill5 = $rate_data = RateData::where('rmd_no', isset($rmd_no_fulfill5) ? $rmd_no_fulfill5 : 0)->where(function ($q) {
+        })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
+
+
+        return $rate_data_fulfill2;
+
+        $spreadsheet = new Spreadsheet();
+        $spreadsheet->getDefaultStyle()->getFont()->setSize(10);
+        $sheet = $spreadsheet->getActiveSheet(0);
+
+        // $sheet->getProtection()->setSheet(true);
+        $sheet->getDefaultColumnDimension()->setWidth(4.5);
+        $sheet->getDefaultRowDimension()->setRowHeight(24);
+        $sheet->getColumnDimension('B')->setWidth(16);
+        $sheet->getColumnDimension('C')->setWidth(12);
+        $sheet->getStyle('A1:Z200')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+        $sheet->getStyle('A1:CT200')->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FFFFFF'));
+        $sheet->setTitle('보세화물 예상경비(건별,월별)');
+
+
+        $sheet->mergeCells('B2:Z6');
+        $sheet->getStyle('B2:Z6')->getBorders()->getOutline()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+        $sheet->setCellValue('B2', '가맹점(화주) 회사명');
+        $sheet->getStyle('B2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('B2')->getFont()->setSize(22)->setBold(true);
+
+        $sheet->getStyle('Z8')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->setCellValue('Z8', '사업자번호 : '. $company->co_license);
+        $sheet->getStyle('Z9')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->setCellValue('Z9', '사업장 주소 : '. $company->co_address. ' ' . $company->co_address_detail);
+        $sheet->getStyle('Z10')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->setCellValue('Z10', '수신자명 : '. $company->co_owner . ' (' . $company->co_email . ')');
+
+        $sheet->getStyle('B12:B17')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
+        $sheet->getStyle('B12:B17')->getFont()->setBold(true);
+        $sheet->mergeCells('B12:Z12');
+        $sheet->setCellValue('B12', ' ∙ 서   비  스 : 보세화물');
+        $sheet->mergeCells('B13:Z13');
+        $sheet->setCellValue('B13', ' ∙ H-BL  No : ');
+        $sheet->mergeCells('B14:Z14');
+        $sheet->setCellValue('B14', ' ∙ 청구서 No : '. $rgd->rgd_status4 . ' ' . $rgd->rgd_settlement_number);
+        $sheet->mergeCells('B15:Z15');
+        $sheet->setCellValue('B15', ' ∙ 청구서 발행일 : '. $rgd->created_at);
+        $sheet->mergeCells('B16:Z16');
+        $sheet->setCellValue('B16', ' ∙ 예상 청구금액 : '. $rgd->rate_data_general->rdg_sum7 . '원');
+        $sheet->mergeCells('B17:Z17');
+        $sheet->setCellValue('B17', ' ∙ 계좌  정보 : ㈜'. $company->company_payment->cp_bank_name .' ' . $company->company_payment->cp_bank_number . ' ('. $company->company_payment->cp_card_name. ')');
+
+        //GENERAL TABLE
+        $sheet->getStyle('B19')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
+        $sheet->getStyle('B19')->getFont()->setBold(true);
+        $sheet->mergeCells('B19:Z19');
+        $sheet->setCellValue('B19', '  ∙ 항목별 청구 금액');
+
+        $headers = ['공급가', '부가세', '합계', '공급가', '부가세', '합계'];
+        $col_start = ['F', 'I', 'L', 'O', 'R', 'U'];
+        $col_end = ['H', 'K', 'N', 'Q', 'T', 'W'];
+
+        foreach($headers as $key => $header){
+            $sheet->mergeCells($col_start[$key].'21'.':'.$col_end[$key].'21');
+            $sheet->getStyle($col_start[$key].'21')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+            $sheet->setCellValue($col_start[$key].'21', $header);
+        }
+
+        $categories = ['BLP센터비용', '관세사비용', '포워더비용', '국내운송비', '요건비용', '합계'];
+
+        $current_row = 22;
+        $count_row = 0;
+
+        foreach($categories as $key => $category){
+            if($rgd->rate_data_general['rdg_sum' . ($key + 1)] != 0){
+                $sheet->mergeCells('B'.($current_row + $count_row).':E'.($current_row + $count_row));
+                $sheet->setCellValue('B'.($current_row + $count_row), $category);
+                $sheet->mergeCells('F'.($current_row + $count_row).':H'.($current_row + $count_row));
+                $sheet->setCellValue('F'.($current_row + $count_row), $rgd->rate_data_general['rdg_supply_price' . ($key + 1)]);
+                $sheet->mergeCells('I'.($current_row + $count_row).':K'.($current_row + $count_row));
+                $sheet->setCellValue('I'.($current_row + $count_row), $rgd->rate_data_general['rdg_vat' . ($key + 1)]);
+                $sheet->mergeCells('L'.($current_row + $count_row).':N'.($current_row + $count_row));
+                $sheet->setCellValue('L'.($current_row + $count_row), $rgd->rate_data_general['rdg_sum' . ($key + 1)]);
+                $sheet->mergeCells('O'.($current_row + $count_row).':Q'.($current_row + $count_row));
+                $sheet->setCellValue('O'.($current_row + $count_row), $rgd->rate_data_general['rdg_supply_price' . ($key  == 5 ? ($key + 9) : ($key + 8))]);
+                $sheet->mergeCells('R'.($current_row + $count_row).':T'.($current_row + $count_row));
+                $sheet->setCellValue('R'.($current_row + $count_row), $rgd->rate_data_general['rdg_vat' . ($key  == 5 ? ($key + 9) : ($key + 8))]);
+                $sheet->mergeCells('U'.($current_row + $count_row).':W'.($current_row + $count_row));
+                $sheet->setCellValue('U'.($current_row + $count_row), $rgd->rate_data_general['rdg_sum' . ($key  == 5 ? ($key + 9) : ($key + 8))]);
+                $sheet->mergeCells('X'.($current_row + $count_row).':Z'.($current_row + $count_row));
+                $sheet->setCellValue('X'.($current_row + $count_row), $rgd->rate_data_general['rdg_etc' . ($key  == 5 ? ($key + 9) : ($key + 8))]);
+
+                $count_row += 1;
+            }
+
+        }
+
+        $sheet->getStyle('B'. ($current_row). ':E'. ($current_row - 1 + $count_row))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+        $sheet->getStyle('B'. ($current_row). ':E'. ($current_row - 1 + $count_row))->getFont()->setBold(true);
+        $sheet->getStyle('B'. ($current_row). ':Z'. ($current_row - 1 + $count_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        $sheet->getStyle('B'. ($current_row - 2). ':Z'. ($current_row - 1 + $count_row))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+        $sheet->getStyle('B'. ($current_row - 2). ':Z'. ($current_row - 2 + 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+        $sheet->getStyle('B'. ($current_row - 2). ':Z'. ($current_row - 2 + 1))->getFont()->setBold(true);
+        $sheet->mergeCells('B'. ($current_row - 2). ':E'. ($current_row - 2 + 1));
+        $sheet->getStyle('B'. ($current_row - 2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->setCellValue('B'. ($current_row - 2), '항목');
+
+        $sheet->mergeCells('F'. ($current_row - 2). ':N'. ($current_row - 2));
+        $sheet->getStyle('F'. ($current_row - 2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->setCellValue('F'. ($current_row - 2), '세금계산서 발행');
+
+        $sheet->mergeCells('O'. ($current_row - 2). ':W'. ($current_row - 2));
+        $sheet->getStyle('O'. ($current_row - 2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->setCellValue('O'. ($current_row - 2), '세금계산서 미발행');
+
+        $sheet->mergeCells('X'. ($current_row - 2). ':Z'. ($current_row - 1));
+        $sheet->getStyle('X'. ($current_row - 2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->setCellValue('X'. ($current_row - 2), '비고');
+
+        $current_row += $count_row;
+
+
+        //FULFILL1
+        if($rgd->rate_data_general['rdg_sum1'] > 0) {
+            $sheet->getStyle('B'. $current_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
+            $sheet->getStyle('B'. $current_row)->getFont()->setBold(true);
+            $sheet->mergeCells('B'. $current_row. ':Z'. $current_row);
+            $sheet->setCellValue('B'. $current_row, ' ∙ 관세사비용');
+
+            $current_row += 3;
+
+            $sheet->mergeCells('B'. ($current_row). ':E'. ($current_row));
+
+            $sheet->getStyle('B'. ($current_row). ':E'. ($current_row))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+            $sheet->getStyle('B'. ($current_row). ':Z'. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('B'. ($current_row). ':E'. ($current_row))->getFont()->setBold(true);
+            $sheet->setCellValue('B'. ($current_row), '관세사비용');
+
+            $sheet->mergeCells('F'.($current_row).':H'.($current_row));
+            $sheet->setCellValue('F'.($current_row), $rgd->rate_data_general['rdg_supply_price2']);
+            $sheet->mergeCells('I'.($current_row).':K'.($current_row));
+            $sheet->setCellValue('I'.($current_row), $rgd->rate_data_general['rdg_vat2']);
+            $sheet->mergeCells('L'.($current_row).':N'.($current_row));
+            $sheet->setCellValue('L'.($current_row), $rgd->rate_data_general['rdg_sum2']);
+            $sheet->mergeCells('O'.($current_row).':Q'.($current_row));
+            $sheet->setCellValue('O'.($current_row), $rgd->rate_data_general['rdg_supply_price9']);
+            $sheet->mergeCells('R'.($current_row).':T'.($current_row));
+            $sheet->setCellValue('R'.($current_row), $rgd->rate_data_general['rdg_vat9']);
+            $sheet->mergeCells('U'.($current_row).':W'.($current_row));
+            $sheet->setCellValue('U'.($current_row), $rgd->rate_data_general['rdg_sum9']);
+            $sheet->mergeCells('X'.($current_row).':Z'.($current_row));
+            $sheet->setCellValue('X'.($current_row), $rgd->rate_data_general['rdg_etc9']);
+
+
+            $count_row = 0;
+            $current_row += 1;
+
+            $count_row_fulfill1 = 0;
+            $current_row_fulfill1 = $current_row;
+
+            $rd_cate1 = [];
+            $rd_sum = [];
+            foreach($rate_data_fulfill1 as $key => $rate_data){
+                if(!in_array($rate_data['rd_cate1'], $rd_cate1)){
+                    $rd_cate1[] = $rate_data['rd_cate1'];
+                    $rd_sum[] = $rate_data_fulfill1[$key + 1]['rd_data4'];
+                }
+            }
+
+            foreach($rate_data_fulfill1 as $key => $rate_data){
+
+
+
+                if($rate_data == $rd_cate1[0]){
+                    if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_fulfill1[$key - 1]['rd_cate1'])){
+                        $sheet->setCellValue('B'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_cate1']);
+                        $count_row_fulfill1 = 0;
+                    }else if($rate_data['rd_data4'] > 0) {
+
+                        $sheet->mergeCells('C'.($current_row_fulfill1 + $count_row_fulfill1).':E'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('C'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_cate2']);
+                        $sheet->mergeCells('F'.($current_row_fulfill1 + $count_row_fulfill1).':H'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('F'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data1']);
+                        $sheet->mergeCells('I'.($current_row_fulfill1 + $count_row_fulfill1).':K'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('I'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data2']);
+                        $sheet->mergeCells('L'.($current_row_fulfill1 + $count_row_fulfill1).':N'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('L'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data4']);
+                        $sheet->mergeCells('O'.($current_row_fulfill1 + $count_row_fulfill1).':Q'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('O'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data5']);
+                        $sheet->mergeCells('R'.($current_row_fulfill1 + $count_row_fulfill1).':T'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('R'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data6']);
+                        $sheet->mergeCells('U'.($current_row_fulfill1 + $count_row_fulfill1).':W'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('U'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data7']);
+                        $sheet->mergeCells('X'.($current_row_fulfill1 + $count_row_fulfill1).':Z'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('X'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data8']);
+
+                        $count_row_fulfill1 += 1;
+                        $count_row += 1;
+                    }
+
+
+                }
+                else {
+                    if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_fulfill1[$key - 1]['rd_cate1'])){
+                        $sheet->mergeCells('B'.($current_row_fulfill1).':B'.($current_row_fulfill1 + $count_row_fulfill1 - 1));
+                        $sheet->getStyle('B'.($current_row_fulfill1).':E'.($current_row_fulfill1 + $count_row_fulfill1 - 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                        $sheet->getStyle('B'.($current_row_fulfill1).':E'.($current_row_fulfill1 + $count_row_fulfill1 - 1))->getFont()->setBold(true);
+                        $sheet->getStyle('B'.($current_row_fulfill1).':Z'.($current_row_fulfill1 + $count_row_fulfill1 - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                        $sheet->getStyle('B'.($current_row_fulfill1).':Z'.($current_row_fulfill1 + $count_row_fulfill1 - 1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                        $sheet->setCellValue('B'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_cate1']);
+                        $current_row_fulfill1 = $current_row_fulfill1 + $count_row_fulfill1;
+                        $count_row_fulfill1 = 0;
+                    }
+                    else if($rate_data['rd_data4'] > 0){
+
+
+                        $sheet->mergeCells('C'.($current_row_fulfill1 + $count_row_fulfill1).':E'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('C'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_cate2']);
+                        $sheet->mergeCells('F'.($current_row_fulfill1 + $count_row_fulfill1).':H'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('F'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data1']);
+                        $sheet->mergeCells('I'.($current_row_fulfill1 + $count_row_fulfill1).':K'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('I'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data2']);
+                        $sheet->mergeCells('L'.($current_row_fulfill1 + $count_row_fulfill1).':N'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('L'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data4']);
+                        $sheet->mergeCells('O'.($current_row_fulfill1 + $count_row_fulfill1).':Q'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('O'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data5']);
+                        $sheet->mergeCells('R'.($current_row_fulfill1 + $count_row_fulfill1).':T'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('R'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data6']);
+                        $sheet->mergeCells('U'.($current_row_fulfill1 + $count_row_fulfill1).':W'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('U'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data7']);
+                        $sheet->mergeCells('X'.($current_row_fulfill1 + $count_row_fulfill1).':Z'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('X'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data8']);
+
+                        $count_row_fulfill1 += 1;
+                        $count_row += 1;
+                    }
+                }
+
+                if(count($rate_data_fulfill1) == $key + 1){
+                    $sheet->mergeCells('B'.($current_row_fulfill1).':B'.($current_row_fulfill1 + $count_row_fulfill1 - 1));
+                    $sheet->getStyle('B'.($current_row_fulfill1).':E'.($current_row_fulfill1 + $count_row_fulfill1 - 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                    $sheet->getStyle('B'.($current_row_fulfill1).':E'.($current_row_fulfill1 + $count_row_fulfill1 - 1))->getFont()->setBold(true);
+                    $sheet->getStyle('B'.($current_row_fulfill1).':Z'.($current_row_fulfill1 + $count_row_fulfill1 - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                    $sheet->getStyle('B'.($current_row_fulfill1).':Z'.($current_row_fulfill1 + $count_row_fulfill1 - 1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                    $current_row_fulfill1 = $current_row_fulfill1 + $count_row_fulfill1;
+                    $count_row_fulfill1 = 0;
+                }
+
+
+            }
+            $sheet->getStyle('B'. ($current_row - 3). ':Z'. ($current_row - 2 + 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+            $sheet->getStyle('B'. ($current_row - 3). ':Z'. ($current_row - 3 + 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+            $sheet->getStyle('B'. ($current_row - 3). ':Z'. ($current_row - 3 + 1))->getFont()->setBold(true);
+            $sheet->mergeCells('B'. ($current_row - 3). ':E'. ($current_row - 3 + 1));
+            $sheet->getStyle('B'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+            $sheet->setCellValue('B'. ($current_row - 3), '항목');
+
+            $sheet->mergeCells('F'. ($current_row - 3). ':N'. ($current_row - 3));
+            $sheet->getStyle('F'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+            $sheet->setCellValue('F'. ($current_row - 3), '세금계산서 발행');
+
+            $sheet->mergeCells('O'. ($current_row - 3). ':W'. ($current_row - 3));
+            $sheet->getStyle('O'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+            $sheet->setCellValue('O'. ($current_row - 3), '세금계산서 미발행');
+
+            $sheet->mergeCells('X'. ($current_row - 3). ':Z'. ($current_row - 2));
+            $sheet->getStyle('X'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+            $sheet->setCellValue('X'. ($current_row - 3), '비고');
+
+            foreach($headers as $key => $header){
+                $sheet->mergeCells($col_start[$key]. ($current_row - 2).':'.$col_end[$key]. ($current_row - 2));
+                $sheet->getStyle($col_start[$key]. ($current_row - 2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $sheet->setCellValue($col_start[$key]. ($current_row - 2), $header);
+            }
+
+            $current_row += $count_row;
+        }
+        //END FULFILL1
+
+        //FULFILL2
+        if($rgd->rate_data_general['rdg_sum2'] > 0) {
+            $sheet->getStyle('B'. $current_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
+            $sheet->getStyle('B'. $current_row)->getFont()->setBold(true);
+            $sheet->mergeCells('B'. $current_row. ':Z'. $current_row);
+            $sheet->setCellValue('B'. $current_row, ' ∙ 관세사비용');
+
+            $current_row += 3;
+
+            $sheet->mergeCells('B'. ($current_row). ':E'. ($current_row));
+
+            $sheet->getStyle('B'. ($current_row). ':E'. ($current_row))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+            $sheet->getStyle('B'. ($current_row). ':Z'. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('B'. ($current_row). ':E'. ($current_row))->getFont()->setBold(true);
+            $sheet->setCellValue('B'. ($current_row), '관세사비용');
+
+            $sheet->mergeCells('F'.($current_row).':H'.($current_row));
+            $sheet->setCellValue('F'.($current_row), $rgd->rate_data_general['rdg_supply_price2']);
+            $sheet->mergeCells('I'.($current_row).':K'.($current_row));
+            $sheet->setCellValue('I'.($current_row), $rgd->rate_data_general['rdg_vat2']);
+            $sheet->mergeCells('L'.($current_row).':N'.($current_row));
+            $sheet->setCellValue('L'.($current_row), $rgd->rate_data_general['rdg_sum2']);
+            $sheet->mergeCells('O'.($current_row).':Q'.($current_row));
+            $sheet->setCellValue('O'.($current_row), $rgd->rate_data_general['rdg_supply_price9']);
+            $sheet->mergeCells('R'.($current_row).':T'.($current_row));
+            $sheet->setCellValue('R'.($current_row), $rgd->rate_data_general['rdg_vat9']);
+            $sheet->mergeCells('U'.($current_row).':W'.($current_row));
+            $sheet->setCellValue('U'.($current_row), $rgd->rate_data_general['rdg_sum9']);
+            $sheet->mergeCells('X'.($current_row).':Z'.($current_row));
+            $sheet->setCellValue('X'.($current_row), $rgd->rate_data_general['rdg_etc9']);
+
+
+            $count_row = 0;
+            $current_row += 1;
+
+            $count_row_fulfill1 = 0;
+            $current_row_fulfill1 = $current_row;
+
+            $rd_cate1 = [];
+            $rd_sum = [];
+            foreach($rate_data_fulfill2 as $key => $rate_data){
+                if(!in_array($rate_data['rd_cate1'], $rd_cate1)){
+                    $rd_cate1[] = $rate_data['rd_cate1'];
+                    $rd_sum[] = $rate_data_fulfill2[$key + 1]['rd_data4'];
+                }
+            }
+
+            foreach($rate_data_fulfill2 as $key => $rate_data){
+
+
+
+                if($rate_data == $rd_cate1[0]){
+                    if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_fulfill2[$key - 1]['rd_cate1'])){
+                        $sheet->setCellValue('B'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_cate1']);
+                        $count_row_fulfill1 = 0;
+                    }else if($rate_data['rd_data4'] > 0) {
+
+                        $sheet->mergeCells('C'.($current_row_fulfill1 + $count_row_fulfill1).':E'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('C'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_cate2']);
+                        $sheet->mergeCells('F'.($current_row_fulfill1 + $count_row_fulfill1).':H'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('F'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data1']);
+                        $sheet->mergeCells('I'.($current_row_fulfill1 + $count_row_fulfill1).':K'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('I'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data2']);
+                        $sheet->mergeCells('L'.($current_row_fulfill1 + $count_row_fulfill1).':N'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('L'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data4']);
+                        $sheet->mergeCells('O'.($current_row_fulfill1 + $count_row_fulfill1).':Q'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('O'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data5']);
+                        $sheet->mergeCells('R'.($current_row_fulfill1 + $count_row_fulfill1).':T'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('R'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data6']);
+                        $sheet->mergeCells('U'.($current_row_fulfill1 + $count_row_fulfill1).':W'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('U'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data7']);
+                        $sheet->mergeCells('X'.($current_row_fulfill1 + $count_row_fulfill1).':Z'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('X'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data8']);
+
+                        $count_row_fulfill1 += 1;
+                        $count_row += 1;
+                    }
+
+
+                }
+                else {
+                    if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_fulfill2[$key - 1]['rd_cate1'])){
+                        $sheet->mergeCells('B'.($current_row_fulfill1).':B'.($current_row_fulfill1 + $count_row_fulfill1 - 1));
+                        $sheet->getStyle('B'.($current_row_fulfill1).':E'.($current_row_fulfill1 + $count_row_fulfill1 - 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                        $sheet->getStyle('B'.($current_row_fulfill1).':E'.($current_row_fulfill1 + $count_row_fulfill1 - 1))->getFont()->setBold(true);
+                        $sheet->getStyle('B'.($current_row_fulfill1).':Z'.($current_row_fulfill1 + $count_row_fulfill1 - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                        $sheet->getStyle('B'.($current_row_fulfill1).':Z'.($current_row_fulfill1 + $count_row_fulfill1 - 1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                        $sheet->setCellValue('B'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_cate1']);
+                        $current_row_fulfill1 = $current_row_fulfill1 + $count_row_fulfill1;
+                        $count_row_fulfill1 = 0;
+                    }
+                    else if($rate_data['rd_data4'] > 0){
+
+
+                        $sheet->mergeCells('C'.($current_row_fulfill1 + $count_row_fulfill1).':E'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('C'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_cate2']);
+                        $sheet->mergeCells('F'.($current_row_fulfill1 + $count_row_fulfill1).':H'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('F'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data1']);
+                        $sheet->mergeCells('I'.($current_row_fulfill1 + $count_row_fulfill1).':K'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('I'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data2']);
+                        $sheet->mergeCells('L'.($current_row_fulfill1 + $count_row_fulfill1).':N'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('L'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data4']);
+                        $sheet->mergeCells('O'.($current_row_fulfill1 + $count_row_fulfill1).':Q'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('O'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data5']);
+                        $sheet->mergeCells('R'.($current_row_fulfill1 + $count_row_fulfill1).':T'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('R'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data6']);
+                        $sheet->mergeCells('U'.($current_row_fulfill1 + $count_row_fulfill1).':W'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('U'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data7']);
+                        $sheet->mergeCells('X'.($current_row_fulfill1 + $count_row_fulfill1).':Z'.($current_row_fulfill1 + $count_row_fulfill1));
+                        $sheet->setCellValue('X'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data8']);
+
+                        $count_row_fulfill1 += 1;
+                        $count_row += 1;
+                    }
+                }
+
+                if(count($rate_data_fulfill2) == $key + 1){
+                    $sheet->mergeCells('B'.($current_row_fulfill1).':B'.($current_row_fulfill1 + $count_row_fulfill1 - 1));
+                    $sheet->getStyle('B'.($current_row_fulfill1).':E'.($current_row_fulfill1 + $count_row_fulfill1 - 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                    $sheet->getStyle('B'.($current_row_fulfill1).':E'.($current_row_fulfill1 + $count_row_fulfill1 - 1))->getFont()->setBold(true);
+                    $sheet->getStyle('B'.($current_row_fulfill1).':Z'.($current_row_fulfill1 + $count_row_fulfill1 - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                    $sheet->getStyle('B'.($current_row_fulfill1).':Z'.($current_row_fulfill1 + $count_row_fulfill1 - 1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                    $current_row_fulfill1 = $current_row_fulfill1 + $count_row_fulfill1;
+                    $count_row_fulfill1 = 0;
+                }
+
+
+            }
+            $sheet->getStyle('B'. ($current_row - 3). ':Z'. ($current_row - 2 + 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+            $sheet->getStyle('B'. ($current_row - 3). ':Z'. ($current_row - 3 + 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+            $sheet->getStyle('B'. ($current_row - 3). ':Z'. ($current_row - 3 + 1))->getFont()->setBold(true);
+            $sheet->mergeCells('B'. ($current_row - 3). ':E'. ($current_row - 3 + 1));
+            $sheet->getStyle('B'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+            $sheet->setCellValue('B'. ($current_row - 3), '항목');
+
+            $sheet->mergeCells('F'. ($current_row - 3). ':N'. ($current_row - 3));
+            $sheet->getStyle('F'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+            $sheet->setCellValue('F'. ($current_row - 3), '세금계산서 발행');
+
+            $sheet->mergeCells('O'. ($current_row - 3). ':W'. ($current_row - 3));
+            $sheet->getStyle('O'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+            $sheet->setCellValue('O'. ($current_row - 3), '세금계산서 미발행');
+
+            $sheet->mergeCells('X'. ($current_row - 3). ':Z'. ($current_row - 2));
+            $sheet->getStyle('X'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+            $sheet->setCellValue('X'. ($current_row - 3), '비고');
+
+            foreach($headers as $key => $header){
+                $sheet->mergeCells($col_start[$key]. ($current_row - 2).':'.$col_end[$key]. ($current_row - 2));
+                $sheet->getStyle($col_start[$key]. ($current_row - 2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $sheet->setCellValue($col_start[$key]. ($current_row - 2), $header);
+            }
+
+            $current_row += $count_row;
+        }
+        //END FULFILL2
+
+        //BONDED4
+        // if($rgd->rate_data_general['rdg_sum4'] > 0) {
+        //     $sheet->getStyle('B'. $current_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
+        //     $sheet->getStyle('B'. $current_row)->getFont()->setBold(true);
+        //     $sheet->mergeCells('B'. $current_row. ':Z'. $current_row);
+        //     $sheet->setCellValue('B'. $current_row, ' ∙ 포워더비용');
+
+        //     $current_row += 3;
+
+        //     $sheet->mergeCells('B'. ($current_row). ':E'. ($current_row));
+
+        //     $sheet->getStyle('B'. ($current_row). ':E'. ($current_row))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+        //     $sheet->getStyle('B'. ($current_row). ':Z'. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        //     $sheet->getStyle('B'. ($current_row). ':E'. ($current_row))->getFont()->setBold(true);
+        //     $sheet->setCellValue('B'. ($current_row), '포워더비용');
+
+        //     $sheet->mergeCells('F'.($current_row).':H'.($current_row));
+        //     $sheet->setCellValue('F'.($current_row), $rgd->rate_data_general['rdg_supply_price4']);
+        //     $sheet->mergeCells('I'.($current_row).':K'.($current_row));
+        //     $sheet->setCellValue('I'.($current_row), $rgd->rate_data_general['rdg_vat4']);
+        //     $sheet->mergeCells('L'.($current_row).':N'.($current_row));
+        //     $sheet->setCellValue('L'.($current_row), $rgd->rate_data_general['rdg_sum4']);
+        //     $sheet->mergeCells('O'.($current_row).':Q'.($current_row));
+        //     $sheet->setCellValue('O'.($current_row), $rgd->rate_data_general['rdg_supply_price11']);
+        //     $sheet->mergeCells('R'.($current_row).':T'.($current_row));
+        //     $sheet->setCellValue('R'.($current_row), $rgd->rate_data_general['rdg_vat11']);
+        //     $sheet->mergeCells('U'.($current_row).':W'.($current_row));
+        //     $sheet->setCellValue('U'.($current_row), $rgd->rate_data_general['rdg_sum11']);
+        //     $sheet->mergeCells('X'.($current_row).':Z'.($current_row));
+        //     $sheet->setCellValue('X'.($current_row), $rgd->rate_data_general['rdg_etc11']);
+
+
+        //     $count_row = 0;
+        //     $current_row += 1;
+
+        //     $count_row_bonded1 = 0;
+        //     $current_row_bonded1 = $current_row;
+
+        //     $rd_cate1 = [];
+        //     $rd_sum = [];
+        //     foreach($rate_data_bonded4 as $key => $rate_data){
+        //         if(!in_array($rate_data['rd_cate1'], $rd_cate1)){
+        //             $rd_cate1[] = $rate_data['rd_cate1'];
+        //             $rd_sum[] = $rate_data_bonded4[$key + 1]['rd_data4'];
+        //         }
+        //     }
+
+        //     foreach($rate_data_bonded4 as $key => $rate_data){
+
+
+
+        //         if($rate_data == $rd_cate1[0]){
+        //             if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_bonded4[$key - 1]['rd_cate1'])){
+        //                 $sheet->setCellValue('B'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_cate1']);
+        //                 $count_row_bonded1 = 0;
+        //             }else if($rate_data['rd_data4'] > 0) {
+
+        //                 $sheet->mergeCells('C'.($current_row_bonded1 + $count_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('C'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_cate2']);
+        //                 $sheet->mergeCells('F'.($current_row_bonded1 + $count_row_bonded1).':H'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('F'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data1']);
+        //                 $sheet->mergeCells('I'.($current_row_bonded1 + $count_row_bonded1).':K'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('I'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data2']);
+        //                 $sheet->mergeCells('L'.($current_row_bonded1 + $count_row_bonded1).':N'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('L'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data4']);
+        //                 $sheet->mergeCells('O'.($current_row_bonded1 + $count_row_bonded1).':Q'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('O'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data5']);
+        //                 $sheet->mergeCells('R'.($current_row_bonded1 + $count_row_bonded1).':T'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('R'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data6']);
+        //                 $sheet->mergeCells('U'.($current_row_bonded1 + $count_row_bonded1).':W'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data7']);
+        //                 $sheet->mergeCells('X'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data8']);
+
+        //                 $count_row_bonded1 += 1;
+        //                 $count_row += 1;
+        //             }
+
+
+        //         }
+        //         else {
+        //             if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_bonded4[$key - 1]['rd_cate1'])){
+        //                 $sheet->mergeCells('B'.($current_row_bonded1).':B'.($current_row_bonded1 + $count_row_bonded1 - 1));
+        //                 $sheet->getStyle('B'.($current_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1 - 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+        //                 $sheet->getStyle('B'.($current_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1 - 1))->getFont()->setBold(true);
+        //                 $sheet->getStyle('B'.($current_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1 - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+        //                 $sheet->getStyle('B'.($current_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1 - 1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        //                 $sheet->setCellValue('B'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_cate1']);
+        //                 $current_row_bonded1 = $current_row_bonded1 + $count_row_bonded1;
+        //                 $count_row_bonded1 = 0;
+        //             }
+        //             else if($rate_data['rd_data4'] > 0){
+
+
+        //                 $sheet->mergeCells('C'.($current_row_bonded1 + $count_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('C'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_cate2']);
+        //                 $sheet->mergeCells('F'.($current_row_bonded1 + $count_row_bonded1).':H'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('F'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data1']);
+        //                 $sheet->mergeCells('I'.($current_row_bonded1 + $count_row_bonded1).':K'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('I'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data2']);
+        //                 $sheet->mergeCells('L'.($current_row_bonded1 + $count_row_bonded1).':N'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('L'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data4']);
+        //                 $sheet->mergeCells('O'.($current_row_bonded1 + $count_row_bonded1).':Q'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('O'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data5']);
+        //                 $sheet->mergeCells('R'.($current_row_bonded1 + $count_row_bonded1).':T'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('R'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data6']);
+        //                 $sheet->mergeCells('U'.($current_row_bonded1 + $count_row_bonded1).':W'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data7']);
+        //                 $sheet->mergeCells('X'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data8']);
+
+        //                 $count_row_bonded1 += 1;
+        //                 $count_row += 1;
+        //             }
+        //         }
+
+        //         if(count($rate_data_bonded4) == $key + 1){
+        //             $sheet->mergeCells('B'.($current_row_bonded1).':B'.($current_row_bonded1 + $count_row_bonded1 - 1));
+        //             $sheet->getStyle('B'.($current_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1 - 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+        //             $sheet->getStyle('B'.($current_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1 - 1))->getFont()->setBold(true);
+        //             $sheet->getStyle('B'.($current_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1 - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+        //             $sheet->getStyle('B'.($current_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1 - 1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        //             $current_row_bonded1 = $current_row_bonded1 + $count_row_bonded1;
+        //             $count_row_bonded1 = 0;
+        //         }
+
+
+        //     }
+        //     $sheet->getStyle('B'. ($current_row - 3). ':Z'. ($current_row - 2 + 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+        //     $sheet->getStyle('B'. ($current_row - 3). ':Z'. ($current_row - 3 + 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+        //     $sheet->getStyle('B'. ($current_row - 3). ':Z'. ($current_row - 3 + 1))->getFont()->setBold(true);
+        //     $sheet->mergeCells('B'. ($current_row - 3). ':E'. ($current_row - 3 + 1));
+        //     $sheet->getStyle('B'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        //     $sheet->setCellValue('B'. ($current_row - 3), '항목');
+
+        //     $sheet->mergeCells('F'. ($current_row - 3). ':N'. ($current_row - 3));
+        //     $sheet->getStyle('F'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        //     $sheet->setCellValue('F'. ($current_row - 3), '세금계산서 발행');
+
+        //     $sheet->mergeCells('O'. ($current_row - 3). ':W'. ($current_row - 3));
+        //     $sheet->getStyle('O'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        //     $sheet->setCellValue('O'. ($current_row - 3), '세금계산서 미발행');
+
+        //     $sheet->mergeCells('X'. ($current_row - 3). ':Z'. ($current_row - 2));
+        //     $sheet->getStyle('X'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        //     $sheet->setCellValue('X'. ($current_row - 3), '비고');
+
+        //     foreach($headers as $key => $header){
+        //         $sheet->mergeCells($col_start[$key]. ($current_row - 2).':'.$col_end[$key]. ($current_row - 2));
+        //         $sheet->getStyle($col_start[$key]. ($current_row - 2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        //         $sheet->setCellValue($col_start[$key]. ($current_row - 2), $header);
+        //     }
+
+        //     $current_row += $count_row;
+        // }
+        //END BONDED4
+
+        //BONDED5
+        // if($rgd->rate_data_general['rdg_sum5'] > 0) {
+        //     $sheet->getStyle('B'. $current_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
+        //     $sheet->getStyle('B'. $current_row)->getFont()->setBold(true);
+        //     $sheet->mergeCells('B'. $current_row. ':Z'. $current_row);
+        //     $sheet->setCellValue('B'. $current_row, ' ∙ 포워더비용');
+
+        //     $current_row += 3;
+
+        //     $sheet->mergeCells('B'. ($current_row). ':E'. ($current_row));
+
+        //     $sheet->getStyle('B'. ($current_row). ':E'. ($current_row))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+        //     $sheet->getStyle('B'. ($current_row). ':Z'. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        //     $sheet->getStyle('B'. ($current_row). ':E'. ($current_row))->getFont()->setBold(true);
+        //     $sheet->setCellValue('B'. ($current_row), '포워더비용');
+
+        //     $sheet->mergeCells('F'.($current_row).':H'.($current_row));
+        //     $sheet->setCellValue('F'.($current_row), $rgd->rate_data_general['rdg_supply_price5']);
+        //     $sheet->mergeCells('I'.($current_row).':K'.($current_row));
+        //     $sheet->setCellValue('I'.($current_row), $rgd->rate_data_general['rdg_vat5']);
+        //     $sheet->mergeCells('L'.($current_row).':N'.($current_row));
+        //     $sheet->setCellValue('L'.($current_row), $rgd->rate_data_general['rdg_sum5']);
+        //     $sheet->mergeCells('O'.($current_row).':Q'.($current_row));
+        //     $sheet->setCellValue('O'.($current_row), $rgd->rate_data_general['rdg_supply_price12']);
+        //     $sheet->mergeCells('R'.($current_row).':T'.($current_row));
+        //     $sheet->setCellValue('R'.($current_row), $rgd->rate_data_general['rdg_vat12']);
+        //     $sheet->mergeCells('U'.($current_row).':W'.($current_row));
+        //     $sheet->setCellValue('U'.($current_row), $rgd->rate_data_general['rdg_sum12']);
+        //     $sheet->mergeCells('X'.($current_row).':Z'.($current_row));
+        //     $sheet->setCellValue('X'.($current_row), $rgd->rate_data_general['rdg_etc12']);
+
+
+        //     $count_row = 0;
+        //     $current_row += 1;
+
+        //     $count_row_bonded1 = 0;
+        //     $current_row_bonded1 = $current_row;
+
+        //     $rd_cate1 = [];
+        //     $rd_sum = [];
+        //     foreach($rate_data_bonded5 as $key => $rate_data){
+        //         if(!in_array($rate_data['rd_cate1'], $rd_cate1)){
+        //             $rd_cate1[] = $rate_data['rd_cate1'];
+        //             $rd_sum[] = $rate_data_bonded5[$key + 1]['rd_data4'];
+        //         }
+        //     }
+
+        //     foreach($rate_data_bonded5 as $key => $rate_data){
+
+
+
+        //         if($rate_data == $rd_cate1[0]){
+        //             if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_bonded5[$key - 1]['rd_cate1'])){
+        //                 $sheet->setCellValue('B'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_cate1']);
+        //                 $count_row_bonded1 = 0;
+        //             }else if($rate_data['rd_data4'] > 0) {
+
+        //                 $sheet->mergeCells('C'.($current_row_bonded1 + $count_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('C'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_cate2']);
+        //                 $sheet->mergeCells('F'.($current_row_bonded1 + $count_row_bonded1).':H'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('F'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data1']);
+        //                 $sheet->mergeCells('I'.($current_row_bonded1 + $count_row_bonded1).':K'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('I'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data2']);
+        //                 $sheet->mergeCells('L'.($current_row_bonded1 + $count_row_bonded1).':N'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('L'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data4']);
+        //                 $sheet->mergeCells('O'.($current_row_bonded1 + $count_row_bonded1).':Q'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('O'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data5']);
+        //                 $sheet->mergeCells('R'.($current_row_bonded1 + $count_row_bonded1).':T'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('R'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data6']);
+        //                 $sheet->mergeCells('U'.($current_row_bonded1 + $count_row_bonded1).':W'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data7']);
+        //                 $sheet->mergeCells('X'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data8']);
+
+        //                 $count_row_bonded1 += 1;
+        //                 $count_row += 1;
+        //             }
+
+
+        //         }
+        //         else {
+        //             if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_bonded5[$key - 1]['rd_cate1'])){
+        //                 $sheet->mergeCells('B'.($current_row_bonded1).':B'.($current_row_bonded1 + $count_row_bonded1 - 1));
+        //                 $sheet->getStyle('B'.($current_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1 - 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+        //                 $sheet->getStyle('B'.($current_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1 - 1))->getFont()->setBold(true);
+        //                 $sheet->getStyle('B'.($current_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1 - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+        //                 $sheet->getStyle('B'.($current_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1 - 1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        //                 $sheet->setCellValue('B'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_cate1']);
+        //                 $current_row_bonded1 = $current_row_bonded1 + $count_row_bonded1;
+        //                 $count_row_bonded1 = 0;
+        //             }
+        //             else if($rate_data['rd_data4'] > 0){
+
+
+        //                 $sheet->mergeCells('C'.($current_row_bonded1 + $count_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('C'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_cate2']);
+        //                 $sheet->mergeCells('F'.($current_row_bonded1 + $count_row_bonded1).':H'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('F'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data1']);
+        //                 $sheet->mergeCells('I'.($current_row_bonded1 + $count_row_bonded1).':K'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('I'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data2']);
+        //                 $sheet->mergeCells('L'.($current_row_bonded1 + $count_row_bonded1).':N'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('L'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data4']);
+        //                 $sheet->mergeCells('O'.($current_row_bonded1 + $count_row_bonded1).':Q'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('O'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data5']);
+        //                 $sheet->mergeCells('R'.($current_row_bonded1 + $count_row_bonded1).':T'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('R'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data6']);
+        //                 $sheet->mergeCells('U'.($current_row_bonded1 + $count_row_bonded1).':W'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('U'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data7']);
+        //                 $sheet->mergeCells('X'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1));
+        //                 $sheet->setCellValue('X'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_data8']);
+
+        //                 $count_row_bonded1 += 1;
+        //                 $count_row += 1;
+        //             }
+        //         }
+
+        //         if(count($rate_data_bonded5) == $key + 1){
+        //             $sheet->mergeCells('B'.($current_row_bonded1).':B'.($current_row_bonded1 + $count_row_bonded1 - 1));
+        //             $sheet->getStyle('B'.($current_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1 - 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+        //             $sheet->getStyle('B'.($current_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1 - 1))->getFont()->setBold(true);
+        //             $sheet->getStyle('B'.($current_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1 - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+        //             $sheet->getStyle('B'.($current_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1 - 1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        //             $current_row_bonded1 = $current_row_bonded1 + $count_row_bonded1;
+        //             $count_row_bonded1 = 0;
+        //         }
+
+
+        //     }
+        //     $sheet->getStyle('B'. ($current_row - 3). ':Z'. ($current_row - 2 + 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+        //     $sheet->getStyle('B'. ($current_row - 3). ':Z'. ($current_row - 3 + 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+        //     $sheet->getStyle('B'. ($current_row - 3). ':Z'. ($current_row - 3 + 1))->getFont()->setBold(true);
+        //     $sheet->mergeCells('B'. ($current_row - 3). ':E'. ($current_row - 3 + 1));
+        //     $sheet->getStyle('B'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        //     $sheet->setCellValue('B'. ($current_row - 3), '항목');
+
+        //     $sheet->mergeCells('F'. ($current_row - 3). ':N'. ($current_row - 3));
+        //     $sheet->getStyle('F'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        //     $sheet->setCellValue('F'. ($current_row - 3), '세금계산서 발행');
+
+        //     $sheet->mergeCells('O'. ($current_row - 3). ':W'. ($current_row - 3));
+        //     $sheet->getStyle('O'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        //     $sheet->setCellValue('O'. ($current_row - 3), '세금계산서 미발행');
+
+        //     $sheet->mergeCells('X'. ($current_row - 3). ':Z'. ($current_row - 2));
+        //     $sheet->getStyle('X'. ($current_row - 3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        //     $sheet->setCellValue('X'. ($current_row - 3), '비고');
+
+        //     foreach($headers as $key => $header){
+        //         $sheet->mergeCells($col_start[$key]. ($current_row - 2).':'.$col_end[$key]. ($current_row - 2));
+        //         $sheet->getStyle($col_start[$key]. ($current_row - 2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        //         $sheet->setCellValue($col_start[$key]. ($current_row - 2), $header);
+        //     }
+
+        //     $current_row += $count_row;
+        // }
+        //END BONDED3
+        $sheet->setCellValue('B'. ($current_row), '');
+        $sheet->setCellValue('B'. ($current_row + 1), '1. 보세화물 서비스의 예상경비 청구서는 BL번호 단위로 발송됩니다.(단 분할인 경우 반출단위)');
+        $sheet->setCellValue('B'. ($current_row + 2), '2. 세금계산서 발행은 확정청구서와 함께 처리 됩니다.');
+        $sheet->setCellValue('B'. ($current_row + 3), '3. 결제는 PC/Mobile에 접속하여서 결제하시면 되며, 월별 청구인 경우 매달 24일까지 결제가 되지 않으면 25일 등록 된 카드로 자동결제 됩니다.');
+        $sheet->setCellValue('B'. ($current_row + 4), '4. 결제수단에 따라 수수료가 추가 청구 됩니다.(카드/카카오페이 2.9%, 실시간계좌이체 1.8% 등)');
+
+
+        $sheet->getStyle('B'. ($current_row + 6). ':Z'. ($current_row + 10))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('B'. ($current_row + 6). ':Z'. ($current_row + 10))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
+        $sheet->mergeCells('B'. ($current_row + 6). ':Z'. ($current_row + 6));
+        $sheet->setCellValue('B'. ($current_row + 6), '가맹점(센터) 회사명');
+        $sheet->mergeCells('B'. ($current_row + 7). ':Z'. ($current_row + 7));
+        $sheet->setCellValue('B'. ($current_row + 7), '가맹점(센터) 주소');
+        $sheet->mergeCells('B'. ($current_row + 8). ':Z'. ($current_row + 8));
+        $sheet->setCellValue('B'. ($current_row + 8), '담당부서');
+        $sheet->mergeCells('B'. ($current_row + 9). ':Z'. ($current_row + 9));
+        $sheet->setCellValue('B'. ($current_row + 9), '전화');
+        $sheet->mergeCells('B'. ($current_row + 10). ':Z'. ($current_row + 10));
         $sheet->setCellValue('B'. ($current_row + 10), '메일');
 
         $sheet->getDefaultRowDimension()->setRowHeight(24);
