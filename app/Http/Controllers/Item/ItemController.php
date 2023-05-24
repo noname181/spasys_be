@@ -1117,12 +1117,26 @@ class ItemController extends Controller
             $item2 = $item->get();
 
             $count_check = 0;
-
+            
             $item3 = collect($item2)->map(function ($q) {
-                $item4 = Item::with(['item_info'])->where('item.item_no', $q->item_no)->first();
-                if (isset($item4['item_info']['stock'])) {
-                    return ['total_amount' => $item4['item_info']['stock']];
+                // $item4 = Item::with(['item_info'])->where('item.item_no', $q->item_no)->first();
+                // if (isset($item4['item_info']['stock'])) {
+                //     return ['total_amount' => $item4['item_info']['stock']];
+                // }
+                if (isset($q->option_id)) {
+                    $status = StockStatusBad::where('product_id', $q->product_id)->where('option_id', $q->option_id)->get();
+                } else {
+                    $status = StockStatusBad::where('product_id', $q->product_id)->get();
                 }
+
+                $count_total = 0;
+                if(isset($status)){
+                    foreach($status as $total){
+                        $count_total += $total->stock;
+                    }
+                }
+                return ['total_amount' => $count_total];
+
             })->sum('total_amount');
 
             $item5 = collect($item2)->map(function ($q) {
@@ -1132,7 +1146,7 @@ class ItemController extends Controller
                 }
             })->sum('total_price');
 
-
+           
             $item = $item->paginate($per_page, ['*'], 'page', $page);
 
             $custom = collect(['sum1' => $item3, 'sum2' => $item5]);
