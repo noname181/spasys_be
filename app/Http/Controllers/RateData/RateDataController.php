@@ -6804,7 +6804,7 @@ class RateDataController extends Controller
         $sheet->getColumnDimension('C')->setWidth(12);
         $sheet->getStyle('A1:Z200')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
         $sheet->getStyle('A1:CT200')->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FFFFFF'));
-        $sheet->setTitle('보세화물 예상경비(건별,월별)');
+        $sheet->setTitle('수입풀필먼트 확정(월별)');
 
 
         $sheet->mergeCells('B2:Z6');
