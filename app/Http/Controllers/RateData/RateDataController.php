@@ -5341,7 +5341,7 @@ class RateDataController extends Controller
         $col_start = ['F', 'I', 'L', 'O', 'R', 'U', 'X'];
         $col_end = ['H', 'K', 'N', 'Q', 'T', 'W', 'Z'];
 
-        $categories = ['센터작업료', '국내 운송료', '해외 운송료', '보관', '부자재', '합계'];
+        $categories = ['작업료', '보관료', '국내운송료', '합계'];
 
         $current_row = 22;
         $count_row = 0;
@@ -7786,6 +7786,30 @@ class RateDataController extends Controller
                         $sheet->setCellValue('B'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_cate1']);
                         $current_row_fulfill1 = $current_row_fulfill1 + $count_row_fulfill1;
                         $count_row_fulfill1 = 0;
+
+                        if($rate_data['rd_data4'] > 0){
+
+
+                            $sheet->mergeCells('C'.($current_row_fulfill1 + $count_row_fulfill1).':E'.($current_row_fulfill1 + $count_row_fulfill1));
+                            $sheet->setCellValue('C'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_cate2']);
+                            $sheet->mergeCells('F'.($current_row_fulfill1 + $count_row_fulfill1).':H'.($current_row_fulfill1 + $count_row_fulfill1));
+                            $sheet->setCellValue('F'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data1']);
+                            $sheet->mergeCells('I'.($current_row_fulfill1 + $count_row_fulfill1).':K'.($current_row_fulfill1 + $count_row_fulfill1));
+                            $sheet->setCellValue('I'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data2']);
+                            $sheet->mergeCells('L'.($current_row_fulfill1 + $count_row_fulfill1).':N'.($current_row_fulfill1 + $count_row_fulfill1));
+                            $sheet->setCellValue('L'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data4']);
+                            $sheet->mergeCells('O'.($current_row_fulfill1 + $count_row_fulfill1).':Q'.($current_row_fulfill1 + $count_row_fulfill1));
+                            $sheet->setCellValue('O'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data5']);
+                            $sheet->mergeCells('R'.($current_row_fulfill1 + $count_row_fulfill1).':T'.($current_row_fulfill1 + $count_row_fulfill1));
+                            $sheet->setCellValue('R'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data6']);
+                            $sheet->mergeCells('U'.($current_row_fulfill1 + $count_row_fulfill1).':W'.($current_row_fulfill1 + $count_row_fulfill1));
+                            $sheet->setCellValue('U'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data7']);
+                            $sheet->mergeCells('X'.($current_row_fulfill1 + $count_row_fulfill1).':Z'.($current_row_fulfill1 + $count_row_fulfill1));
+                            $sheet->setCellValue('X'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data8']);
+    
+                            $count_row_fulfill1 += 1;
+                            $count_row += 1;
+                        }
                     }
                     else if($rate_data['rd_data4'] > 0){
 
