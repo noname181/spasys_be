@@ -496,7 +496,8 @@ class ImportScheduleController extends Controller
                         $join->on('parent_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
                     })
                    ->leftjoin('company', function ($join) {
-                        $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
+                        $join->on('company.co_license', '=', 't_import_expected.tie_co_license')
+                        ->where('company.co_type', '=', "shipper");
                     })->leftjoin('company as parent_shop', function ($join) {
                         $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
                     })
