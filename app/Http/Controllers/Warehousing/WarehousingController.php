@@ -1476,6 +1476,12 @@ class WarehousingController extends Controller
                 });
             }
 
+            if (isset($validated['item_brand'])) {
+                $warehousing->whereHas('warehousing.warehousing_item.item', function ($q) use ($validated) {
+                    return $q->where(DB::raw('lower(item_brand)'), 'like', '%' . strtolower($validated['item_brand']) . '%');
+                });
+            }
+
             if (isset($validated['w_schedule_number_iw'])) {
                 $warehousing->whereHas('w_no', function ($q) use ($validated) {
                     return $q->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number_iw'] . '%');
