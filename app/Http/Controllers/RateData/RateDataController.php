@@ -5371,7 +5371,7 @@ class RateDataController extends Controller
 
             $sheet->mergeCells('B'. ($current_row));
             $sheet->getStyle('B'. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-            $sheet->setCellValue('B'. ($current_row), $key_rgd == (count($rgds) - 1) ? '' : $key_rgd + 1);
+            $sheet->setCellValue('B'. ($current_row), $key_rgd == (count($rgds) - 1) ? '합계' : $key_rgd + 1);
     
             $sheet->mergeCells('C'. ($current_row));
             $sheet->getStyle('C'. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
@@ -5379,7 +5379,7 @@ class RateDataController extends Controller
     
             $sheet->mergeCells('D'. ($current_row));
             $sheet->getStyle('D'. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-            $sheet->setCellValue('D'. ($current_row), $rgd['warehousing']['w_schedule_number2']);
+            $sheet->setCellValue('D'. ($current_row), $key_rgd == (count($rgds) - 1) ? '' : $rgd['warehousing']['w_schedule_number2']);
     
             $sheet->mergeCells('E'. ($current_row));
             $sheet->getStyle('E'. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
@@ -5390,7 +5390,7 @@ class RateDataController extends Controller
 
                 $sheet->mergeCells($col_start[$key]. ($current_row).':'.$col_end[$key]. ($current_row));
                 $sheet->getStyle($col_start[$key]. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                // $sheet->getStyle($col_start[$key]. ($current_row))->getNumberFormat()->setFormatCode('#,##0_-""');
+                $sheet->getStyle($col_start[$key]. ($current_row))->getNumberFormat()->setFormatCode('#,##0_-""');
                 if($key == 0){
                   
                     $sheet->setCellValue($col_start[$key]. ($current_row), $rgd['rate_data_general']['rdg_supply_price2']);
@@ -5603,10 +5603,13 @@ class RateDataController extends Controller
                 $sheet->mergeCells('B'.($current_row + $count_row).':E'.($current_row + $count_row));
                 $sheet->setCellValue('B'.($current_row + $count_row), $category);
                 $sheet->mergeCells('F'.($current_row + $count_row).':I'.($current_row + $count_row));
+                $sheet->getStyle('F'.($current_row + $count_row))->getNumberFormat()->setFormatCode('#,##0_-""');
                 $sheet->setCellValue('F'.($current_row + $count_row), $rgd->rate_data_general['rdg_supply_price' . ($index)]);
                 $sheet->mergeCells('J'.($current_row + $count_row).':M'.($current_row + $count_row));
+                $sheet->getStyle('J'.($current_row + $count_row))->getNumberFormat()->setFormatCode('#,##0_-""');
                 $sheet->setCellValue('J'.($current_row + $count_row), $rgd->rate_data_general['rdg_vat' . ($index)]);
                 $sheet->mergeCells('N'.($current_row + $count_row).':Q'.($current_row + $count_row));
+                $sheet->getStyle('N'.($current_row + $count_row))->getNumberFormat()->setFormatCode('#,##0_-""');
                 $sheet->setCellValue('N'.($current_row + $count_row), $rgd->rate_data_general['rdg_sum' . ($index)]);
                 $sheet->mergeCells('R'.($current_row + $count_row).':Z'.($current_row + $count_row));
                 $sheet->setCellValue('R'.($current_row + $count_row), $rgd->rate_data_general['rdg_etc' . ($index)]);
