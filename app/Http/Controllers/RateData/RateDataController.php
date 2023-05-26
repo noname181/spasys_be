@@ -5315,7 +5315,7 @@ class RateDataController extends Controller
         $sheet->mergeCells('B14:Z14');
         $sheet->setCellValue('B14', ' ∙ 청구서 No : 확정청구서 '. $rgd->rgd_status4 . ' ' . $rgd->rgd_settlement_number);
         $sheet->mergeCells('B15:Z15');
-        $sheet->setCellValue('B15', ' ∙ 청구서 발행일 : '. $rgd->created_at);
+        $sheet->setCellValue('B15', ' ∙ 청구서 발행일 : '. Carbon::createFromFormat('Y-m-d H:i:s', $rgd->created_at)->format('Y.m.d'));
         $sheet->mergeCells('B16:Z16');
         $sheet->setCellValue('B16', ' ∙ 예상 청구금액 : '. $rgd->rate_data_general->rdg_sum4 . '원');
         $sheet->mergeCells('B17:Z17');
@@ -5383,14 +5383,14 @@ class RateDataController extends Controller
     
             $sheet->mergeCells('E'. ($current_row));
             $sheet->getStyle('E'. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-            $sheet->setCellValue('E'. ($current_row), str_replace(' 00:00:00' , '', $rgd['warehousing']['warehousing_child'][$child_length - 1]['w_completed_day']));
+            $sheet->setCellValue('E'. ($current_row), str_replace(' 00:00:00' , '', Carbon::createFromFormat('Y-m-d H:i:s', $rgd['warehousing']['warehousing_child'][$child_length - 1]['w_completed_day'])->format('Y.m.d') ));
 
 
             foreach($headers as $key => $header){
 
                 $sheet->mergeCells($col_start[$key]. ($current_row).':'.$col_end[$key]. ($current_row));
                 $sheet->getStyle($col_start[$key]. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                // $sheet->getStyle($col_start[$key]. ($current_row))->getNumberFormat()->setFormatCode('###,###,###');
+                // $sheet->getStyle($col_start[$key]. ($current_row))->getNumberFormat()->setFormatCode('#,##0_-""');
                 if($key == 0){
                   
                     $sheet->setCellValue($col_start[$key]. ($current_row), $rgd['rate_data_general']['rdg_supply_price2']);
@@ -5572,7 +5572,7 @@ class RateDataController extends Controller
         $sheet->mergeCells('B14:Z14');
         $sheet->setCellValue('B14', ' ∙ 청구서 No : '. $rgd->rgd_status4 . ' ' . $rgd->rgd_settlement_number);
         $sheet->mergeCells('B15:Z15');
-        $sheet->setCellValue('B15', ' ∙ 청구서 발행일 : '. $rgd->created_at);
+        $sheet->setCellValue('B15', ' ∙ 청구서 발행일 : '. Carbon::createFromFormat('Y-m-d H:i:s', $rgd->created_at)->format('Y.m.d'));
         $sheet->mergeCells('B16:Z16');
         $sheet->setCellValue('B16', ' ∙ 예상 청구금액 : '. $rgd->rate_data_general->rdg_sum4 . '원');
         $sheet->mergeCells('B17:Z17');
@@ -6526,7 +6526,7 @@ class RateDataController extends Controller
         $sheet->mergeCells('B14:Z14');
         $sheet->setCellValue('B14', ' ∙ 청구서 No : '. $rgd->rgd_status4 . ' ' . $rgd->rgd_settlement_number);
         $sheet->mergeCells('B15:Z15');
-        $sheet->setCellValue('B15', ' ∙ 청구서 발행일 : '. $rgd->created_at);
+        $sheet->setCellValue('B15', ' ∙ 청구서 발행일 : '. Carbon::createFromFormat('Y-m-d H:i:s', $rgd->created_at)->format('Y.m.d'));
         $sheet->mergeCells('B16:Z16');
         $sheet->setCellValue('B16', ' ∙ 예상 청구금액 : '. $rgd->rate_data_general->rdg_sum7 . '원');
         $sheet->mergeCells('B17:Z17');
@@ -7542,7 +7542,7 @@ class RateDataController extends Controller
         $sheet->mergeCells('B14:R14');
         $sheet->setCellValue('B14', ' ∙ 청구서 No : '. $rgd->rgd_status4 . ' ' . $rgd->rgd_settlement_number);
         $sheet->mergeCells('B15:R15');
-        $sheet->setCellValue('B15', ' ∙ 청구서 발행일 : '. $rgd->created_at);
+        $sheet->setCellValue('B15', ' ∙ 청구서 발행일 : '. Carbon::createFromFormat('Y-m-d H:i:s', $rgd->created_at)->format('Y.m.d'));
         $sheet->mergeCells('B16:R16');
         $sheet->setCellValue('B16', ' ∙ 예상 청구금액 : '. $rgd->rate_data_general->rdg_sum7 . '원');
         $sheet->mergeCells('B17:R17');
@@ -7800,7 +7800,7 @@ class RateDataController extends Controller
         })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
 
         // return response()->json([
-        //     'rgd' => $rgd->rate_data_general,
+        //     'rgd' => $rgd,
         //     '1' => $rate_data_fulfill1,
         //     '2' => $rate_data_fulfill2,
         //     '3' => $rate_data_fulfill3,
@@ -7838,11 +7838,11 @@ class RateDataController extends Controller
         $sheet->getStyle('B13:B17')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
         $sheet->getStyle('B13:B17')->getFont()->setBold(true);
         $sheet->mergeCells('B13:Z13');
-        $sheet->setCellValue('B13', ' ∙ 서   비  스 : 보세화물');
+        $sheet->setCellValue('B13', ' ∙ 서   비  스 : 수입풀필먼트');
         $sheet->mergeCells('B14:Z14');
         $sheet->setCellValue('B14', ' ∙ 청구서 No : '. $rgd->rgd_status4 . ' ' . $rgd->rgd_settlement_number);
         $sheet->mergeCells('B15:Z15');
-        $sheet->setCellValue('B15', ' ∙ 청구서 발행일 : '. $rgd->created_at);
+        $sheet->setCellValue('B15', ' ∙ 청구서 발행일 : '. Carbon::createFromFormat('Y-m-d H:i:s', $rgd->created_at)->format('Y.m.d') );
         $sheet->mergeCells('B16:Z16');
         $sheet->setCellValue('B16', ' ∙ 예상 청구금액 : '. $rgd->rate_data_general->rdg_sum6 . '원');
         $sheet->mergeCells('B17:Z17');
