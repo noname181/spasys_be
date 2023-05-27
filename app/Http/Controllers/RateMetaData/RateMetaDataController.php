@@ -46,6 +46,11 @@ class RateMetaDataController extends Controller
             if(isset($validated['to_date'])) {
                 $rmd->where('created_at', '<=' , date('Y-m-d 23:59:59', strtotime($validated['to_date'])));
             }
+            if(isset($validated['rm_name'])) {
+                $rmd->whereHas('rate_meta', function($rm) use ($validated){
+                    $rm->where('rm_name', 'like', '%'.$validated['rm_name'].'%');
+                });
+            }
             if(isset($validated['rm_biz_name'])) {
                 $rmd->whereHas('rate_meta', function($rm) use ($validated){
                     $rm->where('rm_biz_name', 'like', '%'.$validated['rm_biz_name'].'%');
