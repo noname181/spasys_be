@@ -3428,12 +3428,12 @@ class WarehousingController extends Controller
 
             if (isset($validated['co_parent_name'])) {
                 $warehousing->whereHas('w_no.co_no.co_parent', function ($query) use ($validated) {
-                    $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                    $query->where(DB::raw('lower(co_name)'), 'like', '%' . $validated['co_parent_name'] . '%');
                 });
             }
             if (isset($validated['co_name'])) {
                 $warehousing->whereHas('w_no.co_no', function ($q) use ($validated) {
-                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . $validated['co_name'] . '%');
                 });
             }
             if (isset($validated['w_type'])) {
