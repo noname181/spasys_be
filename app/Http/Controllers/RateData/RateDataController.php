@@ -2655,7 +2655,7 @@ class RateDataController extends Controller
 
              //CHECK EXIST IN DOUBLE CLICK CASE
             $check_settlement_number = ReceivingGoodsDelivery::where('rgd_settlement_number', $request->settlement_number)->first();
-            if(isset($check_settlement_number->rgd_no) && !str_contains($request->type, 'edit')){
+            if(isset($check_settlement_number->rgd_no) && str_contains($request->type, 'create')){
                 return;
             }
 
@@ -6332,8 +6332,6 @@ class RateDataController extends Controller
         }else {
             $name = 'distribution_final_monthbill_';
         }
-
-        return $rgd->service_korean_nam;
 
         $mask = $path . $name .'*.*';
         array_map('unlink', glob($mask) ?: []);
