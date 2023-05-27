@@ -5466,9 +5466,9 @@ class RateDataController extends Controller
             File::makeDirectory($path, $mode = 0777, true, true);
         }
 
-        if($rgd->service_korean_nam == '보세화물' && !str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
+        if($rgd->service_korean_name == '보세화물' && !str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
             $name = 'bonded_est_casebill_';
-        }else if($rgd->service_korean_nam == '보세화물' && str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
+        }else if($rgd->service_korean_name == '보세화물' && str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
             $name = 'bonded_est_monthbill_';
         }else {
             $name = 'bonded_est_monthbill_';
@@ -6325,13 +6325,15 @@ class RateDataController extends Controller
             File::makeDirectory($path, $mode = 0777, true, true);
         }
 
-        if($rgd->service_korean_nam == '유통가공' && !str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
+        if($rgd->service_korean_name == '유통가공' && !str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
             $name = 'distribution_est_casebill_';
-        }else if($rgd->service_korean_nam == '유통가공' && str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
+        }else if($rgd->service_korean_name == '유통가공' && str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
             $name = 'distribution_est_monthbill_';
         }else {
             $name = 'distribution_final_monthbill_';
         }
+
+        return $rgd->service_korean_nam;
 
         $mask = $path . $name .'*.*';
         array_map('unlink', glob($mask) ?: []);
@@ -7394,9 +7396,9 @@ class RateDataController extends Controller
             File::makeDirectory($path, $mode = 0777, true, true);
         }
 
-        if($rgd->service_korean_nam == '보세화물' && !str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
+        if($rgd->service_korean_name == '보세화물' && !str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
             $name = 'bonded_est_casebill_';
-        }else if($rgd->service_korean_nam == '보세화물' && str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
+        }else if($rgd->service_korean_name == '보세화물' && str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
             $name = 'bonded_est_monthbill_';
         }else {
             $name = 'bonded_est_monthbill_';
@@ -7664,9 +7666,9 @@ class RateDataController extends Controller
             File::makeDirectory($path, $mode = 0777, true, true);
         }
 
-        if($rgd->service_korean_nam == '보세화물' && !str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
+        if($rgd->service_korean_name == '보세화물' && !str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
             $name = 'bonded_est_casebill_';
-        }else if($rgd->service_korean_nam == '보세화물' && str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
+        }else if($rgd->service_korean_name == '보세화물' && str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
             $name = 'bonded_est_monthbill_';
         }else {
             $name = 'bonded_est_monthbill_';
