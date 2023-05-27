@@ -98,6 +98,9 @@ class RateMetaDataSearchRequest extends BaseFormRequest
                 'max:5000',
                 'mimes:jpg,jpeg,png,pdf,webp,gif',
             ],
+            'rmd_service' => [
+                '',
+            ],
         ];
     }
 

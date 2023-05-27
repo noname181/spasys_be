@@ -286,6 +286,10 @@ class RateMetaDataController extends Controller
                     });
                 }
             }
+            if(isset($validated['rmd_service'])) {
+               
+                $rmd->where('rmd_service', '=', $validated['rmd_service']);
+            }
 
             $rmd = $rmd->paginate($per_page, ['*'], 'page', $page);
             return response()->json($rmd);
