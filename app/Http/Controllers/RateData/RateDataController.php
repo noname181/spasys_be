@@ -5618,6 +5618,8 @@ class RateDataController extends Controller
             }
 
         }
+        //FORMAT NUMBER
+        $sheet->getStyle('F'. ($current_row). ':Q'. ($current_row - 1 + $count_row))->getNumberFormat()->setFormatCode('#,##0_-""');
 
         $sheet->getStyle('B'. ($current_row). ':E'. ($current_row - 1 + $count_row))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
         $sheet->getStyle('B'. ($current_row). ':E'. ($current_row - 1 + $count_row))->getFont()->setBold(true);
@@ -5650,7 +5652,7 @@ class RateDataController extends Controller
         $current_row += $count_row;
 
        
-        //FULFILL1
+        //WORK
         if($rgd->rate_data_general['rdg_sum2'] > 0) {
             $sheet->getStyle('B'. $current_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
             $sheet->getStyle('B'. $current_row)->getFont()->setBold(true);
@@ -5697,36 +5699,7 @@ class RateDataController extends Controller
                 $rd_data6_sum += $rate_data['rd_data6'];
                 $rd_data7_sum += $rate_data['rd_data7'];
 
-                if($rate_data['rd_cate1'] == '원산지 표시' || $rate_data['rd_cate1'] == 'TAG' || $rate_data['rd_cate1'] == '라벨'){
-                    if(isset($rate_data_work[$key + 1]) && $rate_data['rd_cate1'] != $rate_data_work[$key + 1]['rd_cate1']){
-                        $data = clone $rate_data;
-    
-                        $data['rd_cate2'] = '합계';
-                        $data['rd_data1'] = '';
-                        $data['rd_data2'] = '';
-                        $data['rd_data4'] = $rd_data4_sum;
-                        $data['rd_data5'] = $rd_data5_sum;
-                        $data['rd_data6'] = $rd_data6_sum;
-                        $data['rd_data7'] = $rd_data7_sum;
-    
-                        array_push($rate_data_work_, $data);
-                    }
-                    if($key == count($rate_data_work) - 1) {
-    
-                        $data = clone $rate_data;
-    
-                        $data['rd_cate2'] = '합계';
-                        $data['rd_data1'] = '';
-                        $data['rd_data2'] = '';
-                        $data['rd_data4'] = $rd_data4_sum;
-                        $data['rd_data5'] = $rd_data5_sum;
-                        $data['rd_data6'] = $rd_data6_sum;
-                        $data['rd_data7'] = $rd_data7_sum;
-    
-                        array_push($rate_data_work_, $data);
-                    }
-                }
-
+               
                
             }
 
@@ -5863,6 +5836,10 @@ class RateDataController extends Controller
 
 
             }
+            
+            //FORMAT NUMBER
+            $sheet->getStyle('F'. ($current_row - 2). ':W'. ($current_row - 1 + $count_row))->getNumberFormat()->setFormatCode('#,##0_-""');
+
             $sheet->getStyle('B'. ($current_row - 2). ':Z'. ($current_row - 2))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
             $sheet->getStyle('B'. ($current_row - 2). ':Z'. ($current_row - 2))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
             $sheet->getStyle('B'. ($current_row - 2). ':Z'. ($current_row - 2))->getFont()->setBold(true);
@@ -5901,9 +5878,9 @@ class RateDataController extends Controller
             $sheet->mergeCells('X'.($current_row - 1).':Z'.($current_row - 1));
 
         }
-        //END FULFILL1
+        //END WORK
        
-        //FULFILL2
+        //STORAGE
         if($rgd->rate_data_general['rdg_sum1'] > 0) {
             $sheet->getStyle('B'. $current_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
             $sheet->getStyle('B'. $current_row)->getFont()->setBold(true);
@@ -5948,36 +5925,6 @@ class RateDataController extends Controller
                 $rd_data6_sum += $rate_data['rd_data6'];
                 $rd_data7_sum += $rate_data['rd_data7'];
 
-
-                if($rate_data['rd_cate1'] == '보관'){
-                    if(isset($rate_data_storage[$key + 1]) && $rate_data['rd_cate1'] != $rate_data_storage[$key + 1]['rd_cate1']){
-                        $data = clone $rate_data;
-
-                        $data['rd_cate2'] = '합계';
-                        $data['rd_data1'] = '';
-                        $data['rd_data2'] = '';
-                        $data['rd_data4'] = $rd_data4_sum;
-                        $data['rd_data5'] = $rd_data5_sum;
-                        $data['rd_data6'] = $rd_data6_sum;
-                        $data['rd_data7'] = $rd_data7_sum;
-
-                        array_push($rate_data_storage_, $data);
-                    }
-                    if($key == count($rate_data_storage) - 1) {
-
-                        $data = clone $rate_data;
-
-                        $data['rd_cate2'] = '합계';
-                        $data['rd_data1'] = '';
-                        $data['rd_data2'] = '';
-                        $data['rd_data4'] = $rd_data4_sum;
-                        $data['rd_data5'] = $rd_data5_sum;
-                        $data['rd_data6'] = $rd_data6_sum;
-                        $data['rd_data7'] = $rd_data7_sum;
-
-                        array_push($rate_data_storage_, $data);
-                    }
-                }
             }
 
             foreach($rate_data_storage_ as $key => $rate_data){
@@ -6111,6 +6058,10 @@ class RateDataController extends Controller
 
 
             }
+
+            //FORMAT NUMBER
+            $sheet->getStyle('F'. ($current_row - 2). ':W'. ($current_row - 1 + $count_row))->getNumberFormat()->setFormatCode('#,##0_-""');
+
             $sheet->getStyle('B'. ($current_row - 2). ':Z'. ($current_row - 2))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
             $sheet->getStyle('B'. ($current_row - 2). ':Z'. ($current_row - 2))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
             $sheet->getStyle('B'. ($current_row - 2). ':Z'. ($current_row - 2))->getFont()->setBold(true);
@@ -6148,9 +6099,9 @@ class RateDataController extends Controller
             $sheet->mergeCells('X'.($current_row - 1).':Z'.($current_row - 1));
 
         }
-        //END FULFILL2
+        //END STORAGE
 
-        //FULFILL3
+        //DOMESTIC
         if($rgd->rate_data_general['rdg_sum3'] > 0) {
             $sheet->getStyle('B'. $current_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
             $sheet->getStyle('B'. $current_row)->getFont()->setBold(true);
@@ -6194,35 +6145,6 @@ class RateDataController extends Controller
                 $rd_data5_sum += $rate_data['rd_data5'];
                 $rd_data6_sum += $rate_data['rd_data6'];
                 $rd_data7_sum += $rate_data['rd_data7'];
-
-
-                if(isset($rate_data_domestic[$key + 1]) && $rate_data['rd_cate1'] != $rate_data_domestic[$key + 1]['rd_cate1']){
-                    $data = clone $rate_data;
-
-                    $data['rd_cate2'] = '합계';
-                    $data['rd_data1'] = '';
-                    $data['rd_data2'] = '';
-                    $data['rd_data4'] = $rd_data4_sum;
-                    $data['rd_data5'] = $rd_data5_sum;
-                    $data['rd_data6'] = $rd_data6_sum;
-                    $data['rd_data7'] = $rd_data7_sum;
-
-                    array_push($rate_data_domestic_, $data);
-                }
-                if($key == count($rate_data_domestic) - 1) {
-
-                    $data = clone $rate_data;
-
-                    $data['rd_cate2'] = '합계';
-                    $data['rd_data1'] = '';
-                    $data['rd_data2'] = '';
-                    $data['rd_data4'] = $rd_data4_sum;
-                    $data['rd_data5'] = $rd_data5_sum;
-                    $data['rd_data6'] = $rd_data6_sum;
-                    $data['rd_data7'] = $rd_data7_sum;
-
-                    array_push($rate_data_domestic_, $data);
-                }
             }
 
             foreach($rate_data_domestic_ as $key => $rate_data){
@@ -6328,6 +6250,10 @@ class RateDataController extends Controller
 
 
             }
+
+            //FORMAT NUMBER
+            $sheet->getStyle('F'. ($current_row - 2). ':W'. ($current_row - 1 + $count_row))->getNumberFormat()->setFormatCode('#,##0_-""');
+
             $sheet->getStyle('B'. ($current_row - 2). ':Z'. ($current_row - 2))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
             $sheet->getStyle('B'. ($current_row - 2). ':Z'. ($current_row - 2))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
             $sheet->getStyle('B'. ($current_row - 2). ':Z'. ($current_row - 2))->getFont()->setBold(true);
@@ -6365,7 +6291,7 @@ class RateDataController extends Controller
             $sheet->mergeCells('X'.($current_row - 1).':Z'.($current_row - 1));
 
         }
-        //END FULFILL3
+        //END DOMESTIC
 
         $sheet->setCellValue('B'. ($current_row), '');
         $sheet->setCellValue('B'. ($current_row + 1), '1. 보세화물 서비스의 예상경비 청구서는 BL번호 단위로 발송됩니다.(단 분할인 경우 반출단위)');
@@ -6399,12 +6325,12 @@ class RateDataController extends Controller
             File::makeDirectory($path, $mode = 0777, true, true);
         }
 
-        if($rgd->service_korean_nam == '보세화물' && !str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
-            $name = 'bonded_est_casebill_';
-        }else if($rgd->service_korean_nam == '보세화물' && str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
-            $name = 'bonded_est_monthbill_';
+        if($rgd->service_korean_nam == '유통가공' && !str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
+            $name = 'distribution_est_casebill_';
+        }else if($rgd->service_korean_nam == '유통가공' && str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
+            $name = 'distribution_est_monthbill_';
         }else {
-            $name = 'bonded_est_monthbill_';
+            $name = 'distribution_final_monthbill_';
         }
 
         $mask = $path . $name .'*.*';
@@ -6579,10 +6505,14 @@ class RateDataController extends Controller
             }
 
         }
+        
 
         $sheet->getStyle('B'. ($current_row). ':E'. ($current_row - 1 + $count_row))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
         $sheet->getStyle('B'. ($current_row). ':E'. ($current_row - 1 + $count_row))->getFont()->setBold(true);
         $sheet->getStyle('B'. ($current_row). ':Z'. ($current_row - 1 + $count_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        //FORMAT NUMBER
+        $sheet->getStyle('F'. ($current_row - 2). ':W'. ($current_row - 1 + $count_row))->getNumberFormat()->setFormatCode('#,##0_-""');
 
         $sheet->getStyle('B'. ($current_row - 2). ':Z'. ($current_row - 1 + $count_row))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
         $sheet->getStyle('B'. ($current_row - 2). ':Z'. ($current_row - 2 + 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
@@ -6793,6 +6723,9 @@ class RateDataController extends Controller
                 $sheet->setCellValue($col_start[$key]. ($current_row - 2), $header);
             }
 
+            //FORMAT NUMBER
+            $sheet->getStyle('F'. ($current_row - 1). ':W'. ($current_row - 1 + $count_row))->getNumberFormat()->setFormatCode('#,##0_-""');
+
             $current_row += $count_row;
         }
         //END BONDED1
@@ -6950,6 +6883,8 @@ class RateDataController extends Controller
                 $sheet->setCellValue($col_start[$key]. ($current_row - 2), $header);
             }
 
+            //FORMAT NUMBER
+            $sheet->getStyle('F'. ($current_row - 1). ':W'. ($current_row - 1 + $count_row))->getNumberFormat()->setFormatCode('#,##0_-""');
             $current_row += $count_row;
         }
         //END BONDED2
@@ -7106,7 +7041,8 @@ class RateDataController extends Controller
                 $sheet->getStyle($col_start[$key]. ($current_row - 2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 $sheet->setCellValue($col_start[$key]. ($current_row - 2), $header);
             }
-
+            //FORMAT NUMBER
+            $sheet->getStyle('F'. ($current_row - 1). ':W'. ($current_row - 1 + $count_row))->getNumberFormat()->setFormatCode('#,##0_-""');
             $current_row += $count_row;
         }
         //END BONDED3
@@ -7263,7 +7199,8 @@ class RateDataController extends Controller
                 $sheet->getStyle($col_start[$key]. ($current_row - 2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 $sheet->setCellValue($col_start[$key]. ($current_row - 2), $header);
             }
-
+            //FORMAT NUMBER
+            $sheet->getStyle('F'. ($current_row - 1). ':W'. ($current_row - 1 + $count_row))->getNumberFormat()->setFormatCode('#,##0_-""');
             $current_row += $count_row;
         }
         //END BONDED4
@@ -7420,7 +7357,8 @@ class RateDataController extends Controller
                 $sheet->getStyle($col_start[$key]. ($current_row - 2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 $sheet->setCellValue($col_start[$key]. ($current_row - 2), $header);
             }
-
+            //FORMAT NUMBER
+            $sheet->getStyle('F'. ($current_row - 1). ':W'. ($current_row - 1 + $count_row))->getNumberFormat()->setFormatCode('#,##0_-""');
             $current_row += $count_row;
         }
         //END BONDED3
@@ -7679,17 +7617,19 @@ class RateDataController extends Controller
 
              }
              $count_row = $key;
-         }
+        }
+        //FORMAT NUMBER
+        $sheet->getStyle('C'. ($current_row). ':R'. ($current_row + $count_row))->getNumberFormat()->setFormatCode('#,##0_-""');
 
-         $current_row += $count_row;
-         $sheet->getStyle('B20:R'.$current_row)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
-         $sheet->getStyle('B20:R'.$current_row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $current_row += $count_row;
+        $sheet->getStyle('B20:R'.$current_row)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+        $sheet->getStyle('B20:R'.$current_row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
-         $current_row += 2;
+        $current_row += 2;
 
-         $sheet->getStyle('B'. ($current_row). ':Z'. ($current_row + 3))->getBorders()->getOutLine()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
- 
-         $current_row += 4;
+        $sheet->getStyle('B'. ($current_row). ':Z'. ($current_row + 3))->getBorders()->getOutLine()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+
+        $current_row += 4;
 
          //END PART
         $sheet->setCellValue('B'. ($current_row), '');
@@ -7883,6 +7823,9 @@ class RateDataController extends Controller
             }
 
         }
+
+        //FORMAT NUMBER
+        $sheet->getStyle('F'. ($current_row). ':W'. ($current_row - 1 + $count_row))->getNumberFormat()->setFormatCode('#,##0_-""');
 
         $sheet->getStyle('B'. ($current_row). ':E'. ($current_row - 1 + $count_row))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
         $sheet->getStyle('B'. ($current_row). ':E'. ($current_row - 1 + $count_row))->getFont()->setBold(true);
@@ -8134,6 +8077,8 @@ class RateDataController extends Controller
                 $sheet->setCellValue($col_start[$key]. ($current_row - 2), $header);
             }
 
+            //FORMAT NUMBER
+            $sheet->getStyle('F'. ($current_row - 1). ':W'. ($current_row - 1 + $count_row))->getNumberFormat()->setFormatCode('#,##0_-""');
             $current_row += $count_row;
 
             $sheet->getStyle('B'. ($current_row - 1). ':Z'. ($current_row - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
@@ -8351,7 +8296,8 @@ class RateDataController extends Controller
                 $sheet->getStyle($col_start[$key]. ($current_row - 2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 $sheet->setCellValue($col_start[$key]. ($current_row - 2), $header);
             }
-
+            //FORMAT NUMBER
+            $sheet->getStyle('F'. ($current_row - 1). ':W'. ($current_row - 1 + $count_row))->getNumberFormat()->setFormatCode('#,##0_-""');
             $current_row += $count_row;
 
             $sheet->getStyle('B'. ($current_row - 1). ':Z'. ($current_row - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
@@ -8568,7 +8514,8 @@ class RateDataController extends Controller
                 $sheet->getStyle($col_start[$key]. ($current_row - 2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 $sheet->setCellValue($col_start[$key]. ($current_row - 2), $header);
             }
-
+            //FORMAT NUMBER
+            $sheet->getStyle('F'. ($current_row - 1). ':W'. ($current_row - 1 + $count_row))->getNumberFormat()->setFormatCode('#,##0_-""');
             $current_row += $count_row;
 
             $sheet->getStyle('B'. ($current_row - 1). ':Z'. ($current_row - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
@@ -8784,7 +8731,8 @@ class RateDataController extends Controller
                 $sheet->getStyle($col_start[$key]. ($current_row - 2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 $sheet->setCellValue($col_start[$key]. ($current_row - 2), $header);
             }
-
+            //FORMAT NUMBER
+            $sheet->getStyle('F'. ($current_row - 1). ':W'. ($current_row - 1 + $count_row))->getNumberFormat()->setFormatCode('#,##0_-""');
             $current_row += $count_row;
 
             $sheet->getStyle('B'. ($current_row - 1). ':Z'. ($current_row - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
@@ -9000,7 +8948,8 @@ class RateDataController extends Controller
                 $sheet->getStyle($col_start[$key]. ($current_row - 2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 $sheet->setCellValue($col_start[$key]. ($current_row - 2), $header);
             }
-
+            //FORMAT NUMBER
+            $sheet->getStyle('F'. ($current_row - 1). ':W'. ($current_row - 1 + $count_row))->getNumberFormat()->setFormatCode('#,##0_-""');
             $current_row += $count_row;
 
             $sheet->getStyle('B'. ($current_row - 1). ':Z'. ($current_row - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
@@ -9055,13 +9004,9 @@ class RateDataController extends Controller
             File::makeDirectory($path, $mode = 0777, true, true);
         }
 
-        if($rgd->service_korean_nam == '보세화물' && !str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
-            $name = 'bonded_est_casebill_';
-        }else if($rgd->service_korean_nam == '보세화물' && str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
-            $name = 'bonded_est_monthbill_';
-        }else {
-            $name = 'bonded_est_monthbill_';
-        }
+       
+        $name = 'fulfillment_final_monthbill_';
+        
 
         $mask = $path . $name .'*.*';
         array_map('unlink', glob($mask) ?: []);
