@@ -32,9 +32,7 @@ class ManagerUpdatePopupRequest extends BaseFormRequest
                 '',
             ],
             'm_name' => [
-                'required',
-                'string',
-                'max:255',
+                '',
             ],
             'm_duty1' => [
                 '',

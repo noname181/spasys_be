@@ -32,6 +32,11 @@ class RateMetaDataSearchRequest extends BaseFormRequest
                 'nullable',
                 'date'
             ],
+            'rm_name' => [
+                'nullable',
+                'string',
+                'max:255'
+            ],
             'rm_biz_name' => [
                 'nullable',
                 'string',
@@ -92,6 +97,9 @@ class RateMetaDataSearchRequest extends BaseFormRequest
                 'file',
                 'max:5000',
                 'mimes:jpg,jpeg,png,pdf,webp,gif',
+            ],
+            'rmd_service' => [
+                '',
             ],
         ];
     }
