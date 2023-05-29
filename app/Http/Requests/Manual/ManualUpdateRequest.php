@@ -37,7 +37,7 @@ class ManualUpdateRequest extends BaseFormRequest
                 'string'
             ],
             'man_note' => [
-             
+                'nullable',
                 'string',
                 'max:255',
             ],

@@ -3288,9 +3288,11 @@ class WarehousingController extends Controller
             if (isset($validated['w_schedule_number2'])) {
 
                 $warehousing->where(function ($q) use ($validated) {
-                    $q->whereHas('w_no', function ($q1) use ($validated) {
-                        $q1->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%', 'and', 'w_type', '=', 'IW');
-                    })->orWhereHas('w_no.w_import_parent', function ($q2) use ($validated) {
+                    $q
+                    // ->whereHas('w_no', function ($q1) use ($validated) {
+                    //     $q1->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%', 'and', 'w_type', '=', 'IW');
+                    // });
+                    ->WhereHas('w_no.w_import_parent', function ($q2) use ($validated) {
                         $q2->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%');
                     });
                 });
@@ -3485,9 +3487,11 @@ class WarehousingController extends Controller
             if (isset($validated['w_schedule_number2'])) {
 
                 $warehousing->where(function ($q) use ($validated) {
-                    $q->whereHas('w_no', function ($q1) use ($validated) {
-                        $q1->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%', 'and', 'w_type', '=', 'IW');
-                    })->orWhereHas('w_no.w_import_parent', function ($q2) use ($validated) {
+                    $q
+                    // ->whereHas('w_no', function ($q1) use ($validated) {
+                    //     $q1->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%', 'and', 'w_type', '=', 'IW');
+                    // });
+                    ->WhereHas('w_no.w_import_parent', function ($q2) use ($validated) {
                         $q2->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%');
                     });
                 });
