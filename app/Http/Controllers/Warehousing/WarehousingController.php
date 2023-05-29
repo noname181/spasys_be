@@ -4295,13 +4295,13 @@ class WarehousingController extends Controller
             }
             if (isset($validated['co_name'])) {
                 $warehousing->whereHas('warehousing.co_no', function ($q) use ($validated) {
-                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . $validated['co_name'] . '%');
                 });
                 $warehousing_bonded->whereHas('warehousing.co_no', function ($q) use ($validated) {
-                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . $validated['co_name'] . '%');
                 });
                 $warehousing_fulfillment->whereHas('warehousing.co_no', function ($q) use ($validated) {
-                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . $validated['co_name'] . '%');
                 });
             }
 
