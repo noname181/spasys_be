@@ -3290,9 +3290,10 @@ class WarehousingController extends Controller
                 $warehousing->where(function ($q) use ($validated) {
                     $q->whereHas('w_no', function ($q1) use ($validated) {
                         $q1->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%', 'and', 'w_type', '=', 'IW');
-                    })->orWhereHas('w_no.w_import_parent', function ($q2) use ($validated) {
-                        $q2->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%');
                     });
+                    // ->orWhereHas('w_no.w_import_parent', function ($q2) use ($validated) {
+                    //     $q2->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%');
+                    // });
                 });
             }
             // $warehousing->get();
@@ -3487,9 +3488,10 @@ class WarehousingController extends Controller
                 $warehousing->where(function ($q) use ($validated) {
                     $q->whereHas('w_no', function ($q1) use ($validated) {
                         $q1->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%', 'and', 'w_type', '=', 'IW');
-                    })->orWhereHas('w_no.w_import_parent', function ($q2) use ($validated) {
-                        $q2->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%');
                     });
+                    // ->orWhereHas('w_no.w_import_parent', function ($q2) use ($validated) {
+                    //     $q2->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%');
+                    // });
                 });
             }
             if (isset($validated['connection_number'])) {
