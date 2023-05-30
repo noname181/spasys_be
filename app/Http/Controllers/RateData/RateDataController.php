@@ -12500,6 +12500,7 @@ class RateDataController extends Controller
                         'p_acceptdate' => $request->ACCEPTDATE,
                         'p_acceptno' => $request->ACCEPTNO,
                         'p_cardname' => $request->CARDNAME,
+                        'p_accountno' => $request->ACCOUNTNO,
                         'p_cardno' => $request->ACCOUNTNO,
                     ]
                 );

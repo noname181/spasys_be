@@ -43,6 +43,7 @@ class Payment extends Model
         'p_acceptdate',
         'p_acceptno',
         'p_cardname',
+        'p_accountno',
         'p_cardno',
     ];
 
