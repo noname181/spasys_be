@@ -36,6 +36,14 @@ class Payment extends Model
         'p_card_name',
         'created_at',
         'updated_at',
+        'p_resultmgs',
+        'p_orderno',
+        'p_amount',
+        'p_tid',
+        'p_acceptdate',
+        'p_acceptno',
+        'p_cardname',
+        'p_cardno',
     ];
 
     protected $casts = [
