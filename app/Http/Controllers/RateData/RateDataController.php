@@ -12564,7 +12564,7 @@ class RateDataController extends Controller
             }
 
             DB::commit();
-            return redirect($request->ETC3);
+            return redirect($request->ETC4);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
