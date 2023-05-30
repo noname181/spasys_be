@@ -12563,7 +12563,7 @@ class RateDataController extends Controller
             }
 
             DB::commit();
-            return redirect('/distribution_final_casebill_check/5619');
+            return redirect('/distribution_final_casebill_check/'. $rgd_no);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
