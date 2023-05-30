@@ -12484,7 +12484,7 @@ class RateDataController extends Controller
                 Payment::insertGetId(
                     [
                         'mb_no' => $request->ETC3,
-                        'rgd_no' => $check_payment->rgd_no,
+                        'rgd_no' => $rgd_no,
                         'p_price' => $request->ETC2,
                         'p_method' => 'card',
                         'p_success_yn' => 'y',
