@@ -3990,6 +3990,43 @@ class ReceivingGoodsDeliveryController extends Controller
             } else {
                 $p_method_fee = $request->sumprice;
             }
+
+            // if($request->p_method == 'kakao_pay'){
+            //     $headers = array(); 
+
+            //     array_push($headers, "content-type: application/json; charset=utf-8");
+            //     array_push($headers, "ApiKey: 619a3048e7e01eaabd23d2017ff5dce18e14431a2d69cd9d8c");
+    
+            //     $cookiepayments_url = "https://www.cookiepayments.com/urlpay/kakao";
+    
+            //     $request_data_array = array(
+            //         'API_ID' => 'hfmkpjm2hnr',
+            //         'PRODUCTNAME'=> 'AAAAA',
+            //         'AMOUNT'=> '10',
+            //         'BUYERNAME'=> '고객명',
+            //         'BUYERHP'=> '01020097723',
+            //         'BUYEREMAIL'=> 'aaaa@gmail.com',
+            //     );
+            //     $cookiepayments_json = json_encode($request_data_array, TRUE);
+            //     $ch = curl_init(); // curl 초기화
+    
+            //     curl_setopt($ch,CURLOPT_URL, $cookiepayments_url);
+            //     curl_setopt($ch,CURLOPT_POST, false);
+            //     curl_setopt($ch,CURLOPT_POSTFIELDS, $cookiepayments_json);
+            //     curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
+            //     curl_setopt($ch,CURLOPT_CONNECTTIMEOUT ,3);
+            //     curl_setopt($ch,CURLOPT_TIMEOUT, 20);
+            //     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            //     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+    
+            //     $response = curl_exec($ch);
+            //     curl_close($ch);
+            //     $json = json_encode($response);
+            //     $array = json_decode($json, TRUE);
+    
+            //     return $array;
+            // }
+
             if (isset($check_payment)) {
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
 
@@ -4153,6 +4190,7 @@ class ReceivingGoodsDeliveryController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
