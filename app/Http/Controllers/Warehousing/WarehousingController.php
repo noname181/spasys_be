@@ -4299,13 +4299,13 @@ class WarehousingController extends Controller
             }
             if (isset($validated['co_name'])) {
                 $warehousing->whereHas('warehousing.co_no', function ($q) use ($validated) {
-                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . $validated['co_name'] . '%');
                 });
                 $warehousing_bonded->whereHas('warehousing.co_no', function ($q) use ($validated) {
-                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . $validated['co_name'] . '%');
                 });
                 $warehousing_fulfillment->whereHas('warehousing.co_no', function ($q) use ($validated) {
-                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . $validated['co_name'] . '%');
                 });
             }
 
@@ -4640,6 +4640,11 @@ class WarehousingController extends Controller
             }
 
             if (isset($validated['rgd_status1']) && $validated['rgd_status1'] != '전체') {
+                
+                $warehousing->where('rgd_calculate_deadline_yn', 'y')->where('rgd_status4', '확정청구서');
+                $warehousing_bonded->where('rgd_calculate_deadline_yn', 'y')->where('rgd_status4', '확정청구서');
+                $warehousing_fulfillment->where('rgd_calculate_deadline_yn', 'y')->where('rgd_status4', '확정청구서');
+
                 if ($validated['rgd_status1'] == 'waiting') {
                     $warehousing->where(function ($q) {
                         $q->where('rgd_status4', '확정청구서')->orwhere(function ($q) {
