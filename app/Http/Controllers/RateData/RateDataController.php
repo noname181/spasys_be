@@ -12384,4 +12384,193 @@ class RateDataController extends Controller
         }
     }
 
+    public function payment_result(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            $rgd_no = $request->ETC1;
+
+            $check_payment = Payment::where('rgd_no', $rgd_no)->where('p_cancel_yn', 'y')->first();
+            $user = Member::where('mb_no', $request->ETC3)->first();
+           
+            $p_method_fee = $request->AMOUNT;
+           
+            if (isset($check_payment)) {
+                $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
+
+                Payment::insertGetId(
+                    [
+                        'mb_no' => $request->ETC3,
+                        'rgd_no' => $check_payment->rgd_no,
+                        'p_price' => $request->ETC2,
+                        'p_method' => 'card',
+                        'p_success_yn' => 'y',
+                        'p_method_fee' => $request->AMOUNT,
+                        'p_method_name' => null,
+                        'p_method_number' => null,
+                        'p_card_name' => $request->CARDNAME,
+                        
+                        'p_resultmgs' => $request->RESULTMSG,
+                        'p_orderno' => $request->ORDERNO,
+                        'p_amount' => $request->AMOUNT,
+                        'p_tid' => $request->TID,
+                        'p_acceptdate' => $request->ACCEPTDATE,
+                        'p_acceptno' => $request->ACCEPTNO,
+                        'p_cardname' => $request->CARDNAME,
+                        'p_cardno' => $request->ACCOUNTNO,
+                    ]
+                );
+                CancelBillHistory::insertGetId([
+                    'rgd_no' => $rgd_no,
+                    'mb_no' => $user->mb_no,
+                    'cbh_type' => 'payment',
+                    'cbh_status_before' => $rgd->rgd_status6,
+                    'cbh_status_after' => 'payment_bill',
+                    'cbh_pay_method' => 'card'
+                ]);
+
+                if ($rgd->rgd_status7 == 'taxed') {
+                    CancelBillHistory::insertGetId([
+                        'rgd_no' => $rgd_no,
+                        'mb_no' => $rgd->mb_no,
+                        'cbh_type' => 'tax',
+                        'cbh_status_before' => $rgd->rgd_status7,
+                        'cbh_status_after' => 'completed',
+                    ]);
+
+                    ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                        'rgd_status8' => 'completed',
+                    ]);
+
+
+                    //UPDATE EST BILL
+                    $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
+                    if ($est_rgd->rgd_status8 != 'completed') {
+                        ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
+                            'rgd_status8' => 'completed',
+                        ]);
+                        CancelBillHistory::insertGetId([
+                            'rgd_no' => $est_rgd->rgd_no,
+                            'mb_no' => $rgd->mb_no,
+                            'cbh_type' => 'tax',
+                            'cbh_status_before' => $est_rgd->rgd_status8,
+                            'cbh_status_after' => 'completed'
+                        ]);
+                    }
+                }
+
+
+                ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                    'is_expect_payment' => 'n',
+                    'rgd_status6' => 'paid',
+                    'rgd_paid_date' => Carbon::now(),
+                ]);
+
+                if ($rgd->service_korean_name == '보세화물') {
+                    $ad_tile = '[보세화물] 결제완료';
+                } else if ($rgd->service_korean_name == '수입풀필먼트') {
+                    $ad_tile = '[수입풀필먼트] 결제완료';
+                } else if ($rgd->service_korean_name == '유통가공') {
+                    $ad_tile = '[유통가공] 결제완료';
+                }
+
+                if ($request->p_method != 'deposit_without_bankbook') {
+                    $sender = Member::where('mb_no', $rgd->mb_no)->first();
+                    CommonFunc::insert_alarm($ad_tile, $rgd, $sender, null, 'settle_payment', $p_method_fee);
+                }
+            } else {
+                $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
+                Payment::insertGetId(
+                    [
+                        'mb_no' => $request->ETC3,
+                        'rgd_no' => $rgd_no,
+                        'p_price' => $request->ETC2,
+                        'p_method' => 'card',
+                        'p_success_yn' => 'y',
+                        'p_method_fee' => $request->AMOUNT,
+                        'p_method_name' => null,
+                        'p_method_number' => null,
+                        'p_card_name' => $request->CARDNAME,
+                        
+                        'p_resultmgs' => $request->RESULTMSG,
+                        'p_orderno' => $request->ORDERNO,
+                        'p_amount' => $request->AMOUNT,
+                        'p_tid' => $request->TID,
+                        'p_acceptdate' => $request->ACCEPTDATE,
+                        'p_acceptno' => $request->ACCEPTNO,
+                        'p_cardname' => $request->CARDNAME,
+                        'p_accountno' => $request->ACCOUNTNO,
+                        'p_cardno' => $request->ACCOUNTNO,
+                    ]
+                );
+                CancelBillHistory::insertGetId([
+                    'rgd_no' => $rgd_no,
+                    'mb_no' => $user->mb_no,
+                    'cbh_type' => 'payment',
+                    'cbh_status_before' => $rgd->rgd_status6,
+                    'cbh_status_after' => 'payment_bill',
+                    'cbh_pay_method' => 'card'
+                ]);
+
+                if ($rgd->rgd_status7 == 'taxed') {
+                    CancelBillHistory::insertGetId([
+                        'rgd_no' => $rgd_no,
+                        'mb_no' => $rgd->mb_no,
+                        'cbh_type' => 'tax',
+                        'cbh_status_before' => $rgd->rgd_status7,
+                        'cbh_status_after' => 'completed',
+                        'cbh_pay_method' => 'card'
+                    ]);
+
+                    ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                        'rgd_status8' => 'completed',
+                    ]);
+
+
+                    //UPDATE EST BILL
+                    $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
+                    if ($est_rgd->rgd_status8 != 'completed') {
+                        ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
+                            'rgd_status8' => 'completed',
+                        ]);
+                        CancelBillHistory::insertGetId([
+                            'rgd_no' => $est_rgd->rgd_no,
+                            'mb_no' => $rgd->mb_no,
+                            'cbh_type' => 'tax',
+                            'cbh_status_before' => $est_rgd->rgd_status8,
+                            'cbh_status_after' => 'completed'
+                        ]);
+                    }
+                }
+
+                ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                    'rgd_status6' => 'paid',
+                    'rgd_paid_date' => Carbon::now(),
+                ]);
+
+                if ($rgd->service_korean_name == '보세화물') {
+                    $ad_tile = '[보세화물] 결제완료';
+                } else if ($rgd->service_korean_name == '수입풀필먼트') {
+                    $ad_tile = '[수입풀필먼트] 결제완료';
+                } else if ($rgd->service_korean_name == '유통가공') {
+                    $ad_tile = '[유통가공] 결제완료';
+                }
+
+                
+                $sender = Member::where('mb_no', $rgd->mb_no)->first();
+                CommonFunc::insert_alarm($ad_tile, $rgd, $sender, null, 'settle_payment', $p_method_fee);
+                
+            }
+
+            DB::commit();
+            return redirect($request->ETC4);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
 }

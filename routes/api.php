@@ -36,6 +36,10 @@ Route::get('/daily_alarm_insulace30', [App\Http\Controllers\AlarmData\AlarmDataC
 Route::get('/alarm_pw_90d', [App\Http\Controllers\AlarmData\AlarmDataController::class, 'alarmPw90d'])->name('alarmPw90d');
 Route::get('/api_item_cargo_list', [App\Http\Controllers\Item\ItemController::class, 'apiItemsCargoList'])->name('api_item_cargo_list');
 
+Route::prefix('payment')->name('payment.')->group(function () {
+    Route::post('/payment_result', [App\Http\Controllers\RateData\RateDataController::class, 'payment_result'])->name('payment_result');
+});
+
 Route::middleware('auth')->group(function () {
 
     Route::prefix('member')->name('member.')->group(function () {
@@ -615,5 +619,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/get_warehousing_status', [\App\Http\Controllers\WarehousingStatus\WarehousingStatusController::class, 'getWarehousingStatus']);
     Route::post('/get_warehousing_status_mobile', [\App\Http\Controllers\WarehousingStatus\WarehousingStatusController::class, 'getWarehousingStatusMobile']);
     Route::get('/load_table_top_right/{rgd_no}', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'load_table_top_right']);
+
+
+   
 });
 
