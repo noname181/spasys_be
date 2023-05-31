@@ -141,12 +141,12 @@ class EWHPController extends Controller
                     $count++;
                 }
 
-                $is_no = $value['carry_out_number'];
-                if (isset($is_no)) {
-                    $check = ReceivingGoodsDelivery::where('is_no', $is_no)->first();
+                
+                if (isset($te_carry_out_number)) {
+                    $check = ReceivingGoodsDelivery::where('is_no', $te_carry_out_number)->first();
                     if ($check === null) {
                         ReceivingGoodsDelivery::insertGetId([
-                            'is_no' => $is_no,
+                            'is_no' => $te_carry_out_number,
                             'service_korean_name' => '보세화물',
                             'rgd_status1' => '반출',
                             'rgd_status3' => '배송준비',

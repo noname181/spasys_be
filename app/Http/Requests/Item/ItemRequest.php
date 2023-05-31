@@ -25,9 +25,7 @@ class ItemRequest extends BaseFormRequest
     {
         return [
             'item_brand' => [
-                'required',
-                'string',
-                'max:255',
+                '',
             ],
             'item_service_name' => [
                 'required',
