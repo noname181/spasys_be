@@ -541,6 +541,9 @@ class ScheduleShipmentSearchRequest extends BaseFormRequest
             'name' => [
                 '',
             ],
+            'status_api' => [
+                '',
+            ],
         ];
     }
 

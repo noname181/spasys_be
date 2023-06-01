@@ -104,13 +104,13 @@ class ScheduleShipmentController extends Controller
 
             if (isset($validated['co_parent_name'])) {
                 $schedule_shipment->whereHas('ContractWms.company.co_parent', function ($query) use ($validated) {
-                    $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                    $query->where(DB::raw('lower(co_name)'), 'like', '%' . $validated['co_parent_name'] . '%');
                 });
             }
 
             if (isset($validated['co_name'])) {
                 $schedule_shipment->whereHas('ContractWms.company', function ($q) use ($validated) {
-                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . $validated['co_name'] . '%');
                 });
             }
 
@@ -152,6 +152,14 @@ class ScheduleShipmentController extends Controller
             if (isset($validated['order_id'])) {
 
                 $schedule_shipment->where(DB::raw('lower(order_id)'), 'like', '%' . strtolower($validated['order_id']) . '%');
+            }
+            if (isset($validated['shop_product_id'])) {
+
+                $schedule_shipment->where(DB::raw('lower(shop_product_id)'), 'like', '%' . strtolower($validated['shop_product_id']) . '%');
+            }
+            if (isset($validated['status_api'])) {
+
+                $schedule_shipment->where('status', '=', $validated['status_api']);
             }
             if (isset($validated['recv_name'])) {
                 $schedule_shipment->where(DB::raw('lower(recv_name)'), 'like', '%' . strtolower($validated['recv_name']) . '%');
