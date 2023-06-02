@@ -1091,7 +1091,7 @@ class ItemController extends Controller
             }
             if (isset($validated['item_channel_code'])) {
                 $item->whereHas('item_status_bad.item_channels', function ($query) use ($validated) {
-                    $query->where(DB::raw('lower(item_channel_name)'), 'like', '%' . strtolower($validated['item_channel_name']) . '%');
+                    $query->where(DB::raw('lower(item_channel_code)'), 'like', '%' . strtolower($validated['item_channel_code']) . '%');
                 });
             }
             if (isset($validated['item_bar_code'])) {
