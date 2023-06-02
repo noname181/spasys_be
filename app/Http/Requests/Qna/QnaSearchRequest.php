@@ -61,6 +61,10 @@ class QnaSearchRequest extends BaseFormRequest
                 'nullable',
                 'int',
             ],
+            'writter' => [
+                'nullable',
+                'string',
+            ],
         ];
     }
 

@@ -511,6 +511,7 @@ class QnaController extends Controller
                 ->orderBy('depth_path','ASC')
                 ->orderBy('qna_no', 'DESC');
             }
+
             if (isset($validated['from_date'])) {
                 $qna->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
@@ -547,6 +548,13 @@ class QnaController extends Controller
                 $qna->where(function($query) use ($validated) {
                     $query->where('qna_title', 'like', '%' . $validated['search_string'] . '%');
                     $query->orWhere('qna_content', 'like', '%' . $validated['search_string'] . '%');
+                });
+            }
+            if (isset($validated['writter'])) {
+                $qna->where(function($query) use ($validated) {
+                    $query->whereHas('member',function ($query) use ($validated){
+                        $query->where('mb_type','=',$validated['writter']);
+                    });
                 });
             }
 
