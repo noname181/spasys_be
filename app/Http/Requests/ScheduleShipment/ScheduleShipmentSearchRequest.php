@@ -66,7 +66,7 @@ class ScheduleShipmentSearchRequest extends BaseFormRequest
                 'nullable',
                 'max:255',
             ],
-            'shop_product_id' => [
+            'product_id' => [
                 'string',
                 'nullable',
                 'max:255',

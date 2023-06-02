@@ -60,7 +60,7 @@ class ScheduleShipmentInfo extends Model
 
     public function item()
     {
-        return $this->hasMany(Item::class, 'product_id', 'product_id')->with('item_channels');
+        return $this->hasMany(Item::class, 'option_id', 'product_id')->with('item_channels');
     }
     
 }

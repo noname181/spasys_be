@@ -132,11 +132,16 @@ class ScheduleShipmentController extends Controller
                 });
             }
 
+            if (isset($validated['product_id'])) {
+                $schedule_shipment->whereHas('schedule_shipment_info.item', function ($q) use ($validated) {
+                    return $q->where(DB::raw('lower(product_id)'), 'like', '%' . strtolower($validated['product_id']) . '%');
+                });
+            }
+
             if (isset($validated['status'])) {
                 if ($validated['status'] == '배송준비') {
-                    $schedule_shipment->whereDoesntHave('receving_goods_delivery', function ($q) use ($validated) {
+                    $schedule_shipment->whereDoesntHave('receving_goods_delivery')->orwhereHas('receving_goods_delivery', function ($q) use ($validated) {
                         $q->where(DB::raw('lower(rgd_status3)'), 'like', '%' . strtolower($validated['status']) . '%');
-                        $q->orWhere('rgd_status3', '!=', '배송준비');
                     });
                 } elseif ($validated['status'] == '배송중') {
                     $schedule_shipment->whereHas('receving_goods_delivery', function ($q) use ($validated) {
