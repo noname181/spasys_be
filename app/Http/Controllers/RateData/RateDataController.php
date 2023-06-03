@@ -12397,14 +12397,14 @@ class RateDataController extends Controller
             $p_method_fee = $request->AMOUNT;
            
             if (isset($check_payment)) {
-                $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
+                $rgd = ReceivingGoodsDelivery::with(['rate_data_general'])->where('rgd_no', $rgd_no)->first();
 
                 Payment::insertGetId(
                     [
                         'mb_no' => $request->ETC3,
                         'rgd_no' => $check_payment->rgd_no,
                         'p_price' => $request->ETC2,
-                        'p_method' => 'card',
+                        'p_method' => $request->ETC5,
                         'p_success_yn' => 'y',
                         'p_method_fee' => $request->AMOUNT,
                         'p_method_name' => null,
@@ -12418,6 +12418,7 @@ class RateDataController extends Controller
                         'p_acceptdate' => $request->ACCEPTDATE,
                         'p_acceptno' => $request->ACCEPTNO,
                         'p_cardname' => $request->CARDNAME,
+                        'p_accountno' => $request->ACCOUNTNO,
                         'p_cardno' => $request->ACCOUNTNO,
                     ]
                 );
@@ -12427,7 +12428,7 @@ class RateDataController extends Controller
                     'cbh_type' => 'payment',
                     'cbh_status_before' => $rgd->rgd_status6,
                     'cbh_status_after' => 'payment_bill',
-                    'cbh_pay_method' => 'card'
+                    'cbh_pay_method' => $request->ETC5
                 ]);
 
                 if ($rgd->rgd_status7 == 'taxed') {
@@ -12480,13 +12481,13 @@ class RateDataController extends Controller
                     CommonFunc::insert_alarm($ad_tile, $rgd, $sender, null, 'settle_payment', $p_method_fee);
                 }
             } else {
-                $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
+                $rgd = ReceivingGoodsDelivery::with(['rate_data_general'])->where('rgd_no', $rgd_no)->first();
                 Payment::insertGetId(
                     [
                         'mb_no' => $request->ETC3,
                         'rgd_no' => $rgd_no,
                         'p_price' => $request->ETC2,
-                        'p_method' => 'card',
+                        'p_method' => $request->ETC5,
                         'p_success_yn' => 'y',
                         'p_method_fee' => $request->AMOUNT,
                         'p_method_name' => null,
@@ -12510,7 +12511,7 @@ class RateDataController extends Controller
                     'cbh_type' => 'payment',
                     'cbh_status_before' => $rgd->rgd_status6,
                     'cbh_status_after' => 'payment_bill',
-                    'cbh_pay_method' => 'card'
+                    'cbh_pay_method' => $request->ETC5
                 ]);
 
                 if ($rgd->rgd_status7 == 'taxed') {
@@ -12520,7 +12521,6 @@ class RateDataController extends Controller
                         'cbh_type' => 'tax',
                         'cbh_status_before' => $rgd->rgd_status7,
                         'cbh_status_after' => 'completed',
-                        'cbh_pay_method' => 'card'
                     ]);
 
                     ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([

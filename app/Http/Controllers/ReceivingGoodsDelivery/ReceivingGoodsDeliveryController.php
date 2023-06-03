@@ -4202,64 +4202,207 @@ class ReceivingGoodsDeliveryController extends Controller
             $check_payment = Payment::where('rgd_no', $request->rgd_no)->where('p_success_yn', 'y')->orderBy('p_no', 'desc')->first();
             $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
             if (isset($check_payment)) {
-                Payment::where('rgd_no', $check_payment->rgd_no)->update([
-                    // 'p_price' => $request->sumprice,
-                    // 'p_method' => $request->p_method,
-                    'p_success_yn' => null,
-                    'p_cancel_yn' => 'y',
-                    'p_cancel_time' => Carbon::now(),
-                ]);
+                if($check_payment->p_method == 'card' || $check_payment->p_method == 'virtual_account'){
 
-                ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-                    'rgd_status6' => 'cancel',
-                    'rgd_paid_date' => null,
-                    'rgd_canceled_date' => Carbon::now(),
-                ]);
+                    $tokenheaders  = array(); 
 
-                CancelBillHistory::insertGetId([
-                    'mb_no' => Auth::user()->mb_no,
-                    'rgd_no' => $request->rgd_no,
-                    'cbh_status_before' => 'paid',
-                    'cbh_status_after' => 'cancel',
-                    'cbh_type' => 'cancel_payment',
-                ]);
+                    array_push($tokenheaders , "content-type: application/json; charset=utf-8");
+                    array_push($tokenheaders , "ApiKey: 619a3048e7e01eaabd23d2017ff5dce18e14431a2d69cd9d8c");
+        
+                    $token_url  = "https://www.cookiepayments.com/payAuth/token";
+        
+                    $token_request_data = array(
+                        'pay2_id' => 'hfmkpjm2hnr',
+                        'pay2_key'=> '619a3048e7e01eaabd23d2017ff5dce18e14431a2d69cd9d8c',
+                    );
 
-                CancelBillHistory::insertGetId([
-                    'mb_no' => Auth::user()->mb_no,
-                    'rgd_no' => $request->rgd_no,
-                    'cbh_status_before' => 'cancel',
-                    'cbh_status_after' => 'request_bill',
-                    'cbh_type' => 'payment',
-                ]);
+                    $req_json  = json_encode($token_request_data, TRUE);
 
-                if ($rgd->rgd_status8 == 'completed') {
+                    $ch = curl_init(); // curl 초기화
+        
+                    curl_setopt($ch,CURLOPT_URL, $token_url);
+                    curl_setopt($ch,CURLOPT_POST, false);
+                    curl_setopt($ch,CURLOPT_POSTFIELDS, $req_json);
+                    curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch,CURLOPT_CONNECTTIMEOUT ,3);
+                    curl_setopt($ch,CURLOPT_TIMEOUT, 20);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, $tokenheaders);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        
+                    $response = curl_exec($ch);
+                    curl_close($ch);
+
+                    $RES_STR  = json_decode($response, TRUE);
+        
+                    if($RES_STR['RTN_CD'] == '0000'){
+
+                        $headers = array(); 
+                        array_push($headers, "content-type: application/json; charset=utf-8");
+                        array_push($headers, "TOKEN:". $RES_STR['TOKEN']);
+                        array_push($headers, "ApiKey: 619a3048e7e01eaabd23d2017ff5dce18e14431a2d69cd9d8c");
+                    
+                        $cookiepayments_url = "https://www.cookiepayments.com/api/cancel";
+                    
+                        $request_data_array = array(
+                            'tid' => $check_payment->p_tid,
+                            'reason'=> 'Reasons for cancellation',
+                            'account_no' => $check_payment->p_accountno,
+                        );
+                    
+                        $cookiepayments_json = json_encode($request_data_array, TRUE);
+                    
+                        $ch = curl_init(); // set default curl
+                    
+                        curl_setopt($ch,CURLOPT_URL, $cookiepayments_url);
+                        curl_setopt($ch,CURLOPT_POST, false);
+                        curl_setopt($ch,CURLOPT_POSTFIELDS, $cookiepayments_json);
+                        curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
+                        curl_setopt($ch,CURLOPT_CONNECTTIMEOUT ,3);
+                        curl_setopt($ch,CURLOPT_TIMEOUT, 20);
+                        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+                        $response = curl_exec($ch);
+                        curl_close($ch);
+
+                        $result_array = json_decode($response,TRUE);
+
+                        if($result_array['cancel_code'] == '0000'){
+                            Payment::where('p_no', $check_payment->p_no)->update([
+                                // 'p_price' => $request->sumprice,
+                                // 'p_method' => $request->p_method,
+                                'p_success_yn' => null,
+                                'p_cancel_yn' => 'y',
+                                'p_cancel_time' => Carbon::now(),
+                                'p_cancel_tid' => $result_array['cancel_tid'],
+                                'p_cancel_amount' => $result_array['cancel_amt'],
+                            ]);
+            
+                            ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                                'rgd_status6' => 'cancel',
+                                'rgd_paid_date' => null,
+                                'rgd_canceled_date' => Carbon::now(),
+                            ]);
+            
+                            CancelBillHistory::insertGetId([
+                                'mb_no' => Auth::user()->mb_no,
+                                'rgd_no' => $request->rgd_no,
+                                'cbh_status_before' => 'paid',
+                                'cbh_status_after' => 'cancel',
+                                'cbh_type' => 'cancel_payment',
+                            ]);
+            
+                            CancelBillHistory::insertGetId([
+                                'mb_no' => Auth::user()->mb_no,
+                                'rgd_no' => $request->rgd_no,
+                                'cbh_status_before' => 'cancel',
+                                'cbh_status_after' => 'request_bill',
+                                'cbh_type' => 'payment',
+                            ]);
+            
+                            if ($rgd->rgd_status8 == 'completed') {
+                                CancelBillHistory::insertGetId([
+                                    'rgd_no' => $request->rgd_no,
+                                    'mb_no' => Auth::user()->mb_no,
+                                    'cbh_type' => 'tax',
+                                    'cbh_status_before' => $rgd->rgd_status8,
+                                    'cbh_status_after' => 'in_process'
+                                ]);
+            
+                                ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                                    'rgd_status8' =>  'in_process',
+                                ]);
+            
+                                //UPDATE EST BILL
+                                $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
+                                if ($est_rgd->rgd_status8 != 'in_process') {
+                                    ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
+                                        'rgd_status8' => 'in_process',
+                                    ]);
+                                    CancelBillHistory::insertGetId([
+                                        'rgd_no' => $est_rgd->rgd_no,
+                                        'mb_no' => $user->mb_no,
+                                        'cbh_type' => 'tax',
+                                        'cbh_status_before' => $est_rgd->rgd_status8,
+                                        'cbh_status_after' => 'in_process'
+                                    ]);
+                                }
+                            }
+
+                            DB::commit();
+                            return response()->json([
+                                'message' => 'Success',
+                                'a' => $check_payment->p_tid
+                            ]);
+                        }else {
+                            DB::commit();
+                            return response()->json([
+                                'message' => $result_array['cancel_msg'],
+                                'a' => $check_payment->p_tid
+                            ]);
+                        }
+                    }
+                    
+                }else {
+                    Payment::where('p_no', $check_payment->p_no)->update([
+                        // 'p_price' => $request->sumprice,
+                        // 'p_method' => $request->p_method,
+                        'p_success_yn' => null,
+                        'p_cancel_yn' => 'y',
+                        'p_cancel_time' => Carbon::now(),
+                    ]);
+    
+                    ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                        'rgd_status6' => 'cancel',
+                        'rgd_paid_date' => null,
+                        'rgd_canceled_date' => Carbon::now(),
+                    ]);
+    
                     CancelBillHistory::insertGetId([
-                        'rgd_no' => $request->rgd_no,
                         'mb_no' => Auth::user()->mb_no,
-                        'cbh_type' => 'tax',
-                        'cbh_status_before' => $rgd->rgd_status8,
-                        'cbh_status_after' => 'in_process'
+                        'rgd_no' => $request->rgd_no,
+                        'cbh_status_before' => 'paid',
+                        'cbh_status_after' => 'cancel',
+                        'cbh_type' => 'cancel_payment',
                     ]);
-
-                    ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
-                        'rgd_status8' =>  'in_process',
+    
+                    CancelBillHistory::insertGetId([
+                        'mb_no' => Auth::user()->mb_no,
+                        'rgd_no' => $request->rgd_no,
+                        'cbh_status_before' => 'cancel',
+                        'cbh_status_after' => 'request_bill',
+                        'cbh_type' => 'payment',
                     ]);
-
-                    //UPDATE EST BILL
-                    $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
-                    if ($est_rgd->rgd_status8 != 'in_process') {
-                        ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
-                            'rgd_status8' => 'in_process',
-                        ]);
+    
+                    if ($rgd->rgd_status8 == 'completed') {
                         CancelBillHistory::insertGetId([
-                            'rgd_no' => $est_rgd->rgd_no,
-                            'mb_no' => $user->mb_no,
+                            'rgd_no' => $request->rgd_no,
+                            'mb_no' => Auth::user()->mb_no,
                             'cbh_type' => 'tax',
-                            'cbh_status_before' => $est_rgd->rgd_status8,
+                            'cbh_status_before' => $rgd->rgd_status8,
                             'cbh_status_after' => 'in_process'
                         ]);
+    
+                        ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                            'rgd_status8' =>  'in_process',
+                        ]);
+    
+                        //UPDATE EST BILL
+                        $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
+                        if ($est_rgd->rgd_status8 != 'in_process') {
+                            ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
+                                'rgd_status8' => 'in_process',
+                            ]);
+                            CancelBillHistory::insertGetId([
+                                'rgd_no' => $est_rgd->rgd_no,
+                                'mb_no' => $user->mb_no,
+                                'cbh_type' => 'tax',
+                                'cbh_status_before' => $est_rgd->rgd_status8,
+                                'cbh_status_after' => 'in_process'
+                            ]);
+                        }
                     }
                 }
+               
             }
 
 
@@ -4269,6 +4412,7 @@ class ReceivingGoodsDeliveryController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollback();
+            return $e;
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
