@@ -12397,7 +12397,7 @@ class RateDataController extends Controller
             $p_method_fee = $request->AMOUNT;
            
             if (isset($check_payment)) {
-                $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
+                $rgd = ReceivingGoodsDelivery::with(['rate_data_general'])->where('rgd_no', $rgd_no)->first();
 
                 Payment::insertGetId(
                     [
@@ -12418,6 +12418,7 @@ class RateDataController extends Controller
                         'p_acceptdate' => $request->ACCEPTDATE,
                         'p_acceptno' => $request->ACCEPTNO,
                         'p_cardname' => $request->CARDNAME,
+                        'p_accountno' => $request->ACCOUNTNO,
                         'p_cardno' => $request->ACCOUNTNO,
                     ]
                 );
@@ -12480,7 +12481,7 @@ class RateDataController extends Controller
                     CommonFunc::insert_alarm($ad_tile, $rgd, $sender, null, 'settle_payment', $p_method_fee);
                 }
             } else {
-                $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd_no)->first();
+                $rgd = ReceivingGoodsDelivery::with(['rate_data_general'])->where('rgd_no', $rgd_no)->first();
                 Payment::insertGetId(
                     [
                         'mb_no' => $request->ETC3,
