@@ -45,6 +45,8 @@ class Payment extends Model
         'p_cardname',
         'p_accountno',
         'p_cardno',
+        'p_cancel_tid',
+        'p_cancel_amount',
     ];
 
     protected $casts = [
