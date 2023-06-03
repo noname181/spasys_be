@@ -746,6 +746,20 @@ class AlarmController extends Controller
             if (isset($validated['w_no'])) {
                 $alarm->where('w_no', $validated['w_no']);
             }
+            if (isset($validated['alarm_type'])) {
+                $alarm->where(function ($q) use ($validated, $user) {
+                    $q->whereHas('alarm_data', function ($query) use ($validated) {
+                        $query->where('ad_category', '=' ,$validated['alarm_type'] );
+                    });
+                });
+            }
+            if (isset($validated['sender'])) {
+                $alarm->where(function ($q) use ($validated, $user) {
+                    $q->whereHas('member', function ($query) use ($validated) {
+                        $query->where('mb_type', '=' ,$validated['sender'] );
+                    });
+                });
+            }
 
             if (isset($validated['from_date'])) {
                 $alarm->where('alarm.created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
