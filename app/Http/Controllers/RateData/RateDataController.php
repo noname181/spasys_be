@@ -5335,7 +5335,7 @@ class RateDataController extends Controller
 
         $current_row = 20;
         $count_row = 0;
-        
+
         $sheet->getStyle('B'. ($current_row). ':Z'. ($current_row))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
         $sheet->getStyle('B'. ($current_row). ':Z'. ($current_row))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
         $sheet->getStyle('B'. ($current_row). ':Z'. ($current_row))->getFont()->setBold(true);
@@ -5372,15 +5372,15 @@ class RateDataController extends Controller
             $sheet->mergeCells('B'. ($current_row));
             $sheet->getStyle('B'. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->setCellValue('B'. ($current_row), $key_rgd == (count($rgds) - 1) ? '합계' : $key_rgd + 1);
-    
+
             $sheet->mergeCells('C'. ($current_row));
             $sheet->getStyle('C'. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->setCellValue('C'. ($current_row), $key_rgd == (count($rgds) - 1) ? '' : $rgd['rgd_settlement_number']);
-    
+
             $sheet->mergeCells('D'. ($current_row));
             $sheet->getStyle('D'. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->setCellValue('D'. ($current_row), $key_rgd == (count($rgds) - 1) ? '' : $rgd['warehousing']['w_schedule_number2']);
-    
+
             $sheet->mergeCells('E'. ($current_row));
             $sheet->getStyle('E'. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->setCellValue('E'. ($current_row), str_replace(' 00:00:00' , '', Carbon::createFromFormat('Y-m-d H:i:s', $rgd['warehousing']['warehousing_child'][$child_length - 1]['w_completed_day'])->format('Y.m.d') ));
@@ -5392,7 +5392,7 @@ class RateDataController extends Controller
                 $sheet->getStyle($col_start[$key]. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 $sheet->getStyle($col_start[$key]. ($current_row))->getNumberFormat()->setFormatCode('#,##0_-""');
                 if($key == 0){
-                  
+
                     $sheet->setCellValue($col_start[$key]. ($current_row), $rgd['rate_data_general']['rdg_supply_price2']);
                 }
 
@@ -5419,7 +5419,7 @@ class RateDataController extends Controller
                 if($key == 6){
                     $sheet->setCellValue($col_start[$key]. ($current_row), $rgd['rate_data_general']['rdg_etc3']);
                 }
-                
+
             }
 
             $current_row += 1;
@@ -5427,7 +5427,7 @@ class RateDataController extends Controller
         }
 
         $sheet->getStyle('B'. ($current_row - $count_row). ':Z'. ($current_row - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
-        
+
         $current_row += 1;
 
         $sheet->getStyle('B'. ($current_row). ':Z'. ($current_row + 3))->getBorders()->getOutLine()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
@@ -5661,34 +5661,34 @@ class RateDataController extends Controller
                 $sheet->getStyle('B'. $current_row)->getFont()->setBold(true);
                 $sheet->mergeCells('B'. $current_row. ':Z'. $current_row);
                 $sheet->setCellValue('B'. $current_row, $titles[$key_rate]);
-    
+
                 $current_row += 3;
-    
-               
-    
+
+
+
                 $count_row = 0;
-    
+
                 $count_row_fulfill1 = 0;
                 $current_row_fulfill1 = $current_row - 1;
-    
+
                 $rd_cate1 = [];
                 $rd_data4_sum = 0;
                 $rd_data5_sum = 0;
                 $rd_data6_sum = 0;
                 $rd_data7_sum = 0;
                 $rd_data4_total = 0;
-    
-    
+
+
                 $rate_data_ = [];
-            
+
                 foreach($rate_data_cate as $key => $rate_data){
-                    array_push($rate_data_, $rate_data);               
+                    array_push($rate_data_, $rate_data);
                     $rate_data['rd_data4'] = $rate_data['rd_data4'] == '' ? 0 : $rate_data['rd_data4'];
                     $rate_data['rd_data5'] = $rate_data['rd_data5'] == '' ? 0 : $rate_data['rd_data5'];
                     $rate_data['rd_data6'] = $rate_data['rd_data6'] == '' ? 0 : $rate_data['rd_data6'];
                     $rate_data['rd_data7'] = $rate_data['rd_data7'] == '' ? 0 : $rate_data['rd_data7'];
                     $rd_data4_total += $rate_data['rd_data4'];
-                   
+
                     if(!in_array($rate_data['rd_cate1'], $rd_cate1)){
                         $rd_data4_sum = 0;
                         $rd_data5_sum = 0;
@@ -5696,27 +5696,27 @@ class RateDataController extends Controller
                         $rd_data7_sum = 0;
                         $rd_cate1[] = $rate_data['rd_cate1'];
                     }
-    
+
                     $rd_data4_sum += $rate_data['rd_data4'];
                     $rd_data5_sum += $rate_data['rd_data5'];
                     $rd_data6_sum += $rate_data['rd_data6'];
                     $rd_data7_sum += $rate_data['rd_data7'];
-    
-                   
-                   
+
+
+
                 }
-    
-                
+
+
                 foreach($rate_data_ as $key => $rate_data){
-    
-    
-    
+
+
+
                     if($rate_data['rd_cate1'] == $rd_cate1[0]){
                         if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_[$key - 1]['rd_cate1'])){
                             $sheet->setCellValue('B'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_cate1']);
                             $count_row_fulfill1 = 0;
                             if($rate_data['rd_data4'] > 0) {
-    
+
                                 $sheet->mergeCells('C'.($current_row_fulfill1 + $count_row_fulfill1).':E'.($current_row_fulfill1 + $count_row_fulfill1));
                                 $sheet->setCellValue('C'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_cate2']);
                                 $sheet->mergeCells('F'.($current_row_fulfill1 + $count_row_fulfill1).':H'.($current_row_fulfill1 + $count_row_fulfill1));
@@ -5733,12 +5733,12 @@ class RateDataController extends Controller
                                 $sheet->setCellValue('U'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data7']);
                                 $sheet->mergeCells('X'.($current_row_fulfill1 + $count_row_fulfill1).':Z'.($current_row_fulfill1 + $count_row_fulfill1));
                                 $sheet->setCellValue('X'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data8']);
-        
+
                                 $count_row_fulfill1 += 1;
                                 $count_row += 1;
                             }
                         }else if($rate_data['rd_data4'] > 0) {
-    
+
                             $sheet->mergeCells('C'.($current_row_fulfill1 + $count_row_fulfill1).':E'.($current_row_fulfill1 + $count_row_fulfill1));
                             $sheet->setCellValue('C'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_cate2']);
                             $sheet->mergeCells('F'.($current_row_fulfill1 + $count_row_fulfill1).':H'.($current_row_fulfill1 + $count_row_fulfill1));
@@ -5755,12 +5755,12 @@ class RateDataController extends Controller
                             $sheet->setCellValue('U'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data7']);
                             $sheet->mergeCells('X'.($current_row_fulfill1 + $count_row_fulfill1).':Z'.($current_row_fulfill1 + $count_row_fulfill1));
                             $sheet->setCellValue('X'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data8']);
-    
+
                             $count_row_fulfill1 += 1;
                             $count_row += 1;
                         }
-    
-    
+
+
                     }
                     else {
                         if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_[$key - 1]['rd_cate1'])){
@@ -5772,9 +5772,9 @@ class RateDataController extends Controller
                             $sheet->setCellValue('B'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_cate1']);
                             $current_row_fulfill1 = $current_row_fulfill1 + $count_row_fulfill1;
                             $count_row_fulfill1 = 0;
-    
+
                             if($rate_data['rd_data4'] > 0){
-    
+
                                 if($rate_data['rd_cate1'] != '원산지 표시' && $rate_data['rd_cate1'] != 'TAG' && $rate_data['rd_cate1'] != '라벨'){
                                     $sheet->mergeCells('B'.($current_row_fulfill1 + $count_row_fulfill1).':E'.($current_row_fulfill1 + $count_row_fulfill1));
                                     $sheet->setCellValue('B'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_cate2']);
@@ -5782,7 +5782,7 @@ class RateDataController extends Controller
                                     $sheet->mergeCells('C'.($current_row_fulfill1 + $count_row_fulfill1).':E'.($current_row_fulfill1 + $count_row_fulfill1));
                                     $sheet->setCellValue('C'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_cate2']);
                                 }
-                                
+
                                 $sheet->mergeCells('F'.($current_row_fulfill1 + $count_row_fulfill1).':H'.($current_row_fulfill1 + $count_row_fulfill1));
                                 $sheet->setCellValue('F'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data1']);
                                 $sheet->mergeCells('I'.($current_row_fulfill1 + $count_row_fulfill1).':K'.($current_row_fulfill1 + $count_row_fulfill1));
@@ -5797,14 +5797,14 @@ class RateDataController extends Controller
                                 $sheet->setCellValue('U'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data7']);
                                 $sheet->mergeCells('X'.($current_row_fulfill1 + $count_row_fulfill1).':Z'.($current_row_fulfill1 + $count_row_fulfill1));
                                 $sheet->setCellValue('X'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data8']);
-        
+
                                 $count_row_fulfill1 += 1;
                                 $count_row += 1;
                             }
                         }
                         else if($rate_data['rd_data4'] > 0){
-    
-    
+
+
                             $sheet->mergeCells('C'.($current_row_fulfill1 + $count_row_fulfill1).':E'.($current_row_fulfill1 + $count_row_fulfill1));
                             $sheet->setCellValue('C'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_cate2']);
                             $sheet->mergeCells('F'.($current_row_fulfill1 + $count_row_fulfill1).':H'.($current_row_fulfill1 + $count_row_fulfill1));
@@ -5821,12 +5821,12 @@ class RateDataController extends Controller
                             $sheet->setCellValue('U'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data7']);
                             $sheet->mergeCells('X'.($current_row_fulfill1 + $count_row_fulfill1).':Z'.($current_row_fulfill1 + $count_row_fulfill1));
                             $sheet->setCellValue('X'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data8']);
-    
+
                             $count_row_fulfill1 += 1;
                             $count_row += 1;
                         }
                     }
-    
+
                     if(count($rate_data_) == $key + 1){
                         $sheet->mergeCells('B'.($current_row_fulfill1).':B'.($current_row_fulfill1 + $count_row_fulfill1 - 1));
                         $sheet->getStyle('B'.($current_row_fulfill1).':E'.($current_row_fulfill1 + $count_row_fulfill1 - 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
@@ -5836,37 +5836,37 @@ class RateDataController extends Controller
                         $current_row_fulfill1 = $current_row_fulfill1 + $count_row_fulfill1;
                         $count_row_fulfill1 = 0;
                     }
-    
-    
+
+
                 }
-                
+
                 //FORMAT NUMBER
                 $sheet->getStyle('F'. ($current_row - 2). ':W'. ($current_row - 1 + $count_row))->getNumberFormat()->setFormatCode('#,##0_-""');
-    
+
                 $sheet->getStyle('B'. ($current_row - 2). ':Z'. ($current_row - 2))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
                 $sheet->getStyle('B'. ($current_row - 2). ':Z'. ($current_row - 2))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
                 $sheet->getStyle('B'. ($current_row - 2). ':Z'. ($current_row - 2))->getFont()->setBold(true);
-    
+
                 $sheet->mergeCells('B'. ($current_row - 2). ':E'. ($current_row - 2));
                 $sheet->getStyle('B'. ($current_row - 2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 $sheet->setCellValue('B'. ($current_row - 2), '항목');
-        
-    
+
+
                 foreach($headers as $key => $header){
                     $sheet->mergeCells($col_start[$key]. ($current_row - 2).':'.$col_end[$key]. ($current_row - 2));
                     $sheet->getStyle($col_start[$key]. ($current_row - 2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                     $sheet->setCellValue($col_start[$key]. ($current_row - 2), $header);
                 }
-    
+
                 $current_row += $count_row;
-    
+
                 $sheet->getStyle('B'. ($current_row - 1). ':Z'. ($current_row - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
                 $sheet->getStyle('B'. ($current_row - 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
                 $sheet->getStyle('B'. ($current_row - 1). ':Z'. ($current_row - 1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 $sheet->getStyle('B'. ($current_row - 1))->getFont()->setBold(true);
                 $sheet->setCellValue('B'. ($current_row - 1), '합계');
                 $sheet->setCellValue('B'. ($current_row - 1), '합계');
-        
+
                 $sheet->mergeCells('B'.($current_row - 1).':E'.($current_row - 1));
                 $sheet->mergeCells('F'.($current_row - 1).':H'.($current_row - 1));
                 $sheet->mergeCells('I'.($current_row - 1).':K'.($current_row - 1));
@@ -5879,10 +5879,10 @@ class RateDataController extends Controller
                 $sheet->mergeCells('U'.($current_row - 1).':W'.($current_row - 1));
                 $sheet->setCellValue('U'.($current_row - 1), $rgd->rate_data_general['rdg_sum2']);
                 $sheet->mergeCells('X'.($current_row - 1).':Z'.($current_row - 1));
-    
+
             }
         }
-       
+
         $sheet->setCellValue('B'. ($current_row), '');
         $sheet->setCellValue('B'. ($current_row + 1), '1. 보세화물 서비스의 예상경비 청구서는 BL번호 단위로 발송됩니다.(단 분할인 경우 반출단위)');
         $sheet->setCellValue('B'. ($current_row + 2), '2. 세금계산서 발행은 확정청구서와 함께 처리 됩니다.');
@@ -6096,7 +6096,7 @@ class RateDataController extends Controller
             }
 
         }
-        
+
 
         $sheet->getStyle('B'. ($current_row). ':E'. ($current_row - 1 + $count_row))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
         $sheet->getStyle('B'. ($current_row). ':E'. ($current_row - 1 + $count_row))->getFont()->setBold(true);
@@ -7320,7 +7320,7 @@ class RateDataController extends Controller
 
         if($rgd->service_korean_name == '수입풀필먼트'){
             $company = $rgd->warehousing->company;
-        } 
+        }
 
         $company->company_payment = CompanyPayment::where('co_no', $company->co_no)->first();
 
@@ -7454,7 +7454,7 @@ class RateDataController extends Controller
 
         $current_row += $count_row;
 
-        
+
         //FULFILL1
         if($rgd->rate_data_general['rdg_sum1'] > 0) {
             $sheet->getStyle('B'. $current_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
@@ -7464,7 +7464,7 @@ class RateDataController extends Controller
 
             $current_row += 3;
 
-           
+
 
             $count_row = 0;
 
@@ -7480,15 +7480,15 @@ class RateDataController extends Controller
 
 
             $rate_data_fulfill1_ = [];
-        
+
             foreach($rate_data_fulfill1 as $key => $rate_data){
-                array_push($rate_data_fulfill1_, $rate_data);                
+                array_push($rate_data_fulfill1_, $rate_data);
                 $rate_data['rd_data4'] = $rate_data['rd_data4'] == '' ? 0 : $rate_data['rd_data4'];
                 $rate_data['rd_data5'] = $rate_data['rd_data5'] == '' ? 0 : $rate_data['rd_data5'];
                 $rate_data['rd_data6'] = $rate_data['rd_data6'] == '' ? 0 : $rate_data['rd_data6'];
                 $rate_data['rd_data7'] = $rate_data['rd_data7'] == '' ? 0 : $rate_data['rd_data7'];
                 $rd_data4_total += $rate_data['rd_data4'];
-               
+
                 if(!in_array($rate_data['rd_cate1'], $rd_cate1)){
                     $rd_data4_sum = 0;
                     $rd_data5_sum = 0;
@@ -7558,7 +7558,7 @@ class RateDataController extends Controller
                             $sheet->setCellValue('U'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data7']);
                             $sheet->mergeCells('X'.($current_row_fulfill1 + $count_row_fulfill1).':Z'.($current_row_fulfill1 + $count_row_fulfill1));
                             $sheet->setCellValue('X'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data8']);
-    
+
                             $count_row_fulfill1 += 1;
                             $count_row += 1;
                         }
@@ -7617,7 +7617,7 @@ class RateDataController extends Controller
                             $sheet->setCellValue('U'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data7']);
                             $sheet->mergeCells('X'.($current_row_fulfill1 + $count_row_fulfill1).':Z'.($current_row_fulfill1 + $count_row_fulfill1));
                             $sheet->setCellValue('X'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data8']);
-    
+
                             $count_row_fulfill1 += 1;
                             $count_row += 1;
                         }
@@ -7666,7 +7666,7 @@ class RateDataController extends Controller
             $sheet->mergeCells('B'. ($current_row - 2). ':E'. ($current_row - 2));
             $sheet->getStyle('B'. ($current_row - 2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->setCellValue('B'. ($current_row - 2), '항목');
-    
+
 
             foreach($headers as $key => $header){
                 $sheet->mergeCells($col_start[$key]. ($current_row - 2).':'.$col_end[$key]. ($current_row - 2));
@@ -7684,7 +7684,7 @@ class RateDataController extends Controller
             $sheet->getStyle('B'. ($current_row - 1))->getFont()->setBold(true);
             $sheet->setCellValue('B'. ($current_row - 1), '합계');
             $sheet->setCellValue('B'. ($current_row - 1), '합계');
-    
+
             $sheet->mergeCells('B'.($current_row - 1).':E'.($current_row - 1));
             $sheet->mergeCells('F'.($current_row - 1).':H'.($current_row - 1));
             $sheet->mergeCells('I'.($current_row - 1).':K'.($current_row - 1));
@@ -7700,7 +7700,7 @@ class RateDataController extends Controller
 
         }
         //END FULFILL1
-       
+
         //FULFILL2
         if($rgd->rate_data_general['rdg_sum2'] > 0) {
             $sheet->getStyle('B'. $current_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
@@ -7710,7 +7710,7 @@ class RateDataController extends Controller
 
             $current_row += 3;
 
-           
+
 
             $count_row = 0;
 
@@ -7723,9 +7723,9 @@ class RateDataController extends Controller
             $rd_data6_sum = 0;
             $rd_data7_sum = 0;
             $rd_data4_total = 0;
-            
+
             $rate_data_fulfill2_ = [];
-        
+
             foreach($rate_data_fulfill2 as $key => $rate_data){
                 array_push($rate_data_fulfill2_, $rate_data);
                 $rate_data['rd_data4'] = $rate_data['rd_data4'] == '' ? 0 : $rate_data['rd_data4'];
@@ -7802,7 +7802,7 @@ class RateDataController extends Controller
                             $sheet->setCellValue('U'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data7']);
                             $sheet->mergeCells('X'.($current_row_fulfill1 + $count_row_fulfill1).':Z'.($current_row_fulfill1 + $count_row_fulfill1));
                             $sheet->setCellValue('X'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data8']);
-    
+
                             $count_row_fulfill1 += 1;
                             $count_row += 1;
                         }
@@ -7886,7 +7886,7 @@ class RateDataController extends Controller
             $sheet->mergeCells('B'. ($current_row - 2). ':E'. ($current_row - 2));
             $sheet->getStyle('B'. ($current_row - 2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->setCellValue('B'. ($current_row - 2), '항목');
-    
+
 
             foreach($headers as $key => $header){
                 $sheet->mergeCells($col_start[$key]. ($current_row - 2).':'.$col_end[$key]. ($current_row - 2));
@@ -7902,7 +7902,7 @@ class RateDataController extends Controller
             $sheet->getStyle('B'. ($current_row - 1). ':Z'. ($current_row - 1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->getStyle('B'. ($current_row - 1))->getFont()->setBold(true);
             $sheet->setCellValue('B'. ($current_row - 1), '합계');
-    
+
             $sheet->mergeCells('B'.($current_row - 1).':E'.($current_row - 1));
             $sheet->mergeCells('F'.($current_row - 1).':H'.($current_row - 1));
             $sheet->mergeCells('I'.($current_row - 1).':K'.($current_row - 1));
@@ -7928,7 +7928,7 @@ class RateDataController extends Controller
 
             $current_row += 3;
 
-           
+
 
             $count_row = 0;
 
@@ -7941,9 +7941,9 @@ class RateDataController extends Controller
             $rd_data6_sum = 0;
             $rd_data7_sum = 0;
             $rd_data4_total = 0;
-            
+
             $rate_data_fulfill3_ = [];
-        
+
             foreach($rate_data_fulfill3 as $key => $rate_data){
                 array_push($rate_data_fulfill3_, $rate_data);
                 $rate_data['rd_data4'] = $rate_data['rd_data4'] == '' ? 0 : $rate_data['rd_data4'];
@@ -8020,7 +8020,7 @@ class RateDataController extends Controller
                             $sheet->setCellValue('U'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data7']);
                             $sheet->mergeCells('X'.($current_row_fulfill1 + $count_row_fulfill1).':Z'.($current_row_fulfill1 + $count_row_fulfill1));
                             $sheet->setCellValue('X'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data8']);
-    
+
                             $count_row_fulfill1 += 1;
                             $count_row += 1;
                         }
@@ -8104,7 +8104,7 @@ class RateDataController extends Controller
             $sheet->mergeCells('B'. ($current_row - 2). ':E'. ($current_row - 2));
             $sheet->getStyle('B'. ($current_row - 2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->setCellValue('B'. ($current_row - 2), '항목');
-    
+
 
             foreach($headers as $key => $header){
                 $sheet->mergeCells($col_start[$key]. ($current_row - 2).':'.$col_end[$key]. ($current_row - 2));
@@ -8120,7 +8120,7 @@ class RateDataController extends Controller
             $sheet->getStyle('B'. ($current_row - 1). ':Z'. ($current_row - 1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->getStyle('B'. ($current_row - 1))->getFont()->setBold(true);
             $sheet->setCellValue('B'. ($current_row - 1), '합계');
-    
+
             $sheet->mergeCells('B'.($current_row - 1).':E'.($current_row - 1));
             $sheet->mergeCells('F'.($current_row - 1).':H'.($current_row - 1));
             $sheet->mergeCells('I'.($current_row - 1).':K'.($current_row - 1));
@@ -8146,7 +8146,7 @@ class RateDataController extends Controller
 
             $current_row += 3;
 
-        
+
 
             $count_row = 0;
 
@@ -8160,7 +8160,7 @@ class RateDataController extends Controller
             $rd_data7_sum = 0;
 
             $rate_data_fulfill4_ = [];
-        
+
             foreach($rate_data_fulfill4 as $key => $rate_data){
                 array_push($rate_data_fulfill4_, $rate_data);
                     $rate_data['rd_data4'] = $rate_data['rd_data4'] == '' ? 0 : $rate_data['rd_data4'];
@@ -8362,7 +8362,7 @@ class RateDataController extends Controller
 
             $current_row += 3;
 
-           
+
 
             $count_row = 0;
 
@@ -8377,7 +8377,7 @@ class RateDataController extends Controller
             $rd_data4_total = 0;
 
             $rate_data_fulfill5_ = [];
-        
+
             foreach($rate_data_fulfill5 as $key => $rate_data){
                 array_push($rate_data_fulfill5_, $rate_data);
                 $rate_data['rd_data4'] = $rate_data['rd_data4'] == '' ? 0 : $rate_data['rd_data4'];
@@ -8454,7 +8454,7 @@ class RateDataController extends Controller
                             $sheet->setCellValue('U'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data7']);
                             $sheet->mergeCells('X'.($current_row_fulfill1 + $count_row_fulfill1).':Z'.($current_row_fulfill1 + $count_row_fulfill1));
                             $sheet->setCellValue('X'.($current_row_fulfill1 + $count_row_fulfill1), $rate_data['rd_data8']);
-    
+
                             $count_row_fulfill1 += 1;
                             $count_row += 1;
                         }
@@ -8538,7 +8538,7 @@ class RateDataController extends Controller
             $sheet->mergeCells('B'. ($current_row - 2). ':E'. ($current_row - 2));
             $sheet->getStyle('B'. ($current_row - 2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->setCellValue('B'. ($current_row - 2), '항목');
-    
+
 
             foreach($headers as $key => $header){
                 $sheet->mergeCells($col_start[$key]. ($current_row - 2).':'.$col_end[$key]. ($current_row - 2));
@@ -8554,7 +8554,7 @@ class RateDataController extends Controller
             $sheet->getStyle('B'. ($current_row - 1). ':Z'. ($current_row - 1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $sheet->getStyle('B'. ($current_row - 1))->getFont()->setBold(true);
             $sheet->setCellValue('B'. ($current_row - 1), '합계');
-    
+
             $sheet->mergeCells('B'.($current_row - 1).':E'.($current_row - 1));
             $sheet->mergeCells('F'.($current_row - 1).':H'.($current_row - 1));
             $sheet->mergeCells('I'.($current_row - 1).':K'.($current_row - 1));
@@ -8601,9 +8601,9 @@ class RateDataController extends Controller
             File::makeDirectory($path, $mode = 0777, true, true);
         }
 
-       
+
         $name = 'fulfillment_final_monthbill_';
-        
+
 
         $mask = $path . $name .'*.*';
         array_map('unlink', glob($mask) ?: []);
@@ -12393,9 +12393,9 @@ class RateDataController extends Controller
 
             $check_payment = Payment::where('rgd_no', $rgd_no)->where('p_cancel_yn', 'y')->first();
             $user = Member::where('mb_no', $request->ETC3)->first();
-           
+
             $p_method_fee = $request->AMOUNT;
-           
+
             if (isset($check_payment)) {
                 $rgd = ReceivingGoodsDelivery::with(['rate_data_general'])->where('rgd_no', $rgd_no)->first();
 
@@ -12410,7 +12410,7 @@ class RateDataController extends Controller
                         'p_method_name' => null,
                         'p_method_number' => null,
                         'p_card_name' => $request->CARDNAME,
-                        
+
                         'p_resultmgs' => $request->RESULTMSG,
                         'p_orderno' => $request->ORDERNO,
                         'p_amount' => $request->AMOUNT,
@@ -12420,6 +12420,9 @@ class RateDataController extends Controller
                         'p_cardname' => $request->CARDNAME,
                         'p_accountno' => $request->ACCOUNTNO,
                         'p_cardno' => $request->ACCOUNTNO,
+                        'p_receivername' => $request->RECEIVERNAME,
+                        'p_depositenddate' => $request->DEPOSITENDDATE,
+                        'p_cardcode' => $request->CARDCODE,
                     ]
                 );
                 CancelBillHistory::insertGetId([
@@ -12431,7 +12434,7 @@ class RateDataController extends Controller
                     'cbh_pay_method' => $request->ETC5
                 ]);
 
-                if ($rgd->rgd_status7 == 'taxed') {
+                if ($rgd->rgd_status7 == 'taxed' && $request->ETC5 != 'virtual_account') {
                     CancelBillHistory::insertGetId([
                         'rgd_no' => $rgd_no,
                         'mb_no' => $rgd->mb_no,
@@ -12463,9 +12466,9 @@ class RateDataController extends Controller
 
 
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
-                    'is_expect_payment' => 'n',
-                    'rgd_status6' => 'paid',
-                    'rgd_paid_date' => Carbon::now(),
+                    // 'is_expect_payment' => $request->ETC5 != 'virtual_account' ? 'n' : 'y',
+                    'rgd_status6' => $request->ETC5 != 'virtual_account' ? 'paid' : null,
+                    'rgd_paid_date' => $request->ETC5 != 'virtual_account' ? Carbon::now() : null,
                 ]);
 
                 if ($rgd->service_korean_name == '보세화물') {
@@ -12476,7 +12479,7 @@ class RateDataController extends Controller
                     $ad_tile = '[유통가공] 결제완료';
                 }
 
-                if ($request->p_method != 'deposit_without_bankbook') {
+                if ($request->ETC5 != 'virtual_account') {
                     $sender = Member::where('mb_no', $rgd->mb_no)->first();
                     CommonFunc::insert_alarm($ad_tile, $rgd, $sender, null, 'settle_payment', $p_method_fee);
                 }
@@ -12493,7 +12496,7 @@ class RateDataController extends Controller
                         'p_method_name' => null,
                         'p_method_number' => null,
                         'p_card_name' => $request->CARDNAME,
-                        
+
                         'p_resultmgs' => $request->RESULTMSG,
                         'p_orderno' => $request->ORDERNO,
                         'p_amount' => $request->AMOUNT,
@@ -12503,6 +12506,9 @@ class RateDataController extends Controller
                         'p_cardname' => $request->CARDNAME,
                         'p_accountno' => $request->ACCOUNTNO,
                         'p_cardno' => $request->ACCOUNTNO,
+                        'p_receivername' => $request->RECEIVERNAME,
+                        'p_depositenddate' => $request->DEPOSITENDDATE,
+                        'p_cardcode' => $request->CARDCODE,
                     ]
                 );
                 CancelBillHistory::insertGetId([
@@ -12514,7 +12520,7 @@ class RateDataController extends Controller
                     'cbh_pay_method' => $request->ETC5
                 ]);
 
-                if ($rgd->rgd_status7 == 'taxed') {
+                if ($rgd->rgd_status7 == 'taxed' && $request->ETC5 != 'virtual_account') {
                     CancelBillHistory::insertGetId([
                         'rgd_no' => $rgd_no,
                         'mb_no' => $rgd->mb_no,
@@ -12545,8 +12551,9 @@ class RateDataController extends Controller
                 }
 
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
-                    'rgd_status6' => 'paid',
-                    'rgd_paid_date' => Carbon::now(),
+                    // 'is_expect_payment' => $request->ETC5 != 'virtual_account' ? 'n' : 'y',
+                    'rgd_status6' => $request->ETC5 != 'virtual_account' ? 'paid' : null,
+                    'rgd_paid_date' => $request->ETC5 != 'virtual_account' ? Carbon::now() : null,
                 ]);
 
                 if ($rgd->service_korean_name == '보세화물') {
@@ -12557,10 +12564,12 @@ class RateDataController extends Controller
                     $ad_tile = '[유통가공] 결제완료';
                 }
 
-                
-                $sender = Member::where('mb_no', $rgd->mb_no)->first();
-                CommonFunc::insert_alarm($ad_tile, $rgd, $sender, null, 'settle_payment', $p_method_fee);
-                
+
+                if ($request->ETC5 != 'virtual_account') {
+                    $sender = Member::where('mb_no', $rgd->mb_no)->first();
+                    CommonFunc::insert_alarm($ad_tile, $rgd, $sender, null, 'settle_payment', $p_method_fee);
+                }
+
             }
 
             DB::commit();
