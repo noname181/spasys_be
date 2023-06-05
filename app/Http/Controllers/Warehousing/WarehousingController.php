@@ -50,6 +50,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Http\Requests\Warehousing\ExcelRequest;
 use Illuminate\Support\Str;
+use SoapClient;
 
 class WarehousingController extends Controller
 {
@@ -557,7 +558,7 @@ class WarehousingController extends Controller
                     ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')->where('w_category_name', '=', '수입풀필먼트')
                     ->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    })->orderby('w_completed_day','DESC');
+                    })->orderby('w_completed_day', 'DESC');
             } else if ($user->mb_type == 'spasys') {
 
                 $warehousing2 = Warehousing::join(
@@ -581,7 +582,7 @@ class WarehousingController extends Controller
                     ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent', 'warehousing_child', 'rate_data_general'])->where('w_category_name', '=', '수입풀필먼트')->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')
                     ->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    })->orderby('w_completed_day','DESC');
+                    })->orderby('w_completed_day', 'DESC');
             }
             $warehousing->whereDoesntHave('rate_data_general');
 
@@ -718,277 +719,277 @@ class WarehousingController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
-            if(isset($validated['status']) && $validated['status'] == '입고'){
-            if ($user->mb_type == 'shop') {
-                $warehousing2 = Warehousing::join(
-                    DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
-                    'm.w_no',
-                    '=',
-                    'warehousing.w_no'
-                )->where('warehousing.w_type', '=', 'EW')->where('w_category_name', '=', '수입풀필먼트')->whereHas('co_no.co_parent', function ($q) use ($user) {
-                    $q->where('co_no', $user->co_no);
-                })->get();
-                $w_import_no = collect($warehousing2)->map(function ($q) {
-
-                    return $q->w_import_no;
-                });
-                $w_no_in = collect($warehousing2)->map(function ($q) {
-
-                    return $q->w_no;
-                });
-                $warehousing = Warehousing::with('mb_no')
-                    ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')->where('w_category_name', '=', '수입풀필먼트')
-                    ->whereHas('co_no.co_parent', function ($q) use ($user) {
+            if (isset($validated['status']) && $validated['status'] == '입고') {
+                if ($user->mb_type == 'shop') {
+                    $warehousing2 = Warehousing::join(
+                        DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
+                        'm.w_no',
+                        '=',
+                        'warehousing.w_no'
+                    )->where('warehousing.w_type', '=', 'EW')->where('w_category_name', '=', '수입풀필먼트')->whereHas('co_no.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    })->whereHas('receving_goods_delivery', function ($q) use ($user) {
-                        $q->where('rgd_status1', '!=', '입고 취소');
+                    })->get();
+                    $w_import_no = collect($warehousing2)->map(function ($q) {
+
+                        return $q->w_import_no;
                     });
-            } else if ($user->mb_type == 'shipper') {
-                $warehousing2 = Warehousing::join(
-                    DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
-                    'm.w_no',
-                    '=',
-                    'warehousing.w_no'
-                )->where('warehousing.w_type', '=', 'EW')->where('w_category_name', '=', '수입풀필먼트')->whereHas('co_no', function ($q) use ($user) {
-                    $q->where('co_no', $user->co_no);
-                })->get();
-                $w_import_no = collect($warehousing2)->map(function ($q) {
+                    $w_no_in = collect($warehousing2)->map(function ($q) {
 
-                    return $q->w_import_no;
-                });
-                $w_no_in = collect($warehousing2)->map(function ($q) {
-
-                    return $q->w_no;
-                });
-                $warehousing = Warehousing::with('mb_no')
-                    ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')->where('w_category_name', '=', '수입풀필먼트')
-                    ->whereHas('co_no', function ($q) use ($user) {
+                        return $q->w_no;
+                    });
+                    $warehousing = Warehousing::with('mb_no')
+                        ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')->where('w_category_name', '=', '수입풀필먼트')
+                        ->whereHas('co_no.co_parent', function ($q) use ($user) {
+                            $q->where('co_no', $user->co_no);
+                        })->whereHas('receving_goods_delivery', function ($q) use ($user) {
+                            $q->where('rgd_status1', '!=', '입고 취소');
+                        });
+                } else if ($user->mb_type == 'shipper') {
+                    $warehousing2 = Warehousing::join(
+                        DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
+                        'm.w_no',
+                        '=',
+                        'warehousing.w_no'
+                    )->where('warehousing.w_type', '=', 'EW')->where('w_category_name', '=', '수입풀필먼트')->whereHas('co_no', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    })->whereHas('receving_goods_delivery', function ($q) use ($user) {
-                        $q->where('rgd_status1', '!=', '입고 취소');
+                    })->get();
+                    $w_import_no = collect($warehousing2)->map(function ($q) {
+
+                        return $q->w_import_no;
                     });
-            } else if ($user->mb_type == 'spasys') {
+                    $w_no_in = collect($warehousing2)->map(function ($q) {
 
-                $warehousing2 = Warehousing::join(
-                    DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
-                    'm.w_no',
-                    '=',
-                    'warehousing.w_no'
-                )->where('warehousing.w_type', '=', 'EW')->where('w_category_name', '=', '수입풀필먼트')->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
-                    $q->where('co_no', $user->co_no);
-                })->get();
-                $w_import_no = collect($warehousing2)->map(function ($q) {
+                        return $q->w_no;
+                    });
+                    $warehousing = Warehousing::with('mb_no')
+                        ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')->where('w_category_name', '=', '수입풀필먼트')
+                        ->whereHas('co_no', function ($q) use ($user) {
+                            $q->where('co_no', $user->co_no);
+                        })->whereHas('receving_goods_delivery', function ($q) use ($user) {
+                            $q->where('rgd_status1', '!=', '입고 취소');
+                        });
+                } else if ($user->mb_type == 'spasys') {
 
-                    return $q->w_import_no;
-                });
-                $w_no_in = collect($warehousing2)->map(function ($q) {
-
-                    return $q->w_no;
-                });
-
-                $warehousing = Warehousing::with('mb_no')
-                    ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent', 'warehousing_child', 'rate_data_general'])->where('w_category_name', '=', '수입풀필먼트')->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')
-                    ->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
+                    $warehousing2 = Warehousing::join(
+                        DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
+                        'm.w_no',
+                        '=',
+                        'warehousing.w_no'
+                    )->where('warehousing.w_type', '=', 'EW')->where('w_category_name', '=', '수입풀필먼트')->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    })->whereHas('receving_goods_delivery', function ($q) use ($user) {
-                        $q->where('rgd_status1', '!=', '입고 취소');
+                    })->get();
+                    $w_import_no = collect($warehousing2)->map(function ($q) {
+
+                        return $q->w_import_no;
                     });
-            }
-            $warehousing->whereDoesntHave('rate_data_general');
-       
-            if (isset($validated['connection_number_type'])) {
-                $warehousing->whereNull('connection_number');
-            }
+                    $w_no_in = collect($warehousing2)->map(function ($q) {
 
-            if (isset($validated['page_type']) && $validated['page_type'] == "page130") {
-                $warehousing->where('w_type', '=', 'IW')->where('w_category_name', '=', '수입풀필먼트');
-            }
+                        return $q->w_no;
+                    });
 
-            if (isset($validated['from_date'])) {
+                    $warehousing = Warehousing::with('mb_no')
+                        ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent', 'warehousing_child', 'rate_data_general'])->where('w_category_name', '=', '수입풀필먼트')->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')
+                        ->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
+                            $q->where('co_no', $user->co_no);
+                        })->whereHas('receving_goods_delivery', function ($q) use ($user) {
+                            $q->where('rgd_status1', '!=', '입고 취소');
+                        });
+                }
+                $warehousing->whereDoesntHave('rate_data_general');
 
-                $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
-            }
+                if (isset($validated['connection_number_type'])) {
+                    $warehousing->whereNull('connection_number');
+                }
 
-            if (isset($validated['to_date'])) {
-                $warehousing->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
-            }
+                if (isset($validated['page_type']) && $validated['page_type'] == "page130") {
+                    $warehousing->where('w_type', '=', 'IW')->where('w_category_name', '=', '수입풀필먼트');
+                }
 
-            if (isset($validated['mb_name'])) {
-                $warehousing->whereHas('mb_no', function ($query) use ($validated) {
-                    $query->where(DB::raw('lower(mb_name)'), 'like', '%' . strtolower($validated['mb_name']) . '%');
-                });
-            }
-            if (isset($validated['co_parent_name'])) {
-                $warehousing->whereHas('co_no.co_parent', function ($query) use ($validated) {
-                    $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
-                });
-            }
-            if (isset($validated['co_name'])) {
-                $warehousing->whereHas('co_no', function ($q) use ($validated) {
-                    return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
-                });
-            }
+                if (isset($validated['from_date'])) {
 
-            if (isset($validated['w_schedule_number'])) {
-                $warehousing->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
-            }
-            if (isset($validated['w_schedule_number_iw'])) {
-                $warehousing->whereHas('w_import_parent', function ($q) use ($validated) {
-                    return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number_iw'] . '%', 'and', 'w_type', '=', 'IW');
-                });
-            }
-            if (isset($validated['w_schedule_number_ew'])) {
-                $warehousing->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number_ew'] . '%', 'and', 'w_type', '=', 'EW');
-            }
-            if (isset($validated['logistic_manage_number'])) {
-                $warehousing->where('logistic_manage_number', 'like', '%' . $validated['logistic_manage_number'] . '%');
-            }
-            if (isset($validated['m_bl'])) {
-                $warehousing->where('m_bl', 'like', '%' . $validated['m_bl'] . '%');
-            }
-            if (isset($validated['h_bl'])) {
-                $warehousing->where('h_bl', 'like', '%' . $validated['h_bl'] . '%');
-            }
-            if (isset($validated['rgd_status1'])) {
-                $warehousing->whereHas('receving_goods_delivery', function ($query) use ($validated) {
-                    $query->where('rgd_status1', '=', $validated['rgd_status1']);
-                });
-            }
-            if (isset($validated['status'])) {
-                $warehousing->whereHas('receving_goods_delivery', function ($query) use ($validated) {
-                    $query->where('rgd_status1', '=', $validated['status']);
-                });
-            }
-            if (isset($validated['rgd_status2'])) {
-                $warehousing->whereHas('receving_goods_delivery', function ($query) use ($validated) {
-                    $query->where('rgd_status2', '=', $validated['rgd_status2']);
-                });
-            }
-            if (isset($validated['rgd_status3'])) {
-                $warehousing->whereHas('receving_goods_delivery', function ($query) use ($validated) {
-                    $query->where('rgd_status3', '=', $validated['rgd_status3']);
-                });
-            }
+                    $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                }
 
-            // if (isset($validated['warehousing_status1']) || isset($validated['warehousing_status2'])) {
-            //     $warehousing->where(function($query) use ($validated) {
-            //         $query->orwhere('warehousing_status', '=', $validated['warehousing_status1']);
-            //         $query->orWhere('warehousing_status', '=', $validated['warehousing_status2']);
-            //     });
-            // }
-            $warehousing = $warehousing->orWhereIn('w_no', $w_no_in)->orderBy('w_no', 'DESC');
-            $members = Member::where('mb_no', '!=', 0)->get();
+                if (isset($validated['to_date'])) {
+                    $warehousing->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                }
 
-            $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
-            $warehousing->setCollection(
-                $warehousing->getCollection()->map(function ($item) {
+                if (isset($validated['mb_name'])) {
+                    $warehousing->whereHas('mb_no', function ($query) use ($validated) {
+                        $query->where(DB::raw('lower(mb_name)'), 'like', '%' . strtolower($validated['mb_name']) . '%');
+                    });
+                }
+                if (isset($validated['co_parent_name'])) {
+                    $warehousing->whereHas('co_no.co_parent', function ($query) use ($validated) {
+                        $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                    });
+                }
+                if (isset($validated['co_name'])) {
+                    $warehousing->whereHas('co_no', function ($q) use ($validated) {
+                        return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    });
+                }
 
-                    $item->total_item = WarehousingItem::where('w_no', $item->w_no)->where('wi_type', '입고_spasys')->sum('wi_number');
-                    if ($item['warehousing_item'][0]['item']) {
-                        $first_name_item = $item['warehousing_item'][0]['item']['item_name'];
-                        $total_item = $item['warehousing_item']->count();
-                        $final_total = (($total_item / 2)  - 1);
-                        if ($final_total <= 0) {
-                            $item->first_item_name_total = $first_name_item . '외';
+                if (isset($validated['w_schedule_number'])) {
+                    $warehousing->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
+                }
+                if (isset($validated['w_schedule_number_iw'])) {
+                    $warehousing->whereHas('w_import_parent', function ($q) use ($validated) {
+                        return $q->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number_iw'] . '%', 'and', 'w_type', '=', 'IW');
+                    });
+                }
+                if (isset($validated['w_schedule_number_ew'])) {
+                    $warehousing->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number_ew'] . '%', 'and', 'w_type', '=', 'EW');
+                }
+                if (isset($validated['logistic_manage_number'])) {
+                    $warehousing->where('logistic_manage_number', 'like', '%' . $validated['logistic_manage_number'] . '%');
+                }
+                if (isset($validated['m_bl'])) {
+                    $warehousing->where('m_bl', 'like', '%' . $validated['m_bl'] . '%');
+                }
+                if (isset($validated['h_bl'])) {
+                    $warehousing->where('h_bl', 'like', '%' . $validated['h_bl'] . '%');
+                }
+                if (isset($validated['rgd_status1'])) {
+                    $warehousing->whereHas('receving_goods_delivery', function ($query) use ($validated) {
+                        $query->where('rgd_status1', '=', $validated['rgd_status1']);
+                    });
+                }
+                if (isset($validated['status'])) {
+                    $warehousing->whereHas('receving_goods_delivery', function ($query) use ($validated) {
+                        $query->where('rgd_status1', '=', $validated['status']);
+                    });
+                }
+                if (isset($validated['rgd_status2'])) {
+                    $warehousing->whereHas('receving_goods_delivery', function ($query) use ($validated) {
+                        $query->where('rgd_status2', '=', $validated['rgd_status2']);
+                    });
+                }
+                if (isset($validated['rgd_status3'])) {
+                    $warehousing->whereHas('receving_goods_delivery', function ($query) use ($validated) {
+                        $query->where('rgd_status3', '=', $validated['rgd_status3']);
+                    });
+                }
+
+                // if (isset($validated['warehousing_status1']) || isset($validated['warehousing_status2'])) {
+                //     $warehousing->where(function($query) use ($validated) {
+                //         $query->orwhere('warehousing_status', '=', $validated['warehousing_status1']);
+                //         $query->orWhere('warehousing_status', '=', $validated['warehousing_status2']);
+                //     });
+                // }
+                $warehousing = $warehousing->orWhereIn('w_no', $w_no_in)->orderBy('w_no', 'DESC');
+                $members = Member::where('mb_no', '!=', 0)->get();
+
+                $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
+                $warehousing->setCollection(
+                    $warehousing->getCollection()->map(function ($item) {
+
+                        $item->total_item = WarehousingItem::where('w_no', $item->w_no)->where('wi_type', '입고_spasys')->sum('wi_number');
+                        if ($item['warehousing_item'][0]['item']) {
+                            $first_name_item = $item['warehousing_item'][0]['item']['item_name'];
+                            $total_item = $item['warehousing_item']->count();
+                            $final_total = (($total_item / 2)  - 1);
+                            if ($final_total <= 0) {
+                                $item->first_item_name_total = $first_name_item . '외';
+                            } else {
+                                $item->first_item_name_total = $first_name_item . '외' . ' ' . $final_total . '건';
+                            }
                         } else {
-                            $item->first_item_name_total = $first_name_item . '외' . ' ' . $final_total . '건';
+                            $item->first_item_name_total = '';
                         }
-                    } else {
-                        $item->first_item_name_total = '';
-                    }
 
-                    return $item;
-                })
-            );
-            return response()->json($warehousing);
+                        return $item;
+                    })
+                );
+                return response()->json($warehousing);
             } else {
                 if (isset($validated['status']) && $validated['status'] == '출고예정') {
                     if ($user->mb_type == 'shop') {
-                        $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status','출고예정')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
+                        $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고예정')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
                             $q->where('co_no', $user->co_no);
                         })->orderBy('ss_no', 'DESC');
                     } else if ($user->mb_type == 'shipper') {
-                        $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status','출고예정')->whereHas('ContractWms.company', function ($q) use ($user) {
+                        $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고예정')->whereHas('ContractWms.company', function ($q) use ($user) {
                             $q->where('co_no', $user->co_no);
                         })->orderBy('ss_no', 'DESC');
                     } else if ($user->mb_type == 'spasys') {
-                        $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status','출고예정')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
+                        $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고예정')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
                             $q->where('co_no', $user->co_no);
                         })->orderBy('ss_no', 'DESC');
                     }
-                } else if(isset($validated['status']) && $validated['status'] == '출고') {
+                } else if (isset($validated['status']) && $validated['status'] == '출고') {
                     if ($user->mb_type == 'shop') {
-                        $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status','출고')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
+                        $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
                             $q->where('co_no', $user->co_no);
                         })
-                        // ->where(function ($q) {
-                        //     $q->whereHas('receving_goods_delivery', function ($q1) {
-                        //         $q1->where('rgd_status3', '=',"배송완료");
-                        //     });
-                        // })
-                        ->orderBy('ss_no', 'DESC');
+                            // ->where(function ($q) {
+                            //     $q->whereHas('receving_goods_delivery', function ($q1) {
+                            //         $q1->where('rgd_status3', '=',"배송완료");
+                            //     });
+                            // })
+                            ->orderBy('ss_no', 'DESC');
                     } else if ($user->mb_type == 'shipper') {
-                        $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status','출고')->whereHas('ContractWms.company', function ($q) use ($user) {
+                        $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고')->whereHas('ContractWms.company', function ($q) use ($user) {
                             $q->where('co_no', $user->co_no);
                         })
-                        // ->where(function ($q) {
-                        //     $q->whereHas('receving_goods_delivery', function ($q1) {
-                        //         $q1->where('rgd_status3', '=',"배송완료");
-                        //     });
-                        // })
-                        ->orderBy('ss_no', 'DESC');
+                            // ->where(function ($q) {
+                            //     $q->whereHas('receving_goods_delivery', function ($q1) {
+                            //         $q1->where('rgd_status3', '=',"배송완료");
+                            //     });
+                            // })
+                            ->orderBy('ss_no', 'DESC');
                     } else if ($user->mb_type == 'spasys') {
-                        $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status','출고')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
+                        $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms', 'receving_goods_delivery'])->where('status', '출고')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
                             $q->where('co_no', $user->co_no);
                         })
-                        // ->where(function ($q) {
-                        //     $q->whereHas('receving_goods_delivery', function ($q1) {
-                        //         $q1->where('rgd_status3', '=',"배송완료");
-                        //     });
-                        // })
-                        ->orderBy('ss_no', 'DESC');
+                            // ->where(function ($q) {
+                            //     $q->whereHas('receving_goods_delivery', function ($q1) {
+                            //         $q1->where('rgd_status3', '=',"배송완료");
+                            //     });
+                            // })
+                            ->orderBy('ss_no', 'DESC');
                     }
                 }
                 //return DB::getQueryLog();
-    
+
                 if (isset($validated['from_date'])) {
                     $schedule_shipment->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
                 }
-    
+
                 if (isset($validated['to_date'])) {
                     $schedule_shipment->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
                 }
-    
+
                 if (isset($validated['co_parent_name'])) {
                     $schedule_shipment->whereHas('ContractWms.company.co_parent', function ($query) use ($validated) {
                         $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
                     });
                 }
-    
+
                 if (isset($validated['co_name'])) {
                     $schedule_shipment->whereHas('ContractWms.company', function ($q) use ($validated) {
                         return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
                     });
                 }
-    
+
                 if (isset($validated['item_brand'])) {
                     $schedule_shipment->whereHas('schedule_shipment_info.item', function ($q) use ($validated) {
                         return $q->where(DB::raw('lower(item_brand)'), 'like', '%' . strtolower($validated['item_brand']) . '%');
                     });
                 }
-    
+
                 if (isset($validated['item_channel_name'])) {
                     $schedule_shipment->whereHas('schedule_shipment_info.item.item_channels', function ($q) use ($validated) {
                         return $q->where(DB::raw('lower(item_channel_name)'), 'like', '%' . strtolower($validated['item_channel_name']) . '%');
                     });
                 }
-    
+
                 if (isset($validated['item_name'])) {
                     $schedule_shipment->whereHas('schedule_shipment_info.item', function ($q) use ($validated) {
                         return $q->where(DB::raw('lower(item_name)'), 'like', '%' . strtolower($validated['item_name']) . '%');
                     });
                 }
-    
+
                 if (isset($validated['status'])) {
                     if ($validated['status'] == '배송준비') {
                         $schedule_shipment->whereDoesntHave('receving_goods_delivery', function ($q) use ($validated) {
@@ -1005,9 +1006,9 @@ class WarehousingController extends Controller
                         });
                     }
                 }
-    
+
                 if (isset($validated['order_id'])) {
-    
+
                     $schedule_shipment->where(DB::raw('lower(order_id)'), 'like', '%' . strtolower($validated['order_id']) . '%');
                 }
                 if (isset($validated['recv_name'])) {
@@ -1026,7 +1027,7 @@ class WarehousingController extends Controller
                 if (isset($validated['trans_corp'])) {
                     $schedule_shipment->where(DB::raw('lower(trans_corp)'), 'like', '%' . strtolower($validated['trans_corp']) . '%');
                 }
-    
+
                 $schedule_shipment = $schedule_shipment->paginate($per_page, ['*'], 'page', $page);
                 $schedule_shipment->setCollection(
                     $schedule_shipment->getCollection()->map(function ($q) {
@@ -1037,7 +1038,7 @@ class WarehousingController extends Controller
                             $count_item++;
                         }
                         $q->count_item = $count_item;
-    
+
                         $scheduleshipment_info_ = ScheduleShipmentInfo::with(['item'])->where('ss_no', $q->ss_no)->first();
                         $item_schedule_shipment = Item::where('product_id', $scheduleshipment_info_->product_id)->first();
                         if (isset($item_schedule_shipment)) {
@@ -1051,14 +1052,13 @@ class WarehousingController extends Controller
                         } else {
                             $q->first_item_name_total = '';
                         }
-    
-    
+
+
                         return  $q;
                     })
                 );
                 return response()->json($schedule_shipment);
             }
-  
         } catch (\Exception $e) {
             Log::error($e);
             return $e;
@@ -1400,7 +1400,7 @@ class WarehousingController extends Controller
                         $total_item = $item['warehousing']['warehousing_item']->count();
                         $final_total = ($total_item   - 1);
                         if ($final_total <= 0) {
-                            $item->first_item_name_total = $first_name_item ;
+                            $item->first_item_name_total = $first_name_item;
                         } else {
                             $item->first_item_name_total = $first_name_item . '외' . ' ' . $final_total . '건';
                         }
@@ -1514,13 +1514,13 @@ class WarehousingController extends Controller
                     $item->total_item = WarehousingItem::where('w_no', $item->w_no)->where('wi_type', '입고_shipper')->sum('wi_number');
                     if (!empty($item['warehousing']['warehousing_item'][0]) && isset($item['warehousing']['warehousing_item'][0]['item'])) {
                         $first_name_item = $item['warehousing']['warehousing_item'][0]['item']['item_name'];
-                        
+
                         $total_item = 0;
-                        foreach($item['warehousing']['warehousing_item'] as $a){
-                            if($a['wi_type'] == "입고_spasys"){
+                        foreach ($item['warehousing']['warehousing_item'] as $a) {
+                            if ($a['wi_type'] == "입고_spasys") {
                                 $total_item++;
                             }
-                        } 
+                        }
                         $final_total = ($total_item - 1);
                         if ($final_total <= 0) {
                             $item->first_item_name_total = $first_name_item;
@@ -3289,12 +3289,12 @@ class WarehousingController extends Controller
 
                 $warehousing->where(function ($q) use ($validated) {
                     $q
-                    // ->whereHas('w_no', function ($q1) use ($validated) {
-                    //     $q1->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%', 'and', 'w_type', '=', 'IW');
-                    // });
-                    ->WhereHas('w_no.w_import_parent', function ($q2) use ($validated) {
-                        $q2->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%');
-                    });
+                        // ->whereHas('w_no', function ($q1) use ($validated) {
+                        //     $q1->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%', 'and', 'w_type', '=', 'IW');
+                        // });
+                        ->WhereHas('w_no.w_import_parent', function ($q2) use ($validated) {
+                            $q2->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%');
+                        });
                 });
             }
             // $warehousing->get();
@@ -3335,14 +3335,14 @@ class WarehousingController extends Controller
                         $first_name_item = $item['warehousing']['warehousing_item'][0]['item']['item_name'];
                         // $total_item = $item['warehousing']['warehousing_item']->count();
                         $total_item = 0;
-                        foreach($item['warehousing']['warehousing_item'] as $a){
-                            if($a['wi_type'] == "출고_shipper"){
+                        foreach ($item['warehousing']['warehousing_item'] as $a) {
+                            if ($a['wi_type'] == "출고_shipper") {
                                 $total_item++;
                             }
                         }
                         $final_total = ($total_item   - 1);
                         if ($final_total <= 0) {
-                            $item->first_item_name_total = $first_name_item ;
+                            $item->first_item_name_total = $first_name_item;
                         } else {
                             $item->first_item_name_total = $first_name_item . '외' . ' ' . $final_total . '건';
                         }
@@ -3488,12 +3488,12 @@ class WarehousingController extends Controller
 
                 $warehousing->where(function ($q) use ($validated) {
                     $q
-                    // ->whereHas('w_no', function ($q1) use ($validated) {
-                    //     $q1->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%', 'and', 'w_type', '=', 'IW');
-                    // });
-                    ->WhereHas('w_no.w_import_parent', function ($q2) use ($validated) {
-                        $q2->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%');
-                    });
+                        // ->whereHas('w_no', function ($q1) use ($validated) {
+                        //     $q1->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%', 'and', 'w_type', '=', 'IW');
+                        // });
+                        ->WhereHas('w_no.w_import_parent', function ($q2) use ($validated) {
+                            $q2->where('w_schedule_number2', 'like', '%' . $validated['w_schedule_number2'] . '%');
+                        });
                 });
             }
             if (isset($validated['connection_number'])) {
@@ -3549,7 +3549,7 @@ class WarehousingController extends Controller
             $user = Auth::user();
             $pathname = $request->header('Pathname');
             $is_check_page = str_contains($pathname, '_check');
-            
+
             if ($type == 'monthly') {
                 $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing', 'rgd_parent_payment', 'rate_data_general'])->where('rgd_no', $rgd_no)->first();
                 $contract = Contract::where('co_no',  $user->co_no)->first();
@@ -3627,7 +3627,7 @@ class WarehousingController extends Controller
                 $time = str_replace('-', '.', $start_date) . ' ~ ' . str_replace('-', '.', $end_date);
             }
             if ($type == 'monthly_edit') {
-                $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing' , 'rgd_parent_payment', 'rate_data_general'])->where('rgd_no', $rgd_no)->first();
+                $rgd = ReceivingGoodsDelivery::with(['rgd_child', 'warehousing', 'rgd_parent_payment', 'rate_data_general'])->where('rgd_no', $rgd_no)->first();
                 $contract = Contract::where('co_no',  $user->co_no)->first();
                 if (isset($contract->c_calculate_deadline_yn)) {
                     $rgd['c_calculate_deadline_yn'] = $contract->c_calculate_deadline_yn;
@@ -4068,7 +4068,7 @@ class WarehousingController extends Controller
                     }
                     $service = Service::where('service_name', $service_name)->first();
 
-                    if(isset($service->service_no)){
+                    if (isset($service->service_no)) {
                         $company_settlement = CompanySettlement::where([
                             'co_no' => $co_no,
                             'service_no' => $service->service_no,
@@ -4076,7 +4076,7 @@ class WarehousingController extends Controller
                         $item->settlement_cycle = $company_settlement ? $company_settlement->cs_payment_cycle : "";
                     }
 
-                  
+
 
                     //CHECK SHIPPER COMPANY IS SENT RATE DATA YET
 
@@ -4139,7 +4139,7 @@ class WarehousingController extends Controller
 
             // ====================DISTRIBUTION======================
 
-            $warehousing = ReceivingGoodsDelivery::with(['rate_meta_data', 'rate_meta_data_parent', 'rate_data_general', 'payment', 't_import' ,'cancel_bill_history', 'rgd_child']);
+            $warehousing = ReceivingGoodsDelivery::with(['rate_meta_data', 'rate_meta_data_parent', 'rate_data_general', 'payment', 't_import', 'cancel_bill_history', 'rgd_child']);
             if ($user->mb_type == 'shop' && $request->type == 'check_list') {
                 $warehousing->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('co_no.co_parent', function ($q) use ($user) {
@@ -4640,7 +4640,7 @@ class WarehousingController extends Controller
             }
 
             if (isset($validated['rgd_status1']) && $validated['rgd_status1'] != '전체') {
-                
+
                 $warehousing->where('rgd_calculate_deadline_yn', 'y')->where('rgd_status4', '확정청구서');
                 $warehousing_bonded->where('rgd_calculate_deadline_yn', 'y')->where('rgd_status4', '확정청구서');
                 $warehousing_fulfillment->where('rgd_calculate_deadline_yn', 'y')->where('rgd_status4', '확정청구서');
@@ -4776,23 +4776,23 @@ class WarehousingController extends Controller
                             $item->sum_price_total2 = $item->rate_data_general->rdg_sum7 + $item->rate_data_general->rdg_sum14 + $total_discount;
                             $item->discount = $total_discount;
                         }
-                      
+
                         $item->sum_price_total = isset($item->rate_data_general) ? ($item->rate_data_general->rdg_sum7 + $item->rate_data_general->rdg_sum14) : 0;
-                        if($item->rgd_bill_type == 'final_monthly_shop' || $item->rgd_bill_type == 'final_monthly_spasys' || $item->rgd_bill_type == 'final_monthly'){
-                        $created_at = Carbon::createFromFormat('Y.m.d H:i:s', $item->created_at->format('Y.m.d H:i:s'));
+                        if ($item->rgd_bill_type == 'final_monthly_shop' || $item->rgd_bill_type == 'final_monthly_spasys' || $item->rgd_bill_type == 'final_monthly') {
+                            $created_at = Carbon::createFromFormat('Y.m.d H:i:s', $item->created_at->format('Y.m.d H:i:s'));
 
-                        $start_date = $created_at->startOfMonth()->toDateString();
-                        $end_date = $created_at->endOfMonth()->toDateString();
+                            $start_date = $created_at->startOfMonth()->toDateString();
+                            $end_date = $created_at->endOfMonth()->toDateString();
 
-                        $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent', 't_export','t_import','t_import_expected'])
-                            ->whereHas('w_no', function ($q) use ($co_no) {
-                                $q->where('w_category_name', '보세화물');
-                            })
-                        // ->doesntHave('rgd_child')
-                            ->where('rgd_settlement_number', $item->rgd_settlement_number)
-                        // ->whereDoesntHave('rgd_child')
-                            ->orderBy('rgd_no')
-                            ->count();
+                            $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent', 't_export', 't_import', 't_import_expected'])
+                                ->whereHas('w_no', function ($q) use ($co_no) {
+                                    $q->where('w_category_name', '보세화물');
+                                })
+                                // ->doesntHave('rgd_child')
+                                ->where('rgd_settlement_number', $item->rgd_settlement_number)
+                                // ->whereDoesntHave('rgd_child')
+                                ->orderBy('rgd_no')
+                                ->count();
                             $item->rgds = $rgds;
                         }
                     } else if ($item->service_korean_name == '수입풀필먼트') {
@@ -4803,37 +4803,37 @@ class WarehousingController extends Controller
                         $item->discount = "";
                         $item->sum_price_total2 = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : 0;
                         $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : 0;
-                        if($item->rgd_bill_type == 'final_monthly_shop' || $item->rgd_bill_type == 'final_monthly_spasys' || $item->rgd_bill_type == 'final_monthly'){
-                        $created_at = Carbon::createFromFormat('Y.m.d H:i:s', $item->created_at->format('Y.m.d H:i:s'));
+                        if ($item->rgd_bill_type == 'final_monthly_shop' || $item->rgd_bill_type == 'final_monthly_spasys' || $item->rgd_bill_type == 'final_monthly') {
+                            $created_at = Carbon::createFromFormat('Y.m.d H:i:s', $item->created_at->format('Y.m.d H:i:s'));
 
-                        $start_date = $created_at->startOfMonth()->toDateString();
-                        $end_date = $created_at->endOfMonth()->toDateString();
-            
-                        $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent'])
-                            ->whereHas('w_no', function ($q) use ($item) {
-                                $q->where('w_category_name', '유통가공');
-                            })
-                        // ->doesntHave('rgd_child')
-                            ->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
-                            ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
-                            ->where('rgd_status1', '=', '입고')
-                            ->where('rgd_settlement_number', $item->rgd_settlement_number)
-                            ->orderBy('rgd_no')
-                            ->count();
-            
-                       
-                        $item->rgds = $rgds;
+                            $start_date = $created_at->startOfMonth()->toDateString();
+                            $end_date = $created_at->endOfMonth()->toDateString();
+
+                            $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent'])
+                                ->whereHas('w_no', function ($q) use ($item) {
+                                    $q->where('w_category_name', '유통가공');
+                                })
+                                // ->doesntHave('rgd_child')
+                                ->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
+                                ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
+                                ->where('rgd_status1', '=', '입고')
+                                ->where('rgd_settlement_number', $item->rgd_settlement_number)
+                                ->orderBy('rgd_no')
+                                ->count();
+
+
+                            $item->rgds = $rgds;
                         }
                     }
 
-                    if(isset($item->rate_data_general)){
+                    if (isset($item->rate_data_general)) {
                         if ($item->rate_data_general->rdg_sum7) {
                             $item->sum_price_total3 = $item->rate_data_general->rdg_sum7;
                         } else if ($item->rate_data_general->rdg_sum6) {
                             $item->sum_price_total3 = $item->rate_data_general->rdg_sum6;
                         } else if ($item->rate_data_general->rdg_sum4) {
                             $item->sum_price_total3 = $item->rate_data_general->rdg_sum4;
-                        }   else {
+                        } else {
                             $item->sum_price_total3 = 0;
                         }
                     } else {
@@ -5893,16 +5893,15 @@ class WarehousingController extends Controller
                 else if ($validated['settlement_cycle'] == '월별')
                     $warehousing->where(DB::raw('lower(rgd_bill_type)'), 'like', '%' . 'monthly' . '%');
             }
-            if(isset($validated['settlement_cycle1']) && isset($validated['settlement_cycle2'])){
+            if (isset($validated['settlement_cycle1']) && isset($validated['settlement_cycle2'])) {
                 $warehousing->where(function ($q) use ($validated) {
                     $q->where(DB::raw('lower(rgd_bill_type)'), 'like', '%' . '' . '%');
                 });
-            }else if (isset($validated['settlement_cycle1'])) {
+            } else if (isset($validated['settlement_cycle1'])) {
                 $warehousing->where(function ($q) use ($validated) {
                     $q->where(DB::raw('lower(rgd_bill_type)'), 'not like', '%' . 'monthly' . '%');
-
                 });
-            }else if(isset($validated['settlement_cycle2'])){
+            } else if (isset($validated['settlement_cycle2'])) {
                 $warehousing->where(function ($q) use ($validated) {
                     $q->where(DB::raw('lower(rgd_bill_type)'), 'like', '%' . 'monthly' . '%');
                 });
@@ -6199,7 +6198,7 @@ class WarehousingController extends Controller
 
                             //UPDATE EST BILL
                             $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
-                            if($est_rgd->rgd_status8 != 'completed'){
+                            if ($est_rgd->rgd_status8 != 'completed') {
                                 ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
                                     'rgd_status8' => 'completed',
                                 ]);
@@ -6300,7 +6299,7 @@ class WarehousingController extends Controller
 
                             //UPDATE EST BILL
                             $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
-                            if($est_rgd->rgd_status8 != 'completed'){
+                            if ($est_rgd->rgd_status8 != 'completed') {
                                 ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
                                     'rgd_status8' => 'completed',
                                 ]);
@@ -6378,7 +6377,7 @@ class WarehousingController extends Controller
 
                         //UPDATE EST BILL
                         $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
-                        if($est_rgd->rgd_status8 != 'completed'){
+                        if ($est_rgd->rgd_status8 != 'completed') {
                             ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
                                 'rgd_status8' => 'completed',
                             ]);
@@ -6460,9 +6459,9 @@ class WarehousingController extends Controller
                             'rgd_status8' => 'completed',
                         ]);
 
-                       //UPDATE EST BILL
-                       $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
-                       if($est_rgd->rgd_status8 != 'completed'){
+                        //UPDATE EST BILL
+                        $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
+                        if ($est_rgd->rgd_status8 != 'completed') {
                             ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
                                 'rgd_status8' => 'completed',
                             ]);
@@ -6481,6 +6480,7 @@ class WarehousingController extends Controller
                     'message' => Messages::MSG_0007,
                 ]);
             }
+            $this->tax_invoice_api($request);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
@@ -7045,11 +7045,11 @@ class WarehousingController extends Controller
 
         $approval_history = CancelBillHistory::where('rgd_no', $rgd_no)->whereIn('cbh_type', ['approval'])->first();
 
-        if($rgd->rgd_status4 == '예상경비청구서' && $rgd->service_korean_name != '수입풀필먼트' && !str_contains($rgd->rgd_bill_type, 'month')){
+        if ($rgd->rgd_status4 == '예상경비청구서' && $rgd->service_korean_name != '수입풀필먼트' && !str_contains($rgd->rgd_bill_type, 'month')) {
             $payment_history = CancelBillHistory::where('rgd_no', $rgd_no)->where('cbh_type', 'payment')->where('cbh_status_after', 'request_bill')->first();
 
             if (empty($payment_history->cbh_no) && $rgd->rgd_calculate_deadline_yn == 'y') {
-    
+
                 CancelBillHistory::insertGetId([
                     'rgd_no' => $rgd_no,
                     'mb_no' => $rgd->mb_no,
@@ -7974,5 +7974,323 @@ class WarehousingController extends Controller
             $id[] = $te->tie_logistic_manage_number;
         }
         return $id;
+    }
+
+    
+    function tax_invoice($company1, $company2, $total_price, $b_no)
+    {
+        // issuer
+        $aa = "select * from car_company where  cc_no = '$company1' ";
+        $a = sql_fetch($aa);
+        $cc_license1 = $a['cc_license'];
+        $cc_name1 = $a['cc_name'];
+        $cc_ceo1 = $a['cc_ceo'];
+        $cc_address1 = $a['cc_address1'] . ' ' . $a['cc_address2'];
+        $cc_service1 = $a['cc_service1'];
+        $cc_service2 = $a['cc_service2'];
+        // issuer
+
+
+        // issued
+        $bb = "select * from shipper where  s_no = '$company2' ";
+        $b = sql_fetch($bb);
+        $cc_license2 = $b['s_license'];
+        $cc_name2 = $b['s_name'];
+        $cc_ceo2 = $b['s_ceo'];
+        $cc_address2 = $b['s_address1'] . ' ' . $b['s_address2'];
+
+        $s_type = $b['s_type'];
+        $t_type = "차주발행";
+        $s_no = $company2;
+        $cc_no = $company1;
+
+        $s_service1 = $b['s_service1'];
+        $s_service2 = $b['s_service2'];
+        // issued
+
+
+
+
+        $BaroService_URL = 'https://testws.baroservice.com/TI.asmx?WSDL';    //테스트베드용
+        //$BaroService_URL = 'https://ws.baroservice.com/TI.asmx?WSDL';		//실서비스용
+
+        $BaroService_TI = new SoapClient($BaroService_URL, array(
+            'trace'        => 'true',
+            'encoding'    => 'UTF-8'
+        ));
+
+
+        // GetTaxInvoiceStatesEX.php 파일에서도 수정해야 함
+        $CERTKEY = '813FD596-7CBB-490A-84D2-31570487790E';                            //인증키
+
+        // 사업자등록증 확인 프로세스
+        // 바로빌 연동서비스 웹서비스 참조(WebService Reference) URL
+        $BaroService_URL_staus = 'https://testws.baroservice.com/CORPSTATE.asmx?WSDL';    //테스트베드용
+        // $BaroService_URL_staus = 'https://ws.baroservice.com/CORPSTATE.asmx?WSDL';	//실서비스용
+
+        $BaroService_CORPSTATE = new SoapClient($BaroService_URL_staus, array(
+            'trace' => 'true',
+            'encoding' => 'UTF-8' //소스를 ANSI로 사용할 경우 euc-kr로 수정
+        ));
+
+
+
+        $CheckCorpNumList = array(    //확인할 사업자번호 배열
+            $cc_license1,
+            $cc_license2
+        );
+
+        $Result = $BaroService_CORPSTATE->GetCorpStates(array(
+            'CERTKEY'            => $CERTKEY,
+            'CorpNum'            => '2168142360',
+            'CheckCorpNumList'    => $CheckCorpNumList
+        ))->GetCorpStatesResult->CorpState;
+
+
+
+        if (!is_array($Result) && $Result->State < 0) { // this will be run when this biz_number  closed company
+            //		echo $Result->State;
+
+            $arr = array('msg' => 'cc_license',   'state' => $Result->State);
+            $jsn = json_encode($arr);
+            print_r($jsn);
+            exit;
+        } else { //성공
+            //		echo '<pre>';
+            //		print_r($Result);
+            //		echo '</pre>';
+        }
+
+
+        // 사업자등록증 확인 프로세스
+        /*
+        exit;
+        exit;
+        return false;
+        return false;
+        */
+
+
+
+
+        $IssueDirection = 1;                    //1-정발행, 2-역발행(위수탁 세금계산서는 정발행만 허용)
+        $TaxInvoiceType = 4;                    //1-세금계산서, 2-계산서, 4-위수탁세금계산서, 5-위수탁계산서
+
+        //-------------------------------------------
+        //과세형태
+        //-------------------------------------------
+        //TaxInvoiceType 이 1,4 일 때 : 1-과세, 2-영세
+        //TaxInvoiceType 이 2,5 일 때 : 3-면세
+        //-------------------------------------------
+        $TaxType = 1;
+        $TaxCalcType = 1;                        //세율계산방법 : 1-절상, 2-절사, 3-반올림
+        $PurposeType = 2;                        //1-영수, 2-청구
+
+
+
+        //-------------------------------------------
+        //수정사유코드
+        //-------------------------------------------
+        //공백-일반세금계산서, 1-기재사항의 착오 정정, 2-공급가액의 변동, 3-재화의 환입, 4-계약의 해제, 5-내국신용장 사후개설, 6-착오에 의한 이중발행
+        //-------------------------------------------
+        $ModifyCode = '';
+
+        $Kwon = '';                                //별지서식 11호 상의 [권] 항목
+        $Ho = '';                                //별지서식 11호 상의 [호] 항목
+        $SerialNum = '';                        //별지서식 11호 상의 [일련번호] 항목
+
+        //-------------------------------------------
+        //공급가액 총액
+        //-------------------------------------------
+        $AmountTotal = $total_price - round($total_price * 10 / 110);    // total price without tax
+
+        //-------------------------------------------
+        //세액합계
+        //-------------------------------------------
+        //$TaxType 이 2 또는 3 으로 셋팅된 경우 0으로 입력
+        //-------------------------------------------
+
+        $TaxTotal = round($total_price * 10 / 110);        // total tax
+
+        //-------------------------------------------
+        //합계금액
+        //-------------------------------------------
+        //공급가액 총액 + 세액합계 와 일치해야 합니다.
+        //-------------------------------------------
+        $TotalAmount = $AmountTotal + $TaxTotal;            // total price 
+
+
+        $Cash = '';                                //현금
+        $ChkBill = '';                            //수표
+        $Note = '';                                //어음
+        $Credit = '';                            //외상미수금
+
+        $Remark1 = '';
+        $Remark2 = '';
+        $Remark3 = '';
+
+
+        $WriteDate = '';
+
+
+        //-------------------------------------------
+        //공급자 정보 - 정발행시 세금계산서 작성자
+        //------------------------------------------
+        $InvoicerParty = array(
+            'MgtNum'         => $b_no . "_1",
+            'CorpNum'         => $cc_license1,                //필수입력 - 바로빌 회원 사업자번호 ('-' 제외, 10자리)
+            'TaxRegID'         => '',
+            'CorpName'         => $cc_name1,                    //필수입력
+            'CEOName'         => $cc_ceo1,                //필수입력
+            'Addr'             => $cc_address1,
+            'BizType'         => $cc_service1,
+            'BizClass'         => $cc_service2,
+            'ContactID'     => '',                //필수입력 - 담당자 바로빌 아이디
+            'ContactName'     => $cc_ceo1,                //필수입력
+            'TEL'             => '',
+            'HP'             => '',
+            'Email'         => $cc_license1 . '@bantalk.com'                //필수입력
+        );
+
+        //-------------------------------------------
+        //공급받는자 정보 - 역발행시 세금계산서 작성자
+        //------------------------------------------
+        $InvoiceeParty = array(
+            'MgtNum'         => $b_no . "_1",
+            'CorpNum'         => $cc_license2,                //필수입력
+            'TaxRegID'         => '',
+            'CorpName'         => $cc_name2,                //필수입력
+            'CEOName'         => $cc_ceo2,                //필수입력
+            'Addr'             => $cc_address2,
+            'BizType'         => $s_service1,
+            'BizClass'         => $s_service2,
+            'ContactID'     => '',
+            'ContactName'     => $cc_ceo2,                //필수입력
+            'TEL'             => '',
+            'HP'             => '',
+            'Email'         => $cc_license2 . '@bantalk.com'
+        );
+
+        //-------------------------------------------
+        //수탁자 정보 - 위수탁 발행시 세금계산서 작성자
+        //------------------------------------------
+        $BrokerParty = array(
+            'MgtNum'         => $b_no,                //필수입력 - 연동사부여 문서키
+            'CorpNum'         => '2168142360',                //필수입력 - 바로빌 회원 사업자번호 ('-' 제외, 10자리)
+            'TaxRegID'         => '',
+            'CorpName'         => '(주)스페이시스원',            //필수입력
+            'CEOName'         => '모상희',                //필수입력
+            'Addr'             => '인천광역시 중구 공항동로296번길 98-30, 3층(운서동, 엘엑스판토스 인천물류센터)',
+            'BizType'         => '서비스',
+            'BizClass'         => '창고업',
+            'ContactID'     => 'spasysone',                //필수입력 - 담당자 바로빌 아이디
+            'ContactName'     => '모상희',                //필수입력
+            'TEL'             => '07046597289',
+            'HP'             => '',
+            'Email'         => 'ly.kim@spasysone.com'                //필수입력
+        );
+
+
+
+        // 아래에도 있음, 여기서는 - 없음
+        $t_regtime = b_no_to_tax_day($b_no);
+
+
+
+        //-------------------------------------------
+        //품목
+        //-------------------------------------------
+        $TaxInvoiceTradeLineItems = array(
+            'TaxInvoiceTradeLineItem'    => array(
+                array(
+                    'PurchaseExpiry' => $t_regtime,            //YYYYMMDD
+                    'Name'            => $b_no,
+                    'Information'    => '',
+                    'ChargeableUnit' => '',
+                    'UnitPrice'        => '',
+                    'Amount'        => $AmountTotal,
+                    'Tax'            => $TaxTotal,
+                    'Description'    => ''
+                )
+            )
+        );
+
+        //-------------------------------------------
+        //전자세금계산서
+        //-------------------------------------------
+        $TaxInvoice = array(
+            'InvoiceKey'                => '',
+            'InvoiceeASPEmail'            => '',
+            'IssueDirection'            => $IssueDirection,
+            'TaxInvoiceType'            => $TaxInvoiceType,
+            'TaxType'                    => $TaxType,
+            'TaxCalcType'                => $TaxCalcType,
+            'PurposeType'                => $PurposeType,
+            'ModifyCode'                => $ModifyCode,
+            'Kwon'                        => $Kwon,
+            'Ho'                        => $Ho,
+            'SerialNum'                    => $SerialNum,
+            'Cash'                        => $Cash,
+            'ChkBill'                    => $ChkBill,
+            'Note'                        => $Note,
+            'Credit'                    => $Credit,
+            'WriteDate'                    => $WriteDate,
+            'AmountTotal'                => $AmountTotal,
+            'TaxTotal'                    => $TaxTotal,
+            'TotalAmount'                => $TotalAmount,
+            'Remark1'                    => $Remark1,
+            'Remark2'                    => $Remark2,
+            'Remark3'                    => $Remark3,
+            'InvoicerParty'                => $InvoicerParty,
+            'InvoiceeParty'                => $InvoiceeParty,
+            'BrokerParty'                => $BrokerParty,
+            'TaxInvoiceTradeLineItems'    => $TaxInvoiceTradeLineItems
+        );
+
+        //-------------------------------------------
+
+        $SendSMS = false;                            //문자 발송여부 (공급받는자 정보의 HP 항목이 입력된 경우에만 발송됨)
+
+        $ForceIssue = false;                        //가산세가 예상되는 세금계산서 발행 여부
+
+        $MailTitle = '';                            //전송되는 이메일의 제목 설정 (공백 시 바로빌 기본 제목으로 전송됨)
+
+        //-------------------------------------------
+
+        //정발행
+        $Result = $BaroService_TI->RegistAndIssueBrokerTaxInvoice(array(
+            'CERTKEY'    => $CERTKEY,
+            'CorpNum'    => '6828602575',
+            'Invoice'    => $TaxInvoice,
+            'SendSMS'    => $SendSMS,
+            'ForceIssue' => $ForceIssue,
+            'MailTitle'    => $MailTitle,
+        ))->RegistAndIssueBrokerTaxInvoiceResult;
+
+        $t_amount = $AmountTotal;
+        $t_tax = $TaxTotal;
+        $t_total = $TotalAmount;
+        $t_mgtnum = $b_no . "_1";
+        $text = getErrStr($CERTKEY, $Result);
+
+        if ($Result == 1) {
+            $text = '';
+        }
+
+        if ($Result !== 1) {
+
+            $arr = array('msg' => 'tax_err',   'txt' => $text, 'code' => $sql_tax);
+            $jsn = json_encode($arr);
+            print_r($jsn);
+            exit;
+        } else {
+
+            // 위에도 있음, 여기서는 - 있음
+            $t_regtime = b_no_to_tax_day2($b_no);
+
+
+            $sql_tax  = " insert into tax(b_no, t_mgtnum, t_startdate, t_type, cc_no, s_no, t_regtime, t_modify, t_taxtxt, t_taxcode, t_status, t_result_sendtime, t_result_regtime, t_result_no, t_amount, t_tax, t_total) values('$b_no', '$t_mgtnum', '$b_start', '$t_type', '$cc_no', '$s_no', '$t_regtime', '', '', 0, '$Result', now(), '', '', '$t_amount', '$t_tax', '$t_total') ";
+            sql_query($sql_tax);
+        }
     }
 }
