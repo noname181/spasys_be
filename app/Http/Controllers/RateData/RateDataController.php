@@ -12582,4 +12582,135 @@ class RateDataController extends Controller
         }
     }
 
+    public function check_payment()
+    {
+
+        try {
+            DB::beginTransaction();
+            $tokenheaders = array();
+            array_push($tokenheaders, "content-type: application/json; charset=utf-8");
+            $token_url = "https://www.cookiepayments.com/payAuth/token";
+            $token_request_data = array(
+                'pay2_id' => 'hfmkpjm2hnr',
+                'pay2_key'=> '619a3048e7e01eaabd23d2017ff5dce18e14431a2d69cd9d8c',
+            );
+            $req_json = json_encode($token_request_data, TRUE);
+            $ch = curl_init(); // curl 초기화
+            curl_setopt($ch,CURLOPT_URL, $token_url);
+            curl_setopt($ch,CURLOPT_POST, false);
+            curl_setopt($ch,CURLOPT_POSTFIELDS, $req_json);
+            curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch,CURLOPT_CONNECTTIMEOUT ,3);
+            curl_setopt($ch,CURLOPT_TIMEOUT, 20);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $tokenheaders);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+            $RES_STR = curl_exec($ch);
+
+            curl_close($ch);
+            $RES_STR = json_decode($RES_STR,TRUE);
+            /* 여기 까지 */
+            if($RES_STR['RTN_CD'] == '0000'){
+
+                $std = Carbon::now()->subDays(7)->format('Y-m-d');
+                $end = Carbon::now()->format('Y-m-d');
+
+                $headers = array();
+                array_push($headers, "content-type: application/json; charset=utf-8");
+                array_push($headers, "TOKEN:". $RES_STR['TOKEN']);
+                $cookiepayments_url = "https://www.cookiepayments.com/api/paysearch";
+                $request_data_array = array(
+                'API_ID' => 'hfmkpjm2hnr',
+                'STD_DT' => $std,
+                'END_DT' => $end, 
+                );
+                $cookiepayments_json = json_encode($request_data_array, TRUE);
+                $ch = curl_init(); // curl 초기화
+                curl_setopt($ch,CURLOPT_URL, $cookiepayments_url);
+                curl_setopt($ch,CURLOPT_POST, false);
+                curl_setopt($ch,CURLOPT_POSTFIELDS, $cookiepayments_json);
+                curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch,CURLOPT_CONNECTTIMEOUT ,3);
+                curl_setopt($ch,CURLOPT_TIMEOUT, 20);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+                $response = curl_exec($ch);
+                curl_close($ch);
+
+                $payments  = json_decode($response, TRUE);
+                $ordernos = [];
+
+                foreach($payments as $index=>$payment){
+                    if($payment['PAYMETHOD'] && $payment['CANCELDATE'] == ''){
+                        $ordernos[] = $payment['ORDERNO'];
+                    }
+                }
+
+                $rgds = ReceivingGoodsDelivery::with(['payment'])->whereHas('payment', function($q) use($ordernos){
+                    $q->where('p_method', 'virtual_account')->whereIn('p_orderno', $ordernos);
+                })->get();
+
+                foreach($rgds as $index=>$rgd){
+                    if ($rgd->rgd_status7 == 'taxed') {
+                        CancelBillHistory::insertGetId([
+                            'rgd_no' => $rgd_no,
+                            'mb_no' => $rgd->mb_no,
+                            'cbh_type' => 'tax',
+                            'cbh_status_before' => $rgd->rgd_status7,
+                            'cbh_status_after' => 'completed',
+                        ]);
+
+                        ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                            'rgd_status8' => 'completed',
+                        ]);
+
+
+                        //UPDATE EST BILL
+                        $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
+                        if ($est_rgd->rgd_status8 != 'completed') {
+                            ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
+                                'rgd_status8' => 'completed',
+                            ]);
+                            CancelBillHistory::insertGetId([
+                                'rgd_no' => $est_rgd->rgd_no,
+                                'mb_no' => $rgd->mb_no,
+                                'cbh_type' => 'tax',
+                                'cbh_status_before' => $est_rgd->rgd_status8,
+                                'cbh_status_after' => 'completed'
+                            ]);
+                        }
+                    }
+
+                    ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                        // 'is_expect_payment' => $request->ETC5 != 'virtual_account' ? 'n' : 'y',
+                        'rgd_status6' => 'paid',
+                        'rgd_paid_date' => Carbon::now(),
+                    ]);
+
+                    if ($rgd->service_korean_name == '보세화물') {
+                        $ad_tile = '[보세화물] 결제완료';
+                    } else if ($rgd->service_korean_name == '수입풀필먼트') {
+                        $ad_tile = '[수입풀필먼트] 결제완료';
+                    } else if ($rgd->service_korean_name == '유통가공') {
+                        $ad_tile = '[유통가공] 결제완료';
+                    }
+
+
+                    $sender = Member::where('mb_no', $rgd->mb_no)->first();
+                    CommonFunc::insert_alarm($ad_tile, $rgd, $sender, null, 'settle_payment', $rgd['payment']['p_price']);
+                    
+                }
+
+            }
+
+            DB::commit();
+            return response()->json(['message' => Messages::MSG_0007], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
+
 }
