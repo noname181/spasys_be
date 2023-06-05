@@ -38,6 +38,7 @@ Route::get('/api_item_cargo_list', [App\Http\Controllers\Item\ItemController::cl
 
 Route::prefix('payment')->name('payment.')->group(function () {
     Route::post('/payment_result', [App\Http\Controllers\RateData\RateDataController::class, 'payment_result'])->name('payment_result');
+    Route::get('/check_payment', [App\Http\Controllers\RateData\RateDataController::class, 'check_payment'])->name('check_payment');
 });
 
 Route::middleware('auth')->group(function () {
