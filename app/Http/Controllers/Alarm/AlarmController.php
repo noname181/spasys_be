@@ -362,6 +362,36 @@ class AlarmController extends Controller
                 })
                     ->orderBy('alarm_no', 'DESC');
             }
+            if (isset($validated['service']) && !isset($validated['home'])) {
+                
+                if ($validated['service'] == '보세화물') {
+                    $alarm->where(function ($q) use ($validated) {
+                        $q->whereHas('warehousing', function ($q2) use ($validated) {
+                            return $q2->where('w_category_name', '=', $validated['service']);
+                        })->orWhere('tie_h_bl','!=','')->orWhereNotNull('tie_h_bl')->orWhere(function ($q) {
+                            $q->whereNull('w_no')->whereNull('ss_no')->whereNull('tie_h_bl');
+                        });
+                    });
+                }
+                else if ($validated['service'] == '수입풀필먼트') {
+                    $alarm->where(function ($q) use ($validated) {
+                        $q->whereHas('warehousing', function ($q2) use ($validated) {
+                            return $q2->where('w_category_name', '=', $validated['service']);
+                        })->orwhere('ss_no', '!=', '')->orWhereNotNull('ss_no')->orWhere(function ($q) {
+                            $q->whereNull('w_no')->whereNull('ss_no')->whereNull('tie_h_bl');
+                        });
+                    });
+                } else {
+                    $alarm->where(function ($q) use ($validated) {
+                        $q->whereHas('warehousing', function ($q2) use ($validated) {
+                            return $q2->where('w_category_name', '=', $validated['service']);
+                        })->orWhere(function ($q) {
+                            $q->whereNull('w_no')->whereNull('ss_no')->whereNull('tie_h_bl');
+                        });
+                    });
+                }
+         
+            }
 
             $alarm = $alarm->groupBy('alarm_no')->limit(3)->get();
             DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
@@ -838,7 +868,7 @@ class AlarmController extends Controller
                         });
                     });
                 }
-                if ($validated['service'] == '수입풀필먼트') {
+                else if ($validated['service'] == '수입풀필먼트') {
                     $alarm->where(function ($q) use ($validated) {
                         $q->whereHas('warehousing', function ($q2) use ($validated) {
                             return $q2->where('w_category_name', '=', $validated['service']);
@@ -1160,7 +1190,7 @@ class AlarmController extends Controller
                         });
                     });
                 }
-                if ($validated['service'] == '수입풀필먼트') {
+                else if ($validated['service'] == '수입풀필먼트') {
                     $alarm->where(function ($q) use ($validated) {
                         $q->whereHas('warehousing', function ($q2) use ($validated) {
                             return $q2->where('w_category_name', '=', $validated['service']);
@@ -1308,7 +1338,7 @@ class AlarmController extends Controller
                         });
                     });
                 }
-                if ($validated['service'] == '수입풀필먼트') {
+                else if ($validated['service'] == '수입풀필먼트') {
                     $alarm->where(function ($q) use ($validated) {
                         $q->whereHas('warehousing', function ($q2) use ($validated) {
                             return $q2->where('w_category_name', '=', $validated['service']);

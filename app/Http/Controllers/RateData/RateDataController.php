@@ -12638,21 +12638,108 @@ class RateDataController extends Controller
 
                 $payments  = json_decode($response, TRUE);
                 $ordernos = [];
+                $tids = [];
+                $acceptdates = [];
 
                 foreach($payments as $index=>$payment){
                     if($payment['PAYMETHOD'] && $payment['CANCELDATE'] == ''){
                         $ordernos[] = $payment['ORDERNO'];
+
+                        Payment::where('p_orderno', $payment['ORDERNO'])->update([
+                            'p_tid' => $payment['TID'],
+                            'p_acceptdate' => $payment['ACCEPTDATE']
+                        ]);
+
                     }
                 }
 
                 $rgds = ReceivingGoodsDelivery::with(['payment'])->whereHas('payment', function($q) use($ordernos){
-                    $q->where('p_method', 'virtual_account')->whereIn('p_orderno', $ordernos);
-                })->get();
+                    $q->where('p_method', 'virtual_account')->whereIn('p_orderno', $ordernos)->where('p_depositenddate', '>', Carbon::now()->format('YmdHis'));
+                })->where('rgd_status6', 'virtual_account')->get();
+
+                $rgds_expired = ReceivingGoodsDelivery::with(['payment'])->whereHas('payment', function($q) use($ordernos){
+                    $q->where('p_method', 'virtual_account')->whereIn('p_orderno', $ordernos)->where('p_depositenddate', '<', Carbon::now()->format('YmdHis'));
+                })->where('rgd_status6', 'virtual_account')->get();
+
+
+                foreach($rgds_expired as $index=>$rgd){
+                    $check_payment = Payment::where('rgd_no', $rgd->rgd_no)->where('p_success_yn', 'y')->orderBy('p_no', 'desc')->first();
+                    if (isset($check_payment)) {
+                        if($check_payment->p_method == 'virtual_account'){
+
+                            Payment::where('p_no', $check_payment->p_no)->update([
+                                // 'p_price' => $request->sumprice,
+                                // 'p_method' => $request->p_method,
+                                'p_success_yn' => null,
+                                'p_cancel_yn' => 'y',
+                                'p_cancel_time' => Carbon::now(),
+                            ]);
+            
+                            ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_no)->update([
+                                'rgd_status6' => 'cancel',
+                                'rgd_paid_date' => null,
+                                'rgd_canceled_date' => Carbon::now(),
+                            ]);
+            
+                            CancelBillHistory::insertGetId([
+                                'mb_no' => $rgd->mb_no,
+                                'rgd_no' => $rgd->rgd_no,
+                                'cbh_status_before' => 'paid',
+                                'cbh_status_after' => 'cancel',
+                                'cbh_type' => 'cancel_payment',
+                            ]);
+            
+                            CancelBillHistory::insertGetId([
+                                'mb_no' => $rgd->mb_no,
+                                'rgd_no' => $rgd->rgd_no,
+                                'cbh_status_before' => 'cancel',
+                                'cbh_status_after' => 'request_bill',
+                                'cbh_type' => 'payment',
+                            ]);
+            
+                            if ($rgd->rgd_status8 == 'completed') {
+                                CancelBillHistory::insertGetId([
+                                    'rgd_no' => $rgd->rgd_no,
+                                    'mb_no' => $rgd->mb_no,
+                                    'cbh_type' => 'tax',
+                                    'cbh_status_before' => $rgd->rgd_status8,
+                                    'cbh_status_after' => 'in_process'
+                                ]);
+            
+                                ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                                    'rgd_status8' =>  'in_process',
+                                ]);
+            
+                                //UPDATE EST BILL
+                                $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
+                                if ($est_rgd->rgd_status8 != 'in_process') {
+                                    ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
+                                        'rgd_status8' => 'in_process',
+                                    ]);
+                                    CancelBillHistory::insertGetId([
+                                        'rgd_no' => $est_rgd->rgd_no,
+                                        'mb_no' => $user->mb_no,
+                                        'cbh_type' => 'tax',
+                                        'cbh_status_before' => $est_rgd->rgd_status8,
+                                        'cbh_status_after' => 'in_process'
+                                    ]);
+                                }
+                            }
+
+                            DB::commit();
+                            return response()->json([
+                                'message' => 'Success',
+                            ]);                       
+                            
+                        }
+                       
+                    }
+                }
 
                 foreach($rgds as $index=>$rgd){
                     if ($rgd->rgd_status7 == 'taxed') {
                         CancelBillHistory::insertGetId([
-                            'rgd_no' => $rgd_no,
+                            'rgd_no' => $rgd->rgd_no,
                             'mb_no' => $rgd->mb_no,
                             'cbh_type' => 'tax',
                             'cbh_status_before' => $rgd->rgd_status7,

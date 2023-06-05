@@ -80,6 +80,9 @@ class AlarmSearchRequest extends BaseFormRequest
             'w_schedule_number'=> [
                 'nullable',
             ],
+            'home'=> [
+                'nullable',
+            ],
             'mb_push_yn' => [
                 'nullable',
                 'string',
