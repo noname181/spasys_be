@@ -6112,6 +6112,7 @@ class WarehousingController extends Controller
     {
         try {
             DB::beginTransaction();
+            //return  $this->tax_invoice_api($request);
             if ($request->type == 'option') {
                 $user = Auth::user();
 
@@ -6480,7 +6481,7 @@ class WarehousingController extends Controller
                     'message' => Messages::MSG_0007,
                 ]);
             }
-            $this->tax_invoice_api($request);
+            
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
@@ -7977,38 +7978,63 @@ class WarehousingController extends Controller
     }
 
     
-    function tax_invoice($company1, $company2, $total_price, $b_no)
+    function tax_invoice_api($request)//$company1, $company2, $total_price, $b_no
     {
+        
         // issuer
-        $aa = "select * from car_company where  cc_no = '$company1' ";
-        $a = sql_fetch($aa);
-        $cc_license1 = $a['cc_license'];
-        $cc_name1 = $a['cc_name'];
-        $cc_ceo1 = $a['cc_ceo'];
-        $cc_address1 = $a['cc_address1'] . ' ' . $a['cc_address2'];
-        $cc_service1 = $a['cc_service1'];
-        $cc_service2 = $a['cc_service2'];
+        // $aa = "select * from car_company where  cc_no = '$company1' ";
+        // $a = sql_fetch($aa);
+        // $cc_license1 = $a['cc_license'];
+        // $cc_name1 = $a['cc_name'];
+        // $cc_ceo1 = $a['cc_ceo'];
+        // $cc_address1 = $a['cc_address1'] . ' ' . $a['cc_address2'];
+        // $cc_service1 = $a['cc_service1'];
+        // $cc_service2 = $a['cc_service2'];
+
+        // $aa = "select * from car_company where  cc_no = '$company1' ";
+        // $a = sql_fetch($aa);
+        $cc_license1 = "";
+        $cc_name1 = "";
+        $cc_ceo1 = "";
+        $cc_address1 = "";
+        $cc_service1 = "";
+        $cc_service2 = "";
         // issuer
 
 
         // issued
-        $bb = "select * from shipper where  s_no = '$company2' ";
-        $b = sql_fetch($bb);
-        $cc_license2 = $b['s_license'];
-        $cc_name2 = $b['s_name'];
-        $cc_ceo2 = $b['s_ceo'];
-        $cc_address2 = $b['s_address1'] . ' ' . $b['s_address2'];
+        // $bb = "select * from shipper where  s_no = '$company2' ";
+        // $b = sql_fetch($bb);
+        // $cc_license2 = $b['s_license'];
+        // $cc_name2 = $b['s_name'];
+        // $cc_ceo2 = $b['s_ceo'];
+        // $cc_address2 = $b['s_address1'] . ' ' . $b['s_address2'];
 
-        $s_type = $b['s_type'];
+        // $s_type = $b['s_type'];
+        // $t_type = "차주발행";
+        // $s_no = $company2;
+        // $cc_no = $company1;
+
+        // $s_service1 = $b['s_service1'];
+        // $s_service2 = $b['s_service2'];
+
+        // $bb = "select * from shipper where  s_no = '$company2' ";
+        // $b = sql_fetch($bb);
+        $cc_license2 = "";
+        $cc_name2 = "";
+        $cc_ceo2 = "";
+        $cc_address2 = "";
+
+        $s_type = "";
         $t_type = "차주발행";
-        $s_no = $company2;
-        $cc_no = $company1;
+        $s_no = "";
+        $cc_no = "";
 
-        $s_service1 = $b['s_service1'];
-        $s_service2 = $b['s_service2'];
+        $s_service1 = "";
+        $s_service2 = "";
         // issued
 
-
+        
 
 
         $BaroService_URL = 'https://testws.baroservice.com/TI.asmx?WSDL';    //테스트베드용
@@ -8018,7 +8044,7 @@ class WarehousingController extends Controller
             'trace'        => 'true',
             'encoding'    => 'UTF-8'
         ));
-
+        return $BaroService_TI;
 
         // GetTaxInvoiceStatesEX.php 파일에서도 수정해야 함
         $CERTKEY = '813FD596-7CBB-490A-84D2-31570487790E';                            //인증키
@@ -8102,7 +8128,7 @@ class WarehousingController extends Controller
         //-------------------------------------------
         //공급가액 총액
         //-------------------------------------------
-        $AmountTotal = $total_price - round($total_price * 10 / 110);    // total price without tax
+        $AmountTotal = 200000 - round(200000 * 10 / 110);    // total price without tax
 
         //-------------------------------------------
         //세액합계
@@ -8110,7 +8136,7 @@ class WarehousingController extends Controller
         //$TaxType 이 2 또는 3 으로 셋팅된 경우 0으로 입력
         //-------------------------------------------
 
-        $TaxTotal = round($total_price * 10 / 110);        // total tax
+        $TaxTotal = round(200000 * 10 / 110);        // total tax
 
         //-------------------------------------------
         //합계금액
@@ -8137,7 +8163,7 @@ class WarehousingController extends Controller
         //공급자 정보 - 정발행시 세금계산서 작성자
         //------------------------------------------
         $InvoicerParty = array(
-            'MgtNum'         => $b_no . "_1",
+            'MgtNum'         => 1222222222222222,
             'CorpNum'         => $cc_license1,                //필수입력 - 바로빌 회원 사업자번호 ('-' 제외, 10자리)
             'TaxRegID'         => '',
             'CorpName'         => $cc_name1,                    //필수입력
@@ -8156,7 +8182,7 @@ class WarehousingController extends Controller
         //공급받는자 정보 - 역발행시 세금계산서 작성자
         //------------------------------------------
         $InvoiceeParty = array(
-            'MgtNum'         => $b_no . "_1",
+            'MgtNum'         => 1222222222222222,
             'CorpNum'         => $cc_license2,                //필수입력
             'TaxRegID'         => '',
             'CorpName'         => $cc_name2,                //필수입력
@@ -8175,7 +8201,7 @@ class WarehousingController extends Controller
         //수탁자 정보 - 위수탁 발행시 세금계산서 작성자
         //------------------------------------------
         $BrokerParty = array(
-            'MgtNum'         => $b_no,                //필수입력 - 연동사부여 문서키
+            'MgtNum'         => 1222222222222222,                //필수입력 - 연동사부여 문서키
             'CorpNum'         => '2168142360',                //필수입력 - 바로빌 회원 사업자번호 ('-' 제외, 10자리)
             'TaxRegID'         => '',
             'CorpName'         => '(주)스페이시스원',            //필수입력
@@ -8193,7 +8219,7 @@ class WarehousingController extends Controller
 
 
         // 아래에도 있음, 여기서는 - 없음
-        $t_regtime = b_no_to_tax_day($b_no);
+        //$t_regtime = b_no_to_tax_day($b_no);
 
 
 
@@ -8203,8 +8229,8 @@ class WarehousingController extends Controller
         $TaxInvoiceTradeLineItems = array(
             'TaxInvoiceTradeLineItem'    => array(
                 array(
-                    'PurchaseExpiry' => $t_regtime,            //YYYYMMDD
-                    'Name'            => $b_no,
+                    'PurchaseExpiry' => 20220506,            //YYYYMMDD
+                    'Name'            => 1222222222222222,
                     'Information'    => '',
                     'ChargeableUnit' => '',
                     'UnitPrice'        => '',
@@ -8270,27 +8296,27 @@ class WarehousingController extends Controller
         $t_amount = $AmountTotal;
         $t_tax = $TaxTotal;
         $t_total = $TotalAmount;
-        $t_mgtnum = $b_no . "_1";
-        $text = getErrStr($CERTKEY, $Result);
-
+        $t_mgtnum = 1222222222222222;
+        //$text = getErrStr($CERTKEY, $Result);
+        return $Result;
         if ($Result == 1) {
             $text = '';
         }
 
         if ($Result !== 1) {
 
-            $arr = array('msg' => 'tax_err',   'txt' => $text, 'code' => $sql_tax);
+            $arr = array('msg' => 'tax_err',   'txt' => $text, 'code' => "");
             $jsn = json_encode($arr);
             print_r($jsn);
             exit;
         } else {
 
             // 위에도 있음, 여기서는 - 있음
-            $t_regtime = b_no_to_tax_day2($b_no);
+            //$t_regtime = b_no_to_tax_day2($b_no);
 
 
-            $sql_tax  = " insert into tax(b_no, t_mgtnum, t_startdate, t_type, cc_no, s_no, t_regtime, t_modify, t_taxtxt, t_taxcode, t_status, t_result_sendtime, t_result_regtime, t_result_no, t_amount, t_tax, t_total) values('$b_no', '$t_mgtnum', '$b_start', '$t_type', '$cc_no', '$s_no', '$t_regtime', '', '', 0, '$Result', now(), '', '', '$t_amount', '$t_tax', '$t_total') ";
-            sql_query($sql_tax);
+            $sql_tax  = " insert into tax(b_no, t_mgtnum, t_startdate, t_type, cc_no, s_no, t_regtime, t_modify, t_taxtxt, t_taxcode, t_status, t_result_sendtime, t_result_regtime, t_result_no, t_amount, t_tax, t_total) values('1222222222222222', '$t_mgtnum', '$b_start', '$t_type', '$cc_no', '$s_no', '$t_regtime', '', '', 0, '$Result', now(), '', '', '$t_amount', '$t_tax', '$t_total') ";
+            //sql_query($sql_tax);
         }
     }
 }
