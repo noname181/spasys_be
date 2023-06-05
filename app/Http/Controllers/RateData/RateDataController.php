@@ -12467,7 +12467,7 @@ class RateDataController extends Controller
 
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     // 'is_expect_payment' => $request->ETC5 != 'virtual_account' ? 'n' : 'y',
-                    'rgd_status6' => $request->ETC5 != 'virtual_account' ? 'paid' : null,
+                    'rgd_status6' => $request->ETC5 != 'virtual_account' ? 'paid' : 'virtual_account',
                     'rgd_paid_date' => $request->ETC5 != 'virtual_account' ? Carbon::now() : null,
                 ]);
 
@@ -12552,7 +12552,7 @@ class RateDataController extends Controller
 
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     // 'is_expect_payment' => $request->ETC5 != 'virtual_account' ? 'n' : 'y',
-                    'rgd_status6' => $request->ETC5 != 'virtual_account' ? 'paid' : null,
+                    'rgd_status6' => $request->ETC5 != 'virtual_account' ? 'paid' : 'virtual_account',
                     'rgd_paid_date' => $request->ETC5 != 'virtual_account' ? Carbon::now() : null,
                 ]);
 
