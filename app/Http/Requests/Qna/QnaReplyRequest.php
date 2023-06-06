@@ -31,8 +31,7 @@ class QnaReplyRequest extends BaseFormRequest
                 'max:255',
             ],
             'mb_no_target' => [
-                'required',
-                'max:255',
+                '',
             ],
             'qna_title' => [
                 'required',
