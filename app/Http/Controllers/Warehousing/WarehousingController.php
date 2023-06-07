@@ -6217,7 +6217,7 @@ class WarehousingController extends Controller
                     }
                     $ids[] = $id;
 
-                    $this->tax_invoice_api($rgd, $user, $tid);
+                    //$this->tax_invoice_api($rgd, $user, $tid);
                     
                 }
 
@@ -6483,7 +6483,7 @@ class WarehousingController extends Controller
                         }
                     }
 
-                    $this->tax_invoice_api($rgd, $user, null);
+                    //$this->tax_invoice_api($rgd, $user, null);
                 }
                 DB::commit();
                 return response()->json([
