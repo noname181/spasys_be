@@ -12,6 +12,7 @@ use App\Models\AdjustmentGroup;
 use App\Models\CoAddress;
 use App\Models\ForwarderInfo;
 use App\Models\CustomsInfo;
+use App\Models\RateData;
 use App\Models\RateMetaData;
 use App\Models\Contract;
 use App\Utils\Messages;
@@ -669,7 +670,7 @@ class CompanyController extends Controller
                 $companies->getCollection()->map(function ($item) {
                     $service_names = explode(" ", $item->co_service);
                     $co_no = $item->co_no;
-
+                 
                     $settlement_cycle = [];
 
                     foreach ($service_names as $service_name) {
@@ -685,7 +686,7 @@ class CompanyController extends Controller
                         }
                     }
                     $settlement_cycle = implode("/", $settlement_cycle);
-                         
+                        
                     $rmd = RateMetaData::with(['rate_meta', 'member:mb_no,co_no,mb_name', 'company'])
                     ->whereNotNull('co_no')
                     ->whereNull('rmd_parent_no')
@@ -694,6 +695,28 @@ class CompanyController extends Controller
                     ->orderBy('rmd_no', 'DESC')->get();
                     $item->settlement_cycle = $settlement_cycle;
                     $item->check_rate = $rmd;
+
+                    $check_block = 'n';
+                    foreach(explode(" ", $item->co_service) as $row){
+                     
+                       $rate_data = RateData::where('rd_cate_meta1', $row);
+                       $rmd_2 = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->orderBy('rmd_no', 'DESC')->first();
+                       $rate_data = $rate_data->where('rd_co_no', $co_no);
+                       
+                       if (isset($rmd_2->rmd_no)) {
+                        $rate_data = $rate_data->where('rmd_no', $rmd_2->rmd_no)->get();
+                        if(count($rate_data) > 0){
+                            
+                        } else {
+                            $check_block = 'y';
+                        }
+                       }else {
+                          $check_block = 'y';
+                       }
+                    
+                    }
+                    $item->check_block = $check_block;
+
                     return $item;
                 })
             );
