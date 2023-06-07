@@ -32,8 +32,7 @@ class QnaRegisterRequest extends BaseFormRequest
             //     'exists:member,mb_no'
             // ],
             'mb_no_target' => [
-                'required',
-                'max:255',
+                '',
             ],
             'qna_title' => [
                 'required',
