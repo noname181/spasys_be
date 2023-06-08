@@ -213,10 +213,64 @@ class RateMetaDataController extends Controller
                 $rmd = ['no_services'=>'123'];
             }
             }
-
+           
+           
 
 
             return response()->json($rmd);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+    public function checkCO2(Request $request)
+    {
+
+        try {
+            $user = Auth::user();
+            // If per_page is null set default data = 15
+
+            // If page is null set default data = 1
+            DB::enableQueryLog();
+            $rmd = RateMetaData::with(['rate_meta', 'member:mb_no,co_no,mb_name', 'company'])
+            ->whereNotNull('co_no')
+            ->whereNull('rmd_parent_no')
+            ->whereNull('set_type')
+            ->where('co_no',$request->co_no)
+            ->orderBy('rmd_no', 'DESC');
+            if($request->co_service){
+                $company_check = Company::where('co_no',$request->co_no)->first();
+            }
+            $rmd = $rmd->get();
+            if($request->co_service){
+            if(count($rmd) == 0 && ($company_check->co_service == '' || $company_check->co_service == null)){
+                $rmd = ['no_services'=>'123'];
+            }
+            }
+            $check = Company::where('co_no',$request->co_no)->first();
+            $check_block = 'n';
+            foreach(explode(" ", $check->co_service) as $row){
+                     
+                $rate_data = RateData::where('rd_cate_meta1', $row);
+                $rmd_2 = RateMetaData::where('co_no', $request->co_no)->whereNull('set_type')->orderBy('rmd_no', 'DESC')->first();
+                $rate_data = $rate_data->where('rd_co_no', $request->co_no);
+                
+                if (isset($rmd_2->rmd_no)) {
+                 $rate_data = $rate_data->where('rmd_no', $rmd_2->rmd_no)->get();
+                 if(count($rate_data) > 0){
+                     
+                 } else {
+                     $check_block = 'y';
+                 }
+                }else {
+                   $check_block = 'y';
+                }
+             
+             }
+           
+
+
+            return response()->json(['rmd'=>$rmd,'check_block'=>$check_block]);
         } catch (\Exception $e) {
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0018], 500);
