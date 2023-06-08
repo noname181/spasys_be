@@ -4951,7 +4951,7 @@ class WarehousingController extends Controller
                         ->where('w_category_name', '=', '수입풀필먼트')->where('w_type', '=', 'IW');
                 });
 
-            $warehousing->whereNull('rgd_status4')->whereNull('rgd_status5');
+            $warehousing->whereNull('rgd_status4')->whereNull('rgd_status5')->whereNotNull('rgd_monthbill_start')->whereNotNull('rgd_monthbill_end');
 
             if (isset($validated['from_date'])) {
                 $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
