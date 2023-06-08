@@ -64,7 +64,9 @@ class MenuController extends Controller
 
 
             if (isset($validated['service_no']) && $validated['service_no'] != '1') {
-
+                if($validated['service_no'] == '99999999'){
+                    $menu->where('service_no_array','=','2 3 4')->orwhere('service_no_array','=','1 2 3 4');
+                } else {
                 $collection = $menu->get();
 
                 $filtered = $collection->filter(function($item) use($validated){
@@ -75,9 +77,10 @@ class MenuController extends Controller
                     return in_array($validated['service_no'], $service_no_array);
                        
                 });
-
                 $data = $this->paginate($filtered, $validated['per_page'], $validated['page']);
                 return response()->json($data);
+                }
+             
             
             }
 
