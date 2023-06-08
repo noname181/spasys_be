@@ -44,7 +44,7 @@ class MenuController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $menu = Menu::with(['service','manual','menu_parent'])->orderBy('main_menu_level', 'ASC')->orderBy('sub_menu_level', 'ASC');
+            $menu = Menu::with(['service','manual','menu_parent'])->where('menu_url','!=','popup')->where('menu_depth','!=','상위')->orderBy('main_menu_level', 'ASC')->orderBy('sub_menu_level', 'ASC');
 
 
 
@@ -64,7 +64,9 @@ class MenuController extends Controller
 
 
             if (isset($validated['service_no']) && $validated['service_no'] != '1') {
-
+                if($validated['service_no'] == '99999999'){
+                    $menu->where('service_no_array','=','2 3 4')->orwhere('service_no_array','=','1 2 3 4');
+                } else {
                 $collection = $menu->get();
 
                 $filtered = $collection->filter(function($item) use($validated){
@@ -75,9 +77,10 @@ class MenuController extends Controller
                     return in_array($validated['service_no'], $service_no_array);
                        
                 });
-
                 $data = $this->paginate($filtered, $validated['per_page'], $validated['page']);
                 return response()->json($data);
+                }
+             
             
             }
 
