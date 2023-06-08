@@ -6132,6 +6132,7 @@ class WarehousingController extends Controller
                
                 $i = 0;
                 foreach ($request->tid_list as $tid) {
+                    //return $this->tax_invoice_api($rgd, $user, $tid);
                     if (isset($tid['tid_no'])) {
                         // if(false){
                         $tid_ = TaxInvoiceDivide::where('tid_no', $tid['tid_no']);
@@ -6217,7 +6218,7 @@ class WarehousingController extends Controller
                     }
                     $ids[] = $id;
 
-                    //$this->tax_invoice_api($rgd, $user, $tid);
+                    
                     
                 }
 
@@ -8140,7 +8141,7 @@ class WarehousingController extends Controller
         */
 
         $IssueDirection = 1;                    //1-정발행, 2-역발행(위수탁 세금계산서는 정발행만 허용)
-        $TaxInvoiceType = 4;                    //1-세금계산서, 2-계산서, 4-위수탁세금계산서, 5-위수탁계산서
+        $TaxInvoiceType = 1;                    //1-세금계산서, 2-계산서, 4-위수탁세금계산서, 5-위수탁계산서
 
         //-------------------------------------------
         //과세형태
@@ -8211,7 +8212,7 @@ class WarehousingController extends Controller
             'Addr'             => $cc_address1,
             'BizType'         => $cc_service1,
             'BizClass'         => $cc_service2,
-            'ContactID'     => '',                //필수입력 - 담당자 바로빌 아이디
+            'ContactID'     => 'spasysone',                //필수입력 - 담당자 바로빌 아이디
             'ContactName'     => $cc_ceo1,                //필수입력
             'TEL'             => '',
             'HP'             => '',
@@ -8269,7 +8270,7 @@ class WarehousingController extends Controller
         $TaxInvoiceTradeLineItems = array(
             'TaxInvoiceTradeLineItem'    => array(
                 array(
-                    'PurchaseExpiry' => 20230606,            //YYYYMMDD
+                    'PurchaseExpiry' => 20230608,            //YYYYMMDD
                     'Name'            => $rgd->rgd_settlement_number,
                     'Information'    => '',
                     'ChargeableUnit' => '',
@@ -8309,7 +8310,7 @@ class WarehousingController extends Controller
             'Remark3'                    => $Remark3,
             'InvoicerParty'                => $InvoicerParty,
             'InvoiceeParty'                => $InvoiceeParty,
-            'BrokerParty'                => $BrokerParty,
+            'BrokerParty'                => $user->mb_type == 'spasys' ? "" : $BrokerParty,
             'TaxInvoiceTradeLineItems'    => $TaxInvoiceTradeLineItems
         );
 
