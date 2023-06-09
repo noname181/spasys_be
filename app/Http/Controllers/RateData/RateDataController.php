@@ -87,6 +87,7 @@ class RateDataController extends Controller
                         'rmd_mail_detail3' => isset($validated['rmd_mail_detail3']) ? $validated['rmd_mail_detail3'] : '',
                     ]
                 );
+                $rmd_no_new = $rmd_no;
             } else if (isset($validated['rmd_no']) && isset($validated['rm_no'])) {
                 $rmd = RateMetaData::where('rmd_no', $validated['rmd_no'])->first();
                 $index = RateMetaData::where('rm_no', $validated['rm_no'])->get()->count() + 1;
@@ -289,7 +290,7 @@ class RateDataController extends Controller
                 );
             }
 
-            foreach ($request['rate_data'] as $val) {
+            foreach ($request['rate_data'] as $index => $val) {
                 Log::error($val);
                 $rd_no = RateData::updateOrCreate(
                     [
@@ -300,6 +301,7 @@ class RateDataController extends Controller
                         'w_no' => isset($w_no) ? $w_no : null,
                         'rd_cate_meta1' => $val['rd_cate_meta1'],
                         'rd_cate_meta2' => $val['rd_cate_meta2'],
+                        'rd_index' => $index,
                         'rd_cate1' => isset($val['rd_cate1']) ? $val['rd_cate1'] : '',
                         'rd_cate2' => isset($val['rd_cate2']) ? $val['rd_cate2'] : '',
                         'rd_cate3' => isset($val['rd_cate3']) ? $val['rd_cate3'] : '',
