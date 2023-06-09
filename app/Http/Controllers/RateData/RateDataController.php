@@ -221,12 +221,19 @@ class RateDataController extends Controller
                 );
             }
 
-            $index = 0;
             $check_duplicate_cate = 0;
             $check_duplicate_total = 0;
 
-            foreach ($validated['rate_data'] as $val) {
+            foreach ($validated['rate_data'] as $index => $val) {
                 Log::error($val);
+
+                if($index != 0){
+                    if($val['rd_cate1'] != $validated['rate_data'][$index-1]['rd_cate1']){
+                        $check_duplicate_cate = 0;
+                        $check_duplicate_total = 0;
+                    }
+                }
+
                 if($val['rd_cate2'] == 'bonded345' || $val['rd_cate2'] == 'bonded1' || $val['rd_cate2'] == 'bonded2'){
                     $check_duplicate_cate += 1;
                 }
@@ -258,7 +265,7 @@ class RateDataController extends Controller
                             'rd_data8' => isset($val['rd_data8']) ? $val['rd_data8'] : '',
                         ],
                     );
-                    $index++;
+
                 }else if($val['rd_cate2'] == '소계' && $check_duplicate_total <= 1){
                     $rd_no = RateData::updateOrCreate(
                         [
@@ -283,7 +290,7 @@ class RateDataController extends Controller
                             'rd_data8' => isset($val['rd_data8']) ? $val['rd_data8'] : '',
                         ],
                     );
-                    $index++;
+       
                 }else if($val['rd_cate2'] != '소계' && $val['rd_cate2'] != 'bonded345' && $val['rd_cate2'] != 'bonded1' && $val['rd_cate2'] != 'bonded2'){
                     $rd_no = RateData::updateOrCreate(
                         [
@@ -308,7 +315,7 @@ class RateDataController extends Controller
                             'rd_data8' => isset($val['rd_data8']) ? $val['rd_data8'] : '',
                         ],
                     );
-                    $index++;
+
                 }
                 
             }
@@ -358,6 +365,13 @@ class RateDataController extends Controller
 
             foreach ($request['rate_data'] as $index => $val) {
                 Log::error($val);
+                if($index != 0){
+                    if($val['rd_cate1'] != $validated['rate_data'][$index-1]['rd_cate1']){
+                        $check_duplicate_cate = 0;
+                        $check_duplicate_total = 0;
+                    }
+                }
+               
 
                 if($val['rd_cate2'] == 'bonded345' || $val['rd_cate2'] == 'bonded1' || $val['rd_cate2'] == 'bonded2'){
                     $check_duplicate_cate += 1;
