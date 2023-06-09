@@ -354,15 +354,15 @@ class MemberController extends Controller
                 'co_type' => Member::SPASYS,
                 'co_name' => $validated['mb_name'],
                 'co_etc' => $validated['mb_note'],
-                'co_operating_time' => $validated['co_operating_time'],
-                'co_lunch_break' => $validated['co_lunch_break'],
-                'co_email' => $validated['co_email'],
-                'co_about_us' => $validated['co_about_us'],
+                'co_operating_time' => isset($validated['co_operating_time']) ? $validated['co_operating_time'] : '',
+                'co_lunch_break' => isset($validated['co_lunch_break']) ? $validated['co_lunch_break'] : '',
+                'co_email' => isset($validated['co_email']) ? $validated['co_email'] : '',
+                'co_about_us' => isset($validated['co_about_us']) ? $validated['co_about_us'] : '',
                 'co_policy' => isset($validated['co_policy']) ? $validated['co_policy'] : '',
-                'co_help_center' => $validated['co_help_center'],
-                'warehouse_code' => $validated['warehouse_code'],
-                'co_address' => $validated['co_address'],
-                'co_address_detail' => $validated['co_address_detail'],
+                'co_help_center' => isset($validated['co_help_center']) ? $validated['co_help_center'] : '',
+                'warehouse_code' => isset($validated['warehouse_code']) ? $validated['warehouse_code'] : '',
+                'co_address' => isset($validated['co_address']) ? $validated['co_address'] : '',
+                'co_address_detail' => isset($validated['co_address_detail']) ? $validated['co_address_detail'] : '',
             ]);
 
             $validated['co_no'] = $com_no;
@@ -371,16 +371,16 @@ class MemberController extends Controller
                 'co_no' =>  $validated['co_no'],
                 'mb_name' => $validated['mb_name'],
                 'mb_pw' => $validated['mb_pw'],
-                'mb_tel' => $validated['mb_tel'],
+                'mb_tel' => isset($validated['mb_tel']) ? $validated['mb_tel'] : '',
                 'mb_id' => $validated['mb_id'],
                 'mb_note' => $validated['mb_note'],
-                'mb_email' => $validated['co_email'],
+                'mb_email' => isset($validated['co_email']) ? $validated['co_email'] : '',
                 'mb_type' => $validated['mb_type'],
                 'mb_parent' => $validated['mb_parent'],
                 'role_no' => $validated['role_no'],
                 'mb_language' => $validated['mb_language'],
                 'mb_token' => $validated['mb_token'],
-                'warehouse_code' => $validated['warehouse_code'],
+                'warehouse_code' => isset($validated['warehouse_code']) ? $validated['warehouse_code'] : '',
                 'mb_service_no_array' => '공통 보세화물 수입풀필먼트 유통가공'
             ]);
 
@@ -392,7 +392,7 @@ class MemberController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error($e);
-
+            // return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
