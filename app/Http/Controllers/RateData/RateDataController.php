@@ -87,6 +87,7 @@ class RateDataController extends Controller
                         'rmd_mail_detail3' => isset($validated['rmd_mail_detail3']) ? $validated['rmd_mail_detail3'] : '',
                     ]
                 );
+                $rmd_no_new = $rmd_no;
             } else if (isset($validated['rmd_no']) && isset($validated['rm_no'])) {
                 $rmd = RateMetaData::where('rmd_no', $validated['rmd_no'])->first();
                 $index = RateMetaData::where('rm_no', $validated['rm_no'])->get()->count() + 1;
