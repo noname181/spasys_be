@@ -6132,7 +6132,7 @@ class WarehousingController extends Controller
                
                 $i = 0;
                 foreach ($request->tid_list as $tid) {
-                    //return $this->tax_invoice_api($rgd, $user, $tid);
+                   
                     if (isset($tid['tid_no'])) {
                         // if(false){
                         $tid_ = TaxInvoiceDivide::where('tid_no', $tid['tid_no']);
@@ -6219,7 +6219,7 @@ class WarehousingController extends Controller
                     $ids[] = $id;
 
                     
-                    
+                    $this->tax_invoice_api($rgd, $user, $tid);
                 }
 
                 
@@ -7992,24 +7992,11 @@ class WarehousingController extends Controller
     {
         
         // issuer
-        // $aa = "select * from car_company where  cc_no = '$company1' ";
-        // $a = sql_fetch($aa);
-        // $cc_license1 = $a['cc_license'];
-        // $cc_name1 = $a['cc_name'];
-        // $cc_ceo1 = $a['cc_ceo'];
-        // $cc_address1 = $a['cc_address1'] . ' ' . $a['cc_address2'];
-        // $cc_service1 = $a['cc_service1'];
-        // $cc_service2 = $a['cc_service2'];
-
-        // $aa = "select * from car_company where  cc_no = '$company1' ";
-        // $a = sql_fetch($aa);
 
         $issuer_user = Member::with('company')->where('mb_no', $rgd->mb_no)->first();
 
         $issuer_company = Company::where('co_no', $issuer_user->co_no)->first();
-
-
-        
+ 
         $cc_no = $issuer_user->co_no;
         
         if($rgd->service_korean_name == '수입풀필먼트' || $user->mb_type == 'shop'){
@@ -8049,40 +8036,23 @@ class WarehousingController extends Controller
         }
         $cc_name1 = "(주)스페이시스원";//$issuer_company->co_name;
         $cc_ceo1 = $issuer_company->co_owner ? $issuer_company->co_owner : '모상희';
-        $cc_address1 = "인천 중구 공항동로296번길 98-30 (운서동) 3층";//$issuer_company->co_address_detail;
+        $cc_address1 = "인천 중구 공항동로296번길 98-30 (운서동) 3층";//$issuer_company->co_address;
         $cc_service1 = "창고업";//$issuer_company->co_service;
         $cc_service2 = "서비스 운수 및 창고업";
         // issuer
 
 
         // issued
-        // $bb = "select * from shipper where  s_no = '$company2' ";
-        // $b = sql_fetch($bb);
-        // $cc_license2 = $b['s_license'];
-        // $cc_name2 = $b['s_name'];
-        // $cc_ceo2 = $b['s_ceo'];
-        // $cc_address2 = $b['s_address1'] . ' ' . $b['s_address2'];
-
-        // $s_type = $b['s_type'];
-        // $t_type = "차주발행";
-        // $s_no = $company2;
-        // $cc_no = $company1;
-
-        // $s_service1 = $b['s_service1'];
-        // $s_service2 = $b['s_service2'];
-
-        // $bb = "select * from shipper where  s_no = '$company2' ";
-        // $b = sql_fetch($bb);
-        $cc_license2 = $receiver_company->co_license;
-        $cc_name2 = $receiver_company->co_name;
-        $cc_ceo2 = $receiver_company->co_owner;
-        $cc_address2 = $receiver_company->co_address_detail;
+        $cc_license2 = "1212478494";//$receiver_company->co_license;
+        $cc_name2 = "청림관세사(가맹점)";//$receiver_company->co_name;
+        $cc_ceo2 = "남유호";//$receiver_company->co_owner;
+        $cc_address2 = "인천 중구 영종대로 118";//$receiver_company->co_address;
 
         $s_type = "";
         $t_type = "차주발행";
         
 
-        $s_service1 = $receiver_company->co_service;
+        $s_service1 = "창고업";//$receiver_company->co_service;
         $s_service2 = "";
         // issued
 
@@ -8204,7 +8174,7 @@ class WarehousingController extends Controller
         //공급자 정보 - 정발행시 세금계산서 작성자
         //------------------------------------------
         $InvoicerParty = array(
-            'MgtNum'         => $rgd->rgd_settlement_number,
+            'MgtNum'         => $rgd->rgd_settlement_number."_5",
             'CorpNum'         => $cc_license1,                //필수입력 - 바로빌 회원 사업자번호 ('-' 제외, 10자리)
             'TaxRegID'         => '',
             'CorpName'         => $cc_name1,                    //필수입력
@@ -8223,7 +8193,7 @@ class WarehousingController extends Controller
         //공급받는자 정보 - 역발행시 세금계산서 작성자
         //------------------------------------------
         $InvoiceeParty = array(
-            'MgtNum'         => $rgd->rgd_settlement_number,
+            'MgtNum'         => $rgd->rgd_settlement_number."_5",
             'CorpNum'         => $cc_license2,                //필수입력
             'TaxRegID'         => '',
             'CorpName'         => $cc_name2,                //필수입력
@@ -8241,28 +8211,47 @@ class WarehousingController extends Controller
         //-------------------------------------------
         //수탁자 정보 - 위수탁 발행시 세금계산서 작성자
         //------------------------------------------
-        $BrokerParty = array(
-            'MgtNum'         => $rgd->rgd_settlement_number,                //필수입력 - 연동사부여 문서키
-            'CorpNum'         => '2168142360',                //필수입력 - 바로빌 회원 사업자번호 ('-' 제외, 10자리)
-            'TaxRegID'         => '',
-            'CorpName'         => '(주)스페이시스원',            //필수입력
-            'CEOName'         => '모상희',                //필수입력
-            'Addr'             => '인천광역시 중구 공항동로296번길 98-30, 3층(운서동, 엘엑스판토스 인천물류센터)',
-            'BizType'         => '서비스',
-            'BizClass'         => '창고업',
-            'ContactID'     => 'spasysone',                //필수입력 - 담당자 바로빌 아이디
-            'ContactName'     => '모상희',                //필수입력
-            'TEL'             => '07046597289',
-            'HP'             => '',
-            'Email'         => 'ly.kim@spasysone.com'                //필수입력
-        );
+        
 
+        if($user->mb_type == 'spasys'){
+            $BrokerParty = array(
+                'MgtNum' 		=> '',
+                'CorpNum' 		=> '',
+                'TaxRegID' 		=> '',
+                'CorpName' 		=> '',
+                'CEOName' 		=> '',
+                'Addr' 			=> '',
+                'BizType' 		=> '',
+                'BizClass' 		=> '',
+                'ContactID' 	=> '',
+                'ContactName' 	=> '',
+                'TEL' 			=> '',
+                'HP' 			=> '',
+                'Email' 		=> ''
+            );
+        }else{
+            $BrokerParty = array(
+                'MgtNum'         => $rgd->rgd_settlement_number,                //필수입력 - 연동사부여 문서키
+                'CorpNum'         => '2168142360',                //필수입력 - 바로빌 회원 사업자번호 ('-' 제외, 10자리)
+                'TaxRegID'         => '',
+                'CorpName'         => '(주)스페이시스원',            //필수입력
+                'CEOName'         => '모상희',                //필수입력
+                'Addr'             => '인천광역시 중구 공항동로296번길 98-30, 3층(운서동, 엘엑스판토스 인천물류센터)',
+                'BizType'         => '서비스',
+                'BizClass'         => '창고업',
+                'ContactID'     => 'spasysone',                //필수입력 - 담당자 바로빌 아이디
+                'ContactName'     => '모상희',                //필수입력
+                'TEL'             => '07046597289',
+                'HP'             => '',
+                'Email'         => 'ly.kim@spasysone.com'                //필수입력
+            );
+        }
+        
 
+        
 
         // 아래에도 있음, 여기서는 - 없음
         //$t_regtime = b_no_to_tax_day($b_no);
-
-
 
         //-------------------------------------------
         //품목
@@ -8270,7 +8259,17 @@ class WarehousingController extends Controller
         $TaxInvoiceTradeLineItems = array(
             'TaxInvoiceTradeLineItem'    => array(
                 array(
-                    'PurchaseExpiry' => 20230608,            //YYYYMMDD
+                    'PurchaseExpiry' => "",            //YYYYMMDD
+                    'Name'            => $rgd->rgd_settlement_number,
+                    'Information'    => '',
+                    'ChargeableUnit' => '',
+                    'UnitPrice'        => '',
+                    'Amount'        => $AmountTotal,
+                    'Tax'            => $TaxTotal,
+                    'Description'    => ''
+                ),
+                array(
+                    'PurchaseExpiry' => "",            //YYYYMMDD
                     'Name'            => $rgd->rgd_settlement_number,
                     'Information'    => '',
                     'ChargeableUnit' => '',
@@ -8310,7 +8309,7 @@ class WarehousingController extends Controller
             'Remark3'                    => $Remark3,
             'InvoicerParty'                => $InvoicerParty,
             'InvoiceeParty'                => $InvoiceeParty,
-            'BrokerParty'                => $user->mb_type == 'spasys' ? "" : $BrokerParty,
+            'BrokerParty'                => $BrokerParty,
             'TaxInvoiceTradeLineItems'    => $TaxInvoiceTradeLineItems
         );
 
@@ -8334,21 +8333,24 @@ class WarehousingController extends Controller
         //     'ForceIssue' => $ForceIssue,
         //     'MailTitle'    => $MailTitle,
         // );
-        $Result = $BaroService_TI->RegistAndIssueBrokerTaxInvoice(array(
+        $Result = $BaroService_TI->RegistAndIssueTaxInvoice(array(
             'CERTKEY'    => $CERTKEY,
             'CorpNum'    => '2168142360',
             'Invoice'    => $TaxInvoice,
             'SendSMS'    => $SendSMS,
             'ForceIssue' => $ForceIssue,
             'MailTitle'    => $MailTitle,
-        ))->RegistAndIssueBrokerTaxInvoiceResult;
-        // return $Result;
+        ))->RegistAndIssueTaxInvoiceResult;
+
+        //return $Result;
         $t_amount = $AmountTotal;
         $t_tax = $TaxTotal;
         $t_total = $TotalAmount;
         $t_mgtnum = $rgd->rgd_settlement_number;
         $text = $this->getErrStr($BaroService_TI, $CERTKEY, $Result);
-        return $text;
+
+        //return $text;
+
         if ($Result == 1) {
             $text = '';
         }
@@ -8384,7 +8386,7 @@ class WarehousingController extends Controller
                 't_taxcode' => '0',
                 't_status' => $Result,
                 't_result_sendtime' => Carbon::now()->format('Y-m-d H:i:s'),
-                't_result_regtime' => '',
+                't_result_regtime' => Carbon::now()->format('Y-m-d H:i:s'),
                 't_result_no' => '',
                 't_amount' => $t_amount,
                 't_tax' => $t_tax,
