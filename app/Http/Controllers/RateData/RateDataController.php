@@ -289,7 +289,7 @@ class RateDataController extends Controller
                 );
             }
 
-            foreach ($request['rate_data'] as $val) {
+            foreach ($request['rate_data'] as $index => $val) {
                 Log::error($val);
                 $rd_no = RateData::updateOrCreate(
                     [
@@ -300,6 +300,7 @@ class RateDataController extends Controller
                         'w_no' => isset($w_no) ? $w_no : null,
                         'rd_cate_meta1' => $val['rd_cate_meta1'],
                         'rd_cate_meta2' => $val['rd_cate_meta2'],
+                        'rd_index' => $index,
                         'rd_cate1' => isset($val['rd_cate1']) ? $val['rd_cate1'] : '',
                         'rd_cate2' => isset($val['rd_cate2']) ? $val['rd_cate2'] : '',
                         'rd_cate3' => isset($val['rd_cate3']) ? $val['rd_cate3'] : '',
