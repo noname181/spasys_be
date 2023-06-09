@@ -47,19 +47,13 @@ class CreateAccountRequest extends BaseFormRequest
                 'max:255',
             ],
             'mb_tel' => [
-                'required',
-                'string',
-                'max:255',
+                '',
             ],
             'co_operating_time' => [
-                'required',
-                'string',
-                'max:255',
+                '',
             ],
             'co_lunch_break' => [
-                'required',
-                'string',
-                'max:255',
+                '',
             ],
             'co_email' => [
                 '',

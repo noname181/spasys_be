@@ -5838,7 +5838,7 @@ class WarehousingController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
             if ($user->mb_type == 'shop') {
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
+                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'warehousing', 'rate_data_general', 't_export', 't_import', 'tax'])->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('company.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     })->whereHas('company.contract', function ($q) use ($user) {
@@ -5846,7 +5846,7 @@ class WarehousingController extends Controller
                     });
                 })->orderBy('rgd_tax_invoice_date', 'DESC')->orderBy('rgd_no', 'DESC');
             } else if ($user->mb_type == 'shipper') {
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
+                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'warehousing', 'rate_data_general', 't_export', 't_import', 'tax'])->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('company', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     })->whereHas('company.contract', function ($q) use ($user) {
@@ -5854,7 +5854,7 @@ class WarehousingController extends Controller
                     });
                 })->orderBy('rgd_tax_invoice_date', 'DESC')->orderBy('rgd_no', 'DESC');
             } else if ($user->mb_type == 'spasys') {
-                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
+                $warehousing = ReceivingGoodsDelivery::with(['mb_no', 'warehousing', 'rate_data_general', 't_export', 't_import', 'tax'])->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('company.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     })->orWhereHas('company.co_parent', function ($q) use ($user) {
@@ -6955,18 +6955,25 @@ class WarehousingController extends Controller
             $amount = $warehousing->orWhereIn('w_no', $w_no_in)->orderBy('w_no', 'DESC')->sum('w_amount');
 
             if ($user->mb_type == 'shop') {
-                $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->whereNotNull('trans_no')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
+                $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->withSum(['schedule_shipment_info' => function($query) {
+                    $query->where('order_cs', 0);
+            }], 'qty')->whereNotNull('trans_no')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 })->orderBy('ss_no', 'DESC');
             } else if ($user->mb_type == 'shipper') {
-                $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->whereNotNull('trans_no')->whereHas('ContractWms.company', function ($q) use ($user) {
+                $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->withSum(['schedule_shipment_info' => function($query) {
+                    $query->where('order_cs', 0);
+            }], 'qty')->whereNotNull('trans_no')->whereHas('ContractWms.company', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 })->orderBy('ss_no', 'DESC');
             } else if ($user->mb_type == 'spasys') {
-                $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->whereNotNull('trans_no')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
+                $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->withSum(['schedule_shipment_info' => function($query) {
+                    $query->where('order_cs', 0);
+            }], 'qty')->whereNotNull('trans_no')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
                 })->orderBy('ss_no', 'DESC');
             }
+
 
             if (isset($request->from_date)) {
 
@@ -6977,7 +6984,7 @@ class WarehousingController extends Controller
                 $schedule_shipment->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($request->to_date)));
             }
 
-            $amount_export = $schedule_shipment->sum('qty');
+            $amount_export = $schedule_shipment->get()->sum('schedule_shipment_info_sum_qty');
             // return $warehousing_list[0]['w_schedule_number'];
             if (count($warehousing->get()) > 0) {
                 $first_name_item = $warehousing->get()[0]['warehousing_item'][0]['item'] ? $warehousing->get()[0]['warehousing_item'][0]['item']['item_name'] : null;

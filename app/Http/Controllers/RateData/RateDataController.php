@@ -87,6 +87,7 @@ class RateDataController extends Controller
                         'rmd_mail_detail3' => isset($validated['rmd_mail_detail3']) ? $validated['rmd_mail_detail3'] : '',
                     ]
                 );
+                $rmd_no_new = $rmd_no;
             } else if (isset($validated['rmd_no']) && isset($validated['rm_no'])) {
                 $rmd = RateMetaData::where('rmd_no', $validated['rmd_no'])->first();
                 $index = RateMetaData::where('rm_no', $validated['rm_no'])->get()->count() + 1;
@@ -220,33 +221,103 @@ class RateDataController extends Controller
                 );
             }
 
-            $index = 0;
-            foreach ($validated['rate_data'] as $val) {
+            $check_duplicate_cate = 0;
+            $check_duplicate_total = 0;
+
+            foreach ($validated['rate_data'] as $index => $val) {
                 Log::error($val);
-                $rd_no = RateData::updateOrCreate(
-                    [
-                        'rd_no' => isset($is_new->rmd_no) ? (isset($val['rd_no']) ? $val['rd_no'] : null) : null,
-                        'rmd_no' => isset($rmd) ? $rmd->rmd_no : null,
-                    ],
-                    [
-                        'w_no' => isset($w_no) ? $w_no : null,
-                        'rd_cate_meta1' => $val['rd_cate_meta1'],
-                        'rd_cate_meta2' => $val['rd_cate_meta2'],
-                        'rd_index' => $index,
-                        'rd_cate1' => isset($val['rd_cate1']) ? $val['rd_cate1'] : (isset($val['rd_cate2']) ? $val['rd_cate2'] : ''),
-                        'rd_cate2' => isset($val['rd_cate2']) ? $val['rd_cate2'] : '',
-                        'rd_cate3' => isset($val['rd_cate3']) ? $val['rd_cate3'] : '',
-                        'rd_data1' => isset($val['rd_data1']) ? $val['rd_data1'] : '',
-                        'rd_data2' => isset($val['rd_data2']) ? $val['rd_data2'] : '',
-                        'rd_data3' => isset($val['rd_data3']) ? $val['rd_data3'] : '',
-                        'rd_data4' => isset($val['rd_data4']) ? $val['rd_data4'] : '',
-                        'rd_data5' => isset($val['rd_data5']) ? $val['rd_data5'] : '',
-                        'rd_data6' => isset($val['rd_data6']) ? $val['rd_data6'] : '',
-                        'rd_data7' => isset($val['rd_data7']) ? $val['rd_data7'] : '',
-                        'rd_data8' => isset($val['rd_data8']) ? $val['rd_data8'] : '',
-                    ],
-                );
-                $index++;
+
+                if($index != 0){
+                    if($val['rd_cate1'] != $validated['rate_data'][$index-1]['rd_cate1']){
+                        $check_duplicate_cate = 0;
+                        $check_duplicate_total = 0;
+                    }
+                }
+
+                if($val['rd_cate2'] == 'bonded345' || $val['rd_cate2'] == 'bonded1' || $val['rd_cate2'] == 'bonded2'){
+                    $check_duplicate_cate += 1;
+                }
+                if($val['rd_cate2'] == '소계'){
+                    $check_duplicate_total += 1;
+                }
+                
+                if(($val['rd_cate2'] == 'bonded345' || $val['rd_cate2'] == 'bonded1' || $val['rd_cate2'] == 'bonded2') && $check_duplicate_cate <= 1){
+                    $rd_no = RateData::updateOrCreate(
+                        [
+                            'rd_no' => isset($is_new->rmd_no) ? (isset($val['rd_no']) ? $val['rd_no'] : null) : null,
+                            'rmd_no' => isset($rmd) ? $rmd->rmd_no : null,
+                        ],
+                        [
+                            'w_no' => isset($w_no) ? $w_no : null,
+                            'rd_cate_meta1' => $val['rd_cate_meta1'],
+                            'rd_cate_meta2' => $val['rd_cate_meta2'],
+                            'rd_index' => $index,
+                            'rd_cate1' => isset($val['rd_cate1']) ? $val['rd_cate1'] : (isset($val['rd_cate2']) ? $val['rd_cate2'] : ''),
+                            'rd_cate2' => isset($val['rd_cate2']) ? $val['rd_cate2'] : '',
+                            'rd_cate3' => isset($val['rd_cate3']) ? $val['rd_cate3'] : '',
+                            'rd_data1' => isset($val['rd_data1']) ? $val['rd_data1'] : '',
+                            'rd_data2' => isset($val['rd_data2']) ? $val['rd_data2'] : '',
+                            'rd_data3' => isset($val['rd_data3']) ? $val['rd_data3'] : '',
+                            'rd_data4' => isset($val['rd_data4']) ? $val['rd_data4'] : '',
+                            'rd_data5' => isset($val['rd_data5']) ? $val['rd_data5'] : '',
+                            'rd_data6' => isset($val['rd_data6']) ? $val['rd_data6'] : '',
+                            'rd_data7' => isset($val['rd_data7']) ? $val['rd_data7'] : '',
+                            'rd_data8' => isset($val['rd_data8']) ? $val['rd_data8'] : '',
+                        ],
+                    );
+
+                }else if($val['rd_cate2'] == '소계' && $check_duplicate_total <= 1){
+                    $rd_no = RateData::updateOrCreate(
+                        [
+                            'rd_no' => isset($is_new->rmd_no) ? (isset($val['rd_no']) ? $val['rd_no'] : null) : null,
+                            'rmd_no' => isset($rmd) ? $rmd->rmd_no : null,
+                        ],
+                        [
+                            'w_no' => isset($w_no) ? $w_no : null,
+                            'rd_cate_meta1' => $val['rd_cate_meta1'],
+                            'rd_cate_meta2' => $val['rd_cate_meta2'],
+                            'rd_index' => $index,
+                            'rd_cate1' => isset($val['rd_cate1']) ? $val['rd_cate1'] : (isset($val['rd_cate2']) ? $val['rd_cate2'] : ''),
+                            'rd_cate2' => isset($val['rd_cate2']) ? $val['rd_cate2'] : '',
+                            'rd_cate3' => isset($val['rd_cate3']) ? $val['rd_cate3'] : '',
+                            'rd_data1' => isset($val['rd_data1']) ? $val['rd_data1'] : '',
+                            'rd_data2' => isset($val['rd_data2']) ? $val['rd_data2'] : '',
+                            'rd_data3' => isset($val['rd_data3']) ? $val['rd_data3'] : '',
+                            'rd_data4' => isset($val['rd_data4']) ? $val['rd_data4'] : '',
+                            'rd_data5' => isset($val['rd_data5']) ? $val['rd_data5'] : '',
+                            'rd_data6' => isset($val['rd_data6']) ? $val['rd_data6'] : '',
+                            'rd_data7' => isset($val['rd_data7']) ? $val['rd_data7'] : '',
+                            'rd_data8' => isset($val['rd_data8']) ? $val['rd_data8'] : '',
+                        ],
+                    );
+       
+                }else if($val['rd_cate2'] != '소계' && $val['rd_cate2'] != 'bonded345' && $val['rd_cate2'] != 'bonded1' && $val['rd_cate2'] != 'bonded2'){
+                    $rd_no = RateData::updateOrCreate(
+                        [
+                            'rd_no' => isset($is_new->rmd_no) ? (isset($val['rd_no']) ? $val['rd_no'] : null) : null,
+                            'rmd_no' => isset($rmd) ? $rmd->rmd_no : null,
+                        ],
+                        [
+                            'w_no' => isset($w_no) ? $w_no : null,
+                            'rd_cate_meta1' => $val['rd_cate_meta1'],
+                            'rd_cate_meta2' => $val['rd_cate_meta2'],
+                            'rd_index' => $index,
+                            'rd_cate1' => isset($val['rd_cate1']) ? $val['rd_cate1'] : (isset($val['rd_cate2']) ? $val['rd_cate2'] : ''),
+                            'rd_cate2' => isset($val['rd_cate2']) ? $val['rd_cate2'] : '',
+                            'rd_cate3' => isset($val['rd_cate3']) ? $val['rd_cate3'] : '',
+                            'rd_data1' => isset($val['rd_data1']) ? $val['rd_data1'] : '',
+                            'rd_data2' => isset($val['rd_data2']) ? $val['rd_data2'] : '',
+                            'rd_data3' => isset($val['rd_data3']) ? $val['rd_data3'] : '',
+                            'rd_data4' => isset($val['rd_data4']) ? $val['rd_data4'] : '',
+                            'rd_data5' => isset($val['rd_data5']) ? $val['rd_data5'] : '',
+                            'rd_data6' => isset($val['rd_data6']) ? $val['rd_data6'] : '',
+                            'rd_data7' => isset($val['rd_data7']) ? $val['rd_data7'] : '',
+                            'rd_data8' => isset($val['rd_data8']) ? $val['rd_data8'] : '',
+                        ],
+                    );
+
+                }
+                
             }
 
             //ONLY FOR 보세화물
@@ -289,9 +360,28 @@ class RateDataController extends Controller
                 );
             }
 
-            foreach ($request['rate_data'] as $val) {
+            $check_duplicate_cate = 0;
+            $check_duplicate_total = 0;
+
+            foreach ($request['rate_data'] as $index => $val) {
                 Log::error($val);
-                $rd_no = RateData::updateOrCreate(
+                if($index != 0){
+                    if($val['rd_cate1'] != $validated['rate_data'][$index-1]['rd_cate1']){
+                        $check_duplicate_cate = 0;
+                        $check_duplicate_total = 0;
+                    }
+                }
+               
+
+                if($val['rd_cate2'] == 'bonded345' || $val['rd_cate2'] == 'bonded1' || $val['rd_cate2'] == 'bonded2'){
+                    $check_duplicate_cate += 1;
+                }
+                if($val['rd_cate2'] == '소계'){
+                    $check_duplicate_total += 1;
+                }
+
+                if(($val['rd_cate2'] == 'bonded345' || $val['rd_cate2'] == 'bonded1' || $val['rd_cate2'] == 'bonded2') && $check_duplicate_cate <= 1){
+                     $rd_no = RateData::updateOrCreate(
                     [
                         'rd_no' => isset($val['rd_no']) ? $val['rd_no'] : null,
                         'rmd_no' => isset($rmd_no) ? $rmd_no : ($request->rmd_no ? $request->rmd_no : null),
@@ -300,6 +390,7 @@ class RateDataController extends Controller
                         'w_no' => isset($w_no) ? $w_no : null,
                         'rd_cate_meta1' => $val['rd_cate_meta1'],
                         'rd_cate_meta2' => $val['rd_cate_meta2'],
+                        'rd_index' => $index,
                         'rd_cate1' => isset($val['rd_cate1']) ? $val['rd_cate1'] : '',
                         'rd_cate2' => isset($val['rd_cate2']) ? $val['rd_cate2'] : '',
                         'rd_cate3' => isset($val['rd_cate3']) ? $val['rd_cate3'] : '',
@@ -313,6 +404,60 @@ class RateDataController extends Controller
                         'rd_data8' => isset($val['rd_data8']) ? $val['rd_data8'] : '',
                     ],
                 );
+
+                }else if($val['rd_cate2'] == '소계' && $check_duplicate_total <= 1){
+                     $rd_no = RateData::updateOrCreate(
+                    [
+                        'rd_no' => isset($val['rd_no']) ? $val['rd_no'] : null,
+                        'rmd_no' => isset($rmd_no) ? $rmd_no : ($request->rmd_no ? $request->rmd_no : null),
+                    ],
+                    [
+                        'w_no' => isset($w_no) ? $w_no : null,
+                        'rd_cate_meta1' => $val['rd_cate_meta1'],
+                        'rd_cate_meta2' => $val['rd_cate_meta2'],
+                        'rd_index' => $index,
+                        'rd_cate1' => isset($val['rd_cate1']) ? $val['rd_cate1'] : '',
+                        'rd_cate2' => isset($val['rd_cate2']) ? $val['rd_cate2'] : '',
+                        'rd_cate3' => isset($val['rd_cate3']) ? $val['rd_cate3'] : '',
+                        'rd_data1' => isset($val['rd_data1']) ? $val['rd_data1'] : '',
+                        'rd_data2' => isset($val['rd_data2']) ? $val['rd_data2'] : '',
+                        'rd_data3' => isset($val['rd_data3']) ? $val['rd_data3'] : '',
+                        'rd_data4' => isset($val['rd_data4']) ? $val['rd_data4'] : '',
+                        'rd_data5' => isset($val['rd_data5']) ? $val['rd_data5'] : '',
+                        'rd_data6' => isset($val['rd_data6']) ? $val['rd_data6'] : '',
+                        'rd_data7' => isset($val['rd_data7']) ? $val['rd_data7'] : '',
+                        'rd_data8' => isset($val['rd_data8']) ? $val['rd_data8'] : '',
+                    ],
+                );
+    
+                }else if($val['rd_cate2'] != '소계' && $val['rd_cate2'] != 'bonded345' && $val['rd_cate2'] != 'bonded1' && $val['rd_cate2'] != 'bonded2'){
+                     $rd_no = RateData::updateOrCreate(
+                    [
+                        'rd_no' => isset($val['rd_no']) ? $val['rd_no'] : null,
+                        'rmd_no' => isset($rmd_no) ? $rmd_no : ($request->rmd_no ? $request->rmd_no : null),
+                    ],
+                    [
+                        'w_no' => isset($w_no) ? $w_no : null,
+                        'rd_cate_meta1' => $val['rd_cate_meta1'],
+                        'rd_cate_meta2' => $val['rd_cate_meta2'],
+                        'rd_index' => $index,
+                        'rd_cate1' => isset($val['rd_cate1']) ? $val['rd_cate1'] : '',
+                        'rd_cate2' => isset($val['rd_cate2']) ? $val['rd_cate2'] : '',
+                        'rd_cate3' => isset($val['rd_cate3']) ? $val['rd_cate3'] : '',
+                        'rd_data1' => isset($val['rd_data1']) ? $val['rd_data1'] : '',
+                        'rd_data2' => isset($val['rd_data2']) ? $val['rd_data2'] : '',
+                        'rd_data3' => isset($val['rd_data3']) ? $val['rd_data3'] : '',
+                        'rd_data4' => isset($val['rd_data4']) ? $val['rd_data4'] : '',
+                        'rd_data5' => isset($val['rd_data5']) ? $val['rd_data5'] : '',
+                        'rd_data6' => isset($val['rd_data6']) ? $val['rd_data6'] : '',
+                        'rd_data7' => isset($val['rd_data7']) ? $val['rd_data7'] : '',
+                        'rd_data8' => isset($val['rd_data8']) ? $val['rd_data8'] : '',
+                    ],
+                );
+
+                }
+
+               
             }
 
             DB::commit();
@@ -4370,14 +4515,14 @@ class RateDataController extends Controller
                     'rdg_sum3' => isset($request->bonded3['sum']) ? $request->bonded3['sum'] : 0,
                     'rdg_sum4' => isset($request->bonded4['sum']) ? $request->bonded4['sum'] : 0,
                     'rdg_sum5' => isset($request->bonded5['sum']) ? $request->bonded5['sum'] : 0,
-                    'rdg_sum6' => isset($request->bonded6['sum']) ? $request->bonded1['sum'] : 0,
+                    'rdg_sum6' => isset($request->bonded6['sum']) ? $request->bonded6['sum'] : 0,
                     'rdg_sum7' => isset($request->total['sum']) ? $request->total['sum'] : 0,
                     'rdg_sum8' => isset($request->bonded1['sum1']) ? $request->bonded1['sum1'] : 0,
                     'rdg_sum9' => isset($request->bonded2['sum1']) ? $request->bonded2['sum1'] : 0,
                     'rdg_sum10' => isset($request->bonded3['sum1']) ? $request->bonded3['sum1'] : 0,
                     'rdg_sum11' => isset($request->bonded4['sum1']) ? $request->bonded4['sum1'] : 0,
                     'rdg_sum12' => isset($request->bonded5['sum1']) ? $request->bonded5['sum1'] : 0,
-                    'rdg_sum13' => isset($request->bonded6['sum1']) ? $request->bonded1['sum1'] : 0,
+                    'rdg_sum13' => isset($request->bonded6['sum1']) ? $request->bonded6['sum1'] : 0,
                     'rdg_sum14' => isset($request->total['sum1']) ? $request->total['sum1'] : 0,
 
                     'rdg_etc1' => isset($request->bonded1['etc']) ? $request->bonded1['etc'] : '',
