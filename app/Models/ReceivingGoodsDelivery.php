@@ -152,4 +152,8 @@ class ReceivingGoodsDelivery extends Model
         return $this->belongsTo(Payment::class, 'rgd_no', 'rgd_no');
     }
 
+    public function tax(){
+        return $this->belongsTo(TaxInvoiceDivide::class, 'rgd_no', 'rgd_no');
+    }
+
 }
