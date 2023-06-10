@@ -6954,24 +6954,22 @@ class WarehousingController extends Controller
 
             $amount = $warehousing->orWhereIn('w_no', $w_no_in)->orderBy('w_no', 'DESC')->sum('w_amount');
 
+            $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->withSum(['schedule_shipment_info' => function($query) {
+                $query->whereIn('order_cs', [0, 3, 4, 5, 6, 7, 8]);
+            }], 'qty')->whereNotNull('trans_no')->where('status', '출고');
+
             if ($user->mb_type == 'shop') {
-                $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->withSum(['schedule_shipment_info' => function($query) {
-                    $query->where('order_cs', 0);
-            }], 'qty')->whereNotNull('trans_no')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
+                $schedule_shipment->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
-                })->orderBy('ss_no', 'DESC');
+                });
             } else if ($user->mb_type == 'shipper') {
-                $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->withSum(['schedule_shipment_info' => function($query) {
-                    $query->where('order_cs', 0);
-            }], 'qty')->whereNotNull('trans_no')->whereHas('ContractWms.company', function ($q) use ($user) {
+                $schedule_shipment->whereHas('ContractWms.company', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
-                })->orderBy('ss_no', 'DESC');
+                });
             } else if ($user->mb_type == 'spasys') {
-                $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->withSum(['schedule_shipment_info' => function($query) {
-                    $query->where('order_cs', 0);
-            }], 'qty')->whereNotNull('trans_no')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
+                $schedule_shipment->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
-                })->orderBy('ss_no', 'DESC');
+                });
             }
 
 
@@ -6984,7 +6982,9 @@ class WarehousingController extends Controller
                 $schedule_shipment->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($request->to_date)));
             }
 
-            $amount_export = $schedule_shipment->get()->sum('schedule_shipment_info_sum_qty');
+            $amount_export = $schedule_shipment->orderBy('ss_no', 'ASC')->get()->sum('schedule_shipment_info_sum_qty');
+
+
             // return $warehousing_list[0]['w_schedule_number'];
             if (count($warehousing->get()) > 0) {
                 $first_name_item = $warehousing->get()[0]['warehousing_item'][0]['item'] ? $warehousing->get()[0]['warehousing_item'][0]['item']['item_name'] : null;
@@ -7051,6 +7051,7 @@ class WarehousingController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollback();
+            return $e;
             Log::error($e);
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
