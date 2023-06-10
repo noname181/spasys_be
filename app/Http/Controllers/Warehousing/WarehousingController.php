@@ -6125,7 +6125,7 @@ class WarehousingController extends Controller
                
                 $i = 0;
                 foreach ($request->tid_list as $key => $tid) {
-                    $this->tax_invoice_api($rgd, $user, $tid, $key);
+                    
                     if (isset($tid['tid_no'])) {
                         // if(false){
                         $tid_ = TaxInvoiceDivide::where('tid_no', $tid['tid_no']);
@@ -6146,11 +6146,6 @@ class WarehousingController extends Controller
                         ]);
                         $id = $tid_->first()->tid_no;
 
-                        $tax_number = CommonFunc::generate_tax_number($id);
-
-                        TaxInvoiceDivide::where('tid_no', $tid['tid_no'])->update([
-                            'tid_number' => $tax_number ? $tax_number : null,
-                        ]);
 
                         $cbh = CancelBillHistory::insertGetId([
                             'rgd_no' => $request->rgd_no,
@@ -6159,6 +6154,7 @@ class WarehousingController extends Controller
                             'cbh_status_before' => 'taxed',
                             'cbh_status_after' => 'edited'
                         ]);
+
                     } else {
                         $id = TaxInvoiceDivide::insertGetId([
                             'tid_supply_price' => $tid['tid_supply_price'],
@@ -6217,6 +6213,7 @@ class WarehousingController extends Controller
                                 ]);
                             }
                         }
+                        $this->tax_invoice_api($rgd, $user, $tid, $tax_number, null);
                         $i++;
                     }
                     $ids[] = $id;
@@ -6359,6 +6356,9 @@ class WarehousingController extends Controller
                 TaxInvoiceDivide::where('tid_no', $id)->update([
                     'tid_number' => $tax_number ? $tax_number : null,
                 ]);
+                $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general'])->where('rgd_no', $request->rgd_no)->first();
+
+                $this->tax_invoice_api($rgd, $user, null, $tax_number, $request->rgds);
 
                 foreach ($request->rgds as $rgd) {
                    
@@ -6446,12 +6446,14 @@ class WarehousingController extends Controller
                         'co_address' => $company['co_address'],
                         'co_email' => $ag['ag_email'] ? $ag['ag_email'] : null,
                         'co_email2' => $ag['ag_email2'] ? $ag['ag_email2'] : null,
-                        'rgd_number' => $tax_number ? $tax_number : null,
+                        //'rgd_number' => $tax_number ? $tax_number : null,
                         'mb_no' => $user->mb_no,
                     ]);
 
                     $tax_number = CommonFunc::generate_tax_number($rgd['rgd_no']);
 
+                    $this->tax_invoice_api($rgd, $user, null, $tax_number, null);
+                    
                     TaxInvoiceDivide::where('tid_no', $id)->update([
                         'tid_number' => $tax_number ? $tax_number : null,
                     ]);
@@ -8010,11 +8012,10 @@ class WarehousingController extends Controller
     }
 
     
-    public function tax_invoice_api($rgd, $user, $price)//$company1, $company2, $total_price, $b_no
+    public function tax_invoice_api($rgd, $user, $price, $tax_number, $rgds)//$company1, $company2, $total_price, $b_no
     {
         
         // issuer
-
         $issuer_user = Member::with('company')->where('mb_no', $rgd->mb_no)->first();
 
         $issuer_company = Company::where('co_no', $issuer_user->co_no)->first();
@@ -8033,21 +8034,43 @@ class WarehousingController extends Controller
             if($price){
                 $total_price = $price['tid_sum'];
             }else{
-                $total_price = $rgd->rate_data_general->rdg_sum7;
+                if($rgds){
+                    $total_price = 0;
+                    foreach($rgds as $rgdp){
+                        $total_price += $rgdp['rate_data_general']['rdg_sum7'];
+                    }
+                }else{
+                    $total_price = $rgd->rate_data_general->rdg_sum7;
+                }
+                
             }
         
         }else if($rgd->service_korean_name == '수입풀필먼트'){
             if($price){
                 $total_price = $price['tid_sum'];
             }else{
-                $total_price = $rgd->rate_data_general->rdg_sum6;
+                if($rgds){
+                    $total_price = 0;
+                    foreach($rgds as $rgdp){
+                        $total_price += $rgdp['rate_data_general']['rdg_sum6'];
+                    }
+                }else{
+                    $total_price = $rgd->rate_data_general->rdg_sum6;
+                }
             }
             
         }else if($rgd->service_korean_name == '유통가공'){
             if($price){
                 $total_price = $price['tid_sum'];
             }else{
-                $total_price = $rgd->rate_data_general->rdg_sum6;
+                if($rgds){
+                    $total_price = 0;
+                    foreach($rgds as $rgdp){
+                        $total_price += $rgdp['rate_data_general']['rdg_sum4'];
+                    }
+                }else{
+                    $total_price = $rgd->rate_data_general->rdg_sum4;
+                }
             }
         }
 
@@ -8056,19 +8079,29 @@ class WarehousingController extends Controller
         }else{
             $cc_license1 = $issuer_company->co_license;
         }
-        $cc_name1 = "(주)스페이시스원";//$issuer_company->co_name;
+
+        // $cc_name1 = "(주)스페이시스원";//$issuer_company->co_name;
+        // $cc_ceo1 = $issuer_company->co_owner ? $issuer_company->co_owner : '모상희';
+        // $cc_address1 = "인천 중구 공항동로296번길 98-30 (운서동) 3층";//$issuer_company->co_address;
+        // $cc_service1 = "창고업";//$issuer_company->co_service;
+        // $cc_service2 = "서비스 운수 및 창고업";
+        // issuer
+        $cc_name1 = $issuer_company->co_name;
         $cc_ceo1 = $issuer_company->co_owner ? $issuer_company->co_owner : '모상희';
-        $cc_address1 = "인천 중구 공항동로296번길 98-30 (운서동) 3층";//$issuer_company->co_address;
+        $cc_address1 = $issuer_company->co_address;
         $cc_service1 = "창고업";//$issuer_company->co_service;
         $cc_service2 = "서비스 운수 및 창고업";
-        // issuer
 
 
+        // $cc_license2 = "1212478494";//$receiver_company->co_license;
+        // $cc_name2 = "청림관세사(가맹점)";//$receiver_company->co_name;
+        // $cc_ceo2 = "남유호";//$receiver_company->co_owner;
+        // $cc_address2 = "인천 중구 영종대로 118";//$receiver_company->co_address;
         // issued
-        $cc_license2 = "1212478494";//$receiver_company->co_license;
-        $cc_name2 = "청림관세사(가맹점)";//$receiver_company->co_name;
-        $cc_ceo2 = "남유호";//$receiver_company->co_owner;
-        $cc_address2 = "인천 중구 영종대로 118";//$receiver_company->co_address;
+        $cc_license2 = $receiver_company->co_license;
+        $cc_name2 = $receiver_company->co_name;
+        $cc_ceo2 = $receiver_company->co_owner;
+        $cc_address2 = $receiver_company->co_address;
 
         $s_type = "";
         $t_type = "차주발행";
@@ -8133,8 +8166,11 @@ class WarehousingController extends Controller
         */
 
         $IssueDirection = 1;                    //1-정발행, 2-역발행(위수탁 세금계산서는 정발행만 허용)
-        $TaxInvoiceType = 1;                    //1-세금계산서, 2-계산서, 4-위수탁세금계산서, 5-위수탁계산서
-
+        if($user->mb_type == 'spasys'){
+            $TaxInvoiceType = 1;                    //1-세금계산서, 2-계산서, 4-위수탁세금계산서, 5-위수탁계산서
+        }else{
+            $TaxInvoiceType = 4;                    //1-세금계산서, 2-계산서, 4-위수탁세금계산서, 5-위수탁계산서
+        }
         //-------------------------------------------
         //과세형태
         //-------------------------------------------
@@ -8196,7 +8232,7 @@ class WarehousingController extends Controller
         //공급자 정보 - 정발행시 세금계산서 작성자
         //------------------------------------------
         $InvoicerParty = array(
-            'MgtNum'         => $rgd->rgd_tax_invoice_number."_1MNAS",
+            'MgtNum'         => $tax_number."_1MNHHAS",
             'CorpNum'         => $cc_license1,                //필수입력 - 바로빌 회원 사업자번호 ('-' 제외, 10자리)
             'TaxRegID'         => '',
             'CorpName'         => $cc_name1,                    //필수입력
@@ -8215,7 +8251,7 @@ class WarehousingController extends Controller
         //공급받는자 정보 - 역발행시 세금계산서 작성자
         //------------------------------------------
         $InvoiceeParty = array(
-            'MgtNum'         => $rgd->rgd_tax_invoice_number."_1MNAS",
+            'MgtNum'         => $tax_number."_1MNHHAS",
             'CorpNum'         => $cc_license2,                //필수입력
             'TaxRegID'         => '',
             'CorpName'         => $cc_name2,                //필수입력
@@ -8253,7 +8289,7 @@ class WarehousingController extends Controller
             );
         }else{
             $BrokerParty = array(
-                'MgtNum'         => $rgd->rgd_tax_invoice_number."_1MNAS",                //필수입력 - 연동사부여 문서키
+                'MgtNum'         => $tax_number."_1MNHHAS",                //필수입력 - 연동사부여 문서키
                 'CorpNum'         => '2168142360',                //필수입력 - 바로빌 회원 사업자번호 ('-' 제외, 10자리)
                 'TaxRegID'         => '',
                 'CorpName'         => '(주)스페이시스원',            //필수입력
@@ -8282,7 +8318,7 @@ class WarehousingController extends Controller
             'TaxInvoiceTradeLineItem'    => array(
                 array(
                     'PurchaseExpiry' => "",            //YYYYMMDD
-                    'Name'            => $rgd->rgd_tax_invoice_number."_1MNAS",
+                    'Name'            => $tax_number."_1MNHHAS",
                     'Information'    => '',
                     'ChargeableUnit' => '',
                     'UnitPrice'        => '',
@@ -8292,7 +8328,7 @@ class WarehousingController extends Controller
                 ),
                 array(
                     'PurchaseExpiry' => "",            //YYYYMMDD
-                    'Name'            => $rgd->rgd_tax_invoice_number."_1MNAS",
+                    'Name'            => $tax_number."_1MNHHAS",
                     'Information'    => '',
                     'ChargeableUnit' => '',
                     'UnitPrice'        => '',
@@ -8355,20 +8391,30 @@ class WarehousingController extends Controller
         //     'ForceIssue' => $ForceIssue,
         //     'MailTitle'    => $MailTitle,
         // );
-        $Result = $BaroService_TI->RegistAndIssueTaxInvoice(array(
-            'CERTKEY'    => $CERTKEY,
-            'CorpNum'    => '2168142360',
-            'Invoice'    => $TaxInvoice,
-            'SendSMS'    => $SendSMS,
-            'ForceIssue' => $ForceIssue,
-            'MailTitle'    => $MailTitle,
-        ))->RegistAndIssueTaxInvoiceResult;
-
+        if($user->mb_type == 'spasys'){
+            $Result = $BaroService_TI->RegistAndIssueTaxInvoice(array(
+                'CERTKEY'    => $CERTKEY,
+                'CorpNum'    => '2168142360',
+                'Invoice'    => $TaxInvoice,
+                'SendSMS'    => $SendSMS,
+                'ForceIssue' => $ForceIssue,
+                'MailTitle'    => $MailTitle,
+            ))->RegistAndIssueTaxInvoiceResult;
+        }else{
+            $Result = $BaroService_TI->RegistAndIssueBrokerTaxInvoice(array(
+                'CERTKEY'    => $CERTKEY,
+                'CorpNum'    => '2168142360',
+                'Invoice'    => $TaxInvoice,
+                'SendSMS'    => $SendSMS,
+                'ForceIssue' => $ForceIssue,
+                'MailTitle'    => $MailTitle,
+            ))->RegistAndIssueBrokerTaxInvoiceResult;
+        }
         //return $Result;
         $t_amount = $AmountTotal;
         $t_tax = $TaxTotal;
         $t_total = $TotalAmount;
-        $t_mgtnum = $rgd->rgd_tax_invoice_number."_1MNAS";
+        $t_mgtnum = $tax_number."_1MNHHAS";
         $text = $this->getErrStr($BaroService_TI, $CERTKEY, $Result);
 
         //return $text;
