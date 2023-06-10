@@ -6118,13 +6118,6 @@ class WarehousingController extends Controller
                 $user = Auth::user();
 
                 $tids = TaxInvoiceDivide::where('rgd_no', $request->rgd_no)->get();
-                $tax_number = CommonFunc::generate_tax_number($request->rgd_no);
-
-                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-                    'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
-                    'rgd_tax_invoice_number' => $tax_number ? $tax_number : null,
-                    'rgd_status7' => 'taxed',
-                ]);
 
                 $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general'])->where('rgd_no', $request->rgd_no)->first();
 
@@ -6141,7 +6134,7 @@ class WarehousingController extends Controller
                             'tid_vat' => $tid['tid_vat'],
                             'tid_sum' => $tid['tid_sum'],
                             'rgd_no' => isset($tid['rgd_no']) ? $tid['rgd_no'] : $request->rgd_no,
-                            'tid_number' => isset($tid['tid_number']) ? $tid['tid_number'] : null,
+                            'rgd_number' => isset($tid['tid_number']) ? $tid['tid_number'] : null,
                             'co_license' => $request['company']['co_license'],
                             'co_owner' => $request['company']['co_owner'],
                             'co_name' => $request['company']['co_name'],
@@ -6149,10 +6142,15 @@ class WarehousingController extends Controller
                             'co_address' => $request['company']['co_address'],
                             'co_email' => $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null,
                             'co_email2' => $request['ag']['ag_email2'] ? $request['ag']['ag_email2'] : null,
-                            'rgd_number' => $tax_number ? $tax_number : null,
                             'mb_no' => $user->mb_no,
                         ]);
                         $id = $tid_->first()->tid_no;
+
+                        $tax_number = CommonFunc::generate_tax_number($id);
+
+                        TaxInvoiceDivide::where('tid_no', $tid['tid_no'])->update([
+                            'tid_number' => $tax_number ? $tax_number : null,
+                        ]);
 
                         $cbh = CancelBillHistory::insertGetId([
                             'rgd_no' => $request->rgd_no,
@@ -6167,7 +6165,7 @@ class WarehousingController extends Controller
                             'tid_vat' => $tid['tid_vat'],
                             'tid_sum' => $tid['tid_sum'],
                             'rgd_no' => isset($tid['rgd_no']) ? $tid['rgd_no'] : $request->rgd_no,
-                            'tid_number' => isset($tid['tid_number']) ? $tid['tid_number'] : null,
+                            'rgd_number' => isset($tid['tid_number']) ? $tid['tid_number'] : null,
                             'co_license' => $request['company']['co_license'],
                             'co_owner' => $request['company']['co_owner'],
                             'co_name' => $request['company']['co_name'],
@@ -6175,7 +6173,6 @@ class WarehousingController extends Controller
                             'co_address' => $request['company']['co_address'],
                             'co_email' => $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null,
                             'co_email2' => $request['ag']['ag_email2'] ? $request['ag']['ag_email2'] : null,
-                            'rgd_number' => $tax_number ? $tax_number : null,
                             'mb_no' => $user->mb_no,
                         ]);
 
@@ -6184,6 +6181,12 @@ class WarehousingController extends Controller
                             'mb_no' => $user->mb_no,
                             'cbh_type' => 'tax',
                             'cbh_status_after' => 'taxed'
+                        ]);
+
+                        $tax_number = CommonFunc::generate_tax_number($id);
+
+                        TaxInvoiceDivide::where('tid_no', $id)->update([
+                            'tid_number' => $tax_number ? $tax_number : null,
                         ]);
 
                         if ($rgd['rgd_status6'] == 'paid' && $i == 0) {
@@ -6219,7 +6222,11 @@ class WarehousingController extends Controller
                     $ids[] = $id;
                 }
 
-                
+                ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                    'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
+                    'rgd_status7' => 'taxed',
+                    'rgd_tax_invoice_number' => $tax_number ? $tax_number : null,
+                ]);
 
                 TaxInvoiceDivide::where('rgd_no', $request->rgd_no)
                     ->whereNotIn('tid_no', $ids)->delete();
@@ -6336,7 +6343,7 @@ class WarehousingController extends Controller
                     'tid_supply_price' => $request->supply_price,
                     'tid_vat' => $request->vat,
                     'tid_sum' => $request->sum,
-                    'tid_number' => $request->tid_number,
+                    'rgd_number' => $request->tid_number,
                     'co_license' => $request['company']['co_license'],
                     'co_owner' => $request['company']['co_owner'],
                     'co_name' => $request['company']['co_name'],
@@ -6347,8 +6354,14 @@ class WarehousingController extends Controller
                     'mb_no' => $user->mb_no,
                 ]);
 
+                $tax_number = CommonFunc::generate_tax_number($id);
+
+                TaxInvoiceDivide::where('tid_no', $id)->update([
+                    'tid_number' => $tax_number ? $tax_number : null,
+                ]);
+
                 foreach ($request->rgds as $rgd) {
-                    $tax_number = CommonFunc::generate_tax_number($rgd['rgd_no']);
+                   
 
                     $rgd_ = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
                         'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
@@ -6406,14 +6419,6 @@ class WarehousingController extends Controller
 
                 foreach ($request->rgds as $rgd) {
 
-                    $tax_number = CommonFunc::generate_tax_number($rgd['rgd_no']);
-
-                    ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
-                        'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
-                        'rgd_status7' => 'taxed',
-                        'rgd_tax_invoice_number' => $tax_number ? $tax_number : null,
-                    ]);
-
                     $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general'])->where('rgd_no', $rgd['rgd_no'])->first();
 
                     CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $user, null, 'settle_payment', null);
@@ -6433,7 +6438,7 @@ class WarehousingController extends Controller
                         'tid_vat' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_vat7'] : ($rgd['service_korean_name']  == '수입풀필먼트' ? $rgd['rate_data_general']['rdg_vat6'] : $rgd['rate_data_general']['rdg_vat4']),
                         'tid_sum' => $rgd['service_korean_name']  == '보세화물' ? $rgd['rate_data_general']['rdg_sum7'] : ($rgd['service_korean_name']  == '수입풀필먼트' ? $rgd['rate_data_general']['rdg_sum6'] : $rgd['rate_data_general']['rdg_sum4']),
                         'rgd_no' => $rgd['rgd_no'],
-                        'tid_number' => $rgd['rgd_settlement_number'],
+                        'rgd_number' => $rgd['rgd_settlement_number'],
                         'co_license' => $company['co_license'],
                         'co_owner' => $company['co_owner'],
                         'co_name' => $company['co_name'],
@@ -6443,6 +6448,18 @@ class WarehousingController extends Controller
                         'co_email2' => $ag['ag_email2'] ? $ag['ag_email2'] : null,
                         'rgd_number' => $tax_number ? $tax_number : null,
                         'mb_no' => $user->mb_no,
+                    ]);
+
+                    $tax_number = CommonFunc::generate_tax_number($rgd['rgd_no']);
+
+                    TaxInvoiceDivide::where('tid_no', $id)->update([
+                        'tid_number' => $tax_number ? $tax_number : null,
+                    ]);
+
+                    ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
+                        'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
+                        'rgd_status7' => 'taxed',
+                        'rgd_tax_invoice_number' => $tax_number ? $tax_number : null,
                     ]);
 
                     $cbh = CancelBillHistory::insertGetId([
