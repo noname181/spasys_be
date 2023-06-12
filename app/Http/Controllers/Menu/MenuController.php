@@ -113,36 +113,36 @@ class MenuController extends Controller
         try {
             DB::enableQueryLog();
             DB::beginTransaction();
-            if (isset($validated['menu_url'])) {
-            $menu_check = Menu::whereRaw('LOWER(`menu_url`) = ? ',[strtolower($validated['menu_url'])])->first();
-            if(isset($menu_check)){
-                return response()->json([
-                    'error'=>'same_url'
-                ], 201);
-            }
-            }
-            if (isset($validated['menu_name']) && !isset($validated['menu_url'])) {
-                $service_no_array = explode(" ", $validated['menu_service_no_array']);
-                foreach($service_no_array as $row){
-                    $menu_check_name = Menu::whereRaw('LOWER(`menu_name`) = ? ',[strtolower($validated['menu_name'])])->first();
-                    if(isset($menu_check_name)){
-                        return response()->json([
-                            'error'=>'same_name'
-                        ], 201);
-                    }
-                }
-            }
-            if (isset($validated['menu_name']) && isset($validated['menu_url'])) {
-                $service_no_array = explode(" ", $validated['menu_service_no_array']);
-                foreach($service_no_array as $row){
-                    $menu_check_name = Menu::whereRaw('LOWER(`menu_name`) = ? ',[strtolower($validated['menu_name'])])->where('service_no_array', 'like', '%' . $row . '%')->first();
-                    if(isset($menu_check_name)){
-                        return response()->json([
-                            'error'=>'same_name'
-                        ], 201);
-                    }
-                }
-            }
+            // if (isset($validated['menu_url'])) {
+            // $menu_check = Menu::whereRaw('LOWER(`menu_url`) = ? ',[strtolower($validated['menu_url'])])->first();
+            // if(isset($menu_check)){
+            //     return response()->json([
+            //         'error'=>'same_url'
+            //     ], 201);
+            // }
+            // }
+            // if (isset($validated['menu_name']) && !isset($validated['menu_url'])) {
+            //     $service_no_array = explode(" ", $validated['menu_service_no_array']);
+            //     foreach($service_no_array as $row){
+            //         $menu_check_name = Menu::whereRaw('LOWER(`menu_name`) = ? ',[strtolower($validated['menu_name'])])->first();
+            //         if(isset($menu_check_name)){
+            //             return response()->json([
+            //                 'error'=>'same_name'
+            //             ], 201);
+            //         }
+            //     }
+            // }
+            // if (isset($validated['menu_name']) && isset($validated['menu_url'])) {
+            //     $service_no_array = explode(" ", $validated['menu_service_no_array']);
+            //     foreach($service_no_array as $row){
+            //         $menu_check_name = Menu::whereRaw('LOWER(`menu_name`) = ? ',[strtolower($validated['menu_name'])])->where('service_no_array', 'like', '%' . $row . '%')->first();
+            //         if(isset($menu_check_name)){
+            //             return response()->json([
+            //                 'error'=>'same_name'
+            //             ], 201);
+            //         }
+            //     }
+            // }
             $main_menu = Menu::first();
             $sub_menu_level = 0;
             if(!$main_menu){
