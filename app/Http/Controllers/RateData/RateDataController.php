@@ -27,7 +27,7 @@ use App\Utils\CommonFunc;
 use App\Utils\Messages;
 use App\Models\TaxInvoiceDivide;
 use App\Models\ImportExpected;
-use Carbon\Carbon;
+use App\Models\File as FileTable;
 use File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -237,7 +237,7 @@ class RateDataController extends Controller
                         'file_url' => $file->file_url
                     ];
                 }
-                File::insert($files);
+                FileTable::insert($files);
             }
 
 
