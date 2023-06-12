@@ -180,6 +180,8 @@ class RateDataController extends Controller
     public function register_set_data(RateDataRequest $request)
     {
         $validated = $request->validated();
+        $rmd_file = RateMetaData::with('files')->where('rmd_no',$request->rmd_no_file)->first()->files;
+        return $rmd_file;
         try {
             DB::beginTransaction();
             if (isset($validated['rgd_no'])) {
@@ -189,7 +191,6 @@ class RateDataController extends Controller
 
                 $w_no = null;
             }
-
             // if (isset($validated['type'])) {
             //     if (
             //         $validated['type'] == 'domestic_additional_edit' ||
@@ -319,6 +320,8 @@ class RateDataController extends Controller
                 }
                 
             }
+
+            
 
             //ONLY FOR 보세화물
             if (isset($validated['storage_days']) && isset($validated['rgd_no'])) {
