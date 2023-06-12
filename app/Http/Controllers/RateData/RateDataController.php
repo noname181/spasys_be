@@ -27,6 +27,7 @@ use App\Utils\CommonFunc;
 use App\Utils\Messages;
 use App\Models\TaxInvoiceDivide;
 use App\Models\ImportExpected;
+use Carbon\Carbon;
 use App\Models\File as FileTable;
 use File;
 use Illuminate\Http\Request;
@@ -222,24 +223,25 @@ class RateDataController extends Controller
                 );
 
             }
-            
-            if(isset($rmd_file)){
-                $files = [];
-                foreach($rmd_file->files as $key => $file) {
-                    $files[] = [
-                        'file_table' => 'rate_data',
-                        'file_table_key' => $rmd->rmd_no,
-                        'file_name_old' => $file->file_name_old,
-                        'file_name' => $file->file_name,
-                        'file_size' => $file->file_size,
-                        'file_extension' => $file->file_extension,
-                        'file_position' => $file->file_position,
-                        'file_url' => $file->file_url
-                    ];
+            $check_exist_rmd = RateMetaData::where('rmd_no',$rmd->rmd_no)->first();
+            if($check_exist_rmd->rmd_no != $request->rmd_no_file){
+                if(isset($rmd_file)){
+                    $files = [];
+                    foreach($rmd_file->files as $key => $file) {
+                        $files[] = [
+                            'file_table' => 'rate_data',
+                            'file_table_key' => $rmd->rmd_no,
+                            'file_name_old' => $file->file_name_old,
+                            'file_name' => $file->file_name,
+                            'file_size' => $file->file_size,
+                            'file_extension' => $file->file_extension,
+                            'file_position' => $file->file_position,
+                            'file_url' => $file->file_url
+                        ];
+                    }
+                    FileTable::insert($files);
                 }
-                FileTable::insert($files);
             }
-
 
             $check_duplicate_cate = 0;
             $check_duplicate_total = 0;
