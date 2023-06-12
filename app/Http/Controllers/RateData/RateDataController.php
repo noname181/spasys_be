@@ -27,7 +27,7 @@ use App\Utils\CommonFunc;
 use App\Utils\Messages;
 use App\Models\TaxInvoiceDivide;
 use App\Models\ImportExpected;
-use Carbon\Carbon;
+use App\Models\File as FileTable;
 use File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -180,8 +180,7 @@ class RateDataController extends Controller
     public function register_set_data(RateDataRequest $request)
     {
         $validated = $request->validated();
-        $rmd_file = RateMetaData::with('files')->where('rmd_no',$request->rmd_no_file)->first()->files;
-        return $rmd_file;
+        
         try {
             DB::beginTransaction();
             if (isset($validated['rgd_no'])) {
@@ -206,7 +205,8 @@ class RateDataController extends Controller
             //         $validated['rgd_no'] = $rgd->rgd_parent_no;
             //     }
             // }
-
+            $rmd_file = RateMetaData::with('files')->where('rmd_no',$request->rmd_no_file)->first();
+            
             if (isset($w_no)) {
                 $is_new = RateMetaData::where(['rgd_no' => $validated['rgd_no'],
                     'set_type' => $validated['set_type']])->first();
@@ -220,7 +220,26 @@ class RateDataController extends Controller
                         'mb_no' => Auth::user()->mb_no,
                     ]
                 );
+
             }
+            
+            if(isset($rmd_file)){
+                $files = [];
+                foreach($rmd_file->files as $key => $file) {
+                    $files[] = [
+                        'file_table' => 'rate_data',
+                        'file_table_key' => $rmd->rmd_no,
+                        'file_name_old' => $file->file_name_old,
+                        'file_name' => $file->file_name,
+                        'file_size' => $file->file_size,
+                        'file_extension' => $file->file_extension,
+                        'file_position' => $file->file_position,
+                        'file_url' => $file->file_url
+                    ];
+                }
+                FileTable::insert($files);
+            }
+
 
             $check_duplicate_cate = 0;
             $check_duplicate_total = 0;
