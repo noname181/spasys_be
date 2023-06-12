@@ -6154,7 +6154,7 @@ class WarehousingController extends Controller
                             'cbh_status_before' => 'taxed',
                             'cbh_status_after' => 'edited'
                         ]);
-
+                        $api['message'] = "tax_ok";
                     } else {
                         $id = TaxInvoiceDivide::insertGetId([
                             'tid_supply_price' => $tid['tid_supply_price'],
@@ -6181,6 +6181,8 @@ class WarehousingController extends Controller
 
                         $tax_number = CommonFunc::generate_tax_number($id);
 
+                        $api = $this->tax_invoice_api($rgd, $user, $tid, $tax_number, null);
+                          
                         TaxInvoiceDivide::where('tid_no', $id)->update([
                             'tid_number' => $tax_number ? $tax_number : null,
                         ]);
@@ -6213,7 +6215,7 @@ class WarehousingController extends Controller
                                 ]);
                             }
                         }
-                        $this->tax_invoice_api($rgd, $user, $tid, $tax_number, null);
+                        
                         $i++;
                     }
                     $ids[] = $id;
@@ -6222,16 +6224,23 @@ class WarehousingController extends Controller
                 ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
                     'rgd_status7' => 'taxed',
-                    'rgd_tax_invoice_number' => $tax_number ? $tax_number : null,
+                    'rgd_tax_invoice_number' => isset($tax_number) ? $tax_number : null,
                 ]);
 
                 TaxInvoiceDivide::where('rgd_no', $request->rgd_no)
                     ->whereNotIn('tid_no', $ids)->delete();
 
-                DB::commit();
+                if($api['message'] == "tax_err"){
+                    DB::rollBack();
+                }else{
+                    DB::commit();
+                }
+               
                 return response()->json([
                     'message' => Messages::MSG_0007,
                     'tid_list' => $tids,
+                    'api' => $api['message'],
+                    'api_message' => $api['txt']
                 ]);
             } else if ($request->type == 'receipt') {
                 $user = Auth::user();
@@ -6358,7 +6367,7 @@ class WarehousingController extends Controller
                 ]);
                 $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general'])->where('rgd_no', $request->rgd_no)->first();
 
-                $this->tax_invoice_api($rgd, $user, null, $tax_number, $request->rgds);
+                $api = $this->tax_invoice_api($rgd, $user, null, $tax_number, $request->rgds);
 
                 foreach ($request->rgds as $rgd) {
                    
@@ -6410,9 +6419,15 @@ class WarehousingController extends Controller
                         }
                     }
                 }
-                DB::commit();
+                if($api['message'] == "tax_err"){
+                    DB::rollBack();
+                }else{
+                    DB::commit();
+                }
                 return response()->json([
                     'message' => Messages::MSG_0007,
+                    'api' => $api['message'],
+                    'api_message' => $api['txt']
                 ]);
             } else if ($request->type == 'separate') {
                 $user = Auth::user();
@@ -6444,15 +6459,15 @@ class WarehousingController extends Controller
                         'co_name' => $company['co_name'],
                         'co_major' => $company['co_major'],
                         'co_address' => $company['co_address'],
-                        'co_email' => $ag['ag_email'] ? $ag['ag_email'] : null,
-                        'co_email2' => $ag['ag_email2'] ? $ag['ag_email2'] : null,
+                        'co_email' => isset($ag['ag_email']) ? $ag['ag_email'] : null,
+                        'co_email2' => isset($ag['ag_email2']) ? $ag['ag_email2'] : null,
                         //'rgd_number' => $tax_number ? $tax_number : null,
                         'mb_no' => $user->mb_no,
                     ]);
 
                     $tax_number = CommonFunc::generate_tax_number($rgd['rgd_no']);
 
-                    $this->tax_invoice_api($rgd, $user, null, $tax_number, null);
+                    $api = $this->tax_invoice_api($rgd, $user, null, $tax_number, null);
                     
                     TaxInvoiceDivide::where('tid_no', $id)->update([
                         'tid_number' => $tax_number ? $tax_number : null,
@@ -6502,9 +6517,15 @@ class WarehousingController extends Controller
 
                     //$this->tax_invoice_api($rgd, $user, null);
                 }
-                DB::commit();
+                if($api['message'] == "tax_err"){
+                    DB::rollBack();
+                }else{
+                    DB::commit();
+                }
                 return response()->json([
                     'message' => Messages::MSG_0007,
+                    'api' => $api['message'],
+                    'api_message' => $api['txt']
                 ]);
             }
             
@@ -8232,7 +8253,7 @@ class WarehousingController extends Controller
         //공급자 정보 - 정발행시 세금계산서 작성자
         //------------------------------------------
         $InvoicerParty = array(
-            'MgtNum'         => $tax_number."_1MNHHAS",
+            'MgtNum'         => $tax_number,
             'CorpNum'         => $cc_license1,                //필수입력 - 바로빌 회원 사업자번호 ('-' 제외, 10자리)
             'TaxRegID'         => '',
             'CorpName'         => $cc_name1,                    //필수입력
@@ -8251,7 +8272,7 @@ class WarehousingController extends Controller
         //공급받는자 정보 - 역발행시 세금계산서 작성자
         //------------------------------------------
         $InvoiceeParty = array(
-            'MgtNum'         => $tax_number."_1MNHHAS",
+            'MgtNum'         => $tax_number,
             'CorpNum'         => $cc_license2,                //필수입력
             'TaxRegID'         => '',
             'CorpName'         => $cc_name2,                //필수입력
@@ -8289,7 +8310,7 @@ class WarehousingController extends Controller
             );
         }else{
             $BrokerParty = array(
-                'MgtNum'         => $tax_number."_1MNHHAS",                //필수입력 - 연동사부여 문서키
+                'MgtNum'         => $tax_number,                //필수입력 - 연동사부여 문서키
                 'CorpNum'         => '2168142360',                //필수입력 - 바로빌 회원 사업자번호 ('-' 제외, 10자리)
                 'TaxRegID'         => '',
                 'CorpName'         => '(주)스페이시스원',            //필수입력
@@ -8318,7 +8339,7 @@ class WarehousingController extends Controller
             'TaxInvoiceTradeLineItem'    => array(
                 array(
                     'PurchaseExpiry' => "",            //YYYYMMDD
-                    'Name'            => $tax_number."_1MNHHAS",
+                    'Name'            => $tax_number,
                     'Information'    => '',
                     'ChargeableUnit' => '',
                     'UnitPrice'        => '',
@@ -8328,7 +8349,7 @@ class WarehousingController extends Controller
                 ),
                 array(
                     'PurchaseExpiry' => "",            //YYYYMMDD
-                    'Name'            => $tax_number."_1MNHHAS",
+                    'Name'            => $tax_number,
                     'Information'    => '',
                     'ChargeableUnit' => '',
                     'UnitPrice'        => '',
@@ -8414,7 +8435,7 @@ class WarehousingController extends Controller
         $t_amount = $AmountTotal;
         $t_tax = $TaxTotal;
         $t_total = $TotalAmount;
-        $t_mgtnum = $tax_number."_1MNHHAS";
+        $t_mgtnum = $tax_number;
         $text = $this->getErrStr($BaroService_TI, $CERTKEY, $Result);
 
         //return $text;
@@ -8429,10 +8450,10 @@ class WarehousingController extends Controller
             // $jsn = json_encode($arr);
             // print_r($jsn);
             // exit;
-            // return response()->json([
-            //     'message' => 'tax_err',
-            //     'txt' => $text
-            // ]);
+            return [
+                'message' => 'tax_err',
+                'txt' => $text
+            ];
         } else {
 
             // 위에도 있음, 여기서는 - 있음
@@ -8461,11 +8482,11 @@ class WarehousingController extends Controller
                 't_total' => $t_total,
             ]);
             //sql_query($sql_tax);
-            //DB::commit();
-            // return response()->json([
-            //     'message' => 'tax_err',
-            //     'txt' => $text
-            // ]);
+            DB::commit();
+            return [
+                'message' => 'tax_ok',
+                'txt' => ""
+            ];
         }
     }
 
