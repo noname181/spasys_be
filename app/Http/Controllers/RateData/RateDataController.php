@@ -366,7 +366,7 @@ class RateDataController extends Controller
             foreach ($request['rate_data'] as $index => $val) {
                 Log::error($val);
                 if($index != 0){
-                    if($val['rd_cate1'] != $validated['rate_data'][$index-1]['rd_cate1']){
+                    if($val['rd_cate1'] != $request['rate_data'][$index-1]['rd_cate1']){
                         $check_duplicate_cate = 0;
                         $check_duplicate_total = 0;
                     }
