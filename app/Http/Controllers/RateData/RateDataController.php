@@ -7667,6 +7667,7 @@ class RateDataController extends Controller
 
         //FULFILL1
         if($rgd->rate_data_general['rdg_sum1'] > 0) {
+            $sheet->getStyle('B'. $current_row. ':Z'. $current_row)->getBorders()->getOutline()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('EDEDED'));
             $sheet->getStyle('B'. $current_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
             $sheet->getStyle('B'. $current_row)->getFont()->setBold(true);
             $sheet->mergeCells('B'. $current_row. ':Z'. $current_row);
@@ -7912,6 +7913,7 @@ class RateDataController extends Controller
 
         //FULFILL2
         if($rgd->rate_data_general['rdg_sum2'] > 0) {
+            $sheet->getStyle('B'. $current_row. ':Z'. $current_row)->getBorders()->getOutline()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('EDEDED'));
             $sheet->getStyle('B'. $current_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
             $sheet->getStyle('B'. $current_row)->getFont()->setBold(true);
             $sheet->mergeCells('B'. $current_row. ':Z'. $current_row);
@@ -8130,6 +8132,7 @@ class RateDataController extends Controller
 
         //FULFILL3
         if($rgd->rate_data_general['rdg_sum3'] > 0) {
+            $sheet->getStyle('B'. $current_row. ':Z'. $current_row)->getBorders()->getOutline()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('EDEDED'));
             $sheet->getStyle('B'. $current_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
             $sheet->getStyle('B'. $current_row)->getFont()->setBold(true);
             $sheet->mergeCells('B'. $current_row. ':Z'. $current_row);
@@ -8348,6 +8351,7 @@ class RateDataController extends Controller
 
         //FULFILL4
         if($rgd->rate_data_general['rdg_sum4'] > 0) {
+            $sheet->getStyle('B'. $current_row. ':Z'. $current_row)->getBorders()->getOutline()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('EDEDED'));
             $sheet->getStyle('B'. $current_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
             $sheet->getStyle('B'. $current_row)->getFont()->setBold(true);
             $sheet->mergeCells('B'. $current_row. ':Z'. $current_row);
@@ -8367,7 +8371,7 @@ class RateDataController extends Controller
             $rd_data5_sum = 0;
             $rd_data6_sum = 0;
             $rd_data7_sum = 0;
-
+            $rd_data4_total = 0;
             $rate_data_fulfill4_ = [];
 
             foreach($rate_data_fulfill4 as $key => $rate_data){
@@ -8564,6 +8568,7 @@ class RateDataController extends Controller
 
         //FULFILL5
         if($rgd->rate_data_general['rdg_sum5'] > 0) {
+            $sheet->getStyle('B'. $current_row. ':Z'. $current_row)->getBorders()->getOutline()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('EDEDED'));
             $sheet->getStyle('B'. $current_row)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
             $sheet->getStyle('B'. $current_row)->getFont()->setBold(true);
             $sheet->mergeCells('B'. $current_row. ':Z'. $current_row);
@@ -8586,6 +8591,7 @@ class RateDataController extends Controller
             $rd_data4_total = 0;
 
             $rate_data_fulfill5_ = [];
+
 
             foreach($rate_data_fulfill5 as $key => $rate_data){
                 array_push($rate_data_fulfill5_, $rate_data);
