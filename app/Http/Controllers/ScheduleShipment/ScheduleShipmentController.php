@@ -466,7 +466,7 @@ class ScheduleShipmentController extends Controller
                             if($c == end($check)){
                                 if($c->order_cs == "1"){
                                     $order_cs_status = "전체취소";
-                                }elseif($c->order_cs == "2"){{
+                                }else if($c->order_cs == "2"){{
                                     $order_cs_status = "부분취소";
                                 }
                             }else{
@@ -475,6 +475,7 @@ class ScheduleShipmentController extends Controller
                                 }
                             }  
                         }
+                    }
 
                         ScheduleShipment::where(['ss_no' => $ss_no->ss_no])->update([
                             'order_cs_status' => $order_cs_status
@@ -482,6 +483,7 @@ class ScheduleShipmentController extends Controller
                     }
                 }
             }
+            
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
