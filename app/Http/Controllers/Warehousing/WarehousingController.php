@@ -8408,16 +8408,18 @@ class WarehousingController extends Controller
 
         //-------------------------------------------
 
-        //정발행
-
-        // return array(
+        
+        //Delete
+        // $Result = $BaroService_TI->DeleteTaxInvoice(array(
         //     'CERTKEY'    => $CERTKEY,
         //     'CorpNum'    => '2168142360',
-        //     'Invoice'    => $TaxInvoice,
-        //     'SendSMS'    => $SendSMS,
-        //     'ForceIssue' => $ForceIssue,
-        //     'MailTitle'    => $MailTitle,
-        // );
+        //     'MgtKey'    => $tax_number,
+            
+        // ))->DeleteTaxInvoiceResult;
+        // $text = $this->getErrStr($BaroService_TI, $CERTKEY, $Result);
+        // return $text;
+
+        //정발행
         if($user->mb_type == 'spasys'){
             $Result = $BaroService_TI->RegistAndIssueTaxInvoice(array(
                 'CERTKEY'    => $CERTKEY,
@@ -8468,7 +8470,10 @@ class WarehousingController extends Controller
 
             //$sql_tax  = " insert into tax(b_no, t_mgtnum, t_startdate, t_type, cc_no, s_no, t_regtime, t_modify, t_taxtxt, t_taxcode, t_status, t_result_sendtime, t_result_regtime, t_result_no, t_amount, t_tax, t_total) 
             //values('1222222222222222', '$t_mgtnum', '$b_start', '$t_type', '$cc_no', '$s_no', '$t_regtime', '', '', 0, '$Result', now(), '', '', '$t_amount', '$t_tax', '$t_total') ";
-            Tax::insertGetId([
+            Tax::updateOrCreate([
+                'b_no' => $rgd->rgd_settlement_number,
+                't_mgtnum' => $t_mgtnum,
+            ], [
                 'b_no' => $rgd->rgd_settlement_number,
                 't_mgtnum' => $t_mgtnum,
                 'rgd_no' => $rgd->rgd_no,

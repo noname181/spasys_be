@@ -29,6 +29,7 @@ class Tax extends Model
         't_no',
         'b_no',
         't_mgtnum',
+        'rgd_no',
         't_startdate',
         't_type',
         'co_no_parent',

@@ -2641,6 +2641,7 @@ class ReceivingGoodsDeliveryController extends Controller
             DB::beginTransaction();
             $user = Auth::user();
             $text = "";
+            $text_delete= "";
             if ($request->type == 'add_all') {
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
 
@@ -2722,13 +2723,23 @@ class ReceivingGoodsDeliveryController extends Controller
                     'MgtKey'    => $api_data->t_mgtnum,
                     'ProcType'    => $procType,
                 ))->ProcTaxInvoiceResult;
+
+                $Result_delete = $BaroService_TI->DeleteTaxInvoice(array(
+                    'CERTKEY'    => $CERTKEY,
+                    'CorpNum'    => '2168142360',
+                    'MgtKey'    => $api_data->t_mgtnum,
+                    
+                ))->DeleteTaxInvoiceResult;
                 
                 $text = $this->getErrStr($BaroService_TI, $CERTKEY, $Result);
 
+                $text_delete = $this->getErrStr($BaroService_TI, $CERTKEY, $Result_delete);
+
                 if ($Result == 1) {
-                    $text = '';
+                    $text = "";
+                    $text_delete= "";
                 }
-                
+
                 ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_status7' => 'cancel',
                     'rgd_tax_invoice_date' => NULL,
@@ -2786,7 +2797,8 @@ class ReceivingGoodsDeliveryController extends Controller
             return response()->json([
                 'message' => 'Success',
                 'rgd' => $rgd,
-                'txt' => $text
+                'txt' => $text,
+                'txt_delete' => $text_delete
             ], 201);
         } catch (\Exception $e) {
             DB::rollback();
