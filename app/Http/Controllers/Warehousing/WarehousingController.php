@@ -8209,7 +8209,13 @@ class WarehousingController extends Controller
         //-------------------------------------------
         //공백-일반세금계산서, 1-기재사항의 착오 정정, 2-공급가액의 변동, 3-재화의 환입, 4-계약의 해제, 5-내국신용장 사후개설, 6-착오에 의한 이중발행
         //-------------------------------------------
-        $ModifyCode = '';
+        $check_mgtnum = Tax::where('t_mgtnum', $tax_number)->first();
+        if($check_mgtnum == null){
+            $ModifyCode = '';
+        }else{
+            $ModifyCode = 1;
+        }
+        
 
         $Kwon = '';                                //별지서식 11호 상의 [권] 항목
         $Ho = '';                                //별지서식 11호 상의 [호] 항목
@@ -8465,6 +8471,7 @@ class WarehousingController extends Controller
             Tax::insertGetId([
                 'b_no' => $rgd->rgd_settlement_number,
                 't_mgtnum' => $t_mgtnum,
+                'rgd_no' => $rgd->rgd_no,
                 't_startdate' => Carbon::now()->format('Y-m-d H:i:s'),
                 't_type' => $t_type,
                 'co_no_parent' => $cc_no,

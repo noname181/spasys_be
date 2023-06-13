@@ -18,6 +18,7 @@ use App\Models\Package;
 use App\Models\ItemChannel;
 use App\Models\Company;
 use App\Models\TaxInvoiceDivide;
+use App\Models\Tax;
 use App\Models\CancelBillHistory;
 //use App\Models\CargoConnect;
 use App\Utils\Messages;
@@ -44,6 +45,7 @@ use App\Models\Import;
 use App\Models\ImportExpected;
 use \Carbon\Carbon;
 use PhpParser\Node\Expr\Cast\Object_;
+use SoapClient;
 
 class ReceivingGoodsDeliveryController extends Controller
 {
@@ -2638,12 +2640,16 @@ class ReceivingGoodsDeliveryController extends Controller
         try {
             DB::beginTransaction();
             $user = Auth::user();
+            $text = "";
             if ($request->type == 'add_all') {
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+
                 TaxInvoiceDivide::where('tid_no', $rgd->tid_no)->delete();
 
                 $rgds = ReceivingGoodsDelivery::where('tid_no', $rgd->tid_no)->get();
 
+                
+                
                 foreach ($rgds as $rgd) {
                     CommonFunc::insert_alarm('[공통] 계산서취소 안내', $rgd, $user, null, 'settle_payment', null);
 
@@ -2695,6 +2701,34 @@ class ReceivingGoodsDeliveryController extends Controller
             } else {
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
 
+                $BaroService_URL = 'https://testws.baroservice.com/TI.asmx?WSDL';    //테스트베드용
+                //$BaroService_URL = 'https://ws.baroservice.com/TI.asmx?WSDL';		//실서비스용
+
+                $BaroService_TI = new SoapClient($BaroService_URL, array(
+                    'trace'        => 'true',
+                    'encoding'    => 'UTF-8'
+                ));
+
+                // GetTaxInvoiceStatesEX.php 파일에서도 수정해야 함
+                $CERTKEY = '813FD596-7CBB-490A-84D2-31570487790E';                            //인증키
+
+                $api_data  = Tax::where('rgd_no', $request->rgd_no)->first();
+
+                $procType = "ISSUE_CANCEL";
+
+                $Result = $BaroService_TI->ProcTaxInvoice(array(
+                    'CERTKEY'    => $CERTKEY,
+                    'CorpNum'    => '2168142360',
+                    'MgtKey'    => $api_data->t_mgtnum,
+                    'ProcType'    => $procType,
+                ))->ProcTaxInvoiceResult;
+                
+                $text = $this->getErrStr($BaroService_TI, $CERTKEY, $Result);
+
+                if ($Result == 1) {
+                    $text = '';
+                }
+                
                 ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_status7' => 'cancel',
                     'rgd_tax_invoice_date' => NULL,
@@ -2752,6 +2786,7 @@ class ReceivingGoodsDeliveryController extends Controller
             return response()->json([
                 'message' => 'Success',
                 'rgd' => $rgd,
+                'txt' => $text
             ], 201);
         } catch (\Exception $e) {
             DB::rollback();
@@ -2761,6 +2796,16 @@ class ReceivingGoodsDeliveryController extends Controller
         }
     }
 
+    public function getErrStr($BaroService_TI, $CERTKEY, $ErrCode){
+        //global $BaroService_TI;
+       
+        $ErrStr = $BaroService_TI->GetErrString(array(
+          'CERTKEY' => $CERTKEY,
+          'ErrCode' => $ErrCode
+        ))->GetErrStringResult;
+      
+        return $ErrStr;
+      }
 
     public function update_settlement_status(Request $request)
     {
