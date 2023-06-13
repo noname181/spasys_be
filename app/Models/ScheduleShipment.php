@@ -59,6 +59,7 @@ class ScheduleShipment extends Model
         'status',
         'delivery_status',
         'order_cs',
+        'order_cs_status',
         'collect_date',
         'order_date',
         'trans_date',
