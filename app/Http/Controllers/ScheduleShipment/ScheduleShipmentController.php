@@ -466,6 +466,8 @@ class ScheduleShipmentController extends Controller
                             if($c == end($check)){
                                 if($c->order_cs == "1"){
                                     $order_cs_status = "전체취소";
+                                }elseif($c->order_cs == "2"){{
+                                    $order_cs_status = "부분취소";
                                 }
                             }else{
                                 if($c->order_cs == "1" || $c->order_cs == "2"){
