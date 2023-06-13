@@ -1220,10 +1220,12 @@ class ItemController extends Controller
             $item_channels = $item->item_channels()->get();
             $company = $item->company()->get();
             $item_info = $item->item_info()->get();
+            $contract_wms = $item->ContractWms()->first();
             $item['item_channels'] = $item_channels;
             $item['file'] = $file;
             $item['company'] = $company;
             $item['item_info'] = $item_info;
+            $item['contract_wms'] = $contract_wms;
             return response()->json($item);
         } catch (\Exception $e) {
             Log::error($e);
