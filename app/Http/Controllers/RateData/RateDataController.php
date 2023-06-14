@@ -10294,9 +10294,9 @@ class RateDataController extends Controller
 
         $Excel_writer = new Xlsx($spreadsheet);
         if (isset($user->mb_no)) {
-            $path = '../storage/download/' . $user->mb_no . '/';
+            $path = 'storage/download/' . $user->mb_no . '/';
         } else {
-            $path = '../storage/download/no-name/';
+            $path = 'storage/download/no-name/';
         }
         if (!is_dir($path)) {
             File::makeDirectory($path, $mode = 0777, true, true);
@@ -10309,7 +10309,7 @@ class RateDataController extends Controller
             'status' => 1,
             'link_download' => $file_name_download,
             'message' => 'Download File',
-        ], 500);
+        ], 200);
         ob_end_clean();
     }
 
@@ -10386,7 +10386,7 @@ class RateDataController extends Controller
             'status' => 1,
             'link_download' => $file_name_download,
             'message' => 'Download File',
-        ], 500);
+        ], 200);
         ob_end_clean();
     }
     public function download_add_casebill_issue($rgd_no)

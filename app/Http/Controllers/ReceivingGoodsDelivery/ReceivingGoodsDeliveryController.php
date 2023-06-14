@@ -2713,32 +2713,37 @@ class ReceivingGoodsDeliveryController extends Controller
                 // GetTaxInvoiceStatesEX.php 파일에서도 수정해야 함
                 $CERTKEY = '813FD596-7CBB-490A-84D2-31570487790E';                            //인증키
 
-                $api_data  = Tax::where('rgd_no', $request->rgd_no)->first();
+                $apis  = Tax::where('rgd_no', $request->rgd_no)->get();
 
                 $procType = "ISSUE_CANCEL";
 
-                $Result = $BaroService_TI->ProcTaxInvoice(array(
-                    'CERTKEY'    => $CERTKEY,
-                    'CorpNum'    => '2168142360',
-                    'MgtKey'    => $api_data->t_mgtnum,
-                    'ProcType'    => $procType,
-                ))->ProcTaxInvoiceResult;
+                foreach($apis as $api){
+                    $Result = $BaroService_TI->ProcTaxInvoice(array(
+                        'CERTKEY'    => $CERTKEY,
+                        'CorpNum'    => '2168142360',
+                        'MgtKey'    => $api->t_mgtnum,
+                        'ProcType'    => $procType,
+                    ))->ProcTaxInvoiceResult;
 
-                $Result_delete = $BaroService_TI->DeleteTaxInvoice(array(
-                    'CERTKEY'    => $CERTKEY,
-                    'CorpNum'    => '2168142360',
-                    'MgtKey'    => $api_data->t_mgtnum,
-                    
-                ))->DeleteTaxInvoiceResult;
-                
-                $text = $this->getErrStr($BaroService_TI, $CERTKEY, $Result);
+                    //Delete t_mgtnum
+                    // $Result_delete = $BaroService_TI->DeleteTaxInvoice(array(
+                    //     'CERTKEY'    => $CERTKEY,
+                    //     'CorpNum'    => '2168142360',
+                    //     'MgtKey'    => $api->t_mgtnum,
+                        
+                    // ))->DeleteTaxInvoiceResult;
 
-                $text_delete = $this->getErrStr($BaroService_TI, $CERTKEY, $Result_delete);
+                    $text = $this->getErrStr($BaroService_TI, $CERTKEY, $Result);
 
-                if ($Result == 1) {
-                    $text = "";
-                    $text_delete= "";
+                    if ($Result == 1) {
+                        $text = "";
+                        $text_delete= "";
+                    }
                 }
+
+                //$text_delete = $this->getErrStr($BaroService_TI, $CERTKEY, $Result_delete);
+
+                
 
                 ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_status7' => 'cancel',
