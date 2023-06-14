@@ -6382,7 +6382,7 @@ class RateDataController extends Controller
                 if($rate_data['rd_cate1'] == '하역비용'){
                     if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_bonded1[$key - 1]['rd_cate1'])){
                         $sheet->setCellValue('B'.($current_row_bonded1 + $count_row_bonded1), '하역비용');
-                        $sheet->getStyle('F'.($current_row).':Z'.($current_row))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                        $sheet->getStyle('F'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
                         $count_row_bonded1 = 0;
                     }else if($rate_data['rd_data4'] > 0) {
 
@@ -6411,7 +6411,7 @@ class RateDataController extends Controller
                 }
                 else if($rate_data['rd_cate1'] == '센터 작업료'){
                     if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_bonded1[$key - 1]['rd_cate1'])){
-                        $sheet->getStyle('F'.($current_row).':Z'.($current_row))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                        $sheet->getStyle('F'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
                         $sheet->mergeCells('B'.($current_row_bonded1).':B'.($current_row_bonded1 + $count_row_bonded1 - 1));
                         $sheet->getStyle('B'.($current_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1 - 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
                         $sheet->getStyle('B'.($current_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1 - 1))->getFont()->setBold(true);
@@ -6420,6 +6420,7 @@ class RateDataController extends Controller
                         $sheet->setCellValue('B'.($current_row_bonded1 + $count_row_bonded1), '센터 작업료');
                         $current_row_bonded1 = $current_row_bonded1 + $count_row_bonded1;
                         $count_row_bonded1 = 0;
+                        $sheet->getStyle('F'.($current_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1 - 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
                     }
                     else if($rate_data['rd_data4'] > 0 || (($rate_data['rd_cate2'] == '할인율') && $rd_sum[1] > 0)){
 
@@ -6448,6 +6449,7 @@ class RateDataController extends Controller
                 }
                 else if($rate_data['rd_cate1'] == '기타 비용'){
                     if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_bonded1[$key - 1]['rd_cate1'])){
+                        $sheet->getStyle('F'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
                         $sheet->mergeCells('B'.($current_row_bonded1).':B'.($current_row_bonded1 + $count_row_bonded1 - 1));
                         $sheet->getStyle('B'.($current_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1 - 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
                         $sheet->getStyle('B'.($current_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1 - 1))->getFont()->setBold(true);
@@ -6581,8 +6583,8 @@ class RateDataController extends Controller
 
                 if($rate_data == $rd_cate1[0]){
                     if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_bonded2[$key - 1]['rd_cate1'])){
+                        $sheet->getStyle('F'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
                         $sheet->setCellValue('B'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_cate1']);
-                        $sheet->getStyle('F'.($current_row).':Z'.($current_row))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
                         $count_row_bonded1 = 0;
                     }else if($rate_data['rd_data4'] > 0 || $rate_data['rd_data7'] > 0) {
 
@@ -6611,7 +6613,7 @@ class RateDataController extends Controller
                 }
                 else {
                     if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_bonded2[$key - 1]['rd_cate1'])){
-                        $sheet->getStyle('F'.($current_row).':Z'.($current_row))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                        $sheet->getStyle('F'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
                         $sheet->mergeCells('B'.($current_row_bonded1).':B'.($current_row_bonded1 + $count_row_bonded1 - 1));
                         $sheet->getStyle('B'.($current_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1 - 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
                         $sheet->getStyle('B'.($current_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1 - 1))->getFont()->setBold(true);
@@ -6743,7 +6745,7 @@ class RateDataController extends Controller
 
                 if($rate_data == $rd_cate1[0]){
                     if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_bonded3[$key - 1]['rd_cate1'])){
-                        $sheet->getStyle('F'.($current_row).':Z'.($current_row))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                        $sheet->getStyle('F'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
                         $sheet->setCellValue('B'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_cate1']);
                         $count_row_bonded1 = 0;
 
@@ -6774,7 +6776,7 @@ class RateDataController extends Controller
                 }
                 else {
                     if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_bonded3[$key - 1]['rd_cate1'])){
-                        $sheet->getStyle('F'.($current_row).':Z'.($current_row))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                        $sheet->getStyle('F'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
                         $sheet->mergeCells('B'.($current_row_bonded1).':B'.($current_row_bonded1 + $count_row_bonded1 - 1));
                         $sheet->getStyle('B'.($current_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1 - 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
                         $sheet->getStyle('B'.($current_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1 - 1))->getFont()->setBold(true);
@@ -6905,7 +6907,7 @@ class RateDataController extends Controller
 
                 if($rate_data == $rd_cate1[0]){
                     if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_bonded4[$key - 1]['rd_cate1'])){
-                        $sheet->getStyle('F'.($current_row).':Z'.($current_row))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                        $sheet->getStyle('F'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
                         $sheet->setCellValue('B'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_cate1']);
                         $count_row_bonded1 = 0;
                     }else if($rate_data['rd_data4'] > 0 || $rate_data['rd_data7'] > 0) {
@@ -6935,7 +6937,7 @@ class RateDataController extends Controller
                 }
                 else {
                     if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_bonded4[$key - 1]['rd_cate1'])){
-                        $sheet->getStyle('F'.($current_row).':Z'.($current_row))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                        $sheet->getStyle('F'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
                         $sheet->mergeCells('B'.($current_row_bonded1).':B'.($current_row_bonded1 + $count_row_bonded1 - 1));
                         $sheet->getStyle('B'.($current_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1 - 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
                         $sheet->getStyle('B'.($current_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1 - 1))->getFont()->setBold(true);
@@ -7066,7 +7068,7 @@ class RateDataController extends Controller
 
                 if($rate_data == $rd_cate1[0]){
                     if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_bonded5[$key - 1]['rd_cate1'])){
-                        $sheet->getStyle('F'.($current_row).':Z'.($current_row))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                        $sheet->getStyle('F'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
                         $sheet->setCellValue('B'.($current_row_bonded1 + $count_row_bonded1), $rate_data['rd_cate1']);
                         $count_row_bonded1 = 0;
                     }else if($rate_data['rd_data4'] > 0 || $rate_data['rd_data7'] > 0) {
@@ -7096,7 +7098,7 @@ class RateDataController extends Controller
                 }
                 else {
                     if($key == 0 || ($rate_data['rd_cate1'] != $rate_data_bonded5[$key - 1]['rd_cate1'])){
-                        $sheet->getStyle('F'.($current_row).':Z'.($current_row))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                        $sheet->getStyle('F'.($current_row_bonded1 + $count_row_bonded1).':Z'.($current_row_bonded1 + $count_row_bonded1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
                         $sheet->mergeCells('B'.($current_row_bonded1).':B'.($current_row_bonded1 + $count_row_bonded1 - 1));
                         $sheet->getStyle('B'.($current_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1 - 1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
                         $sheet->getStyle('B'.($current_row_bonded1).':E'.($current_row_bonded1 + $count_row_bonded1 - 1))->getFont()->setBold(true);
