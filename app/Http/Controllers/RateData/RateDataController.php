@@ -7370,65 +7370,65 @@ class RateDataController extends Controller
         foreach($rgds as $key => $rgd){
             foreach($headers as $key_col => $header){
 
-                $sheet->getStyle($col_start[$key_col].$current_row + $key)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle($col_start[$key_col].($current_row + $key))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
                 if($key_col == 0 && ($key != count($rgds) - 1)){
-                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $key + 1);
-                    $sheet->getStyle($col_start[$key_col].$current_row + $key)->getFont()->setBold(true);
-                    $sheet->getStyle($col_start[$key_col].$current_row + $key)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                    $sheet->setCellValue($col_start[$key_col].($current_row + $key), $key + 1);
+                    $sheet->getStyle($col_start[$key_col].($current_row + $key))->getFont()->setBold(true);
+                    $sheet->getStyle($col_start[$key_col].($current_row + $key))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
                 }
                 else if($key_col == 0 && ($key == count($rgds) - 1)){
-                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, '합계');
-                    $sheet->getStyle($col_start[$key_col].$current_row + $key)->getFont()->setBold(true);
-                    $sheet->getStyle($col_start[$key_col].$current_row + $key)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                    $sheet->setCellValue($col_start[$key_col].($current_row + $key), '합계');
+                    $sheet->getStyle($col_start[$key_col].($current_row + $key))->getFont()->setBold(true);
+                    $sheet->getStyle($col_start[$key_col].($current_row + $key))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
                 }
                 else if($key_col == 1 && ($key != count($rgds) - 1)){
-                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['rgd_settlement_number']);
+                    $sheet->setCellValue($col_start[$key_col].($current_row + $key), $rgd['rgd_settlement_number']);
                 }
                 else if($key_col == 2 && ($key != count($rgds) - 1)){
-                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['warehousing']['logistic_manage_number']);
+                    $sheet->setCellValue($col_start[$key_col].($current_row + $key), $rgd['warehousing']['logistic_manage_number']);
                 }
                 else if($key_col == 3 && ($key != count($rgds) - 1)){
-                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['t_import_expected']['tie_h_bl']);
+                    $sheet->setCellValue($col_start[$key_col].($current_row + $key), $rgd['t_import_expected']['tie_h_bl']);
                 }
                 else if($key_col == 4){
-                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['rate_data_general']['rdg_supply_price7'] ? $rgd['rate_data_general']['rdg_supply_price7'] : 0);
+                    $sheet->setCellValue($col_start[$key_col].($current_row + $key), $rgd['rate_data_general']['rdg_supply_price7'] ? $rgd['rate_data_general']['rdg_supply_price7'] : 0);
                 }
                 else if($key_col == 5){
-                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['rate_data_general']['rdg_vat7'] ? $rgd['rate_data_general']['rdg_vat7'] : 0);
+                    $sheet->setCellValue($col_start[$key_col].($current_row + $key), $rgd['rate_data_general']['rdg_vat7'] ? $rgd['rate_data_general']['rdg_vat7'] : 0);
                 }
                 else if($key_col == 6){
-                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['rate_data_general']['rdg_sum7'] ? $rgd['rate_data_general']['rdg_sum7'] : 0);
+                    $sheet->setCellValue($col_start[$key_col].($current_row + $key), $rgd['rate_data_general']['rdg_sum7'] ? $rgd['rate_data_general']['rdg_sum7'] : 0);
                 }
                 else if($key_col == 7){
-                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['rate_data_general']['rdg_supply_price14'] ? $rgd['rate_data_general']['rdg_supply_price14'] : 0);
+                    $sheet->setCellValue($col_start[$key_col].($current_row + $key), $rgd['rate_data_general']['rdg_supply_price14'] ? $rgd['rate_data_general']['rdg_supply_price14'] : 0);
                 }
                 else if($key_col == 8){
-                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['rate_data_general']['rdg_vat14'] ? $rgd['rate_data_general']['rdg_vat14'] : 0);
+                    $sheet->setCellValue($col_start[$key_col].($current_row + $key), $rgd['rate_data_general']['rdg_vat14'] ? $rgd['rate_data_general']['rdg_vat14'] : 0);
                 }
                 else if($key_col == 9){
-                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['rate_data_general']['rdg_sum14'] ? $rgd['rate_data_general']['rdg_sum14'] : 0);
+                    $sheet->setCellValue($col_start[$key_col].($current_row + $key), $rgd['rate_data_general']['rdg_sum14'] ? $rgd['rate_data_general']['rdg_sum14'] : 0);
                 }
                 else if($key_col == 10){
-                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['rate_data_general']['rdg_sum7'] ? $rgd['rate_data_general']['rdg_sum7'] : 0);
+                    $sheet->setCellValue($col_start[$key_col].($current_row + $key), $rgd['rate_data_general']['rdg_sum7'] ? $rgd['rate_data_general']['rdg_sum7'] : 0);
                 }
                 else if($key_col == 11){
-                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['rate_data_general']['rdg_supply_price7'] ? $rgd['rate_data_general']['rdg_supply_price7'] : 0);
+                    $sheet->setCellValue($col_start[$key_col].($current_row + $key), $rgd['rate_data_general']['rdg_supply_price7'] ? $rgd['rate_data_general']['rdg_supply_price7'] : 0);
                 }
                 else if($key_col == 12){
-                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['rate_data_general']['rdg_supply_price2'] ? $rgd['rate_data_general']['rdg_supply_price2'] : 0);
+                    $sheet->setCellValue($col_start[$key_col].($current_row + $key), $rgd['rate_data_general']['rdg_supply_price2'] ? $rgd['rate_data_general']['rdg_supply_price2'] : 0);
                 }
                 else if($key_col == 13){
-                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['rate_data_general']['rdg_supply_price3'] ? $rgd['rate_data_general']['rdg_supply_price3'] : 0);
+                    $sheet->setCellValue($col_start[$key_col].($current_row + $key), $rgd['rate_data_general']['rdg_supply_price3'] ? $rgd['rate_data_general']['rdg_supply_price3'] : 0);
                 }
                 else if($key_col == 14){
-                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['rate_data_general']['rdg_supply_price4'] ? $rgd['rate_data_general']['rdg_supply_price4'] : 0);
+                    $sheet->setCellValue($col_start[$key_col].($current_row + $key), $rgd['rate_data_general']['rdg_supply_price4'] ? $rgd['rate_data_general']['rdg_supply_price4'] : 0);
                 }
                 else if($key_col == 15){
-                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, $rgd['rate_data_general']['rdg_supply_price5'] ? $rgd['rate_data_general']['rdg_supply_price5'] : 0);
+                    $sheet->setCellValue($col_start[$key_col].($current_row + $key), $rgd['rate_data_general']['rdg_supply_price5'] ? $rgd['rate_data_general']['rdg_supply_price5'] : 0);
                 }
                 else if($key_col == 16){
-                    $sheet->setCellValue($col_start[$key_col].$current_row + $key, '');
+                    $sheet->setCellValue($col_start[$key_col].($current_row + $key), '');
                 }
 
              }
