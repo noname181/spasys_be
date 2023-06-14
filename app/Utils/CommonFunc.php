@@ -7,6 +7,7 @@ use App\Models\Alarm;
 use App\Models\Member;
 use App\Models\Company;
 use App\Models\Warehousing;
+use App\Models\Tax;
 use DateTime;
 use \Carbon\Carbon;
 
@@ -52,11 +53,22 @@ class CommonFunc
         return $string;
     }
 
-    static function generate_tax_number($data)
+    static function generate_tax_number($data,$rgd_no)
     {
         $string = 'TAX';
 
         $string = $string . '_' . date('Ymd') . $data;
+
+
+        // $tax = Tax::where('rgd_no', $rgd_no)->first();
+
+        // if($tax == null){
+        //     $string = $string."_1";
+        // }else{
+        //     $pieces = explode('_', $tax->t_mgtnum);
+        //     $last_word = array_pop($pieces);
+        //     $string = $string."_".((int)$last_word+1);
+        // }
 
         return $string;
     }
