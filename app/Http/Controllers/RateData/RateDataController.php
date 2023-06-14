@@ -250,13 +250,17 @@ class RateDataController extends Controller
                 Log::error($val);
                 if(!isset($validated['rate_data'][$index]['rd_cate1']))  {
                     $validated['rate_data'][$index]['rd_cate1'] = isset($validated['rate_data'][$index]['rd_cate2']) ?  $validated['rate_data'][$index]['rd_cate2'] : '';
+                    $val['rd_cate1'] = isset($validated['rate_data'][$index]['rd_cate2']) ?  $validated['rate_data'][$index]['rd_cate2'] : '';
                 }else if($validated['rate_data'][$index]['rd_cate1'] == ''){
                     $validated['rate_data'][$index]['rd_cate1'] = isset($validated['rate_data'][$index]['rd_cate2']) ?  $validated['rate_data'][$index]['rd_cate2'] : '';
+                    $val['rd_cate1'] = isset($validated['rate_data'][$index]['rd_cate2']) ?  $validated['rate_data'][$index]['rd_cate2'] : '';
                 }
                 if(!isset($validated['rate_data'][$index]['rd_cate2']))  {
                     $validated['rate_data'][$index]['rd_cate2'] = isset($validated['rate_data'][$index]['rd_cate1']) ?  $validated['rate_data'][$index]['rd_cate1'] : '';
+                    $val['rd_cate2'] = isset($validated['rate_data'][$index]['rd_cate1']) ?  $validated['rate_data'][$index]['rd_cate1'] : '';
                 }else if($validated['rate_data'][$index]['rd_cate2'] == ''){
                     $validated['rate_data'][$index]['rd_cate2'] = isset($validated['rate_data'][$index]['rd_cate1']) ?  $validated['rate_data'][$index]['rd_cate1'] : '';
+                    $val['rd_cate2'] = isset($validated['rate_data'][$index]['rd_cate1']) ?  $validated['rate_data'][$index]['rd_cate1'] : '';
                 }
 
                 if($index != 0){
