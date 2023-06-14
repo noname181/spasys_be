@@ -16,12 +16,13 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         //$schedule->command('inspire')->hourly();
-        $schedule->call('App\Http\Controllers\RateData\RateDataController@check_payment')->cron('*/5 * * * *');
         $schedule->call('App\Http\Controllers\Item\ItemController@apiItemsCargoList')->cron('*/5 * * * *');
-        $schedule->call('App\Http\Controllers\Item\ItemController@updateStockItemsApiNoLogin')->cron('*/6 * * * *');
-        $schedule->call('App\Http\Controllers\Item\ItemController@apiItemCronNoLogin')->cron('*/7 * * * *');
-        $schedule->call('App\Http\Controllers\ScheduleShipment\ScheduleShipmentController@getScheduleFromApiNoLogin')->cron('*/8 * * * *');
-        $schedule->call('App\Http\Controllers\ScheduleShipment\ScheduleShipmentController@stock_history')->cron('*/9 * * * *');
+        $schedule->call('App\Http\Controllers\RateData\RateDataController@check_payment')->cron('*/10 * * * *');
+        $schedule->call('App\Http\Controllers\Item\ItemController@updateStockItemsApiNoLogin')->cron('*/15 * * * *');
+        $schedule->call('App\Http\Controllers\Item\ItemController@apiItemCronNoLogin')->cron('*/20 * * * *');
+        $schedule->call('App\Http\Controllers\ScheduleShipment\ScheduleShipmentController@getScheduleFromApiNoLogin')->cron('*/30 * * * *');
+        $schedule->call('App\Http\Controllers\ScheduleShipment\ScheduleShipmentController@stock_history')->cron('*/35 * * * *');
+
         $schedule->call('App\Http\Controllers\AlarmData\AlarmDataController@insertDailyAlarm7')->cron('01 9 * * *');
         $schedule->call('App\Http\Controllers\AlarmData\AlarmDataController@insertDailyAlarm30')->cron('02 9 * * *');
         $schedule->call('App\Http\Controllers\AlarmData\AlarmDataController@insertDailyAlarmInsulace7')->cron('03 9 * * *');
