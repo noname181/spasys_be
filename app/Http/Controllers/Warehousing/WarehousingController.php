@@ -6179,7 +6179,7 @@ class WarehousingController extends Controller
                             'cbh_status_after' => 'taxed'
                         ]);
 
-                        $tax_number = CommonFunc::generate_tax_number($id);
+                        $tax_number = CommonFunc::generate_tax_number($id,$request->rgd_no);
 
                         $api = $this->tax_invoice_api($rgd, $user, $tid, $tax_number, null);
                           
@@ -6360,7 +6360,7 @@ class WarehousingController extends Controller
                     'mb_no' => $user->mb_no,
                 ]);
 
-                $tax_number = CommonFunc::generate_tax_number($id);
+                $tax_number = CommonFunc::generate_tax_number($id,$request->rgd_no);
 
                 TaxInvoiceDivide::where('tid_no', $id)->update([
                     'tid_number' => $tax_number ? $tax_number : null,
@@ -6465,7 +6465,7 @@ class WarehousingController extends Controller
                         'mb_no' => $user->mb_no,
                     ]);
 
-                    $tax_number = CommonFunc::generate_tax_number($rgd['rgd_no']);
+                    $tax_number = CommonFunc::generate_tax_number($id,$rgd['rgd_no']);
 
                     $api = $this->tax_invoice_api($rgd, $user, null, $tax_number, null);
                     
