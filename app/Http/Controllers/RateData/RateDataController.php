@@ -7214,7 +7214,7 @@ class RateDataController extends Controller
         }else if($rgd->service_korean_name == '보세화물' && str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
             $name = 'bonded_est_monthbill_';
         }else {
-            $name = 'bonded_est_monthbill_';
+            $name = 'bonded_final_casebill_';
         }
 
         $mask = $path . $name .'*.*';
@@ -7301,7 +7301,7 @@ class RateDataController extends Controller
         $sheet->mergeCells('B15:R15');
         $sheet->setCellValue('B15', ' ∙ 청구서 발행일 : '. Carbon::createFromFormat('Y-m-d H:i:s', $rgd->created_at)->format('Y.m.d'));
         $sheet->mergeCells('B16:R16');
-        $sheet->setCellValue('B16', ' ∙ 예상 청구금액 : '. $rgd->rate_data_general->rdg_sum7 . '원');
+        $sheet->setCellValue('B16', ' ∙ 예상 청구금액 : '. ($rgd->rate_data_general->rdg_sum7 + $rgd->rate_data_general->rdg_sum14) . '원');
         $sheet->mergeCells('B17:R17');
         $sheet->setCellValue('B17', ' ∙ 계좌  정보 : ㈜'. $company->company_payment->cp_bank_name .' ' . $company->company_payment->cp_bank_number . ' ('. $company->company_payment->cp_card_name. ')');
 
@@ -7483,13 +7483,8 @@ class RateDataController extends Controller
             File::makeDirectory($path, $mode = 0777, true, true);
         }
 
-        if($rgd->service_korean_name == '보세화물' && !str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
-            $name = 'bonded_est_casebill_';
-        }else if($rgd->service_korean_name == '보세화물' && str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
-            $name = 'bonded_est_monthbill_';
-        }else {
-            $name = 'bonded_final_casebill_';
-        }
+        $name = 'bonded_final_monthbill_';
+
 
         $mask = $path . $name .'*.*';
         array_map('unlink', glob($mask) ?: []);
