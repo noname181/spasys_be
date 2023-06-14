@@ -250,13 +250,17 @@ class RateDataController extends Controller
                 Log::error($val);
                 if(!isset($validated['rate_data'][$index]['rd_cate1']))  {
                     $validated['rate_data'][$index]['rd_cate1'] = isset($validated['rate_data'][$index]['rd_cate2']) ?  $validated['rate_data'][$index]['rd_cate2'] : '';
+                    $val['rd_cate1'] = isset($validated['rate_data'][$index]['rd_cate2']) ?  $validated['rate_data'][$index]['rd_cate2'] : '';
                 }else if($validated['rate_data'][$index]['rd_cate1'] == ''){
                     $validated['rate_data'][$index]['rd_cate1'] = isset($validated['rate_data'][$index]['rd_cate2']) ?  $validated['rate_data'][$index]['rd_cate2'] : '';
+                    $val['rd_cate1'] = isset($validated['rate_data'][$index]['rd_cate2']) ?  $validated['rate_data'][$index]['rd_cate2'] : '';
                 }
                 if(!isset($validated['rate_data'][$index]['rd_cate2']))  {
                     $validated['rate_data'][$index]['rd_cate2'] = isset($validated['rate_data'][$index]['rd_cate1']) ?  $validated['rate_data'][$index]['rd_cate1'] : '';
+                    $val['rd_cate2'] = isset($validated['rate_data'][$index]['rd_cate1']) ?  $validated['rate_data'][$index]['rd_cate1'] : '';
                 }else if($validated['rate_data'][$index]['rd_cate2'] == ''){
                     $validated['rate_data'][$index]['rd_cate2'] = isset($validated['rate_data'][$index]['rd_cate1']) ?  $validated['rate_data'][$index]['rd_cate1'] : '';
+                    $val['rd_cate2'] = isset($validated['rate_data'][$index]['rd_cate1']) ?  $validated['rate_data'][$index]['rd_cate1'] : '';
                 }
 
                 if($index != 0){
@@ -2981,9 +2985,9 @@ class RateDataController extends Controller
 
             //UPDATE EST BILL WHEN ISSUE FINAL BILL
             if($request->type == 'create_final'){
-                // RateMetaData::where('rgd_no', $request->rgd_no)->update([
-                //     'rgd_no' => $final_rgd->rgd_no,
-                // ]);
+                RateMetaData::where('rgd_no', $request->rgd_no)->where('set_type', 'like', '%final%')->update([
+                    'rgd_no' => $final_rgd->rgd_no,
+                ]);
 
                 $est_rgd =  ReceivingGoodsDelivery::where('rgd_no', $final_rgd->rgd_parent_no)->first();
 
@@ -5748,6 +5752,7 @@ class RateDataController extends Controller
         $sheet->getStyle('Z10')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
         $sheet->setCellValue('Z10', '수신자명 : '. $company->co_owner . ' (' . $company->co_email . ')');
 
+        $sheet->getRowDimension('11')->setVisible(false);
         $sheet->getStyle('B13:B17')->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('EDEDED'));
         $sheet->getStyle('B13:B17')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
         $sheet->getStyle('B13:B17')->getFont()->setBold(true);
@@ -6072,11 +6077,11 @@ class RateDataController extends Controller
                 $sheet->mergeCells('L'.($current_row - 1).':N'.($current_row - 1));
                 $sheet->setCellValue('L'.($current_row - 1), $rd_data4_total);
                 $sheet->mergeCells('O'.($current_row - 1).':Q'.($current_row - 1));
-                $sheet->setCellValue('O'.($current_row - 1), $rgd->rate_data_general['rdg_supply_price2']);
+                $sheet->setCellValue('O'.($current_row - 1), $rgd->rate_data_general['rdg_supply_price'.($key_rate == 0 ? '2' : ($key_rate == 1 ? '1' : ($key_rate + 1)))]);
                 $sheet->mergeCells('R'.($current_row - 1).':T'.($current_row - 1));
-                $sheet->setCellValue('R'.($current_row - 1), $rgd->rate_data_general['rdg_vat2']);
+                $sheet->setCellValue('R'.($current_row - 1), $rgd->rate_data_general['rdg_vat'.($key_rate == 0 ? '2' : ($key_rate == 1 ? '1' : ($key_rate + 1)))]);
                 $sheet->mergeCells('U'.($current_row - 1).':W'.($current_row - 1));
-                $sheet->setCellValue('U'.($current_row - 1), $rgd->rate_data_general['rdg_sum2']);
+                $sheet->setCellValue('U'.($current_row - 1), $rgd->rate_data_general['rdg_sum'.($key_rate == 0 ? '2' : ($key_rate == 1 ? '1' : ($key_rate + 1)))]);
                 $sheet->mergeCells('X'.($current_row - 1).':Z'.($current_row - 1));
 
             }
@@ -7214,7 +7219,7 @@ class RateDataController extends Controller
         }else if($rgd->service_korean_name == '보세화물' && str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
             $name = 'bonded_est_monthbill_';
         }else {
-            $name = 'bonded_est_monthbill_';
+            $name = 'bonded_final_casebill_';
         }
 
         $mask = $path . $name .'*.*';
@@ -7301,7 +7306,7 @@ class RateDataController extends Controller
         $sheet->mergeCells('B15:R15');
         $sheet->setCellValue('B15', ' ∙ 청구서 발행일 : '. Carbon::createFromFormat('Y-m-d H:i:s', $rgd->created_at)->format('Y.m.d'));
         $sheet->mergeCells('B16:R16');
-        $sheet->setCellValue('B16', ' ∙ 예상 청구금액 : '. $rgd->rate_data_general->rdg_sum7 . '원');
+        $sheet->setCellValue('B16', ' ∙ 예상 청구금액 : '. ($rgd->rate_data_general->rdg_sum7 + $rgd->rate_data_general->rdg_sum14) . '원');
         $sheet->mergeCells('B17:R17');
         $sheet->setCellValue('B17', ' ∙ 계좌  정보 : ㈜'. $company->company_payment->cp_bank_name .' ' . $company->company_payment->cp_bank_number . ' ('. $company->company_payment->cp_card_name. ')');
 
@@ -7483,13 +7488,8 @@ class RateDataController extends Controller
             File::makeDirectory($path, $mode = 0777, true, true);
         }
 
-        if($rgd->service_korean_name == '보세화물' && !str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
-            $name = 'bonded_est_casebill_';
-        }else if($rgd->service_korean_name == '보세화물' && str_contains($rgd->rgd_bill_type, 'month') && $rgd->rgd_status4 == '예상경비청구서'){
-            $name = 'bonded_est_monthbill_';
-        }else {
-            $name = 'bonded_final_casebill_';
-        }
+        $name = 'bonded_final_monthbill_';
+
 
         $mask = $path . $name .'*.*';
         array_map('unlink', glob($mask) ?: []);
