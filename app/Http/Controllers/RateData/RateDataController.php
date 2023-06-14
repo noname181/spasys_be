@@ -6076,11 +6076,11 @@ class RateDataController extends Controller
                 $sheet->mergeCells('L'.($current_row - 1).':N'.($current_row - 1));
                 $sheet->setCellValue('L'.($current_row - 1), $rd_data4_total);
                 $sheet->mergeCells('O'.($current_row - 1).':Q'.($current_row - 1));
-                $sheet->setCellValue('O'.($current_row - 1), $rgd->rate_data_general['rdg_supply_price2']);
+                $sheet->setCellValue('O'.($current_row - 1), $rgd->rate_data_general['rdg_supply_price'.($key_rate == 0 ? '2' : ($key_rate == 1 ? '1' : ($key_rate + 1)))]);
                 $sheet->mergeCells('R'.($current_row - 1).':T'.($current_row - 1));
-                $sheet->setCellValue('R'.($current_row - 1), $rgd->rate_data_general['rdg_vat2']);
+                $sheet->setCellValue('R'.($current_row - 1), $rgd->rate_data_general['rdg_vat'.($key_rate == 0 ? '2' : ($key_rate == 1 ? '1' : ($key_rate + 1)))]);
                 $sheet->mergeCells('U'.($current_row - 1).':W'.($current_row - 1));
-                $sheet->setCellValue('U'.($current_row - 1), $rgd->rate_data_general['rdg_sum2']);
+                $sheet->setCellValue('U'.($current_row - 1), $rgd->rate_data_general['rdg_sum'.($key_rate == 0 ? '2' : ($key_rate == 1 ? '1' : ($key_rate + 1)))]);
                 $sheet->mergeCells('X'.($current_row - 1).':Z'.($current_row - 1));
 
             }
