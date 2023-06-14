@@ -8051,46 +8051,68 @@ class WarehousingController extends Controller
             $s_no = $rgd->warehousing->company->co_parent->co_no;
         }
 
+        $amount_price = 0;
+        $total_price = 0;
+        $vat_price = 0;
+
         if($rgd->service_korean_name == '보세화물'){
             if($price){
+                $amount_price = $price['tid_supply_price'];
                 $total_price = $price['tid_sum'];
+                $vat_price = $price['tid_vat'];
             }else{
                 if($rgds){
                     $total_price = 0;
                     foreach($rgds as $rgdp){
+                        $amount_price += $rgdp['rate_data_general']['rdg_supply_price7'];
                         $total_price += $rgdp['rate_data_general']['rdg_sum7'];
+                        $vat_price += $rgdp['rate_data_general']['rdg_vat7'];
                     }
                 }else{
+                    $amount_price = $rgd->rate_data_general->rdg_supply_price7;
                     $total_price = $rgd->rate_data_general->rdg_sum7;
+                    $vat_price = $rgd->rate_data_general->rdg_vat7;
                 }
                 
             }
         
         }else if($rgd->service_korean_name == '수입풀필먼트'){
             if($price){
+                $amount_price = $price['tid_supply_price'];
                 $total_price = $price['tid_sum'];
+                $vat_price = $price['tid_vat'];
             }else{
                 if($rgds){
                     $total_price = 0;
                     foreach($rgds as $rgdp){
+                        $amount_price += $rgdp['rate_data_general']['rdg_supply_price6'];
                         $total_price += $rgdp['rate_data_general']['rdg_sum6'];
+                        $vat_price += $rgdp['rate_data_general']['rdg_vat6'];
                     }
                 }else{
+                    $amount_price = $rgd->rate_data_general->rdg_supply_price6;
                     $total_price = $rgd->rate_data_general->rdg_sum6;
+                    $vat_price = $rgd->rate_data_general->rdg_vat6;
                 }
             }
             
         }else if($rgd->service_korean_name == '유통가공'){
             if($price){
+                $amount_price = $price['tid_supply_price'];
                 $total_price = $price['tid_sum'];
+                $vat_price = $price['tid_vat'];
             }else{
                 if($rgds){
                     $total_price = 0;
                     foreach($rgds as $rgdp){
+                        $amount_price += $rgdp['rate_data_general']['rdg_supply_price4'];
                         $total_price += $rgdp['rate_data_general']['rdg_sum4'];
+                        $vat_price += $rgdp['rate_data_general']['rdg_vat4'];
                     }
                 }else{
+                    $amount_price = $rgd->rate_data_general->rdg_supply_price4;
                     $total_price = $rgd->rate_data_general->rdg_sum4;
+                    $vat_price = $rgd->rate_data_general->rdg_vat4;
                 }
             }
         }
@@ -8224,7 +8246,7 @@ class WarehousingController extends Controller
         //-------------------------------------------
         //공급가액 총액
         //-------------------------------------------
-        $AmountTotal = $total_price - round($total_price * 10 / 110);    // total price without tax
+        $AmountTotal = $amount_price;//$total_price - round($total_price * 10 / 110);    // total price without tax
 
         //-------------------------------------------
         //세액합계
@@ -8232,14 +8254,14 @@ class WarehousingController extends Controller
         //$TaxType 이 2 또는 3 으로 셋팅된 경우 0으로 입력
         //-------------------------------------------
 
-        $TaxTotal = round($total_price * 10 / 110);        // total tax
+        $TaxTotal = $vat_price;//round($total_price * 10 / 110);        // total tax
 
         //-------------------------------------------
         //합계금액
         //-------------------------------------------
         //공급가액 총액 + 세액합계 와 일치해야 합니다.
         //-------------------------------------------
-        $TotalAmount = $AmountTotal + $TaxTotal;            // total price 
+        $TotalAmount = $total_price;//$AmountTotal + $TaxTotal;            // total price 
         
 
         $Cash = '';                                //현금
