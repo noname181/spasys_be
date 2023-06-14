@@ -2985,9 +2985,9 @@ class RateDataController extends Controller
 
             //UPDATE EST BILL WHEN ISSUE FINAL BILL
             if($request->type == 'create_final'){
-                // RateMetaData::where('rgd_no', $request->rgd_no)->update([
-                //     'rgd_no' => $final_rgd->rgd_no,
-                // ]);
+                RateMetaData::where('rgd_no', $request->rgd_no)->where('set_type', 'like', '%final%')->update([
+                    'rgd_no' => $final_rgd->rgd_no,
+                ]);
 
                 $est_rgd =  ReceivingGoodsDelivery::where('rgd_no', $final_rgd->rgd_parent_no)->first();
 
