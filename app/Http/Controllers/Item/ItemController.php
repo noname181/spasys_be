@@ -2599,7 +2599,7 @@ class ItemController extends Controller
                 })->orderBy('update_api_time', 'ASC');
 
             //$import_schedule->whereNull('ddd.te_logistic_manage_number');
-            $import_schedule = $import_schedule->offset(0)->limit(50)->get();
+            $import_schedule = $import_schedule->offset(0)->limit(30)->get();
             //$this->createBondedSettlement();
 
             //return $import_schedule;
