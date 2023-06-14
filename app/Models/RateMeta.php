@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use DateTimeInterface;
-use App\Models\SendEmail;
+use App\Models\SendEmailHistory;
 class RateMeta extends Model
 {
     use HasFactory;
@@ -48,7 +48,7 @@ class RateMeta extends Model
     ];
 
     public function send_email() {
-        return $this->hasOne(SendEmail::class, 'rm_no', 'rm_no')->orderBy('se_no','desc')->with('member');
+        return $this->hasOne(SendEmailHistory::class, 'rm_no', 'rm_no')->orderBy('se_no','desc')->with('member');
     }
 
 }

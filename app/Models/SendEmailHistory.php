@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use DateTimeInterface;
 use App\Models\Member;
-class SendEmail extends Model
+class SendEmailHistory extends Model
 {
     use HasFactory;
 
