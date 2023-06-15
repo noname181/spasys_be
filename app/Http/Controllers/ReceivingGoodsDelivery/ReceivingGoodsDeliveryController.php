@@ -23,6 +23,7 @@ use App\Models\CancelBillHistory;
 //use App\Models\CargoConnect;
 use App\Utils\Messages;
 use App\Utils\CommonFunc;
+use App\Http\Controllers\Warehousing\WarehousingController;
 use Illuminate\Http\Request;
 use PhpParser\Node\Stmt\TryCatch;
 use Illuminate\Support\Facades\DB;
@@ -539,7 +540,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     }
 
                     if ($check_alarm_firstIW2 == null && $status1 == "입고") {
-                       CommonFunc::insert_alarm_cargo('[유통가공] 입고', null, $user, $w_no_alert, 'cargo_IW');
+                        CommonFunc::insert_alarm_cargo('[유통가공] 입고', null, $user, $w_no_alert, 'cargo_IW');
                     }
                 }
             } else {
@@ -2641,7 +2642,7 @@ class ReceivingGoodsDeliveryController extends Controller
             DB::beginTransaction();
             $user = Auth::user();
             $text = "";
-            $text_delete= "";
+            $text_delete = "";
 
             if ($request->type == 'add_all') {
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
@@ -2650,8 +2651,8 @@ class ReceivingGoodsDeliveryController extends Controller
 
                 $rgds = ReceivingGoodsDelivery::where('tid_no', $rgd->tid_no)->get();
 
-                
-                
+
+
                 foreach ($rgds as $rgd) {
                     CommonFunc::insert_alarm('[공통] 계산서취소 안내', $rgd, $user, null, 'settle_payment', null);
 
@@ -2722,9 +2723,9 @@ class ReceivingGoodsDeliveryController extends Controller
 
                 $procType = "ISSUE_CANCEL";
 
-                foreach($apis as $api){
-                    
-                    
+                foreach ($apis as $api) {
+
+
                     $Result = $BaroService_TI->ProcTaxInvoice(array(
                         'CERTKEY'    => $CERTKEY,
                         'CorpNum'    => '2168142360',
@@ -2737,23 +2738,23 @@ class ReceivingGoodsDeliveryController extends Controller
                     //     'CERTKEY'    => $CERTKEY,
                     //     'CorpNum'    => '2168142360',
                     //     'MgtKey'    => $api->t_mgtnum,
-                        
+
                     // ))->DeleteTaxInvoiceResult;
 
                     $text = $this->getErrStr($BaroService_TI, $CERTKEY, $Result);
 
                     if ($Result == 1 && $text != "error") {
                         $text = "";
-                        $text_delete= "";
-                    }else{
+                        $text_delete = "";
+                    } else {
                         $text = "error";
-                        $text_delete= "";
+                        $text_delete = "";
                     }
                 }
 
                 //$text_delete = $this->getErrStr($BaroService_TI, $CERTKEY, $Result_delete);
 
-                
+
 
                 ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_status7' => 'cancel',
@@ -2806,12 +2807,12 @@ class ReceivingGoodsDeliveryController extends Controller
 
             TaxInvoiceDivide::where('rgd_no', $request->rgd_no)->delete();
 
-            if($text == "error"){
-                DB::rollBack();  
-            }else{
+            if ($text == "error") {
+                DB::rollBack();
+            } else {
                 DB::commit();
             }
-            
+
 
             return response()->json([
                 'message' => 'Success',
@@ -2827,16 +2828,17 @@ class ReceivingGoodsDeliveryController extends Controller
         }
     }
 
-    public function getErrStr($BaroService_TI, $CERTKEY, $ErrCode){
+    public function getErrStr($BaroService_TI, $CERTKEY, $ErrCode)
+    {
         //global $BaroService_TI;
-       
+
         $ErrStr = $BaroService_TI->GetErrString(array(
-          'CERTKEY' => $CERTKEY,
-          'ErrCode' => $ErrCode
+            'CERTKEY' => $CERTKEY,
+            'ErrCode' => $ErrCode
         ))->GetErrStringResult;
-      
+
         return $ErrStr;
-      }
+    }
 
     public function update_settlement_status(Request $request)
     {
@@ -3490,10 +3492,13 @@ class ReceivingGoodsDeliveryController extends Controller
     public function update_status5(Request $request)
     {
         DB::beginTransaction();
+
         try {
             $user = Auth::user();
 
             //UPDATE FOR CASE BILL
+
+            $api['message'] = "tax_ok";
             if ($request->bill_type == 'case') {
                 $rgd = ReceivingGoodsDelivery::with(['rate_data_general', 'warehousing'])->where('rgd_no', $request->rgd_no)->first();
 
@@ -3574,7 +3579,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'rgd_tax_invoice_date' =>  Carbon::now()->toDateTimeString(),
                             ]);
 
-                            $tax_number = CommonFunc::generate_tax_number($rgd->rgd_no);
+
 
                             $tid = TaxInvoiceDivide::updateOrCreate(
                                 [
@@ -3593,9 +3598,17 @@ class ReceivingGoodsDeliveryController extends Controller
                                     'co_address'  => $company->co_address,
                                     'co_email'  => $ag->ag_email,
                                     'co_email2'  => $ag->ag_email2,
-                                    'rgd_number' => $tax_number,
+                                    //'rgd_number' => $tax_number,
                                 ]
                             );
+
+                            $tax_number = CommonFunc::generate_tax_number($tid, $rgd->rgd_no);
+
+                            $api = WarehousingController::tax_invoice_api($rgd, $user, $tid, $tax_number, null);
+
+                            TaxInvoiceDivide::where('tid_no', $tid)->update([
+                                'tid_number' => $tax_number ? $tax_number : null,
+                            ]);
 
                             CancelBillHistory::insertGetId([
                                 'rgd_no' => $request->rgd_no,
@@ -3704,7 +3717,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                     'rgd_tax_invoice_date' =>  Carbon::now()->toDateTimeString(),
                                 ]);
 
-                                $tax_number = CommonFunc::generate_tax_number($rgd->rgd_no);
+                                //$tax_number = CommonFunc::generate_tax_number($rgd->rgd_no);
 
                                 $tid = TaxInvoiceDivide::updateOrCreate(
                                     [
@@ -3722,10 +3735,18 @@ class ReceivingGoodsDeliveryController extends Controller
                                         'co_address'  => $company->co_address,
                                         'co_email'  => $ag->ag_email,
                                         'co_email2'  => $ag->ag_email2,
-                                        'rgd_number' => $tax_number,
-                                        'tid_number' => $rgd['rgd_settlement_number'],
+                                        //'rgd_number' => $tax_number,
+                                        'rgd_number' => $rgd['rgd_settlement_number'],
                                     ]
                                 );
+
+                                $tax_number = CommonFunc::generate_tax_number($tid, $rgd->rgd_no);
+
+                                $api = WarehousingController::tax_invoice_api($rgd, $user, $tid, $tax_number, null);
+
+                                TaxInvoiceDivide::where('tid_no', $tid)->update([
+                                    'tid_number' => $tax_number ? $tax_number : null,
+                                ]);
 
                                 CancelBillHistory::insertGetId([
                                     'rgd_no' => $rgd->rgd_no,
@@ -3834,7 +3855,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                     'rgd_tax_invoice_date' =>  $ag->ag_auto_issue == 'y' ? Carbon::now()->toDateTimeString() : NULL,
                                 ]);
 
-                                $tax_number = CommonFunc::generate_tax_number($rgd->rgd_no);
+                                //$tax_number = CommonFunc::generate_tax_number($rgd->rgd_no);
 
                                 $tid = TaxInvoiceDivide::updateOrCreate(
                                     [
@@ -3852,10 +3873,18 @@ class ReceivingGoodsDeliveryController extends Controller
                                         'co_address'  => $company->co_address,
                                         'co_email'  => $ag->ag_email,
                                         'co_email2'  => $ag->ag_email2,
-                                        'rgd_number' => $tax_number,
-                                        'tid_number' => $rgd['rgd_settlement_number'],
+                                        //'rgd_number' => $tax_number,
+                                        'rgd_number' => $rgd['rgd_settlement_number'],
                                     ]
                                 );
+
+                                $tax_number = CommonFunc::generate_tax_number($tid, $rgd->rgd_no);
+
+                                $api = WarehousingController::tax_invoice_api($rgd, $user, $tid, $tax_number, null);
+
+                                TaxInvoiceDivide::where('tid_no', $tid)->update([
+                                    'tid_number' => $tax_number ? $tax_number : null,
+                                ]);
 
                                 CancelBillHistory::insertGetId([
                                     'rgd_no' => $rgd->rgd_no,
@@ -3900,9 +3929,17 @@ class ReceivingGoodsDeliveryController extends Controller
                     // }
                 }
             }
-            DB::commit();
+
+            if ($api['message'] == "tax_err") {
+                DB::rollBack();
+            } else {
+                DB::commit();
+            }
+
             return response()->json([
-                'message' => 'Success'
+                'message' => 'Success',
+                'api' => isset($api['message']) ? $api['message'] : null,
+                'api_message' => isset($api['txt']) ? $api['txt'] : null,
             ]);
         } catch (\Exception $e) {
             DB::rollback();
@@ -4071,9 +4108,9 @@ class ReceivingGoodsDeliveryController extends Controller
 
             //     array_push($headers, "content-type: application/json; charset=utf-8");
             //     array_push($headers, "ApiKey: 619a3048e7e01eaabd23d2017ff5dce18e14431a2d69cd9d8c");
-    
+
             //     $cookiepayments_url = "https://www.cookiepayments.com/urlpay/kakao";
-    
+
             //     $request_data_array = array(
             //         'API_ID' => 'hfmkpjm2hnr',
             //         'PRODUCTNAME'=> 'AAAAA',
@@ -4084,7 +4121,7 @@ class ReceivingGoodsDeliveryController extends Controller
             //     );
             //     $cookiepayments_json = json_encode($request_data_array, TRUE);
             //     $ch = curl_init(); // curl 초기화
-    
+
             //     curl_setopt($ch,CURLOPT_URL, $cookiepayments_url);
             //     curl_setopt($ch,CURLOPT_POST, false);
             //     curl_setopt($ch,CURLOPT_POSTFIELDS, $cookiepayments_json);
@@ -4093,12 +4130,12 @@ class ReceivingGoodsDeliveryController extends Controller
             //     curl_setopt($ch,CURLOPT_TIMEOUT, 20);
             //     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
             //     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-    
+
             //     $response = curl_exec($ch);
             //     curl_close($ch);
             //     $json = json_encode($response);
             //     $array = json_decode($json, TRUE);
-    
+
             //     return $array;
             // }
 
@@ -4277,71 +4314,71 @@ class ReceivingGoodsDeliveryController extends Controller
             $check_payment = Payment::where('rgd_no', $request->rgd_no)->where('p_success_yn', 'y')->orderBy('p_no', 'desc')->first();
             $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
             if (isset($check_payment)) {
-                if($check_payment->p_method == 'card' || $check_payment->p_method == 'virtual_account'){
+                if ($check_payment->p_method == 'card' || $check_payment->p_method == 'virtual_account') {
 
-                    $tokenheaders  = array(); 
+                    $tokenheaders  = array();
 
-                    array_push($tokenheaders , "content-type: application/json; charset=utf-8");
-                    array_push($tokenheaders , "ApiKey: 619a3048e7e01eaabd23d2017ff5dce18e14431a2d69cd9d8c");
-        
+                    array_push($tokenheaders, "content-type: application/json; charset=utf-8");
+                    array_push($tokenheaders, "ApiKey: 619a3048e7e01eaabd23d2017ff5dce18e14431a2d69cd9d8c");
+
                     $token_url  = "https://www.cookiepayments.com/payAuth/token";
-        
+
                     $token_request_data = array(
                         'pay2_id' => 'hfmkpjm2hnr',
-                        'pay2_key'=> '619a3048e7e01eaabd23d2017ff5dce18e14431a2d69cd9d8c',
+                        'pay2_key' => '619a3048e7e01eaabd23d2017ff5dce18e14431a2d69cd9d8c',
                     );
 
                     $req_json  = json_encode($token_request_data, TRUE);
 
                     $ch = curl_init(); // curl 초기화
-        
-                    curl_setopt($ch,CURLOPT_URL, $token_url);
-                    curl_setopt($ch,CURLOPT_POST, false);
-                    curl_setopt($ch,CURLOPT_POSTFIELDS, $req_json);
-                    curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
-                    curl_setopt($ch,CURLOPT_CONNECTTIMEOUT ,3);
-                    curl_setopt($ch,CURLOPT_TIMEOUT, 20);
+
+                    curl_setopt($ch, CURLOPT_URL, $token_url);
+                    curl_setopt($ch, CURLOPT_POST, false);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $req_json);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
+                    curl_setopt($ch, CURLOPT_TIMEOUT, 20);
                     curl_setopt($ch, CURLOPT_HTTPHEADER, $tokenheaders);
                     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-        
+
                     $response = curl_exec($ch);
                     curl_close($ch);
 
                     $RES_STR  = json_decode($response, TRUE);
-        
-                    if($RES_STR['RTN_CD'] == '0000'){
 
-                        $headers = array(); 
+                    if ($RES_STR['RTN_CD'] == '0000') {
+
+                        $headers = array();
                         array_push($headers, "content-type: application/json; charset=utf-8");
-                        array_push($headers, "TOKEN:". $RES_STR['TOKEN']);
+                        array_push($headers, "TOKEN:" . $RES_STR['TOKEN']);
                         array_push($headers, "ApiKey: 619a3048e7e01eaabd23d2017ff5dce18e14431a2d69cd9d8c");
-                    
+
                         $cookiepayments_url = "https://www.cookiepayments.com/api/cancel";
-                    
+
                         $request_data_array = array(
                             'tid' => $check_payment->p_tid,
-                            'reason'=> 'Reasons for cancellation',
+                            'reason' => 'Reasons for cancellation',
                             'account_no' => $check_payment->p_accountno,
                         );
-                    
+
                         $cookiepayments_json = json_encode($request_data_array, TRUE);
-                    
+
                         $ch = curl_init(); // set default curl
-                    
-                        curl_setopt($ch,CURLOPT_URL, $cookiepayments_url);
-                        curl_setopt($ch,CURLOPT_POST, false);
-                        curl_setopt($ch,CURLOPT_POSTFIELDS, $cookiepayments_json);
-                        curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
-                        curl_setopt($ch,CURLOPT_CONNECTTIMEOUT ,3);
-                        curl_setopt($ch,CURLOPT_TIMEOUT, 20);
+
+                        curl_setopt($ch, CURLOPT_URL, $cookiepayments_url);
+                        curl_setopt($ch, CURLOPT_POST, false);
+                        curl_setopt($ch, CURLOPT_POSTFIELDS, $cookiepayments_json);
+                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
+                        curl_setopt($ch, CURLOPT_TIMEOUT, 20);
                         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
                         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
                         $response = curl_exec($ch);
                         curl_close($ch);
 
-                        $result_array = json_decode($response,TRUE);
+                        $result_array = json_decode($response, TRUE);
 
-                        if($result_array['cancel_code'] == '0000'){
+                        if ($result_array['cancel_code'] == '0000') {
                             Payment::where('p_no', $check_payment->p_no)->update([
                                 // 'p_price' => $request->sumprice,
                                 // 'p_method' => $request->p_method,
@@ -4351,13 +4388,13 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'p_cancel_tid' => $result_array['cancel_tid'],
                                 'p_cancel_amount' => $result_array['cancel_amt'],
                             ]);
-            
+
                             ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                                 'rgd_status6' => 'cancel',
                                 'rgd_paid_date' => null,
                                 'rgd_canceled_date' => Carbon::now(),
                             ]);
-            
+
                             CancelBillHistory::insertGetId([
                                 'mb_no' => Auth::user()->mb_no,
                                 'rgd_no' => $request->rgd_no,
@@ -4365,7 +4402,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'cbh_status_after' => 'cancel',
                                 'cbh_type' => 'cancel_payment',
                             ]);
-            
+
                             CancelBillHistory::insertGetId([
                                 'mb_no' => Auth::user()->mb_no,
                                 'rgd_no' => $request->rgd_no,
@@ -4373,7 +4410,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'cbh_status_after' => 'request_bill',
                                 'cbh_type' => 'payment',
                             ]);
-            
+
                             if ($rgd->rgd_status8 == 'completed') {
                                 CancelBillHistory::insertGetId([
                                     'rgd_no' => $request->rgd_no,
@@ -4382,11 +4419,11 @@ class ReceivingGoodsDeliveryController extends Controller
                                     'cbh_status_before' => $rgd->rgd_status8,
                                     'cbh_status_after' => 'in_process'
                                 ]);
-            
+
                                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                                     'rgd_status8' =>  'in_process',
                                 ]);
-            
+
                                 //UPDATE EST BILL
                                 $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
                                 if ($est_rgd->rgd_status8 != 'in_process') {
@@ -4408,7 +4445,7 @@ class ReceivingGoodsDeliveryController extends Controller
                                 'message' => 'Success',
                                 'a' => $check_payment->p_tid
                             ]);
-                        }else {
+                        } else {
                             DB::commit();
                             return response()->json([
                                 'message' => $result_array['cancel_msg'],
@@ -4416,8 +4453,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             ]);
                         }
                     }
-                    
-                }else {
+                } else {
                     Payment::where('p_no', $check_payment->p_no)->update([
                         // 'p_price' => $request->sumprice,
                         // 'p_method' => $request->p_method,
@@ -4425,13 +4461,13 @@ class ReceivingGoodsDeliveryController extends Controller
                         'p_cancel_yn' => 'y',
                         'p_cancel_time' => Carbon::now(),
                     ]);
-    
+
                     ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                         'rgd_status6' => 'cancel',
                         'rgd_paid_date' => null,
                         'rgd_canceled_date' => Carbon::now(),
                     ]);
-    
+
                     CancelBillHistory::insertGetId([
                         'mb_no' => Auth::user()->mb_no,
                         'rgd_no' => $request->rgd_no,
@@ -4439,7 +4475,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         'cbh_status_after' => 'cancel',
                         'cbh_type' => 'cancel_payment',
                     ]);
-    
+
                     CancelBillHistory::insertGetId([
                         'mb_no' => Auth::user()->mb_no,
                         'rgd_no' => $request->rgd_no,
@@ -4447,7 +4483,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         'cbh_status_after' => 'request_bill',
                         'cbh_type' => 'payment',
                     ]);
-    
+
                     if ($rgd->rgd_status8 == 'completed') {
                         CancelBillHistory::insertGetId([
                             'rgd_no' => $request->rgd_no,
@@ -4456,11 +4492,11 @@ class ReceivingGoodsDeliveryController extends Controller
                             'cbh_status_before' => $rgd->rgd_status8,
                             'cbh_status_after' => 'in_process'
                         ]);
-    
+
                         ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                             'rgd_status8' =>  'in_process',
                         ]);
-    
+
                         //UPDATE EST BILL
                         $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
                         if ($est_rgd->rgd_status8 != 'in_process') {
@@ -4477,7 +4513,6 @@ class ReceivingGoodsDeliveryController extends Controller
                         }
                     }
                 }
-               
             }
 
 

@@ -6239,8 +6239,8 @@ class WarehousingController extends Controller
                 return response()->json([
                     'message' => Messages::MSG_0007,
                     'tid_list' => $tids,
-                    'api' => $api['message'],
-                    'api_message' => $api['txt']
+                    'api' => isset($api['message']) ? $api['message'] : null,
+                    'api_message' => isset($api['txt']) ? $api['txt'] : null,
                 ]);
             } else if ($request->type == 'receipt') {
                 $user = Auth::user();
@@ -6426,8 +6426,8 @@ class WarehousingController extends Controller
                 }
                 return response()->json([
                     'message' => Messages::MSG_0007,
-                    'api' => $api['message'],
-                    'api_message' => $api['txt']
+                    'api' => isset($api['message']) ? $api['message'] : null,
+                'api_message' => isset($api['txt']) ? $api['txt'] : null,
                 ]);
             } else if ($request->type == 'separate') {
                 $user = Auth::user();
@@ -6524,8 +6524,8 @@ class WarehousingController extends Controller
                 }
                 return response()->json([
                     'message' => Messages::MSG_0007,
-                    'api' => $api['message'],
-                    'api_message' => $api['txt']
+                    'api' => isset($api['message']) ? $api['message'] : null,
+                    'api_message' => isset($api['txt']) ? $api['txt'] : null,
                 ]);
             }
             
@@ -8033,7 +8033,7 @@ class WarehousingController extends Controller
     }
 
     
-    public function tax_invoice_api($rgd, $user, $price, $tax_number, $rgds)//$company1, $company2, $total_price, $b_no
+    public static function tax_invoice_api($rgd, $user, $price, $tax_number, $rgds)//$company1, $company2, $total_price, $b_no
     {
         
         // issuer
