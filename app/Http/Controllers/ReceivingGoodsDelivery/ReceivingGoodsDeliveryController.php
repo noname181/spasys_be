@@ -2642,6 +2642,7 @@ class ReceivingGoodsDeliveryController extends Controller
             $user = Auth::user();
             $text = "";
             $text_delete= "";
+
             if ($request->type == 'add_all') {
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
 
@@ -2702,6 +2703,10 @@ class ReceivingGoodsDeliveryController extends Controller
             } else {
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
 
+                Tax::where('rgd_no', $request->rgd_no)->update([
+                    't_status' => '0',
+                ]);
+
                 $BaroService_URL = 'https://testws.baroservice.com/TI.asmx?WSDL';    //테스트베드용
                 //$BaroService_URL = 'https://ws.baroservice.com/TI.asmx?WSDL';		//실서비스용
 
@@ -2718,6 +2723,8 @@ class ReceivingGoodsDeliveryController extends Controller
                 $procType = "ISSUE_CANCEL";
 
                 foreach($apis as $api){
+                    
+                    
                     $Result = $BaroService_TI->ProcTaxInvoice(array(
                         'CERTKEY'    => $CERTKEY,
                         'CorpNum'    => '2168142360',
@@ -2735,8 +2742,11 @@ class ReceivingGoodsDeliveryController extends Controller
 
                     $text = $this->getErrStr($BaroService_TI, $CERTKEY, $Result);
 
-                    if ($Result == 1) {
+                    if ($Result == 1 && $text != "error") {
                         $text = "";
+                        $text_delete= "";
+                    }else{
+                        $text = "error";
                         $text_delete= "";
                     }
                 }
@@ -2792,13 +2802,17 @@ class ReceivingGoodsDeliveryController extends Controller
                 }
             }
 
-
-
-
             $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child'])->where('rgd_no', $request->rgd_no)->first();
 
             TaxInvoiceDivide::where('rgd_no', $request->rgd_no)->delete();
-            DB::commit();
+
+            if($text == "error"){
+                DB::rollBack();  
+            }else{
+                DB::commit();
+            }
+            
+
             return response()->json([
                 'message' => 'Success',
                 'rgd' => $rgd,
