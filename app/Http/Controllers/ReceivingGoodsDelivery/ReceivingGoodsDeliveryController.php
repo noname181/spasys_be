@@ -4277,7 +4277,7 @@ class ReceivingGoodsDeliveryController extends Controller
             $check_payment = Payment::where('rgd_no', $request->rgd_no)->where('p_success_yn', 'y')->orderBy('p_no', 'desc')->first();
             $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
             if (isset($check_payment)) {
-                if($check_payment->p_method == 'card' || $check_payment->p_method == 'virtual_account'){
+                if($check_payment->p_method == 'card' || $check_payment->p_method == 'virtual_account' || $check_payment->p_method == 'kakao_pay'){
 
                     $tokenheaders  = array(); 
 
@@ -4320,7 +4320,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     
                         $request_data_array = array(
                             'tid' => $check_payment->p_tid,
-                            'reason'=> 'Reasons for cancellation',
+                            'reason'=> 'Client request',
                             'account_no' => $check_payment->p_accountno,
                         );
                     
