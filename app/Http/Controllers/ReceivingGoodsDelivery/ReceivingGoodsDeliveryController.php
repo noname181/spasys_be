@@ -2828,6 +2828,72 @@ class ReceivingGoodsDeliveryController extends Controller
         }
     }
 
+    public function update_status_co_license(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+            $user = Auth::user();
+
+            
+            return $user;
+            $text = "";
+            $text_delete = "";
+
+            $BaroService_URL = 'https://testws.baroservice.com/TI.asmx?WSDL';    //테스트베드용
+            //$BaroService_URL = 'https://ws.baroservice.com/TI.asmx?WSDL';		//실서비스용
+
+            $BaroService_TI = new SoapClient($BaroService_URL, array(
+                'trace'        => 'true',
+                'encoding'    => 'UTF-8'
+            ));
+
+
+            // GetTaxInvoiceStatesEX.php 파일에서도 수정해야 함
+            $CERTKEY = '813FD596-7CBB-490A-84D2-31570487790E';                            //인증키
+
+            // 사업자등록증 확인 프로세스
+            // 바로빌 연동서비스 웹서비스 참조(WebService Reference) URL
+            $BaroService_URL_staus = 'https://testws.baroservice.com/CORPSTATE.asmx?WSDL';    //테스트베드용
+            // $BaroService_URL_staus = 'https://ws.baroservice.com/CORPSTATE.asmx?WSDL';	//실서비스용
+
+            $BaroService_CORPSTATE = new SoapClient($BaroService_URL_staus, array(
+                'trace' => 'true',
+                'encoding' => 'UTF-8' //소스를 ANSI로 사용할 경우 euc-kr로 수정
+            ));
+
+
+
+            $CheckCorpNumList = array(    //확인할 사업자번호 배열
+                $cc_license1,
+                $cc_license2
+            );
+
+            $Result = $BaroService_CORPSTATE->GetCorpStates(array(
+                'CERTKEY'            => $CERTKEY,
+                'CorpNum'            => '2168142360',
+                'CheckCorpNumList'    => $CheckCorpNumList
+            ))->GetCorpStatesResult->CorpState;
+
+            if ($text == "error") {
+                DB::rollBack();
+            } else {
+                DB::commit();
+            }
+
+
+            return response()->json([
+                'message' => 'Success',
+                'txt' => $text,
+                'txt_delete' => $text_delete
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
     public function getErrStr($BaroService_TI, $CERTKEY, $ErrCode)
     {
         //global $BaroService_TI;
@@ -4314,7 +4380,7 @@ class ReceivingGoodsDeliveryController extends Controller
             $check_payment = Payment::where('rgd_no', $request->rgd_no)->where('p_success_yn', 'y')->orderBy('p_no', 'desc')->first();
             $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
             if (isset($check_payment)) {
-                if($check_payment->p_method == 'card' || $check_payment->p_method == 'virtual_account' || $check_payment->p_method == 'kakao_pay'){
+                if ($check_payment->p_method == 'card' || $check_payment->p_method == 'virtual_account' || $check_payment->p_method == 'kakao_pay') {
 
                     $tokenheaders  = array();
 
@@ -4357,7 +4423,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                         $request_data_array = array(
                             'tid' => $check_payment->p_tid,
-                            'reason'=> 'Client request',
+                            'reason' => 'Client request',
                             'account_no' => $check_payment->p_accountno,
                         );
 
