@@ -3789,7 +3789,7 @@ class RateDataController extends Controller
                         }else
                             $final_rdg = $is_exist;
                     }
-
+                    $main_rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
                     $expectation_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->where('rgd_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
                     $final_rgd = ReceivingGoodsDelivery::where('rgd_parent_no', $rgd['rgd_no'])->where('rgd_bill_type', 'final_monthly')->where('rgd_status5', '!=', 'cancel')->first();
 
@@ -3801,6 +3801,7 @@ class RateDataController extends Controller
                         $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
                         $final_rgd->rgd_status4 = '확정청구서';
                         $final_rgd->rgd_issue_date = Carbon::now()->toDateTimeString();
+                        $final_rgd->rgd_memo_settle = $main_rgd->rgd_memo_settle;
                         $final_rgd->rgd_status5 = null;
                         $final_rgd->rgd_status6 = null;
                         $final_rgd->rgd_status7 = null;
@@ -13029,5 +13030,23 @@ class RateDataController extends Controller
         }
     }
 
+    public function update_memo(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                'rgd_memo_settle' => $request->memo
+            ]);
+
+            DB::commit();
+            return response()->json(['message' => Messages::MSG_0007, 'rgd' => $rgd], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
 
 }

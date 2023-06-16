@@ -46,6 +46,7 @@ class ReceivingGoodsDelivery extends Model
         'rgd_bill_type',
         'rgd_hp',
         'rgd_memo',
+        'rgd_memo_settle',
         'rgd_status1',
         'rgd_status2',
         'rgd_status3',

@@ -571,7 +571,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/get_list_payment_history', [\App\Http\Controllers\RateData\RateDataController::class,'get_list_payment_history'])->name('get_list_payment_history');
         Route::post('/get_approval_history', [\App\Http\Controllers\RateData\RateDataController::class,'get_approval_history'])->name('get_approval_history');
 
-
+        Route::post('/update_memo', [\App\Http\Controllers\RateData\RateDataController::class,'update_memo'])->name('update_memo');
     });
 
     Route::prefix('alarm')->name('alarm.')->group(function () {
