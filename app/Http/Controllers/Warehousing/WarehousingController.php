@@ -6119,7 +6119,7 @@ class WarehousingController extends Controller
 
                 $tids = TaxInvoiceDivide::where('rgd_no', $request->rgd_no)->get();
 
-                $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general'])->where('rgd_no', $request->rgd_no)->first();
+                $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general', 't_import_expected'])->where('rgd_no', $request->rgd_no)->first();
 
                 CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $user, null, 'settle_payment', null);
                
@@ -6379,7 +6379,7 @@ class WarehousingController extends Controller
                         'tid_no' => $id
                     ]);
 
-                    $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general'])->where('rgd_no', $rgd['rgd_no'])->first();
+                    $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general', 't_import_expected'])->where('rgd_no', $rgd['rgd_no'])->first();
 
                     CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $user, null, 'settle_payment', null);
 
@@ -6434,7 +6434,7 @@ class WarehousingController extends Controller
 
                 foreach ($request->rgds as $rgd) {
 
-                    $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general'])->where('rgd_no', $rgd['rgd_no'])->first();
+                    $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general', 't_import_expected'])->where('rgd_no', $rgd['rgd_no'])->first();
 
                     CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $user, null, 'settle_payment', null);
 
