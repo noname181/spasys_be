@@ -2834,8 +2834,15 @@ class ReceivingGoodsDeliveryController extends Controller
             DB::beginTransaction();
             $user = Auth::user();
 
+           
+            $company_child = Company::where('co_parent_no', $user->co_no)->orwhere('co_no', $user->co_no)->get();
             
-            return $user;
+            
+            $CheckCorpNumList = [];
+            foreach($company_child as $company){
+                $CheckCorpNumList[] =  $company->co_license;
+            }
+            //return $CheckCorpNumList;
             $text = "";
             $text_delete = "";
 
@@ -2863,16 +2870,32 @@ class ReceivingGoodsDeliveryController extends Controller
 
 
 
-            $CheckCorpNumList = array(    //확인할 사업자번호 배열
-                $cc_license1,
-                $cc_license2
-            );
+            // $CheckCorpNumList = array(    //확인할 사업자번호 배열
+            //     $cc_license1,
+            //     $cc_license2
+            // );
 
             $Result = $BaroService_CORPSTATE->GetCorpStates(array(
                 'CERTKEY'            => $CERTKEY,
                 'CorpNum'            => '2168142360',
                 'CheckCorpNumList'    => $CheckCorpNumList
             ))->GetCorpStatesResult->CorpState;
+
+            foreach($Result as $value){
+                //return $value->State;
+                if($value->State > 0){
+                    Company::where('co_license', $value->CorpNum)->update([
+                        'co_close_yn' => "n",
+                    ]);
+                }else{
+                    Company::where('co_license', $value->CorpNum)->update([
+                        'co_close_yn' => "y",
+                    ]);
+                }
+                
+            }
+
+            
 
             if ($text == "error") {
                 DB::rollBack();
@@ -2884,7 +2907,8 @@ class ReceivingGoodsDeliveryController extends Controller
             return response()->json([
                 'message' => 'Success',
                 'txt' => $text,
-                'txt_delete' => $text_delete
+                'txt_delete' => $text_delete,
+                'result' => $Result
             ], 201);
         } catch (\Exception $e) {
             DB::rollback();
