@@ -194,9 +194,12 @@ class SendEmailController extends Controller
                 'body' => $validated['se_content'],
             ];
             $path2 = '/var/www/html/'.$file_name_download;
-            Mail::send('emails.mailOTP',['details'=>$mail_details], function($message)use($validated,$path2) {
-                $message->to($validated['se_email_receiver'])
-                        ->subject($validated['se_title']);
+            Mail::send('emails.mailOTP',['details'=>$mail_details], function($message)use($validated) {
+                $message->to($validated['se_email_receiver']);
+                if($validated['se_email_cc']){
+                    $message->cc([$validated['se_title']]);
+                }
+                $message->subject($validated['se_title']);
      
                
                 $message->attach($path2);
