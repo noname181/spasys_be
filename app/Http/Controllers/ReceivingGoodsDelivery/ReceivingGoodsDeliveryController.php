@@ -2835,7 +2835,7 @@ class ReceivingGoodsDeliveryController extends Controller
             $user = Auth::user();
 
            
-            $company_child = Company::where('co_parent_no', $user->co_no)->get();
+            $company_child = Company::where('co_parent_no', $user->co_no)->orwhere('co_no', $user->co_no)->get();
             
             
             $CheckCorpNumList = [];

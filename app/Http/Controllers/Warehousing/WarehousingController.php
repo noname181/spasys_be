@@ -8466,7 +8466,7 @@ class WarehousingController extends Controller
         $t_tax = $TaxTotal;
         $t_total = $TotalAmount;
         $t_mgtnum = $tax_number;
-        $text = $this->getErrStr($BaroService_TI, $CERTKEY, $Result);
+        $text = WarehousingController::getErrStr($BaroService_TI, $CERTKEY, $Result);
 
         //return $text;
 
@@ -8524,7 +8524,7 @@ class WarehousingController extends Controller
         }
     }
 
-    public function getErrStr($BaroService_TI, $CERTKEY, $ErrCode){
+    public static function getErrStr($BaroService_TI, $CERTKEY, $ErrCode){
         //global $BaroService_TI;
        
         $ErrStr = $BaroService_TI->GetErrString(array(
