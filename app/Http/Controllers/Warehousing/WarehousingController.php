@@ -5262,19 +5262,8 @@ class WarehousingController extends Controller
                         $rate_data = [];
                     }
 
+
                     $item->rate_data = count($rate_data) == 0 ? 0 : 1;
-
-                    //GET PRECALCULATE INFO
-
-                    $precalculate = RateMetaData::where('co_no', $user->mb_type == 'spasys' ? $item->warehousing->company->co_parent->co_no : $item->warehousing->co_no)->where(function($q){
-                        $q->where('set_type','=','estimated_costs')
-                        ->orWhere('set_type', 'precalculate');
-                    })->whereHas('rate_data_general', function($q) use($item){
-                        $q->where('rdg_sum1', $item->t_import_expected->tie_h_bl)->orWhere('rdg_supply_price1', $item->t_import_expected->tie_h_bl)->orWhere('rdg_vat1', $item->t_import_expected->tie_h_bl);
-                    })->first();
-
-
-                    $item->precalculate = $precalculate;
 
                     return $item;
                 })
