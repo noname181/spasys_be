@@ -194,7 +194,7 @@ class SendEmailController extends Controller
                 'body' => $validated['se_content'],
             ];
             $path2 = '/var/www/html/'.$file_name_download;
-            Mail::send('emails.mailOTP',['details'=>$mail_details], function($message)use($validated,$path2) {
+            Mail::send('emails.quotation',['details'=>$mail_details], function($message)use($validated,$path2) {
                 $message->to($validated['se_email_receiver'])->from('bonded_logistics_platform@spasysone.com');
                 if($validated['se_email_cc']){
                     $message->cc([$validated['se_email_cc']]);
@@ -263,6 +263,51 @@ class SendEmailController extends Controller
         }
     }
   
-    
+    public function SendEmailPrecalculate(SendEmailRegisterRequest $request)
+    {
+        $validated = $request->validated();
+       
+      
+        try {
+            $push = SendEmailHistory::insertGetId([
+                'mb_no' => Auth::user()->mb_no,
+                'rm_no' => isset($validated['rm_no']) ? $validated['rm_no'] : null,
+                'rmd_no' => isset($validated['rmd_no']) ? $validated['rmd_no'] : null,
+                'se_email_cc' => $validated['se_email_cc'],
+                'se_email_receiver' => $validated['se_email_receiver'],
+                'se_name_receiver' => $validated['se_name_receiver'],
+                'se_title' => $validated['se_title'],
+                'se_content' => $validated['se_content'],
+                'se_rmd_number'=>isset($validated['rmd_number']) ? $validated['rmd_number'] : null,
+                'created_at'=>Carbon::now()->format('Y-m-d H:i:s'),
+                'updated_at'=>Carbon::now()->format('Y-m-d H:i:s')
+            ]);
+            $mail_details = [ 
+                'title' => $validated['se_title'],
+                'body' => $validated['se_content'],
+            ];
+          
+            Mail::send('emails.mailOTP',['details'=>$mail_details], function($message)use($validated) {
+                $message->to($validated['se_email_receiver'])->from('bonded_logistics_platform@spasysone.com');
+                if($validated['se_email_cc']){
+                    $message->cc([$validated['se_email_cc']]);
+                }
+                $message->subject($validated['se_title']);
+     
+               
+      
+                         
+            });
+
+            return response()->json([
+                'message' => Messages::MSG_0007,
+                'push' => $push,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0001], 500);
+        }
+    }
 
 }
