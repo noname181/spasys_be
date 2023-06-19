@@ -6124,6 +6124,7 @@ class WarehousingController extends Controller
                 CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $user, null, 'settle_payment', null);
                
                 $i = 0;
+                
                 foreach ($request->tid_list as $key => $tid) {
                     
                     if (isset($tid['tid_no'])) {
@@ -6146,6 +6147,9 @@ class WarehousingController extends Controller
                         ]);
                         $id = $tid_->first()->tid_no;
 
+                        $tax_number = CommonFunc::generate_tax_number($id,$request->rgd_no);
+
+                        return $api = $this->update_tax_invoice_api($rgd, $user, $tid, $tax_number, null, $request['company']);
 
                         $cbh = CancelBillHistory::insertGetId([
                             'rgd_no' => $request->rgd_no,
@@ -8231,6 +8235,7 @@ class WarehousingController extends Controller
         //-------------------------------------------
         //공백-일반세금계산서, 1-기재사항의 착오 정정, 2-공급가액의 변동, 3-재화의 환입, 4-계약의 해제, 5-내국신용장 사후개설, 6-착오에 의한 이중발행
         //-------------------------------------------
+        //return $tax_number;
         $check_mgtnum = Tax::where('t_mgtnum', $tax_number)->first();
         if($check_mgtnum == null){
             $ModifyCode = '';
@@ -8269,7 +8274,7 @@ class WarehousingController extends Controller
         $Note = '';                                //어음
         $Credit = '';                            //외상미수금
 
-        $Remark1 = '';
+        $Remark1 = $tax_number;
         $Remark2 = '';
         $Remark3 = '';
 
@@ -8441,6 +8446,14 @@ class WarehousingController extends Controller
         // $text = $this->getErrStr($BaroService_TI, $CERTKEY, $Result);
         // return $text;
 
+        // return array(
+        //     'CERTKEY'    => $CERTKEY,
+        //     'CorpNum'    => '2168142360',
+        //     'Invoice'    => $TaxInvoice,
+        //     'SendSMS'    => $SendSMS,
+        //     'ForceIssue' => $ForceIssue,
+        //     'MailTitle'    => $MailTitle,
+        // );
         //정발행
         if($user->mb_type == 'spasys'){
             $Result = $BaroService_TI->RegistAndIssueTaxInvoice(array(
@@ -8451,6 +8464,8 @@ class WarehousingController extends Controller
                 'ForceIssue' => $ForceIssue,
                 'MailTitle'    => $MailTitle,
             ))->RegistAndIssueTaxInvoiceResult;
+
+        
         }else{
             $Result = $BaroService_TI->RegistAndIssueBrokerTaxInvoice(array(
                 'CERTKEY'    => $CERTKEY,
@@ -8460,6 +8475,504 @@ class WarehousingController extends Controller
                 'ForceIssue' => $ForceIssue,
                 'MailTitle'    => $MailTitle,
             ))->RegistAndIssueBrokerTaxInvoiceResult;
+        }
+        //return $Result;
+        $t_amount = $AmountTotal;
+        $t_tax = $TaxTotal;
+        $t_total = $TotalAmount;
+        $t_mgtnum = $tax_number;
+        $text = WarehousingController::getErrStr($BaroService_TI, $CERTKEY, $Result);
+
+        //return $text;
+
+        if ($Result == 1) {
+            $text = '';
+        }
+
+        if ($Result !== 1) {
+
+            // $arr = array('msg' => 'tax_err',   'txt' => $text, 'code' => "");
+            // $jsn = json_encode($arr);
+            // print_r($jsn);
+            // exit;
+            return [
+                'message' => 'tax_err',
+                'txt' => $text
+            ];
+        } else {
+
+            // 위에도 있음, 여기서는 - 있음
+            //$t_regtime = b_no_to_tax_day2($b_no);
+
+
+            //$sql_tax  = " insert into tax(b_no, t_mgtnum, t_startdate, t_type, cc_no, s_no, t_regtime, t_modify, t_taxtxt, t_taxcode, t_status, t_result_sendtime, t_result_regtime, t_result_no, t_amount, t_tax, t_total) 
+            //values('1222222222222222', '$t_mgtnum', '$b_start', '$t_type', '$cc_no', '$s_no', '$t_regtime', '', '', 0, '$Result', now(), '', '', '$t_amount', '$t_tax', '$t_total') ";
+            Tax::updateOrCreate([
+                'b_no' => $rgd->rgd_settlement_number,
+                't_mgtnum' => $t_mgtnum,
+            ], [
+                'b_no' => $rgd->rgd_settlement_number,
+                't_mgtnum' => $t_mgtnum,
+                'rgd_no' => $rgd->rgd_no,
+                't_startdate' => Carbon::now()->format('Y-m-d H:i:s'),
+                't_type' => $t_type,
+                'co_no_parent' => $cc_no,
+                'co_no_shipper' => $s_no,
+                't_regtime' => Carbon::now()->format('Y-m-d H:i:s'),
+                't_modify' => '',
+                't_taxtxt' => '',
+                't_taxcode' => '0',
+                't_status' => $Result,
+                't_result_sendtime' => Carbon::now()->format('Y-m-d H:i:s'),
+                't_result_regtime' => Carbon::now()->format('Y-m-d H:i:s'),
+                't_result_no' => '',
+                't_amount' => $t_amount,
+                't_tax' => $t_tax,
+                't_total' => $t_total,
+            ]);
+            //sql_query($sql_tax);
+            DB::commit();
+            return [
+                'message' => 'tax_ok',
+                'txt' => ""
+            ];
+        }
+    }
+
+    public static function update_tax_invoice_api($rgd, $user, $price, $tax_number, $rgds, $company = null)//$company1, $company2, $total_price, $b_no
+    {
+        
+        // issuer
+        $issuer_user = Member::with('company')->where('mb_no', $rgd->mb_no)->first();
+
+        $issuer_company = Company::where('co_no', $issuer_user->co_no)->first();
+ 
+        $cc_no = $issuer_user->co_no;
+        
+        if($rgd->service_korean_name == '수입풀필먼트' || $user->mb_type == 'shop'){
+            $receiver_company = Company::where('co_no', $rgd->warehousing->co_no)->first();
+            $s_no = $rgd->warehousing->co_no;
+        }else if($user->mb_type == 'spasys'){
+            $receiver_company = Company::where('co_no', $rgd->warehousing->company->co_parent->co_no)->first();
+            $s_no = $rgd->warehousing->company->co_parent->co_no;
+        }
+
+        $amount_price = 0;
+        $total_price = 0;
+        $vat_price = 0;
+
+        if($rgd->service_korean_name == '보세화물'){
+            if($price){
+                $amount_price = $price['tid_supply_price'];
+                $total_price = $price['tid_sum'];
+                $vat_price = $price['tid_vat'];
+            }else{
+                if($rgds){
+                    $total_price = 0;
+                    foreach($rgds as $rgdp){
+                        $amount_price += $rgdp['rate_data_general']['rdg_supply_price7'];
+                        $total_price += $rgdp['rate_data_general']['rdg_sum7'];
+                        $vat_price += $rgdp['rate_data_general']['rdg_vat7'];
+                    }
+                }else{
+                    $amount_price = $rgd->rate_data_general->rdg_supply_price7;
+                    $total_price = $rgd->rate_data_general->rdg_sum7;
+                    $vat_price = $rgd->rate_data_general->rdg_vat7;
+                }
+                
+            }
+        
+        }else if($rgd->service_korean_name == '수입풀필먼트'){
+            if($price){
+                $amount_price = $price['tid_supply_price'];
+                $total_price = $price['tid_sum'];
+                $vat_price = $price['tid_vat'];
+            }else{
+                if($rgds){
+                    $total_price = 0;
+                    foreach($rgds as $rgdp){
+                        $amount_price += $rgdp['rate_data_general']['rdg_supply_price6'];
+                        $total_price += $rgdp['rate_data_general']['rdg_sum6'];
+                        $vat_price += $rgdp['rate_data_general']['rdg_vat6'];
+                    }
+                }else{
+                    $amount_price = $rgd->rate_data_general->rdg_supply_price6;
+                    $total_price = $rgd->rate_data_general->rdg_sum6;
+                    $vat_price = $rgd->rate_data_general->rdg_vat6;
+                }
+            }
+            
+        }else if($rgd->service_korean_name == '유통가공'){
+            if($price){
+                $amount_price = $price['tid_supply_price'];
+                $total_price = $price['tid_sum'];
+                $vat_price = $price['tid_vat'];
+            }else{
+                if($rgds){
+                    $total_price = 0;
+                    foreach($rgds as $rgdp){
+                        $amount_price += $rgdp['rate_data_general']['rdg_supply_price4'];
+                        $total_price += $rgdp['rate_data_general']['rdg_sum4'];
+                        $vat_price += $rgdp['rate_data_general']['rdg_vat4'];
+                    }
+                }else{
+                    $amount_price = $rgd->rate_data_general->rdg_supply_price4;
+                    $total_price = $rgd->rate_data_general->rdg_sum4;
+                    $vat_price = $rgd->rate_data_general->rdg_vat4;
+                }
+            }
+        }
+
+        if($user->mb_type == 'spasys'){
+            $cc_license1 = "2168142360";
+        }else{
+            $cc_license1 = $issuer_company->co_license;
+        }
+
+        // $cc_name1 = "(주)스페이시스원";//$issuer_company->co_name;
+        // $cc_ceo1 = $issuer_company->co_owner ? $issuer_company->co_owner : '모상희';
+        // $cc_address1 = "인천 중구 공항동로296번길 98-30 (운서동) 3층";//$issuer_company->co_address;
+        // $cc_service1 = "창고업";//$issuer_company->co_service;
+        // $cc_service2 = "서비스 운수 및 창고업";
+        // issuer
+        $cc_name1 = $issuer_company->co_name;
+        $cc_ceo1 = $issuer_company->co_owner ? $issuer_company->co_owner : '모상희';
+        $cc_address1 = $issuer_company->co_address;
+        $cc_service1 = "창고업";//$issuer_company->co_service;
+        $cc_service2 = "서비스 운수 및 창고업";
+
+
+        // $cc_license2 = "1212478494";//$receiver_company->co_license;
+        // $cc_name2 = "청림관세사(가맹점)";//$receiver_company->co_name;
+        // $cc_ceo2 = "남유호";//$receiver_company->co_owner;
+        // $cc_address2 = "인천 중구 영종대로 118";//$receiver_company->co_address;
+        // issued
+        $cc_license2 = $company['co_license'] ? $company['co_license'] : $receiver_company->co_license;
+        $cc_name2 = $company['co_name'] ? $company['co_name'] :  $receiver_company->co_name;
+        $cc_ceo2 = $company['co_owner'] ? $company['co_owner'] : $receiver_company->co_owner;
+        $cc_address2 = $company['co_address'] ? $company['co_address'] : $receiver_company->co_address;
+
+        $s_type = "";
+        $t_type = "차주발행";
+        
+
+        $s_service1 = "창고업";//$receiver_company->co_service;
+        $s_service2 = "";
+        // issued
+
+    
+        $BaroService_URL = 'https://testws.baroservice.com/TI.asmx?WSDL';    //테스트베드용
+        //$BaroService_URL = 'https://ws.baroservice.com/TI.asmx?WSDL';		//실서비스용
+
+        $BaroService_TI = new SoapClient($BaroService_URL, array(
+            'trace'        => 'true',
+            'encoding'    => 'UTF-8'
+        ));
+        
+
+        // GetTaxInvoiceStatesEX.php 파일에서도 수정해야 함
+        $CERTKEY = '813FD596-7CBB-490A-84D2-31570487790E';                            //인증키
+
+        // 사업자등록증 확인 프로세스
+        // 바로빌 연동서비스 웹서비스 참조(WebService Reference) URL
+        $BaroService_URL_staus = 'https://testws.baroservice.com/CORPSTATE.asmx?WSDL';    //테스트베드용
+        // $BaroService_URL_staus = 'https://ws.baroservice.com/CORPSTATE.asmx?WSDL';	//실서비스용
+
+        $BaroService_CORPSTATE = new SoapClient($BaroService_URL_staus, array(
+            'trace' => 'true',
+            'encoding' => 'UTF-8' //소스를 ANSI로 사용할 경우 euc-kr로 수정
+        ));
+
+
+
+        $CheckCorpNumList = array(    //확인할 사업자번호 배열
+            $cc_license1,
+            $cc_license2
+        );
+
+        $Result = $BaroService_CORPSTATE->GetCorpStates(array(
+            'CERTKEY'            => $CERTKEY,
+            'CorpNum'            => '2168142360',
+            'CheckCorpNumList'    => $CheckCorpNumList
+        ))->GetCorpStatesResult->CorpState;
+
+
+        //return $Result;
+        if (!is_array($Result) && $Result->State < 0) { // this will be run when this biz_number  closed company
+            //		echo $Result->State;
+            return response()->json([
+                'message' => 'cc_license',
+                'state' => $Result->State
+            ]);
+        }
+
+        // 사업자등록증 확인 프로세스
+        /*
+        exit;
+        exit;
+        return false;
+        return false;
+        */
+
+        $IssueDirection = 1;                    //1-정발행, 2-역발행(위수탁 세금계산서는 정발행만 허용)
+        if($user->mb_type == 'spasys'){
+            $TaxInvoiceType = 1;                    //1-세금계산서, 2-계산서, 4-위수탁세금계산서, 5-위수탁계산서
+        }else{
+            $TaxInvoiceType = 4;                    //1-세금계산서, 2-계산서, 4-위수탁세금계산서, 5-위수탁계산서
+        }
+        //-------------------------------------------
+        //과세형태
+        //-------------------------------------------
+        //TaxInvoiceType 이 1,4 일 때 : 1-과세, 2-영세
+        //TaxInvoiceType 이 2,5 일 때 : 3-면세
+        //-------------------------------------------
+        $TaxType = 1;
+        $TaxCalcType = 1;                        //세율계산방법 : 1-절상, 2-절사, 3-반올림
+        $PurposeType = 2;                        //1-영수, 2-청구
+
+
+
+        //-------------------------------------------
+        //수정사유코드
+        //-------------------------------------------
+        //공백-일반세금계산서, 1-기재사항의 착오 정정, 2-공급가액의 변동, 3-재화의 환입, 4-계약의 해제, 5-내국신용장 사후개설, 6-착오에 의한 이중발행
+        //-------------------------------------------
+        //return $tax_number;
+        $check_mgtnum = Tax::where('t_mgtnum', $tax_number)->first();
+        if($check_mgtnum == null){
+            $ModifyCode = '';
+        }else{
+            $ModifyCode = 1;
+        }
+        
+
+        $Kwon = '';                                //별지서식 11호 상의 [권] 항목
+        $Ho = '';                                //별지서식 11호 상의 [호] 항목
+        $SerialNum = '';                        //별지서식 11호 상의 [일련번호] 항목
+
+        //-------------------------------------------
+        //공급가액 총액
+        //-------------------------------------------
+        $AmountTotal = $amount_price;//$total_price - round($total_price * 10 / 110);    // total price without tax
+
+        //-------------------------------------------
+        //세액합계
+        //-------------------------------------------
+        //$TaxType 이 2 또는 3 으로 셋팅된 경우 0으로 입력
+        //-------------------------------------------
+
+        $TaxTotal = $vat_price;//round($total_price * 10 / 110);        // total tax
+
+        //-------------------------------------------
+        //합계금액
+        //-------------------------------------------
+        //공급가액 총액 + 세액합계 와 일치해야 합니다.
+        //-------------------------------------------
+        $TotalAmount = $total_price;//$AmountTotal + $TaxTotal;            // total price 
+        
+
+        $Cash = '';                                //현금
+        $ChkBill = '';                            //수표
+        $Note = '';                                //어음
+        $Credit = '';                            //외상미수금
+
+        $Remark1 = $tax_number;
+        $Remark2 = '';
+        $Remark3 = '';
+
+
+        $WriteDate = '';
+
+
+        //-------------------------------------------
+        //공급자 정보 - 정발행시 세금계산서 작성자
+        //------------------------------------------
+        $InvoicerParty = array(
+            'MgtNum'         => $tax_number,
+            'CorpNum'         => $cc_license1,                //필수입력 - 바로빌 회원 사업자번호 ('-' 제외, 10자리)
+            'TaxRegID'         => '',
+            'CorpName'         => $cc_name1,                    //필수입력
+            'CEOName'         => $cc_ceo1,                //필수입력
+            'Addr'             => $cc_address1,
+            'BizType'         => $cc_service1,
+            'BizClass'         => $cc_service2,
+            'ContactID'     => 'spasysone',                //필수입력 - 담당자 바로빌 아이디
+            'ContactName'     => $cc_ceo1,                //필수입력
+            'TEL'             => '',
+            'HP'             => '',
+            'Email'         => $cc_license1 . '@bantalk.com'                //필수입력
+        );
+
+        //-------------------------------------------
+        //공급받는자 정보 - 역발행시 세금계산서 작성자
+        //------------------------------------------
+        $InvoiceeParty = array(
+            'MgtNum'         => $tax_number,
+            'CorpNum'         => $cc_license2,                //필수입력
+            'TaxRegID'         => '',
+            'CorpName'         => $cc_name2,                //필수입력
+            'CEOName'         => $cc_ceo2,                //필수입력
+            'Addr'             => $cc_address2,
+            'BizType'         => $s_service1,
+            'BizClass'         => $s_service2,
+            'ContactID'     => '',
+            'ContactName'     => $cc_ceo2,                //필수입력
+            'TEL'             => '',
+            'HP'             => '',
+            'Email'         => $cc_license2 . '@bantalk.com'
+        );
+
+        //-------------------------------------------
+        //수탁자 정보 - 위수탁 발행시 세금계산서 작성자
+        //------------------------------------------
+        
+
+        if($user->mb_type == 'spasys'){
+            $BrokerParty = array(
+                'MgtNum' 		=> '',
+                'CorpNum' 		=> '',
+                'TaxRegID' 		=> '',
+                'CorpName' 		=> '',
+                'CEOName' 		=> '',
+                'Addr' 			=> '',
+                'BizType' 		=> '',
+                'BizClass' 		=> '',
+                'ContactID' 	=> '',
+                'ContactName' 	=> '',
+                'TEL' 			=> '',
+                'HP' 			=> '',
+                'Email' 		=> ''
+            );
+        }else{
+            $BrokerParty = array(
+                'MgtNum'         => $tax_number,                //필수입력 - 연동사부여 문서키
+                'CorpNum'         => '2168142360',                //필수입력 - 바로빌 회원 사업자번호 ('-' 제외, 10자리)
+                'TaxRegID'         => '',
+                'CorpName'         => '(주)스페이시스원',            //필수입력
+                'CEOName'         => '모상희',                //필수입력
+                'Addr'             => '인천광역시 중구 공항동로296번길 98-30, 3층(운서동, 엘엑스판토스 인천물류센터)',
+                'BizType'         => '서비스',
+                'BizClass'         => '창고업',
+                'ContactID'     => 'spasysone',                //필수입력 - 담당자 바로빌 아이디
+                'ContactName'     => '모상희',                //필수입력
+                'TEL'             => '07046597289',
+                'HP'             => '',
+                'Email'         => 'ly.kim@spasysone.com'                //필수입력
+            );
+        }
+        
+
+        
+
+        // 아래에도 있음, 여기서는 - 없음
+        //$t_regtime = b_no_to_tax_day($b_no);
+
+        //-------------------------------------------
+        //품목
+        //-------------------------------------------
+        $TaxInvoiceTradeLineItems = array(
+            'TaxInvoiceTradeLineItem'    => array(
+                array(
+                    'PurchaseExpiry' => "",            //YYYYMMDD
+                    'Name'            => $tax_number,
+                    'Information'    => '',
+                    'ChargeableUnit' => '',
+                    'UnitPrice'        => '',
+                    'Amount'        => $AmountTotal,
+                    'Tax'            => $TaxTotal,
+                    'Description'    => ''
+                ),
+                array(
+                    'PurchaseExpiry' => "",            //YYYYMMDD
+                    'Name'            => $tax_number,
+                    'Information'    => '',
+                    'ChargeableUnit' => '',
+                    'UnitPrice'        => '',
+                    'Amount'        => $AmountTotal,
+                    'Tax'            => $TaxTotal,
+                    'Description'    => ''
+                )
+            )
+        );
+
+        //-------------------------------------------
+        //전자세금계산서
+        //-------------------------------------------
+        $TaxInvoice = array(
+            'InvoiceKey'                => '',
+            'InvoiceeASPEmail'            => '',
+            'IssueDirection'            => $IssueDirection,
+            'TaxInvoiceType'            => $TaxInvoiceType,
+            'TaxType'                    => $TaxType,
+            'TaxCalcType'                => $TaxCalcType,
+            'PurposeType'                => $PurposeType,
+            'ModifyCode'                => $ModifyCode,
+            'Kwon'                        => $Kwon,
+            'Ho'                        => $Ho,
+            'SerialNum'                    => $SerialNum,
+            'Cash'                        => $Cash,
+            'ChkBill'                    => $ChkBill,
+            'Note'                        => $Note,
+            'Credit'                    => $Credit,
+            'WriteDate'                    => $WriteDate,
+            'AmountTotal'                => $AmountTotal,
+            'TaxTotal'                    => $TaxTotal,
+            'TotalAmount'                => $TotalAmount,
+            'Remark1'                    => $Remark1,
+            'Remark2'                    => $Remark2,
+            'Remark3'                    => $Remark3,
+            'InvoicerParty'                => $InvoicerParty,
+            'InvoiceeParty'                => $InvoiceeParty,
+            'BrokerParty'                => $BrokerParty,
+            'TaxInvoiceTradeLineItems'    => $TaxInvoiceTradeLineItems
+        );
+
+        //-------------------------------------------
+
+        $SendSMS = false;                            //문자 발송여부 (공급받는자 정보의 HP 항목이 입력된 경우에만 발송됨)
+
+        $ForceIssue = false;                        //가산세가 예상되는 세금계산서 발행 여부
+
+        $MailTitle = '';                            //전송되는 이메일의 제목 설정 (공백 시 바로빌 기본 제목으로 전송됨)
+
+        $IssueTiming = 1;
+
+        //-------------------------------------------
+
+        
+        //Delete
+        // $Result = $BaroService_TI->DeleteTaxInvoice(array(
+        //     'CERTKEY'    => $CERTKEY,
+        //     'CorpNum'    => '2168142360',
+        //     'MgtKey'    => $tax_number,
+            
+        // ))->DeleteTaxInvoiceResult;
+        // $text = $this->getErrStr($BaroService_TI, $CERTKEY, $Result);
+        // return $text;
+
+        // return array(
+        //     'CERTKEY'    => $CERTKEY,
+        //     'CorpNum'    => '2168142360',
+        //     'Invoice'    => $TaxInvoice,
+        //     'SendSMS'    => $SendSMS,
+        //     'ForceIssue' => $ForceIssue,
+        //     'MailTitle'    => $MailTitle,
+        // );
+        //정발행
+        if($user->mb_type == 'spasys'){
+            $Result = $BaroService_TI->UpdateTaxInvoiceEX(array(
+                'CERTKEY'    => $CERTKEY,
+                'CorpNum'    => '2168142360',
+                'Invoice'    => $TaxInvoice,
+                'IssueTiming' => $IssueTiming
+            ))->UpdateTaxInvoiceEXResult;
+        }else{
+            $Result = $BaroService_TI->UpdateBrokerTaxInvoiceEX(array(
+                'CERTKEY'    => $CERTKEY,
+                'CorpNum'    => '2168142360',
+                'Invoice'    => $TaxInvoice,
+                'IssueTiming' => $IssueTiming
+            ))->UpdateBrokerTaxInvoiceEXResult;
         }
         //return $Result;
         $t_amount = $AmountTotal;
