@@ -60,6 +60,7 @@ class SendEmailRegisterRequest extends BaseFormRequest
             ],
             'rmd_no' => [
                 '',
+                'nullable'
             ]
         ];
     }
