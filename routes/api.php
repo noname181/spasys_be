@@ -130,6 +130,7 @@ Route::middleware('auth')->group(function () {
     });
     Route::prefix('sendemail')->name('sendemail.')->group(function () {
         Route::post('/create', [App\Http\Controllers\SendEmail\SendEmailController::class, 'createSendEmail'])->name('create');
+        Route::post('/create_precalculate', [App\Http\Controllers\SendEmail\SendEmailController::class, 'SendEmailPrecalculate'])->name('create_email_precalculate');
     });
 
     Route::prefix('contract')->name('contract.')->group(function () {

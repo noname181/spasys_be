@@ -3421,7 +3421,7 @@ class ItemController extends Controller
         }
         return response()->json([
             'message' => '완료되었습니다.',
-            'status' => 1
+            'status' => 1,
         ], 200);
     }
 
