@@ -2741,13 +2741,13 @@ class ReceivingGoodsDeliveryController extends Controller
 
                     // ))->DeleteTaxInvoiceResult;
 
-                    $text = $this->getErrStr($BaroService_TI, $CERTKEY, $Result);
+                    $text_error = $this->getErrStr($BaroService_TI, $CERTKEY, $Result);
 
-                    if ($Result == 1 && $text != "error") {
+                    if ($Result == 1 && $text == "") {
                         $text = "";
                         $text_delete = "";
                     } else {
-                        $text = "error";
+                        $text = $text_error;
                         $text_delete = "";
                     }
                 }
