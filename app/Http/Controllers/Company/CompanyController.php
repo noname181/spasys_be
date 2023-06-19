@@ -744,7 +744,7 @@ class CompanyController extends Controller
             return response()->json($companies);
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
