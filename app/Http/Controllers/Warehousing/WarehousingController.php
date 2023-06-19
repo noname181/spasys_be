@@ -6149,7 +6149,7 @@ class WarehousingController extends Controller
 
                         $tax_number = CommonFunc::generate_tax_number($id,$request->rgd_no);
 
-                        return $api = $this->update_tax_invoice_api($rgd, $user, $tid, $tax_number, null, $request['company']);
+                        //return $api = $this->update_tax_invoice_api($rgd, $user, $tid, $tax_number, null, $request['company']);
 
                         $cbh = CancelBillHistory::insertGetId([
                             'rgd_no' => $request->rgd_no,
@@ -6536,7 +6536,7 @@ class WarehousingController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            return $e;
+            //return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
