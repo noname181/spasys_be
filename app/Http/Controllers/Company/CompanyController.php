@@ -619,6 +619,27 @@ class CompanyController extends Controller
                 ->orderBy('rmd_no', 'DESC')->get();
                 $item->settlement_cycle = $settlement_cycle;
                 $item->check_rate = $rmd;
+
+                $check_block = 'n';
+                foreach(explode(" ", $item->co_service) as $row){
+                 
+                   $rate_data = RateData::where('rd_cate_meta1', $row);
+                   $rmd_2 = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->orderBy('rmd_no', 'DESC')->first();
+                   $rate_data = $rate_data->where('rd_co_no', $co_no);
+                   
+                   if (isset($rmd_2->rmd_no)) {
+                    $rate_data = $rate_data->where('rmd_no', $rmd_2->rmd_no)->get();
+                    if(count($rate_data) > 0){
+                        
+                    } else {
+                        $check_block = 'y';
+                    }
+                   }else {
+                      $check_block = 'y';
+                   }
+                
+                }
+                $item->check_block = $check_block;
                // return $item;
             }
 
