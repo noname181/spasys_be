@@ -2239,7 +2239,7 @@ class RateDataController extends Controller
 
 
 
-            $import = Import::with(['export_confirm', 'export', 'import_expect'])->where('ti_carry_in_number', $rgd->rgd_ti_carry_in_number)->first();
+            $import = Import::with(['export_confirm', 'export', 'import_expect'])->where('ti_carry_in_number', isset($rgd->rgd_ti_carry_in_number) ? $rgd->rgd_ti_carry_in_number : '')->first();
 
 
             $company = Company::where('co_no', $user->mb_type == 'spasys' ? $rgd->warehousing->company->co_parent->co_no : $rgd->warehousing->co_no)->first();
