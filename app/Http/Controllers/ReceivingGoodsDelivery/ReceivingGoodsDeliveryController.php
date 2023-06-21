@@ -3296,7 +3296,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 ]);
 
                 if ($rgd->rgd_status7 != 'taxed') {
-                    $tax_number = CommonFunc::generate_tax_number($rgd['rgd_no']);
+                    $tax_number = CommonFunc::generate_tax_number($rgd['rgd_no'],null);
 
                     ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
                         'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
@@ -3370,7 +3370,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     }
                 }
             } else if ($request->complete_status == '정산완료' && $rgd->rgd_status7 != 'taxed') {
-                $tax_number = CommonFunc::generate_tax_number($rgd['rgd_no']);
+                $tax_number = CommonFunc::generate_tax_number($rgd['rgd_no'],null);
 
                 ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
                     'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
