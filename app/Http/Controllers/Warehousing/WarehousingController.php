@@ -6147,7 +6147,7 @@ class WarehousingController extends Controller
                             'tid_vat' => $tid['tid_vat'],
                             'tid_sum' => $tid['tid_sum'],
                             'rgd_no' => isset($tid['rgd_no']) ? $tid['rgd_no'] : $request->rgd_no,
-                            'rgd_number' => isset($tid['tid_number']) ? $tid['tid_number'] : null,
+                            'rgd_number' => isset($tid['rgd_number']) ? $tid['rgd_number'] : null,
                             'co_license' => $request['company']['co_license'],
                             'co_owner' => $request['company']['co_owner'],
                             'co_name' => $request['company']['co_name'],
@@ -6159,9 +6159,9 @@ class WarehousingController extends Controller
                         ]);
                         $id = $tid_->first()->tid_no;
 
-                        $tax_number = CommonFunc::generate_tax_number($id,$request->rgd_no);
-
-                        //return $api = $this->update_tax_invoice_api($rgd, $user, $tid, $tax_number, null, $request['company']);
+                        //$tax_number = CommonFunc::generate_tax_number($id,$request->rgd_no);
+                       
+                        $api = $this->update_tax_invoice_api($rgd, $user, $tid, $tid['tid_number'], null, $request['company']);
 
                         $cbh = CancelBillHistory::insertGetId([
                             'rgd_no' => $request->rgd_no,
@@ -6170,7 +6170,7 @@ class WarehousingController extends Controller
                             'cbh_status_before' => 'taxed',
                             'cbh_status_after' => 'edited'
                         ]);
-                        $api['message'] = "tax_ok";
+                        
                     } else {
                         $id = TaxInvoiceDivide::insertGetId([
                             'tid_supply_price' => $tid['tid_supply_price'],
@@ -6240,7 +6240,7 @@ class WarehousingController extends Controller
                 ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
                     'rgd_status7' => 'taxed',
-                    'rgd_tax_invoice_number' => isset($tax_number) ? $tax_number : null,
+                    'rgd_tax_invoice_number' => isset($tax_number) ? $tax_number : ($api['tax_number'] ? $api['tax_number'] : null),
                 ]);
 
                 TaxInvoiceDivide::where('rgd_no', $request->rgd_no)
@@ -8718,6 +8718,31 @@ class WarehousingController extends Controller
             ]);
         }
 
+
+        //Cancel old invoice
+
+        $procType = "ISSUE_CANCEL";
+
+        $Result = $BaroService_TI->ProcTaxInvoice(array(
+            'CERTKEY'    => $CERTKEY,
+            'CorpNum'    => '2168142360',
+            'MgtKey'    => $tax_number,
+            'ProcType'    => $procType,
+        ))->ProcTaxInvoiceResult;
+
+        $tax = Tax::where('t_mgtnum', $tax_number)->first();
+
+        
+        $pieces = explode('_', $tax->t_mgtnum);
+        $last_word = array_pop($pieces);
+        $count_last_word = ((int)$last_word+1);
+       
+        $tax_number =  substr_replace($tax->t_mgtnum,$count_last_word,-1);
+        
+        TaxInvoiceDivide::where('tid_no', $price['tid_no'])->update([
+            'tid_number' => $tax_number ? $tax_number : null,
+        ]);
+        
         // 사업자등록증 확인 프로세스
         /*
         exit;
@@ -8972,19 +8997,23 @@ class WarehousingController extends Controller
         // );
         //정발행
         if($user->mb_type == 'spasys'){
-            $Result = $BaroService_TI->UpdateTaxInvoiceEX(array(
+            $Result = $BaroService_TI->RegistAndIssueTaxInvoice(array(
                 'CERTKEY'    => $CERTKEY,
                 'CorpNum'    => '2168142360',
                 'Invoice'    => $TaxInvoice,
-                'IssueTiming' => $IssueTiming
-            ))->UpdateTaxInvoiceEXResult;
+                'SendSMS'    => $SendSMS,
+                'ForceIssue' => $ForceIssue,
+                'MailTitle'    => $MailTitle,
+            ))->RegistAndIssueTaxInvoiceResult;
         }else{
-            $Result = $BaroService_TI->UpdateBrokerTaxInvoiceEX(array(
+            $Result = $BaroService_TI->RegistAndIssueBrokerTaxInvoice(array(
                 'CERTKEY'    => $CERTKEY,
                 'CorpNum'    => '2168142360',
                 'Invoice'    => $TaxInvoice,
-                'IssueTiming' => $IssueTiming
-            ))->UpdateBrokerTaxInvoiceEXResult;
+                'SendSMS'    => $SendSMS,
+                'ForceIssue' => $ForceIssue,
+                'MailTitle'    => $MailTitle,
+            ))->RegistAndIssueBrokerTaxInvoiceResult;
         }
         //return $Result;
         $t_amount = $AmountTotal;
@@ -9019,7 +9048,6 @@ class WarehousingController extends Controller
             //values('1222222222222222', '$t_mgtnum', '$b_start', '$t_type', '$cc_no', '$s_no', '$t_regtime', '', '', 0, '$Result', now(), '', '', '$t_amount', '$t_tax', '$t_total') ";
             Tax::updateOrCreate([
                 'b_no' => $rgd->rgd_settlement_number,
-                't_mgtnum' => $t_mgtnum,
             ], [
                 'b_no' => $rgd->rgd_settlement_number,
                 't_mgtnum' => $t_mgtnum,
@@ -9044,7 +9072,8 @@ class WarehousingController extends Controller
             DB::commit();
             return [
                 'message' => 'tax_ok',
-                'txt' => ""
+                'txt' => "",
+                'tax_number' => $tax_number
             ];
         }
     }
