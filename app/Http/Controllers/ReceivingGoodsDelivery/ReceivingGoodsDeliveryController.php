@@ -4605,10 +4605,12 @@ class ReceivingGoodsDeliveryController extends Controller
                 }
             }
 
+            $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
 
             DB::commit();
             return response()->json([
-                'message' => 'Success'
+                'message' => 'Success',
+                'rgd' => $rgd,
             ]);
         } catch (\Exception $e) {
             DB::rollback();
