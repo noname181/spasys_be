@@ -57,7 +57,7 @@ class CommonFunc
     {
         $string = 'TAX';
 
-        $string = $string . '_' . date('Ymd') . $data;
+        $string = $string . '_' . date('Ymd') . $data . "_1";
 
 
         // $tax = Tax::where('rgd_no', $rgd_no)->first();
