@@ -189,6 +189,67 @@ class RateMetaDataController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
+
+    public function getAllCOAndRM(RateMetaDataSearchRequest $request)
+    {
+        $validated = $request->validated();
+        try {
+            $user = Auth::user();
+            // If per_page is null set default data = 15
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+            $rmd = RateMetaData::with(['rate_meta', 'member:mb_no,co_no,mb_name', 'company', 'rate_data_one'])
+            ->where(function($q) use($user){  
+                $q->where(function($q) use($user){
+                    $q->whereNotNull('co_no')
+                    ->whereNull('rmd_parent_no')
+                    ->whereHas('member', function($q) use($user){
+                        $q->where('co_no', $user->co_no);
+                    })
+                    ->whereHas('company', function($q) use($user){
+                        $q->where('co_type', '!=', 'spasys');
+                    })
+                    ->whereNull('set_type');
+                })->orWhere(function($q) use($user){
+                    $q->whereNotNull('rm_no')
+                    ->whereNull('rmd_parent_no')
+                    ->whereHas('member', function($q) use($user){
+                        $q->where('co_no', $user->co_no);
+                    });
+                });
+            })
+            ->orderBy('rmd_no', 'DESC');
+            if(isset($validated['from_date'])) {
+                $rmd->where('created_at', '>=' , date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            }
+            if(isset($validated['to_date'])) {
+                $rmd->where('created_at', '<=' , date('Y-m-d 23:59:59', strtotime($validated['to_date'])));
+            }
+        
+            $rmd = $rmd->paginate($per_page, ['*'], 'page', $page);
+
+            $rmd->setCollection(
+                $rmd->getCollection()->map(function ($item) {
+                    $rmd = RateMetaData::where('rmd_no', $item['rmd_no'])->first();
+                    if(isset($rmd->rmd_parent_no)){
+                        $lastest = RateMetaData::where('rmd_no', $rmd->rmd_parent_no)->orWhere('rmd_parent_no', $rmd->rmd_parent_no)->orderBy('rmd_no', 'DESC')->first();
+                    }else {
+                        $lastest = RateMetaData::where('rmd_no', '!=', $item['rmd_no'])->where('rmd_parent_no', $item['rmd_no'])->orderBy('rmd_no', 'DESC')->first();
+                    }
+
+                    $item->lastest = $lastest;
+                    return $item;
+                })
+            );
+
+            return response()->json($rmd);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
     public function checkCO(Request $request)
     {
 
