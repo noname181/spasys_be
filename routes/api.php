@@ -423,6 +423,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/get_RMD_data/{rmd_no}', [App\Http\Controllers\RateMetaData\RateMetaDataController::class, 'get_RMD_data'])->name('get_rmd_data');
         Route::post('/rm', [App\Http\Controllers\RateMetaData\RateMetaDataController::class, 'getAllRM'])->name('get_all_rm');
         Route::post('/co', [App\Http\Controllers\RateMetaData\RateMetaDataController::class, 'getAllCO'])->name('get_all_co');
+        Route::post('/co_rm', [App\Http\Controllers\RateMetaData\RateMetaDataController::class, 'getAllCOAndRM']);
         Route::post('/check', [App\Http\Controllers\RateMetaData\RateMetaDataController::class, 'checkCO'])->name('check_co');
         Route::post('/check2', [App\Http\Controllers\RateMetaData\RateMetaDataController::class, 'checkCO2'])->name('check_co2');
         Route::post('/get_precalculate_details', [App\Http\Controllers\RateMetaData\RateMetaDataController::class, 'get_precalculate_details'])->name('get_all_co_precalculate_details');
