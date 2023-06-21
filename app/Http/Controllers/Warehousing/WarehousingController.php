@@ -6170,7 +6170,7 @@ class WarehousingController extends Controller
                             'cbh_status_before' => 'taxed',
                             'cbh_status_after' => 'edited'
                         ]);
-                        $api['message'] = "tax_ok";
+                        
                     } else {
                         $id = TaxInvoiceDivide::insertGetId([
                             'tid_supply_price' => $tid['tid_supply_price'],
