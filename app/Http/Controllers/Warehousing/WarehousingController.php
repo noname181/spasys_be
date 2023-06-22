@@ -5603,14 +5603,14 @@ class WarehousingController extends Controller
                     })->orWhereHas('company.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
-                })
-                    ->whereHas('warehousing', function ($query) use ($user) {
-                        $query->whereHas('company.co_parent.contract', function ($q) use ($user) {
-                            $q->where('c_calculate_deadline_yn', 'y');
-                        })->orWhereHas('company.contract', function ($q) use ($user) {
-                            $q->where('c_calculate_deadline_yn', 'y');
-                        });
-                    });
+                });
+                    // ->whereHas('warehousing', function ($query) use ($user) {
+                    //     $query->whereHas('company.co_parent.contract', function ($q) use ($user) {
+                    //         $q->where('c_calculate_deadline_yn', 'y');
+                    //     })->orWhereHas('company.contract', function ($q) use ($user) {
+                    //         $q->where('c_calculate_deadline_yn', 'y');
+                    //     });
+                    // });
             }
             $warehousing->where(function ($q) {
                 $q->where('rgd_status4', '확정청구서');
@@ -6132,7 +6132,7 @@ class WarehousingController extends Controller
     {
         try {
             DB::beginTransaction();
-            
+
             if ($request->type == 'option') {
                 $user = Auth::user();
 
@@ -6141,11 +6141,11 @@ class WarehousingController extends Controller
                 $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general', 't_import_expected'])->where('rgd_no', $request->rgd_no)->first();
 
                 CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $user, null, 'settle_payment', null);
-               
+
                 $i = 0;
-                
+
                 foreach ($request->tid_list as $key => $tid) {
-                    
+
                     if (isset($tid['tid_no'])) {
                         // if(false){
                         $tid_ = TaxInvoiceDivide::where('tid_no', $tid['tid_no']);
@@ -6167,7 +6167,7 @@ class WarehousingController extends Controller
                         $id = $tid_->first()->tid_no;
 
                         //$tax_number = CommonFunc::generate_tax_number($id,$request->rgd_no);
-                       
+
                         $api = $this->update_tax_invoice_api($rgd, $user, $tid, $tid['tid_number'], null, $request['company']);
 
                         $cbh = CancelBillHistory::insertGetId([
@@ -6177,7 +6177,7 @@ class WarehousingController extends Controller
                             'cbh_status_before' => 'taxed',
                             'cbh_status_after' => 'edited'
                         ]);
-                        
+
                     } else {
                         $id = TaxInvoiceDivide::insertGetId([
                             'tid_supply_price' => $tid['tid_supply_price'],
@@ -6205,7 +6205,7 @@ class WarehousingController extends Controller
                         $tax_number = CommonFunc::generate_tax_number($id,$request->rgd_no);
 
                         $api = $this->tax_invoice_api($rgd, $user, $tid, $tax_number, null);
-                          
+
                         TaxInvoiceDivide::where('tid_no', $id)->update([
                             'tid_number' => $tax_number ? $tax_number : null,
                         ]);
@@ -6238,7 +6238,7 @@ class WarehousingController extends Controller
                                 ]);
                             }
                         }
-                        
+
                         $i++;
                     }
                     $ids[] = $id;
@@ -6258,7 +6258,7 @@ class WarehousingController extends Controller
                 }else{
                     DB::commit();
                 }
-               
+
                 return response()->json([
                     'message' => Messages::MSG_0007,
                     'tid_list' => $tids,
@@ -6393,7 +6393,7 @@ class WarehousingController extends Controller
                 $api = $this->tax_invoice_api($rgd, $user, null, $tax_number, $request->rgds);
 
                 foreach ($request->rgds as $rgd) {
-                   
+
 
                     $rgd_ = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
                         'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
@@ -6491,7 +6491,7 @@ class WarehousingController extends Controller
                     $tax_number = CommonFunc::generate_tax_number($id,$rgd['rgd_no']);
 
                     $api = $this->tax_invoice_api($rgd, $user, null, $tax_number, null);
-                    
+
                     TaxInvoiceDivide::where('tid_no', $id)->update([
                         'tid_number' => $tax_number ? $tax_number : null,
                     ]);
@@ -6551,7 +6551,7 @@ class WarehousingController extends Controller
                     'api_message' => isset($api['txt']) ? $api['txt'] : null,
                 ]);
             }
-            
+
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
@@ -8055,17 +8055,17 @@ class WarehousingController extends Controller
         return $id;
     }
 
-    
+
     public static function tax_invoice_api($rgd, $user, $price, $tax_number, $rgds)//$company1, $company2, $total_price, $b_no
     {
-        
+
         // issuer
         $issuer_user = Member::with('company')->where('mb_no', $rgd->mb_no)->first();
 
         $issuer_company = Company::where('co_no', $issuer_user->co_no)->first();
- 
+
         $cc_no = $issuer_user->co_no;
-        
+
         if($rgd->service_korean_name == '수입풀필먼트' || $user->mb_type == 'shop'){
             $receiver_company = Company::where('co_no', $rgd->warehousing->co_no)->first();
             $s_no = $rgd->warehousing->co_no;
@@ -8096,9 +8096,9 @@ class WarehousingController extends Controller
                     $total_price = $rgd->rate_data_general->rdg_sum7;
                     $vat_price = $rgd->rate_data_general->rdg_vat7;
                 }
-                
+
             }
-        
+
         }else if($rgd->service_korean_name == '수입풀필먼트'){
             if($price){
                 $amount_price = $price['tid_supply_price'];
@@ -8118,7 +8118,7 @@ class WarehousingController extends Controller
                     $vat_price = $rgd->rate_data_general->rdg_vat6;
                 }
             }
-            
+
         }else if($rgd->service_korean_name == '유통가공'){
             if($price){
                 $amount_price = $price['tid_supply_price'];
@@ -8171,13 +8171,13 @@ class WarehousingController extends Controller
 
         $s_type = "";
         $t_type = "차주발행";
-        
+
 
         $s_service1 = "창고업";//$receiver_company->co_service;
         $s_service2 = "";
         // issued
 
-    
+
         $BaroService_URL = 'https://testws.baroservice.com/TI.asmx?WSDL';    //테스트베드용
         //$BaroService_URL = 'https://ws.baroservice.com/TI.asmx?WSDL';		//실서비스용
 
@@ -8185,7 +8185,7 @@ class WarehousingController extends Controller
             'trace'        => 'true',
             'encoding'    => 'UTF-8'
         ));
-        
+
 
         // GetTaxInvoiceStatesEX.php 파일에서도 수정해야 함
         $CERTKEY = '813FD596-7CBB-490A-84D2-31570487790E';                            //인증키
@@ -8261,7 +8261,7 @@ class WarehousingController extends Controller
         }else{
             $ModifyCode = 1;
         }
-        
+
 
         $Kwon = '';                                //별지서식 11호 상의 [권] 항목
         $Ho = '';                                //별지서식 11호 상의 [호] 항목
@@ -8285,8 +8285,8 @@ class WarehousingController extends Controller
         //-------------------------------------------
         //공급가액 총액 + 세액합계 와 일치해야 합니다.
         //-------------------------------------------
-        $TotalAmount = $total_price;//$AmountTotal + $TaxTotal;            // total price 
-        
+        $TotalAmount = $total_price;//$AmountTotal + $TaxTotal;            // total price
+
 
         $Cash = '';                                //현금
         $ChkBill = '';                            //수표
@@ -8342,7 +8342,7 @@ class WarehousingController extends Controller
         //-------------------------------------------
         //수탁자 정보 - 위수탁 발행시 세금계산서 작성자
         //------------------------------------------
-        
+
 
         if($user->mb_type == 'spasys'){
             $BrokerParty = array(
@@ -8377,9 +8377,9 @@ class WarehousingController extends Controller
                 'Email'         => 'ly.kim@spasysone.com'                //필수입력
             );
         }
-        
 
-        
+
+
 
         // 아래에도 있음, 여기서는 - 없음
         //$t_regtime = b_no_to_tax_day($b_no);
@@ -8454,13 +8454,13 @@ class WarehousingController extends Controller
 
         //-------------------------------------------
 
-        
+
         //Delete
         // $Result = $BaroService_TI->DeleteTaxInvoice(array(
         //     'CERTKEY'    => $CERTKEY,
         //     'CorpNum'    => '2168142360',
         //     'MgtKey'    => $tax_number,
-            
+
         // ))->DeleteTaxInvoiceResult;
         // $text = $this->getErrStr($BaroService_TI, $CERTKEY, $Result);
         // return $text;
@@ -8484,7 +8484,7 @@ class WarehousingController extends Controller
                 'MailTitle'    => $MailTitle,
             ))->RegistAndIssueTaxInvoiceResult;
 
-        
+
         }else{
             $Result = $BaroService_TI->RegistAndIssueBrokerTaxInvoice(array(
                 'CERTKEY'    => $CERTKEY,
@@ -8524,7 +8524,7 @@ class WarehousingController extends Controller
             //$t_regtime = b_no_to_tax_day2($b_no);
 
 
-            //$sql_tax  = " insert into tax(b_no, t_mgtnum, t_startdate, t_type, cc_no, s_no, t_regtime, t_modify, t_taxtxt, t_taxcode, t_status, t_result_sendtime, t_result_regtime, t_result_no, t_amount, t_tax, t_total) 
+            //$sql_tax  = " insert into tax(b_no, t_mgtnum, t_startdate, t_type, cc_no, s_no, t_regtime, t_modify, t_taxtxt, t_taxcode, t_status, t_result_sendtime, t_result_regtime, t_result_no, t_amount, t_tax, t_total)
             //values('1222222222222222', '$t_mgtnum', '$b_start', '$t_type', '$cc_no', '$s_no', '$t_regtime', '', '', 0, '$Result', now(), '', '', '$t_amount', '$t_tax', '$t_total') ";
             Tax::updateOrCreate([
                 'b_no' => $rgd->rgd_settlement_number,
@@ -8560,14 +8560,14 @@ class WarehousingController extends Controller
 
     public static function update_tax_invoice_api($rgd, $user, $price, $tax_number, $rgds, $company = null)//$company1, $company2, $total_price, $b_no
     {
-        
+
         // issuer
         $issuer_user = Member::with('company')->where('mb_no', $rgd->mb_no)->first();
 
         $issuer_company = Company::where('co_no', $issuer_user->co_no)->first();
- 
+
         $cc_no = $issuer_user->co_no;
-        
+
         if($rgd->service_korean_name == '수입풀필먼트' || $user->mb_type == 'shop'){
             $receiver_company = Company::where('co_no', $rgd->warehousing->co_no)->first();
             $s_no = $rgd->warehousing->co_no;
@@ -8598,9 +8598,9 @@ class WarehousingController extends Controller
                     $total_price = $rgd->rate_data_general->rdg_sum7;
                     $vat_price = $rgd->rate_data_general->rdg_vat7;
                 }
-                
+
             }
-        
+
         }else if($rgd->service_korean_name == '수입풀필먼트'){
             if($price){
                 $amount_price = $price['tid_supply_price'];
@@ -8620,7 +8620,7 @@ class WarehousingController extends Controller
                     $vat_price = $rgd->rate_data_general->rdg_vat6;
                 }
             }
-            
+
         }else if($rgd->service_korean_name == '유통가공'){
             if($price){
                 $amount_price = $price['tid_supply_price'];
@@ -8673,13 +8673,13 @@ class WarehousingController extends Controller
 
         $s_type = "";
         $t_type = "차주발행";
-        
+
 
         $s_service1 = "창고업";//$receiver_company->co_service;
         $s_service2 = "";
         // issued
 
-    
+
         $BaroService_URL = 'https://testws.baroservice.com/TI.asmx?WSDL';    //테스트베드용
         //$BaroService_URL = 'https://ws.baroservice.com/TI.asmx?WSDL';		//실서비스용
 
@@ -8687,7 +8687,7 @@ class WarehousingController extends Controller
             'trace'        => 'true',
             'encoding'    => 'UTF-8'
         ));
-        
+
 
         // GetTaxInvoiceStatesEX.php 파일에서도 수정해야 함
         $CERTKEY = '813FD596-7CBB-490A-84D2-31570487790E';                            //인증키
@@ -8739,17 +8739,17 @@ class WarehousingController extends Controller
 
         $tax = Tax::where('t_mgtnum', $tax_number)->first();
 
-        
+
         $pieces = explode('_', $tax->t_mgtnum);
         $last_word = array_pop($pieces);
         $count_last_word = ((int)$last_word+1);
-       
+
         $tax_number =  substr_replace($tax->t_mgtnum,$count_last_word,-1);
-        
+
         TaxInvoiceDivide::where('tid_no', $price['tid_no'])->update([
             'tid_number' => $tax_number ? $tax_number : null,
         ]);
-        
+
         // 사업자등록증 확인 프로세스
         /*
         exit;
@@ -8788,7 +8788,7 @@ class WarehousingController extends Controller
         }else{
             $ModifyCode = 1;
         }
-        
+
 
         $Kwon = '';                                //별지서식 11호 상의 [권] 항목
         $Ho = '';                                //별지서식 11호 상의 [호] 항목
@@ -8812,8 +8812,8 @@ class WarehousingController extends Controller
         //-------------------------------------------
         //공급가액 총액 + 세액합계 와 일치해야 합니다.
         //-------------------------------------------
-        $TotalAmount = $total_price;//$AmountTotal + $TaxTotal;            // total price 
-        
+        $TotalAmount = $total_price;//$AmountTotal + $TaxTotal;            // total price
+
 
         $Cash = '';                                //현금
         $ChkBill = '';                            //수표
@@ -8869,7 +8869,7 @@ class WarehousingController extends Controller
         //-------------------------------------------
         //수탁자 정보 - 위수탁 발행시 세금계산서 작성자
         //------------------------------------------
-        
+
 
         if($user->mb_type == 'spasys'){
             $BrokerParty = array(
@@ -8904,9 +8904,9 @@ class WarehousingController extends Controller
                 'Email'         => 'ly.kim@spasysone.com'                //필수입력
             );
         }
-        
 
-        
+
+
 
         // 아래에도 있음, 여기서는 - 없음
         //$t_regtime = b_no_to_tax_day($b_no);
@@ -8983,13 +8983,13 @@ class WarehousingController extends Controller
 
         //-------------------------------------------
 
-        
+
         //Delete
         // $Result = $BaroService_TI->DeleteTaxInvoice(array(
         //     'CERTKEY'    => $CERTKEY,
         //     'CorpNum'    => '2168142360',
         //     'MgtKey'    => $tax_number,
-            
+
         // ))->DeleteTaxInvoiceResult;
         // $text = $this->getErrStr($BaroService_TI, $CERTKEY, $Result);
         // return $text;
@@ -9051,7 +9051,7 @@ class WarehousingController extends Controller
             //$t_regtime = b_no_to_tax_day2($b_no);
 
 
-            //$sql_tax  = " insert into tax(b_no, t_mgtnum, t_startdate, t_type, cc_no, s_no, t_regtime, t_modify, t_taxtxt, t_taxcode, t_status, t_result_sendtime, t_result_regtime, t_result_no, t_amount, t_tax, t_total) 
+            //$sql_tax  = " insert into tax(b_no, t_mgtnum, t_startdate, t_type, cc_no, s_no, t_regtime, t_modify, t_taxtxt, t_taxcode, t_status, t_result_sendtime, t_result_regtime, t_result_no, t_amount, t_tax, t_total)
             //values('1222222222222222', '$t_mgtnum', '$b_start', '$t_type', '$cc_no', '$s_no', '$t_regtime', '', '', 0, '$Result', now(), '', '', '$t_amount', '$t_tax', '$t_total') ";
             Tax::updateOrCreate([
                 'b_no' => $rgd->rgd_settlement_number,
@@ -9087,12 +9087,12 @@ class WarehousingController extends Controller
 
     public static function getErrStr($BaroService_TI, $CERTKEY, $ErrCode){
         //global $BaroService_TI;
-       
+
         $ErrStr = $BaroService_TI->GetErrString(array(
           'CERTKEY' => $CERTKEY,
           'ErrCode' => $ErrCode
         ))->GetErrStringResult;
-      
+
         return $ErrStr;
       }
 }
