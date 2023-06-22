@@ -12,6 +12,7 @@ use App\Models\ScheduleShipmentInfo;
 use App\Models\AdjustmentGroup;
 use App\Models\CompanySettlement;
 use App\Models\Company;
+use App\Models\CompanyPayment;
 use App\Models\Contract;
 use App\Models\RateData;
 use App\Models\CancelBillHistory;
@@ -4708,10 +4709,12 @@ class WarehousingController extends Controller
 
 
             $contract = Contract::where('co_no',  $user->co_no)->first();
+            $issuer = Member::where('mb_no', $warehousing->first()->mb_no)->first();
+            $company_payment = CompanyPayment::where('co_no',  $issuer->co_no)->first();
 
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             $warehousing->setCollection(
-                $warehousing->getCollection()->map(function ($item) use ($contract) {
+                $warehousing->getCollection()->map(function ($item) use ($contract, $company_payment) {
                     if (isset($contract->c_calculate_deadline_yn))
                         $item->c_calculate_deadline_yn = $contract->c_calculate_deadline_yn;
                     else
@@ -4849,6 +4852,10 @@ class WarehousingController extends Controller
                         $item->is_completed = false;
                         $item->completed_date = null;
                     }
+
+
+                    //GET ISSUER BANK ACCOUNT
+                    $item->issuer_bank_account = isset($company_payment) ? $company_payment->cp_bank_number : null;
 
                     return $item;
                 })

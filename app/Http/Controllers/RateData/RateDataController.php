@@ -2566,7 +2566,9 @@ class RateDataController extends Controller
 
             $rate_data = $rate_data->get();
 
-            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data], 200);
+            $rate_data_general = RateDataGeneral::where('rmd_no', $request->rmd_no)->where('rdg_set_type', 'estimated_costs')->first();
+
+            return response()->json(['message' => Messages::MSG_0007, 'rate_data' => $rate_data ,'rate_data_general' => $rate_data_general], 200);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
