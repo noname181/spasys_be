@@ -95,11 +95,11 @@ class ScheduleShipmentController extends Controller
             //return DB::getQueryLog();
 
             if (isset($validated['from_date'])) {
-                $schedule_shipment->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                $schedule_shipment->where('updated_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
 
             if (isset($validated['to_date'])) {
-                $schedule_shipment->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                $schedule_shipment->where('updated_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
             }
 
             if (isset($validated['co_parent_name'])) {
