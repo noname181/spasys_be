@@ -57,6 +57,10 @@ class ScheduleShipmentInfo extends Model
         'updated_at' => "date:Y.m.d H:i",
     ];
 
+    public function file()
+    {
+        return $this->hasOne(File::class, 'file_table_key', 'item_no')->where('file_table', 'item');
+    }
 
     public function item()
     {
