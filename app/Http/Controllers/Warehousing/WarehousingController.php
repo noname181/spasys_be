@@ -4706,10 +4706,10 @@ class WarehousingController extends Controller
             $warehousing->union($warehousing_fulfillment)->union($warehousing_bonded)->orderBy('updated_at', 'DESC')
                 ->orderBy('rgd_no', 'DESC');
 
-
+            $warehousing_ = clone $warehousing;
 
             $contract = Contract::where('co_no',  $user->co_no)->first();
-            $issuer = Member::where('mb_no', $warehousing->first()->mb_no)->first();
+            $issuer = Member::where('mb_no', $warehousing_->first()->mb_no)->first();
             $company_payment = CompanyPayment::where('co_no',  $issuer->co_no)->first();
 
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
