@@ -12,6 +12,7 @@ use App\Http\Requests\Member\MemberUpdate\MemberUpdateByIdRequest;
 use App\Http\Requests\Member\MemberUpdate\MemberUpdatePush;
 use App\Http\Requests\Member\MemberUpdate\MemberUpdateRequest;
 use App\Models\Company;
+use App\Models\CompanyPayment;
 use App\Models\Member;
 use App\Models\Service;
 use App\Utils\Messages;
@@ -385,6 +386,16 @@ class MemberController extends Controller
                 'mb_service_no_array' => '공통 보세화물 수입풀필먼트 유통가공'
             ]);
 
+            CompanyPayment::updateOrCreate(
+                [
+                    'co_no' =>  $validated['co_no'],
+                ],
+                [
+                    'cp_bank_number' => $validated['cp_bank_number'],
+                    'cp_method' => 'card'
+                ]
+            );
+
 
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -436,6 +447,16 @@ class MemberController extends Controller
                 'co_address_detail' => $validated['co_address_detail'],
             ]);
 
+            CompanyPayment::updateOrCreate(
+                [
+                    'co_no' =>  $memeber['co_no'],
+                ],
+                [
+                    'cp_bank_number' => $validated['cp_bank_number'],
+                    'cp_method' => 'card'
+                ]
+            );
+
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -444,7 +465,7 @@ class MemberController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            //return $e;
+            // return $e;
             return response()->json(['message' => Messages::MSG_0002], 500);
         }
     }

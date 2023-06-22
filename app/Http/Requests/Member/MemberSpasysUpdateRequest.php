@@ -41,6 +41,9 @@ class MemberSpasysUpdateRequest extends BaseFormRequest
             'mb_pw' => [
                 '',
             ],
+            'cp_bank_number' => [
+                '',
+            ],
             'mb_note' => [
                 'required',
                 'string',
