@@ -6247,7 +6247,7 @@ class WarehousingController extends Controller
                 ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                     'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
                     'rgd_status7' => 'taxed',
-                    'rgd_tax_invoice_number' => isset($tax_number) ? $tax_number : ($api['tax_number'] ? $api['tax_number'] : null),
+                    'rgd_tax_invoice_number' => isset($tax_number) ? $tax_number : (isset($api['tax_number']) ? $api['tax_number'] : null),
                 ]);
 
                 TaxInvoiceDivide::where('rgd_no', $request->rgd_no)
@@ -6555,7 +6555,7 @@ class WarehousingController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
-            //return $e;
+            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
