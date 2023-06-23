@@ -5581,7 +5581,7 @@ class WarehousingController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
             if ($user->mb_type == 'shop') {
-                $warehousing = ReceivingGoodsDelivery::select('receiving_goods_delivery.*', 'tax_invoice_divide.*')->leftjoin('tax_invoice_divide', function ($join) {
+                $warehousing = ReceivingGoodsDelivery::select('receiving_goods_delivery.*', 'tax_invoice_divide.tid_no as tid_no2', 'tax_invoice_divide.tid_sum', 'tax_invoice_divide.tid_supply_price', 'tax_invoice_divide.tid_vat', 'tax_invoice_divide.tid_number')->leftjoin('tax_invoice_divide', function ($join) {
                     $join->on('tax_invoice_divide.rgd_no', '=', 'receiving_goods_delivery.rgd_no');
                 })->with(['member', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('company.co_parent', function ($q) use ($user) {
@@ -5591,7 +5591,7 @@ class WarehousingController extends Controller
                     });
                 });
             } else if ($user->mb_type == 'shipper') {
-                $warehousing = ReceivingGoodsDelivery::select('receiving_goods_delivery.*', 'tax_invoice_divide.*')->leftjoin('tax_invoice_divide', function ($join) {
+                $warehousing = ReceivingGoodsDelivery::select('receiving_goods_delivery.*', 'tax_invoice_divide.tid_sum', 'tax_invoice_divide.tid_supply_price', 'tax_invoice_divide.tid_vat', 'tax_invoice_divide.tid_number')->leftjoin('tax_invoice_divide', function ($join) {
                     $join->on('tax_invoice_divide.rgd_no', '=', 'receiving_goods_delivery.rgd_no');
                 })->with(['member', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('company', function ($q) use ($user) {
@@ -5601,7 +5601,7 @@ class WarehousingController extends Controller
                     });
                 });
             } else if ($user->mb_type == 'spasys') {
-                $warehousing = ReceivingGoodsDelivery::select('receiving_goods_delivery.*', 'tax_invoice_divide.*')->leftjoin('tax_invoice_divide', function ($join) {
+                $warehousing = ReceivingGoodsDelivery::select('receiving_goods_delivery.*', 'tax_invoice_divide.tid_sum', 'tax_invoice_divide.tid_supply_price', 'tax_invoice_divide.tid_vat', 'tax_invoice_divide.tid_number')->leftjoin('tax_invoice_divide', function ($join) {
                     $join->on('tax_invoice_divide.rgd_no', '=', 'receiving_goods_delivery.rgd_no');
                 })->with(['member', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('company.co_parent.co_parent', function ($q) use ($user) {
@@ -5820,6 +5820,8 @@ class WarehousingController extends Controller
                         $item->vat_price_total = $item->rate_data_general->rdg_vat7 ? $item->rate_data_general->rdg_vat7 : 0;
                         $item->sum_price_total = $item->rate_data_general->rdg_sum7 ? $item->rate_data_general->rdg_sum7 : 0;
                     }
+
+                    $item->tid_no = $item->tid_no ? $item->tid_no : $item->tid_no2;
 
                     return $item;
                 })
