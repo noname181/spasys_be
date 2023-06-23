@@ -10,6 +10,7 @@ use App\Models\Contract;
 use App\Models\Company;
 use App\Models\CompanySettlement;
 use App\Models\CompanyPayment;
+use App\Models\Member;
 use App\Models\Service;
 use App\Utils\Messages;
 use Illuminate\Http\Client\Request;
@@ -234,6 +235,32 @@ class ContractController extends Controller
                 'co_service' => $validated['co_service'],
             ]);
             $i = 0;
+           
+            // $member = Member::where('co_no', $co_no)->get();
+            
+            
+            // $array_services_co = explode(" ",$validated['co_service']);
+            // foreach($member as $row){
+            //     $services_member = '';
+            //     foreach(explode(" ", $row['mb_service_no_array']) as $row2){
+            //         if($row2 != '공통'){
+            //             if(in_array($row2, $array_services_co)){
+            //                 $services_member .= $row2.' ';
+            //             }
+            //         }
+            //     }
+            //     $services_member = rtrim($services_member, " ");
+            //     if($services_member == '보세화물 수입풀필먼트 유통가공' && $validated['co_service'] == '보세화물 수입풀필먼트 유통가공'){
+            //         $services_member = '공통 보세화물 수입풀필먼트 유통가공';
+            //     }
+
+
+            //     Member::where('co_no', $co_no)->where('mb_no',$row['mb_no'])->update([
+            //         'mb_service_no_array' => $services_member,
+            //     ]);
+            // }
+
+           
             foreach($validated['service_no'] as $service_no){
 
                 CompanySettlement::updateOrCreate(
