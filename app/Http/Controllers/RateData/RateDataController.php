@@ -5481,7 +5481,7 @@ class RateDataController extends Controller
 
         $sheet->mergeCells('B2:Z6');
         $sheet->getStyle('B2:Z6')->getBorders()->getOutline()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
-        $sheet->setCellValue('B2', '가맹점(화주) 회사명');
+        $sheet->setCellValue('B2', $company->co_name);
         $sheet->getStyle('B2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle('B2')->getFont()->setSize(22)->setBold(true);
 
@@ -5744,7 +5744,7 @@ class RateDataController extends Controller
 
         $sheet->mergeCells('B2:Z6');
         $sheet->getStyle('B2:Z6')->getBorders()->getOutline()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
-        $sheet->setCellValue('B2', '가맹점(화주) 회사명');
+        $sheet->setCellValue('B2', $company->co_name);
         $sheet->getStyle('B2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle('B2')->getFont()->setSize(22)->setBold(true);
 
@@ -6113,7 +6113,11 @@ class RateDataController extends Controller
         $sheet->mergeCells('B'. ($current_row + 10). ':Z'. ($current_row + 10));
         $sheet->setCellValue('B'. ($current_row + 10), $company->co_email);
 
-        $sheet->getDefaultRowDimension()->setRowHeight(24);
+        // $sheet->getDefaultRowDimension()->setRowHeight(24);
+
+        foreach ($sheet->getRowIterator() as $row) {
+            $sheet->getRowDimension($row->getRowIndex())->setRowHeight(21);
+        }
 
         $Excel_writer = new Xlsx($spreadsheet);
         if (isset($user->mb_no)) {
@@ -6235,7 +6239,7 @@ class RateDataController extends Controller
 
         $sheet->mergeCells('B2:Z6');
         $sheet->getStyle('B2:Z6')->getBorders()->getOutline()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
-        $sheet->setCellValue('B2', '가맹점(화주) 회사명');
+        $sheet->setCellValue('B2', $company->co_name);
         $sheet->getStyle('B2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle('B2')->getFont()->setSize(22)->setBold(true);
 
@@ -7205,8 +7209,11 @@ class RateDataController extends Controller
         $sheet->mergeCells('B'. ($current_row + 10). ':Z'. ($current_row + 10));
         $sheet->setCellValue('B'. ($current_row + 10), $company->co_email);
 
-        $sheet->getDefaultRowDimension()->setRowHeight(24);
+        // $sheet->getDefaultRowDimension()->setRowHeight(24);
 
+        foreach ($sheet->getRowIterator() as $row) {
+            $sheet->getRowDimension($row->getRowIndex())->setRowHeight(21);
+        }
         $Excel_writer = new Xlsx($spreadsheet);
         if (isset($user->mb_no)) {
             $path = 'storage/download/' . $user->mb_no . '/';
@@ -7286,7 +7293,7 @@ class RateDataController extends Controller
 
         $sheet->mergeCells('B2:R6');
         $sheet->getStyle('B2:R6')->getBorders()->getOutline()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
-        $sheet->setCellValue('B2', '가맹점(화주) 회사명');
+        $sheet->setCellValue('B2', $company->co_name);
         $sheet->getStyle('B2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle('B2')->getFont()->setSize(22)->setBold(true);
 
@@ -7589,7 +7596,7 @@ class RateDataController extends Controller
 
         $sheet->mergeCells('B2:Z6');
         $sheet->getStyle('B2:Z6')->getBorders()->getOutline()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
-        $sheet->setCellValue('B2', '가맹점(화주) 회사명');
+        $sheet->setCellValue('B2', $company->co_name);
         $sheet->getStyle('B2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle('B2')->getFont()->setSize(22)->setBold(true);
 
