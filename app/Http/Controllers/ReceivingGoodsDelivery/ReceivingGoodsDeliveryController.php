@@ -2645,11 +2645,11 @@ class ReceivingGoodsDeliveryController extends Controller
             $text_delete = "";
 
             if ($request->type == 'add_all') {
-                $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+                $rgd = ReceivingGoodsDelivery::with(['rate_data_general'])->where('rgd_no', $request->rgd_no)->first();
 
                 TaxInvoiceDivide::where('tid_no', $rgd->tid_no)->delete();
 
-                $rgds = ReceivingGoodsDelivery::where('tid_no', $rgd->tid_no)->get();
+                $rgds = ReceivingGoodsDelivery::with(['rate_data_general'])->where('tid_no', $rgd->tid_no)->get();
 
 
 
