@@ -5581,7 +5581,9 @@ class WarehousingController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
             if ($user->mb_type == 'shop') {
-                $warehousing = ReceivingGoodsDelivery::with(['member', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
+                $warehousing = ReceivingGoodsDelivery::select('receiving_goods_delivery.*')->leftjoin('tax_invoice_divide', function ($join) {
+                    $join->on('tax_invoice_divide.rgd_no', '=', 'receiving_goods_delivery.rgd_no');
+                })->with(['member', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('company.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     })->whereHas('company.contract', function ($q) use ($user) {
@@ -5589,7 +5591,9 @@ class WarehousingController extends Controller
                     });
                 });
             } else if ($user->mb_type == 'shipper') {
-                $warehousing = ReceivingGoodsDelivery::with(['member', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
+                $warehousing = ReceivingGoodsDelivery::select('receiving_goods_delivery.*')->leftjoin('tax_invoice_divide', function ($join) {
+                    $join->on('tax_invoice_divide.rgd_no', '=', 'receiving_goods_delivery.rgd_no');
+                })->with(['member', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('company', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     })->whereHas('company.contract', function ($q) use ($user) {
@@ -5597,7 +5601,9 @@ class WarehousingController extends Controller
                     });
                 });
             } else if ($user->mb_type == 'spasys') {
-                $warehousing = ReceivingGoodsDelivery::with(['member', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
+                $warehousing = ReceivingGoodsDelivery::select('receiving_goods_delivery.*')->leftjoin('tax_invoice_divide', function ($join) {
+                    $join->on('tax_invoice_divide.rgd_no', '=', 'receiving_goods_delivery.rgd_no');
+                })->with(['member', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('company.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     })->orWhereHas('company.co_parent', function ($q) use ($user) {
@@ -5625,7 +5631,7 @@ class WarehousingController extends Controller
                     $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
                 })
                 ->orderBy('rgd_status7')
-                ->orderBy('rgd_no', 'DESC');
+                ->orderBy('receiving_goods_delivery.rgd_no', 'DESC');
 
             if (isset($validated['status'])) {
                 if ($validated['status'] == 'waiting')
@@ -5641,11 +5647,11 @@ class WarehousingController extends Controller
             }
 
             if (isset($validated['from_date'])) {
-                $warehousing->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+                $warehousing->where('receiving_goods_delivery.created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
             }
 
             if (isset($validated['to_date'])) {
-                $warehousing->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                $warehousing->where('receiving_goods_delivery.created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
             }
 
             if (isset($validated['co_parent_name'])) {
@@ -5771,7 +5777,7 @@ class WarehousingController extends Controller
             $warehousing_data = $warehousing->get();
 
             $arr_data = collect($warehousing_data)->map(function ($item) {
-
+                if(isset($item['rate_data_general']))
                 return [
                     'sum_supply_price' => $item['service_korean_name'] == '유통가공' ? $item['rate_data_general']['rdg_supply_price4'] : ($item['service_korean_name'] == '수입풀필먼트' ? $item['rate_data_general']['rdg_supply_price6'] : $item['rate_data_general']['rdg_supply_price7']),
 
@@ -5800,6 +5806,7 @@ class WarehousingController extends Controller
             //return DB::getQueryLog();
             $warehousing->setCollection(
                 $warehousing->getCollection()->map(function ($item) {
+                    if(isset($item['rate_data_general']))
                     if ($item->service_korean_name === "유통가공") {
                         $item->supply_price_total = $item->rate_data_general->rdg_supply_price4 ? $item->rate_data_general->rdg_supply_price4 : 0;
                         $item->vat_price_total = $item->rate_data_general->rdg_vat4 ? $item->rate_data_general->rdg_vat4 : 0;
