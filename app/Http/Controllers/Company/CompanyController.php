@@ -209,6 +209,7 @@ class CompanyController extends Controller
             if (isset($contract->c_no)) {
                 $company = Company::select([
                     'company.co_no',
+                    'company.co_parent_no',
                     'company.mb_no',
                     'company.co_name',
                     'company.co_address',
@@ -234,6 +235,7 @@ class CompanyController extends Controller
             } else {
                 $company = Company::select([
                     'company.co_no',
+                    'company.co_parent_no',
                     'company.mb_no',
                     'company.co_name',
                     'company.co_address',
@@ -267,7 +269,7 @@ class CompanyController extends Controller
             $manager = Manager::where('co_no', $co_no)->first();
             $services = Service::where('service_use_yn', 'y')->where('service_no', '!=', 1)->get();
             $services_use = explode(" ",$company->co_service);
-            $company_payment = CompanyPayment::where('co_no', $co_no)->first();
+            $company_payment = CompanyPayment::where('co_no', $company->co_parent_no)->first();
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'company' => $company,
