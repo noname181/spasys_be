@@ -5469,7 +5469,10 @@ class RateDataController extends Controller
 
         // $sheet->getProtection()->setSheet(true);
         $sheet->getDefaultColumnDimension()->setWidth(4.5);
-        $sheet->getDefaultRowDimension()->setRowHeight(24);
+        // $sheet->getDefaultRowDimension()->setRowHeight(24);
+        foreach ($sheet->getRowIterator() as $row) {
+            $sheet->getRowDimension($row->getRowIndex())->setRowHeight(21);
+        }
         $sheet->getColumnDimension('B')->setWidth(10);
         $sheet->getColumnDimension('C')->setWidth(24);
         $sheet->getColumnDimension('D')->setWidth(24);
@@ -5504,7 +5507,7 @@ class RateDataController extends Controller
         $sheet->mergeCells('B15:Z15');
         $sheet->setCellValue('B15', ' ∙ 청구서 발행일 : '. Carbon::createFromFormat('Y-m-d H:i:s', $rgd->created_at)->format('Y.m.d'));
         $sheet->mergeCells('B16:Z16');
-        $sheet->setCellValue('B16', ' ∙ 예상 청구금액 : '. $rgd->rate_data_general->rdg_sum4 . '원');
+        $sheet->setCellValue('B16', ' ∙ 예상 청구금액 : '. number_format($rgd->rate_data_general->rdg_sum4) . '원');
         $sheet->mergeCells('B17:Z17');
         $sheet->setCellValue('B17', isset($company->company_payment) ? (' ∙ 계좌  정보 : ㈜' . $company->company_payment->cp_bank_name .' ' . $company->company_payment->cp_bank_number . ' ('. $company->company_payment->cp_card_name. ')' ) : ' ∙ 계좌  정보 : ㈜');
 
@@ -5644,7 +5647,10 @@ class RateDataController extends Controller
         $sheet->mergeCells('B'. ($current_row + 10). ':Z'. ($current_row + 10));
         $sheet->setCellValue('B'. ($current_row + 10), $company->co_email);
 
-        $sheet->getDefaultRowDimension()->setRowHeight(24);
+        // $sheet->getDefaultRowDimension()->setRowHeight(24);
+        foreach ($sheet->getRowIterator() as $row) {
+            $sheet->getRowDimension($row->getRowIndex())->setRowHeight(21);
+        }
 
         $Excel_writer = new Xlsx($spreadsheet);
         if (isset($user->mb_no)) {
@@ -5734,7 +5740,10 @@ class RateDataController extends Controller
 
         // $sheet->getProtection()->setSheet(true);
         $sheet->getDefaultColumnDimension()->setWidth(4.5);
-        $sheet->getDefaultRowDimension()->setRowHeight(24);
+        // $sheet->getDefaultRowDimension()->setRowHeight(24);
+        foreach ($sheet->getRowIterator() as $row) {
+            $sheet->getRowDimension($row->getRowIndex())->setRowHeight(21);
+        }
         $sheet->getColumnDimension('B')->setWidth(16);
         $sheet->getColumnDimension('C')->setWidth(12);
         $sheet->getStyle('A1:Z200')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
@@ -5766,7 +5775,7 @@ class RateDataController extends Controller
         $sheet->mergeCells('B15:Z15');
         $sheet->setCellValue('B15', ' ∙ 청구서 발행일 : '. Carbon::createFromFormat('Y-m-d H:i:s', $rgd->created_at)->format('Y.m.d'));
         $sheet->mergeCells('B16:Z16');
-        $sheet->setCellValue('B16', ' ∙ 예상 청구금액 : '. $rgd->rate_data_general->rdg_sum4 . '원');
+        $sheet->setCellValue('B16', ' ∙ 예상 청구금액 : '. number_format($rgd->rate_data_general->rdg_sum4) . '원');
         $sheet->mergeCells('B17:Z17');
         $sheet->setCellValue('B17', isset($company->company_payment) ? (' ∙ 계좌  정보 : ㈜' . $company->company_payment->cp_bank_name .' ' . $company->company_payment->cp_bank_number . ' ('. $company->company_payment->cp_card_name. ')' ) : ' ∙ 계좌  정보 : ㈜');
 
@@ -6229,7 +6238,10 @@ class RateDataController extends Controller
 
         // $sheet->getProtection()->setSheet(true);
         $sheet->getDefaultColumnDimension()->setWidth(4.5);
-        $sheet->getDefaultRowDimension()->setRowHeight(24);
+        // $sheet->getDefaultRowDimension()->setRowHeight(24);
+        foreach ($sheet->getRowIterator() as $row) {
+            $sheet->getRowDimension($row->getRowIndex())->setRowHeight(21);
+        }
         $sheet->getColumnDimension('B')->setWidth(16);
         $sheet->getColumnDimension('C')->setWidth(12);
         $sheet->getStyle('A1:Z200')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
@@ -6262,7 +6274,7 @@ class RateDataController extends Controller
         $sheet->mergeCells('B15:Z15');
         $sheet->setCellValue('B15', ' ∙ 청구서 발행일 : '. Carbon::createFromFormat('Y-m-d H:i:s', $rgd->created_at)->format('Y.m.d'));
         $sheet->mergeCells('B16:Z16');
-        $sheet->setCellValue('B16', ' ∙ 예상 청구금액 : '. ($rgd->rate_data_general->rdg_sum7 + $rgd->rate_data_general->rdg_sum14) . '원');
+        $sheet->setCellValue('B16', ' ∙ 예상 청구금액 : '. (number_format($rgd->rate_data_general->rdg_sum7 + $rgd->rate_data_general->rdg_sum14)) . '원');
         $sheet->mergeCells('B17:Z17');
         $sheet->setCellValue('B17', ' ∙ 계좌  정보 : ㈜'. $company->company_payment->cp_bank_name .' ' . $company->company_payment->cp_bank_number . ' ('. $company->company_payment->cp_card_name. ')');
 
@@ -7285,7 +7297,10 @@ class RateDataController extends Controller
 
         // $sheet->getProtection()->setSheet(true);
         $sheet->getDefaultColumnDimension()->setWidth(4.5);
-        $sheet->getDefaultRowDimension()->setRowHeight(24);
+        // $sheet->getDefaultRowDimension()->setRowHeight(24);
+        foreach ($sheet->getRowIterator() as $row) {
+            $sheet->getRowDimension($row->getRowIndex())->setRowHeight(21);
+        }
         $sheet->getStyle('A1:S200')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
         $sheet->getStyle('A1:CT200')->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FFFFFF'));
         $sheet->setTitle('보세화물 예상경비(건별,월별)');
@@ -7310,13 +7325,13 @@ class RateDataController extends Controller
         $sheet->mergeCells('B12:R12');
         $sheet->setCellValue('B12', ' ∙ 서   비  스 : 보세화물');
         $sheet->mergeCells('B13:R13');
-        $sheet->setCellValue('B13', ' ∙ H-BL  건수 :' . count($rgds));
+        $sheet->setCellValue('B13', ' ∙ H-BL  건수 : ' . (count($rgds) - 1) . '건');
         $sheet->mergeCells('B14:R14');
         $sheet->setCellValue('B14', ' ∙ 청구서 No : '. $rgd->rgd_status4 . ' ' . $rgd->rgd_settlement_number);
         $sheet->mergeCells('B15:R15');
         $sheet->setCellValue('B15', ' ∙ 청구서 발행일 : '. Carbon::createFromFormat('Y-m-d H:i:s', $rgd->created_at)->format('Y.m.d'));
         $sheet->mergeCells('B16:R16');
-        $sheet->setCellValue('B16', ' ∙ 예상 청구금액 : '. ($rgd->rate_data_general->rdg_sum7 + $rgd->rate_data_general->rdg_sum14) . '원');
+        $sheet->setCellValue('B16', ' ∙ 예상 청구금액 : '. (number_format($rgd->rate_data_general->rdg_sum7 + $rgd->rate_data_general->rdg_sum14)) . '원');
         $sheet->mergeCells('B17:R17');
         $sheet->setCellValue('B17', ' ∙ 계좌  정보 : ㈜'. $company->company_payment->cp_bank_name .' ' . $company->company_payment->cp_bank_number . ' ('. $company->company_payment->cp_card_name. ')');
 
@@ -7486,7 +7501,9 @@ class RateDataController extends Controller
         $sheet->mergeCells('B'. ($current_row + 10). ':R'. ($current_row + 10));
         $sheet->setCellValue('B'. ($current_row + 10), $company->co_email);
 
-        $sheet->getDefaultRowDimension()->setRowHeight(24);
+        foreach ($sheet->getRowIterator() as $row) {
+            $sheet->getRowDimension($row->getRowIndex())->setRowHeight(21);
+        }
 
         $Excel_writer = new Xlsx($spreadsheet);
         if (isset($user->mb_no)) {
@@ -7509,6 +7526,7 @@ class RateDataController extends Controller
             'status' => 1,
             'link_download' => '../'. $file_name_download,
             'message' => 'Download File',
+            'rgds'=>$rgds
         ], 200);
         ob_end_clean();
     }
@@ -7586,7 +7604,10 @@ class RateDataController extends Controller
 
         // $sheet->getProtection()->setSheet(true);
         $sheet->getDefaultColumnDimension()->setWidth(4.5);
-        $sheet->getDefaultRowDimension()->setRowHeight(24);
+        // $sheet->getDefaultRowDimension()->setRowHeight(24);
+        foreach ($sheet->getRowIterator() as $row) {
+            $sheet->getRowDimension($row->getRowIndex())->setRowHeight(21);
+        }
         $sheet->getColumnDimension('B')->setWidth(16);
         $sheet->getColumnDimension('C')->setWidth(12);
         $sheet->getStyle('A1:Z200')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
@@ -7617,7 +7638,7 @@ class RateDataController extends Controller
         $sheet->mergeCells('B15:Z15');
         $sheet->setCellValue('B15', ' ∙ 청구서 발행일 : '. Carbon::createFromFormat('Y-m-d H:i:s', $rgd->created_at)->format('Y.m.d') );
         $sheet->mergeCells('B16:Z16');
-        $sheet->setCellValue('B16', ' ∙ 예상 청구금액 : '. $rgd->rate_data_general->rdg_sum6 . '원');
+        $sheet->setCellValue('B16', ' ∙ 예상 청구금액 : '. number_format($rgd->rate_data_general->rdg_sum6) . '원');
         $sheet->mergeCells('B17:Z17');
         $sheet->setCellValue('B17', isset($company->company_payment) ? (' ∙ 계좌  정보 : ㈜' . $company->company_payment->cp_bank_name .' ' . $company->company_payment->cp_bank_number . ' ('. $company->company_payment->cp_card_name. ')' ) : ' ∙ 계좌  정보 : ㈜');
 
@@ -8829,7 +8850,10 @@ class RateDataController extends Controller
         $sheet->mergeCells('B'. ($current_row + 10). ':Z'. ($current_row + 10));
         $sheet->setCellValue('B'. ($current_row + 10), $company->co_email);
 
-        $sheet->getDefaultRowDimension()->setRowHeight(24);
+        // $sheet->getDefaultRowDimension()->setRowHeight(24);
+        foreach ($sheet->getRowIterator() as $row) {
+            $sheet->getRowDimension($row->getRowIndex())->setRowHeight(21);
+        }
 
         $Excel_writer = new Xlsx($spreadsheet);
         if (isset($user->mb_no)) {
