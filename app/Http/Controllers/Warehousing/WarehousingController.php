@@ -5888,7 +5888,7 @@ class WarehousingController extends Controller
                     })->orWhereHas('company.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
-                })
+                });
                     // ->whereHas('warehousing', function ($query) use ($user) {
                     //     $query->whereHas('company.co_parent.contract', function ($q) use ($user) {
                     //         $q->where('c_calculate_deadline_yn', 'y');
