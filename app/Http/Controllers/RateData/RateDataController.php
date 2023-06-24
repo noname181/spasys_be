@@ -6301,7 +6301,7 @@ class RateDataController extends Controller
         $count_row = 0;
 
         foreach($categories as $key => $category){
-            if($rgd->rate_data_general['rdg_sum' . ($key  == 5 ? ($key + 2) : ($key + 1))] != 0){
+            if($rgd->rate_data_general['rdg_sum' . ($key  == 5 ? ($key + 2) : ($key + 1))] != 0 || $rgd->rate_data_general['rdg_sum' . ($key  == 5 ? ($key + 9) : ($key + 8))] != 0){
                 $sheet->mergeCells('B'.($current_row + $count_row).':E'.($current_row + $count_row));
                 $sheet->setCellValue('B'.($current_row + $count_row), $category);
                 $sheet->mergeCells('F'.($current_row + $count_row).':H'.($current_row + $count_row));
