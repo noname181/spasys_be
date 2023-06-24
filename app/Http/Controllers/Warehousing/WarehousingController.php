@@ -5888,21 +5888,23 @@ class WarehousingController extends Controller
                     })->orWhereHas('company.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
-                })
-                    ->whereHas('warehousing', function ($query) use ($user) {
-                        $query->whereHas('company.co_parent.contract', function ($q) use ($user) {
-                            $q->where('c_calculate_deadline_yn', 'y');
-                        })->orWhereHas('company.contract', function ($q) use ($user) {
-                            $q->where('c_calculate_deadline_yn', 'y');
-                        });
-                    });
+                });
+                    // ->whereHas('warehousing', function ($query) use ($user) {
+                    //     $query->whereHas('company.co_parent.contract', function ($q) use ($user) {
+                    //         $q->where('c_calculate_deadline_yn', 'y');
+                    //     })->orWhereHas('company.contract', function ($q) use ($user) {
+                    //         $q->where('c_calculate_deadline_yn', 'y');
+                    //     });
+                    // });
             }
             $warehousing->where(function ($q) {
                 $q->where('rgd_status4', '확정청구서');
             })
                 ->where('rgd_status5', 'confirmed')
                 ->where('rgd_calculate_deadline_yn', 'y')
-                ->whereNull('rgd_status6')
+                ->where(function ($q4) {
+                    $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '==', 'cancel');
+                })
                 ->where('rgd_is_show', 'y')
                 ->where(function ($q4) {
                     $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
@@ -6163,7 +6165,7 @@ class WarehousingController extends Controller
                             'tid_vat' => $tid['tid_vat'],
                             'tid_sum' => $tid['tid_sum'],
                             'rgd_no' => isset($tid['rgd_no']) ? $tid['rgd_no'] : $request->rgd_no,
-                            'rgd_number' => isset($tid['rgd_number']) ? $tid['rgd_number'] : null,
+                            'rgd_number' => isset($tid['rgd_number']) ? $tid['rgd_number'] : $rgd->settlement_number,
                             'co_license' => $request['company']['co_license'],
                             'co_owner' => $request['company']['co_owner'],
                             'co_name' => $request['company']['co_name'],
@@ -6193,7 +6195,7 @@ class WarehousingController extends Controller
                             'tid_vat' => $tid['tid_vat'],
                             'tid_sum' => $tid['tid_sum'],
                             'rgd_no' => isset($tid['rgd_no']) ? $tid['rgd_no'] : $request->rgd_no,
-                            'rgd_number' => isset($tid['tid_number']) ? $tid['tid_number'] : null,
+                            'rgd_number' => isset($tid['tid_number']) ? $tid['tid_number'] : $rgd->settlement_number,
                             'co_license' => $request['company']['co_license'],
                             'co_owner' => $request['company']['co_owner'],
                             'co_name' => $request['company']['co_name'],
