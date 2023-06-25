@@ -37,6 +37,7 @@ class TaxInvoiceDivide extends Model
         'tid_supply_price',
         'tid_sum',
         'tid_vat',
+        'tid_type',
         'co_license',
         'co_owner',
         'co_name',

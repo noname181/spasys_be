@@ -5581,7 +5581,7 @@ class WarehousingController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
             if ($user->mb_type == 'shop') {
-                $warehousing = ReceivingGoodsDelivery::select('receiving_goods_delivery.*', 'tax_invoice_divide.tid_no as tid_no2', 'tax_invoice_divide.tid_sum', 'tax_invoice_divide.rgd_number', 'tax_invoice_divide.tid_supply_price', 'tax_invoice_divide.tid_vat', 'tax_invoice_divide.tid_number')->leftjoin('tax_invoice_divide', function ($join) {
+                $warehousing = ReceivingGoodsDelivery::select('receiving_goods_delivery.*', 'tax_invoice_divide.tid_no as tid_no2', 'tax_invoice_divide.tid_sum', 'tax_invoice_divide.tid_type', 'tax_invoice_divide.rgd_number', 'tax_invoice_divide.tid_supply_price', 'tax_invoice_divide.tid_vat', 'tax_invoice_divide.tid_number')->leftjoin('tax_invoice_divide', function ($join) {
                     $join->on('tax_invoice_divide.rgd_no', '=', 'receiving_goods_delivery.rgd_no');
                 })->with(['member', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('company.co_parent', function ($q) use ($user) {
@@ -5591,7 +5591,7 @@ class WarehousingController extends Controller
                     });
                 });
             } else if ($user->mb_type == 'shipper') {
-                $warehousing = ReceivingGoodsDelivery::select('receiving_goods_delivery.*', 'tax_invoice_divide.tid_no as tid_no2', 'tax_invoice_divide.tid_sum', 'tax_invoice_divide.rgd_number', 'tax_invoice_divide.tid_supply_price', 'tax_invoice_divide.tid_vat', 'tax_invoice_divide.tid_number')->leftjoin('tax_invoice_divide', function ($join) {
+                $warehousing = ReceivingGoodsDelivery::select('receiving_goods_delivery.*', 'tax_invoice_divide.tid_no as tid_no2', 'tax_invoice_divide.tid_sum', 'tax_invoice_divide.tid_type', 'tax_invoice_divide.rgd_number', 'tax_invoice_divide.tid_supply_price', 'tax_invoice_divide.tid_vat', 'tax_invoice_divide.tid_number')->leftjoin('tax_invoice_divide', function ($join) {
                     $join->on('tax_invoice_divide.rgd_no', '=', 'receiving_goods_delivery.rgd_no');
                 })->with(['member', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('company', function ($q) use ($user) {
@@ -5601,7 +5601,7 @@ class WarehousingController extends Controller
                     });
                 });
             } else if ($user->mb_type == 'spasys') {
-                $warehousing = ReceivingGoodsDelivery::select('receiving_goods_delivery.*', 'tax_invoice_divide.tid_no as tid_no2', 'tax_invoice_divide.tid_sum', 'tax_invoice_divide.rgd_number', 'tax_invoice_divide.tid_supply_price', 'tax_invoice_divide.tid_vat', 'tax_invoice_divide.tid_number')->leftjoin('tax_invoice_divide', function ($join) {
+                $warehousing = ReceivingGoodsDelivery::select('receiving_goods_delivery.*', 'tax_invoice_divide.tid_no as tid_no2', 'tax_invoice_divide.tid_sum', 'tax_invoice_divide.tid_type', 'tax_invoice_divide.rgd_number', 'tax_invoice_divide.tid_supply_price', 'tax_invoice_divide.tid_vat', 'tax_invoice_divide.tid_number')->leftjoin('tax_invoice_divide', function ($join) {
                     $join->on('tax_invoice_divide.rgd_no', '=', 'receiving_goods_delivery.rgd_no');
                 })->with(['member', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('company.co_parent.co_parent', function ($q) use ($user) {
@@ -6174,6 +6174,7 @@ class WarehousingController extends Controller
                             'co_email' => $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null,
                             'co_email2' => $request['ag']['ag_email2'] ? $request['ag']['ag_email2'] : null,
                             'mb_no' => $user->mb_no,
+                            'tid_type' => 'option',
                         ]);
                         $id = $tid_->first()->tid_no;
 
@@ -6204,6 +6205,7 @@ class WarehousingController extends Controller
                             'co_email' => $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null,
                             'co_email2' => $request['ag']['ag_email2'] ? $request['ag']['ag_email2'] : null,
                             'mb_no' => $user->mb_no,
+                            'tid_type' => 'option',
                         ]);
 
                         $cbh = CancelBillHistory::insertGetId([
@@ -6276,7 +6278,7 @@ class WarehousingController extends Controller
                     'api' => isset($api['message']) ? $api['message'] : null,
                     'api_message' => isset($api['txt']) ? $api['txt'] : null,
                 ]);
-            } 
+            }
             // NOT USE MORE
             // else if ($request->type == 'receipt') {
             //     $user = Auth::user();
@@ -6378,7 +6380,7 @@ class WarehousingController extends Controller
             //         'message' => Messages::MSG_0007,
             //         'cr_list' => $tids,
             //     ]);
-            // } 
+            // }
             else if ($request->type == 'add_all') {
                 $user = Auth::user();
 
@@ -6395,6 +6397,7 @@ class WarehousingController extends Controller
                     'co_email' => $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null,
                     'co_email2' => $request['ag']['ag_email2'] ? $request['ag']['ag_email2'] : null,
                     'mb_no' => $user->mb_no,
+                    'tid_type' => 'add_all',
                 ]);
 
                 $tax_number = CommonFunc::generate_tax_number($id,$request->rgd_no);
@@ -6500,6 +6503,7 @@ class WarehousingController extends Controller
                         'co_email2' => isset($ag['ag_email2']) ? $ag['ag_email2'] : null,
                         //'rgd_number' => $tax_number ? $tax_number : null,
                         'mb_no' => $user->mb_no,
+                        'tid_type' => 'seperate',
                     ]);
 
                     $tax_number = CommonFunc::generate_tax_number($id,$rgd['rgd_no']);
