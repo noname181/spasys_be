@@ -5503,7 +5503,7 @@ class RateDataController extends Controller
         $sheet->mergeCells('B13:Z13');
         $sheet->setCellValue('B13', ' ∙ 입고화물번호 건수 : '. (count($rgds) - 1).'건');
         $sheet->mergeCells('B14:Z14');
-        $sheet->setCellValue('B14', ' ∙ 청구서 No : 확정청구서 '. $rgd->rgd_status4 . ' ' . $rgd->rgd_settlement_number);
+        $sheet->setCellValue('B14', ' ∙ 청구서 No : '. $rgd->rgd_status4 . ' ' . $rgd->rgd_settlement_number);
         $sheet->mergeCells('B15:Z15');
         $sheet->setCellValue('B15', ' ∙ 청구서 발행일 : '. Carbon::createFromFormat('Y-m-d H:i:s', $rgd->created_at)->format('Y.m.d'));
         $sheet->mergeCells('B16:Z16');
