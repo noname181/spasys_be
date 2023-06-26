@@ -5848,7 +5848,26 @@ class WarehousingController extends Controller
             return response()->json($th);
         } catch (\Exception $e) {
             Log::error($e);
-            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function get_tax_history_popup(Request $request) //page277
+
+    {
+        try {
+          
+            $th = CancelBillHistory::with('member')->where('rgd_no', $request->rgd_no)
+            ->where(function($q){
+                $q->where('cbh_status_after', 'taxed')->orwhere('cbh_status_after', 'cancel')->orwhere('cbh_status_after', 'edited');
+            })
+            ->where('cbh_type', 'tax')
+            ->orderby('cbh_no', 'DESC')
+            ->get();
+
+            return response()->json($th);
+        } catch (\Exception $e) {
+            Log::error($e);
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
