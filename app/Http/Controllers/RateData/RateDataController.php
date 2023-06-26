@@ -5769,7 +5769,7 @@ class RateDataController extends Controller
         $sheet->getStyle('B13:B17')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
         $sheet->getStyle('B13:B17')->getFont()->setBold(true);
         $sheet->mergeCells('B13:Z13');
-        $sheet->setCellValue('B13', ' ∙ 서   비  스 : 보세화물');
+        $sheet->setCellValue('B13', ' ∙ 서   비  스 : 유통가공');
         $sheet->mergeCells('B14:Z14');
         $sheet->setCellValue('B14', ' ∙ 청구서 No : '. $rgd->rgd_status4 . ' ' . $rgd->rgd_settlement_number);
         $sheet->mergeCells('B15:Z15');
