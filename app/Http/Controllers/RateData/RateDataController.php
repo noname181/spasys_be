@@ -7443,7 +7443,7 @@ class RateDataController extends Controller
                     $sheet->setCellValue($col_start[$key_col].($current_row + $key), $rgd['rate_data_general']['rdg_sum7'] ? $rgd['rate_data_general']['rdg_sum7'] : 0);
                 }
                 else if($key_col == 11){
-                    $sheet->setCellValue($col_start[$key_col].($current_row + $key), $rgd['rate_data_general']['rdg_supply_price7'] ? $rgd['rate_data_general']['rdg_supply_price7'] : 0);
+                    $sheet->setCellValue($col_start[$key_col].($current_row + $key), $rgd['rate_data_general']['rdg_supply_price1'] ? $rgd['rate_data_general']['rdg_supply_price1'] : 0);
                 }
                 else if($key_col == 12){
                     $sheet->setCellValue($col_start[$key_col].($current_row + $key), $rgd['rate_data_general']['rdg_supply_price2'] ? $rgd['rate_data_general']['rdg_supply_price2'] : 0);
