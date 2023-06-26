@@ -217,7 +217,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/get_fulfillment_export_status4_by_id/{rgd_no}', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getFulfillmentExportStatus4ById']); //page 253 mobile
 
-    Route::post('/get_tax_history', [\App\Http\Controllers\Warehousing\WarehousingController::class,'get_tax_history']); //page 277
+    Route::post('/get_tax_history', [\App\Http\Controllers\Warehousing\WarehousingController::class,'get_tax_history']); //right table 
+    Route::post('/get_tax_history_popup', [\App\Http\Controllers\Warehousing\WarehousingController::class,'get_tax_history_popup']); //page 277
     Route::post('/get_tax_invoice_list', [\App\Http\Controllers\Warehousing\WarehousingController::class,'get_tax_invoice_list']); //page 277
     Route::post('/get_tax_invoice_completed_list', [\App\Http\Controllers\Warehousing\WarehousingController::class,'get_tax_invoice_completed_list']); //page 282
     Route::post('/get_tid_list', [\App\Http\Controllers\Warehousing\WarehousingController::class,'get_tid_list']); //page 277
