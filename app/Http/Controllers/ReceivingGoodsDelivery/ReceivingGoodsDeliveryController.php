@@ -2704,7 +2704,7 @@ class ReceivingGoodsDeliveryController extends Controller
             } else {
                 $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
 
-                Tax::where('rgd_no', $request->rgd_no)->update([
+                Tax::where('rgd_no', $request->rgd_no)->where('t_status', 1)->update([
                     't_status' => '0',
                 ]);
 
@@ -2719,7 +2719,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 // GetTaxInvoiceStatesEX.php 파일에서도 수정해야 함
                 $CERTKEY = '813FD596-7CBB-490A-84D2-31570487790E';                            //인증키
 
-                $apis  = Tax::where('rgd_no', $request->rgd_no)->get();
+                $apis  = Tax::where('rgd_no', $request->rgd_no)->where('t_status', 1)->get();
 
                 $procType = "ISSUE_CANCEL";
 
@@ -2807,10 +2807,10 @@ class ReceivingGoodsDeliveryController extends Controller
 
             TaxInvoiceDivide::where('rgd_no', $request->rgd_no)->delete();
 
-            if ($text == "error") {
-                DB::rollBack();
-            } else {
+            if ($text == "") {
                 DB::commit();
+            } else {
+                DB::rollBack();
             }
 
 

@@ -8787,6 +8787,10 @@ class WarehousingController extends Controller
             'MgtKey'    => $tax_number,
             'ProcType'    => $procType,
         ))->ProcTaxInvoiceResult;
+        
+        Tax::where('t_mgtnum', $tax_number)->where('t_status', 1)->update([
+            't_status' => '0',
+        ]);
 
         $tax = Tax::where('t_mgtnum', $tax_number)->first();
 
@@ -9104,9 +9108,7 @@ class WarehousingController extends Controller
 
             //$sql_tax  = " insert into tax(b_no, t_mgtnum, t_startdate, t_type, cc_no, s_no, t_regtime, t_modify, t_taxtxt, t_taxcode, t_status, t_result_sendtime, t_result_regtime, t_result_no, t_amount, t_tax, t_total)
             //values('1222222222222222', '$t_mgtnum', '$b_start', '$t_type', '$cc_no', '$s_no', '$t_regtime', '', '', 0, '$Result', now(), '', '', '$t_amount', '$t_tax', '$t_total') ";
-            Tax::updateOrCreate([
-                'b_no' => $rgd->rgd_settlement_number,
-            ], [
+            Tax::insertGetId([
                 'b_no' => $rgd->rgd_settlement_number,
                 't_mgtnum' => $t_mgtnum,
                 'rgd_no' => $rgd->rgd_no,
