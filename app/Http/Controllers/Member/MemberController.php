@@ -681,7 +681,7 @@ class MemberController extends Controller
             } else if ($user->mb_type == 'shipper') {
 
                 $members = [];
-                $member2 = Company::with(['co_parent'])->where('co_no', $user->co_no)->where('co_service', 'like', '%' . $request->service . '%')->first();
+                $member2 = Company::with(['co_parent'])->where('co_no', $user->co_no)->first();
                 $members[] = $member2;
                 array_multisort($members, SORT_ASC);
 
