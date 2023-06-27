@@ -6202,13 +6202,16 @@ class WarehousingController extends Controller
 
                         $api = $this->update_tax_invoice_api($rgd, $user, $tid, $tid['tid_number'], null, $request['company']);
 
-                        $cbh = CancelBillHistory::insertGetId([
-                            'rgd_no' => $request->rgd_no,
-                            'mb_no' => $user->mb_no,
-                            'cbh_type' => 'tax',
-                            'cbh_status_before' => 'taxed',
-                            'cbh_status_after' => 'edited'
-                        ]);
+                        if($key == 0){
+                            $cbh = CancelBillHistory::insertGetId([
+                                'rgd_no' => $request->rgd_no,
+                                'mb_no' => $user->mb_no,
+                                'cbh_type' => 'tax',
+                                'cbh_status_before' => 'taxed',
+                                'cbh_status_after' => 'edited'
+                            ]);
+                        }
+                      
 
                     } else {
                         $id = TaxInvoiceDivide::insertGetId([
@@ -6228,12 +6231,15 @@ class WarehousingController extends Controller
                             'tid_type' => 'option',
                         ]);
 
-                        $cbh = CancelBillHistory::insertGetId([
-                            'rgd_no' => $request->rgd_no,
-                            'mb_no' => $user->mb_no,
-                            'cbh_type' => 'tax',
-                            'cbh_status_after' => 'taxed'
-                        ]);
+                        if($key == 0){
+                            $cbh = CancelBillHistory::insertGetId([
+                                'rgd_no' => $request->rgd_no,
+                                'mb_no' => $user->mb_no,
+                                'cbh_type' => 'tax',
+                                'cbh_status_before' => 'taxed',
+                                'cbh_status_after' => 'edited'
+                            ]);
+                        }
 
                         $tax_number = CommonFunc::generate_tax_number($id,$request->rgd_no);
 
