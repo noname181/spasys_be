@@ -72,7 +72,7 @@ class Company extends Model
 
     public function co_parent()
     {
-        return $this->belongsTo(Company::class, 'co_parent_no', 'co_no')->with(['co_parent', 'contract']);
+        return $this->belongsTo(Company::class, 'co_parent_no', 'co_no')->with(['co_parent', 'contract', 'company_distribution_cycle']);
     }
     public function co_childen()
     {

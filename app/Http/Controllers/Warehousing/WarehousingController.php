@@ -4048,9 +4048,16 @@ class WarehousingController extends Controller
                 });
             }
             if (isset($validated['settlement_cycle'])) {
-                $warehousing->whereHas('w_no.co_no.company_distribution_cycle', function ($q) use ($validated) {
-                    return $q->where('cs_payment_cycle', $validated['settlement_cycle']);
-                });
+                if ($user->mb_type == 'spasys') {
+                    $warehousing->whereHas('w_no.co_no.co_parent.company_distribution_cycle', function ($q) use ($validated) {
+                        return $q->where('cs_payment_cycle', $validated['settlement_cycle']);
+                    });
+                } else if ($user->mb_type == 'shop') {
+                    $warehousing->whereHas('w_no.co_no.company_distribution_cycle', function ($q) use ($validated) {
+                        return $q->where('cs_payment_cycle', $validated['settlement_cycle']);
+                    });
+                }
+                
             }
 
             $warehousing->orderBy('created_at', 'DESC');
