@@ -6290,7 +6290,7 @@ class WarehousingController extends Controller
                 }
 
                 if($request->is_edit == 'y' && $request->tid_list[0]['tid_type'] == 'add_all'){
-                    ReceivingGoodsDelivery::where('rgd_no', $request->tid_list[0]['tid_no'])->update([
+                    ReceivingGoodsDelivery::where('tid_no', $request->tid_list[0]['tid_no'])->update([
                         'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
                         'rgd_status7' => 'taxed',
                         'rgd_tax_invoice_number' => isset($tax_number) ? $tax_number : (isset($api['tax_number']) ? $api['tax_number'] : null),
@@ -8145,9 +8145,19 @@ class WarehousingController extends Controller
                 if($rgds){
                     $total_price = 0;
                     foreach($rgds as $rgdp){
-                        $amount_price += $rgdp['rate_data_general']['rdg_supply_price7'];
-                        $total_price += $rgdp['rate_data_general']['rdg_sum7'];
-                        $vat_price += $rgdp['rate_data_general']['rdg_vat7'];
+                        if($rgdp['service_korean_name'] == '보세화물'){
+                            $amount_price += $rgdp['rate_data_general']['rdg_supply_price7'];
+                            $total_price += $rgdp['rate_data_general']['rdg_sum7'];
+                            $vat_price += $rgdp['rate_data_general']['rdg_vat7'];
+                        }else if($rgdp['service_korean_name'] == '수입풀필먼트'){
+                            $amount_price += $rgdp['rate_data_general']['rdg_supply_price6'];
+                            $total_price += $rgdp['rate_data_general']['rdg_sum6'];
+                            $vat_price += $rgdp['rate_data_general']['rdg_vat6'];
+                        }else if($rgdp['service_korean_name'] == '유통가공'){
+                            $amount_price += $rgdp['rate_data_general']['rdg_supply_price4'];
+                            $total_price += $rgdp['rate_data_general']['rdg_sum4'];
+                            $vat_price += $rgdp['rate_data_general']['rdg_vat4'];
+                        }
                     }
                 }else{
                     $amount_price = $rgd->rate_data_general->rdg_supply_price7;
@@ -8166,9 +8176,19 @@ class WarehousingController extends Controller
                 if($rgds){
                     $total_price = 0;
                     foreach($rgds as $rgdp){
-                        $amount_price += $rgdp['rate_data_general']['rdg_supply_price6'];
-                        $total_price += $rgdp['rate_data_general']['rdg_sum6'];
-                        $vat_price += $rgdp['rate_data_general']['rdg_vat6'];
+                        if($rgdp['service_korean_name'] == '보세화물'){
+                            $amount_price += $rgdp['rate_data_general']['rdg_supply_price7'];
+                            $total_price += $rgdp['rate_data_general']['rdg_sum7'];
+                            $vat_price += $rgdp['rate_data_general']['rdg_vat7'];
+                        }else if($rgdp['service_korean_name'] == '수입풀필먼트'){
+                            $amount_price += $rgdp['rate_data_general']['rdg_supply_price6'];
+                            $total_price += $rgdp['rate_data_general']['rdg_sum6'];
+                            $vat_price += $rgdp['rate_data_general']['rdg_vat6'];
+                        }else if($rgdp['service_korean_name'] == '유통가공'){
+                            $amount_price += $rgdp['rate_data_general']['rdg_supply_price4'];
+                            $total_price += $rgdp['rate_data_general']['rdg_sum4'];
+                            $vat_price += $rgdp['rate_data_general']['rdg_vat4'];
+                        }
                     }
                 }else{
                     $amount_price = $rgd->rate_data_general->rdg_supply_price6;
@@ -8186,9 +8206,19 @@ class WarehousingController extends Controller
                 if($rgds){
                     $total_price = 0;
                     foreach($rgds as $rgdp){
-                        $amount_price += $rgdp['rate_data_general']['rdg_supply_price4'];
-                        $total_price += $rgdp['rate_data_general']['rdg_sum4'];
-                        $vat_price += $rgdp['rate_data_general']['rdg_vat4'];
+                        if($rgdp['service_korean_name'] == '보세화물'){
+                            $amount_price += $rgdp['rate_data_general']['rdg_supply_price7'];
+                            $total_price += $rgdp['rate_data_general']['rdg_sum7'];
+                            $vat_price += $rgdp['rate_data_general']['rdg_vat7'];
+                        }else if($rgdp['service_korean_name'] == '수입풀필먼트'){
+                            $amount_price += $rgdp['rate_data_general']['rdg_supply_price6'];
+                            $total_price += $rgdp['rate_data_general']['rdg_sum6'];
+                            $vat_price += $rgdp['rate_data_general']['rdg_vat6'];
+                        }else if($rgdp['service_korean_name'] == '유통가공'){
+                            $amount_price += $rgdp['rate_data_general']['rdg_supply_price4'];
+                            $total_price += $rgdp['rate_data_general']['rdg_sum4'];
+                            $vat_price += $rgdp['rate_data_general']['rdg_vat4'];
+                        }
                     }
                 }else{
                     $amount_price = $rgd->rate_data_general->rdg_supply_price4;
