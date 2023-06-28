@@ -6201,7 +6201,6 @@ class WarehousingController extends Controller
                             'co_email' => $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null,
                             'co_email2' => $request['ag']['ag_email2'] ? $request['ag']['ag_email2'] : null,
                             'mb_no' => $user->mb_no,
-                            'tid_type' => 'option',
                         ]);
                         $id = $tid_->first()->tid_no;
 
