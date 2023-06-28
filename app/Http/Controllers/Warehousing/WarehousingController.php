@@ -6289,8 +6289,8 @@ class WarehousingController extends Controller
                     $ids[] = $id;
                 }
 
-                if($request->is_edit == 'y' && $request->tid_list[0]->tid_type == 'add_all'){
-                    ReceivingGoodsDelivery::where('rgd_no', $request->tid_list[0]->tid_no)->update([
+                if($request->is_edit == 'y' && $request->tid_list[0]['tid_type'] == 'add_all'){
+                    ReceivingGoodsDelivery::where('rgd_no', $request->tid_list[0]['tid_no'])->update([
                         'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
                         'rgd_status7' => 'taxed',
                         'rgd_tax_invoice_number' => isset($tax_number) ? $tax_number : (isset($api['tax_number']) ? $api['tax_number'] : null),
