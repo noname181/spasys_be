@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Warehousing;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Item\ItemController;
 use App\Http\Requests\Warehousing\WarehousingDataValidate;
 use App\Http\Requests\Warehousing\WarehousingItemValidate;
 use App\Http\Requests\Warehousing\WarehousingRequest;
@@ -7127,6 +7128,41 @@ class WarehousingController extends Controller
             // Warehousing::where('w_no', $w_no_data)->update([
             //     'w_schedule_number' => null
             // ]);
+
+            //GET STOCK FROM API
+            
+            // $stock_start_date = 0;
+            // $stock_end_date = 0;
+
+            //GET STOCK START DATE
+            // $response = $this->get_stock_api($request->from_date, $request->from_date);
+    
+            // $api = json_decode($response);  
+
+            // if($api == 'no_data'){
+
+            // }else if(isset($api->data)) {
+            //     foreach($api->data as $index => $data){
+            //         $stock_start_date += $data->stock;
+            //     }
+            // }
+  
+            // //GET STOCK END DATE
+            // $response = $this->get_stock_api('2020-01-01', '2020-01-01');
+    
+            // $api = json_decode($response);  
+
+            // if($api == 'no_data'){
+
+            // }else if(isset($api->data)) {
+            //     foreach($api->data as $index => $data){
+            //         $stock_end_date += $data->stock;
+            //     }
+            // }
+            //END GET STOCK FROM API
+
+            // return $stock_end_date;
+
             //THUONG EDIT TO MAKE SETTLEMENT
             $rgd_no = ReceivingGoodsDelivery::insertGetId([
                 'mb_no' => $user->mb_no,
@@ -7174,6 +7210,48 @@ class WarehousingController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
+
+    public static function get_stock_api($from_date, $to_date){
+        $param_arrays = array(
+            'partner_key' => '50e2331771d085ddccbcd2188a03800c',
+            'domain_key' => '50e2331771d085ddeab1bc2f91a39ae14e1b924b8df05d11ff40eea3aff3d9fb',
+            'action' => 'get_stock_info'
+        );
+        $filter = array();
+        $url_api = 'https://api2.cloud.ezadmin.co.kr/ezadmin/function.php?';
+        foreach ($param_arrays as $key => $param) {
+            $filter[$key] = !empty($request[$key]) ? $request[$key] : $param;
+        }
+        $url_api .= '&partner_key=' . $filter['partner_key'];
+        $url_api .= '&domain_key=' . $filter['domain_key'];
+        $url_api .= '&action=' . $filter['action'];
+        $url_api .= '&start_date=' . date('Y-m-d', strtotime($from_date));
+        $url_api .= '&end_date=' . date('Y-m-d', strtotime($to_date));
+        $url_api .= '&bad=0';
+
+        $items = ItemController::paginateItemsApiIdRaw()->toArray();
+
+        if (!empty($items)) {
+            $url_api .= '&product_id=';
+            foreach ($items as $key_item => $item) {
+                if ($key_item > 0) {
+                    $url_api .= ',';
+                }
+                $url_api .= $item['product_id'];
+                if ($key_item >= 50) {
+                    break;
+                }
+            }
+        }else {
+            return 'no_data';
+        }
+
+        $response = file_get_contents($url_api);
+
+        return $response;
+    }
+
+
     public function load_table_top_right($rgd_no)
     {
         $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child', 'rate_data_general', 'payment'])->find($rgd_no);

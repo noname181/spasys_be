@@ -823,7 +823,7 @@ class ItemController extends Controller
         }
     }
 
-    public function paginateItemsApiIdRaw()
+    public static function paginateItemsApiIdRaw()
     {
         try {
             $user = Auth::user();
