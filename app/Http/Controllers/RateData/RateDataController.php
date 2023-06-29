@@ -12620,7 +12620,7 @@ class RateDataController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $list = CancelBillHistory::with('member')->where(function ($q){
-                $q->where('cbh_pay_method','!=','deposit_without_bankbook')->orwhereNull('cbh_pay_method');
+                $q->where('cbh_pay_method','!=','deposit_without_bankbook')->where('cbh_pay_method','!=','virtual_account')->orwhereNull('cbh_pay_method');
             })->where('rgd_no', '=', $request->rgd_no)->whereIn('cbh_type', ['payment', 'cancel_payment'])->orderBy('cbh_no', 'DESC')->paginate($per_page, ['*'], 'page', $page);
 
             return response()->json($list);

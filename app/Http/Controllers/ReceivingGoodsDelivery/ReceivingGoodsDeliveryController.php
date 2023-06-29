@@ -3694,7 +3694,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                             $tax_number = CommonFunc::generate_tax_number($tid, $rgd->rgd_no);
 
-                            $api = WarehousingController::tax_invoice_api($rgd, $user, $tid, $tax_number, null);
+                            $api = WarehousingController::tax_invoice_api($rgd, $user, $tid, $tax_number, null, true);
 
                             TaxInvoiceDivide::where('tid_no', $tid)->update([
                                 'tid_number' => $tax_number ? $tax_number : null,
@@ -3724,7 +3724,7 @@ class ReceivingGoodsDeliveryController extends Controller
             } else if ($request->bill_type == 'monthly') {
                 $i = 0;
                 foreach ($request->rgds as $rgd) {
-                    $rgd = ReceivingGoodsDelivery::where('rgd_parent_no', $rgd['rgd_no'])->where(function ($q) {
+                    $rgd = ReceivingGoodsDelivery::with(['rate_data_general', 'warehousing'])->where('rgd_parent_no', $rgd['rgd_no'])->where(function ($q) {
                         $q->where('rgd_status5', '!=', 'cancel')
                             ->orwhereNull('rgd_status5');
                     })->first();
@@ -3832,7 +3832,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                                 $tax_number = CommonFunc::generate_tax_number($tid, $rgd->rgd_no);
 
-                                $api = WarehousingController::tax_invoice_api($rgd, $user, $tid, $tax_number, null);
+                                $api = WarehousingController::tax_invoice_api($rgd, $user, $tid, $tax_number, null, true);
 
                                 TaxInvoiceDivide::where('tid_no', $tid)->update([
                                     'tid_number' => $tax_number ? $tax_number : null,
@@ -3865,7 +3865,7 @@ class ReceivingGoodsDeliveryController extends Controller
             } else if ($request->bill_type == 'multiple') {
                 foreach ($request->rgds as $rgd) {
                     // if ($rgd['rgd_bill_type'] == 'final') {
-                    $rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->first();
+                    $rgd = ReceivingGoodsDelivery::with(['rate_data_general', 'warehousing'])->where('rgd_no', $rgd['rgd_no'])->first();
 
                     $rate_data_general = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->first();
 
@@ -3970,7 +3970,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                                 $tax_number = CommonFunc::generate_tax_number($tid, $rgd->rgd_no);
 
-                                $api = WarehousingController::tax_invoice_api($rgd, $user, $tid, $tax_number, null);
+                                $api = WarehousingController::tax_invoice_api($rgd, $user, $tid, $tax_number, null, true);
 
                                 TaxInvoiceDivide::where('tid_no', $tid)->update([
                                     'tid_number' => $tax_number ? $tax_number : null,
