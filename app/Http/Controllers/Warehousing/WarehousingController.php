@@ -5229,10 +5229,18 @@ class WarehousingController extends Controller
                     return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
                 });
             }
+
             if (isset($validated['settlement_cycle']) && $validated['settlement_cycle'] != '전체') {
-                $warehousing->whereHas('warehousing.co_no.company_bonded_cycle', function ($q) use ($validated) {
-                    return $q->where('cs_payment_cycle', $validated['settlement_cycle']);
-                });
+                if ($user->mb_type == 'spasys') {
+                    $warehousing->whereHas('w_no.co_no.co_parent.company_bonded_cycle', function ($q) use ($validated) {
+                        return $q->where('cs_payment_cycle', $validated['settlement_cycle']);
+                    });
+                } else if ($user->mb_type == 'shop') {
+                    $warehousing->whereHas('w_no.co_no.company_bonded_cycle', function ($q) use ($validated) {
+                        return $q->where('cs_payment_cycle', $validated['settlement_cycle']);
+                    });
+                }
+                
             }
             if (isset($validated['w_schedule_number'])) {
                 $warehousing->whereHas('warehousing', function ($q) use ($validated) {
