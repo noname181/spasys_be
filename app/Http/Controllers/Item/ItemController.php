@@ -3310,23 +3310,22 @@ class ItemController extends Controller
                         foreach ($chunk_params as $param) {
                             $link_params = implode(',', $param);
                             $url_api .= $link_params;
-                            
+
                             $this->updateStockStatus($url_api);
-                            
                         }
                     } else {
                         $link_params = implode(',', $unique_params);
                         $url_api .= $link_params;
-                        
+
                         $this->updateStockStatus($url_api);
                     }
                 } else {
-                    
+
                     $this->updateStockStatus($url_api);
                 }
             }
             return response()->json([
-                'param' => $url_api,
+                //'param' => $url_api,
                 'message' => '완료되었습니다.',
                 'status' => 1
             ], 200);
@@ -3341,7 +3340,7 @@ class ItemController extends Controller
     {
         // $response = file_get_contents($url_api);
         // $api_data = json_decode($response);
-        
+
         $con = curl_init();
         curl_setopt($con, CURLOPT_URL, $url_api);
         curl_setopt($con, CURLOPT_HEADER, 0);
@@ -3352,14 +3351,14 @@ class ItemController extends Controller
         $response = curl_exec($con);
         curl_close($con);
         $api_data = json_decode($response);
-       
+
         if (!empty($api_data->data)) {
             foreach ($api_data->data as $item) {
-                
+
                 $item = (array)$item;
                 $item_info = Item::where('product_id', $item['product_id'])->orWhere('option_id', $item['product_id'])->first();
                 if ($item['stock'] > 0 && $item_info) {
-                    
+
                     ItemInfo::where('product_id', $item_info->product_id)
                         ->where('item_no', $item_info->item_no)
                         ->update([
@@ -3379,7 +3378,6 @@ class ItemController extends Controller
                         'status' => $item['bad'],
                         'item_no' => $item_info->item_no
                     ]);
-                    
                 }
                 if ($item['stock'] == 0) { // Khong thuoc kho nao
                     $stock = rand(10, 100);
@@ -3433,7 +3431,7 @@ class ItemController extends Controller
             //             $url_api .= ',';
             //         }
             //         $url_api .= $item['product_id'];
-                    
+
             //         if ($key_item >= 50) {
             //             break;
             //         }
@@ -3444,7 +3442,7 @@ class ItemController extends Controller
 
             if (!empty($params)) {
                 $unique_params = array_unique($params);
-                
+
                 if (count($unique_params) > 100) {
                     $chunk_params = array_chunk($unique_params, 100);
                     //return $chunk_params;
@@ -3464,7 +3462,7 @@ class ItemController extends Controller
                 $this->updateStockStatus($url_api);
             }
 
-            
+
 
             // $response = file_get_contents($url_api);
             // $api_data = json_decode($response);
@@ -3510,7 +3508,74 @@ class ItemController extends Controller
             // }
         }
         return response()->json([
-            'params' => $url_api,
+            //'params' => $url_api,
+            'message' => '완료되었습니다.',
+            'status' => 1,
+        ], 200);
+    }
+
+    public function updateStockCompanyApiNoLogin(Request $request)
+    {
+        $param_arrays = array(
+            'partner_key' => '50e2331771d085ddccbcd2188a03800c',
+            'domain_key' => '50e2331771d085ddeab1bc2f91a39ae14e1b924b8df05d11ff40eea3aff3d9fb',
+            'action' => 'get_stock_info'
+        );
+        $filter = array();
+        $url_api = 'https://api2.cloud.ezadmin.co.kr/ezadmin/function.php?';
+        foreach ($param_arrays as $key => $param) {
+            $filter[$key] = !empty($request[$key]) ? $request[$key] : $param;
+        }
+        $url_api .= '&partner_key=' . $filter['partner_key'];
+        $url_api .= '&domain_key=' . $filter['domain_key'];
+        $url_api .= '&action=' . $filter['action'];
+
+        $company_shipper = Company::where("co_type", "shipper")->get();
+        return $company_shipper;
+        foreach ($company_shipper as $shipper) {
+            $list_items = $this->paginateItemsApiIdRawNoLogin();
+            $params = array();
+            foreach ($list_items as $item) {
+                if (!empty($item)) {
+                    if (!empty($item['option_id'])) {
+                        $params[] = $item['option_id'];
+                    } else {
+                        $params[] = $item['product_id'];
+                    }
+                }
+            }
+
+            for ($bad = 0; $bad <= 1; $bad++) {
+                $url_api .= '&bad=' . $bad;
+                $url_api .= '&product_id=';
+
+                if (!empty($params)) {
+                    $unique_params = array_unique($params);
+
+                    if (count($unique_params) > 100) {
+                        $chunk_params = array_chunk($unique_params, 100);
+                        //return $chunk_params;
+                        foreach ($chunk_params as $param) {
+                            $link_params = implode(',', $param);
+                            $url_api .= $link_params;
+                            return $url_api;
+                            $this->updateStockStatus($url_api);
+                        }
+                    } else {
+                        $link_params = implode(',', $unique_params);
+                        $url_api .= $link_params;
+
+                        $this->updateStockStatus($url_api);
+                    }
+                } else {
+                    $this->updateStockStatus($url_api);
+                }
+            }
+        }
+
+
+        return response()->json([
+            //'params' => $url_api,
             'message' => '완료되었습니다.',
             'status' => 1,
         ], 200);

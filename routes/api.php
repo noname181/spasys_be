@@ -27,6 +27,7 @@ Route::get('/find_id', [\App\Http\Controllers\Member\MemberController::class, 'f
 Route::get('/api_item_cron_nologin', [App\Http\Controllers\Item\ItemController::class, 'apiItemCronNoLogin'])->name('api_item_cron_nologin');
 Route::get('/api_schedule_cron_nologin', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'getScheduleFromApiNoLogin'])->name('api_schedule_cron_nologin');
 Route::get('/api_stock_list_nologin', [App\Http\Controllers\Item\ItemController::class, 'updateStockItemsApiNoLogin'])->name('api_stock_list_nologin');
+Route::get('/api_stock_company_nologin', [App\Http\Controllers\Item\ItemController::class, 'updateStockCompanyApiNoLogin'])->name('api_stock_company_nologin');
 Route::get('/stock_history', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'stock_history'])->name('stock_history');
 Route::post('/banner_load', [App\Http\Controllers\Banner\BannerController::class, 'banner_load'])->name('banner_load');
 Route::get('/daily_alarm7', [App\Http\Controllers\AlarmData\AlarmDataController::class, 'insertDailyAlarm7'])->name('insertDailyAlarm7');
