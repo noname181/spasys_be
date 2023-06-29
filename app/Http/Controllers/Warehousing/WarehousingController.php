@@ -5229,10 +5229,18 @@ class WarehousingController extends Controller
                     return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
                 });
             }
+
             if (isset($validated['settlement_cycle']) && $validated['settlement_cycle'] != '전체') {
-                $warehousing->whereHas('warehousing.co_no.company_bonded_cycle', function ($q) use ($validated) {
-                    return $q->where('cs_payment_cycle', $validated['settlement_cycle']);
-                });
+                if ($user->mb_type == 'spasys') {
+                    $warehousing->whereHas('w_no.co_no.co_parent.company_bonded_cycle', function ($q) use ($validated) {
+                        return $q->where('cs_payment_cycle', $validated['settlement_cycle']);
+                    });
+                } else if ($user->mb_type == 'shop') {
+                    $warehousing->whereHas('w_no.co_no.company_bonded_cycle', function ($q) use ($validated) {
+                        return $q->where('cs_payment_cycle', $validated['settlement_cycle']);
+                    });
+                }
+                
             }
             if (isset($validated['w_schedule_number'])) {
                 $warehousing->whereHas('warehousing', function ($q) use ($validated) {
@@ -6250,7 +6258,7 @@ class WarehousingController extends Controller
 
                         $tax_number = CommonFunc::generate_tax_number($id,$request->rgd_no);
 
-                        $api = $this->tax_invoice_api($rgd, $user, $tid, $tax_number, null);
+                        $api = $this->tax_invoice_api($rgd, $user, $tid, $tax_number, null, null);
 
                         TaxInvoiceDivide::where('tid_no', $id)->update([
                             'tid_number' => $tax_number ? $tax_number : null,
@@ -6448,7 +6456,7 @@ class WarehousingController extends Controller
                 ]);
                 $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general'])->where('rgd_no', $request->rgd_no)->first();
 
-                $api = $this->tax_invoice_api($rgd, $user, null, $tax_number, $request->rgds);
+                $api = $this->tax_invoice_api($rgd, $user, null, $tax_number, $request->rgds, null);
 
                 foreach ($request->rgds as $rgd) {
 
@@ -6549,7 +6557,7 @@ class WarehousingController extends Controller
 
                     $tax_number = CommonFunc::generate_tax_number($id,$rgd['rgd_no']);
 
-                    $api = $this->tax_invoice_api($rgd, $user, null, $tax_number, null);
+                    $api = $this->tax_invoice_api($rgd, $user, null, $tax_number, null, null);
 
                     TaxInvoiceDivide::where('tid_no', $id)->update([
                         'tid_number' => $tax_number ? $tax_number : null,
@@ -8192,7 +8200,7 @@ class WarehousingController extends Controller
     }
 
 
-    public static function tax_invoice_api($rgd, $user, $price, $tax_number, $rgds)//$company1, $company2, $total_price, $b_no
+    public static function tax_invoice_api($rgd, $user, $price, $tax_number, $rgds, $is_check)//$company1, $company2, $total_price, $b_no
     {
 
         // issuer
@@ -8202,7 +8210,16 @@ class WarehousingController extends Controller
 
         $cc_no = $issuer_user->co_no;
 
-        if($rgd->service_korean_name == '수입풀필먼트' || $user->mb_type == 'shop'){
+        if($rgd->service_korean_name == '수입풀필먼트'){
+            $receiver_company = Company::where('co_no', $rgd->warehousing->co_no)->first();
+            $s_no = $rgd->warehousing->co_no;
+        }else if($user->mb_type == 'shop' && $is_check == true){
+            $receiver_company = Company::where('co_no', $rgd->warehousing->company->co_parent->co_no)->first();
+            $s_no = $rgd->warehousing->company->co_parent->co_no;
+        }else if($user->mb_type == 'shop'){
+            $receiver_company = Company::where('co_no', $rgd->warehousing->co_no)->first();
+            $s_no = $rgd->warehousing->co_no;
+        }else if($user->mb_type == 'shipper' && $is_check == true){
             $receiver_company = Company::where('co_no', $rgd->warehousing->co_no)->first();
             $s_no = $rgd->warehousing->co_no;
         }else if($user->mb_type == 'spasys'){
