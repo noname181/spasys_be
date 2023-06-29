@@ -3310,14 +3310,18 @@ class ItemController extends Controller
                         foreach ($chunk_params as $param) {
                             $link_params = implode(',', $param);
                             $url_api .= $link_params;
+                            
                             $this->updateStockStatus($url_api);
+                            
                         }
                     } else {
                         $link_params = implode(',', $unique_params);
                         $url_api .= $link_params;
+                        
                         $this->updateStockStatus($url_api);
                     }
                 } else {
+                    
                     $this->updateStockStatus($url_api);
                 }
             }
@@ -3335,13 +3339,27 @@ class ItemController extends Controller
 
     public function updateStockStatus($url_api)
     {
-        $response = file_get_contents($url_api);
+        // $response = file_get_contents($url_api);
+        // $api_data = json_decode($response);
+        
+        $con = curl_init();
+        curl_setopt($con, CURLOPT_URL, $url_api);
+        curl_setopt($con, CURLOPT_HEADER, 0);
+        curl_setopt($con, CURLOPT_RETURNTRANSFER, 1); // Return data inplace of echoing on screen
+        curl_setopt($con, CURLOPT_SSL_VERIFYPEER, 0); // Skip SSL Verification
+        curl_setopt($con, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+
+        $response = curl_exec($con);
+        curl_close($con);
         $api_data = json_decode($response);
+       
         if (!empty($api_data->data)) {
             foreach ($api_data->data as $item) {
+                
                 $item = (array)$item;
                 $item_info = Item::where('product_id', $item['product_id'])->orWhere('option_id', $item['product_id'])->first();
                 if ($item['stock'] > 0 && $item_info) {
+                    
                     ItemInfo::where('product_id', $item_info->product_id)
                         ->where('item_no', $item_info->item_no)
                         ->update([
@@ -3360,6 +3378,20 @@ class ItemController extends Controller
                         'stock' => $item['stock'],
                         'status' => $item['bad'],
                         'item_no' => $item_info->item_no
+                    ]);
+                    
+                }
+                if ($item['stock'] == 0) { // Khong thuoc kho nao
+                    $stock = rand(10, 100);
+                    ItemInfo::updateOrCreate([
+                        'product_id' => $item['product_id'],
+                        'stock' => $stock, //$item['stock'],
+                        'item_no' => $item_info->item_no,
+                    ], [
+                        'product_id' => $item['product_id'],
+                        'stock' => $stock, //$item['stock'],
+                        'status' => $item['bad'],
+                        'item_no' => $item_info->item_no,
                     ]);
                 }
             }
@@ -3382,44 +3414,103 @@ class ItemController extends Controller
         $url_api .= '&domain_key=' . $filter['domain_key'];
         $url_api .= '&action=' . $filter['action'];
         $list_items = $this->paginateItemsApiIdRawNoLogin();
-        for ($bad = 0; $bad <= 1; $bad++) {
-            if (!empty($list_items)) {
-                $url_api .= '&product_id=';
-                foreach ($list_items as $key_item => $item) {
-                    if ($key_item > 0) {
-                        $url_api .= ',';
-                    }
-                    $url_api .= $item['product_id'];
-                    if ($key_item >= 50) {
-                        break;
-                    }
-                }
-            }
-            $url_api .= '&bad=' . $bad;
-
-            $response = file_get_contents($url_api);
-            $api_data = json_decode($response);
-            if (!empty($api_data->data)) {
-                foreach ($api_data->data as $item) {
-                    $item = (array)$item;
-                    $item_info = Item::where('product_id', $item['product_id'])->first();
-                    if ($item['stock'] == 0) { // Khong thuoc kho nao
-                        $stock = rand(10, 100);
-                        $item_info_no = ItemInfo::updateOrCreate([
-                            'product_id' => $item['product_id'],
-                            'stock' => $stock, //$item['stock'],
-                            'item_no' => $item_info->item_no,
-                        ], [
-                            'product_id' => $item['product_id'],
-                            'stock' => $stock, //$item['stock'],
-                            'status' => $item['bad'],
-                            'item_no' => $item_info->item_no,
-                        ]);
-                    }
+        $params = array();
+        foreach ($list_items as $item) {
+            if (!empty($item)) {
+                if (!empty($item['option_id'])) {
+                    $params[] = $item['option_id'];
+                } else {
+                    $params[] = $item['product_id'];
                 }
             }
         }
+
+        for ($bad = 0; $bad <= 1; $bad++) {
+            // if (!empty($list_items)) {
+            //     $url_api .= '&product_id=';
+            //     foreach ($list_items as $key_item => $item) {
+            //         if ($key_item > 0) {
+            //             $url_api .= ',';
+            //         }
+            //         $url_api .= $item['product_id'];
+                    
+            //         if ($key_item >= 50) {
+            //             break;
+            //         }
+            //     }
+            // }
+            $url_api .= '&bad=' . $bad;
+            $url_api .= '&product_id=';
+
+            if (!empty($params)) {
+                $unique_params = array_unique($params);
+                
+                if (count($unique_params) > 100) {
+                    $chunk_params = array_chunk($unique_params, 100);
+                    //return $chunk_params;
+                    foreach ($chunk_params as $param) {
+                        $link_params = implode(',', $param);
+                        $url_api .= $link_params;
+                        return $url_api;
+                        $this->updateStockStatus($url_api);
+                    }
+                } else {
+                    $link_params = implode(',', $unique_params);
+                    $url_api .= $link_params;
+
+                    $this->updateStockStatus($url_api);
+                }
+            } else {
+                $this->updateStockStatus($url_api);
+            }
+
+            
+
+            // $response = file_get_contents($url_api);
+            // $api_data = json_decode($response);
+            // if (!empty($api_data->data)) {
+            //     foreach ($api_data->data as $item) {
+            //         $item = (array)$item;
+            //         $item_info = Item::where('product_id', $item['product_id'])->orWhere('option_id', $item['product_id'])->first();
+            //         if ($item['stock'] == 0) { // Khong thuoc kho nao
+            //             $stock = rand(10, 100);
+            //             ItemInfo::updateOrCreate([
+            //                 'product_id' => $item['product_id'],
+            //                 'stock' => $stock, //$item['stock'],
+            //                 'item_no' => $item_info->item_no,
+            //             ], [
+            //                 'product_id' => $item['product_id'],
+            //                 'stock' => $stock, //$item['stock'],
+            //                 'status' => $item['bad'],
+            //                 'item_no' => $item_info->item_no,
+            //             ]);
+            //         }
+            //         if ($item['stock'] > 0 && $item_info) {
+            //             ItemInfo::where('product_id', $item_info->product_id)
+            //             ->where('item_no', $item_info->item_no)
+            //             ->update([
+            //                 'product_id' => $item_info->product_id,
+            //                 'stock' => $item['stock'],
+            //                 'status' => $item['bad'],
+            //                 'item_no' => $item_info->item_no
+            //             ]);
+            //         StockStatusBad::updateOrCreate([
+            //             'product_id' => $item_info->product_id,
+            //             'option_id' => !empty($item_info['option_id']) ? $item_info['option_id'] : '',
+            //             'status' => $item['bad'],
+            //         ], [
+            //             'product_id' => $item_info['product_id'],
+            //             'option_id' => !empty($item_info['option_id']) ? $item_info['option_id'] : '',
+            //             'stock' => $item['stock'],
+            //             'status' => $item['bad'],
+            //             'item_no' => $item_info->item_no
+            //         ]);
+            //         }
+            //     }
+            // }
+        }
         return response()->json([
+            'params' => $url_api,
             'message' => '완료되었습니다.',
             'status' => 1,
         ], 200);
