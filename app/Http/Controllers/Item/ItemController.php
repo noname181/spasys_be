@@ -3350,107 +3350,6 @@ class ItemController extends Controller
         }
     }
 
-    public function updateStockStatus($url_api)
-    {
-        // $response = file_get_contents($url_api);
-        // $api_data = json_decode($response);
-
-        $con = curl_init();
-        curl_setopt($con, CURLOPT_URL, $url_api);
-        curl_setopt($con, CURLOPT_HEADER, 0);
-        curl_setopt($con, CURLOPT_RETURNTRANSFER, 1); // Return data inplace of echoing on screen
-        curl_setopt($con, CURLOPT_SSL_VERIFYPEER, 0); // Skip SSL Verification
-        curl_setopt($con, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-
-        $response = curl_exec($con);
-        curl_close($con);
-        $api_data = json_decode($response);
-
-        if (!empty($api_data->data)) {
-            foreach ($api_data->data as $item) {
-
-                $item = (array)$item;
-                $item_info = Item::where('product_id', $item['product_id'])->orWhere('option_id', $item['product_id'])->first();
-                if ($item['stock'] > 0 && $item_info) {
-
-                    ItemInfo::where('product_id', $item_info->product_id)
-                        ->where('item_no', $item_info->item_no)
-                        ->update([
-                            'product_id' => $item_info->product_id,
-                            'stock' => $item['stock'],
-                            'status' => $item['bad'],
-                            'item_no' => $item_info->item_no
-                        ]);
-                    StockStatusBad::updateOrCreate([
-                        'product_id' => $item_info->product_id,
-                        'option_id' => !empty($item_info['option_id']) ? $item_info['option_id'] : '',
-                        'status' => $item['bad'],
-                    ], [
-                        'product_id' => $item_info['product_id'],
-                        'option_id' => !empty($item_info['option_id']) ? $item_info['option_id'] : '',
-                        'stock' => $item['stock'],
-                        'status' => $item['bad'],
-                        'item_no' => $item_info->item_no
-                    ]);
-                }
-                if ($item['stock'] == 0) { // Khong thuoc kho nao
-                    $stock = rand(10, 100);
-                    ItemInfo::updateOrCreate([
-                        'product_id' => $item['product_id'],
-                        'stock' => $stock, //$item['stock'],
-                        'item_no' => $item_info->item_no,
-                    ], [
-                        'product_id' => $item['product_id'],
-                        'stock' => $stock, //$item['stock'],
-                        'status' => $item['bad'],
-                        'item_no' => $item_info->item_no,
-                    ]);
-                }
-            }
-        }
-    }
-
-    public function updateStockStatusCompany($url_api)
-    {
-        // $response = file_get_contents($url_api);
-        // $api_data = json_decode($response);
-
-        $con = curl_init();
-        curl_setopt($con, CURLOPT_URL, $url_api);
-        curl_setopt($con, CURLOPT_HEADER, 0);
-        curl_setopt($con, CURLOPT_RETURNTRANSFER, 1); // Return data inplace of echoing on screen
-        curl_setopt($con, CURLOPT_SSL_VERIFYPEER, 0); // Skip SSL Verification
-        curl_setopt($con, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-
-        $response = curl_exec($con);
-        curl_close($con);
-        $api_data = json_decode($response);
-        $total = 0;
-        if (!empty($api_data->data)) {
-            foreach ($api_data->data as $item) {
-
-                $item = (array)$item;
-                $item_info = Item::where('product_id', $item['product_id'])->orWhere('option_id', $item['product_id'])->first();
-                if ($item['stock'] > 0 && $item_info) {
-                    
-                }
-                
-            }
-        }
-
-        StockStatusCompany::updateOrCreate([
-            'product_id' => $item_info->product_id,
-            'option_id' => !empty($item_info['option_id']) ? $item_info['option_id'] : '',
-            'status' => $item['bad'],
-        ], [
-            'product_id' => $item_info['product_id'],
-            'option_id' => !empty($item_info['option_id']) ? $item_info['option_id'] : '',
-            'stock' => $item['stock'],
-            'status' => $item['bad'],
-            'item_no' => $item_info->item_no
-        ]);
-    }
-
     public function updateStockItemsApiNoLogin(Request $request)
     {
         $param_arrays = array(
@@ -3569,6 +3468,104 @@ class ItemController extends Controller
         ], 200);
     }
 
+    public function updateStockStatus($url_api)
+    {
+        // $response = file_get_contents($url_api);
+        // $api_data = json_decode($response);
+
+        $con = curl_init();
+        curl_setopt($con, CURLOPT_URL, $url_api);
+        curl_setopt($con, CURLOPT_HEADER, 0);
+        curl_setopt($con, CURLOPT_RETURNTRANSFER, 1); // Return data inplace of echoing on screen
+        curl_setopt($con, CURLOPT_SSL_VERIFYPEER, 0); // Skip SSL Verification
+        curl_setopt($con, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+
+        $response = curl_exec($con);
+        curl_close($con);
+        $api_data = json_decode($response);
+
+        if (!empty($api_data->data)) {
+            foreach ($api_data->data as $item) {
+
+                $item = (array)$item;
+                $item_info = Item::where('product_id', $item['product_id'])->orWhere('option_id', $item['product_id'])->first();
+                if ($item['stock'] > 0 && $item_info) {
+
+                    ItemInfo::where('product_id', $item_info->product_id)
+                        ->where('item_no', $item_info->item_no)
+                        ->update([
+                            'product_id' => $item_info->product_id,
+                            'stock' => $item['stock'],
+                            'status' => $item['bad'],
+                            'item_no' => $item_info->item_no
+                        ]);
+                    StockStatusBad::updateOrCreate([
+                        'product_id' => $item_info->product_id,
+                        'option_id' => !empty($item_info['option_id']) ? $item_info['option_id'] : '',
+                        'status' => $item['bad'],
+                    ], [
+                        'product_id' => $item_info['product_id'],
+                        'option_id' => !empty($item_info['option_id']) ? $item_info['option_id'] : '',
+                        'stock' => $item['stock'],
+                        'status' => $item['bad'],
+                        'item_no' => $item_info->item_no
+                    ]);
+                }
+                if ($item['stock'] == 0) { // Khong thuoc kho nao
+                    $stock = rand(10, 100);
+                    ItemInfo::updateOrCreate([
+                        'product_id' => $item['product_id'],
+                        'stock' => $stock, //$item['stock'],
+                        'item_no' => $item_info->item_no,
+                    ], [
+                        'product_id' => $item['product_id'],
+                        'stock' => $stock, //$item['stock'],
+                        'status' => $item['bad'],
+                        'item_no' => $item_info->item_no,
+                    ]);
+                }
+            }
+        }
+    }
+
+    public function updateStockStatusCompany($url_api,$shipper)
+    {
+        // $response = file_get_contents($url_api);
+        // $api_data = json_decode($response);
+
+        $con = curl_init();
+        curl_setopt($con, CURLOPT_URL, $url_api);
+        curl_setopt($con, CURLOPT_HEADER, 0);
+        curl_setopt($con, CURLOPT_RETURNTRANSFER, 1); // Return data inplace of echoing on screen
+        curl_setopt($con, CURLOPT_SSL_VERIFYPEER, 0); // Skip SSL Verification
+        curl_setopt($con, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+
+        $response = curl_exec($con);
+        curl_close($con);
+        $api_data = json_decode($response);
+        $total_stock = 0;
+        $cw_code = [];
+        if(isset($shipper['contract_wms'])){
+            foreach($shipper['contract_wms'] as $contract_wms){
+                $cw_code[] = $contract_wms['cw_code'];
+            }
+        } 
+       
+        if (!empty($api_data->data)) {
+            foreach ($api_data->data as $item) {
+                $item_info = Item::where('product_id', $item['product_id'])->orWhere('option_id', $item['product_id'])->first();
+                if(in_array($item_info['supply_code'], $cw_code)){
+                    $total_stock += $item['stock']; 
+                }                      
+            }
+        }
+
+        StockStatusCompany::insert([
+            'stock' => $total_stock,
+            'co_no' => $shipper['co_no'],
+        ]);
+    }
+
     public function updateStockCompanyApiNoLogin(Request $request)
     {
         $param_arrays = array(
@@ -3585,10 +3582,11 @@ class ItemController extends Controller
         $url_api .= '&domain_key=' . $filter['domain_key'];
         $url_api .= '&action=' . $filter['action'];
 
-        $company_shipper = Company::where("co_type", "shipper")->get();
-        //return $company_shipper;
+        $company_shipper = Company::with(['ContractWms'])->where("co_type", "shipper")->get();
+        
         foreach ($company_shipper as $shipper) {
-            $list_items = $this->paginateItemsApiIdCompanyRawNoLogin($shipper['co_no']);
+            $list_items = $this->paginateItemsApiIdCompanyRawNoLogin($shipper['co_no'])->toArray();
+           
             $params = array();
             foreach ($list_items as $item) {
                 if (!empty($item)) {
@@ -3599,14 +3597,16 @@ class ItemController extends Controller
                     }
                 }
             }
-
+            if($item['co_no'] == 197){
+                return $params;
+            }
             for ($bad = 0; $bad <= 1; $bad++) {
                 $url_api .= '&bad=' . $bad;
                 $url_api .= '&product_id=';
 
                 if (!empty($params)) {
                     $unique_params = array_unique($params);
-
+                    
                     if (count($unique_params) > 100) {
                         $chunk_params = array_chunk($unique_params, 100);
                         //return $chunk_params;
@@ -3614,16 +3614,17 @@ class ItemController extends Controller
                             $link_params = implode(',', $param);
                             $url_api .= $link_params;
                             
-                            $this->updateStockStatusCompany($url_api);
+                            $this->updateStockStatusCompany($url_api,$shipper);
                         }
                     } else {
                         $link_params = implode(',', $unique_params);
                         $url_api .= $link_params;
-
-                        $this->updateStockStatusCompany($url_api);
+                        
+                        $this->updateStockStatusCompany($url_api,$shipper);
                     }
                 } else {
-                    $this->updateStockStatusCompany($url_api);
+                    
+                    $this->updateStockStatusCompany($url_api,$shipper);
                 }
             }
         }
