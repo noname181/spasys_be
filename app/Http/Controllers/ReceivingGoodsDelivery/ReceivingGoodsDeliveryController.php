@@ -3088,6 +3088,7 @@ class ReceivingGoodsDeliveryController extends Controller
             $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child', 'payment' => function ($q) {
                 $q->orderBy('p_no', 'desc');
             }])->where('rgd_no', $request->rgd_no)->first();
+            
             if ($request->payment_status == '결제완료' && $rgd->rgd_status6 != 'paid') {
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     'rgd_status6' => 'paid',
