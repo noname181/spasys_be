@@ -3645,16 +3645,20 @@ class ItemController extends Controller
             DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
 
 
+            //FIX NOT WORK 'with'
             $sub = ImportExpected::select('company.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
-                ->leftjoin('company', function ($join) {
-                    $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
-                })->leftjoin('company as parent_shop', function ($join) {
-                    $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
-                })->leftjoin('company as parent_spasys', function ($join) {
-                    $join->on('parent_shop.co_parent_no', '=', 'parent_spasys.co_no');
-                })->where('tie_is_date', '>=', '2022-01-04')
-                ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
-                ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
+            ->leftjoin('company as parent_spasys', function ($join) {
+                $join->on('parent_spasys.warehouse_code', '=', 't_import_expected.tie_warehouse_code');
+            })
+           ->leftjoin('company', function ($join) {
+                $join->on('company.co_license', '=', 't_import_expected.tie_co_license')
+                ->where('company.co_type', '=', "shipper");
+            })->leftjoin('company as parent_shop', function ($join) {
+                $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
+            })
+            ->where('tie_is_date', '>=', '2022-01-04')
+            ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
+            ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number']);
 
             $sub_2 = Import::select('ti_status_2', 'ti_logistic_manage_number', 'ti_i_confirm_number', 'ti_i_date', 'ti_i_order', 'ti_i_number', 'ti_carry_in_number')
                 // ->leftjoin('receiving_goods_delivery', function ($join) {
@@ -3689,7 +3693,8 @@ class ItemController extends Controller
                     $leftjoin->orOn('aaa.tie_logistic_manage_number', '=', 'nnn.is_no')->whereNull('ddd.te_carry_out_number')->whereNull('bbb.ti_carry_in_number');
                 })
                 ->orderBy('tie_is_date', 'DESC')->orderBy('tie_h_bl', 'DESC')
-                ->where('updated_at', '>', Carbon::now()->subDays(2));
+                ->where('updated_at', '>', Carbon::now()->subDays(3));
+
 
             foreach ($import_schedule->get() as $item) {
 
