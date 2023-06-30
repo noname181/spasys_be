@@ -21,6 +21,7 @@ use App\Models\ReceivingGoodsDelivery;
 use App\Utils\Messages;
 use App\Http\Requests\Item\ExcelRequest;
 use App\Models\StockStatusBad;
+use App\Models\StockStatusCompany;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -814,6 +815,19 @@ class ItemController extends Controller
     {
         try {
             $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->orderBy('item_no', 'DESC');
+            $item = $item->get();
+            return $item;
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
+
+    public function paginateItemsApiIdCompanyRawNoLogin($co_no)
+    {
+        try {
+            $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->where('co_no', $co_no)->orderBy('item_no', 'DESC');
             $item = $item->get();
             return $item;
         } catch (\Exception $e) {
@@ -3396,6 +3410,47 @@ class ItemController extends Controller
         }
     }
 
+    public function updateStockStatusCompany($url_api)
+    {
+        // $response = file_get_contents($url_api);
+        // $api_data = json_decode($response);
+
+        $con = curl_init();
+        curl_setopt($con, CURLOPT_URL, $url_api);
+        curl_setopt($con, CURLOPT_HEADER, 0);
+        curl_setopt($con, CURLOPT_RETURNTRANSFER, 1); // Return data inplace of echoing on screen
+        curl_setopt($con, CURLOPT_SSL_VERIFYPEER, 0); // Skip SSL Verification
+        curl_setopt($con, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+
+        $response = curl_exec($con);
+        curl_close($con);
+        $api_data = json_decode($response);
+        $total = 0;
+        if (!empty($api_data->data)) {
+            foreach ($api_data->data as $item) {
+
+                $item = (array)$item;
+                $item_info = Item::where('product_id', $item['product_id'])->orWhere('option_id', $item['product_id'])->first();
+                if ($item['stock'] > 0 && $item_info) {
+                    
+                }
+                
+            }
+        }
+
+        StockStatusCompany::updateOrCreate([
+            'product_id' => $item_info->product_id,
+            'option_id' => !empty($item_info['option_id']) ? $item_info['option_id'] : '',
+            'status' => $item['bad'],
+        ], [
+            'product_id' => $item_info['product_id'],
+            'option_id' => !empty($item_info['option_id']) ? $item_info['option_id'] : '',
+            'stock' => $item['stock'],
+            'status' => $item['bad'],
+            'item_no' => $item_info->item_no
+        ]);
+    }
+
     public function updateStockItemsApiNoLogin(Request $request)
     {
         $param_arrays = array(
@@ -3531,9 +3586,9 @@ class ItemController extends Controller
         $url_api .= '&action=' . $filter['action'];
 
         $company_shipper = Company::where("co_type", "shipper")->get();
-        return $company_shipper;
+        //return $company_shipper;
         foreach ($company_shipper as $shipper) {
-            $list_items = $this->paginateItemsApiIdRawNoLogin();
+            $list_items = $this->paginateItemsApiIdCompanyRawNoLogin($shipper['co_no']);
             $params = array();
             foreach ($list_items as $item) {
                 if (!empty($item)) {
@@ -3558,24 +3613,24 @@ class ItemController extends Controller
                         foreach ($chunk_params as $param) {
                             $link_params = implode(',', $param);
                             $url_api .= $link_params;
-                            return $url_api;
-                            $this->updateStockStatus($url_api);
+                            
+                            $this->updateStockStatusCompany($url_api);
                         }
                     } else {
                         $link_params = implode(',', $unique_params);
                         $url_api .= $link_params;
 
-                        $this->updateStockStatus($url_api);
+                        $this->updateStockStatusCompany($url_api);
                     }
                 } else {
-                    $this->updateStockStatus($url_api);
+                    $this->updateStockStatusCompany($url_api);
                 }
             }
         }
 
 
         return response()->json([
-            //'params' => $url_api,
+            'params' => $url_api,
             'message' => '완료되었습니다.',
             'status' => 1,
         ], 200);
