@@ -4058,7 +4058,7 @@ class WarehousingController extends Controller
                         return $q->where('cs_payment_cycle', $validated['settlement_cycle']);
                     });
                 }
-                
+
             }
 
             $warehousing->orderBy('created_at', 'DESC');
@@ -5150,7 +5150,7 @@ class WarehousingController extends Controller
                         },
                     ]);
                 }])->join('t_import', 't_import.ti_carry_in_number', '=', 'receiving_goods_delivery.rgd_ti_carry_in_number')->whereHas('warehousing', function ($query) use ($user) {
-                    $query->whereHas('co_no.co_parent', function ($q) use ($user) {
+                    $query->whereHas('company.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
                 })->whereNull('rgd_status4');
@@ -5164,7 +5164,7 @@ class WarehousingController extends Controller
                         },
                     ]);
                 }])->join('t_import', 't_import.ti_carry_in_number', '=', 'receiving_goods_delivery.rgd_ti_carry_in_number')->whereHas('warehousing', function ($query) use ($user) {
-                    $query->whereHas('co_no', function ($q) use ($user) {
+                    $query->whereHas('company', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
                 });
@@ -5178,7 +5178,7 @@ class WarehousingController extends Controller
                         },
                     ]);
                 }])->join('t_import', 't_import.ti_carry_in_number', '=', 'receiving_goods_delivery.rgd_ti_carry_in_number')->whereHas('warehousing', function ($query) use ($user) {
-                    $query->whereHas('co_no.co_parent.co_parent', function ($q) use ($user) {
+                    $query->whereHas('company.co_parent.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
                 })->whereNull('rgd_status5');
@@ -5214,7 +5214,7 @@ class WarehousingController extends Controller
             }
 
             if (isset($validated['co_parent_name'])) {
-                $warehousing->whereHas('warehousing.co_no.co_parent', function ($query) use ($validated) {
+                $warehousing->whereHas('warehousing.company.co_parent', function ($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_parent_name']) . '%');
                 });
             }
@@ -5225,22 +5225,22 @@ class WarehousingController extends Controller
             }
 
             if (isset($validated['co_name'])) {
-                $warehousing->whereHas('warehousing.co_no', function ($q) use ($validated) {
+                $warehousing->whereHas('warehousing.company', function ($q) use ($validated) {
                     return $q->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
                 });
             }
 
             if (isset($validated['settlement_cycle']) && $validated['settlement_cycle'] != '전체') {
                 if ($user->mb_type == 'spasys') {
-                    $warehousing->whereHas('w_no.co_no.co_parent.company_bonded_cycle', function ($q) use ($validated) {
+                    $warehousing->whereHas('warehousing.company.co_parent.company_bonded_cycle', function ($q) use ($validated) {
                         return $q->where('cs_payment_cycle', $validated['settlement_cycle']);
                     });
                 } else if ($user->mb_type == 'shop') {
-                    $warehousing->whereHas('w_no.co_no.company_bonded_cycle', function ($q) use ($validated) {
+                    $warehousing->whereHas('warehousing.company.company_bonded_cycle', function ($q) use ($validated) {
                         return $q->where('cs_payment_cycle', $validated['settlement_cycle']);
                     });
                 }
-                
+
             }
             if (isset($validated['w_schedule_number'])) {
                 $warehousing->whereHas('warehousing', function ($q) use ($validated) {
@@ -5873,7 +5873,7 @@ class WarehousingController extends Controller
 
     {
         try {
-          
+
             $th = CancelBillHistory::with('member')->where('rgd_no', $request->rgd_no)
             ->where(function($q){
                 $q->where('cbh_status_after', 'taxed')->orwhere('cbh_status_after', 'cancel')->orwhere('cbh_status_after', 'edited');
@@ -6226,7 +6226,7 @@ class WarehousingController extends Controller
                                 'cbh_status_after' => 'edited'
                             ]);
                         }
-                      
+
 
                     } else {
                         $id = TaxInvoiceDivide::insertGetId([
@@ -7137,14 +7137,14 @@ class WarehousingController extends Controller
             // ]);
 
             //GET STOCK FROM API
-            
+
             // $stock_start_date = 0;
             // $stock_end_date = 0;
 
             //GET STOCK START DATE
             // $response = $this->get_stock_api($request->from_date, $request->from_date);
-    
-            // $api = json_decode($response);  
+
+            // $api = json_decode($response);
 
             // if($api == 'no_data'){
 
@@ -7153,11 +7153,11 @@ class WarehousingController extends Controller
             //         $stock_start_date += $data->stock;
             //     }
             // }
-  
+
             // //GET STOCK END DATE
             // $response = $this->get_stock_api('2020-01-01', '2020-01-01');
-    
-            // $api = json_decode($response);  
+
+            // $api = json_decode($response);
 
             // if($api == 'no_data'){
 
@@ -8918,7 +8918,7 @@ class WarehousingController extends Controller
             'MgtKey'    => $tax_number,
             'ProcType'    => $procType,
         ))->ProcTaxInvoiceResult;
-        
+
         Tax::where('t_mgtnum', $tax_number)->where('t_status', 1)->update([
             't_status' => '0',
         ]);
