@@ -7242,7 +7242,9 @@ class RateDataController extends Controller
             $current_row += $count_row;
         }
         //END BONDED5
+        
         $sheet->setCellValue('B'. ($current_row), '');
+        $sheet->getStyle('B'. ($current_row). ':Z'. ($current_row))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFFFFF');
         $sheet->setCellValue('B'. ($current_row + 1), '1. 보세화물 서비스의 예상경비 청구서는 BL번호 단위로 발송됩니다.(단 분할인 경우 반출단위)');
         $sheet->setCellValue('B'. ($current_row + 2), '2. 세금계산서 발행은 확정청구서와 함께 처리 됩니다.');
         $sheet->setCellValue('B'. ($current_row + 3), '3. 결제는 PC/Mobile에 접속하여서 결제하시면 되며, 월별 청구인 경우 매달 24일까지 결제가 되지 않으면 25일 등록 된 카드로 자동결제 됩니다.');
