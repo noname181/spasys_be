@@ -4769,8 +4769,31 @@ class RateDataController extends Controller
                                 $rd_expectation->rmd_no = $rmd_expectation->rmd_no;
                                 $rd_expectation->save();
                             }
+
+                            $rmd_file = RateMetaData::with('files')->where('rmd_no', $rmd->rmd_no)->first();
+            
+   
+                            if(isset($rmd_file)){
+                                $files = [];
+                                foreach($rmd_file->files as $key => $file) {
+                                    $files[] = [
+                                        'file_table' => 'rate_data',
+                                        'file_table_key' => $rmd_expectation->rmd_no,
+                                        'file_name_old' => $file->file_name_old,
+                                        'file_name' => $file->file_name,
+                                        'file_size' => $file->file_size,
+                                        'file_extension' => $file->file_extension,
+                                        'file_position' => $file->file_position,
+                                        'file_url' => $file->file_url
+                                    ];
+                                }
+                                FileTable::insert($files);
+                            }
+                            
                         }
                     }
+
+                    
                 }
 
 
@@ -5660,6 +5683,7 @@ class RateDataController extends Controller
             $count_row += 1;
         }
 
+
         $sheet->getStyle('B'. ($current_row - $count_row). ':Z'. ($current_row - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
 
         $current_row += 1;
@@ -5686,9 +5710,9 @@ class RateDataController extends Controller
         $sheet->setCellValue('B'. ($current_row + 7), $company->co_address . ' ' . $company->co_address_detail);
         // $sheet->mergeCells('B'. ($current_row + 8). ':Z'. ($current_row + 8));
         // $sheet->setCellValue('B'. ($current_row + 8), $company->co_owner);
-        $sheet->mergeCells('B'. ($current_row + 8). ':Z'. ($current_row + 9));
+        $sheet->mergeCells('B'. ($current_row + 8). ':Z'. ($current_row + 8));
         $sheet->setCellValue('B'. ($current_row + 8), $company->co_tel);
-        $sheet->mergeCells('B'. ($current_row + 9). ':Z'. ($current_row + 10));
+        $sheet->mergeCells('B'. ($current_row + 9). ':Z'. ($current_row + 9));
         $sheet->setCellValue('B'. ($current_row + 9), $company->co_email);
 
         // $sheet->getDefaultRowDimension()->setRowHeight(24);
@@ -6161,9 +6185,9 @@ class RateDataController extends Controller
         $sheet->setCellValue('B'. ($current_row + 7), $company->co_address . ' ' . $company->co_address_detail);
         // $sheet->mergeCells('B'. ($current_row + 8). ':Z'. ($current_row + 8));
         // $sheet->setCellValue('B'. ($current_row + 8), $company->co_owner);
-        $sheet->mergeCells('B'. ($current_row + 8). ':Z'. ($current_row + 9));
+        $sheet->mergeCells('B'. ($current_row + 8). ':Z'. ($current_row + 8));
         $sheet->setCellValue('B'. ($current_row + 8), $company->co_tel);
-        $sheet->mergeCells('B'. ($current_row + 9). ':Z'. ($current_row + 10));
+        $sheet->mergeCells('B'. ($current_row + 9). ':Z'. ($current_row + 9));
         $sheet->setCellValue('B'. ($current_row + 9), $company->co_email);
 
         // $sheet->getDefaultRowDimension()->setRowHeight(24);
@@ -7262,9 +7286,9 @@ class RateDataController extends Controller
         $sheet->setCellValue('B'. ($current_row + 7), $company->co_address . ' ' . $company->co_address_detail);
         // $sheet->mergeCells('B'. ($current_row + 8). ':Z'. ($current_row + 8));
         // $sheet->setCellValue('B'. ($current_row + 8), $company->co_owner);
-        $sheet->mergeCells('B'. ($current_row + 8). ':Z'. ($current_row + 9));
+        $sheet->mergeCells('B'. ($current_row + 8). ':Z'. ($current_row + 8));
         $sheet->setCellValue('B'. ($current_row + 8), $company->co_tel);
-        $sheet->mergeCells('B'. ($current_row + 9). ':Z'. ($current_row + 10));
+        $sheet->mergeCells('B'. ($current_row + 9). ':Z'. ($current_row + 9));
         $sheet->setCellValue('B'. ($current_row + 9), $company->co_email);
 
         // $sheet->getDefaultRowDimension()->setRowHeight(24);
@@ -7519,7 +7543,7 @@ class RateDataController extends Controller
 
         $current_row += 2;
 
-        $sheet->getStyle('B'. ($current_row). ':Z'. ($current_row + 3))->getBorders()->getOutLine()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+        $sheet->getStyle('B'. ($current_row). ':R'. ($current_row + 3))->getBorders()->getOutLine()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
 
         $current_row += 4;
 
@@ -7542,9 +7566,9 @@ class RateDataController extends Controller
         $sheet->setCellValue('B'. ($current_row + 7), $company->co_address . ' ' . $company->co_address_detail);
         // $sheet->mergeCells('B'. ($current_row + 8). ':R'. ($current_row + 8));
         // $sheet->setCellValue('B'. ($current_row + 8), $company->co_owner);
-        $sheet->mergeCells('B'. ($current_row + 8). ':R'. ($current_row + 9));
+        $sheet->mergeCells('B'. ($current_row + 8). ':R'. ($current_row + 8));
         $sheet->setCellValue('B'. ($current_row + 8), $company->co_tel);
-        $sheet->mergeCells('B'. ($current_row + 9). ':R'. ($current_row + 10));
+        $sheet->mergeCells('B'. ($current_row + 9). ':R'. ($current_row + 9));
         $sheet->setCellValue('B'. ($current_row + 9), $company->co_email);
 
         foreach ($sheet->getRowIterator() as $row) {
@@ -8891,9 +8915,9 @@ class RateDataController extends Controller
         $sheet->setCellValue('B'. ($current_row + 7), $company->co_address . ' ' . $company->co_address_detail);
         // $sheet->mergeCells('B'. ($current_row + 8). ':Z'. ($current_row + 8));
         // $sheet->setCellValue('B'. ($current_row + 8), $company->co_owner);
-        $sheet->mergeCells('B'. ($current_row + 8). ':Z'. ($current_row + 9));
+        $sheet->mergeCells('B'. ($current_row + 8). ':Z'. ($current_row + 8));
         $sheet->setCellValue('B'. ($current_row + 8), $company->co_tel);
-        $sheet->mergeCells('B'. ($current_row + 9). ':Z'. ($current_row + 10));
+        $sheet->mergeCells('B'. ($current_row + 9). ':Z'. ($current_row + 9));
         $sheet->setCellValue('B'. ($current_row + 9), $company->co_email);
 
         // $sheet->getDefaultRowDimension()->setRowHeight(24);
