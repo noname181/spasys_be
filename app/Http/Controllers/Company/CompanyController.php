@@ -209,6 +209,7 @@ class CompanyController extends Controller
             if (isset($contract->c_no)) {
                 $company = Company::select([
                     'company.co_no',
+                    'company.co_type',
                     'company.co_parent_no',
                     'company.mb_no',
                     'company.co_name',
@@ -235,6 +236,7 @@ class CompanyController extends Controller
             } else {
                 $company = Company::select([
                     'company.co_no',
+                    'company.co_type',
                     'company.co_parent_no',
                     'company.mb_no',
                     'company.co_name',
