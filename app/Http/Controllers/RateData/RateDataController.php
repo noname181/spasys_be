@@ -5692,10 +5692,10 @@ class RateDataController extends Controller
         $current_row += 4;
 
         $sheet->setCellValue('B'. ($current_row), '');
-        $sheet->setCellValue('B'. ($current_row + 1), '1. 보세화물 서비스의 예상경비 청구서는 BL번호 단위로 발송됩니다.(단 분할인 경우 반출단위)');
-        $sheet->setCellValue('B'. ($current_row + 2), '2. 세금계산서 발행은 확정청구서와 함께 처리 됩니다.');
-        $sheet->setCellValue('B'. ($current_row + 3), '3. 결제는 PC/Mobile에 접속하여서 결제하시면 되며, 월별 청구인 경우 매달 24일까지 결제가 되지 않으면 25일 등록 된 카드로 자동결제 됩니다.');
-        $sheet->setCellValue('B'. ($current_row + 4), '4. 결제수단에 따라 수수료가 추가 청구 됩니다.(카드/카카오페이 2.9%, 실시간계좌이체 1.8% 등)');
+        // $sheet->setCellValue('B'. ($current_row + 1), '1. 보세화물 서비스의 예상경비 청구서는 BL번호 단위로 발송됩니다.(단 분할인 경우 반출단위)');
+        // $sheet->setCellValue('B'. ($current_row + 2), '2. 세금계산서 발행은 확정청구서와 함께 처리 됩니다.');
+        $sheet->setCellValue('B'. ($current_row + 1), '1. 결제는 PC/Mobile에 접속하여서 결제하시면 되며, 월별 청구인 경우 매달 24일까지 결제가 되지 않으면 25일 등록 된 카드로 자동결제 됩니다.');
+        $sheet->setCellValue('B'. ($current_row + 2), '2. 결제수단에 따라 수수료가 추가 청구 됩니다.(카드/카카오페이 2.9%, 실시간계좌이체 1.8% 등)');
 
         $issuer = Member::where('mb_no', $rgd->mb_no)->first();
         $company = Company::where('co_no', $issuer->co_no)->first();
@@ -5707,12 +5707,12 @@ class RateDataController extends Controller
         $sheet->setCellValue('B'. ($current_row + 6), $company->co_name);
         $sheet->mergeCells('B'. ($current_row + 7). ':Z'. ($current_row + 7));
         $sheet->setCellValue('B'. ($current_row + 7), $company->co_address . ' ' . $company->co_address_detail);
-        $sheet->mergeCells('B'. ($current_row + 8). ':Z'. ($current_row + 8));
-        $sheet->setCellValue('B'. ($current_row + 8), $company->co_owner);
-        $sheet->mergeCells('B'. ($current_row + 9). ':Z'. ($current_row + 9));
-        $sheet->setCellValue('B'. ($current_row + 9), $company->co_tel);
-        $sheet->mergeCells('B'. ($current_row + 10). ':Z'. ($current_row + 10));
-        $sheet->setCellValue('B'. ($current_row + 10), $company->co_email);
+        // $sheet->mergeCells('B'. ($current_row + 8). ':Z'. ($current_row + 8));
+        // $sheet->setCellValue('B'. ($current_row + 8), $company->co_owner);
+        $sheet->mergeCells('B'. ($current_row + 8). ':Z'. ($current_row + 9));
+        $sheet->setCellValue('B'. ($current_row + 8), $company->co_tel);
+        $sheet->mergeCells('B'. ($current_row + 9). ':Z'. ($current_row + 10));
+        $sheet->setCellValue('B'. ($current_row + 9), $company->co_email);
 
         // $sheet->getDefaultRowDimension()->setRowHeight(24);
         foreach ($sheet->getRowIterator() as $row) {
@@ -6167,10 +6167,10 @@ class RateDataController extends Controller
         }
 
         $sheet->setCellValue('B'. ($current_row), '');
-        $sheet->setCellValue('B'. ($current_row + 1), '1. 보세화물 서비스의 예상경비 청구서는 BL번호 단위로 발송됩니다.(단 분할인 경우 반출단위)');
-        $sheet->setCellValue('B'. ($current_row + 2), '2. 세금계산서 발행은 확정청구서와 함께 처리 됩니다.');
-        $sheet->setCellValue('B'. ($current_row + 3), '3. 결제는 PC/Mobile에 접속하여서 결제하시면 되며, 월별 청구인 경우 매달 24일까지 결제가 되지 않으면 25일 등록 된 카드로 자동결제 됩니다.');
-        $sheet->setCellValue('B'. ($current_row + 4), '4. 결제수단에 따라 수수료가 추가 청구 됩니다.(카드/카카오페이 2.9%, 실시간계좌이체 1.8% 등)');
+        // $sheet->setCellValue('B'. ($current_row + 1), '1. 보세화물 서비스의 예상경비 청구서는 BL번호 단위로 발송됩니다.(단 분할인 경우 반출단위)');
+        // $sheet->setCellValue('B'. ($current_row + 2), '2. 세금계산서 발행은 확정청구서와 함께 처리 됩니다.');
+        $sheet->setCellValue('B'. ($current_row + 1), '1. 결제는 PC/Mobile에 접속하여서 결제하시면 되며, 월별 청구인 경우 매달 24일까지 결제가 되지 않으면 25일 등록 된 카드로 자동결제 됩니다.');
+        $sheet->setCellValue('B'. ($current_row + 2), '2. 결제수단에 따라 수수료가 추가 청구 됩니다.(카드/카카오페이 2.9%, 실시간계좌이체 1.8% 등)');
 
         $issuer = Member::where('mb_no', $rgd->mb_no)->first();
         $company = Company::where('co_no', $issuer->co_no)->first();
@@ -6182,12 +6182,12 @@ class RateDataController extends Controller
         $sheet->setCellValue('B'. ($current_row + 6), $company->co_name);
         $sheet->mergeCells('B'. ($current_row + 7). ':Z'. ($current_row + 7));
         $sheet->setCellValue('B'. ($current_row + 7), $company->co_address . ' ' . $company->co_address_detail);
-        $sheet->mergeCells('B'. ($current_row + 8). ':Z'. ($current_row + 8));
-        $sheet->setCellValue('B'. ($current_row + 8), $company->co_owner);
-        $sheet->mergeCells('B'. ($current_row + 9). ':Z'. ($current_row + 9));
-        $sheet->setCellValue('B'. ($current_row + 9), $company->co_tel);
-        $sheet->mergeCells('B'. ($current_row + 10). ':Z'. ($current_row + 10));
-        $sheet->setCellValue('B'. ($current_row + 10), $company->co_email);
+        // $sheet->mergeCells('B'. ($current_row + 8). ':Z'. ($current_row + 8));
+        // $sheet->setCellValue('B'. ($current_row + 8), $company->co_owner);
+        $sheet->mergeCells('B'. ($current_row + 8). ':Z'. ($current_row + 9));
+        $sheet->setCellValue('B'. ($current_row + 8), $company->co_tel);
+        $sheet->mergeCells('B'. ($current_row + 9). ':Z'. ($current_row + 10));
+        $sheet->setCellValue('B'. ($current_row + 9), $company->co_email);
 
         // $sheet->getDefaultRowDimension()->setRowHeight(24);
 
@@ -7265,7 +7265,9 @@ class RateDataController extends Controller
             $current_row += $count_row;
         }
         //END BONDED5
+
         $sheet->setCellValue('B'. ($current_row), '');
+        $sheet->getStyle('B'. ($current_row). ':Z'. ($current_row))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFFFFF');
         $sheet->setCellValue('B'. ($current_row + 1), '1. 보세화물 서비스의 예상경비 청구서는 BL번호 단위로 발송됩니다.(단 분할인 경우 반출단위)');
         $sheet->setCellValue('B'. ($current_row + 2), '2. 세금계산서 발행은 확정청구서와 함께 처리 됩니다.');
         $sheet->setCellValue('B'. ($current_row + 3), '3. 결제는 PC/Mobile에 접속하여서 결제하시면 되며, 월별 청구인 경우 매달 24일까지 결제가 되지 않으면 25일 등록 된 카드로 자동결제 됩니다.');
@@ -7281,12 +7283,12 @@ class RateDataController extends Controller
         $sheet->setCellValue('B'. ($current_row + 6), $company->co_name);
         $sheet->mergeCells('B'. ($current_row + 7). ':Z'. ($current_row + 7));
         $sheet->setCellValue('B'. ($current_row + 7), $company->co_address . ' ' . $company->co_address_detail);
-        $sheet->mergeCells('B'. ($current_row + 8). ':Z'. ($current_row + 8));
-        $sheet->setCellValue('B'. ($current_row + 8), $company->co_owner);
-        $sheet->mergeCells('B'. ($current_row + 9). ':Z'. ($current_row + 9));
-        $sheet->setCellValue('B'. ($current_row + 9), $company->co_tel);
-        $sheet->mergeCells('B'. ($current_row + 10). ':Z'. ($current_row + 10));
-        $sheet->setCellValue('B'. ($current_row + 10), $company->co_email);
+        // $sheet->mergeCells('B'. ($current_row + 8). ':Z'. ($current_row + 8));
+        // $sheet->setCellValue('B'. ($current_row + 8), $company->co_owner);
+        $sheet->mergeCells('B'. ($current_row + 8). ':Z'. ($current_row + 9));
+        $sheet->setCellValue('B'. ($current_row + 8), $company->co_tel);
+        $sheet->mergeCells('B'. ($current_row + 9). ':Z'. ($current_row + 10));
+        $sheet->setCellValue('B'. ($current_row + 9), $company->co_email);
 
         // $sheet->getDefaultRowDimension()->setRowHeight(24);
 
@@ -7561,12 +7563,12 @@ class RateDataController extends Controller
         $sheet->setCellValue('B'. ($current_row + 6), $company->co_name);
         $sheet->mergeCells('B'. ($current_row + 7). ':R'. ($current_row + 7));
         $sheet->setCellValue('B'. ($current_row + 7), $company->co_address . ' ' . $company->co_address_detail);
-        $sheet->mergeCells('B'. ($current_row + 8). ':R'. ($current_row + 8));
-        $sheet->setCellValue('B'. ($current_row + 8), $company->co_owner);
-        $sheet->mergeCells('B'. ($current_row + 9). ':R'. ($current_row + 9));
-        $sheet->setCellValue('B'. ($current_row + 9), $company->co_tel);
-        $sheet->mergeCells('B'. ($current_row + 10). ':R'. ($current_row + 10));
-        $sheet->setCellValue('B'. ($current_row + 10), $company->co_email);
+        // $sheet->mergeCells('B'. ($current_row + 8). ':R'. ($current_row + 8));
+        // $sheet->setCellValue('B'. ($current_row + 8), $company->co_owner);
+        $sheet->mergeCells('B'. ($current_row + 8). ':R'. ($current_row + 9));
+        $sheet->setCellValue('B'. ($current_row + 8), $company->co_tel);
+        $sheet->mergeCells('B'. ($current_row + 9). ':R'. ($current_row + 10));
+        $sheet->setCellValue('B'. ($current_row + 9), $company->co_email);
 
         foreach ($sheet->getRowIterator() as $row) {
             $sheet->getRowDimension($row->getRowIndex())->setRowHeight(21);
@@ -8895,10 +8897,10 @@ class RateDataController extends Controller
         }
         //END FULFILL5
         $sheet->setCellValue('B'. ($current_row), '');
-        $sheet->setCellValue('B'. ($current_row + 1), '1. 보세화물 서비스의 예상경비 청구서는 BL번호 단위로 발송됩니다.(단 분할인 경우 반출단위)');
-        $sheet->setCellValue('B'. ($current_row + 2), '2. 세금계산서 발행은 확정청구서와 함께 처리 됩니다.');
-        $sheet->setCellValue('B'. ($current_row + 3), '3. 결제는 PC/Mobile에 접속하여서 결제하시면 되며, 월별 청구인 경우 매달 24일까지 결제가 되지 않으면 25일 등록 된 카드로 자동결제 됩니다.');
-        $sheet->setCellValue('B'. ($current_row + 4), '4. 결제수단에 따라 수수료가 추가 청구 됩니다.(카드/카카오페이 2.9%, 실시간계좌이체 1.8% 등)');
+        // $sheet->setCellValue('B'. ($current_row + 1), '1. 보세화물 서비스의 예상경비 청구서는 BL번호 단위로 발송됩니다.(단 분할인 경우 반출단위)');
+        // $sheet->setCellValue('B'. ($current_row + 2), '2. 세금계산서 발행은 확정청구서와 함께 처리 됩니다.');
+        $sheet->setCellValue('B'. ($current_row + 1), '1. 결제는 PC/Mobile에 접속하여서 결제하시면 되며, 월별 청구인 경우 매달 24일까지 결제가 되지 않으면 25일 등록 된 카드로 자동결제 됩니다.');
+        $sheet->setCellValue('B'. ($current_row + 2), '2. 결제수단에 따라 수수료가 추가 청구 됩니다.(카드/카카오페이 2.9%, 실시간계좌이체 1.8% 등)');
 
         $issuer = Member::where('mb_no', $rgd->mb_no)->first();
         $company = Company::where('co_no', $issuer->co_no)->first();
@@ -8910,12 +8912,12 @@ class RateDataController extends Controller
         $sheet->setCellValue('B'. ($current_row + 6), $company->co_name);
         $sheet->mergeCells('B'. ($current_row + 7). ':Z'. ($current_row + 7));
         $sheet->setCellValue('B'. ($current_row + 7), $company->co_address . ' ' . $company->co_address_detail);
-        $sheet->mergeCells('B'. ($current_row + 8). ':Z'. ($current_row + 8));
-        $sheet->setCellValue('B'. ($current_row + 8), $company->co_owner);
-        $sheet->mergeCells('B'. ($current_row + 9). ':Z'. ($current_row + 9));
-        $sheet->setCellValue('B'. ($current_row + 9), $company->co_tel);
-        $sheet->mergeCells('B'. ($current_row + 10). ':Z'. ($current_row + 10));
-        $sheet->setCellValue('B'. ($current_row + 10), $company->co_email);
+        // $sheet->mergeCells('B'. ($current_row + 8). ':Z'. ($current_row + 8));
+        // $sheet->setCellValue('B'. ($current_row + 8), $company->co_owner);
+        $sheet->mergeCells('B'. ($current_row + 8). ':Z'. ($current_row + 9));
+        $sheet->setCellValue('B'. ($current_row + 8), $company->co_tel);
+        $sheet->mergeCells('B'. ($current_row + 9). ':Z'. ($current_row + 10));
+        $sheet->setCellValue('B'. ($current_row + 9), $company->co_email);
 
         // $sheet->getDefaultRowDimension()->setRowHeight(24);
         foreach ($sheet->getRowIterator() as $row) {

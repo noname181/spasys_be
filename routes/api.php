@@ -36,6 +36,7 @@ Route::get('/daily_alarm_insulace7', [App\Http\Controllers\AlarmData\AlarmDataCo
 Route::get('/daily_alarm_insulace30', [App\Http\Controllers\AlarmData\AlarmDataController::class, 'insertDailyAlarmInsulace30'])->name('insertDailyAlarmInsulace30');
 Route::get('/alarm_pw_90d', [App\Http\Controllers\AlarmData\AlarmDataController::class, 'alarmPw90d'])->name('alarmPw90d');
 Route::get('/api_item_cargo_list', [App\Http\Controllers\Item\ItemController::class, 'apiItemsCargoList'])->name('api_item_cargo_list');
+Route::get('/create_bonded_settlement', [App\Http\Controllers\Item\ItemController::class, 'createBondedSettlement'])->name('create_bonded_settlement');
 
 Route::prefix('payment')->name('payment.')->group(function () {
     Route::post('/payment_result', [App\Http\Controllers\RateData\RateDataController::class, 'payment_result'])->name('payment_result');
@@ -218,7 +219,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/get_fulfillment_export_status4_by_id/{rgd_no}', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getFulfillmentExportStatus4ById']); //page 253 mobile
 
-    Route::post('/get_tax_history', [\App\Http\Controllers\Warehousing\WarehousingController::class,'get_tax_history']); //right table 
+    Route::post('/get_tax_history', [\App\Http\Controllers\Warehousing\WarehousingController::class,'get_tax_history']); //right table
     Route::post('/get_tax_history_popup', [\App\Http\Controllers\Warehousing\WarehousingController::class,'get_tax_history_popup']); //page 277
     Route::post('/get_tax_invoice_list', [\App\Http\Controllers\Warehousing\WarehousingController::class,'get_tax_invoice_list']); //page 277
     Route::post('/get_tax_invoice_completed_list', [\App\Http\Controllers\Warehousing\WarehousingController::class,'get_tax_invoice_completed_list']); //page 282
@@ -393,7 +394,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/api_update_stock_items', [App\Http\Controllers\Item\ItemController::class, 'apiupdateStockItems'])->name('api_update_stock_items');
         Route::post('/caculate_total_item', [App\Http\Controllers\Item\ItemController::class, 'caculateItem'])->name('caculate_total_item');
         Route::post('/update_stock_items_api', [App\Http\Controllers\Item\ItemController::class, 'updateStockItemsApi'])->name('update_stock_items_api');
-        Route::post('/create_bonded_settlement', [App\Http\Controllers\Item\ItemController::class, 'createBondedSettlement'])->name('create_bonded_settlement');
+
     });
     Route::prefix('scheduleshipment')->name('scheduleshipment.')->group(function () {
         Route::post('/paginate', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'paginateScheduleShipments'])->name('paginate');
@@ -480,7 +481,7 @@ Route::middleware('auth')->group(function () {
 
         Route::post('/get_tax_invoice_by_rgd_no', [\App\Http\Controllers\RateData\RateDataController::class, 'get_tax_invoice_by_rgd_no']);
 
-        
+
         //distribution
         Route::get('/download_distribution_monthbill_excel/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_distribution_monthbill_excel']);
         //distribution
@@ -491,7 +492,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/download_fulfill_excel/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_fulfill_excel']);
         //bonded
         Route::get('/download_bonded_monthbill_excel/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_bonded_monthbill_excel']);
-        
+
         //distribution_final_casebill
         Route::get('/download_final_case_bill/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_final_case_bill']);
         //distribution_final_monthbill_edit
@@ -628,6 +629,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/load_table_top_right/{rgd_no}', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'load_table_top_right']);
 
 
-   
+
 });
 
