@@ -4769,8 +4769,31 @@ class RateDataController extends Controller
                                 $rd_expectation->rmd_no = $rmd_expectation->rmd_no;
                                 $rd_expectation->save();
                             }
+
+                            $rmd_file = RateMetaData::with('files')->where('rmd_no', $rmd->rmd_no)->first();
+            
+   
+                            if(isset($rmd_file)){
+                                $files = [];
+                                foreach($rmd_file->files as $key => $file) {
+                                    $files[] = [
+                                        'file_table' => 'rate_data',
+                                        'file_table_key' => $rmd_expectation->rmd_no,
+                                        'file_name_old' => $file->file_name_old,
+                                        'file_name' => $file->file_name,
+                                        'file_size' => $file->file_size,
+                                        'file_extension' => $file->file_extension,
+                                        'file_position' => $file->file_position,
+                                        'file_url' => $file->file_url
+                                    ];
+                                }
+                                FileTable::insert($files);
+                            }
+                            
                         }
                     }
+
+                    
                 }
 
 

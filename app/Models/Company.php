@@ -65,6 +65,11 @@ class Company extends Model
         'updated_at' => "date:Y.m.d",
     ];
 
+    public function ContractWms()
+    {
+        return $this->hasMany(ContractWms::class, 'co_no', 'co_no')->where('cw_tab','=','공급처');
+    }
+
     public function contract()
     {
         return $this->hasOne(Contract::class, 'co_no', 'co_no');
