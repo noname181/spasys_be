@@ -5689,6 +5689,9 @@ class RateDataController extends Controller
         $current_row += 1;
 
         $sheet->getStyle('B'. ($current_row). ':Z'. ($current_row + 3))->getBorders()->getOutLine()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+        $sheet->getStyle('B'. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+        $sheet->mergeCells('B'. ($current_row). ':Z'. ($current_row + 3));
+        $sheet->setCellValue('B'. ($current_row), $rgd['rgd_memo_settle']);
 
         $current_row += 4;
 
@@ -5701,9 +5704,9 @@ class RateDataController extends Controller
         $issuer = Member::where('mb_no', $rgd->mb_no)->first();
         $company = Company::where('co_no', $issuer->co_no)->first();
 
-        $sheet->getStyle('B'. ($current_row + 6). ':Z'. ($current_row + 10))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('EDEDED'));
-        $sheet->getStyle('B'. ($current_row + 6). ':Z'. ($current_row + 10))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
-        $sheet->getStyle('B'. ($current_row + 6). ':Z'. ($current_row + 10))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
+        $sheet->getStyle('B'. ($current_row + 6). ':Z'. ($current_row + 9))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('EDEDED'));
+        $sheet->getStyle('B'. ($current_row + 6). ':Z'. ($current_row + 9))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('B'. ($current_row + 6). ':Z'. ($current_row + 9))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
         $sheet->mergeCells('B'. ($current_row + 6). ':Z'. ($current_row + 6));
         $sheet->setCellValue('B'. ($current_row + 6), $company->co_name);
         $sheet->mergeCells('B'. ($current_row + 7). ':Z'. ($current_row + 7));
@@ -6176,9 +6179,9 @@ class RateDataController extends Controller
         $issuer = Member::where('mb_no', $rgd->mb_no)->first();
         $company = Company::where('co_no', $issuer->co_no)->first();
 
-        $sheet->getStyle('B'. ($current_row + 6). ':Z'. ($current_row + 10))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('EDEDED'));
-        $sheet->getStyle('B'. ($current_row + 6). ':Z'. ($current_row + 10))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
-        $sheet->getStyle('B'. ($current_row + 6). ':Z'. ($current_row + 10))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
+        $sheet->getStyle('B'. ($current_row + 6). ':Z'. ($current_row + 9))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('EDEDED'));
+        $sheet->getStyle('B'. ($current_row + 6). ':Z'. ($current_row + 9))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('B'. ($current_row + 6). ':Z'. ($current_row + 9))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
         $sheet->mergeCells('B'. ($current_row + 6). ':Z'. ($current_row + 6));
         $sheet->setCellValue('B'. ($current_row + 6), $company->co_name);
         $sheet->mergeCells('B'. ($current_row + 7). ':Z'. ($current_row + 7));
@@ -7277,9 +7280,9 @@ class RateDataController extends Controller
         $issuer = Member::where('mb_no', $rgd->mb_no)->first();
         $company = Company::where('co_no', $issuer->co_no)->first();
 
-        $sheet->getStyle('B'. ($current_row + 6). ':Z'. ($current_row + 10))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('EDEDED'));
-        $sheet->getStyle('B'. ($current_row + 6). ':Z'. ($current_row + 10))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
-        $sheet->getStyle('B'. ($current_row + 6). ':Z'. ($current_row + 10))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
+        $sheet->getStyle('B'. ($current_row + 6). ':Z'. ($current_row + 9))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('EDEDED'));
+        $sheet->getStyle('B'. ($current_row + 6). ':Z'. ($current_row + 9))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('B'. ($current_row + 6). ':Z'. ($current_row + 9))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
         $sheet->mergeCells('B'. ($current_row + 6). ':Z'. ($current_row + 6));
         $sheet->setCellValue('B'. ($current_row + 6), $company->co_name);
         $sheet->mergeCells('B'. ($current_row + 7). ':Z'. ($current_row + 7));
@@ -7544,7 +7547,9 @@ class RateDataController extends Controller
         $current_row += 2;
 
         $sheet->getStyle('B'. ($current_row). ':R'. ($current_row + 3))->getBorders()->getOutLine()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
-
+        $sheet->getStyle('B'. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+        $sheet->mergeCells('B'. ($current_row). ':R'. ($current_row + 3));
+        $sheet->setCellValue('B'. ($current_row), $rgd['rgd_memo_settle']);
         $current_row += 4;
 
          //END PART
@@ -7557,9 +7562,9 @@ class RateDataController extends Controller
         $issuer = Member::where('mb_no', $rgd->mb_no)->first();
         $company = Company::where('co_no', $issuer->co_no)->first();
 
-        $sheet->getStyle('B'. ($current_row + 6). ':R'. ($current_row + 10))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('EDEDED'));
-        $sheet->getStyle('B'. ($current_row + 6). ':R'. ($current_row + 10))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
-        $sheet->getStyle('B'. ($current_row + 6). ':R'. ($current_row + 10))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
+        $sheet->getStyle('B'. ($current_row + 6). ':R'. ($current_row + 9))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('EDEDED'));
+        $sheet->getStyle('B'. ($current_row + 6). ':R'. ($current_row + 9))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('B'. ($current_row + 6). ':R'. ($current_row + 9))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
         $sheet->mergeCells('B'. ($current_row + 6). ':R'. ($current_row + 6));
         $sheet->setCellValue('B'. ($current_row + 6), $company->co_name);
         $sheet->mergeCells('B'. ($current_row + 7). ':R'. ($current_row + 7));
@@ -8906,9 +8911,9 @@ class RateDataController extends Controller
         $issuer = Member::where('mb_no', $rgd->mb_no)->first();
         $company = Company::where('co_no', $issuer->co_no)->first();
 
-        $sheet->getStyle('B'. ($current_row + 6). ':Z'. ($current_row + 10))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('EDEDED'));
-        $sheet->getStyle('B'. ($current_row + 6). ':Z'. ($current_row + 10))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
-        $sheet->getStyle('B'. ($current_row + 6). ':Z'. ($current_row + 10))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
+        $sheet->getStyle('B'. ($current_row + 6). ':Z'. ($current_row + 9))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('EDEDED'));
+        $sheet->getStyle('B'. ($current_row + 6). ':Z'. ($current_row + 9))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('B'. ($current_row + 6). ':Z'. ($current_row + 9))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
         $sheet->mergeCells('B'. ($current_row + 6). ':Z'. ($current_row + 6));
         $sheet->setCellValue('B'. ($current_row + 6), $company->co_name);
         $sheet->mergeCells('B'. ($current_row + 7). ':Z'. ($current_row + 7));
