@@ -827,7 +827,7 @@ class ItemController extends Controller
     public function paginateItemsApiIdCompanyRawNoLogin($co_no)
     {
         try {
-            $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->where('co_no', $co_no)->orderBy('item_no', 'DESC');
+            $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->whereIn('supply_code', $co_no)->orderBy('item_no', 'DESC');
             $item = $item->get();
             return $item;
         } catch (\Exception $e) {
@@ -3542,24 +3542,16 @@ class ItemController extends Controller
 
         $response = curl_exec($con);
         curl_close($con);
-        $api_data = json_decode($response);
+        $api_data = json_decode($response, true);
         $total_stock = 0;
-        $cw_code = [];
-        if(isset($shipper['contract_wms'])){
-            foreach($shipper['contract_wms'] as $contract_wms){
-                $cw_code[] = $contract_wms['cw_code'];
-            }
-        }
-
-        if (!empty($api_data->data)) {
-            foreach ($api_data->data as $item) {
-                $item_info = Item::where('product_id', $item['product_id'])->orWhere('option_id', $item['product_id'])->first();
-                if(in_array($item_info['supply_code'], $cw_code)){
+        if (!empty($api_data['data'])) {
+            foreach ($api_data['data'] as $item) {
+                if ($item['stock'] > 0) {
                     $total_stock += $item['stock'];
-                }
+                }                 
             }
         }
-
+        //return $total_stock;
         StockStatusCompany::insert([
             'stock' => $total_stock,
             'co_no' => $shipper['co_no'],
@@ -3583,10 +3575,19 @@ class ItemController extends Controller
         $url_api .= '&action=' . $filter['action'];
 
         $company_shipper = Company::with(['ContractWms'])->where("co_type", "shipper")->get();
-
+        //return $company_shipper;
         foreach ($company_shipper as $shipper) {
-            $list_items = $this->paginateItemsApiIdCompanyRawNoLogin($shipper['co_no'])->toArray();
+            
+            $cw_code = [];
 
+            if(isset($shipper->ContractWms)){
+                foreach($shipper->ContractWms as $contract_wms){
+                    $cw_code[] = $contract_wms['cw_code'];
+                }
+            }
+            
+            $list_items = $this->paginateItemsApiIdCompanyRawNoLogin($cw_code)->toArray();
+            
             $params = array();
             foreach ($list_items as $item) {
                 if (!empty($item)) {
@@ -3597,10 +3598,8 @@ class ItemController extends Controller
                     }
                 }
             }
-            if($item['co_no'] == 197){
-                return $params;
-            }
-            for ($bad = 0; $bad <= 1; $bad++) {
+           
+            for ($bad = 0; $bad <= 0; $bad++) {
                 $url_api .= '&bad=' . $bad;
                 $url_api .= '&product_id=';
 
@@ -3609,7 +3608,7 @@ class ItemController extends Controller
 
                     if (count($unique_params) > 100) {
                         $chunk_params = array_chunk($unique_params, 100);
-                        //return $chunk_params;
+                        return $chunk_params;
                         foreach ($chunk_params as $param) {
                             $link_params = implode(',', $param);
                             $url_api .= $link_params;
@@ -3619,7 +3618,7 @@ class ItemController extends Controller
                     } else {
                         $link_params = implode(',', $unique_params);
                         $url_api .= $link_params;
-
+                        //return $url_api;
                         $this->updateStockStatusCompany($url_api,$shipper);
                     }
                 } else {
