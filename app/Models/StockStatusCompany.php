@@ -35,4 +35,9 @@ class StockStatusCompany extends Model
     {
         return $this->belongsTo(Item::class, 'product_id', 'product_id')->with(['file', 'company', 'item_channels', 'item_info', 'ContractWms']);
     }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'co_no', 'co_no')->with(['co_parent']);
+    }
 }
