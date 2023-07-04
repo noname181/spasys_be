@@ -54,6 +54,7 @@ class InvokeRequest extends BaseFormRequest
             ],
             'co_license' => [
                 'required',
+                'unique:company,co_license,'.$this->co_no.',co_no',
                 'string',
                 'max:255'
             ],
