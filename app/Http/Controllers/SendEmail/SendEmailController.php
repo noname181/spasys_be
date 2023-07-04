@@ -191,7 +191,7 @@ class SendEmailController extends Controller
             ]);
             $mail_details = [ 
                 'title' => $validated['se_title'],
-                'body' => $validated['se_content'],
+                'body' => nl2br($validated['se_content']),
             ];
             $path2 = '/var/www/html/'.$file_name_download;
             Mail::send('emails.quotation',['details'=>$mail_details], function($message)use($validated,$path2) {
