@@ -7118,15 +7118,44 @@ class WarehousingController extends Controller
 
             //GET STOCK FROM API
             if($user->mb_type == 'shop'){
-                $start_stock = StockStatusCompany::where('co_no', $request->co_no)->where('created_at', '>=' ,date('Y-m-d 00:00:00', strtotime($request->from_date)))->orderBy('created_at')->first()->stock;
-                $end_stock = StockStatusCompany::where('co_no', $request->co_no)->where('created_at', '>=',date('Y-m-d 00:00:00', strtotime($request->to_date)))->orderBy('created_at')->first()->stock;
+                $start_stock = StockStatusCompany::where('co_no', $request->co_no)
+                ->where('created_at', '>=' , Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->from_date))->format('Y-m-d') . ' 00:00:00')
+                ->where('created_at', '<=' , Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->from_date)->addDays(1))->format('Y-m-d') . ' 00:00:00')
+                ->orderBy('created_at')->first();
+                
+                $end_stock = StockStatusCompany::where('co_no', $request->co_no)
+                ->where('created_at', '>=', Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date))->format('Y-m-d') . ' 00:00:00')
+                ->where('created_at', '<=' , Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date)->addDays(1))->format('Y-m-d') . ' 00:00:00')
+                ->orderBy('created_at')->first();
+
             }else if($user->mb_type == 'spasys'){
-                $start_stock = StockStatusCompany::whereHas('company.co_parent', function($q) use ($request){
+
+                $shipper_companies = Company::wherehas('co_parent', function($q) use($request){
                     $q->where('co_no', $request->co_no);
-                })->where('created_at', '>=' ,date('Y-m-d 00:00:00', strtotime($request->from_date)))->orderBy('created_at')->sum('stock');
-                $end_stock = StockStatusCompany::whereHas('company.co_parent', function($q) use ($request){
-                    $q->where('co_no', $request->co_no);
-                })->where('created_at', '>=',date('Y-m-d 00:00:00', strtotime($request->to_date)))->orderBy('created_at')->sum('stock');
+                })->get();
+
+                $start_stock = 0;
+                $end_stock = 0;
+
+                return Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->from_date)->addDays(1))->format('Y-m-d') . ' 00:00:00';
+
+                foreach($shipper_companies as $index => $shipper_company){
+                    $start_stock_ = StockStatusCompany::where('co_no', $shipper_company->co_no)
+                    ->where('created_at', '>=' , Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->from_date))->format('Y-m-d') . ' 00:00:00')
+                    ->where('created_at', '<=' , Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->from_date)->addDays(1))->format('Y-m-d') . ' 00:00:00')
+                    ->orderBy('created_at')->first();
+                    $start_stock += isset($start_stock_->stock) ? $start_stock_->stock : 0;
+
+
+                    $end_stock_ = StockStatusCompany::where('co_no', $shipper_company->co_no)
+                    ->where('created_at', '>=', Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date))->format('Y-m-d') . ' 00:00:00')
+                    ->where('created_at', '<=' , Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date)->addDays(1))->format('Y-m-d') . ' 00:00:00')
+                    ->orderBy('created_at')->first();
+                    $end_stock += isset($end_stock_->stock) ? $end_stock_->stock : 0;
+
+                }
+
+               
             }
           
             //END GET STOCK FROM API
@@ -7141,8 +7170,8 @@ class WarehousingController extends Controller
                 'rgd_status2' => '작업완료',
                 'rgd_monthbill_start' => Carbon::createFromFormat('Y-m-d', $request->from_date),
                 'rgd_monthbill_end' => Carbon::createFromFormat('Y-m-d', $request->to_date),
-                'rgd_stock_start' => isset($start_stock) ? $start_stock : 0,
-                'rgd_stock_end' => isset($end_stock) ? $end_stock : 0,
+                'rgd_stock_start' => isset($start_stock->stock) ? $start_stock->stock : 0,
+                'rgd_stock_end' => isset($end_stock->stock) ? $end_stock->stock : 0,
                 'rgd_item_first_name' => isset($first_name_item) && isset($final_total) ? ($first_name_item . '외' . ' ' . $final_total . '건') : '',
             ]);
 
