@@ -5640,7 +5640,7 @@ class RateDataController extends Controller
 
             $sheet->mergeCells('E'. ($current_row));
             $sheet->getStyle('E'. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-            $sheet->setCellValue('E'. ($current_row), str_replace(' 00:00:00' , '', isset($rgd['warehousing']['warehousing_child'][$child_length - 1]['w_completed_day'])  ? Carbon::createFromFormat('Y-m-d H:i:s', $rgd['warehousing']['warehousing_child'][$child_length - 1]['w_completed_day'])->format('Y.m.d') : ''));
+            $sheet->setCellValue('E'. ($current_row), $key_rgd == (count($rgds) - 1) ? '' : str_replace(' 00:00:00' , '', isset($rgd['warehousing']['warehousing_child'][$child_length - 1]['w_completed_day'])  ? Carbon::createFromFormat('Y-m-d H:i:s', $rgd['warehousing']['warehousing_child'][$child_length - 1]['w_completed_day'])->format('Y.m.d') : ''));
 
 
             foreach($headers as $key => $header){
