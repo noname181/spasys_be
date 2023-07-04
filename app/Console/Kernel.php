@@ -23,7 +23,8 @@ class Kernel extends ConsoleKernel
         $schedule->call('App\Http\Controllers\ScheduleShipment\ScheduleShipmentController@getScheduleFromApiNoLogin')->cron('*/30 * * * *');
         $schedule->call('App\Http\Controllers\ScheduleShipment\ScheduleShipmentController@stock_history')->cron('*/35 * * * *');
         $schedule->call('App\Http\Controllers\Item\ItemController@createBondedSettlement')->cron('*/40 * * * *');
-
+        
+        $schedule->call('App\Http\Controllers\Item\ItemController@updateStockCompanyApiNoLogin')->cron('01 0 * * *');
         $schedule->call('App\Http\Controllers\AlarmData\AlarmDataController@insertDailyAlarm7')->cron('01 9 * * *');
         $schedule->call('App\Http\Controllers\AlarmData\AlarmDataController@insertDailyAlarm30')->cron('02 9 * * *');
         $schedule->call('App\Http\Controllers\AlarmData\AlarmDataController@insertDailyAlarmInsulace7')->cron('03 9 * * *');
