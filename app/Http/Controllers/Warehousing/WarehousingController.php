@@ -18,6 +18,7 @@ use App\Models\Contract;
 use App\Models\RateData;
 use App\Models\CancelBillHistory;
 use App\Models\TaxInvoiceDivide;
+use App\Models\StockStatusCompany;
 use App\Models\Tax;
 use App\Models\CashReceipt;
 use App\Models\Import;
@@ -5043,27 +5044,6 @@ class WarehousingController extends Controller
                     }
 
                     $company = Company::where('co_no', $co_no)->first();
-                    if ($company->co_type == 'shipper') {
-                        $sh = StockHistory::whereHas('member', function ($q) use ($co_no) {
-                            $q->where('co_no', $co_no);
-                        })->where('sh_date', $item->rgd_monthbill_start->format('Y-m-d'))->first();
-                        $item->start_stock = isset($sh->sh_left_stock) ? $sh->sh_left_stock : 0;
-
-                        $sh = StockHistory::whereHas('member', function ($q) use ($co_no) {
-                            $q->where('co_no', $co_no);
-                        })->where('sh_date', $item->rgd_monthbill_end->format('Y-m-d'))->first();
-                        $item->end_stock = isset($sh->sh_left_stock) ? $sh->sh_left_stock : 0;
-                    } else if ($company->co_type == 'shop') {
-                        $sh = StockHistory::whereHas('member.company.co_parent', function ($q) use ($co_no) {
-                            $q->where('co_no', $co_no);
-                        })->where('sh_date', $item->rgd_monthbill_start->format('Y-m-d'));
-                        $item->start_stock = !empty($sh) ? $sh->sum('sh_left_stock') : 0;
-
-                        $sh = StockHistory::whereHas('member.company.co_parent', function ($q) use ($co_no) {
-                            $q->where('co_no', $co_no);
-                        })->where('sh_date', $item->rgd_monthbill_end->format('Y-m-d'));
-                        $item->end_stock = !empty($sh) ? $sh->sum('sh_left_stock') : 0;
-                    }
 
                     $rmd = RateMetaData::where('co_no', $co_no)->whereNull('set_type')->latest('created_at')->first();
                     $rate_data = $rate_data->where('rd_co_no', $co_no);
@@ -7137,38 +7117,11 @@ class WarehousingController extends Controller
             // ]);
 
             //GET STOCK FROM API
-
-            // $stock_start_date = 0;
-            // $stock_end_date = 0;
-
-            //GET STOCK START DATE
-            // $response = $this->get_stock_api($request->from_date, $request->from_date);
-
-            // $api = json_decode($response);
-
-            // if($api == 'no_data'){
-
-            // }else if(isset($api->data)) {
-            //     foreach($api->data as $index => $data){
-            //         $stock_start_date += $data->stock;
-            //     }
-            // }
-
-            // //GET STOCK END DATE
-            // $response = $this->get_stock_api('2020-01-01', '2020-01-01');
-
-            // $api = json_decode($response);
-
-            // if($api == 'no_data'){
-
-            // }else if(isset($api->data)) {
-            //     foreach($api->data as $index => $data){
-            //         $stock_end_date += $data->stock;
-            //     }
-            // }
+            $start_stock = StockStatusCompany::where('co_no', $request->co_no)->where('created_at', '>=' ,date('Y-m-d 00:00:00', strtotime($request->from_date)))->orderBy('created_at')->first();
+            $end_stock = StockStatusCompany::where('co_no', $request->co_no)->where('created_at', '>=',date('Y-m-d 00:00:00', strtotime($request->to_date)))->orderBy('created_at')->first();
+        
             //END GET STOCK FROM API
 
-            // return $stock_end_date;
 
             //THUONG EDIT TO MAKE SETTLEMENT
             $rgd_no = ReceivingGoodsDelivery::insertGetId([
@@ -7179,6 +7132,8 @@ class WarehousingController extends Controller
                 'rgd_status2' => '작업완료',
                 'rgd_monthbill_start' => Carbon::createFromFormat('Y-m-d', $request->from_date),
                 'rgd_monthbill_end' => Carbon::createFromFormat('Y-m-d', $request->to_date),
+                'rgd_stock_start' => isset($start_stock->stock) ? $start_stock->stock : 0,
+                'rgd_stock_end' => isset($end_stock->stock) ? $end_stock->stock : 0,
                 'rgd_item_first_name' => isset($first_name_item) && isset($final_total) ? ($first_name_item . '외' . ' ' . $final_total . '건') : '',
             ]);
 
