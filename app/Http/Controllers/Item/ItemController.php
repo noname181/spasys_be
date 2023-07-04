@@ -3692,7 +3692,7 @@ class ItemController extends Controller
                     $leftjoin->orOn('aaa.tie_logistic_manage_number', '=', 'nnn.is_no')->whereNull('ddd.te_carry_out_number')->whereNull('bbb.ti_carry_in_number');
                 })
                 ->orderBy('tie_is_date', 'DESC')->orderBy('tie_h_bl', 'DESC')
-                ->where('updated_at', '>', Carbon::now()->subDays(3));
+                ->where('updated_at', '>', Carbon::now()->subDays(2));
 
 
             foreach ($import_schedule->get() as $item) {
