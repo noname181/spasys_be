@@ -44,21 +44,23 @@ class MenuController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $menu = Menu::with(['service','manual','menu_parent'])->where('menu_url','!=','popup')->where('menu_depth','!=','상위')->orderBy('main_menu_level', 'ASC')->orderBy('sub_menu_level', 'ASC');
+            $menu = Menu::select('menu.*','menu_parent.menu_name as name2')->with(['service','manual','menu_parent'])->join('menu as menu_parent', function ($join) {
+                $join->on('menu_parent.menu_no', '=', 'menu.menu_parent_no');
+            })->where('menu.menu_url','!=','popup')->where('menu.menu_depth','!=','상위')->orderBy('service_no_array', 'ASC')->orderBy('menu_parent.menu_name','ASC')->orderBy('menu.menu_name','ASC');
 
 
 
             if (isset($validated['menu_depth'])) {
-                $menu->where('menu_depth', $validated['menu_depth']);
+                $menu->where('menu.menu_depth', $validated['menu_depth']);
             }
 
             if (isset($validated['menu_device'])) {
-                $menu->where(DB::raw('lower(menu_device)'), strtolower($validated['menu_device']));
+                $menu->where(DB::raw('lower(menu.menu_device)'), strtolower($validated['menu_device']));
             }
 
             if (isset($validated['menu_name'])) {
                 $menu->where(function($query) use ($validated) {
-                    $query->where('menu_name', 'like', '%' . $validated['menu_name'] . '%');
+                    $query->where('menu.menu_name', 'like', '%' . $validated['menu_name'] . '%');
                 });
             }
 
@@ -66,11 +68,11 @@ class MenuController extends Controller
             if (isset($validated['service_no']) && $validated['service_no'] != '1') {
                 if($validated['service_no'] == '99999999'){
                     $menu->where(function($query) use ($validated) {
-                        $query->where('service_no_array','=','2 3 4')->orwhere('service_no_array','=','1 2 3 4');
+                        $query->where('menu.service_no_array','=','2 3 4')->orwhere('menu.service_no_array','=','1 2 3 4');
                     });
                 } else {
                 $collection = $menu->where(function($query) use ($validated) {
-                    $query->where('service_no_array','!=','2 3 4')->where('service_no_array','!=','1 2 3 4');
+                    $query->where('menu.service_no_array','!=','2 3 4')->where('menu.service_no_array','!=','1 2 3 4');
                 })->get();
 
                 $filtered = $collection->filter(function($item) use($validated){
