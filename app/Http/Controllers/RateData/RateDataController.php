@@ -5689,7 +5689,7 @@ class RateDataController extends Controller
         $current_row += 1;
 
         $sheet->getStyle('B'. ($current_row). ':Z'. ($current_row + 3))->getBorders()->getOutLine()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
-        $sheet->getStyle('B'. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+        $sheet->getStyle('B'. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT)->setWrapText(true);
         $sheet->mergeCells('B'. ($current_row). ':Z'. ($current_row + 3));
         $sheet->setCellValue('B'. ($current_row), $rgd['rgd_memo_settle']);
 
@@ -7547,7 +7547,7 @@ class RateDataController extends Controller
         $current_row += 2;
 
         $sheet->getStyle('B'. ($current_row). ':R'. ($current_row + 3))->getBorders()->getOutLine()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
-        $sheet->getStyle('B'. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+        $sheet->getStyle('B'. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT)->setWrapText(true);
         $sheet->mergeCells('B'. ($current_row). ':R'. ($current_row + 3));
         $sheet->setCellValue('B'. ($current_row), $rgd['rgd_memo_settle']);
         $current_row += 4;
