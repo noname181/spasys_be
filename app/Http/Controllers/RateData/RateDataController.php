@@ -4948,10 +4948,12 @@ class RateDataController extends Controller
             DB::beginTransaction();
             //Check is there already RateDataGeneral with rdg_no yet
 
-            $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $request->rgd_no)->update([
+            ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $request->rgd_no)->update([
                 'rgd_storage_days' => $request->storage_days,
                 'rgd_e_price' => $request->te_e_price ? $request->te_e_price : null,
             ]);
+
+            $rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $request->rgd_no)->first();
 
             $company = Company::where('co_no', $rgd->warehousing->co_no)->first();
 
