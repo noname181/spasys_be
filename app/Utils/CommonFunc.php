@@ -169,10 +169,10 @@ class CommonFunc
             if ($sender->mb_type == 'spasys' && $rgd->co_type == 'shop') {
                 $receiver_list = Member::where(function ($q) use ($sender, $rgd) {
                     $q->where('co_no', $sender->co_no)
-                        ->orwhere('co_no', $rgd->co_no)
-                        ->orwherehas('company.co_parent', function ($q) use ($sender, $rgd) {
-                            $q->where('co_no', $rgd->co_no);
-                        });
+                        ->orwhere('co_no', $rgd->co_no);
+                        // ->orwherehas('company.co_parent', function ($q) use ($sender, $rgd) {
+                        //     $q->where('co_no', $rgd->co_no);
+                        // });
                 });
                 //SPASYS UPDATE SHIPPER
             } else if ($sender->mb_type == 'spasys' && $rgd->co_type == 'shipper') {
