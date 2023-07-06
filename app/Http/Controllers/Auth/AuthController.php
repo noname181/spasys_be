@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\AuthController\InvokeRequest;
 
 use App\Models\Member;
+use App\Models\Company;
 use App\Models\Service;
 use App\Utils\Messages;
 
@@ -54,6 +55,10 @@ class AuthController extends Controller
 
             $member->save();
 
+            $company = Company::with(['company_payment', 'co_parent'])->where('co_no', $member->co_no)->first();
+
+            $company_parent = Company::with(['company_payment', 'co_parent'])->where('co_no', $company->co_parent_no)->first();;
+
             return response()->json([
                 'message' => Messages::MSG_0007,
                 'mb_token' => $token,
@@ -66,6 +71,8 @@ class AuthController extends Controller
                 'role_name' => $member['role']['role_name'],
                 'role_no' => $member['role_no'],
                 'co_no' => $member['co_no'],
+                'company_bank_info' => $company->company_payment->cp_bank_name . ' ' . $company->company_payment->cp_bank_number . ' ' . $company->company_payment->cp_card_name,
+                'company_parent_bank_info' => $company_parent ? $company_parent->company_payment->cp_bank_name . ' ' . $company_parent->company_payment->cp_bank_number . ' ' . $company_parent->company_payment->cp_card_name : '',
                 'mb_no' => $member['mb_no'],
                 'mb_push_yn' => $member['mb_push_yn'],
             ]);
