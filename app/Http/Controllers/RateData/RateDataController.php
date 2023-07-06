@@ -10334,28 +10334,40 @@ class RateDataController extends Controller
             $sheet_row1 = 4;
             $sheet_row2 = 4;
             $sheet_row3 = 4;
-            foreach ($data_sheet1 as $dt1) {
-                if ($dt1['rd_cate_meta2'] == '창고화물') {
+            foreach ($data_sheet1  as $key => $dt1) {
+                if ($dt1['rd_cate_meta2'] == '창고화물' || ($dt1['rd_cate_meta2'] == '온도화물' && $key == 14)) {
+                    if($key < 15){
                     $sheet->setCellValue('A' . $sheet_row1, !empty($dt1['rd_cate1']) ? $dt1['rd_cate1'] : '');
                     $sheet->setCellValue('B' . $sheet_row1, !empty($dt1['rd_cate2']) ? $dt1['rd_cate2'] : '');
                     $sheet->setCellValue('C' . $sheet_row1, !empty($dt1['rd_cate3']) ? $dt1['rd_cate3'] : '');
                     $sheet->setCellValue('D' . $sheet_row1, !empty($dt1['rd_data1']) ? $dt1['rd_data1'] : '');
+                    if($key < 14){
                     $sheet->setCellValue('E' . $sheet_row1, !empty($dt1['rd_data2']) ? $dt1['rd_data2'] : '');
+                    }
                     $sheet_row1++;
+                    }
                 } else if ($dt1['rd_cate_meta2'] == '온도화물') {
+                    if($key >= 15 && $key < 30){
                     $sheet->setCellValue('H' . $sheet_row2, !empty($dt1['rd_cate1']) ? $dt1['rd_cate1'] : '');
                     $sheet->setCellValue('I' . $sheet_row2, !empty($dt1['rd_cate2']) ? $dt1['rd_cate2'] : '');
                     $sheet->setCellValue('J' . $sheet_row2, !empty($dt1['rd_cate3']) ? $dt1['rd_cate3'] : '');
                     $sheet->setCellValue('K' . $sheet_row2, !empty($dt1['rd_data1']) ? $dt1['rd_data1'] : '');
+                    if($key < 29){
                     $sheet->setCellValue('L' . $sheet_row2, !empty($dt1['rd_data2']) ? $dt1['rd_data2'] : '');
+                    }
                     $sheet_row2++;
+                    }
                 } else if ($dt1['rd_cate_meta2'] == '위험물') {
+                    if($key >= 30 && $key < 45){
                     $sheet->setCellValue('O' . $sheet_row3, !empty($dt1['rd_cate1']) ? $dt1['rd_cate1'] : '');
                     $sheet->setCellValue('P' . $sheet_row3, !empty($dt1['rd_cate2']) ? $dt1['rd_cate2'] : '');
                     $sheet->setCellValue('Q' . $sheet_row3, !empty($dt1['rd_cate3']) ? $dt1['rd_cate3'] : '');
                     $sheet->setCellValue('R' . $sheet_row3, !empty($dt1['rd_data1']) ? $dt1['rd_data1'] : '');
+                    if($key < 44){
                     $sheet->setCellValue('S' . $sheet_row3, !empty($dt1['rd_data2']) ? $dt1['rd_data2'] : '');
+                    }
                     $sheet_row3++;
+                    }
                 }
             }
         }
@@ -10425,6 +10437,7 @@ class RateDataController extends Controller
             'status' => 1,
             'link_download' => $file_name_download,
             'message' => 'Download File',
+            'rate_data_send_meta'=>$rate_data_send_meta,
         ], 200);
         ob_end_clean();
     }
