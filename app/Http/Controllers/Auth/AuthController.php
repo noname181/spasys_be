@@ -71,13 +71,14 @@ class AuthController extends Controller
                 'role_name' => $member['role']['role_name'],
                 'role_no' => $member['role_no'],
                 'co_no' => $member['co_no'],
-                'company_bank_info' => $company ? $company->company_payment->cp_bank_name . ' ' . $company->company_payment->cp_bank_number . ' ' . $company->company_payment->cp_card_name : '',
-                'company_parent_bank_info' => $company_parent ? $company_parent->company_payment->cp_bank_name . ' ' . $company_parent->company_payment->cp_bank_number . ' ' . $company_parent->company_payment->cp_card_name : '',
+                'company_bank_info' => isset($company->company_payment) ? $company->company_payment->cp_bank_name . ' ' . $company->company_payment->cp_bank_number . ' ' . $company->company_payment->cp_card_name : '',
+                'company_parent_bank_info' => isset($company_parent->company_payment) ? $company_parent->company_payment->cp_bank_name . ' ' . $company_parent->company_payment->cp_bank_number . ' ' . $company_parent->company_payment->cp_card_name : '',
                 'mb_no' => $member['mb_no'],
                 'mb_push_yn' => $member['mb_push_yn'],
             ]);
         } catch (\Exception $error) {
             Log::error($error);
+            return $error;
             return response()->json(['message' => Messages::MSG_0009], 500);
         }
     }
