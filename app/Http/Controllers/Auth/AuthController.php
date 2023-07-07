@@ -78,7 +78,7 @@ class AuthController extends Controller
             ]);
         } catch (\Exception $error) {
             Log::error($error);
-            return $error;
+            // return $error;
             return response()->json(['message' => Messages::MSG_0009], 500);
         }
     }
