@@ -33,8 +33,9 @@ class SendMailController extends Controller
             if (!empty($member)) {
                 // send otp in the email
                 $mail_details = [ 
-                    'title' => 'Verify email OTP',
-                    'body' => 'Your OTP is : ' . $mb_otp,
+                    'title' => '비밀번호 찾기',
+                    'body' => '임시 비밀번호를 드립니다. 로그인하셔서 새 비밀번호로 변경하세요: ',
+                    'otp' => $mb_otp,
                 ];
 
                 Member::where('mb_email', '=', $validated['mb_email'])->update(['mb_otp' => Hash::make($mb_otp)]);

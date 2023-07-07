@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Send Mail</title>
+    <title>{{ $details['title'] }}</title>
 </head>
 <body>
     <h1>{{ $details['title'] }}</h1>
-    <p>{{ $details['body'] }}</p>
+    <p>{{ $details['body'] }}<b style="font-style: italic">{{ $details['otp'] }}</b></p> 
    
-    <p>Thank you!</p>
+    <p>감사합니다.</p>
 </body>
 </html>

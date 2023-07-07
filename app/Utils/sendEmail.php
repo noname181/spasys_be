@@ -29,7 +29,7 @@ class sendEmail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Verify email OTP')
+        return $this->subject('비밀번호 찾기')
                     ->view('emails.mailOTP', $this->details);
     }
 }
