@@ -5791,12 +5791,25 @@ class WarehousingController extends Controller
 
             $sum_sum = $arr_data->sum('sum_sum');
 
+            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            $x = clone($warehousing);
+
+            $all_bill =  $x->groupby('receiving_goods_delivery.rgd_no')->get()->count();
+
+            $issued_tax_bill =   $x->where('rgd_status7', 'taxed')->groupby('receiving_goods_delivery.rgd_no')->get()->count();
+
+            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+
 
             $custom = collect([
                 'sum_supply_price' => $sum_supply_price,
                 'sum_vat' => $sum_vat,
                 'sum_sum' => $sum_sum,
+                'all_bill' => $all_bill,
+                'issued_tax_bill' => $issued_tax_bill,
             ]);
+           
+
 
 
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
