@@ -13007,7 +13007,7 @@ class RateDataController extends Controller
                     }
                 }
 
-                $rgds = ReceivingGoodsDelivery::with(['payment'])->whereHas('payment', function($q) use($ordernos){
+                $rgds = ReceivingGoodsDelivery::with(['payment', 'warehousing'])->whereHas('payment', function($q) use($ordernos){
                     $q->where('p_method', 'virtual_account')->whereIn('p_orderno', $ordernos)->where('p_depositenddate', '>', Carbon::now()->format('YmdHis'));
                 })->where('rgd_status6', 'virtual_account')->get();
 
@@ -13125,6 +13125,15 @@ class RateDataController extends Controller
                         // 'is_expect_payment' => $request->ETC5 != 'virtual_account' ? 'n' : 'y',
                         'rgd_status6' => 'paid',
                         'rgd_paid_date' => Carbon::now(),
+                    ]);
+
+                    CancelBillHistory::insertGetId([
+                        'rgd_no' => $rgd['rgd_no'],
+                        'mb_no' => isset($rgd['payment']) ? $rgd['payment']['mb_no'] : null,
+                        'cbh_type' => 'payment',
+                        'cbh_status_before' => $rgd['rgd_status6'],
+                        'cbh_status_after' => 'payment_bill',
+                        'cbh_pay_method' => isset($rgd['payment']) ? $rgd['payment']['p_method'] : null,
                     ]);
 
                     if ($rgd->service_korean_name == '보세화물') {
