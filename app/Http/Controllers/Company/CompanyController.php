@@ -690,6 +690,12 @@ class CompanyController extends Controller
             //         $query->where('w_no', '=',  $validated['w_no']);
             //     });
             // }
+            
+            if (isset($validated['co_service'])) {
+                $companies->where(function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(co_service)'), 'like', '%' . strtolower($validated['co_service']) . '%');
+                });
+            }
 
             if (isset($validated['from_date'])) {
                 $companies->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
