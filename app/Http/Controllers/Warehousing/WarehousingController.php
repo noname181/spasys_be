@@ -689,7 +689,7 @@ class WarehousingController extends Controller
                 $warehousing->getCollection()->map(function ($item) {
 
                     $item->total_item = WarehousingItem::where('w_no', $item->w_no)->where('wi_type', '입고_spasys')->sum('wi_number');
-                    if ($item['warehousing_item'][0]['item']) {
+                    if (isset($item['warehousing_item'][0]['item'])) {
                         $first_name_item = $item['warehousing_item'][0]['item']['item_name'];
                         $total_item = $item['warehousing_item']->count();
                         $final_total = (($total_item / 2)  - 1);
