@@ -4718,8 +4718,12 @@ class WarehousingController extends Controller
             $warehousing_ = clone $warehousing;
 
             $contract = Contract::where('co_no',  $user->co_no)->first();
-            $issuer = Member::where('mb_no', $warehousing_->first()->mb_no)->first();
-            $company_payment = CompanyPayment::where('co_no',  $issuer->co_no)->first();
+
+            $company_payment = null;
+            if($warehousing_->count() > 0){
+                $issuer = Member::where('mb_no', $warehousing_->first()->mb_no)->first();
+                $company_payment = CompanyPayment::where('co_no',  $issuer->co_no)->first();
+            };
 
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             $warehousing->setCollection(
