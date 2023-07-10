@@ -4830,6 +4830,13 @@ class ReceivingGoodsDeliveryController extends Controller
 
                 if ($check_alarm_first === null && $rgd_status3 == '배송중')
                     CommonFunc::insert_alarm_cargo('[보세화물] 배송중', null, $user, $w_no_alert, 'cargo_delivery');
+
+                $check_alarm_first = Alarm::with(['alarm_data'])->where('w_no', $dataSubmit['is_no'])->whereHas('alarm_data', function ($query) {
+                    $query->where(DB::raw('lower(ad_title)'), 'like', '%' . strtolower('[보세화물] 배송완료') . '%');
+                })->first();
+
+                if ($check_alarm_first === null && $rgd_status3 == '배송완료')
+                    CommonFunc::insert_alarm_cargo('[보세화물] 배송완료', null, $user, $w_no_alert, 'cargo_delivery');
             }
             if (isset($data['remove'])) {
                 foreach ($data['remove'] as $remove) {
