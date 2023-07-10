@@ -689,7 +689,7 @@ class WarehousingController extends Controller
                 $warehousing->getCollection()->map(function ($item) {
 
                     $item->total_item = WarehousingItem::where('w_no', $item->w_no)->where('wi_type', '입고_spasys')->sum('wi_number');
-                    if ($item['warehousing_item'][0]['item']) {
+                    if (isset($item['warehousing_item'][0]['item'])) {
                         $first_name_item = $item['warehousing_item'][0]['item']['item_name'];
                         $total_item = $item['warehousing_item']->count();
                         $final_total = (($total_item / 2)  - 1);
@@ -4718,8 +4718,12 @@ class WarehousingController extends Controller
             $warehousing_ = clone $warehousing;
 
             $contract = Contract::where('co_no',  $user->co_no)->first();
-            $issuer = Member::where('mb_no', $warehousing_->first()->mb_no)->first();
-            $company_payment = CompanyPayment::where('co_no',  $issuer->co_no)->first();
+
+            $company_payment = null;
+            if($warehousing_->count() > 0){
+                $issuer = Member::where('mb_no', $warehousing_->first()->mb_no)->first();
+                $company_payment = CompanyPayment::where('co_no',  $issuer->co_no)->first();
+            };
 
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             $warehousing->setCollection(
