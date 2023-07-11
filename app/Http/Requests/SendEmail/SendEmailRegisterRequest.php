@@ -61,6 +61,18 @@ class SendEmailRegisterRequest extends BaseFormRequest
             'rmd_no' => [
                 '',
                 'nullable'
+            ],
+            'rmd_service' => [
+                '',
+                'nullable'
+            ],
+            'rmd_tab_child'=>[
+                '',
+                'nullable'
+            ],
+            'co_no_services'=>[
+                '',
+                'nullable'
             ]
         ];
     }
