@@ -18,6 +18,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 // use App\Models\File;
 use App\Models\RateData;
 use App\Models\RateMetaData;
+use App\Models\Company;
 use App\Models\RateDataGeneral;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\File;
@@ -276,16 +277,24 @@ class SendEmailController extends Controller
         DB::beginTransaction();
         DB::commit();
         $user = Auth::user();
+        $co_no = Company::with(['contract'])->where('co_no',$validated['co_no_services'])->first();
         $rate_data = [];
         $rate_data_general = [];
         $bonded1a = [];
         $bonded2a = [];
         $bonded3a = [];
         $bonded4a = [];
+        $bonded5a = [];
         $bonded1b = [];
         $bonded2b = [];
+        $bonded3b = [];
+        $bonded4b = [];
+        $bonded5b = [];
         $bonded1c = [];
         $bonded2c = [];
+        $bonded3c = [];
+        $bonded4c = [];
+        $bonded5c = [];
         $count1 = 0;
         $count2 = 0;
         $count3 = 0;
@@ -302,8 +311,11 @@ class SendEmailController extends Controller
         $count_arr3 = [];
         $arr4 = [];
         $count_arr4 = [];
+        $arr5 = [];
+        $count_arr5 = [];
         $sum3 = [];
         $sum4 = [];
+        $sum5 = [];
         $sum2 = [];
         if (isset($validated['rmd_service']) && $validated['rmd_service'] == 1) {
         
@@ -325,7 +337,7 @@ class SendEmailController extends Controller
         } else if ((isset($validated['rmd_service']) && $validated['rmd_service'] == 0) || (!isset($validated['rmd_service']) || !$validated['rmd_service'])){
             $service='보세화물';
             if($validated['rmd_tab_child'] == '창고화물'){
-                if(Auth::user()->mb_type == 'spasys'){
+                if(Auth::user()->mb_type == 'spasys' || $co_no['contract']['c_integrated_calculate_yn'] == 'n' || $co_no['contract']['c_integrated_calculate_yn'] == ''){
                     $bonded1a = $rate_data = RateData::where('rmd_no', $validated['rmd_no'])->where(function ($q) {
                         $q->where('rd_cate_meta1', 'bonded1a');
                     })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
@@ -352,7 +364,7 @@ class SendEmailController extends Controller
                         $total_3 = $total_3 + $row['rd_data4'];
                       }
                     }
-                } else {
+                } else if(Auth::user()->mb_type != 'spasys' && $co_no['contract']['c_integrated_calculate_yn'] == 'y') {
 
                     $bonded1a = $rate_data = RateData::where('rmd_no', $validated['rmd_no'])->where(function ($q) {
                         $q->where('rd_cate_meta1', 'bonded1a');
@@ -543,9 +555,57 @@ class SendEmailController extends Controller
                         $sum4[] = $total7_4;
                     }
 
+                    $bonded5a = $rate_data = RateData::where('rmd_no', $validated['rmd_no'])->where(function ($q) {
+                        $q->where('rd_cate_meta1', 'bonded5a');
+                    })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
+
+                    foreach($bonded5a as $row){
+                      
+                            if( !in_array( $row['rd_cate1'] ,$arr5 ) ){
+                                $arr5[] =  $row['rd_cate1'];
+                            }
+                        
+                    }
+                    if(count($arr5) > 0){
+                        $total1_5 = 0;
+                        $total2_5 = 0;
+                        $total3_5 = 0;
+                        $total5_5 = 0;
+                        $total6_5 = 0;
+                        $total7_5 = 0;
+                        for($i = 0;$i < count($arr4);$i++){
+                            $check = 0;
+                         
+                            foreach($bonded5a as $row){
+                                if($row['rd_cate1'] == $arr5[$i]){
+                                    if($row['rd_cate2'] != 'bonded345'){
+                                        $check = $check + 1;
+                                    }
+                                    if($row['rd_cate2'] == '소계'){
+                                        $total1_5 = $total1_5 + $row['rd_data1'];
+                                        $total2_5 = $total2_5 + $row['rd_data2'];
+                                        $total3_5 = $total3_5 + $row['rd_data4'];
+                                        $total5_5 = $total5_5 + $row['rd_data5'];
+                                        $total6_5 = $total6_5 + $row['rd_data6'];
+                                        $total7_5 = $total7_5 + $row['rd_data7'];
+                                    }
+                                }
+                            }
+                         
+                            $count_arr5[] = $check;
+                        }
+
+                            $sum5[] = $total1_5;
+                            $sum5[] = $total2_5;
+                            $sum5[] = $total3_5;
+                            $sum5[] = $total5_5;
+                            $sum5[] = $total6_5;
+                            $sum5[] = $total7_5;
+                    }
+
                 }
             } else if ($validated['rmd_tab_child'] == '온도화물'){
-                if(Auth::user()->mb_type == 'spasys'){
+                if(Auth::user()->mb_type == 'spasys' || $co_no['contract']['c_integrated_calculate_yn'] == 'n' || $co_no['contract']['c_integrated_calculate_yn'] == ''){
                     $bonded1b = $rate_data = RateData::where('rmd_no', $validated['rmd_no'])->where(function ($q) {
                         $q->where('rd_cate_meta1', 'bonded1b');
                     })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
@@ -571,12 +631,249 @@ class SendEmailController extends Controller
                             $total_3 = $total_3 + $row['rd_data4'];
                           }
                     }
-                } else {
+                }  else if(Auth::user()->mb_type != 'spasys' && $co_no['contract']['c_integrated_calculate_yn'] == 'y') {
+
+                    $bonded1b = $rate_data = RateData::where('rmd_no', $validated['rmd_no'])->where(function ($q) {
+                        $q->where('rd_cate_meta1', 'bonded1b');
+                    })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
+               
+                    foreach($bonded1b as $row){
+                      if($row['rd_cate1'] == '하역비용'){
+                        if($row['rd_cate2'] != '하역비용'){
+                            $count1 = $count1 + 1;
+                        }
+                      }
+                      if($row['rd_cate1'] == '센터 작업료'){
+                        if($row['rd_cate2'] != '센터 작업료'){
+                            $count2 = $count2 + 1;
+                        }
+                      }
+                      if($row['rd_cate1'] == '기타 비용'){
+                        if($row['rd_cate2'] != '기타 비용'){
+                            $count3 = $count3 + 1;
+                        }
+                      }
+                      if($row['rd_cate2'] == '소계'){
+                        $total_1 = $total_1 + $row['rd_data1'];
+                        $total_2 = $total_2 + $row['rd_data2'];
+                        $total_3 = $total_3 + $row['rd_data4'];
+                      }
+                    }
+
+
+                    $bonded2b = $rate_data = RateData::where('rmd_no', $validated['rmd_no'])->where(function ($q) {
+                        $q->where('rd_cate_meta1', 'bonded2b');
+                    })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
+                        $total1_2 = 0;
+                        $total2_2 = 0;
+                        $total3_2 = 0;
+                        $total5_2 = 0;
+                        $total6_2 = 0;
+                        $total7_2 = 0;
+                                     
+                    foreach($bonded2b as $row){
+                                            if($row['rd_cate1'] == '세금'){
+                                                if($row['rd_cate2'] != '세금'){
+                                                    $count1_2 = $count1_2 + 1;
+                                                }
+                                            }
+                                            if($row['rd_cate1'] == '운임'){
+                                                if($row['rd_cate2'] != '운임'){
+                                                    $count2_2 = $count2_2 + 1;
+                                                }
+                                            }
+                                            if($row['rd_cate1'] == '창고료'){
+                                                if($row['rd_cate2'] != '창고료'){
+                                                    $count3_2 = $count3_2 + 1;
+                                                }
+                                            }
+                                            if($row['rd_cate1'] == '수수료'){
+                                                if($row['rd_cate2'] != '수수료'){
+                                                    $count4_2 = $count4_2 + 1;
+                                                }
+                                            }
+                                            if($row['rd_cate1'] != '수수료' && $row['rd_cate1'] != '창고료' && $row['rd_cate1'] != '운임' && $row['rd_cate1'] != '세금'){
+                                                if( !in_array( $row['rd_cate1'] ,$arr2 ) ){
+                                                    $arr2[] =  $row['rd_cate1'];
+                                                }
+                                            }
+                                            if($row['rd_cate2'] == '소계'){
+                                                $total1_2 = $total1_2 + $row['rd_data1'];
+                                                $total2_2 = $total2_2 + $row['rd_data2'];
+                                                $total3_2 = $total3_2 + $row['rd_data4'];
+                                                $total5_2 = $total5_2 + $row['rd_data5'];
+                                                $total6_2 = $total6_2 + $row['rd_data6'];
+                                                $total7_2 = $total7_2 + $row['rd_data7'];
+                                            }                                        
+                    }
+                    $sum2[] = $total1_2;
+                    $sum2[] = $total2_2;
+                    $sum2[] = $total3_2;
+                    $sum2[] = $total5_2;
+                    $sum2[] = $total6_2;
+                    $sum2[] = $total7_2;
+                    if(count($arr2) > 0){
+                                            for($i = 0;$i < count($arr2);$i++){
+                                                $check = 0;
+                                                foreach($bonded2b as $row){
+                                                    if($row['rd_cate1'] == $arr2[$i]){
+                                                        if($row['rd_cate2'] != 'bonded2'){
+                                                            $check = $check + 1;
+                                                        }
+                                                    }
+                                                }
+                                                $count_arr2[] = $check;
+                                            }
+                    }
+
+                    $bonded3b = $rate_data = RateData::where('rmd_no', $validated['rmd_no'])->where(function ($q) {
+                        $q->where('rd_cate_meta1', 'bonded3b');
+                    })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
+
+                    foreach($bonded3b as $row){
+                      
+                            if( !in_array( $row['rd_cate1'] ,$arr3 ) ){
+                                $arr3[] =  $row['rd_cate1'];
+                            }
+                        
+                    }
+                    if(count($arr3) > 0){
+                        $total1_3 = 0;
+                        $total2_3 = 0;
+                        $total3_3 = 0;
+                        $total5_3 = 0;
+                        $total6_3 = 0;
+                        $total7_3 = 0;
+                        for($i = 0;$i < count($arr3);$i++){
+                            $check = 0;
+                         
+                            foreach($bonded3b as $row){
+                                if($row['rd_cate1'] == $arr3[$i]){
+                                    if($row['rd_cate2'] != 'bonded345'){
+                                        $check = $check + 1;
+                                    }
+                                    if($row['rd_cate2'] == '소계'){
+                                        $total1_3 = $total1_3 + $row['rd_data1'];
+                                        $total2_3 = $total2_3 + $row['rd_data2'];
+                                        $total3_3 = $total3_3 + $row['rd_data4'];
+                                        $total5_3 = $total5_3 + $row['rd_data5'];
+                                        $total6_3 = $total6_3 + $row['rd_data6'];
+                                        $total7_3 = $total7_3 + $row['rd_data7'];
+                                    }
+                                }
+                            }
+                         
+                            $count_arr3[] = $check;
+                        }
+
+                        $sum3[] = $total1_3;
+                        $sum3[] = $total2_3;
+                        $sum3[] = $total3_3;
+                        $sum3[] = $total5_3;
+                        $sum3[] = $total6_3;
+                        $sum3[] = $total7_3;
+                    }
+
+                    $bonded4b = $rate_data = RateData::where('rmd_no', $validated['rmd_no'])->where(function ($q) {
+                        $q->where('rd_cate_meta1', 'bonded4b');
+                    })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
+
+                    foreach($bonded4b as $row){
+                      
+                            if( !in_array( $row['rd_cate1'] ,$arr4 ) ){
+                                $arr4[] =  $row['rd_cate1'];
+                            }
+                        
+                    }
+                    if(count($arr4) > 0){
+                        $total1_4 = 0;
+                        $total2_4 = 0;
+                        $total3_4 = 0;
+                        $total5_4 = 0;
+                        $total6_4 = 0;
+                        $total7_4 = 0;
+                        for($i = 0;$i < count($arr4);$i++){
+                            $check = 0;
+                         
+                            foreach($bonded4b as $row){
+                                if($row['rd_cate1'] == $arr4[$i]){
+                                    if($row['rd_cate2'] != 'bonded345'){
+                                        $check = $check + 1;
+                                    }
+                                    if($row['rd_cate2'] == '소계'){
+                                        $total1_4 = $total1_4 + $row['rd_data1'];
+                                        $total2_4 = $total2_4 + $row['rd_data2'];
+                                        $total3_4 = $total3_4 + $row['rd_data4'];
+                                        $total5_4 = $total5_4 + $row['rd_data5'];
+                                        $total6_4 = $total6_4 + $row['rd_data6'];
+                                        $total7_4 = $total7_4 + $row['rd_data7'];
+                                    }
+                                }
+                            }
+                         
+                            $count_arr4[] = $check;
+                        }
+
+                        $sum4[] = $total1_4;
+                        $sum4[] = $total2_4;
+                        $sum4[] = $total3_4;
+                        $sum4[] = $total5_4;
+                        $sum4[] = $total6_4;
+                        $sum4[] = $total7_4;
+                    }
+
+                    $bonded5b = $rate_data = RateData::where('rmd_no', $validated['rmd_no'])->where(function ($q) {
+                        $q->where('rd_cate_meta1', 'bonded5b');
+                    })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
+
+                    foreach($bonded5b as $row){
+                      
+                            if( !in_array( $row['rd_cate1'] ,$arr5 ) ){
+                                $arr5[] =  $row['rd_cate1'];
+                            }
+                        
+                    }
+                    if(count($arr5) > 0){
+                        $total1_5 = 0;
+                        $total2_5 = 0;
+                        $total3_5 = 0;
+                        $total5_5 = 0;
+                        $total6_5 = 0;
+                        $total7_5 = 0;
+                        for($i = 0;$i < count($arr4);$i++){
+                            $check = 0;
+                         
+                            foreach($bonded5b as $row){
+                                if($row['rd_cate1'] == $arr5[$i]){
+                                    if($row['rd_cate2'] != 'bonded345'){
+                                        $check = $check + 1;
+                                    }
+                                    if($row['rd_cate2'] == '소계'){
+                                        $total1_5 = $total1_5 + $row['rd_data1'];
+                                        $total2_5 = $total2_5 + $row['rd_data2'];
+                                        $total3_5 = $total3_5 + $row['rd_data4'];
+                                        $total5_5 = $total5_5 + $row['rd_data5'];
+                                        $total6_5 = $total6_5 + $row['rd_data6'];
+                                        $total7_5 = $total7_5 + $row['rd_data7'];
+                                    }
+                                }
+                            }
+                         
+                            $count_arr5[] = $check;
+                        }
+
+                            $sum5[] = $total1_5;
+                            $sum5[] = $total2_5;
+                            $sum5[] = $total3_5;
+                            $sum5[] = $total5_5;
+                            $sum5[] = $total6_5;
+                            $sum5[] = $total7_5;
+                    }
 
                 }
 
             } else if($validated['rmd_tab_child'] == '위험물'){
-                if(Auth::user()->mb_type == 'spasys'){
+                if(Auth::user()->mb_type == 'spasys' || $co_no['contract']['c_integrated_calculate_yn'] == 'n' || $co_no['contract']['c_integrated_calculate_yn'] == ''){
                     $bonded1c = $rate_data = RateData::where('rmd_no', $validated['rmd_no'])->where(function ($q) {
                         $q->where('rd_cate_meta1', 'bonded1c');
                     })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
@@ -602,7 +899,244 @@ class SendEmailController extends Controller
                             $total_3 = $total_3 + $row['rd_data4'];
                           }
                     }
-                } else {
+                } else if(Auth::user()->mb_type != 'spasys' && $co_no['contract']['c_integrated_calculate_yn'] == 'y') {
+
+                    $bonded1c = $rate_data = RateData::where('rmd_no', $validated['rmd_no'])->where(function ($q) {
+                        $q->where('rd_cate_meta1', 'bonded1c');
+                    })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
+               
+                    foreach($bonded1c as $row){
+                      if($row['rd_cate1'] == '하역비용'){
+                        if($row['rd_cate2'] != '하역비용'){
+                            $count1 = $count1 + 1;
+                        }
+                      }
+                      if($row['rd_cate1'] == '센터 작업료'){
+                        if($row['rd_cate2'] != '센터 작업료'){
+                            $count2 = $count2 + 1;
+                        }
+                      }
+                      if($row['rd_cate1'] == '기타 비용'){
+                        if($row['rd_cate2'] != '기타 비용'){
+                            $count3 = $count3 + 1;
+                        }
+                      }
+                      if($row['rd_cate2'] == '소계'){
+                        $total_1 = $total_1 + $row['rd_data1'];
+                        $total_2 = $total_2 + $row['rd_data2'];
+                        $total_3 = $total_3 + $row['rd_data4'];
+                      }
+                    }
+
+
+                    $bonded2c = $rate_data = RateData::where('rmd_no', $validated['rmd_no'])->where(function ($q) {
+                        $q->where('rd_cate_meta1', 'bonded2c');
+                    })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
+                        $total1_2 = 0;
+                        $total2_2 = 0;
+                        $total3_2 = 0;
+                        $total5_2 = 0;
+                        $total6_2 = 0;
+                        $total7_2 = 0;
+                                     
+                    foreach($bonded2c as $row){
+                                            if($row['rd_cate1'] == '세금'){
+                                                if($row['rd_cate2'] != '세금'){
+                                                    $count1_2 = $count1_2 + 1;
+                                                }
+                                            }
+                                            if($row['rd_cate1'] == '운임'){
+                                                if($row['rd_cate2'] != '운임'){
+                                                    $count2_2 = $count2_2 + 1;
+                                                }
+                                            }
+                                            if($row['rd_cate1'] == '창고료'){
+                                                if($row['rd_cate2'] != '창고료'){
+                                                    $count3_2 = $count3_2 + 1;
+                                                }
+                                            }
+                                            if($row['rd_cate1'] == '수수료'){
+                                                if($row['rd_cate2'] != '수수료'){
+                                                    $count4_2 = $count4_2 + 1;
+                                                }
+                                            }
+                                            if($row['rd_cate1'] != '수수료' && $row['rd_cate1'] != '창고료' && $row['rd_cate1'] != '운임' && $row['rd_cate1'] != '세금'){
+                                                if( !in_array( $row['rd_cate1'] ,$arr2 ) ){
+                                                    $arr2[] =  $row['rd_cate1'];
+                                                }
+                                            }
+                                            if($row['rd_cate2'] == '소계'){
+                                                $total1_2 = $total1_2 + $row['rd_data1'];
+                                                $total2_2 = $total2_2 + $row['rd_data2'];
+                                                $total3_2 = $total3_2 + $row['rd_data4'];
+                                                $total5_2 = $total5_2 + $row['rd_data5'];
+                                                $total6_2 = $total6_2 + $row['rd_data6'];
+                                                $total7_2 = $total7_2 + $row['rd_data7'];
+                                            }                                        
+                    }
+                    $sum2[] = $total1_2;
+                    $sum2[] = $total2_2;
+                    $sum2[] = $total3_2;
+                    $sum2[] = $total5_2;
+                    $sum2[] = $total6_2;
+                    $sum2[] = $total7_2;
+                    if(count($arr2) > 0){
+                                            for($i = 0;$i < count($arr2);$i++){
+                                                $check = 0;
+                                                foreach($bonded2c as $row){
+                                                    if($row['rd_cate1'] == $arr2[$i]){
+                                                        if($row['rd_cate2'] != 'bonded2'){
+                                                            $check = $check + 1;
+                                                        }
+                                                    }
+                                                }
+                                                $count_arr2[] = $check;
+                                            }
+                    }
+
+                    $bonded3c = $rate_data = RateData::where('rmd_no', $validated['rmd_no'])->where(function ($q) {
+                        $q->where('rd_cate_meta1', 'bonded3c');
+                    })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
+
+                    foreach($bonded3c as $row){
+                      
+                            if( !in_array( $row['rd_cate1'] ,$arr3 ) ){
+                                $arr3[] =  $row['rd_cate1'];
+                            }
+                        
+                    }
+                    if(count($arr3) > 0){
+                        $total1_3 = 0;
+                        $total2_3 = 0;
+                        $total3_3 = 0;
+                        $total5_3 = 0;
+                        $total6_3 = 0;
+                        $total7_3 = 0;
+                        for($i = 0;$i < count($arr3);$i++){
+                            $check = 0;
+                         
+                            foreach($bonded3c as $row){
+                                if($row['rd_cate1'] == $arr3[$i]){
+                                    if($row['rd_cate2'] != 'bonded345'){
+                                        $check = $check + 1;
+                                    }
+                                    if($row['rd_cate2'] == '소계'){
+                                        $total1_3 = $total1_3 + $row['rd_data1'];
+                                        $total2_3 = $total2_3 + $row['rd_data2'];
+                                        $total3_3 = $total3_3 + $row['rd_data4'];
+                                        $total5_3 = $total5_3 + $row['rd_data5'];
+                                        $total6_3 = $total6_3 + $row['rd_data6'];
+                                        $total7_3 = $total7_3 + $row['rd_data7'];
+                                    }
+                                }
+                            }
+                         
+                            $count_arr3[] = $check;
+                        }
+
+                        $sum3[] = $total1_3;
+                        $sum3[] = $total2_3;
+                        $sum3[] = $total3_3;
+                        $sum3[] = $total5_3;
+                        $sum3[] = $total6_3;
+                        $sum3[] = $total7_3;
+                    }
+
+                    $bonded4c = $rate_data = RateData::where('rmd_no', $validated['rmd_no'])->where(function ($q) {
+                        $q->where('rd_cate_meta1', 'bonded4c');
+                    })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
+
+                    foreach($bonded4c as $row){
+                      
+                            if( !in_array( $row['rd_cate1'] ,$arr4 ) ){
+                                $arr4[] =  $row['rd_cate1'];
+                            }
+                        
+                    }
+                    if(count($arr4) > 0){
+                        $total1_4 = 0;
+                        $total2_4 = 0;
+                        $total3_4 = 0;
+                        $total5_4 = 0;
+                        $total6_4 = 0;
+                        $total7_4 = 0;
+                        for($i = 0;$i < count($arr4);$i++){
+                            $check = 0;
+                         
+                            foreach($bonded4c as $row){
+                                if($row['rd_cate1'] == $arr4[$i]){
+                                    if($row['rd_cate2'] != 'bonded345'){
+                                        $check = $check + 1;
+                                    }
+                                    if($row['rd_cate2'] == '소계'){
+                                        $total1_4 = $total1_4 + $row['rd_data1'];
+                                        $total2_4 = $total2_4 + $row['rd_data2'];
+                                        $total3_4 = $total3_4 + $row['rd_data4'];
+                                        $total5_4 = $total5_4 + $row['rd_data5'];
+                                        $total6_4 = $total6_4 + $row['rd_data6'];
+                                        $total7_4 = $total7_4 + $row['rd_data7'];
+                                    }
+                                }
+                            }
+                         
+                            $count_arr4[] = $check;
+                        }
+
+                        $sum4[] = $total1_4;
+                        $sum4[] = $total2_4;
+                        $sum4[] = $total3_4;
+                        $sum4[] = $total5_4;
+                        $sum4[] = $total6_4;
+                        $sum4[] = $total7_4;
+                    }
+
+                    $bonded5c = $rate_data = RateData::where('rmd_no', $validated['rmd_no'])->where(function ($q) {
+                        $q->where('rd_cate_meta1', 'bonded5c');
+                    })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
+
+                    foreach($bonded5c as $row){
+                      
+                            if( !in_array( $row['rd_cate1'] ,$arr5 ) ){
+                                $arr5[] =  $row['rd_cate1'];
+                            }
+                        
+                    }
+                    if(count($arr5) > 0){
+                        $total1_5 = 0;
+                        $total2_5 = 0;
+                        $total3_5 = 0;
+                        $total5_5 = 0;
+                        $total6_5 = 0;
+                        $total7_5 = 0;
+                        for($i = 0;$i < count($arr4);$i++){
+                            $check = 0;
+                         
+                            foreach($bonded5c as $row){
+                                if($row['rd_cate1'] == $arr5[$i]){
+                                    if($row['rd_cate2'] != 'bonded345'){
+                                        $check = $check + 1;
+                                    }
+                                    if($row['rd_cate2'] == '소계'){
+                                        $total1_5 = $total1_5 + $row['rd_data1'];
+                                        $total2_5 = $total2_5 + $row['rd_data2'];
+                                        $total3_5 = $total3_5 + $row['rd_data4'];
+                                        $total5_5 = $total5_5 + $row['rd_data5'];
+                                        $total6_5 = $total6_5 + $row['rd_data6'];
+                                        $total7_5 = $total7_5 + $row['rd_data7'];
+                                    }
+                                }
+                            }
+                         
+                            $count_arr5[] = $check;
+                        }
+
+                            $sum5[] = $total1_5;
+                            $sum5[] = $total2_5;
+                            $sum5[] = $total3_5;
+                            $sum5[] = $total5_5;
+                            $sum5[] = $total6_5;
+                            $sum5[] = $total7_5;
+                    }
 
                 }
 
@@ -630,7 +1164,10 @@ class SendEmailController extends Controller
         'count3'=>$count3,'count2'=>$count2,'count1'=>$count1,'total_1'=>$total_1,'total_2'=>$total_2,'total_3'=>$total_3,'mb_type'=>Auth::user()->mb_type
         ,'bonded2a'=>$bonded2a, 'count4_2'=>$count4_2,'count3_2'=>$count3_2,'count1_2'=>$count1_2,'count2_2'=>$count2_2,'count_arr2'=>$count_arr2,'arr2'=>$arr2,
         'count_arr3'=>$count_arr3,'arr3'=>$arr3,'bonded3a'=>$bonded3a,'sum3'=>$sum3,'sum2'=>$sum2,
-        'count_arr4'=>$count_arr4,'arr4'=>$arr4,'bonded4a'=>$bonded4a,'sum4'=>$sum4]);
+        'count_arr4'=>$count_arr4,'arr4'=>$arr4,'bonded4a'=>$bonded4a,'sum4'=>$sum4,
+        'count_arr5'=>$count_arr5,'arr5'=>$arr5,'bonded5a'=>$bonded5a,'sum5'=>$sum5,
+        'bonded5b'=>$bonded5b,'bonded5c'=>$bonded5c,'bonded4b'=>$bonded4b,'bonded4c'=>$bonded4c,
+        'bonded3b'=>$bonded3b,'bonded3c'=>$bonded3c,'bonded2b'=>$bonded2b,'bonded2c'=>$bonded2c]);
         $pdf->save($file_name_download);
         
         try {
@@ -668,9 +1205,7 @@ class SendEmailController extends Controller
                 'message' => Messages::MSG_0007,
                 'rate_data_general'=>$rate_data_general,
                 'rate_data'=>$rate_data,
-                'bonded1a'=>$bonded1a,
-                'sum3'=>$sum3
-                
+             
             ]);
         } catch (\Exception $e) {
             Log::error($e);

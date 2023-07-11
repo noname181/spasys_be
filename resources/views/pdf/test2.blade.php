@@ -23,9 +23,53 @@
    </head>
    <body>
       @if($service == '보세화물' && $mb_type == 'spasys') 
+         <div>
+              <table id="custom_table">
+                  <thead>
+                    <tr>
+                        <th rowspan="2" colspan="2">항목</th>
+                        <th colspan="3">세금계산서 발행</th>
+                        <th colspan="3">세금계산서 미발행</th>
+                        <th rowspan="2">비고</th>
+                    </tr>
+                    <tr>
+                        <th>공급가</th>
+                        <th>부가세</th>
+                        <th>합계</th>
+                        <th>공급가</th>
+                        <th>부가세</th>
+                        <th>합계</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  @if(count($bonded1a) > 0 || count($bonded1b) > 0 || count($bonded1c) > 0)
+                  <tr>
+                    <td colspan="2">BLP센터비용</td>
+                    <td >{{number_format($total_1)}}</td>
+                    <td >{{number_format($total_2)}}</td>
+                    <td >{{number_format($total_3)}}</td>
+                    <td >0</td>
+                    <td >0</td>
+                    <td >0</td>
+                    <td ></td>
+                  </tr>
+                  @endif
+                  <tr>
+                    <td colspan="2">합계</td>
+                    <td >{{number_format(($total_1 ? $total_1 : 0))}}</td>
+                    <td >{{number_format(($total_2 ? $total_2 : 0))}}</td>
+                    <td >{{number_format(($total_3 ? $total_3 : 0))}}</td>
+                    <td ></td>
+                    <td ></td>
+                    <td ></td>
+                    <td ></td>
+                  </tr>
+                  </tbody>
+                </table>
+        </div>
         @if($tab_child == '창고화물')
           @if(count($bonded1a) > 0)
-          <div style="border-bottom:1px solid #ddd">
+             <div>
             <table id="custom_table">
                 <thead>
                   <tr>
@@ -148,7 +192,7 @@
         @endif
         @if($tab_child == '온도화물')
           @if(count($bonded1b) > 0)
-          <div style="border-bottom:1px solid #ddd">
+             <div>
             <table id="custom_table">
                 <thead>
                 <tr>
@@ -271,7 +315,7 @@
         @endif
         @if($tab_child == '위험물')
           @if(count($bonded1c) > 0)
-          <div style="border-bottom:1px solid #ddd">
+             <div>
             <table id="custom_table">
                 <thead>
                 <tr>
@@ -395,9 +439,102 @@
       @endif
 
       @if($service == '보세화물' && $mb_type != 'spasys') 
+        <div>
+              <table id="custom_table">
+                  <thead>
+                    <tr>
+                        <th rowspan="2" colspan="2">항목</th>
+                        <th colspan="3">세금계산서 발행</th>
+                        <th colspan="3">세금계산서 미발행</th>
+                        <th rowspan="2">비고</th>
+                    </tr>
+                    <tr>
+                        <th>공급가</th>
+                        <th>부가세</th>
+                        <th>합계</th>
+                        <th>공급가</th>
+                        <th>부가세</th>
+                        <th>합계</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  @if(count($bonded1a) > 0 || count($bonded1b) > 0 || count($bonded1c) > 0)
+                  <tr>
+                    <td colspan="2">BLP센터비용</td>
+                    <td >{{number_format($total_1)}}</td>
+                    <td >{{number_format($total_2)}}</td>
+                    <td >{{number_format($total_3)}}</td>
+                    <td >0</td>
+                    <td >0</td>
+                    <td >0</td>
+                    <td ></td>
+                  </tr>
+                  @endif
+                  @if(count($bonded2a) > 0 || count($bonded2b) > 0 || count($bonded2c) > 0)
+                  <tr>
+                    <td colspan="2">관세사비용</td>
+                    <td >{{number_format($sum2[0] ? $sum2[0] : 0)}}</td>
+                    <td >{{number_format($sum2[1] ? $sum2[1] : 0)}}</td>
+                    <td >{{number_format($sum2[2] ? $sum2[2] : 0)}}</td>
+                    <td >{{number_format($sum2[3] ? $sum2[3] : 0)}}</td>
+                    <td >{{number_format($sum2[4] ? $sum2[4] : 0)}}</td>
+                    <td >{{number_format($sum2[5] ? $sum2[5] : 0)}}</td>
+                    <td ></td>
+                  </tr>
+                  @endif
+                  @if(count($bonded3a) > 0 || count($bonded3b) > 0 || count($bonded3c) > 0)
+                  <tr>
+                    <td colspan="2">포워더비용</td>
+                    <td >{{number_format($sum3[0] ? $sum3[0] : 0)}}</td>
+                    <td >{{number_format($sum3[1] ? $sum3[1] : 0)}}</td>
+                    <td >{{number_format($sum3[2] ? $sum3[2] : 0)}}</td>
+                    <td >{{number_format($sum3[3] ? $sum3[3] : 0)}}</td>
+                    <td >{{number_format($sum3[4] ? $sum3[4] : 0)}}</td>
+                    <td >{{number_format($sum3[5] ? $sum3[5] : 0)}}</td>
+                    <td ></td>
+                  </tr>
+                  @endif
+                  @if(count($bonded4a) > 0 || count($bonded4b) > 0 || count($bonded4c) > 0)
+                  <tr>
+                    <td colspan="2">국내운송비</td>
+                    <td >{{number_format($sum4[0] ? $sum4[0] : 0)}}</td>
+                    <td >{{number_format($sum4[1] ? $sum4[1] : 0)}}</td>
+                    <td >{{number_format($sum4[2] ? $sum4[2] : 0)}}</td>
+                    <td >{{number_format($sum4[3] ? $sum4[3] : 0)}}</td>
+                    <td >{{number_format($sum4[4] ? $sum4[4] : 0)}}</td>
+                    <td >{{number_format($sum4[5] ? $sum4[5] : 0)}}</td>
+                    <td ></td>
+                  </tr>
+                  @endif
+                  @if(count($bonded5a) > 0 || count($bonded5b) > 0 || count($bonded5c) > 0)
+                  <tr>
+                    <td colspan="2">요건비용</td>
+                    <td >{{number_format($sum5[0] ? $sum5[0] : 0)}}</td>
+                    <td >{{number_format($sum5[1] ? $sum5[1] : 0)}}</td>
+                    <td >{{number_format($sum5[2] ? $sum5[2] : 0)}}</td>
+                    <td >{{number_format($sum5[3] ? $sum5[3] : 0)}}</td>
+                    <td >{{number_format($sum5[4] ? $sum5[4] : 0)}}</td>
+                    <td >{{number_format($sum5[5] ? $sum5[5] : 0)}}</td>
+                    <td ></td>
+                  </tr>
+                  @endif
+                  <tr>
+                    <td colspan="2">합계</td>
+                    <td >{{number_format(($total_1 ? $total_1 : 0) + (isset($sum5[0]) ? $sum5[0] : 0) + (isset($sum4[0]) ? $sum4[0] : 0) + (isset($sum3[0]) ? $sum3[0] : 0) + (isset($sum2[0]) ? $sum2[0] : 0))}}</td>
+                    <td >{{number_format(($total_2 ? $total_2 : 0) +(isset($sum5[1]) ? $sum5[1] : 0) + (isset($sum4[1]) ? $sum4[1] : 0) + (isset($sum3[1]) ? $sum3[1] : 0) + (isset($sum2[1]) ? $sum2[1] : 0))}}</td>
+                    <td >{{number_format(($total_3 ? $total_3 : 0) +(isset($sum5[2]) ? $sum5[2] : 0) + (isset($sum4[2]) ? $sum4[2] : 0) + (isset($sum3[2]) ? $sum3[2] : 0) + (isset($sum2[2]) ? $sum2[2] : 0))}}</td>
+                    <td >{{number_format((isset($sum5[3]) ? $sum5[3] : 0) + (isset($sum4[3]) ? $sum4[3] : 0) + (isset($sum3[3]) ? $sum3[3] : 0) + (isset($sum2[3]) ? $sum2[3] : 0))}}</td>
+                    <td >{{number_format((isset($sum5[4]) ? $sum5[4] : 0) + (isset($sum4[4]) ? $sum4[4] : 0) + (isset($sum3[4]) ? $sum3[4] : 0) + (isset($sum2[4]) ? $sum2[4] : 0))}}</td>
+                    <td >{{number_format((isset($sum5[5]) ? $sum5[5] : 0) + (isset($sum4[5]) ? $sum4[5] : 0) + (isset($sum3[5]) ? $sum3[5] : 0) + (isset($sum2[5]) ? $sum2[5] : 0))}}</td>
+                    <td ></td>
+                  </tr>
+                  </tbody>
+                </table>
+        </div>
         @if($tab_child == '창고화물')
           @if(count($bonded1a) > 0)
-          <div style="border-bottom:1px solid #ddd">
+          <div class="page-break"></div>
+             <div>
             <table id="custom_table">
                 <thead>
                   <tr>
@@ -518,8 +655,8 @@
           </div>
           @endif
           @if(count($bonded2a) > 0)
-          <div class="page-break"></div>
-          <div style="border-bottom:1px solid #ddd">
+            <div class="page-break"></div>
+               <div>
             <table id="custom_table">
                 <thead>
                   <tr>
@@ -705,7 +842,7 @@
           @endif
           @if(count($bonded3a) > 0)
             <div class="page-break"></div>
-            <div style="border-bottom:1px solid #ddd">
+               <div>
               <table id="custom_table">
                   <thead>
                     <tr>
@@ -773,11 +910,11 @@
           @endif
           @if(count($bonded4a) > 0)
             <div class="page-break"></div>
-            <div style="border-bottom:1px solid #ddd">
+               <div>
               <table id="custom_table">
                   <thead>
                     <tr>
-                      <th colspan="9"> 포워더비용</th>
+                      <th colspan="9"> 국내운송비</th>
                     </tr>
                     <tr>
                         <th rowspan="2" colspan="2">항목</th>
@@ -827,12 +964,80 @@
                   @endfor
                       <tr>
                         <td colspan="2">합계</td>
-                        <td >{{number_format($sum3[0] ? $sum3[0] : 0)}}</td>
-                        <td >{{number_format($sum3[1] ? $sum3[1] : 0)}}</td>
-                        <td >{{number_format($sum3[2] ? $sum3[2] : 0)}}</td>
-                        <td >{{number_format($sum3[3] ? $sum3[3] : 0)}}</td>
-                        <td >{{number_format($sum3[4] ? $sum3[4] : 0)}}</td>
-                        <td >{{number_format($sum3[5] ? $sum3[5] : 0)}}</td>
+                        <td >{{number_format($sum4[0] ? $sum4[0] : 0)}}</td>
+                        <td >{{number_format($sum4[1] ? $sum4[1] : 0)}}</td>
+                        <td >{{number_format($sum4[2] ? $sum4[2] : 0)}}</td>
+                        <td >{{number_format($sum4[3] ? $sum4[3] : 0)}}</td>
+                        <td >{{number_format($sum4[4] ? $sum4[4] : 0)}}</td>
+                        <td >{{number_format($sum4[5] ? $sum4[5] : 0)}}</td>
+                        <td ></td>
+                      </tr>
+                  </tbody>
+              </table>
+            </div>
+          @endif
+          @if(count($bonded5a) > 0)
+            <div class="page-break"></div>
+               <div>
+              <table id="custom_table">
+                  <thead>
+                    <tr>
+                      <th colspan="9"> 요건비용</th>
+                    </tr>
+                    <tr>
+                        <th rowspan="2" colspan="2">항목</th>
+                        <th colspan="3">세금계산서 발행</th>
+                        <th colspan="3">세금계산서 미발행</th>
+                        <th rowspan="2">비고</th>
+                    </tr>
+                    <tr>
+                        <th>공급가</th>
+                        <th>부가세</th>
+                        <th>합계</th>
+                        <th>공급가</th>
+                        <th>부가세</th>
+                        <th>합계</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  @for ($i = 0; $i < count($arr5); $i++)
+                        @foreach($bonded5a as $key => $row)
+                              @if($row->rd_cate1 == $arr5[$i] &&  $row->rd_cate2 != 'bonded345')
+                              @if($row->rd_cate2 == '소계')
+                              <tr >
+                                  <td rowspan={{$count_arr5[$i]}}> {{$arr5[$i]}}  </td>
+                                  <td>{{$row->rd_cate2}}</td>
+                                  <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                                  <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                                  <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                                  <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                                  <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                                  <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                                  <td>{{$row->rd_data8}}</td>
+                              </tr>
+                              @else
+                              <tr>
+                                  <td>{{$row->rd_cate2}}</td>
+                                  <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                                  <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                                  <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                                  <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                                  <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                                  <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                                  <td>{{$row->rd_data8}}</td>
+                              </tr>
+                              @endif
+                              @endif
+                        @endforeach
+                  @endfor
+                      <tr>
+                        <td colspan="2">합계</td>
+                        <td >{{number_format($sum5[0] ? $sum5[0] : 0)}}</td>
+                        <td >{{number_format($sum5[1] ? $sum5[1] : 0)}}</td>
+                        <td >{{number_format($sum5[2] ? $sum5[2] : 0)}}</td>
+                        <td >{{number_format($sum5[3] ? $sum5[3] : 0)}}</td>
+                        <td >{{number_format($sum5[4] ? $sum5[4] : 0)}}</td>
+                        <td >{{number_format($sum5[5] ? $sum5[5] : 0)}}</td>
                         <td ></td>
                       </tr>
                   </tbody>
@@ -840,10 +1045,1038 @@
             </div>
           @endif
         @endif
+        @if($tab_child == '온도화물')
+              @if(count($bonded1b) > 0)
+                <div class="page-break"></div>
+                   <div>
+                  <table id="custom_table">
+                      <thead>
+                        <tr>
+                          <th colspan="9"> BLP센터비용</th>
+                        </tr>
+                        <tr>
+                            <th rowspan="2" colspan="2">항목</th>
+                            <th colspan="3">세금계산서 발행</th>
+                            <th colspan="3">세금계산서 미발행</th>
+                            <th rowspan="2">비고</th>
+                        </tr>
+                        <tr>
+                            <th>공급가</th>
+                            <th>부가세</th>
+                            <th>합계</th>
+                            <th>공급가</th>
+                            <th>부가세</th>
+                            <th>합계</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @foreach($bonded1b as $key => $row)
+                        @if($row->rd_cate1 == '하역비용' && $row->rd_cate1 != $row->rd_cate2)
+                        @if($row->rd_cate2 == '소계')
+                        <tr >
+                            <td rowspan={{$count1}}> 하역비용 </td>
+                            <td>{{$row->rd_cate2}}</td>
+                            <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                            <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                            <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>{{$row->rd_data8}}</td>
+                        </tr>
+                        @else
+                        <tr>
+                            <td>{{$row->rd_cate2}}</td>
+                            <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                            <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                            <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>{{$row->rd_data8}}</td>
+                        </tr>
+                        @endif
+                        @endif
+                        @if($row->rd_cate1 == '센터 작업료' && $row->rd_cate1 != $row->rd_cate2)
+                        @if($row->rd_cate2 == '소계')
+                        <tr >
+                            <td rowspan={{$count2}}> 센터 작업료 </td>
+                            <td>{{$row->rd_cate2}}</td>
+                            <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                            <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                            <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>{{$row->rd_data8}}</td>
+                        </tr>
+                        @else
+                        <tr>
+                            <td>{{$row->rd_cate2}}</td>
+                            @if($row->rd_cate2 == '할인율')
+                            <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}} %</td>
+                            @else
+                            <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                            @endif
+                            <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                            <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>{{$row->rd_data8}}</td>
+                        </tr>
+                        @endif
+                        @endif
+                        @if($row->rd_cate1 == '기타 비용' && $row->rd_cate1 != $row->rd_cate2)
+                        @if($row->rd_cate2 == '소계')
+                        <tr >
+                            <td rowspan={{$count3}}> 기타 비용 </td>
+                            <td>{{$row->rd_cate2}}</td>
+                            <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                            <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                            <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>{{$row->rd_data8}}</td>
+                        </tr>
+                        @else
+                        <tr>
+                            <td>{{$row->rd_cate2}}</td>
+                            <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                            <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                            <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>{{$row->rd_data8}}</td>
+                        </tr>
+                        @endif
+                        @endif
+                        @endforeach
+                        <tr>
+                          <td colspan="2">합계</td>
+                          <td >{{number_format($total_1)}}</td>
+                          <td >{{number_format($total_2)}}</td>
+                          <td >{{number_format($total_3)}}</td>
+                          <td >0</td>
+                          <td >0</td>
+                          <td >0</td>
+                          <td ></td>
+                        </tr>
+                      </tbody>
+                  </table>
+                </div>
+              @endif
+              @if(count($bonded2b) > 0)
+                <div class="page-break"></div>
+                   <div>
+                <table id="custom_table">
+                    <thead>
+                      <tr>
+                        <th colspan="9"> 관세사비용</th>
+                      </tr>
+                      <tr>
+                          <th rowspan="2" colspan="2">항목</th>
+                          <th colspan="3">세금계산서 발행</th>
+                          <th colspan="3">세금계산서 미발행</th>
+                          <th rowspan="2">비고</th>
+                      </tr>
+                      <tr>
+                          <th>공급가</th>
+                          <th>부가세</th>
+                          <th>합계</th>
+                          <th>공급가</th>
+                          <th>부가세</th>
+                          <th>합계</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($bonded2b as $key => $row)
+                      @if($row->rd_cate1 == '세금' && $row->rd_cate1 != $row->rd_cate2)
+                      @if($row->rd_cate2 == '소계')
+                      <tr >
+                          <td rowspan={{$count1_2}}> 세금 </td>
+                          <td>{{$row->rd_cate2}}</td>
+                          <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                          <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                          <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                          <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                          <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                          <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                          <td>{{$row->rd_data8}}</td>
+                      </tr>
+                      @else
+                      <tr>
+                          <td>{{$row->rd_cate2}}</td>
+                          <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                          <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                          <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                          <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                          <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                          <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                          <td>{{$row->rd_data8}}</td>
+                      </tr>
+                      @endif
+                      @endif
+
+
+                      @if($row->rd_cate1 == '운임' && $row->rd_cate1 != $row->rd_cate2)
+                      @if($row->rd_cate2 == '소계')
+                      <tr >
+                          <td rowspan={{$count2_2}}> 운임 </td>
+                          <td>{{$row->rd_cate2}}</td>
+                          <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                          <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                          <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                          <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                          <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                          <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                          <td>{{$row->rd_data8}}</td>
+                      </tr>
+                      @else
+                      <tr>
+                          <td>{{$row->rd_cate2}}</td>
+                          <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                          <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                          <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                          <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                          <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                          <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                          <td>{{$row->rd_data8}}</td>
+                      </tr>
+                      @endif
+                      @endif
+
+
+
+
+                      @if($row->rd_cate1 == '창고료' && $row->rd_cate1 != $row->rd_cate2)
+                      @if($row->rd_cate2 == '소계')
+                      <tr >
+                          <td rowspan={{$count3_2}}> 창고료 </td>
+                          <td>{{$row->rd_cate2}}</td>
+                          <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                          <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                          <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                          <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                          <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                          <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                          <td>{{$row->rd_data8}}</td>
+                      </tr>
+                      @else
+                      <tr>
+                          <td>{{$row->rd_cate2}}</td>
+                          <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                          <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                          <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                          <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                          <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                          <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                          <td>{{$row->rd_data8}}</td>
+                      </tr>
+                      @endif
+                      @endif
+
+
+
+                      @if($row->rd_cate1 == '수수료' && $row->rd_cate1 != $row->rd_cate2)
+                      @if($row->rd_cate2 == '소계')
+                      <tr >
+                          <td rowspan={{$count4_2}}> 수수료 </td>
+                          <td>{{$row->rd_cate2}}</td>
+                          <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                          <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                          <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                          <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                          <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                          <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>1
+                          <td>{{$row->rd_data8}}</td>
+                      </tr>
+                      @else
+                      <tr>
+                          <td>{{$row->rd_cate2}}</td>
+                          <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                          <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                          <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                          <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                          <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                          <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                          <td>{{$row->rd_data8}}</td>
+                      </tr>
+                      @endif
+                      @endif
+
+
+                      @endforeach
+
+                      @for ($i = 0; $i < count($arr2); $i++)
+                          @foreach($bonded2b as $key => $row)
+                                @if($row->rd_cate1 == $arr2[$i] &&  $row->rd_cate2 != 'bonded2')
+                                @if($row->rd_cate2 == '소계')
+                                <tr >
+                                    <td rowspan={{$count_arr2[$i]}}> {{$arr2[$i]}}  </td>
+                                    <td>{{$row->rd_cate2}}</td>
+                                    <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                                    <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                                    <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                                    <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                                    <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                                    <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                                    <td>{{$row->rd_data8}}</td>
+                                </tr>
+                                @else
+                                <tr>
+                                    <td>{{$row->rd_cate2}}</td>
+                                    <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                                    <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                                    <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                                    <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                                    <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                                    <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                                    <td>{{$row->rd_data8}}</td>
+                                </tr>
+                                @endif
+                                @endif
+                          @endforeach
+                      @endfor
+                      <tr>
+                        <td colspan="2">합계</td>
+                        <td >{{number_format($sum2[0] ? $sum2[0] : 0)}}</td>
+                        <td >{{number_format($sum2[1] ? $sum2[1] : 0)}}</td>
+                        <td >{{number_format($sum2[2] ? $sum2[2] : 0)}}</td>
+                        <td >{{number_format($sum2[3] ? $sum2[3] : 0)}}</td>
+                        <td >{{number_format($sum2[4] ? $sum2[4] : 0)}}</td>
+                        <td >{{number_format($sum2[5] ? $sum2[5] : 0)}}</td>
+                        <td ></td>
+                      </tr>
+                    </tbody>
+                    </table>
+                </div>
+              @endif
+              @if(count($bonded3b) > 0)
+                <div class="page-break"></div>
+                   <div>
+                  <table id="custom_table">
+                      <thead>
+                        <tr>
+                          <th colspan="9"> 포워더비용</th>
+                        </tr>
+                        <tr>
+                            <th rowspan="2" colspan="2">항목</th>
+                            <th colspan="3">세금계산서 발행</th>
+                            <th colspan="3">세금계산서 미발행</th>
+                            <th rowspan="2">비고</th>
+                        </tr>
+                        <tr>
+                            <th>공급가</th>
+                            <th>부가세</th>
+                            <th>합계</th>
+                            <th>공급가</th>
+                            <th>부가세</th>
+                            <th>합계</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      @for ($i = 0; $i < count($arr3); $i++)
+                            @foreach($bonded3b as $key => $row)
+                                  @if($row->rd_cate1 == $arr3[$i] &&  $row->rd_cate2 != 'bonded345')
+                                  @if($row->rd_cate2 == '소계')
+                                  <tr >
+                                      <td rowspan={{$count_arr3[$i]}}> {{$arr3[$i]}}  </td>
+                                      <td>{{$row->rd_cate2}}</td>
+                                      <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                                      <td>{{$row->rd_data8}}</td>
+                                  </tr>
+                                  @else
+                                  <tr>
+                                      <td>{{$row->rd_cate2}}</td>
+                                      <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                                      <td>{{$row->rd_data8}}</td>
+                                  </tr>
+                                  @endif
+                                  @endif
+                            @endforeach
+                      @endfor
+                          <tr>
+                            <td colspan="2">합계</td>
+                            <td >{{number_format($sum3[0] ? $sum3[0] : 0)}}</td>
+                            <td >{{number_format($sum3[1] ? $sum3[1] : 0)}}</td>
+                            <td >{{number_format($sum3[2] ? $sum3[2] : 0)}}</td>
+                            <td >{{number_format($sum3[3] ? $sum3[3] : 0)}}</td>
+                            <td >{{number_format($sum3[4] ? $sum3[4] : 0)}}</td>
+                            <td >{{number_format($sum3[5] ? $sum3[5] : 0)}}</td>
+                            <td ></td>
+                          </tr>
+                      </tbody>
+                  </table>
+                </div>
+              @endif
+              @if(count($bonded4b) > 0)
+                <div class="page-break"></div>
+                   <div>
+                  <table id="custom_table">
+                      <thead>
+                        <tr>
+                          <th colspan="9"> 국내운송비</th>
+                        </tr>
+                        <tr>
+                            <th rowspan="2" colspan="2">항목</th>
+                            <th colspan="3">세금계산서 발행</th>
+                            <th colspan="3">세금계산서 미발행</th>
+                            <th rowspan="2">비고</th>
+                        </tr>
+                        <tr>
+                            <th>공급가</th>
+                            <th>부가세</th>
+                            <th>합계</th>
+                            <th>공급가</th>
+                            <th>부가세</th>
+                            <th>합계</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      @for ($i = 0; $i < count($arr4); $i++)
+                            @foreach($bonded4b as $key => $row)
+                                  @if($row->rd_cate1 == $arr4[$i] &&  $row->rd_cate2 != 'bonded345')
+                                  @if($row->rd_cate2 == '소계')
+                                  <tr >
+                                      <td rowspan={{$count_arr4[$i]}}> {{$arr4[$i]}}  </td>
+                                      <td>{{$row->rd_cate2}}</td>
+                                      <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                                      <td>{{$row->rd_data8}}</td>
+                                  </tr>
+                                  @else
+                                  <tr>
+                                      <td>{{$row->rd_cate2}}</td>
+                                      <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                                      <td>{{$row->rd_data8}}</td>
+                                  </tr>
+                                  @endif
+                                  @endif
+                            @endforeach
+                      @endfor
+                          <tr>
+                            <td colspan="2">합계</td>
+                            <td >{{number_format($sum4[0] ? $sum4[0] : 0)}}</td>
+                            <td >{{number_format($sum4[1] ? $sum4[1] : 0)}}</td>
+                            <td >{{number_format($sum4[2] ? $sum4[2] : 0)}}</td>
+                            <td >{{number_format($sum4[3] ? $sum4[3] : 0)}}</td>
+                            <td >{{number_format($sum4[4] ? $sum4[4] : 0)}}</td>
+                            <td >{{number_format($sum4[5] ? $sum4[5] : 0)}}</td>
+                            <td ></td>
+                          </tr>
+                      </tbody>
+                  </table>
+                </div>
+              @endif
+              @if(count($bonded5b) > 0)
+                <div class="page-break"></div>
+                   <div>
+                  <table id="custom_table">
+                      <thead>
+                        <tr>
+                          <th colspan="9"> 요건비용</th>
+                        </tr>
+                        <tr>
+                            <th rowspan="2" colspan="2">항목</th>
+                            <th colspan="3">세금계산서 발행</th>
+                            <th colspan="3">세금계산서 미발행</th>
+                            <th rowspan="2">비고</th>
+                        </tr>
+                        <tr>
+                            <th>공급가</th>
+                            <th>부가세</th>
+                            <th>합계</th>
+                            <th>공급가</th>
+                            <th>부가세</th>
+                            <th>합계</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      @for ($i = 0; $i < count($arr5); $i++)
+                            @foreach($bonded5b as $key => $row)
+                                  @if($row->rd_cate1 == $arr5[$i] &&  $row->rd_cate2 != 'bonded345')
+                                  @if($row->rd_cate2 == '소계')
+                                  <tr >
+                                      <td rowspan={{$count_arr5[$i]}}> {{$arr5[$i]}}  </td>
+                                      <td>{{$row->rd_cate2}}</td>
+                                      <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                                      <td>{{$row->rd_data8}}</td>
+                                  </tr>
+                                  @else
+                                  <tr>
+                                      <td>{{$row->rd_cate2}}</td>
+                                      <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                                      <td>{{$row->rd_data8}}</td>
+                                  </tr>
+                                  @endif
+                                  @endif
+                            @endforeach
+                      @endfor
+                          <tr>
+                            <td colspan="2">합계</td>
+                            <td >{{number_format($sum5[0] ? $sum5[0] : 0)}}</td>
+                            <td >{{number_format($sum5[1] ? $sum5[1] : 0)}}</td>
+                            <td >{{number_format($sum5[2] ? $sum5[2] : 0)}}</td>
+                            <td >{{number_format($sum5[3] ? $sum5[3] : 0)}}</td>
+                            <td >{{number_format($sum5[4] ? $sum5[4] : 0)}}</td>
+                            <td >{{number_format($sum5[5] ? $sum5[5] : 0)}}</td>
+                            <td ></td>
+                          </tr>
+                      </tbody>
+                  </table>
+                </div>
+              @endif
+        @endif
+        @if($tab_child == '위험물')
+          @if(count($bonded1c) > 0)
+                <div class="page-break"></div>
+                   <div>
+                  <table id="custom_table">
+                      <thead>
+                        <tr>
+                          <th colspan="9"> BLP센터비용</th>
+                        </tr>
+                        <tr>
+                            <th rowspan="2" colspan="2">항목</th>
+                            <th colspan="3">세금계산서 발행</th>
+                            <th colspan="3">세금계산서 미발행</th>
+                            <th rowspan="2">비고</th>
+                        </tr>
+                        <tr>
+                            <th>공급가</th>
+                            <th>부가세</th>
+                            <th>합계</th>
+                            <th>공급가</th>
+                            <th>부가세</th>
+                            <th>합계</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @foreach($bonded1c as $key => $row)
+                        @if($row->rd_cate1 == '하역비용' && $row->rd_cate1 != $row->rd_cate2)
+                        @if($row->rd_cate2 == '소계')
+                        <tr >
+                            <td rowspan={{$count1}}> 하역비용 </td>
+                            <td>{{$row->rd_cate2}}</td>
+                            <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                            <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                            <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>{{$row->rd_data8}}</td>
+                        </tr>
+                        @else
+                        <tr>
+                            <td>{{$row->rd_cate2}}</td>
+                            <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                            <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                            <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>{{$row->rd_data8}}</td>
+                        </tr>
+                        @endif
+                        @endif
+                        @if($row->rd_cate1 == '센터 작업료' && $row->rd_cate1 != $row->rd_cate2)
+                        @if($row->rd_cate2 == '소계')
+                        <tr >
+                            <td rowspan={{$count2}}> 센터 작업료 </td>
+                            <td>{{$row->rd_cate2}}</td>
+                            <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                            <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                            <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>{{$row->rd_data8}}</td>
+                        </tr>
+                        @else
+                        <tr>
+                            <td>{{$row->rd_cate2}}</td>
+                            @if($row->rd_cate2 == '할인율')
+                            <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}} %</td>
+                            @else
+                            <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                            @endif
+                            <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                            <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>{{$row->rd_data8}}</td>
+                        </tr>
+                        @endif
+                        @endif
+                        @if($row->rd_cate1 == '기타 비용' && $row->rd_cate1 != $row->rd_cate2)
+                        @if($row->rd_cate2 == '소계')
+                        <tr >
+                            <td rowspan={{$count3}}> 기타 비용 </td>
+                            <td>{{$row->rd_cate2}}</td>
+                            <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                            <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                            <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>{{$row->rd_data8}}</td>
+                        </tr>
+                        @else
+                        <tr>
+                            <td>{{$row->rd_cate2}}</td>
+                            <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                            <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                            <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>{{$row->rd_data8}}</td>
+                        </tr>
+                        @endif
+                        @endif
+                        @endforeach
+                        <tr>
+                          <td colspan="2">합계</td>
+                          <td >{{number_format($total_1)}}</td>
+                          <td >{{number_format($total_2)}}</td>
+                          <td >{{number_format($total_3)}}</td>
+                          <td >0</td>
+                          <td >0</td>
+                          <td >0</td>
+                          <td ></td>
+                        </tr>
+                      </tbody>
+                  </table>
+                </div>
+              @endif
+              @if(count($bonded2c) > 0)
+                <div class="page-break"></div>
+                   <div>
+                <table id="custom_table">
+                    <thead>
+                      <tr>
+                        <th colspan="9"> 관세사비용</th>
+                      </tr>
+                      <tr>
+                          <th rowspan="2" colspan="2">항목</th>
+                          <th colspan="3">세금계산서 발행</th>
+                          <th colspan="3">세금계산서 미발행</th>
+                          <th rowspan="2">비고</th>
+                      </tr>
+                      <tr>
+                          <th>공급가</th>
+                          <th>부가세</th>
+                          <th>합계</th>
+                          <th>공급가</th>
+                          <th>부가세</th>
+                          <th>합계</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($bonded2c as $key => $row)
+                      @if($row->rd_cate1 == '세금' && $row->rd_cate1 != $row->rd_cate2)
+                      @if($row->rd_cate2 == '소계')
+                      <tr >
+                          <td rowspan={{$count1_2}}> 세금 </td>
+                          <td>{{$row->rd_cate2}}</td>
+                          <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                          <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                          <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                          <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                          <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                          <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                          <td>{{$row->rd_data8}}</td>
+                      </tr>
+                      @else
+                      <tr>
+                          <td>{{$row->rd_cate2}}</td>
+                          <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                          <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                          <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                          <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                          <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                          <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                          <td>{{$row->rd_data8}}</td>
+                      </tr>
+                      @endif
+                      @endif
+
+
+                      @if($row->rd_cate1 == '운임' && $row->rd_cate1 != $row->rd_cate2)
+                      @if($row->rd_cate2 == '소계')
+                      <tr >
+                          <td rowspan={{$count2_2}}> 운임 </td>
+                          <td>{{$row->rd_cate2}}</td>
+                          <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                          <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                          <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                          <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                          <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                          <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                          <td>{{$row->rd_data8}}</td>
+                      </tr>
+                      @else
+                      <tr>
+                          <td>{{$row->rd_cate2}}</td>
+                          <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                          <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                          <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                          <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                          <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                          <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                          <td>{{$row->rd_data8}}</td>
+                      </tr>
+                      @endif
+                      @endif
+
+
+
+
+                      @if($row->rd_cate1 == '창고료' && $row->rd_cate1 != $row->rd_cate2)
+                      @if($row->rd_cate2 == '소계')
+                      <tr >
+                          <td rowspan={{$count3_2}}> 창고료 </td>
+                          <td>{{$row->rd_cate2}}</td>
+                          <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                          <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                          <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                          <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                          <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                          <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                          <td>{{$row->rd_data8}}</td>
+                      </tr>
+                      @else
+                      <tr>
+                          <td>{{$row->rd_cate2}}</td>
+                          <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                          <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                          <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                          <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                          <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                          <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                          <td>{{$row->rd_data8}}</td>
+                      </tr>
+                      @endif
+                      @endif
+
+
+
+                      @if($row->rd_cate1 == '수수료' && $row->rd_cate1 != $row->rd_cate2)
+                      @if($row->rd_cate2 == '소계')
+                      <tr >
+                          <td rowspan={{$count4_2}}> 수수료 </td>
+                          <td>{{$row->rd_cate2}}</td>
+                          <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                          <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                          <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                          <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                          <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                          <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>1
+                          <td>{{$row->rd_data8}}</td>
+                      </tr>
+                      @else
+                      <tr>
+                          <td>{{$row->rd_cate2}}</td>
+                          <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                          <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                          <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                          <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                          <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                          <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                          <td>{{$row->rd_data8}}</td>
+                      </tr>
+                      @endif
+                      @endif
+
+
+                      @endforeach
+
+                      @for ($i = 0; $i < count($arr2); $i++)
+                          @foreach($bonded2c as $key => $row)
+                                @if($row->rd_cate1 == $arr2[$i] &&  $row->rd_cate2 != 'bonded2')
+                                @if($row->rd_cate2 == '소계')
+                                <tr >
+                                    <td rowspan={{$count_arr2[$i]}}> {{$arr2[$i]}}  </td>
+                                    <td>{{$row->rd_cate2}}</td>
+                                    <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                                    <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                                    <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                                    <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                                    <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                                    <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                                    <td>{{$row->rd_data8}}</td>
+                                </tr>
+                                @else
+                                <tr>
+                                    <td>{{$row->rd_cate2}}</td>
+                                    <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                                    <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                                    <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                                    <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                                    <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                                    <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                                    <td>{{$row->rd_data8}}</td>
+                                </tr>
+                                @endif
+                                @endif
+                          @endforeach
+                      @endfor
+                      <tr style='border-bottom: 0px'>
+                        <td colspan="2">합계</td>
+                        <td >{{number_format($sum2[0] ? $sum2[0] : 0)}}</td>
+                        <td >{{number_format($sum2[1] ? $sum2[1] : 0)}}</td>
+                        <td >{{number_format($sum2[2] ? $sum2[2] : 0)}}</td>
+                        <td >{{number_format($sum2[3] ? $sum2[3] : 0)}}</td>
+                        <td >{{number_format($sum2[4] ? $sum2[4] : 0)}}</td>
+                        <td >{{number_format($sum2[5] ? $sum2[5] : 0)}}</td>
+                        <td ></td>
+                      </tr>
+                    </tbody>
+                    </table>
+                </div>
+              @endif
+              @if(count($bonded3c) > 0)
+                <div class="page-break"></div>
+                   <div>
+                  <table id="custom_table">
+                      <thead>
+                        <tr>
+                          <th colspan="9"> 포워더비용</th>
+                        </tr>
+                        <tr>
+                            <th rowspan="2" colspan="2">항목</th>
+                            <th colspan="3">세금계산서 발행</th>
+                            <th colspan="3">세금계산서 미발행</th>
+                            <th rowspan="2">비고</th>
+                        </tr>
+                        <tr>
+                            <th>공급가</th>
+                            <th>부가세</th>
+                            <th>합계</th>
+                            <th>공급가</th>
+                            <th>부가세</th>
+                            <th>합계</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      @for ($i = 0; $i < count($arr3); $i++)
+                            @foreach($bonded3c as $key => $row)
+                                  @if($row->rd_cate1 == $arr3[$i] &&  $row->rd_cate2 != 'bonded345')
+                                  @if($row->rd_cate2 == '소계')
+                                  <tr >
+                                      <td rowspan={{$count_arr3[$i]}}> {{$arr3[$i]}}  </td>
+                                      <td>{{$row->rd_cate2}}</td>
+                                      <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                                      <td>{{$row->rd_data8}}</td>
+                                  </tr>
+                                  @else
+                                  <tr>
+                                      <td>{{$row->rd_cate2}}</td>
+                                      <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                                      <td>{{$row->rd_data8}}</td>
+                                  </tr>
+                                  @endif
+                                  @endif
+                            @endforeach
+                      @endfor
+                      <tr style='border-bottom: 0px'>
+                            <td colspan="2">합계</td>
+                            <td >{{number_format($sum3[0] ? $sum3[0] : 0)}}</td>
+                            <td >{{number_format($sum3[1] ? $sum3[1] : 0)}}</td>
+                            <td >{{number_format($sum3[2] ? $sum3[2] : 0)}}</td>
+                            <td >{{number_format($sum3[3] ? $sum3[3] : 0)}}</td>
+                            <td >{{number_format($sum3[4] ? $sum3[4] : 0)}}</td>
+                            <td >{{number_format($sum3[5] ? $sum3[5] : 0)}}</td>
+                            <td ></td>
+                          </tr>
+                      </tbody>
+                  </table>
+                </div>
+              @endif
+              @if(count($bonded4c) > 0)
+                <div class="page-break"></div>
+                   <div>
+                  <table id="custom_table">
+                      <thead>
+                        <tr>
+                          <th colspan="9"> 국내운송비</th>
+                        </tr>
+                        <tr>
+                            <th rowspan="2" colspan="2">항목</th>
+                            <th colspan="3">세금계산서 발행</th>
+                            <th colspan="3">세금계산서 미발행</th>
+                            <th rowspan="2">비고</th>
+                        </tr>
+                        <tr>
+                            <th>공급가</th>
+                            <th>부가세</th>
+                            <th>합계</th>
+                            <th>공급가</th>
+                            <th>부가세</th>
+                            <th>합계</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      @for ($i = 0; $i < count($arr4); $i++)
+                            @foreach($bonded4c as $key => $row)
+                                  @if($row->rd_cate1 == $arr4[$i] &&  $row->rd_cate2 != 'bonded345')
+                                  @if($row->rd_cate2 == '소계')
+                                  <tr >
+                                      <td rowspan={{$count_arr4[$i]}}> {{$arr4[$i]}}  </td>
+                                      <td>{{$row->rd_cate2}}</td>
+                                      <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                                      <td>{{$row->rd_data8}}</td>
+                                  </tr>
+                                  @else
+                                  <tr>
+                                      <td>{{$row->rd_cate2}}</td>
+                                      <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                                      <td>{{$row->rd_data8}}</td>
+                                  </tr>
+                                  @endif
+                                  @endif
+                            @endforeach
+                      @endfor
+                      <tr style='border-bottom: 0px'>
+                            <td colspan="2">합계</td>
+                            <td >{{number_format($sum4[0] ? $sum4[0] : 0)}}</td>
+                            <td >{{number_format($sum4[1] ? $sum4[1] : 0)}}</td>
+                            <td >{{number_format($sum4[2] ? $sum4[2] : 0)}}</td>
+                            <td >{{number_format($sum4[3] ? $sum4[3] : 0)}}</td>
+                            <td >{{number_format($sum4[4] ? $sum4[4] : 0)}}</td>
+                            <td >{{number_format($sum4[5] ? $sum4[5] : 0)}}</td>
+                            <td ></td>
+                          </tr>
+                      </tbody>
+                  </table>
+                </div>
+              @endif
+              @if(count($bonded5c) > 0)
+                <div class="page-break"></div>
+                   <div>
+                  <table id="custom_table">
+                      <thead>
+                        <tr>
+                          <th colspan="9"> 요건비용</th>
+                        </tr>
+                        <tr>
+                            <th rowspan="2" colspan="2">항목</th>
+                            <th colspan="3">세금계산서 발행</th>
+                            <th colspan="3">세금계산서 미발행</th>
+                            <th rowspan="2">비고</th>
+                        </tr>
+                        <tr>
+                            <th>공급가</th>
+                            <th>부가세</th>
+                            <th>합계</th>
+                            <th>공급가</th>
+                            <th>부가세</th>
+                            <th>합계</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      @for ($i = 0; $i < count($arr5); $i++)
+                            @foreach($bonded5c as $key => $row)
+                                  @if($row->rd_cate1 == $arr5[$i] &&  $row->rd_cate2 != 'bonded345')
+                                  @if($row->rd_cate2 == '소계')
+                                  <tr >
+                                      <td rowspan={{$count_arr5[$i]}}> {{$arr5[$i]}}  </td>
+                                      <td>{{$row->rd_cate2}}</td>
+                                      <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                                      <td>{{$row->rd_data8}}</td>
+                                  </tr>
+                                  @else
+                                  <tr>
+                                      <td>{{$row->rd_cate2}}</td>
+                                      <td>{{number_format($row->rd_data1 ? $row->rd_data1 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data2 ? $row->rd_data2 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data4 ? $row->rd_data4 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data5 ? $row->rd_data5 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data6 ? $row->rd_data6 : 0)}}</td>
+                                      <td>{{number_format($row->rd_data7 ? $row->rd_data7 : 0)}}</td>
+                                      <td>{{$row->rd_data8}}</td>
+                                  </tr>
+                                  @endif
+                                  @endif
+                            @endforeach
+                      @endfor
+                          <tr style='border-bottom: 0px'>
+                            <td colspan="2">합계</td>
+                            <td >{{number_format($sum5[0] ? $sum5[0] : 0)}}</td>
+                            <td >{{number_format($sum5[1] ? $sum5[1] : 0)}}</td>
+                            <td >{{number_format($sum5[2] ? $sum5[2] : 0)}}</td>
+                            <td >{{number_format($sum5[3] ? $sum5[3] : 0)}}</td>
+                            <td >{{number_format($sum5[4] ? $sum5[4] : 0)}}</td>
+                            <td >{{number_format($sum5[5] ? $sum5[5] : 0)}}</td>
+                            <td ></td>
+                          </tr>
+                      </tbody>
+                  </table>
+                </div>
+              @endif
+        @endif
       @endif
 
       @if($service == '수입풀필먼트')
-              <div style="border-bottom:1px solid #ddd">
+      <div style="border-bottom:1px solid #ddd">
                 <table id="custom_table">
                     <thead>
                       <tr>
