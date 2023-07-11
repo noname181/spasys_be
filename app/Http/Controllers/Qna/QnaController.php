@@ -465,7 +465,7 @@ class QnaController extends Controller
                 ->orderBy('qna_no', 'DESC');
             }else if($member_type->mb_type == 'shop'){
                 $qna = Qna::with(['member','company','member_question'])->where('qna_status','!=','삭제')->where(function ($query) use ($member_type) {
-                    $query->where('co_no_target', '=', Auth::user()->co_no)->orWhere('mb_no_question',$member_type->mb_no)->orWhere('co_no_target', '=', $member_type->company->co_parent->co_no)
+                    $query->where('co_no_target', '=', Auth::user()->co_no)->orWhere('mb_no_question',$member_type->mb_no)//->orWhere('co_no_target', '=', $member_type->company->co_parent->co_no) this shop can see other shop with the same spasys
                         ->orWhereHas('member',function ($query) use ($member_type){
                             $query->where('co_no','=',$member_type->co_no);
                             

@@ -257,12 +257,20 @@ class CompanyController extends Controller
                 ])->where('company.co_no', $co_no)
                     // ->where('co_address.co_no', $co_no)
                     ->first();
+
+                
                 if ($company) {
-                    $company->c_integrated_calculate_yn = null;
+                    $companyc_integrated_calculate_yn = null;
                     $company->c_calculate_deadline_yn = null;
                 }
             }
 
+            if($company->co_parent_no){
+                $contract = Contract::where('co_no',  $company->co_parent_no)->first();
+                $company->co_parent = Company::where('co_no', $company->co_parent_no)->first();
+                $company->co_parent->c_integrated_calculate_yn = isset($contract->c_integrated_calculate_yn) ? $contract->c_integrated_calculate_yn : null;
+                $company->co_parent->c_calculate_deadline_yn = isset($contract->c_integrated_calculate_yn) ? $contract->c_calculate_deadline_yn : null;
+            }
 
             $adjustment_groups = AdjustmentGroup::select(['ag_no', 'co_no', 'ag_name', 'ag_manager', 'ag_hp', 'ag_email', 'ag_email2', 'ag_auto_issue'])->where('co_no', $co_no)->get();
             $co_address = CoAddress::select(['ca_is_default', 'ca_no', 'co_no', 'ca_name', 'ca_manager', 'ca_hp', 'ca_address', 'ca_address_detail'])->where('co_no', $co_no)->get();
