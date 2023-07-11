@@ -7163,7 +7163,6 @@ class WarehousingController extends Controller
                     ->where('created_at', '>=' , Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->from_date))->format('Y-m-d') . ' 00:00:00')
                     ->where('created_at', '<=' , Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->from_date)->addDays(1))->format('Y-m-d') . ' 00:00:00')
                     ->orderBy('created_at')->sum('stock');
-                    return $start_stock_;
                     $start_stock += isset($start_stock_) ? $start_stock_ : 0;
 
 
