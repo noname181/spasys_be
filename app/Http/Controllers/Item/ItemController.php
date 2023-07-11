@@ -3599,7 +3599,7 @@ class ItemController extends Controller
                 }
             }
            
-            for ($bad = 0; $bad <= 0; $bad++) {
+            for ($bad = 0; $bad <= 1; $bad++) {
                 $url_api .= '&bad=' . $bad;
                 $url_api .= '&product_id=';
 

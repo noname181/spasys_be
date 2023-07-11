@@ -15,10 +15,12 @@ use App\Utils\sendEmail2;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use App\Models\File;
+// use App\Models\File;
 use App\Models\RateData;
 use App\Models\RateMetaData;
+use App\Models\RateDataGeneral;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\File;
 
 
 class SendEmailController extends Controller
@@ -173,43 +175,43 @@ class SendEmailController extends Controller
         if (!is_dir($path)) {
             File::makeDirectory($path, $mode = 0777, true, true);
         }
-        $mask = $path . 'Excel-Quotation-Send-Details-*.*';
+        $mask = $path . 'PDF-Quotation-Send-Details-*.*';
         array_map('unlink', glob($mask) ?: []);
-        $file_name_download = $path . 'Excel-Quotation-Send-Details-' . date('YmdHis') . '.pdf';
+        $file_name_download = $path . 'PDF-Quotation-Send-Details-' . date('YmdHis') . '.pdf';
         // $check_status = $Excel_writer->save($file_name_download);
         $pdf = Pdf::loadView('pdf.test',['rate_data_send_meta'=>$rate_data_send_meta]);
         $pdf->save($file_name_download);
       
         try {
-            // $push = SendEmailHistory::insertGetId([
-            //     'mb_no' => Auth::user()->mb_no,
-            //     'rm_no' => isset($validated['rm_no']) ? $validated['rm_no'] : null,
-            //     'rmd_no' => isset($validated['rmd_no']) ? $validated['rmd_no'] : null,
-            //     'se_email_cc' => $validated['se_email_cc'],
-            //     'se_email_receiver' => $validated['se_email_receiver'],
-            //     'se_name_receiver' => $validated['se_name_receiver'],
-            //     'se_title' => $validated['se_title'],
-            //     'se_content' => $validated['se_content'],
-            //     'se_rmd_number'=>isset($validated['rmd_number']) ? $validated['rmd_number'] : null,
-            //     'created_at'=>Carbon::now()->format('Y-m-d H:i:s'),
-            //     'updated_at'=>Carbon::now()->format('Y-m-d H:i:s')
-            // ]);
-            // $mail_details = [ 
-            //     'title' => $validated['se_title'],
-            //     'body' => nl2br($validated['se_content']),
-            // ];
-            // $path2 = '/var/www/html/'.$file_name_download;
-            // Mail::send('emails.quotation',['details'=>$mail_details], function($message)use($validated,$path2) {
-            //     $message->to($validated['se_email_receiver'])->from('Bonded_Logistics_Platform@spasysone.com');
-            //     if($validated['se_email_cc']){
-            //         $message->cc([$validated['se_email_cc']]);
-            //     }
-            //     $message->subject($validated['se_title']);
+            $push = SendEmailHistory::insertGetId([
+                'mb_no' => Auth::user()->mb_no,
+                'rm_no' => isset($validated['rm_no']) ? $validated['rm_no'] : null,
+                'rmd_no' => isset($validated['rmd_no']) ? $validated['rmd_no'] : null,
+                'se_email_cc' => $validated['se_email_cc'],
+                'se_email_receiver' => $validated['se_email_receiver'],
+                'se_name_receiver' => $validated['se_name_receiver'],
+                'se_title' => $validated['se_title'],
+                'se_content' => $validated['se_content'],
+                'se_rmd_number'=>isset($validated['rmd_number']) ? $validated['rmd_number'] : null,
+                'created_at'=>Carbon::now()->format('Y-m-d H:i:s'),
+                'updated_at'=>Carbon::now()->format('Y-m-d H:i:s')
+            ]);
+            $mail_details = [ 
+                'title' => $validated['se_title'],
+                'body' => nl2br($validated['se_content']),
+            ];
+            $path2 = '/var/www/html/'.$file_name_download;
+            Mail::send('emails.quotation',['details'=>$mail_details], function($message)use($validated,$path2) {
+                $message->to($validated['se_email_receiver'])->from('Bonded_Logistics_Platform@spasysone.com');
+                if($validated['se_email_cc']){
+                    $message->cc([$validated['se_email_cc']]);
+                }
+                $message->subject($validated['se_title']);
      
                
-            //     $message->attach($path2);
+                $message->attach($path2);
                          
-            // });
+            });
 
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -271,42 +273,404 @@ class SendEmailController extends Controller
     public function SendEmailPrecalculate(SendEmailRegisterRequest $request)
     {
         $validated = $request->validated();
-       
-      
-        try {
-            $push = SendEmailHistory::insertGetId([
-                'mb_no' => Auth::user()->mb_no,
-                'rm_no' => isset($validated['rm_no']) ? $validated['rm_no'] : null,
-                'rmd_no' => isset($validated['rmd_no']) ? $validated['rmd_no'] : null,
-                'se_email_cc' => $validated['se_email_cc'],
-                'se_email_receiver' => $validated['se_email_receiver'],
-                'se_name_receiver' => $validated['se_name_receiver'],
-                'se_title' => $validated['se_title'],
-                'se_content' => $validated['se_content'],
-                'se_rmd_number'=>isset($validated['rmd_number']) ? $validated['rmd_number'] : null,
-                'created_at'=>Carbon::now()->format('Y-m-d H:i:s'),
-                'updated_at'=>Carbon::now()->format('Y-m-d H:i:s')
-            ]);
-            $mail_details = [ 
-                'title' => $validated['se_title'],
-                'body' => $validated['se_content'],
-            ];
-          
-            Mail::send('emails.mailOTP',['details'=>$mail_details], function($message)use($validated) {
-                $message->to($validated['se_email_receiver'])->from('Bonded_Logistics_Platform@spasysone.com');
-                if($validated['se_email_cc']){
-                    $message->cc([$validated['se_email_cc']]);
+        DB::beginTransaction();
+        DB::commit();
+        $user = Auth::user();
+        $rate_data = [];
+        $rate_data_general = [];
+        $bonded1a = [];
+        $bonded2a = [];
+        $bonded3a = [];
+        $bonded4a = [];
+        $bonded1b = [];
+        $bonded2b = [];
+        $bonded1c = [];
+        $bonded2c = [];
+        $count1 = 0;
+        $count2 = 0;
+        $count3 = 0;
+        $count1_2 = 0;
+        $count2_2 = 0;
+        $count3_2 = 0;
+        $count4_2 = 0;
+        $total_1 = 0;
+        $total_2 = 0;
+        $total_3 = 0;
+        $arr2 = [];
+        $count_arr2 = [];
+        $arr3 = [];
+        $count_arr3 = [];
+        $arr4 = [];
+        $count_arr4 = [];
+        $sum3 = [];
+        $sum4 = [];
+        $sum2 = [];
+        if (isset($validated['rmd_service']) && $validated['rmd_service'] == 1) {
+        
+            $service='수입풀필먼트';
+            if (isset($request->rmd_no)) {
+                $rate_data = RateData::where('rd_cate_meta1', '수입풀필먼트')->where('rmd_no', $validated['rmd_no']);
+            }
+            $rate_data = $rate_data->get();
+
+            $rate_data_general = RateDataGeneral::where('rmd_no', $validated['rmd_no'])->where('rdg_set_type', 'estimated_costs')->first();
+        } else if( isset($validated['rmd_service']) && $validated['rmd_service'] == 2){
+            $service='유통가공';
+            if (isset($request->rmd_no)) {
+                $rate_data = RateData::where('rd_cate_meta1', '유통가공')->where('rmd_no', $validated['rmd_no']);
+            }
+            $rate_data = $rate_data->get();
+
+            $rate_data_general = RateDataGeneral::where('rmd_no', $validated['rmd_no'])->where('rdg_set_type', 'estimated_costs')->first();
+        } else if ((isset($validated['rmd_service']) && $validated['rmd_service'] == 0) || (!isset($validated['rmd_service']) || !$validated['rmd_service'])){
+            $service='보세화물';
+            if($validated['rmd_tab_child'] == '창고화물'){
+                if(Auth::user()->mb_type == 'spasys'){
+                    $bonded1a = $rate_data = RateData::where('rmd_no', $validated['rmd_no'])->where(function ($q) {
+                        $q->where('rd_cate_meta1', 'bonded1a');
+                    })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
+               
+                    foreach($bonded1a as $row){
+                      if($row['rd_cate1'] == '하역비용'){
+                        if($row['rd_cate2'] != '하역비용'){
+                            $count1 = $count1 + 1;
+                        }
+                      }
+                      if($row['rd_cate1'] == '센터 작업료'){
+                        if($row['rd_cate2'] != '센터 작업료'){
+                            $count2 = $count2 + 1;
+                        }
+                      }
+                      if($row['rd_cate1'] == '기타 비용'){
+                        if($row['rd_cate2'] != '기타 비용'){
+                            $count3 = $count3 + 1;
+                        }
+                      }
+                      if($row['rd_cate2'] == '소계'){
+                        $total_1 = $total_1 + $row['rd_data1'];
+                        $total_2 = $total_2 + $row['rd_data2'];
+                        $total_3 = $total_3 + $row['rd_data4'];
+                      }
+                    }
+                } else {
+
+                    $bonded1a = $rate_data = RateData::where('rmd_no', $validated['rmd_no'])->where(function ($q) {
+                        $q->where('rd_cate_meta1', 'bonded1a');
+                    })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
+               
+                    foreach($bonded1a as $row){
+                      if($row['rd_cate1'] == '하역비용'){
+                        if($row['rd_cate2'] != '하역비용'){
+                            $count1 = $count1 + 1;
+                        }
+                      }
+                      if($row['rd_cate1'] == '센터 작업료'){
+                        if($row['rd_cate2'] != '센터 작업료'){
+                            $count2 = $count2 + 1;
+                        }
+                      }
+                      if($row['rd_cate1'] == '기타 비용'){
+                        if($row['rd_cate2'] != '기타 비용'){
+                            $count3 = $count3 + 1;
+                        }
+                      }
+                      if($row['rd_cate2'] == '소계'){
+                        $total_1 = $total_1 + $row['rd_data1'];
+                        $total_2 = $total_2 + $row['rd_data2'];
+                        $total_3 = $total_3 + $row['rd_data4'];
+                      }
+                    }
+
+
+                    $bonded2a = $rate_data = RateData::where('rmd_no', $validated['rmd_no'])->where(function ($q) {
+                        $q->where('rd_cate_meta1', 'bonded2a');
+                    })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
+                        $total1_2 = 0;
+                        $total2_2 = 0;
+                        $total3_2 = 0;
+                        $total5_2 = 0;
+                        $total6_2 = 0;
+                        $total7_2 = 0;
+                                     
+                    foreach($bonded2a as $row){
+                                            if($row['rd_cate1'] == '세금'){
+                                                if($row['rd_cate2'] != '세금'){
+                                                    $count1_2 = $count1_2 + 1;
+                                                }
+                                            }
+                                            if($row['rd_cate1'] == '운임'){
+                                                if($row['rd_cate2'] != '운임'){
+                                                    $count2_2 = $count2_2 + 1;
+                                                }
+                                            }
+                                            if($row['rd_cate1'] == '창고료'){
+                                                if($row['rd_cate2'] != '창고료'){
+                                                    $count3_2 = $count3_2 + 1;
+                                                }
+                                            }
+                                            if($row['rd_cate1'] == '수수료'){
+                                                if($row['rd_cate2'] != '수수료'){
+                                                    $count4_2 = $count4_2 + 1;
+                                                }
+                                            }
+                                            if($row['rd_cate1'] != '수수료' && $row['rd_cate1'] != '창고료' && $row['rd_cate1'] != '운임' && $row['rd_cate1'] != '세금'){
+                                                if( !in_array( $row['rd_cate1'] ,$arr2 ) ){
+                                                    $arr2[] =  $row['rd_cate1'];
+                                                }
+                                            }
+                                            if($row['rd_cate2'] == '소계'){
+                                                $total1_2 = $total1_2 + $row['rd_data1'];
+                                                $total2_2 = $total2_2 + $row['rd_data2'];
+                                                $total3_2 = $total3_2 + $row['rd_data4'];
+                                                $total5_2 = $total5_2 + $row['rd_data5'];
+                                                $total6_2 = $total6_2 + $row['rd_data6'];
+                                                $total7_2 = $total7_2 + $row['rd_data7'];
+                                            }                                        
+                    }
+                    $sum2[] = $total1_2;
+                    $sum2[] = $total2_2;
+                    $sum2[] = $total3_2;
+                    $sum2[] = $total5_2;
+                    $sum2[] = $total6_2;
+                    $sum2[] = $total7_2;
+                    if(count($arr2) > 0){
+                                            for($i = 0;$i < count($arr2);$i++){
+                                                $check = 0;
+                                                foreach($bonded2a as $row){
+                                                    if($row['rd_cate1'] == $arr2[$i]){
+                                                        if($row['rd_cate2'] != 'bonded2'){
+                                                            $check = $check + 1;
+                                                        }
+                                                    }
+                                                }
+                                                $count_arr2[] = $check;
+                                            }
+                    }
+
+                    $bonded3a = $rate_data = RateData::where('rmd_no', $validated['rmd_no'])->where(function ($q) {
+                        $q->where('rd_cate_meta1', 'bonded3a');
+                    })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
+
+                    foreach($bonded3a as $row){
+                      
+                            if( !in_array( $row['rd_cate1'] ,$arr3 ) ){
+                                $arr3[] =  $row['rd_cate1'];
+                            }
+                        
+                    }
+                    if(count($arr3) > 0){
+                        $total1_3 = 0;
+                        $total2_3 = 0;
+                        $total3_3 = 0;
+                        $total5_3 = 0;
+                        $total6_3 = 0;
+                        $total7_3 = 0;
+                        for($i = 0;$i < count($arr3);$i++){
+                            $check = 0;
+                         
+                            foreach($bonded3a as $row){
+                                if($row['rd_cate1'] == $arr3[$i]){
+                                    if($row['rd_cate2'] != 'bonded345'){
+                                        $check = $check + 1;
+                                    }
+                                    if($row['rd_cate2'] == '소계'){
+                                        $total1_3 = $total1_3 + $row['rd_data1'];
+                                        $total2_3 = $total2_3 + $row['rd_data2'];
+                                        $total3_3 = $total3_3 + $row['rd_data4'];
+                                        $total5_3 = $total5_3 + $row['rd_data5'];
+                                        $total6_3 = $total6_3 + $row['rd_data6'];
+                                        $total7_3 = $total7_3 + $row['rd_data7'];
+                                    }
+                                }
+                            }
+                         
+                            $count_arr3[] = $check;
+                        }
+
+                        $sum3[] = $total1_3;
+                        $sum3[] = $total2_3;
+                        $sum3[] = $total3_3;
+                        $sum3[] = $total5_3;
+                        $sum3[] = $total6_3;
+                        $sum3[] = $total7_3;
+                    }
+
+                    $bonded4a = $rate_data = RateData::where('rmd_no', $validated['rmd_no'])->where(function ($q) {
+                        $q->where('rd_cate_meta1', 'bonded4a');
+                    })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
+
+                    foreach($bonded4a as $row){
+                      
+                            if( !in_array( $row['rd_cate1'] ,$arr4 ) ){
+                                $arr4[] =  $row['rd_cate1'];
+                            }
+                        
+                    }
+                    if(count($arr4) > 0){
+                        $total1_4 = 0;
+                        $total2_4 = 0;
+                        $total3_4 = 0;
+                        $total5_4 = 0;
+                        $total6_4 = 0;
+                        $total7_4 = 0;
+                        for($i = 0;$i < count($arr4);$i++){
+                            $check = 0;
+                         
+                            foreach($bonded4a as $row){
+                                if($row['rd_cate1'] == $arr4[$i]){
+                                    if($row['rd_cate2'] != 'bonded345'){
+                                        $check = $check + 1;
+                                    }
+                                    if($row['rd_cate2'] == '소계'){
+                                        $total1_4 = $total1_4 + $row['rd_data1'];
+                                        $total2_4 = $total2_4 + $row['rd_data2'];
+                                        $total3_4 = $total3_4 + $row['rd_data4'];
+                                        $total5_4 = $total5_4 + $row['rd_data5'];
+                                        $total6_4 = $total6_4 + $row['rd_data6'];
+                                        $total7_4 = $total7_4 + $row['rd_data7'];
+                                    }
+                                }
+                            }
+                         
+                            $count_arr4[] = $check;
+                        }
+
+                        $sum4[] = $total1_4;
+                        $sum4[] = $total2_4;
+                        $sum4[] = $total3_4;
+                        $sum4[] = $total5_4;
+                        $sum4[] = $total6_4;
+                        $sum4[] = $total7_4;
+                    }
+
                 }
-                $message->subject($validated['se_title']);
+            } else if ($validated['rmd_tab_child'] == '온도화물'){
+                if(Auth::user()->mb_type == 'spasys'){
+                    $bonded1b = $rate_data = RateData::where('rmd_no', $validated['rmd_no'])->where(function ($q) {
+                        $q->where('rd_cate_meta1', 'bonded1b');
+                    })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
+                    foreach($bonded1b as $row){
+                        if($row['rd_cate1'] == '하역비용'){
+                          if($row['rd_cate2'] != '하역비용'){
+                              $count1 = $count1 + 1;
+                          }
+                        }
+                        if($row['rd_cate1'] == '센터 작업료'){
+                          if($row['rd_cate2'] != '센터 작업료'){
+                              $count2 = $count2 + 1;
+                          }
+                        }
+                        if($row['rd_cate1'] == '기타 비용'){
+                          if($row['rd_cate2'] != '기타 비용'){
+                              $count3 = $count3 + 1;
+                          }
+                        }
+                        if($row['rd_cate2'] == '소계'){
+                            $total_1 = $total_1 + $row['rd_data1'];
+                            $total_2 = $total_2 + $row['rd_data2'];
+                            $total_3 = $total_3 + $row['rd_data4'];
+                          }
+                    }
+                } else {
+
+                }
+
+            } else if($validated['rmd_tab_child'] == '위험물'){
+                if(Auth::user()->mb_type == 'spasys'){
+                    $bonded1c = $rate_data = RateData::where('rmd_no', $validated['rmd_no'])->where(function ($q) {
+                        $q->where('rd_cate_meta1', 'bonded1c');
+                    })->orderBy('rd_index', 'ASC')->orderBy('rd_no')->get();
+                    foreach($bonded1c as $row){
+                        if($row['rd_cate1'] == '하역비용'){
+                          if($row['rd_cate2'] != '하역비용'){
+                              $count1 = $count1 + 1;
+                          }
+                        }
+                        if($row['rd_cate1'] == '센터 작업료'){
+                          if($row['rd_cate2'] != '센터 작업료'){
+                              $count2 = $count2 + 1;
+                          }
+                        }
+                        if($row['rd_cate1'] == '기타 비용'){
+                          if($row['rd_cate2'] != '기타 비용'){
+                              $count3 = $count3 + 1;
+                          }
+                        }
+                        if($row['rd_cate2'] == '소계'){
+                            $total_1 = $total_1 + $row['rd_data1'];
+                            $total_2 = $total_2 + $row['rd_data2'];
+                            $total_3 = $total_3 + $row['rd_data4'];
+                          }
+                    }
+                } else {
+
+                }
+
+            }
+        }
+
+   
+      
+
+        if (isset($user->mb_no)) {
+            $path = 'storage/download/' . $user->mb_no . '/';
+        } else {
+            $path = 'storage/download/no-name/';
+        }
+
+        if (!is_dir($path)) {
+            File::makeDirectory($path, $mode = 0777, true, true);
+        }
+
+        $mask = $path . 'PDF-pre-Details-*.*';
+        array_map('unlink', glob($mask) ?: []);
+        $file_name_download = $path . 'PDF-pre-Details-' . date('YmdHis') . '.pdf';
+        $pdf = Pdf::loadView('pdf.test2',['rate_data_general'=>$rate_data_general,'rate_data'=>$rate_data,'service'=>$service,'bonded1a'=>$bonded1a
+        ,'bonded1b'=>$bonded1b,'bonded1c'=>$bonded1c,'tab_child'=>$validated['rmd_tab_child'] ? $validated['rmd_tab_child'] : '',
+        'count3'=>$count3,'count2'=>$count2,'count1'=>$count1,'total_1'=>$total_1,'total_2'=>$total_2,'total_3'=>$total_3,'mb_type'=>Auth::user()->mb_type
+        ,'bonded2a'=>$bonded2a, 'count4_2'=>$count4_2,'count3_2'=>$count3_2,'count1_2'=>$count1_2,'count2_2'=>$count2_2,'count_arr2'=>$count_arr2,'arr2'=>$arr2,
+        'count_arr3'=>$count_arr3,'arr3'=>$arr3,'bonded3a'=>$bonded3a,'sum3'=>$sum3,'sum2'=>$sum2,
+        'count_arr4'=>$count_arr4,'arr4'=>$arr4,'bonded4a'=>$bonded4a,'sum4'=>$sum4]);
+        $pdf->save($file_name_download);
+        
+        try {
+            // $push = SendEmailHistory::insertGetId([
+            //     'mb_no' => Auth::user()->mb_no,
+            //     'rm_no' => isset($validated['rm_no']) ? $validated['rm_no'] : null,
+            //     'rmd_no' => isset($validated['rmd_no']) ? $validated['rmd_no'] : null,
+            //     'se_email_cc' => $validated['se_email_cc'],
+            //     'se_email_receiver' => $validated['se_email_receiver'],
+            //     'se_name_receiver' => $validated['se_name_receiver'],
+            //     'se_title' => $validated['se_title'],
+            //     'se_content' => $validated['se_content'],
+            //     'se_rmd_number'=>isset($validated['rmd_number']) ? $validated['rmd_number'] : null,
+            //     'created_at'=>Carbon::now()->format('Y-m-d H:i:s'),
+            //     'updated_at'=>Carbon::now()->format('Y-m-d H:i:s')
+            // ]);
+            // $mail_details = [ 
+            //     'title' => $validated['se_title'],
+            //     'body' => $validated['se_content'],
+            // ];
+          
+            // Mail::send('emails.mailOTP',['details'=>$mail_details], function($message)use($validated) {
+            //     $message->to($validated['se_email_receiver'])->from('Bonded_Logistics_Platform@spasysone.com');
+            //     if($validated['se_email_cc']){
+            //         $message->cc([$validated['se_email_cc']]);
+            //     }
+            //     $message->subject($validated['se_title']);
      
                
       
                          
-            });
+            // });
 
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'push' => $push,
+                'rate_data_general'=>$rate_data_general,
+                'rate_data'=>$rate_data,
+                'bonded1a'=>$bonded1a,
+                'sum3'=>$sum3
+                
             ]);
         } catch (\Exception $e) {
             Log::error($e);

@@ -239,7 +239,9 @@ class NoticeController extends Controller
             if($user->mb_type == 'shop'){
                 $notices = Notice::with(['files','member'])->where(function ($q) use ($user){
                     $q ->where(function ($q) use ($user){
-                        $q->where('notice_target', '=' , '가맹점')->orWhere('notice_target','=','전체')
+                        $q->where(function ($q) {
+                            $q->where('notice_target', '=' , '가맹점')->orWhere('notice_target','=','전체');
+                        })
                         ->whereHas('member.company',function($q) use ($user){
                             $q->where('co_no', $user->company->co_parent->co_no);
                         });
@@ -255,7 +257,9 @@ class NoticeController extends Controller
             }
             else if($user->mb_type == 'shipper'){
                 $notices = Notice::with(['files','member'])->where(function ($q) use ($user){
-                    $q->where('notice_target' , '=' , '화주')->orWhere('notice_target', '=','전체');
+                    $q->where(function ($q){
+                        $q->where('notice_target' , '=' , '화주')->orWhere('notice_target', '=','전체');
+                    });
                 })->whereHas('member.company',function($q) use ($user){
                     $q->where('co_no', $user->company->co_parent->co_no)
                     ->orWhere('co_no', $user->company->co_parent->co_parent->co_no);
