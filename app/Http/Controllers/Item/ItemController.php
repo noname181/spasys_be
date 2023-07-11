@@ -3551,11 +3551,27 @@ class ItemController extends Controller
                 }                 
             }
         }
-        //return $total_stock;
-        StockStatusCompany::insert([
-            'stock' => $total_stock,
-            'co_no' => $shipper['co_no'],
-        ]);
+
+        $today = StockStatusCompany::where('created_at', 'LIKE', Carbon::now()->format('Y-m-d'). '%')->where('co_no', $shipper['co_no'])->first();
+
+       
+        if(isset($today->ssc_id)){
+            StockStatusCompany::where('created_at', 'LIKE', Carbon::now()
+            ->format('Y-m-d'). '%')
+            ->where('co_no', $shipper['co_no'])
+            ->update([
+                'stock' => $total_stock + $today->stock
+            ]);
+        } else {
+            StockStatusCompany::insert(
+                [
+                    'co_no' => $shipper['co_no'],
+                    'stock' => $total_stock,
+                ]
+            );
+        }
+        
+        
     }
 
     public function updateStockCompanyApiNoLogin(Request $request)
