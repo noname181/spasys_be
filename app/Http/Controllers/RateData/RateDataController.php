@@ -13133,7 +13133,7 @@ class RateDataController extends Controller
                         'cbh_type' => 'payment',
                         'cbh_status_before' => $rgd['rgd_status6'],
                         'cbh_status_after' => 'payment_bill',
-                        'cbh_pay_method' => isset($rgd['payment']) ? $rgd['payment']['p_method'] : null,
+                        'cbh_pay_method' => null,
                     ]);
 
                     if ($rgd->service_korean_name == '보세화물') {

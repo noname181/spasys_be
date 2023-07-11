@@ -7139,15 +7139,15 @@ class WarehousingController extends Controller
                 $start_stock = StockStatusCompany::where('co_no', $request->co_no)
                 ->where('created_at', '>=' , Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->from_date))->format('Y-m-d') . ' 00:00:00')
                 ->where('created_at', '<=' , Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->from_date)->addDays(1))->format('Y-m-d') . ' 00:00:00')
-                ->orderBy('created_at')->first();
+                ->orderBy('created_at')->sum('stock');
 
                 $end_stock = StockStatusCompany::where('co_no', $request->co_no)
                 ->where('created_at', '>=', Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date))->format('Y-m-d') . ' 00:00:00')
                 ->where('created_at', '<=' , Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date)->addDays(1))->format('Y-m-d') . ' 00:00:00')
-                ->orderBy('created_at')->first();
+                ->orderBy('created_at')->sum('stock');
 
-                $start_stock = isset($start_stock->stock) ? $start_stock->stock : 0;
-                $end_stock = isset($end_stock->stock) ? $end_stock->stock : 0;
+                $start_stock = isset($start_stock) ? $start_stock : 0;
+                $end_stock = isset($end_stock) ? $end_stock : 0;
 
             }else if($user->mb_type == 'spasys'){
 
@@ -7162,15 +7162,15 @@ class WarehousingController extends Controller
                     $start_stock_ = StockStatusCompany::where('co_no', $shipper_company->co_no)
                     ->where('created_at', '>=' , Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->from_date))->format('Y-m-d') . ' 00:00:00')
                     ->where('created_at', '<=' , Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->from_date)->addDays(1))->format('Y-m-d') . ' 00:00:00')
-                    ->orderBy('created_at')->first();
-                    $start_stock += isset($start_stock_->stock) ? $start_stock_->stock : 0;
+                    ->orderBy('created_at')->sum('stock');
+                    $start_stock += isset($start_stock_) ? $start_stock_ : 0;
 
 
                     $end_stock_ = StockStatusCompany::where('co_no', $shipper_company->co_no)
                     ->where('created_at', '>=', Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date))->format('Y-m-d') . ' 00:00:00')
                     ->where('created_at', '<=' , Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date)->addDays(1))->format('Y-m-d') . ' 00:00:00')
-                    ->orderBy('created_at')->first();
-                    $end_stock += isset($end_stock_->stock) ? $end_stock_->stock : 0;
+                    ->orderBy('created_at')->sum('stock');
+                    $end_stock += isset($end_stock_) ? $end_stock_ : 0;
 
                 }
 
