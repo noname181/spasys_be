@@ -3548,16 +3548,16 @@ class ItemController extends Controller
             foreach ($api_data['data'] as $item) {
                 if ($item['stock'] > 0) {
                     $total_stock += $item['stock'];
-                }                 
+                }
             }
         }
 
         $today = StockStatusCompany::where('created_at', 'LIKE', Carbon::now()->format('Y-m-d'). '%')->where('co_no', $shipper['co_no'])->first();
 
-       
+
         if(isset($today->ssc_id)){
             StockStatusCompany::where('created_at', 'LIKE', Carbon::now()
-            ->format('Y-m-d'). '%')
+            ->format('Y-m-d h:i'). '%')
             ->where('co_no', $shipper['co_no'])
             ->update([
                 'stock' => $total_stock + $today->stock
@@ -3570,8 +3570,8 @@ class ItemController extends Controller
                 ]
             );
         }
-        
-        
+
+
     }
 
     public function updateStockCompanyApiNoLogin(Request $request)
@@ -3593,7 +3593,7 @@ class ItemController extends Controller
         $company_shipper = Company::with(['ContractWms'])->where("co_type", "shipper")->get();
         //return $company_shipper;
         foreach ($company_shipper as $shipper) {
-            
+
             $cw_code = [];
 
             if(isset($shipper->ContractWms)){
@@ -3601,9 +3601,9 @@ class ItemController extends Controller
                     $cw_code[] = $contract_wms['cw_code'];
                 }
             }
-            
+
             $list_items = $this->paginateItemsApiIdCompanyRawNoLogin($cw_code)->toArray();
-            
+
             $params = array();
             foreach ($list_items as $item) {
                 if (!empty($item)) {
@@ -3614,7 +3614,7 @@ class ItemController extends Controller
                     }
                 }
             }
-           
+
             for ($bad = 0; $bad <= 1; $bad++) {
                 $url_api .= '&bad=' . $bad;
                 $url_api .= '&product_id=';
