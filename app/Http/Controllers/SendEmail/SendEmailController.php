@@ -22,7 +22,9 @@ use App\Models\Company;
 use App\Models\RateDataGeneral;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\File;
-
+use App\Http\Requests\SendMail\SendMailOtpRequest;
+use Illuminate\Support\Str;
+use App\Models\Member;
 
 class SendEmailController extends Controller
 {
@@ -36,6 +38,51 @@ class SendEmailController extends Controller
      * @param  App\Http\Requests\Push\PushRegisterRequest  $request
      * @return \Illuminate\Http\JsonResponse
      */
+    public function sendEmailOtp(SendMailOtpRequest $request)
+    {
+       
+        try {
+        
+            $validated = $request->validated();
+            $mb_otp = Str::lower(Str::random(6));
+            $member = Member::where('mb_email', '=', $validated['mb_email'])
+            ->where(function ($query)  use ($validated){
+                $query->where('mb_id', '=', strtoupper($validated['mb_id']))
+                ->orWhere('mb_id', '=', strtolower($validated['mb_id']));
+            })
+            ->first();
+    
+            if (!empty($member)) {
+                // send otp in the email
+                $mail_details = [ 
+                    'title' => '비밀번호 찾기',
+                    'body' => '임시 비밀번호를 드립니다. 로그인하셔서 새 비밀번호로 변경하세요: ',
+                    'otp' => $mb_otp,
+                ];
+
+                // Member::where('mb_email', '=', $validated['mb_email'])->update(['mb_otp' => Hash::make($mb_otp)]);
+    
+                // $check =  Mail::to($member->mb_email)->send(new sendEmail($mail_details));
+                Mail::send('emails.mailOTP',['details'=>$mail_details], function($message)use($validated,$member) {
+                    $message->to($member->mb_email)->from('Bonded_Logistics_Platform@spasysone.com');
+            
+                    $message->subject('비밀번호 찾기');
+         
+                   
+             
+                             
+                });
+    
+                return response()->json(['message' => Messages::MSG_0007], 200);
+            } else {
+                return response()->json(['message' => Messages::MSG_0013], 400);
+            }
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0019], 500);
+        }
+    }
     public function createSendEmail(SendEmailRegisterRequest $request)
     {
         $validated = $request->validated();
