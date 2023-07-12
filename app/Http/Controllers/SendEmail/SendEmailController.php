@@ -620,7 +620,7 @@ class SendEmailController extends Controller
                         $total5_5 = 0;
                         $total6_5 = 0;
                         $total7_5 = 0;
-                        for($i = 0;$i < count($arr4);$i++){
+                        for($i = 0;$i < count($arr5);$i++){
                             $check = 0;
                          
                             foreach($bonded5a as $row){
@@ -1252,6 +1252,13 @@ class SendEmailController extends Controller
                 'message' => Messages::MSG_0007,
                 'rate_data_general'=>$rate_data_general,
                 'rate_data'=>$rate_data,
+                'arr5'=>$arr5,
+                'count_arr5'=>$count_arr5,
+                'bonded5a'=>$bonded5a,
+                'count1'=>$count1,
+                'count2'=>$count2,
+                'count3'=>$count3,
+                'bonded1a'=>$bonded1a
              
             ]);
         } catch (\Exception $e) {
