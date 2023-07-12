@@ -992,9 +992,7 @@ class AlarmController extends Controller
                             ->where('receiver_no', $user->mb_no);
                     })->orwhere(function ($q) use ($validated, $user) {
                         $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_IW')->where('w_no', $validated['w_no'])
-                            ->where('receiver_no', $user->mb_no)->whereHas('alarm_data', function ($query) {
-                                $query->where('ad_no', '!=', 31);
-                            });
+                            ->where('receiver_no', $user->mb_no);
                     })->orwhere(function ($q) use ($validated, $user) {
 
                         $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_EW')->where('w_no', $validated['w_no'])
@@ -1052,9 +1050,10 @@ class AlarmController extends Controller
                             ->where('receiver_no', $user->mb_no);
                     })->orwhere(function ($q) use ($validated, $user) {
                         $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_IW')->where('w_no', $validated['w_no'])
-                            ->where('receiver_no', $user->mb_no)->whereHas('alarm_data', function ($query) {
-                                $query->where('ad_no', '!=', 31);
-                            });
+                            ->where('receiver_no', $user->mb_no);
+                            // ->whereHas('alarm_data', function ($query) {
+                            //     $query->where('ad_no', '!=', 31);
+                            // });
                     })->orwhere(function ($q) use ($validated, $user) {
                         $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_EW')->where('w_no', $validated['w_no'])
                             ->where('receiver_no', $user->mb_no);
@@ -1111,9 +1110,10 @@ class AlarmController extends Controller
                             ->where('receiver_no', $user->mb_no);
                     })->orwhere(function ($q) use ($validated, $user) {
                         $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_IW')->where('w_no', $validated['w_no'])
-                            ->where('receiver_no', $user->mb_no)->whereHas('alarm_data', function ($query) {
-                                $query->where('ad_no', '!=', 31);
-                            });
+                            ->where('receiver_no', $user->mb_no);
+                            // ->whereHas('alarm_data', function ($query) {
+                            //     $query->where('ad_no', '!=', 31);
+                            // });
                     })->orwhere(function ($q) use ($validated, $user) {
                         $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_EW')->where('w_no', $validated['w_no'])
                             ->where('receiver_no', $user->mb_no);
