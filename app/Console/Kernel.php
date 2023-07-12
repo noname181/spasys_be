@@ -16,8 +16,8 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         //$schedule->command('inspire')->hourly();
-        $schedule->call('App\Http\Controllers\Item\ItemController@apiItemsCargoList')->name('apiItemsCargoList')->withoutOverlapping()->cron('*/* * * * *');
-        $schedule->call('App\Http\Controllers\RateData\RateDataController@check_payment')->name('check_payment')->withoutOverlapping()->cron('*/10 * * * *');
+        $schedule->call('App\Http\Controllers\Item\ItemController@apiItemsCargoList')->name('apiItemsCargoList')->withoutOverlapping()->cron('*/5 * * * *');
+        $schedule->call('App\Http\Controllers\RateData\RateDataController@check_payment')->name('check_payment')->withoutOverlapping()->cron('*/* * * * *');
         $schedule->call('App\Http\Controllers\Item\ItemController@updateStockItemsApiNoLogin')->name('updateStockItemsApiNoLogin')->withoutOverlapping()->cron('*/15 * * * *');
         $schedule->call('App\Http\Controllers\Item\ItemController@apiItemCronNoLogin')->name('apiItemCronNoLogin')->withoutOverlapping()->cron('*/20 * * * *');
         $schedule->call('App\Http\Controllers\ScheduleShipment\ScheduleShipmentController@getScheduleFromApiNoLogin')->name('getScheduleFromApiNoLogin')->withoutOverlapping()->cron('*/30 * * * *');
