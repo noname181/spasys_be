@@ -96,7 +96,12 @@ class CommonFunc
                 $ccccc = number_format($rgd->rate_data_general->rdg_sum4);
                 $bbbbb = $rgd->rgd_settlement_number;
                 $aaaaa = $rgd->warehousing->w_schedule_number2;
-                $ddddd = str_contains($rgd->rgd_bill_type, 'month') ? '월별 확정청구서로 결제요청 예정입니다.' : '결제를 진행해주세요.';
+                if($rgd->rgd_status4 == '예상경비청구서'){
+                    $ddddd = str_contains($rgd->rgd_bill_type, 'month') ? '월별 확정청구서로 결제요청 예정입니다.' : '';
+                }else{
+                    $ddddd = str_contains($rgd->rgd_bill_type, 'month') ? '월별 확정청구서로 결제요청 예정입니다.' : '결제를 진행해주세요.';
+
+                }
                 $cargo_number = $rgd->warehousing->w_schedule_number2;
             } else if ($rgd->service_korean_name == '보세화물') {
                 $ccccc = number_format($rgd->rate_data_general->rdg_sum7);
