@@ -265,7 +265,7 @@ class CompanyController extends Controller
                 }
             }
 
-            if($company->co_parent_no){
+            if(isset($company->co_parent_no)){
                 $contract = Contract::where('co_no',  $company->co_parent_no)->first();
                 $company->co_parent = Company::where('co_no', $company->co_parent_no)->first();
                 $company->co_parent->c_integrated_calculate_yn = isset($contract->c_integrated_calculate_yn) ? $contract->c_integrated_calculate_yn : null;
