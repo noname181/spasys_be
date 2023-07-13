@@ -3557,7 +3557,7 @@ class ItemController extends Controller
 
         if(isset($today->ssc_id)){
             StockStatusCompany::where('created_at', 'LIKE', Carbon::now()
-            ->format('Y-m-d h:i'). '%')
+            ->format('Y-m-d H:i'). '%')
             ->where('co_no', $shipper['co_no'])
             ->update([
                 'stock' => $total_stock + $today->stock
