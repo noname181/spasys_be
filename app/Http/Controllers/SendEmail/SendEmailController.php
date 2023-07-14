@@ -20,7 +20,7 @@ use App\Models\RateData;
 use App\Models\RateMetaData;
 use App\Models\Company;
 use App\Models\RateDataGeneral;
-use Barryvdh\DomPDF\Facade\Pdf;
+// use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\File;
 use App\Http\Requests\SendMail\SendMailOtpRequest;
 use Illuminate\Support\Str;

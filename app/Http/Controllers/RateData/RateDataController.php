@@ -3693,7 +3693,7 @@ class RateDataController extends Controller
 
 
             if ($request->is_edit == 'edit') {
-                RateDataGeneral::where('rgd_no_expectation', $rgd['rgd_no'])->where('rdg_bill_type', 'final_monthly')->update([
+                RateDataGeneral::where('rgd_no', $request->rgd_no)->where('rdg_bill_type', 'final_monthly')->update([
                     'rdg_supply_price1' =>  $rdg_supply_price1,
                     'rdg_supply_price2' =>  $rdg_supply_price2,
                     'rdg_supply_price3' =>  $rdg_supply_price3,
