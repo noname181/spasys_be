@@ -31,13 +31,10 @@ class ManagerCreateRequest extends BaseFormRequest
                 'integer',
             ],
             '*.m_position' => [
-                'string',
-                'max:255',
+                '',
             ],
             '*.m_name' => [
-                'required',
-                'string',
-                'max:255',
+                '',
             ],
             '*.m_duty1' => [
                 '',

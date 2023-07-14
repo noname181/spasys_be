@@ -152,7 +152,7 @@ class ReceivingGoodsDelivery extends Model
         return $this->belongsTo(Import::class, 'is_no', 'ti_carry_in_number');
     }
     public function payment(){
-        return $this->belongsTo(Payment::class, 'rgd_no', 'rgd_no');
+        return $this->belongsTo(Payment::class, 'rgd_no', 'rgd_no')->orderBy('p_no', 'DESC');
     }
 
     public function tax(){
