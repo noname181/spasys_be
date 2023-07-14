@@ -142,23 +142,31 @@ class AlarmDataController extends Controller
             DB::beginTransaction();
 
             $companies = Company::with(['contract', 'co_parent', 'co_childen', 'mb_no'])
-                ->whereHas('contract', function ($q) {
-                    $q->whereBetween('c_end_date', [Carbon::now()->startOfDay(), Carbon::now()->addDays(7)->endOfDay()]);
-                })
+                // ->whereHas('contract', function ($q) {
+                //     $q->whereBetween('c_end_date', [Carbon::now()->startOfDay(), Carbon::now()->addDays(7)->endOfDay()]);
+                // })
                 ->where('co_type', '!=', 'spasys')
                 ->orderBy('co_no', 'DESC')->get();
-
+            
+           
+            $now =  (Carbon::now()->addDays(6)->startOfDay())->format('Y-m-d');
+            
             foreach ($companies as $company) {
-                CommonFunc::insert_alarm_company_daily('계약 종료일', null, null, $company, 'alarm_daily7');
+                
+                if(isset($company->contract->c_end_date) && (new Carbon($company->contract->c_end_date))->format('Y-m-d') == $now){
+                    
+                    CommonFunc::insert_alarm_company_daily('계약 종료일', null, null, $company, 'alarm_daily7');
+                }
+                
             }
-
+            
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
             ]);
         } catch (\Exception $e) {
             DB::rollback();
-            
+            return $e;
             return response()->json(['message' => Messages::MSG_0001], 500);
         }
     }
@@ -169,14 +177,17 @@ class AlarmDataController extends Controller
             DB::beginTransaction();
 
             $companies = Company::with(['contract', 'co_parent', 'co_childen', 'mb_no'])
-                ->whereHas('contract', function ($q) {
-                    $q->whereBetween('c_end_date', [Carbon::now()->addDays(8)->startOfDay(), Carbon::now()->addDays(30)->endOfDay()]);
-                })
+                // ->whereHas('contract', function ($q) {
+                //     $q->whereBetween('c_end_date', [Carbon::now()->addDays(8)->startOfDay(), Carbon::now()->addDays(30)->endOfDay()]);
+                // })
                 ->where('co_type', '!=', 'spasys')
                 ->orderBy('co_no', 'DESC')->get();
-
+            
+            $now =  (Carbon::now()->addDays(29)->startOfDay())->format('Y-m-d');
             foreach ($companies as $company) {
-                CommonFunc::insert_alarm_company_daily('계약 종료일', null, null, $company, 'alarm_daily30');
+                if(isset($company->contract->c_end_date) && (new Carbon($company->contract->c_end_date))->format('Y-m-d') == $now){
+                    CommonFunc::insert_alarm_company_daily('계약 종료일', null, null, $company, 'alarm_daily30');
+                }
             }
 
             DB::commit();
