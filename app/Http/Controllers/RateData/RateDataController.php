@@ -4018,13 +4018,22 @@ class RateDataController extends Controller
 
                 //Get the est bill
                 $expectation_rdg = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->where('rgd_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
-                //Check if there is any RateDataGeneral of est bill
-                $is_exist = RateDataGeneral::where('rgd_no_expectation', $rgd['rgd_no'])->where('rdg_bill_type', 'final_monthly')->first();
+                
                 //Get the final bill if any
-                $final_rgd = ReceivingGoodsDelivery::where('rgd_parent_no', $rgd['rgd_no'])->where('rgd_bill_type', 'final_monthly')->first();
+                $final_rgd = ReceivingGoodsDelivery::where('rgd_parent_no', $rgd['rgd_no'])->where('rgd_bill_type', 'final_monthly')->where(function($q) {
+                    $q->where('rgd_status5', '!=', 'cancel')->orWhereNull('rgd_status5');
+                })->first();
+
+                if($final_rgd){
+                    //Check if there is any RateDataGeneral of est bill
+                    $is_exist = RateDataGeneral::where('rgd_no_expectation', $rgd['rgd_no'])->where('rgd_no', $final_rgd->rgd_no)->where('rdg_bill_type', 'final_monthly')->first();
+                }else {
+                    //Check if there is any RateDataGeneral of est bill
+                    $is_exist = RateDataGeneral::where('rgd_no_expectation', $rgd['rgd_no'])->where('rdg_bill_type', 'final_monthly')->first();
+                }
 
                 //Creating RateDataGeneral for final bill if not
-                if (!$is_exist || $final_rgd->rgd_status5 == 'cancel') {
+                if (!$final_rgd) {
                     $expectation_rdg = RateDataGeneral::where('rgd_no', $rgd['rgd_no'])->where('rdg_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
 
                     $final_rdg = $expectation_rdg->replicate();
@@ -4128,7 +4137,7 @@ class RateDataController extends Controller
                 $expectation_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->where('rgd_bill_type', $user->mb_type == 'spasys' ? 'expectation_monthly_spasys' : 'expectation_monthly_shop')->first();
                 $final_rgds[] = $final_rgd;
                 //Creating final bill
-                if (!$final_rgd || $final_rgd->rgd_status5 == 'cancel') {
+                if (!$final_rgd) {
                     $expectation_rgd->rgd_status5 = 'issued';
                     $expectation_rgd->save();
 
