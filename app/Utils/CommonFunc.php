@@ -1099,6 +1099,10 @@ class CommonFunc
             $aaaaa = 30;
         }
 
+        if (isset($company)) {
+            $bbbbb = $company->co_name;
+        }
+
         $alarm_data = AlarmData::where('ad_title', $ad_title)->first();
 
         $alarm_content = $alarm_data->ad_content;
