@@ -40,10 +40,12 @@ class ItemSearchRequest extends BaseFormRequest
                 '',
             ],
             'from_date' => [
+                'nullable',
                 'string',
                 'date_format:Y-m-d'
             ],
             'to_date' => [
+                'nullable',
                 'string',
                 'date_format:Y-m-d'
             ],
