@@ -429,6 +429,18 @@ class QnaController extends Controller
         }
     }
 
+    public function Call($qna)
+    {
+        $datas = $qna->get();
+        $qna_no = [];
+        foreach ($datas as $data){
+            if($data["depth_level"] == 0){
+                $qna_no[] = $data["qna_no"];
+            }
+        }
+        return $qna_no;
+    }
+
     public function get_qnas_new(QnaSearchRequest $request)
     {
         try {
@@ -439,6 +451,8 @@ class QnaController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
+            $count_qna_question = 0;
+
             if($member_type->mb_type == 'spasys'){
                 $qna = Qna::with(['member','company','member_question'])->where('qna_status','!=','삭제')->where(function ($query) use ($member_type){
                     $query->where('co_no_target', '=', Auth::user()->co_no)->orwhere('spasys_no',$member_type->co_no)
@@ -463,6 +477,8 @@ class QnaController extends Controller
                 ->orderBy('answer_for','DESC')
                 ->orderBy('depth_path','ASC')
                 ->orderBy('qna_no', 'DESC');
+                
+                
             }else if($member_type->mb_type == 'shop'){
                 $qna = Qna::with(['member','company','member_question'])->where('qna_status','!=','삭제')->where(function ($query) use ($member_type) {
                     $query->where('co_no_target', '=', Auth::user()->co_no)->orWhere('mb_no_question',$member_type->mb_no)//->orWhere('co_no_target', '=', $member_type->company->co_parent->co_no) this shop can see other shop with the same spasys
@@ -519,6 +535,11 @@ class QnaController extends Controller
             if (isset($validated['to_date'])) {
                 $qna->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
             }
+            
+            $return_v = $this->Call($qna);
+            if(isset($return_v)){
+                $qna->whereIn('answer_for', $return_v);
+            }
 
             if (isset($validated['qna_title'])) {
                 $qna->where('qna_title', 'like', '%' . $validated['qna_title'] . '%');
@@ -560,36 +581,71 @@ class QnaController extends Controller
 
      
             // $count_qna_question = Qna::where('depth_level',0)->count();
+            // $count_qna_question = 0;
+            // if($member_type->mb_type == 'spasys'){
+            //     $count_qna_question = Qna::with(['member','company','member_question'])->where('depth_level',0)->where('qna_status','!=','삭제')->where(function ($query) use ($member_type){
+            //         $query->where('co_no_target', '=', Auth::user()->co_no)->orwhere('spasys_no',$member_type->co_no)
+            //             ->orWhereHas('member',function ($query) use ($member_type){
+            //                 $query->where('co_no','=',$member_type->co_no);
+            //             })->orWhereHas('company',function ($query) use ($member_type){
+            //                 $query->where('co_no','=',$member_type->co_no);
+            //             });
+            //     });
+            //     if (isset($validated['from_date'])) {
+            //         $qna->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            //     }
+    
+            //     if (isset($validated['to_date'])) {
+            //         $qna->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            //     }
+            //     if (isset($validated['status'])) {
+            //         $count_qna_question->where('qna_status', 'like', '%' . $validated['status'] . '%');
+            //     }
+            //     $count_qna_question = $count_qna_question->count();
 
-            if($member_type->mb_type == 'spasys'){
-                $count_qna_question = Qna::with(['member','company','member_question'])->where('depth_level',0)->where('qna_status','!=','삭제')->where(function ($query) use ($member_type){
-                    $query->where('co_no_target', '=', Auth::user()->co_no)->orwhere('spasys_no',$member_type->co_no)
-                        ->orWhereHas('member',function ($query) use ($member_type){
-                            $query->where('co_no','=',$member_type->co_no);
-                        })->orWhereHas('company',function ($query) use ($member_type){
-                            $query->where('co_no','=',$member_type->co_no);
-                        });
-                })->count();
-            }else if($member_type->mb_type == 'shop'){
-                $count_qna_question = Qna::with(['member','company','member_question'])->where('depth_level',0)->where('qna_status','!=','삭제')->where(function ($query) use ($member_type) {
-                    $query->where('co_no_target', '=', Auth::user()->co_no)->orWhere('mb_no_question',$member_type->mb_no)->orWhere('co_no_target', '=', $member_type->company->co_parent->co_no)
-                        ->orWhereHas('member',function ($query) use ($member_type){
-                            $query->where('co_no','=',$member_type->co_no);
+            // }else if($member_type->mb_type == 'shop'){
+            //     $count_qna_question = Qna::with(['member','company','member_question'])->where('depth_level',0)->where('qna_status','!=','삭제')->where(function ($query) use ($member_type) {
+            //         $query->where('co_no_target', '=', Auth::user()->co_no)->orWhere('mb_no_question',$member_type->mb_no)->orWhere('co_no_target', '=', $member_type->company->co_parent->co_no)
+            //             ->orWhereHas('member',function ($query) use ($member_type){
+            //                 $query->where('co_no','=',$member_type->co_no);
                             
-                        })->orwhereHas('company.co_parent',function ($query2) use ($member_type){
-                            $query2->where('co_no','=',$member_type->co_no);
-                        });
-                })->count();
-            } else if($member_type->mb_type == 'shipper') {
-                $count_qna_question = Qna::with(['member','company','member_question'])->where('depth_level',0)->where('qna_status','!=','삭제')->where(function ($query) use ($member_type) {
-                    $query->where('co_no_target', '=', Auth::user()->co_no)->orWhere('mb_no_question',$member_type->mb_no)
-                        ->orWhereHas('member',function ($query) use ($member_type){
-                            $query->where('co_no','=',$member_type->co_no);
-                        });
-                })->count();
-            }
-         
+            //             })->orwhereHas('company.co_parent',function ($query2) use ($member_type){
+            //                 $query2->where('co_no','=',$member_type->co_no);
+            //             });
+            //     });
+            //     if (isset($validated['from_date'])) {
+            //         $qna->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            //     }
+    
+            //     if (isset($validated['to_date'])) {
+            //         $qna->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            //     }
+            //     if (isset($validated['status'])) {
+            //         $count_qna_question->where('qna_status', 'like', '%' . $validated['status'] . '%');
+            //     }
+            //     $count_qna_question = $count_qna_question->count();
 
+            // } else if($member_type->mb_type == 'shipper') {
+            //     $count_qna_question = Qna::with(['member','company','member_question'])->where('depth_level',0)->where('qna_status','!=','삭제')->where(function ($query) use ($member_type) {
+            //         $query->where('co_no_target', '=', Auth::user()->co_no)->orWhere('mb_no_question',$member_type->mb_no)
+            //             ->orWhereHas('member',function ($query) use ($member_type){
+            //                 $query->where('co_no','=',$member_type->co_no);
+            //             });
+            //     });
+                
+            //     if (isset($validated['status'])) {
+            //         $count_qna_question->where('qna_status', 'like', '%' . $validated['status'] . '%');
+            //     }
+            //     $count_qna_question = $count_qna_question->count();
+
+            // }
+         
+            $count_qt = $qna->get();
+            foreach ($count_qt as $count) {
+                if($count->depth_level == 0){
+                    $count_qna_question++ ;
+                }
+            }
             $members = Member::where('mb_no', '!=', 0)->get();
 
             $qna = $qna->paginate($per_page, ['*'], 'page', $page);
