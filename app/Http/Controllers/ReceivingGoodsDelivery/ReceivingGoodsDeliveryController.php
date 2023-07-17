@@ -4532,10 +4532,13 @@ class ReceivingGoodsDeliveryController extends Controller
                                 }
                             }
 
+                            $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+
                             DB::commit();
                             return response()->json([
                                 'message' => 'Success',
-                                'a' => $check_payment->p_tid
+                                'a' => $check_payment->p_tid,
+                                'rgd' => $rgd
                             ]);
                         } else {
                             DB::commit();
