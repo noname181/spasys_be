@@ -12754,12 +12754,12 @@ class RateDataController extends Controller
 
             $rgd_no = $request->ETC1;
 
-            $check_payment = Payment::where('rgd_no', $rgd_no)->where('p_cancel_yn', 'y')->first();
+            $check_payment = Payment::where('rgd_no', $rgd_no)->orderBy('p_no', 'DESC')->first();
             $user = Member::where('mb_no', $request->ETC3)->first();
 
             $p_method_fee = $request->AMOUNT;
 
-            if (isset($check_payment)) {
+            if (isset($check_payment->p_no) && $check_payment->p_cancel_yn == 'y') {
                 $rgd = ReceivingGoodsDelivery::with(['rate_data_general'])->where('rgd_no', $rgd_no)->first();
 
                 Payment::insertGetId(
@@ -12846,6 +12846,33 @@ class RateDataController extends Controller
                     $sender = Member::where('mb_no', $rgd->mb_no)->first();
                     CommonFunc::insert_alarm($ad_tile, $rgd, $sender, null, 'settle_payment', $p_method_fee);
                 }
+            } else if (isset($check_payment->p_no)) {
+                Payment::where('p_no', $check_payment->p_no)->update(
+                    [
+                        'mb_no' => $request->ETC3,
+                        'rgd_no' => $rgd_no,
+                        'p_price' => $request->ETC2,
+                        'p_method' => $request->ETC5,
+                        'p_success_yn' => 'y',
+                        'p_method_fee' => $request->AMOUNT,
+                        'p_method_name' => null,
+                        'p_method_number' => null,
+                        'p_card_name' => $request->CARDNAME,
+
+                        'p_resultmgs' => $request->RESULTMSG,
+                        'p_orderno' => $request->ORDERNO,
+                        'p_amount' => $request->AMOUNT,
+                        'p_tid' => $request->TID,
+                        'p_acceptdate' => $request->ACCEPTDATE,
+                        'p_acceptno' => $request->ACCEPTNO,
+                        'p_cardname' => $request->CARDNAME,
+                        'p_accountno' => $request->ACCOUNTNO,
+                        'p_cardno' => $request->ACCOUNTNO,
+                        'p_receivername' => $request->RECEIVERNAME,
+                        'p_depositenddate' => $request->DEPOSITENDDATE,
+                        'p_cardcode' => $request->CARDCODE,
+                    ]
+                );
             } else {
                 $rgd = ReceivingGoodsDelivery::with(['rate_data_general'])->where('rgd_no', $rgd_no)->first();
                 Payment::insertGetId(
