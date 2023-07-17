@@ -769,6 +769,9 @@ class AlarmController extends Controller
                     })->orwhere(function ($q) use ($user) {
                         $q->whereNotNull('receiver_no')->where('alarm_type', 'like', '%alarm_pw_company_3m%')
                             ->where('receiver_no', $user->mb_no);
+                    })->orwhere(function ($q) use ($user) {
+                        $q->whereNotNull('receiver_no')->where('alarm_type', 'like', 'cargo_status3_EW')
+                            ->where('receiver_no', $user->mb_no);
                     });
                 })
                     ->orderBy('alarm_no', 'DESC');
