@@ -223,9 +223,9 @@ class SendEmailController extends Controller
         if (!is_dir($path)) {
             File::makeDirectory($path, $mode = 0777, true, true);
         }
-        $mask = $path . 'PDF-Quotation-Send-Details-*.*';
+        $mask = $path . '요율발송_*.*';
         array_map('unlink', glob($mask) ?: []);
-        $file_name_download = $path . 'PDF-Quotation-Send-Details-' . date('YmdHis') . '.pdf';
+        $file_name_download = $path . '요율발송_' . isset($validated['rmd_number']) ? $validated['rmd_number'] : '' . '.pdf';
         // $check_status = $Excel_writer->save($file_name_download);
         $pdf = Pdf::loadView('pdf.test',['rate_data_send_meta'=>$rate_data_send_meta]);
         $pdf->save($file_name_download);
@@ -264,6 +264,7 @@ class SendEmailController extends Controller
             return response()->json([
                 'message' => Messages::MSG_0007,
                 // 'push' => $push,
+                'rate_data_send_meta'=>$rate_data_send_meta
             ]);
         } catch (\Exception $e) {
             Log::error($e);
@@ -1203,9 +1204,9 @@ class SendEmailController extends Controller
             File::makeDirectory($path, $mode = 0777, true, true);
         }
 
-        $mask = $path . 'PDF-precalculate-Details-*.*';
+        $mask = $path . '예상비용 미리보기_*.*';
         array_map('unlink', glob($mask) ?: []);
-        $file_name_download = $path . 'PDF-precalculate-Details-' . date('YmdHis') . '.pdf';
+        $file_name_download = $path . '예상비용 미리보기_' . isset($validated['rmd_number']) ? $validated['rmd_number'] : null . '.pdf';
         $pdf = Pdf::loadView('pdf.test2',['rate_data_general'=>$rate_data_general,'rate_data'=>$rate_data,'service'=>$service,'bonded1a'=>$bonded1a
         ,'bonded1b'=>$bonded1b,'bonded1c'=>$bonded1c,'tab_child'=>$validated['rmd_tab_child'] ? $validated['rmd_tab_child'] : '',
         'count3'=>$count3,'count2'=>$count2,'count1'=>$count1,'total_1'=>$total_1,'total_2'=>$total_2,'total_3'=>$total_3,'mb_type'=>Auth::user()->mb_type
@@ -1233,7 +1234,7 @@ class SendEmailController extends Controller
             ]);
             $mail_details = [ 
                 'title' => $validated['se_title'],
-                'body' => $validated['se_content'],
+                'body' => nl2br($validated['se_content']),
             ];
             $path2 = '/var/www/html/'.$file_name_download;
             Mail::send('emails.quotation',['details'=>$mail_details], function($message)use($validated,$path2) {

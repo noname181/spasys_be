@@ -492,6 +492,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/download_fulfill_excel/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_fulfill_excel']);
         //bonded
         Route::get('/download_bonded_monthbill_excel/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_bonded_monthbill_excel']);
+        //settlement list
+        Route::post('/download_settlement_list_excel',[\App\Http\Controllers\RateData\RateDataController::class, 'download_settlement_list_excel']);
 
         //distribution_final_casebill
         Route::get('/download_final_case_bill/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_final_case_bill']);
