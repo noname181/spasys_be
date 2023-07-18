@@ -47,6 +47,18 @@ class CommonFunc
         return $string;
     }
 
+    static function generate_w_schedule_number_service2($data, $type ,$date , $key = "")
+    {
+        $string = 'SPA';
+        if ($key) {
+            $string = $string . '_' . date_format($date,"Ymd") . $data . '_' . $key . '_' . $type;
+        } else {
+            $string = $string . '_' . date_format($date,"Ymd") . $data . '_' . $type;
+        }
+
+        return $string;
+    }
+
     static function generate_rmd_number($id, $index)
     {
         $string = date('Ymd') . $id;

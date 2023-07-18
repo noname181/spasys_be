@@ -212,8 +212,8 @@ class ScheduleShipmentController extends Controller
                     } else {
                         $q->first_item_name_total = '';
                     }
-
-                    $q->w_schedule_number = (new CommonFunc)->generate_w_schedule_number($item->ss_no, 'EW');
+                    // $text = $q->status == '출고' ? "EWC" : "EW";
+                    // $q->w_schedule_number = isset($q->w_schedule_number) ? $q->w_schedule_number : (new CommonFunc)->generate_w_schedule_number_service2($q->ss_no, $text, $q->created_at);
                     //$q->test = $total_item;
 
                     return  $q;
@@ -651,7 +651,8 @@ class ScheduleShipmentController extends Controller
         if (!empty($schedule_shipment) && !empty($schedule_shipment_item)) {
             $collect_test = collect($schedule_shipment)->map(function ($item) use ($schedule_shipment_item) {
                 $item->item2 = isset($schedule_shipment_item) ? $schedule_shipment_item : array();
-                $item->w_schedule_number = (new CommonFunc)->generate_w_schedule_number($item->ss_no, 'EW');
+                $text = $item->status == '출고' ? "EWC" : "EW";
+                $item->w_schedule_number = (new CommonFunc)->generate_w_schedule_number_service2($item->ss_no, $text, $item->created_at);
                 return $item;
             });
             return response()->json(
