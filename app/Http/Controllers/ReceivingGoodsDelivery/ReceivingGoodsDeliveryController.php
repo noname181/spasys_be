@@ -1291,6 +1291,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_status1' => isset($location['rgd_status1']) ? $location['rgd_status1'] : null,
                             'rgd_status2' => isset($location['rgd_status2']) ? $location['rgd_status2'] : null,
                             'rgd_status3' => isset($location['rgd_status3']) ? $location['rgd_status3'] : null,
+                            'rgd_status3_time' => isset($location['rgd_status3']) && $location['rgd_status3'] == "배송완료" ? Carbon::now()->toDateTimeString() : null,
                             'rgd_contents' => isset($location['rgd_contents']) ? $location['rgd_contents'] : null,
                             'rgd_delivery_company' => isset($location['rgd_delivery_company']) ? $location['rgd_delivery_company'] : null,
                             'rgd_tracking_code' => isset($location['rgd_tracking_code']) ? $location['rgd_tracking_code'] : null,
