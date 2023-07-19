@@ -2209,11 +2209,15 @@ class ReceivingGoodsDeliveryController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $rgd = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->where('is_no', $is_no)->whereNull('rgd_parent_no')->get();
-
+            $rgd = collect($rgd)->map(function ($item) use ($is_no) {
+                $export = Export::with(['import', 'import_expected', 't_export_confirm'])->where('te_carry_out_number', $is_no)->first();
+                $item->export = $export;
+                return $item;
+            });
             return response()->json($rgd);
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -2242,7 +2246,7 @@ class ReceivingGoodsDeliveryController extends Controller
     public function create_import_schedule(ReceivingGoodsDeliveryCreateRequest $request)
     {
         $validated = $request->validated();
-
+        $user = Auth::user();
         try {
             DB::beginTransaction();
 
@@ -2322,9 +2326,34 @@ class ReceivingGoodsDeliveryController extends Controller
                         ]);
                     }
                 }
+
+
+                //alert
+                if (isset($request->company)) {
+                    $w_no_alert = (object)$rgd;
+                    $w_no_alert->w_category_name = '보세화물';
+
+                    $w_no_alert->company = (object)$request->company;
+                    $w_no_alert->company->co_parent = (object)$request->company['co_parent'];
+                    $w_no_alert->company->co_parent->co_parent = (object)$w_no_alert->company->co_parent->co_parent;
+
+                    $rgd_status3  = isset($rgd['rgd_status3']) ? $rgd['rgd_status3'] : null;
+
+                    $check_alarm_first = Alarm::with(['alarm_data'])->where('w_no', $validated['is_no'])->whereHas('alarm_data', function ($query) {
+                        $query->where(DB::raw('lower(ad_title)'), 'like', '%' . strtolower('[보세화물] 배송중') . '%');
+                    })->first();
+
+                    if ($check_alarm_first === null && $rgd_status3 == '배송중')
+                        CommonFunc::insert_alarm_cargo('[보세화물] 배송중', null, $user, $w_no_alert, 'cargo_delivery');
+
+                    $check_alarm_first = Alarm::with(['alarm_data'])->where('w_no', $validated['is_no'])->whereHas('alarm_data', function ($query) {
+                        $query->where(DB::raw('lower(ad_title)'), 'like', '%' . strtolower('[보세화물] 배송완료') . '%');
+                    })->first();
+
+                    if ($check_alarm_first === null && $rgd_status3 == '배송완료')
+                        CommonFunc::insert_alarm_cargo('[보세화물] 배송완료', null, $user, $w_no_alert, 'cargo_delivery');
+                }
             }
-
-
 
 
 
@@ -2835,12 +2864,12 @@ class ReceivingGoodsDeliveryController extends Controller
             DB::beginTransaction();
             $user = Auth::user();
 
-           
+
             $company_child = Company::where('co_parent_no', $user->co_no)->orwhere('co_no', $user->co_no)->get();
-            
-            
+
+
             $CheckCorpNumList = [];
-            foreach($company_child as $company){
+            foreach ($company_child as $company) {
                 $CheckCorpNumList[] =  $company->co_license;
             }
             //return $CheckCorpNumList;
@@ -2882,21 +2911,20 @@ class ReceivingGoodsDeliveryController extends Controller
                 'CheckCorpNumList'    => $CheckCorpNumList
             ))->GetCorpStatesResult->CorpState;
 
-            foreach($Result as $value){
+            foreach ($Result as $value) {
                 //return $value->State;
-                if($value->State > 0){
+                if ($value->State > 0) {
                     Company::where('co_license', $value->CorpNum)->update([
                         'co_close_yn' => "n",
                     ]);
-                }else{
+                } else {
                     Company::where('co_license', $value->CorpNum)->update([
                         'co_close_yn' => "y",
                     ]);
                 }
-                
             }
 
-            
+
 
             if ($text == "error") {
                 DB::rollBack();
@@ -3089,7 +3117,7 @@ class ReceivingGoodsDeliveryController extends Controller
             $rgd = ReceivingGoodsDelivery::with(['cancel_bill_history', 'rgd_child', 'payment' => function ($q) {
                 $q->orderBy('p_no', 'desc');
             }])->where('rgd_no', $request->rgd_no)->first();
-            
+
             if ($request->payment_status == '결제완료' && $rgd->rgd_status6 != 'paid') {
                 ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
                     'rgd_status6' => 'paid',
@@ -3298,7 +3326,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 ]);
 
                 if ($rgd->rgd_status7 != 'taxed') {
-                    $tax_number = CommonFunc::generate_tax_number($rgd['rgd_no'],null);
+                    $tax_number = CommonFunc::generate_tax_number($rgd['rgd_no'], null);
 
                     ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
                         'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
@@ -3372,7 +3400,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     }
                 }
             } else if ($request->complete_status == '정산완료' && $rgd->rgd_status7 != 'taxed') {
-                $tax_number = CommonFunc::generate_tax_number($rgd['rgd_no'],null);
+                $tax_number = CommonFunc::generate_tax_number($rgd['rgd_no'], null);
 
                 ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
                     'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
@@ -4818,7 +4846,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 );
 
                 //alert
-                if(isset($request->company)){
+                if (isset($request->company)) {
                     $w_no_alert = (object)$dataSubmit;
                     $w_no_alert->w_category_name = '보세화물';
 
@@ -4842,7 +4870,6 @@ class ReceivingGoodsDeliveryController extends Controller
                     if ($check_alarm_first === null && $rgd_status3 == '배송완료')
                         CommonFunc::insert_alarm_cargo('[보세화물] 배송완료', null, $user, $w_no_alert, 'cargo_delivery');
                 }
-                
             }
             if (isset($data['remove'])) {
                 foreach ($data['remove'] as $remove) {
