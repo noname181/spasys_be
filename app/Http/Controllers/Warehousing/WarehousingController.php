@@ -5168,7 +5168,7 @@ class WarehousingController extends Controller
                 })->whereNull('rgd_status5');
             }
             $warehousing
-                ->whereNotNull('rgd_te_carry_out_number')
+                // ->whereNotNull('rgd_te_carry_out_number')
                 ->where('rgd_status1', '=', '입고')
                 ->where(function ($q) {
                     $q->where(function ($query) {
