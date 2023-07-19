@@ -225,7 +225,7 @@ class SendEmailController extends Controller
         }
         $mask = $path . '요율발송_*.*';
         array_map('unlink', glob($mask) ?: []);
-        $file_name_download = $path . '요율발송_' . isset($validated['rmd_number']) ? $validated['rmd_number'] : '' . '.pdf';
+        $file_name_download = $path . '요율발송_' . $validated['rmd_number'] . '.pdf';
         // $check_status = $Excel_writer->save($file_name_download);
         $pdf = Pdf::loadView('pdf.test',['rate_data_send_meta'=>$rate_data_send_meta]);
         $pdf->save($file_name_download);
@@ -1206,7 +1206,8 @@ class SendEmailController extends Controller
 
         $mask = $path . '예상비용 미리보기_*.*';
         array_map('unlink', glob($mask) ?: []);
-        $file_name_download = $path . '예상비용 미리보기_' . isset($validated['rmd_number']) ? $validated['rmd_number'] : null . '.pdf';
+        $rmd_name_file = isset($validated['rmd_number']) ? $validated['rmd_number'] : '';
+        $file_name_download = $path . '예상비용 미리보기_' . $rmd_name_file . '.pdf';
         $pdf = Pdf::loadView('pdf.test2',['rate_data_general'=>$rate_data_general,'rate_data'=>$rate_data,'service'=>$service,'bonded1a'=>$bonded1a
         ,'bonded1b'=>$bonded1b,'bonded1c'=>$bonded1c,'tab_child'=>$validated['rmd_tab_child'] ? $validated['rmd_tab_child'] : '',
         'count3'=>$count3,'count2'=>$count2,'count1'=>$count1,'total_1'=>$total_1,'total_2'=>$total_2,'total_3'=>$total_3,'mb_type'=>Auth::user()->mb_type
