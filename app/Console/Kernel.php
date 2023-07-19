@@ -24,13 +24,12 @@ class Kernel extends ConsoleKernel
         $schedule->call('App\Http\Controllers\ScheduleShipment\ScheduleShipmentController@stock_history')->name('stock_history')->withoutOverlapping()->cron('*/35 * * * *');
         $schedule->call('App\Http\Controllers\Item\ItemController@createBondedSettlement')->name('createBondedSettlement')->withoutOverlapping()->cron('*/40 * * * *');
         
-        $schedule->call('App\Http\Controllers\Item\ItemController@updateStockCompanyApiNoLogin')->name('updateStockCompanyApiNoLogin')->withoutOverlapping()->cron('01 0 * * *');
+        $schedule->call('App\Http\Controllers\Item\ItemController@updateStockCompanyApiNoLogin')->name('updateStockCompanyApiNoLogin')->withoutOverlapping()->cron('00 0 * * *');
         $schedule->call('App\Http\Controllers\AlarmData\AlarmDataController@insertDailyAlarm7')->name('insertDailyAlarm7')->withoutOverlapping()->cron('01 9 * * *');
         $schedule->call('App\Http\Controllers\AlarmData\AlarmDataController@insertDailyAlarm30')->name('insertDailyAlarm30')->withoutOverlapping()->cron('02 9 * * *');
         $schedule->call('App\Http\Controllers\AlarmData\AlarmDataController@insertDailyAlarmInsulace7')->name('insertDailyAlarmInsulace7')->withoutOverlapping()->cron('03 9 * * *');
         $schedule->call('App\Http\Controllers\AlarmData\AlarmDataController@insertDailyAlarmInsulace30')->name('insertDailyAlarmInsulace30')->withoutOverlapping()->cron('04 9 * * *');
         $schedule->call('App\Http\Controllers\AlarmData\AlarmDataController@alarmPw90d')->name('alarmPw90d')->withoutOverlapping()->cron('05 9 * * *');
-        $schedule->call('App\Http\Controllers\Item\ItemController@updateStockCompanyApiNoLogin')->name('updateStockCompanyApiNoLogin2')->withoutOverlapping()->cron('00 10 * * *');
 
     }
 
