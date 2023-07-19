@@ -10958,140 +10958,185 @@ class RateDataController extends Controller
         $rate_data_send_meta = $this->getRateDataRaw($rm_no, $rmd_no);
         DB::commit();
         $user = Auth::user();
-
+        $company = Company::where('co_no',$co_no)->first();
+        $rate_meta = RateMeta::where('rm_no',$rm_no)->first();
         $data_sheet3 = $data_sheet2 = $rate_data = array();
 
         $spreadsheet = new Spreadsheet();
+        $spreadsheet->getDefaultStyle()->getFont()->setSize(10);
         $sheet = $spreadsheet->getActiveSheet(0);
+        
         $spreadsheet->getActiveSheet()->getProtection()->setSheet(true);
-
+        $sheet->getColumnDimension('B')->setWidth(16);
+        $sheet->getColumnDimension('C')->setWidth(12);
+        $sheet->getStyle('A1:Z200')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+        $sheet->getStyle('A1:CT200')->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FFFFFF'));
         $sheet->setTitle('보세화물');
 
-        $sheet->setCellValue('A1', '창고화물');
-        $sheet->setCellValue('H1', '온도화물');
-        $sheet->setCellValue('O1', '위험물');
-        $sheet->mergeCells('A1:E1');
-        $sheet->mergeCells('H1:L1');
-        $sheet->mergeCells('O1:S1');
+        $sheet->mergeCells('B2:Z6');
+        $sheet->getStyle('B2:Z6')->getBorders()->getOutline()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+        $sheet->setCellValue('B2', $rate_meta->rm_biz_name);
+        $sheet->getStyle('B2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('B2')->getFont()->setSize(22)->setBold(true);
+      
 
-        $sheet->setCellValue('A2', '구분');
-        $sheet->setCellValue('B2', '내역');
-        $sheet->mergeCells('B2:E2');
-        $sheet->setCellValue('H2', '구분');
-        $sheet->setCellValue('I2', '내역');
-        $sheet->mergeCells('I2:L2');
-        $sheet->setCellValue('O2', '구분');
-        $sheet->setCellValue('P2', '내역');
-        $sheet->mergeCells('P2:S2');
-
-        $sheet->setCellValue('A3', '');
-        $sheet->setCellValue('B3', '항목');
-        $sheet->setCellValue('C3', '상세');
-        $sheet->setCellValue('D3', '기본료');
-        $sheet->setCellValue('E3', '단가/KG');
-
-        $sheet->setCellValue('H3', '');
-        $sheet->setCellValue('I3', '항목');
-        $sheet->setCellValue('J3', '상세');
-        $sheet->setCellValue('K3', '기본료');
-        $sheet->setCellValue('L3', '단가/KG');
-
-        $sheet->setCellValue('O3', '');
-        $sheet->setCellValue('P3', '항목');
-        $sheet->setCellValue('Q3', '상세');
-        $sheet->setCellValue('R3', '기본료');
-        $sheet->setCellValue('S3', '단가/KG');
-
-        if (!empty($rate_data_send_meta['rate_data1'])) {
-            $data_sheet1 = $rate_data_send_meta['rate_data1'];
-            $sheet_row1 = 4;
-            $sheet_row2 = 4;
-            $sheet_row3 = 4;
-            foreach ($data_sheet1  as $key => $dt1) {
-                if ($dt1['rd_cate_meta2'] == '창고화물' || ($dt1['rd_cate_meta2'] == '온도화물' && $key == 14)) {
-                    if($key < 15){
-                    $sheet->setCellValue('A' . $sheet_row1, !empty($dt1['rd_cate1']) ? $dt1['rd_cate1'] : '');
-                    $sheet->setCellValue('B' . $sheet_row1, !empty($dt1['rd_cate2']) ? $dt1['rd_cate2'] : '');
-                    $sheet->setCellValue('C' . $sheet_row1, !empty($dt1['rd_cate3']) ? $dt1['rd_cate3'] : '');
-                    $sheet->setCellValue('D' . $sheet_row1, !empty($dt1['rd_data1']) ? $dt1['rd_data1'] : '');
-                    if($key < 14){
-                    $sheet->setCellValue('E' . $sheet_row1, !empty($dt1['rd_data2']) ? $dt1['rd_data2'] : '');
-                    }
-                    $sheet_row1++;
-                    }
-                } else if ($dt1['rd_cate_meta2'] == '온도화물') {
-                    if($key >= 15 && $key < 30){
-                    $sheet->setCellValue('H' . $sheet_row2, !empty($dt1['rd_cate1']) ? $dt1['rd_cate1'] : '');
-                    $sheet->setCellValue('I' . $sheet_row2, !empty($dt1['rd_cate2']) ? $dt1['rd_cate2'] : '');
-                    $sheet->setCellValue('J' . $sheet_row2, !empty($dt1['rd_cate3']) ? $dt1['rd_cate3'] : '');
-                    $sheet->setCellValue('K' . $sheet_row2, !empty($dt1['rd_data1']) ? $dt1['rd_data1'] : '');
-                    if($key < 29){
-                    $sheet->setCellValue('L' . $sheet_row2, !empty($dt1['rd_data2']) ? $dt1['rd_data2'] : '');
-                    }
-                    $sheet_row2++;
-                    }
-                } else if ($dt1['rd_cate_meta2'] == '위험물') {
-                    if($key >= 30 && $key < 45){
-                    $sheet->setCellValue('O' . $sheet_row3, !empty($dt1['rd_cate1']) ? $dt1['rd_cate1'] : '');
-                    $sheet->setCellValue('P' . $sheet_row3, !empty($dt1['rd_cate2']) ? $dt1['rd_cate2'] : '');
-                    $sheet->setCellValue('Q' . $sheet_row3, !empty($dt1['rd_cate3']) ? $dt1['rd_cate3'] : '');
-                    $sheet->setCellValue('R' . $sheet_row3, !empty($dt1['rd_data1']) ? $dt1['rd_data1'] : '');
-                    if($key < 44){
-                    $sheet->setCellValue('S' . $sheet_row3, !empty($dt1['rd_data2']) ? $dt1['rd_data2'] : '');
-                    }
-                    $sheet_row3++;
-                    }
-                }
-            }
+        $sheet->getStyle('Z8')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->setCellValue('Z8', '사업자번호 : '. $rate_meta->rm_biz_number);
+        $sheet->getStyle('Z9')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->setCellValue('Z9', '사업장 주소 : '. $rate_meta->rm_biz_address);
+        if($rate_meta->rm_owner_name && $rate_meta->rm_biz_email){
+        $sheet->getStyle('Z10')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->setCellValue('Z10', '대표자명 : '. $rate_meta->rm_owner_name . ' (' . $rate_meta->rm_biz_email . ')');
+        } else if($rate_meta->rm_owner_name && !$rate_meta->rm_biz_email){
+            $sheet->getStyle('Z10')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+            $sheet->setCellValue('Z10', '대표자명 : '. $rate_meta->rm_owner_name );
         }
 
-        $spreadsheet->createSheet();
-        $sheet2 = $spreadsheet->getSheet(1);
-
-        $sheet2->setTitle('수입풀필먼트');
-
-        $sheet2->setCellValue('A1', '기준');
-        $sheet2->mergeCells('A1:B1');
-        $sheet2->setCellValue('C1', '단위');
-        $sheet2->setCellValue('D1', '단가');
-        $sheet2->setCellValue('E1', 'ON/OFF');
-
-        $sheet2_row = 2;
         if (!empty($rate_data_send_meta['rate_data2'])) {
-            $data_sheet2 = $rate_data_send_meta['rate_data2'];
-            foreach ($data_sheet2 as $dt2) {
-                $sheet2->setCellValue('A' . $sheet2_row, !empty($dt2['rd_cate1']) ? $dt2['rd_cate1'] : '');
-                $sheet2->setCellValue('B' . $sheet2_row, !empty($dt2['rd_cate2']) ? $dt2['rd_cate2'] : '');
-                $sheet2->setCellValue('C' . $sheet2_row, !empty($dt2['rd_cate3']) ? $dt2['rd_cate3'] : '');
-                $sheet2->setCellValue('D' . $sheet2_row, !empty($dt2['rd_data1']) ? $dt2['rd_data1'] : '');
-                $sheet2->setCellValue('E' . $sheet2_row, !empty($dt2['rd_data2']) ? $dt2['rd_data2'] : '');
-                $sheet2_row++;
+        $sheet->getStyle('B13')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
+        $sheet->getStyle('B13')->getFont()->setBold(true);
+        $sheet->mergeCells('B13:Z13');
+        $sheet->setCellValue('B13', '서비스: 수입풀필먼트');
+
+        foreach ($sheet->getRowIterator() as $row) {
+            $sheet->getRowDimension($row->getRowIndex())->setRowHeight(21);
+        }
+    
+
+        $sheet->getStyle('N'. (14). ':Q'. (14))->getNumberFormat()->setFormatCode('#,##0_-""');
+
+        $sheet->getStyle('B'. (14). ':E'. (14))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+        $sheet->getStyle('B'. (14). ':E'. (14))->getFont()->setBold(true);
+        $sheet->getStyle('B'. (14). ':Z'. (14))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        $sheet->getStyle('B'. (14). ':Z'. (14))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+        $sheet->getStyle('B'. (14). ':Z'. (14))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+        $sheet->getStyle('B'. (14). ':Z'. (14))->getFont()->setBold(true);
+
+        $sheet->mergeCells('B'. (14). ':I'. (14));
+        $sheet->getStyle('B'. (14))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->setCellValue('B'. (14), '기준');
+
+
+
+        $sheet->mergeCells('J'. (14). ':M'. (14));
+        $sheet->getStyle('J'. (14))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->setCellValue('J'. (14), '단위');
+
+        $sheet->mergeCells('N'. (14). ':Q'. (14));
+        $sheet->getStyle('N'. (14))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->setCellValue('N'. (14), '단가');
+
+        $sheet->mergeCells('R'. (14). ':Z'. (14));
+        $sheet->getStyle('R'. (14))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->setCellValue('R'. (14), 'ON/OFF');
+        $current_row = 15;
+        $count1 = 0;
+        foreach($rate_data_send_meta['rate_data2'] as $key => $row){
+            if($row['rd_cate1'] == '입고' && ($row['rd_cate2'] == '정상입고' || $row['rd_cate2'] == '입고검품' || $row['rd_cate2'] == '반품입고' || $row['rd_cate2'] == '반품양품화')){
+                $sheet->mergeCells('C'.($current_row + $count1).':I'.($current_row + $count1));
+                $sheet->setCellValue('C'.($current_row + $count1), $row['rd_cate2']);
+                $count1 += 1;
             }
         }
-
-        $spreadsheet->createSheet();
-        $sheet3 = $spreadsheet->getSheet(2);
-
-        $sheet3->setTitle('유통가공');
-
-        $sheet3->setCellValue('A1', '기준');
-        $sheet3->mergeCells('A1:B1');
-        $sheet3->setCellValue('C1', '단위');
-        $sheet3->setCellValue('D1', '단가');
-        $sheet3->setCellValue('E1', 'ON/OFF');
-
-        $sheet3_row = 2;
-        if (!empty($rate_data_send_meta['rate_data3'])) {
-            $data_sheet3 = $rate_data_send_meta['rate_data3'];
-            foreach ($data_sheet3 as $dt3) {
-                $sheet3->setCellValue('A' . $sheet3_row, !empty($dt3['rd_cate1']) ? $dt3['rd_cate1'] : '');
-                $sheet3->setCellValue('B' . $sheet3_row, !empty($dt3['rd_cate2']) ? $dt3['rd_cate2'] : '');
-                $sheet3->setCellValue('C' . $sheet3_row, !empty($dt3['rd_cate3']) ? $dt3['rd_cate3'] : '');
-                $sheet3->setCellValue('D' . $sheet3_row, !empty($dt3['rd_data1']) ? $dt3['rd_data1'] : '');
-                $sheet3->setCellValue('E' . $sheet3_row, !empty($dt3['rd_data2']) ? $dt3['rd_data2'] : '');
-                $sheet3_row++;
-            }
+        if($count1 > 0){
+            $sheet->mergeCells('B'. ($current_row). ':B'. ($current_row+$count1 - 1));
+            $sheet->getStyle('B'. ($current_row))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+            $sheet->setCellValue('B'. ($current_row), '입고');
         }
+        
+
+        }
+        // if (!empty($rate_data_send_meta['rate_data1'])) {
+        //     $data_sheet1 = $rate_data_send_meta['rate_data1'];
+        //     $sheet_row1 = 4;
+        //     $sheet_row2 = 4;
+        //     $sheet_row3 = 4;
+        //     foreach ($data_sheet1  as $key => $dt1) {
+        //         if ($dt1['rd_cate_meta2'] == '창고화물' || ($dt1['rd_cate_meta2'] == '온도화물' && $key == 14)) {
+        //             if($key < 15){
+        //             $sheet->setCellValue('A' . $sheet_row1, !empty($dt1['rd_cate1']) ? $dt1['rd_cate1'] : '');
+        //             $sheet->setCellValue('B' . $sheet_row1, !empty($dt1['rd_cate2']) ? $dt1['rd_cate2'] : '');
+        //             $sheet->setCellValue('C' . $sheet_row1, !empty($dt1['rd_cate3']) ? $dt1['rd_cate3'] : '');
+        //             $sheet->setCellValue('D' . $sheet_row1, !empty($dt1['rd_data1']) ? $dt1['rd_data1'] : '');
+        //             if($key < 14){
+        //             $sheet->setCellValue('E' . $sheet_row1, !empty($dt1['rd_data2']) ? $dt1['rd_data2'] : '');
+        //             }
+        //             $sheet_row1++;
+        //             }
+        //         } else if ($dt1['rd_cate_meta2'] == '온도화물') {
+        //             if($key >= 15 && $key < 30){
+        //             $sheet->setCellValue('H' . $sheet_row2, !empty($dt1['rd_cate1']) ? $dt1['rd_cate1'] : '');
+        //             $sheet->setCellValue('I' . $sheet_row2, !empty($dt1['rd_cate2']) ? $dt1['rd_cate2'] : '');
+        //             $sheet->setCellValue('J' . $sheet_row2, !empty($dt1['rd_cate3']) ? $dt1['rd_cate3'] : '');
+        //             $sheet->setCellValue('K' . $sheet_row2, !empty($dt1['rd_data1']) ? $dt1['rd_data1'] : '');
+        //             if($key < 29){
+        //             $sheet->setCellValue('L' . $sheet_row2, !empty($dt1['rd_data2']) ? $dt1['rd_data2'] : '');
+        //             }
+        //             $sheet_row2++;
+        //             }
+        //         } else if ($dt1['rd_cate_meta2'] == '위험물') {
+        //             if($key >= 30 && $key < 45){
+        //             $sheet->setCellValue('O' . $sheet_row3, !empty($dt1['rd_cate1']) ? $dt1['rd_cate1'] : '');
+        //             $sheet->setCellValue('P' . $sheet_row3, !empty($dt1['rd_cate2']) ? $dt1['rd_cate2'] : '');
+        //             $sheet->setCellValue('Q' . $sheet_row3, !empty($dt1['rd_cate3']) ? $dt1['rd_cate3'] : '');
+        //             $sheet->setCellValue('R' . $sheet_row3, !empty($dt1['rd_data1']) ? $dt1['rd_data1'] : '');
+        //             if($key < 44){
+        //             $sheet->setCellValue('S' . $sheet_row3, !empty($dt1['rd_data2']) ? $dt1['rd_data2'] : '');
+        //             }
+        //             $sheet_row3++;
+        //             }
+        //         }
+        //     }
+        // }
+
+        // $spreadsheet->createSheet();
+        // $sheet2 = $spreadsheet->getSheet(1);
+
+        // $sheet2->setTitle('수입풀필먼트');
+
+        // $sheet2->setCellValue('A1', '기준');
+        // $sheet2->mergeCells('A1:B1');
+        // $sheet2->setCellValue('C1', '단위');
+        // $sheet2->setCellValue('D1', '단가');
+        // $sheet2->setCellValue('E1', 'ON/OFF');
+
+        // $sheet2_row = 2;
+        // if (!empty($rate_data_send_meta['rate_data2'])) {
+        //     $data_sheet2 = $rate_data_send_meta['rate_data2'];
+        //     foreach ($data_sheet2 as $dt2) {
+        //         $sheet2->setCellValue('A' . $sheet2_row, !empty($dt2['rd_cate1']) ? $dt2['rd_cate1'] : '');
+        //         $sheet2->setCellValue('B' . $sheet2_row, !empty($dt2['rd_cate2']) ? $dt2['rd_cate2'] : '');
+        //         $sheet2->setCellValue('C' . $sheet2_row, !empty($dt2['rd_cate3']) ? $dt2['rd_cate3'] : '');
+        //         $sheet2->setCellValue('D' . $sheet2_row, !empty($dt2['rd_data1']) ? $dt2['rd_data1'] : '');
+        //         $sheet2->setCellValue('E' . $sheet2_row, !empty($dt2['rd_data2']) ? $dt2['rd_data2'] : '');
+        //         $sheet2_row++;
+        //     }
+        // }
+
+        // $spreadsheet->createSheet();
+        // $sheet3 = $spreadsheet->getSheet(2);
+
+        // $sheet3->setTitle('유통가공');
+
+        // $sheet3->setCellValue('A1', '기준');
+        // $sheet3->mergeCells('A1:B1');
+        // $sheet3->setCellValue('C1', '단위');
+        // $sheet3->setCellValue('D1', '단가');
+        // $sheet3->setCellValue('E1', 'ON/OFF');
+
+        // $sheet3_row = 2;
+        // if (!empty($rate_data_send_meta['rate_data3'])) {
+        //     $data_sheet3 = $rate_data_send_meta['rate_data3'];
+        //     foreach ($data_sheet3 as $dt3) {
+        //         $sheet3->setCellValue('A' . $sheet3_row, !empty($dt3['rd_cate1']) ? $dt3['rd_cate1'] : '');
+        //         $sheet3->setCellValue('B' . $sheet3_row, !empty($dt3['rd_cate2']) ? $dt3['rd_cate2'] : '');
+        //         $sheet3->setCellValue('C' . $sheet3_row, !empty($dt3['rd_cate3']) ? $dt3['rd_cate3'] : '');
+        //         $sheet3->setCellValue('D' . $sheet3_row, !empty($dt3['rd_data1']) ? $dt3['rd_data1'] : '');
+        //         $sheet3->setCellValue('E' . $sheet3_row, !empty($dt3['rd_data2']) ? $dt3['rd_data2'] : '');
+        //         $sheet3_row++;
+        //     }
+        // }
 
         $Excel_writer = new Xlsx($spreadsheet);
         if (isset($user->mb_no)) {
@@ -11111,6 +11156,7 @@ class RateDataController extends Controller
             'link_download' => $file_name_download,
             'message' => 'Download File',
             'rate_data_send_meta'=>$rate_data_send_meta,
+            'count1'=>$count1
         ], 200);
         ob_end_clean();
     }
