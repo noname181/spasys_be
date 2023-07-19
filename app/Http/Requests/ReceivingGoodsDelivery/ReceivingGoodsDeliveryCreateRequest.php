@@ -165,6 +165,9 @@ class ReceivingGoodsDeliveryCreateRequest extends BaseFormRequest
             'location.*.rgd_delivery_company' => [
                 '',
             ],
+            'location.*.order_number' => [
+                '',
+            ],
             'location.*.rgd_tracking_code' => [
                 '',
                 '',
