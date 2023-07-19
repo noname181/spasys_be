@@ -50,6 +50,7 @@ class ReceivingGoodsDelivery extends Model
         'rgd_status1',
         'rgd_status2',
         'rgd_status3',
+        'rgd_status3_time',
         'rgd_delivery_company',
         'rgd_tracking_code',
         'rgd_delivery_man',
