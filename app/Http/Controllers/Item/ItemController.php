@@ -12,6 +12,7 @@ use App\Models\Item;
 use App\Models\ItemInfo;
 use App\Models\Company;
 use App\Models\File;
+use File as Files;
 use App\Models\ItemChannel;
 use App\Models\ImportExpected;
 use App\Models\Import;
@@ -23,6 +24,8 @@ use App\Http\Requests\Item\ExcelRequest;
 use App\Models\StockStatusBad;
 use App\Models\StockStatusCompany;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -1425,6 +1428,86 @@ class ItemController extends Controller
         //     Log::error($e);
         //     return response()->json(['message' => Messages::MSG_0004], 500);
         // }
+    }
+
+    public function downloadFulfillmentItemList(Request $request)
+    {
+
+        try {
+            $user = Auth::user();
+
+            if ($user->mb_type == 'shop') {
+                $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                })->orderBy('item_no', 'DESC')->get();
+            } else if ($user->mb_type == 'shipper') {
+                $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('ContractWms.company', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                })->orderBy('item_no', 'DESC')->get();
+            } else if ($user->mb_type == 'spasys') {
+                $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
+                    $q->where('co_no', $user->co_no);
+                })->orderBy('item_no', 'DESC')->get();
+            }
+            //$item->get();
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+
+            $sheet->setCellValue('A1', 'No');
+            $sheet->setCellValue('B1', '가맹점');
+            $sheet->setCellValue('C1', '화주');
+            $sheet->setCellValue('D1', '상품코드');
+            $sheet->setCellValue('E1', '옵션코드');
+            $sheet->setCellValue('F1', '상품명');
+            $sheet->setCellValue('G1', '옵션1');
+            $sheet->setCellValue('H1', '옵션2');
+            $sheet->setCellValue('I1', '등록일시');
+
+            $num_row = 2;
+            //return $item;
+            // $data_schedules =  json_decode($import_schedule);
+            if (!empty($item)) {
+                foreach ($item as $key => $data) {
+                    
+                    $sheet->setCellValue('A' . $num_row, ($key+1));
+                    $sheet->setCellValue('B' . $num_row, isset($data->ContractWms->company->co_parent->co_name) ? $data->ContractWms->company->co_parent->co_name : '');
+                    $sheet->setCellValue('C' . $num_row, isset($data->ContractWms->company->co_name) ? $data->ContractWms->company->co_name : '');
+                    $sheet->setCellValue('D' . $num_row, $data->product_id);
+                    $sheet->setCellValue('E' . $num_row, $data->option_id);
+                    $sheet->setCellValue('F' . $num_row, $data->item_name);
+                    $sheet->setCellValue('G' . $num_row, $data->item_option1);
+                    $sheet->setCellValue('H' . $num_row, $data->item_option2);
+                    $sheet->setCellValue('I' . $num_row, $data->created_at);
+                    $num_row++;
+                }
+            }
+            
+            $Excel_writer = new Xlsx($spreadsheet);
+            if (isset($user->mb_no)) {
+                $path = 'storage/download/' . $user->mb_no . '/';
+            } else {
+                $path = 'storage/download/no-name/';
+            }
+            if (!is_dir($path)) {
+                Files::makeDirectory($path, $mode = 0777, true, true);
+            }
+
+            $name = '수입_상품리스팅_';
+
+            $mask = $path . $name . '*.*';
+            array_map('unlink', glob($mask) ?: []);
+            $file_name_download = $path . $name . date('YmdHis') . '.Xlsx';
+            $check_status = $Excel_writer->save($file_name_download);
+            return response()->json([
+                'status' => 1,
+                'link_download' => '../'. $file_name_download,
+                'message' => 'Download File',
+            ], 200);
+            ob_end_clean();
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+        }
     }
 
     public function updateFile(Request $request)

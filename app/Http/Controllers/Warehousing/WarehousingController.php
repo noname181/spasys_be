@@ -9,6 +9,7 @@ use App\Http\Requests\Warehousing\WarehousingItemValidate;
 use App\Http\Requests\Warehousing\WarehousingRequest;
 use App\Http\Requests\Warehousing\WarehousingSearchRequest;
 use App\Models\StockHistory;
+use App\Models\StockStatusBad;
 use App\Models\ScheduleShipmentInfo;
 use App\Models\AdjustmentGroup;
 use App\Models\CompanySettlement;
@@ -7140,12 +7141,38 @@ class WarehousingController extends Controller
                 ->orderBy('created_at')->sum('stock');
 
                 $end_stock = StockStatusCompany::where('co_no', $request->co_no)
-                ->where('created_at', '>=', Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date))->format('Y-m-d') . ' 00:00:00')
-                ->where('created_at', '<=' , Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date)->addDays(1))->format('Y-m-d') . ' 00:00:00')
+                ->where('created_at', '>=', Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date)->addDays(1))->format('Y-m-d') . ' 00:00:00')
+                ->where('created_at', '<=' , Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date)->addDays(2))->format('Y-m-d') . ' 00:00:00')
                 ->orderBy('created_at')->sum('stock');
 
                 $start_stock = isset($start_stock) ? $start_stock : 0;
                 $end_stock = isset($end_stock) ? $end_stock : 0;
+
+                if(Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date))->format('Y-m-d') == Carbon::now()->format('Y-m-d')){
+                    DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+                    $item = StockStatusBad::with(['item_status_bad'])->whereHas('item_status_bad', function ($q) use ($user, $request) {
+                        $q->whereHas('ContractWms.company', function ($k) use ($request) {
+                            $k->where('co_no', $request->co_no);
+                        });
+                    })->whereNotNull('stock')->groupby('product_id')->groupby('option_id')->orderBy('product_id', 'DESC');
+
+                    $end_stock = collect($item->get())->map(function ($q) {
+                      
+                        if (isset($q->option_id)) {
+                            $status = StockStatusBad::where('product_id', $q->product_id)->where('option_id', $q->option_id)->get();
+                        } else {
+                            $status = StockStatusBad::where('product_id', $q->product_id)->get();
+                        }
+                        $count_total = 0;
+                        if (isset($status)) {
+                            foreach ($status as $total) {
+                                $count_total += $total->stock;
+                            }
+                        }
+                        return ['total_amount' => $count_total];
+                    })->sum('total_amount');
+                    DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+                }
 
             }else if($user->mb_type == 'spasys'){
 
@@ -7163,15 +7190,39 @@ class WarehousingController extends Controller
                     ->orderBy('created_at')->sum('stock');
                     $start_stock += isset($start_stock_) ? $start_stock_ : 0;
 
-
                     $end_stock_ = StockStatusCompany::where('co_no', $shipper_company->co_no)
-                    ->where('created_at', '>=', Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date))->format('Y-m-d') . ' 00:00:00')
-                    ->where('created_at', '<=' , Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date)->addDays(1))->format('Y-m-d') . ' 00:00:00')
+                    ->where('created_at', '>=', Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date)->addDays(1))->format('Y-m-d') . ' 00:00:00')
+                    ->where('created_at', '<=' , Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date)->addDays(2))->format('Y-m-d') . ' 00:00:00')
                     ->orderBy('created_at')->sum('stock');
                     $end_stock += isset($end_stock_) ? $end_stock_ : 0;
 
                 }
 
+                if(Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date))->format('Y-m-d') == Carbon::now()->format('Y-m-d')){
+                    DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+                    $item = StockStatusBad::with(['item_status_bad'])->whereHas('item_status_bad', function ($q) use ($user, $request) {
+                        $q->whereHas('ContractWms.company.co_parent', function ($k) use ($request) {
+                            $k->where('co_no', $request->co_no);
+                        });
+                    })->whereNotNull('stock')->groupby('product_id')->groupby('option_id')->orderBy('product_id', 'DESC');
+
+                    $end_stock = collect($item->get())->map(function ($q) {
+                      
+                        if (isset($q->option_id)) {
+                            $status = StockStatusBad::where('product_id', $q->product_id)->where('option_id', $q->option_id)->get();
+                        } else {
+                            $status = StockStatusBad::where('product_id', $q->product_id)->get();
+                        }
+                        $count_total = 0;
+                        if (isset($status)) {
+                            foreach ($status as $total) {
+                                $count_total += $total->stock;
+                            }
+                        }
+                        return ['total_amount' => $count_total];
+                    })->sum('total_amount');
+                    DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+                }
 
             }
 
