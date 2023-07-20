@@ -12,6 +12,7 @@ use App\Models\Item;
 use App\Models\ItemInfo;
 use App\Models\Company;
 use App\Models\File;
+use File as Files;
 use App\Models\ItemChannel;
 use App\Models\ImportExpected;
 use App\Models\Import;
@@ -1481,12 +1482,12 @@ class ItemController extends Controller
 
             $Excel_writer = new Xlsx($spreadsheet);
             if (isset($user->mb_no)) {
-                $path = '../storage/download/' . $user->mb_no . '/';
+                $path = 'storage/download/' . $user->mb_no . '/';
             } else {
-                $path = '../storage/download/no-name/';
+                $path = 'storage/download/no-name/';
             }
             if (!is_dir($path)) {
-                File::makeDirectory($path, $mode = 0777, true, true);
+                Files::makeDirectory($path, $mode = 0777, true, true);
             }
 
             $name = '수입_상품리스팅_';
