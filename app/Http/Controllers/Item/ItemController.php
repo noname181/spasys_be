@@ -1427,6 +1427,10 @@ class ItemController extends Controller
         // }
     }
 
+    public function downloadFulfillmentItemList(Request $request){
+        return "aaaa";
+    }
+
     public function updateFile(Request $request)
     {
         $path = join('/', ['files', 'item', $request->item_no]);
