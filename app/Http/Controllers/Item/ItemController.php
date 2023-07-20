@@ -1439,17 +1439,17 @@ class ItemController extends Controller
             if ($user->mb_type == 'shop') {
                 $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
-                })->orderBy('item_no', 'DESC');
+                })->orderBy('item_no', 'DESC')->get();
             } else if ($user->mb_type == 'shipper') {
                 $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('ContractWms.company', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
-                })->orderBy('item_no', 'DESC');
+                })->orderBy('item_no', 'DESC')->get();
             } else if ($user->mb_type == 'spasys') {
                 $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
-                })->orderBy('item_no', 'DESC');
+                })->orderBy('item_no', 'DESC')->get();
             }
-            $item->get();
+            //$item->get();
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
 
@@ -1464,12 +1464,14 @@ class ItemController extends Controller
             $sheet->setCellValue('I1', '등록일시');
 
             $num_row = 2;
+            //return $item;
             // $data_schedules =  json_decode($import_schedule);
             if (!empty($item)) {
                 foreach ($item as $key => $data) {
-                    $sheet->setCellValue('A' . $num_row, $key);
-                    $sheet->setCellValue('B' . $num_row, $data->contract_wms->company->co_parent->co_name);
-                    $sheet->setCellValue('C' . $num_row, $data->contract_wms->company->co_name);
+                    
+                    $sheet->setCellValue('A' . $num_row, ($key+1));
+                    $sheet->setCellValue('B' . $num_row, isset($data->ContractWms->company->co_parent->co_name) ? $data->ContractWms->company->co_parent->co_name : '');
+                    $sheet->setCellValue('C' . $num_row, isset($data->ContractWms->company->co_name) ? $data->ContractWms->company->co_name : '');
                     $sheet->setCellValue('D' . $num_row, $data->product_id);
                     $sheet->setCellValue('E' . $num_row, $data->option_id);
                     $sheet->setCellValue('F' . $num_row, $data->item_name);
@@ -1479,7 +1481,7 @@ class ItemController extends Controller
                     $num_row++;
                 }
             }
-
+            
             $Excel_writer = new Xlsx($spreadsheet);
             if (isset($user->mb_no)) {
                 $path = 'storage/download/' . $user->mb_no . '/';
@@ -1492,7 +1494,7 @@ class ItemController extends Controller
 
             $name = '수입_상품리스팅_';
 
-            $mask = $path . $name .'*.*';
+            $mask = $path . $name . '*.*';
             array_map('unlink', glob($mask) ?: []);
             $file_name_download = $path . $name . date('YmdHis') . '.Xlsx';
             $check_status = $Excel_writer->save($file_name_download);
