@@ -349,6 +349,7 @@ class RateMetaDataController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $rmd = RateMetaData::with(['rate_meta', 'member:mb_no,co_no,mb_name', 'company','rate_data_general','send_email_rmd'])
+            ->whereHas('rate_data_general')
             ->whereNotNull('co_no')->where(function($q){
                 $q->where('set_type','=','estimated_costs')
                 ->orWhere('set_type', 'precalculate');
