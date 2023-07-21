@@ -1604,6 +1604,24 @@ class RateDataController extends Controller
         }
     }
 
+    public function update_total_precalculate(Request $request)
+    {
+        try {
+            $rate_data_general = RateDataGeneral::where('rmd_no', $request->rmd_no)->update(
+                [
+                    'rdg_precalculate_total' => $request->total
+                ]
+            );
+
+            return response()->json(['message' => Messages::MSG_0007], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0020], 500);
+        }
+    }
+
     public function register_data_general_precalculate(Request $request)
     {
         try {
@@ -1651,7 +1669,7 @@ class RateDataController extends Controller
                     'rdg_vat4' => $request->data14,
                     'rdg_vat5' => $request->data15,
 
-                    'rdg_precalculate_total' => $request->total,
+                    // 'rdg_precalculate_total' => $request->total,
 
                     'mb_no' => $user->mb_no,
                 ]
