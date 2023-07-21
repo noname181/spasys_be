@@ -1328,8 +1328,8 @@ class ItemController extends Controller
         $sheet = $spreadsheet->getSheet(0);
         $datas = $sheet->toArray(null, true, true, true);
 
-        $sheet2 = $spreadsheet->getSheet(1);
-        $data_channels = $sheet2->toArray(null, true, true, true);
+        $sheet2 = null;//$spreadsheet->getSheet(1);
+        $data_channels = null;//$sheet2->toArray(null, true, true, true);
 
         $results[$sheet->getTitle()] = [];
         $errors[$sheet->getTitle()] = [];
@@ -1338,44 +1338,49 @@ class ItemController extends Controller
         $data_channel_count = 0;
 
         $check_error = false;
+        //return $datas;
         foreach ($datas as $key => $d) {
-            if ($key <= 2) {
+            if ($key < 2) { 
                 continue;
             }
-
+           
             $validator = Validator::make($d, ExcelRequest::rules());
+            
             if ($validator->fails()) {
                 $data_item_count =  $data_item_count - 1;
                 $errors[$sheet->getTitle()][] = $validator->errors();
                 $check_error = true;
             } else {
                 $data_item_count =  $data_item_count + 1;
+                $company = Company::where('co_name', $d['B'])->first();
+               
                 $item_no = Item::insertGetId([
                     'item_service_name' => '유통가공',
                     'mb_no' => Auth::user()->mb_no,
-                    'co_no' => Auth::user()->co_no,
-                    'item_brand' => $d['B'],
-                    'item_name' => $d['C'],
-                    'item_option1' => $d['D'],
-                    'item_option2' => $d['E'],
-                    'item_cargo_bar_code' => $d['F'],
-                    'item_upc_code' => $d['G'],
-                    'item_bar_code' => $d['H'],
-                    'item_weight' => $d['I'],
-                    'item_url' => $d['J'],
-                    'item_price1' => $d['K'],
-                    'item_price2' => $d['L'],
-                    'item_price3' => $d['M'],
-                    'item_price4' => $d['N'],
-                    'item_cate1' => $d['O'],
-                    'item_cate2' => $d['P'],
-                    'item_cate3' => $d['Q'],
-                    'item_origin' => $d['R'],
-                    'item_manufacturer' => $d['S']
+                    //'co_no' => Auth::user()->co_no,
+                    'co_no' => $company->co_no,
+                    'item_brand' => $d['C'],
+                    'item_name' => $d['D'],
+                    'item_option1' => $d['E'],
+                    'item_option2' => $d['F'],
+                    'item_cargo_bar_code' => $d['G'],
+                    'item_upc_code' => $d['H'],
+                    'item_bar_code' => $d['I'],
+                    'item_weight' => $d['J'],
+                    'item_url' => $d['K'],
+                    'item_price1' => $d['L'],
+                    'item_price2' => $d['M'],
+                    'item_price3' => $d['N'],
+                    'item_price4' => $d['O'],
+                    'item_cate1' => $d['P'],
+                    'item_cate2' => $d['Q'],
+                    'item_cate3' => $d['R'],
+                    // 'item_origin' => $d['R'],
+                    // 'item_manufacturer' => $d['S']
                 ]);
 
                 // Check validator item_channel
-                if ($data_channels) {
+                if (isset($data_channels)) {
                     $validator = [];
                     foreach ($data_channels as $key2 => $channel) {
                         if ($key2 == 1) {

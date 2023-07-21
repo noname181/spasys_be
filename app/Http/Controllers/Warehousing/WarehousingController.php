@@ -7442,7 +7442,7 @@ class WarehousingController extends Controller
         // $sheet2 = $spreadsheet->getSheet(1);
         // $data_channels = $sheet2->toArray(null, true, true, true);
 
-        //return $datas;
+        return $datas;
 
         $results[$sheet->getTitle()] = [];
         $errors[$sheet->getTitle()] = [];

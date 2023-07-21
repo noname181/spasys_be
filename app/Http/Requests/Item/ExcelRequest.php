@@ -25,7 +25,7 @@ class ExcelRequest extends BaseFormRequest
     {
         return [
             'A' => [
-                'required',
+                'nullable',
                 'integer',
             ],
             'B' => [
@@ -33,7 +33,7 @@ class ExcelRequest extends BaseFormRequest
                 'max:255',
             ],
             'C' => [
-                'required',
+                'nullable',
                 'max:255',
             ],
             'D' => [
@@ -41,12 +41,11 @@ class ExcelRequest extends BaseFormRequest
                 'max:255',
             ],
             'E' => [
-                'required',
+                'nullable',
                 'max:255',
             ],
             'F' => [
-                'required',
-                'max:255',
+                'nullable',
             ],
             'G' => [
                 'max:255',
@@ -82,7 +81,7 @@ class ExcelRequest extends BaseFormRequest
             ],
             'O' => [
                 'nullable',
-                'max:255',
+                'integer',
             ],
             'P' => [
                 'nullable',
