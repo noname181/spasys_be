@@ -2033,8 +2033,15 @@ class WarehousingController extends Controller
                         });
                     }
                 }
-                $schedule_shipment = $schedule_shipment->paginate($per_page, ['*'], 'page', $page);
 
+
+                $schedule_shipment = $schedule_shipment->paginate($per_page, ['*'], 'page', $page);
+                $schedule_shipment->setCollection(
+                    $schedule_shipment->getCollection()->map(function ($q) { 
+                        $text = $q->status == '출고' ? "EWC" : "EW";
+                        $q->w_schedule_number = isset($q->w_schedule_number) ? $q->w_schedule_number : (new CommonFunc)->generate_w_schedule_number_service2($q->ss_no, $text, $q->created_at);
+                        return  $q;
+                }));
                 return response()->json($schedule_shipment);
             } else if ($validated['service'] == "보세화물") {
                 // If per_page is null set default data = 15
@@ -2585,7 +2592,7 @@ class WarehousingController extends Controller
                         });
                     }
                 }
-
+                
                 DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
                 $user = Auth::user();
                 if ($user->mb_type == 'shop') {
@@ -2830,14 +2837,15 @@ class WarehousingController extends Controller
                 $schedule_shipment = $schedule_shipment->get();
 
                 $import_schedule = $import_schedule->get();
-
+                
                 //$final =  $warehousing->merge($schedule_shipment)->merge($import_schedule);
                 $final = collect($warehousing)->map(function ($q) {
 
                     return $q;
                 });
                 $final2 = collect($schedule_shipment)->map(function ($q) {
-
+                    $text = $q->status == '출고' ? "EWC" : "EW";
+                    $q->w_schedule_number = isset($q->w_schedule_number) ? $q->w_schedule_number : (new CommonFunc)->generate_w_schedule_number_service2($q->ss_no, $text, $q->created_at);
                     return $q;
                 });
                 $final3 = collect($import_schedule)->map(function ($q) {
