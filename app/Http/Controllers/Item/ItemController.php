@@ -1451,13 +1451,13 @@ class ItemController extends Controller
                 })->orderBy('item_no', 'DESC');
             }
 
-            if (isset($validated['from_date'])) {
-                $item->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
-            }
+            // if (isset($validated['from_date'])) {
+            //     $item->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            // }
 
-            if (isset($validated['to_date'])) {
-                $item->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
-            }
+            // if (isset($validated['to_date'])) {
+            //     $item->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            // }
             if (isset($validated['co_name_shop'])) {
                 $item->whereHas('ContractWms.company.co_parent', function ($query) use ($validated) {
                     $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name_shop']) . '%');
