@@ -1328,8 +1328,8 @@ class ItemController extends Controller
         $sheet = $spreadsheet->getSheet(0);
         $datas = $sheet->toArray(null, true, true, true);
 
-        $sheet2 = $spreadsheet->getSheet(1);
-        $data_channels = $sheet2->toArray(null, true, true, true);
+        $sheet2 = null;//$spreadsheet->getSheet(1);
+        $data_channels = null;//$sheet2->toArray(null, true, true, true);
 
         $results[$sheet->getTitle()] = [];
         $errors[$sheet->getTitle()] = [];
@@ -1338,44 +1338,49 @@ class ItemController extends Controller
         $data_channel_count = 0;
 
         $check_error = false;
+        //return $datas;
         foreach ($datas as $key => $d) {
-            if ($key <= 2) {
+            if ($key < 2) { 
                 continue;
             }
-
+           
             $validator = Validator::make($d, ExcelRequest::rules());
+            
             if ($validator->fails()) {
                 $data_item_count =  $data_item_count - 1;
                 $errors[$sheet->getTitle()][] = $validator->errors();
                 $check_error = true;
             } else {
                 $data_item_count =  $data_item_count + 1;
+                $company = Company::where('co_name', $d['B'])->first();
+               
                 $item_no = Item::insertGetId([
                     'item_service_name' => '유통가공',
                     'mb_no' => Auth::user()->mb_no,
-                    'co_no' => Auth::user()->co_no,
-                    'item_brand' => $d['B'],
-                    'item_name' => $d['C'],
-                    'item_option1' => $d['D'],
-                    'item_option2' => $d['E'],
-                    'item_cargo_bar_code' => $d['F'],
-                    'item_upc_code' => $d['G'],
-                    'item_bar_code' => $d['H'],
-                    'item_weight' => $d['I'],
-                    'item_url' => $d['J'],
-                    'item_price1' => $d['K'],
-                    'item_price2' => $d['L'],
-                    'item_price3' => $d['M'],
-                    'item_price4' => $d['N'],
-                    'item_cate1' => $d['O'],
-                    'item_cate2' => $d['P'],
-                    'item_cate3' => $d['Q'],
-                    'item_origin' => $d['R'],
-                    'item_manufacturer' => $d['S']
+                    //'co_no' => Auth::user()->co_no,
+                    'co_no' => $company->co_no,
+                    'item_brand' => $d['C'],
+                    'item_name' => $d['D'],
+                    'item_option1' => $d['E'],
+                    'item_option2' => $d['F'],
+                    'item_cargo_bar_code' => $d['G'],
+                    'item_upc_code' => $d['H'],
+                    'item_bar_code' => $d['I'],
+                    'item_weight' => $d['J'],
+                    'item_url' => $d['K'],
+                    'item_price1' => $d['L'],
+                    'item_price2' => $d['M'],
+                    'item_price3' => $d['N'],
+                    'item_price4' => $d['O'],
+                    'item_cate1' => $d['P'],
+                    'item_cate2' => $d['Q'],
+                    'item_cate3' => $d['R'],
+                    // 'item_origin' => $d['R'],
+                    // 'item_manufacturer' => $d['S']
                 ]);
 
                 // Check validator item_channel
-                if ($data_channels) {
+                if (isset($data_channels)) {
                     $validator = [];
                     foreach ($data_channels as $key2 => $channel) {
                         if ($key2 == 1) {
@@ -1430,25 +1435,91 @@ class ItemController extends Controller
         // }
     }
 
-    public function downloadFulfillmentItemList(Request $request)
+    public function downloadFulfillmentItemList(ItemSearchRequest $request)
     {
-
+        $validated = $request->validated();
         try {
+            DB::enableQueryLog();
             $user = Auth::user();
 
             if ($user->mb_type == 'shop') {
                 $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('ContractWms.company.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
-                })->orderBy('item_no', 'DESC')->get();
+                })->orderBy('item_no', 'DESC');
             } else if ($user->mb_type == 'shipper') {
                 $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('ContractWms.company', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
-                })->orderBy('item_no', 'DESC')->get();
+                })->orderBy('item_no', 'DESC');
             } else if ($user->mb_type == 'spasys') {
                 $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->where('item_service_name', '=', '수입풀필먼트')->whereHas('ContractWms.company.co_parent.co_parent', function ($q) use ($user) {
                     $q->where('co_no', $user->co_no);
-                })->orderBy('item_no', 'DESC')->get();
+                })->orderBy('item_no', 'DESC');
             }
+
+            // if (isset($validated['from_date'])) {
+            //     $item->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($validated['from_date'])));
+            // }
+
+            // if (isset($validated['to_date'])) {
+            //     $item->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+            // }
+            if (isset($validated['co_name_shop'])) {
+                $item->whereHas('ContractWms.company.co_parent', function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name_shop']) . '%');
+                });
+            }
+            if (isset($validated['co_name_agency'])) {
+                $item->whereHas('ContractWms.company', function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name_agency']) . '%', 'and', 'co_type', '=', 'shipper');
+                });
+            }
+            if (isset($validated['item_name'])) {
+                //return $validated['item_name'];
+                $item->where(function ($query) use ($validated) {
+                    $query->where('item_name', 'like', '%' . $validated['item_name'] . '%');
+                });
+            }
+            if (isset($validated['product_id'])) {
+                $item->where(function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(product_id)'), 'like', '%' . strtolower($validated['product_id']) . '%');
+                });
+            }
+            if (isset($validated['option_id'])) {
+                $item->where(function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(option_id)'), 'like', '%' . strtolower($validated['option_id']) . '%');
+                });
+            }
+            if (isset($validated['item_cargo_bar_code'])) {
+                $item->where(function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_cargo_bar_code)'), 'like', '%' . strtolower($validated['item_cargo_bar_code']) . '%');
+                });
+            }
+            if (isset($validated['item_channel_code'])) {
+                $item->whereHas('item_channels', function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_channel_name)'), 'like', '%' . strtolower($validated['item_channel_name']) . '%');
+                });
+            }
+            if (isset($validated['item_bar_code'])) {
+                $item->where(function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_bar_code)'), 'like', '%' . strtolower($validated['item_bar_code']) . '%');
+                });
+            }
+            if (isset($validated['item_upc_code'])) {
+                $item->where(function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_upc_code)'), 'like', '%' . strtolower($validated['item_upc_code']) . '%');
+                });
+            }
+            if (isset($validated['item_channel_name'])) {
+                $item->whereHas('item_channels', function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_channel_name)'), 'like', '%' . strtolower($validated['item_channel_name']) . '%');
+                });
+            }
+            if (isset($validated['item_brand'])) {
+                $item->where(function ($query) use ($validated) {
+                    $query->where(DB::raw('lower(item_brand)'), 'like', '%' . strtolower($validated['item_brand']) . '%');
+                });
+            }
+            $item = $item->get();
             //$item->get();
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();

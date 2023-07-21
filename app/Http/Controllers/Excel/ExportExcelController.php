@@ -1306,19 +1306,49 @@ class ExportExcelController extends Controller
             $spreadsheet = new Spreadsheet();
             $sheet = $spreadsheet->getActiveSheet();
 
+            // $sheet->setCellValue('A1', 'No');
+            // $sheet->setCellValue('B1', '가맹점');
+            // $sheet->setCellValue('C1', '화주');
+            // $sheet->setCellValue('D1', 'H-BL');
+            // $sheet->setCellValue('E1', '화물유형');
+            // $sheet->setCellValue('F1', '화물관리번호');
+            // $sheet->setCellValue('G1', '선명');
+            // $sheet->setCellValue('H1', '품명');
+            // $sheet->setCellValue('I1', '입항일자');
+            // $sheet->setCellValue('J1', '반입일자');
+            // $sheet->setCellValue('K1', '반입수량');
+            // $sheet->setCellValue('L1', '반입수량');
+            // $sheet->setCellValue('M1', '승인일자');
+            // $sheet->setCellValue('N1', '반출일자');
+            // $sheet->setCellValue('O1', '반출수량');
+            // $sheet->setCellValue('P1', '반출중량(KG)');
+            // $sheet->setCellValue('Q1', '보관일수');
+            // $sheet->setCellValue('R1', '과세금액(₩)');
+            // $sheet->setCellValue('S1', '배송방법');
+            // $sheet->setCellValue('T1', '배송주소');
+            // $sheet->setCellValue('U1', '상세주소');
+            // $sheet->setCellValue('V1', '연락처');
+            // $sheet->setCellValue('W1', '택배/운송사');
+            // $sheet->setCellValue('X1', '송장(배차)번호');
+            // $sheet->setCellValue('Y1', '운송인');
+            // $sheet->setCellValue('Z1', '운송인 연락처');
+            // $sheet->setCellValue('AA1', '화물상태');
+            // $sheet->setCellValue('AB1', '통관상태');
+            // $sheet->setCellValue('AC1', '배송상태');
+
             $sheet->setCellValue('A1', 'No');
             $sheet->setCellValue('B1', '가맹점');
             $sheet->setCellValue('C1', '화주');
-            $sheet->setCellValue('D1', 'H-BL');
-            $sheet->setCellValue('E1', '화물유형');
-            $sheet->setCellValue('F1', '화물관리번호');
-            $sheet->setCellValue('G1', '선명');
-            $sheet->setCellValue('H1', '품명');
-            $sheet->setCellValue('I1', '입항일자');
-            $sheet->setCellValue('J1', '반입일자');
-            $sheet->setCellValue('K1', '반입수량');
+            $sheet->setCellValue('D1', '화물관리번호');
+            $sheet->setCellValue('E1', '반출승인번호');
+            $sheet->setCellValue('F1', 'H-BL');
+            $sheet->setCellValue('G1', '화물유형');
+            $sheet->setCellValue('H1', '선명');
+            $sheet->setCellValue('I1', '품명');
+            $sheet->setCellValue('J1', '반입예정일');
+            $sheet->setCellValue('K1', '반입일자');
             $sheet->setCellValue('L1', '반입수량');
-            $sheet->setCellValue('M1', '승인일자');
+            $sheet->setCellValue('M1', '반출승인일자');
             $sheet->setCellValue('N1', '반출일자');
             $sheet->setCellValue('O1', '반출수량');
             $sheet->setCellValue('P1', '반출중량(KG)');
@@ -1435,18 +1465,48 @@ class ExportExcelController extends Controller
                     $value_status2 = $data->tie_status_2;
                 }
 
+                // $sheet->setCellValue('A'.$num_row, isset($data->is_no)?$data->is_no:'');
+                // $sheet->setCellValue('B'.$num_row, $shop);
+                // $sheet->setCellValue('C'.$num_row, $shop2);
+                // $sheet->setCellValue('D'.$num_row, $data->tie_h_bl);
+                // $sheet->setCellValue('E'.$num_row, $data->ti_logistic_type);
+                // $sheet->setCellValue('F'.$num_row, $data->te_logistic_manage_number);
+                // $sheet->setCellValue('G'.$num_row, $data->tie_is_ship);
+                // $sheet->setCellValue('H'.$num_row, $data->tie_is_name_eng);
+                // $sheet->setCellValue('I'.$num_row, $data->tie_is_date);
+                // $sheet->setCellValue('J'.$num_row, $data->ti_i_date);
+                // $sheet->setCellValue('K'.$num_row, $data->ti_i_number);
+                // $sheet->setCellValue('L'.$num_row, $data->te_e_confirm_number);
+                // $sheet->setCellValue('M'.$num_row, $data->tec_ec_date);
+                // $sheet->setCellValue('N'.$num_row, $data->te_e_date);
+                // $sheet->setCellValue('O'.$num_row, $data->te_e_number);
+                // $sheet->setCellValue('P'.$num_row, $data->te_e_weight);
+                // $sheet->setCellValue('Q'.$num_row, $data->te_e_number);
+                // $sheet->setCellValue('R'.$num_row, $data->te_e_price);
+                // $sheet->setCellValue('S'.$num_row, $value_s);
+                // $sheet->setCellValue('T'.$num_row, $value_t);
+                // $sheet->setCellValue('U'.$num_row, $value_u);
+                // $sheet->setCellValue('V'.$num_row, $value_v);
+                // $sheet->setCellValue('W'.$num_row, $value_w);
+                // $sheet->setCellValue('X'.$num_row, $value_x);
+                // $sheet->setCellValue('Y'.$num_row, $value_y);
+                // $sheet->setCellValue('Z'.$num_row, $value_z);
+                // $sheet->setCellValue('AA'.$num_row, $value_status1);
+                // $sheet->setCellValue('AB'.$num_row, $value_status2);
+                // $sheet->setCellValue('AC'.$num_row, $value_ac);
+
                 $sheet->setCellValue('A'.$num_row, isset($data->is_no)?$data->is_no:'');
                 $sheet->setCellValue('B'.$num_row, $shop);
                 $sheet->setCellValue('C'.$num_row, $shop2);
-                $sheet->setCellValue('D'.$num_row, $data->tie_h_bl);
-                $sheet->setCellValue('E'.$num_row, $data->ti_logistic_type);
-                $sheet->setCellValue('F'.$num_row, $data->te_logistic_manage_number);
-                $sheet->setCellValue('G'.$num_row, $data->tie_is_ship);
-                $sheet->setCellValue('H'.$num_row, $data->tie_is_name_eng);
-                $sheet->setCellValue('I'.$num_row, $data->tie_is_date);
-                $sheet->setCellValue('J'.$num_row, $data->ti_i_date);
-                $sheet->setCellValue('K'.$num_row, $data->ti_i_number);
-                $sheet->setCellValue('L'.$num_row, $data->te_e_confirm_number);
+                $sheet->setCellValue('D'.$num_row, isset($data->te_logistic_manage_number) ? $data->te_logistic_manage_number : (isset($data->tie_logistic_manage_number) ? $data->tie_logistic_manage_number : (isset($data->ti_logistic_manage_number) ? $data->ti_logistic_manage_number : $data->tec_logistic_manage_number)));
+                $sheet->setCellValue('E'.$num_row, $data->te_carry_out_number);
+                $sheet->setCellValue('F'.$num_row, $data->tie_h_bl);
+                $sheet->setCellValue('G'.$num_row, $data->ti_logistic_type);
+                $sheet->setCellValue('H'.$num_row, $data->tie_is_ship);
+                $sheet->setCellValue('I'.$num_row, $data->tie_is_name_eng);
+                $sheet->setCellValue('J'.$num_row, $data->tie_is_date);
+                $sheet->setCellValue('K'.$num_row, $data->ti_i_date);
+                $sheet->setCellValue('L'.$num_row, $data->ti_i_number);
                 $sheet->setCellValue('M'.$num_row, $data->tec_ec_date);
                 $sheet->setCellValue('N'.$num_row, $data->te_e_date);
                 $sheet->setCellValue('O'.$num_row, $data->te_e_number);
@@ -1476,9 +1536,9 @@ class ExportExcelController extends Controller
             if (!is_dir($path)) {
                 File::makeDirectory($path, $mode = 0777, true, true);
             }
-            $mask = $path.'DownloadBondedCargo-*.*';
+            $mask = $path.'보세화물조회_*.*';
             array_map('unlink', glob($mask));
-            $file_name_download = $path.'DownloadBondedCargo-'.date('YmdHis').'.Xlsx';
+            $file_name_download = $path.'보세화물조회_'.date('YmdHis').'.Xlsx';
             $Excel_writer->save($file_name_download);
             return response()->json([
                 'status' => 1,
