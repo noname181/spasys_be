@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\PHPExcel_Style_NumberFormat;
 use PhpOffice\PhpSpreadsheet\Reader\Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Carbon\Carbon;
@@ -1365,7 +1366,13 @@ class ExportExcelController extends Controller
             $sheet->setCellValue('AA1', '화물상태');
             $sheet->setCellValue('AB1', '통관상태');
             $sheet->setCellValue('AC1', '배송상태');
-          
+            
+            // $sheet->getStyle('A1')
+            // ->getNumberFormat()
+            // ->setFormatCode(
+            //     PHPExcel_Style_NumberFormat::FORMAT_TEXT
+            // );
+
             $num_row = 2;
             $data_schedules =  json_decode($import_schedule);
             foreach($data_schedules as $key => $data){
