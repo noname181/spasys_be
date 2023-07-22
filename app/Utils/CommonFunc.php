@@ -532,8 +532,9 @@ class CommonFunc
             }
         } else if ($w_no->w_category_name == '수입풀필먼트') {
             if ($type == 'cargo_delivery') {
-
-                $aaaaa = $w_no->ss_no;
+                $text = $w_no->status == '출고' ? "EWC" : "EW";
+                $aaaaa = (new CommonFunc)->generate_w_schedule_number_service2($w_no->ss_no, $text, $w_no->created_at);
+                //$aaaaa = $w_no->ss_no;
 
                 $bbbbb = $w_no->receving_goods_delivery[0]->rgd_contents;
 
