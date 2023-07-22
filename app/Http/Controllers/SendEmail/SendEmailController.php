@@ -1252,16 +1252,6 @@ class SendEmailController extends Controller
             
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'rate_data_general'=>$rate_data_general,
-                'rate_data'=>$rate_data,
-                'arr5'=>$arr5,
-                'count_arr5'=>$count_arr5,
-                'bonded5a'=>$bonded5a,
-                'count1'=>$count1,
-                'count2'=>$count2,
-                'count3'=>$count3,
-                'bonded1a'=>$bonded1a
-             
             ]);
         } catch (\Exception $e) {
             Log::error($e);
