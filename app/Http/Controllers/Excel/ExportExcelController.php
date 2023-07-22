@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\PHPExcel_Style_NumberFormat;
 use PhpOffice\PhpSpreadsheet\Reader\Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Carbon\Carbon;
@@ -1086,7 +1087,7 @@ class ExportExcelController extends Controller
                 // $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
                 //     ->groupBy(['tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number']);
 
-                $sub_4 = Export::select('connection_number','tec_ec_date', 't_export.te_status_2', 'te_logistic_manage_number','te_e_price', 'te_carry_out_number','te_e_weight', 'te_e_date', 'te_carry_in_number','te_e_confirm_number', 'te_e_order', 'te_e_number')
+                $sub_4 = Export::select('connection_number', 't_export.te_status_2', 'te_logistic_manage_number','te_e_price', 'te_carry_out_number','te_e_weight', 'te_e_date', 'te_carry_in_number','te_e_confirm_number', 'te_e_order', 'te_e_number')
                     // ->leftjoin('receiving_goods_delivery', function ($join) {
                     //     $join->on('t_export.te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
                     // })
@@ -1126,7 +1127,7 @@ class ExportExcelController extends Controller
                 // $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
                 //     ->groupBy(['tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number']);
 
-                $sub_4 = Export::select('connection_number','tec_ec_date', 't_export.te_status_2', 'te_logistic_manage_number','te_e_price', 'te_carry_out_number','te_e_weight', 'te_e_date', 'te_carry_in_number','te_e_confirm_number', 'te_e_order', 'te_e_number')
+                $sub_4 = Export::select('connection_number', 't_export.te_status_2', 'te_logistic_manage_number','te_e_price', 'te_carry_out_number','te_e_weight', 'te_e_date', 'te_carry_in_number','te_e_confirm_number', 'te_e_order', 'te_e_number')
                     // ->leftjoin('receiving_goods_delivery', function ($join) {
                     //     $join->on('t_export.te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
                     // })
@@ -1181,7 +1182,7 @@ class ExportExcelController extends Controller
                 // $sub_3 = ExportConfirm::select('tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number')
                 //     ->groupBy(['tec_logistic_manage_number', 'tec_ec_confirm_number', 'tec_ec_date', 'tec_ec_number']);
 
-                $sub_4 = Export::select('connection_number','tec_ec_date', 't_export.te_status_2', 'te_logistic_manage_number','te_e_price', 'te_carry_out_number','te_e_weight', 'te_e_date', 'te_carry_in_number','te_e_confirm_number', 'te_e_order', 'te_e_number')
+                $sub_4 = Export::select('connection_number', 't_export.te_status_2', 'te_logistic_manage_number','te_e_price', 'te_carry_out_number','te_e_weight', 'te_e_date', 'te_carry_in_number','te_e_confirm_number', 'te_e_order', 'te_e_number')
                     ->leftjoin('t_export_confirm', function ($join) {
                         $join->on('t_export.te_logistic_manage_number', '=', 't_export_confirm.tec_logistic_manage_number');
                     })
@@ -1365,10 +1366,16 @@ class ExportExcelController extends Controller
             $sheet->setCellValue('AA1', '화물상태');
             $sheet->setCellValue('AB1', '통관상태');
             $sheet->setCellValue('AC1', '배송상태');
-          
+            
+            // $sheet->getStyle('A1')
+            // ->getNumberFormat()
+            // ->setFormatCode(
+            //     PHPExcel_Style_NumberFormat::FORMAT_TEXT
+            // );
+
             $num_row = 2;
             $data_schedules =  json_decode($import_schedule);
-            foreach($data_schedules as $data){
+            foreach($data_schedules as $key => $data){
                 $value_s = '';
                 $value_t = '';
                 $value_u = '';
@@ -1495,7 +1502,7 @@ class ExportExcelController extends Controller
                 // $sheet->setCellValue('AB'.$num_row, $value_status2);
                 // $sheet->setCellValue('AC'.$num_row, $value_ac);
 
-                $sheet->setCellValue('A'.$num_row, isset($data->is_no)?$data->is_no:'');
+                $sheet->setCellValue('A'.$num_row, ($key+1));
                 $sheet->setCellValue('B'.$num_row, $shop);
                 $sheet->setCellValue('C'.$num_row, $shop2);
                 $sheet->setCellValue('D'.$num_row, isset($data->te_logistic_manage_number) ? $data->te_logistic_manage_number : (isset($data->tie_logistic_manage_number) ? $data->tie_logistic_manage_number : (isset($data->ti_logistic_manage_number) ? $data->ti_logistic_manage_number : $data->tec_logistic_manage_number)));
@@ -1507,12 +1514,12 @@ class ExportExcelController extends Controller
                 $sheet->setCellValue('J'.$num_row, $data->tie_is_date);
                 $sheet->setCellValue('K'.$num_row, $data->ti_i_date);
                 $sheet->setCellValue('L'.$num_row, $data->ti_i_number);
-                $sheet->setCellValue('M'.$num_row, $data->tec_ec_date);
-                $sheet->setCellValue('N'.$num_row, $data->te_e_date);
-                $sheet->setCellValue('O'.$num_row, $data->te_e_number);
-                $sheet->setCellValue('P'.$num_row, $data->te_e_weight);
-                $sheet->setCellValue('Q'.$num_row, $data->te_e_number);
-                $sheet->setCellValue('R'.$num_row, $data->te_e_price);
+                $sheet->setCellValue('M'.$num_row, isset($data->te_e_date) ? $data->te_e_date : '');
+                $sheet->setCellValue('N'.$num_row, isset($data->te_e_date) ? $data->te_e_date : '');
+                $sheet->setCellValue('O'.$num_row, isset($data->te_e_number) ? $data->te_e_number : '');
+                $sheet->setCellValue('P'.$num_row, isset($data->te_e_weight) ? $data->te_e_weight : '');
+                $sheet->setCellValue('Q'.$num_row, isset($data->te_e_number) ? $data->te_e_number : '');
+                $sheet->setCellValue('R'.$num_row, isset($data->te_e_price) ? $data->te_e_price : '');
                 $sheet->setCellValue('S'.$num_row, $value_s);
                 $sheet->setCellValue('T'.$num_row, $value_t);
                 $sheet->setCellValue('U'.$num_row, $value_u);
