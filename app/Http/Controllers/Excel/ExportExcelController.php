@@ -1507,12 +1507,12 @@ class ExportExcelController extends Controller
                 $sheet->setCellValue('J'.$num_row, $data->tie_is_date);
                 $sheet->setCellValue('K'.$num_row, $data->ti_i_date);
                 $sheet->setCellValue('L'.$num_row, $data->ti_i_number);
-                $sheet->setCellValue('M'.$num_row, $data->tec_ec_date);
-                $sheet->setCellValue('N'.$num_row, $data->te_e_date);
-                $sheet->setCellValue('O'.$num_row, $data->te_e_number);
-                $sheet->setCellValue('P'.$num_row, $data->te_e_weight);
-                $sheet->setCellValue('Q'.$num_row, $data->te_e_number);
-                $sheet->setCellValue('R'.$num_row, $data->te_e_price);
+                $sheet->setCellValue('M'.$num_row, isset($data->tec_ec_date) ? $data->tec_ec_date : '');
+                $sheet->setCellValue('N'.$num_row, isset($data->te_e_date) ? $data->te_e_date : '');
+                $sheet->setCellValue('O'.$num_row, isset($data->te_e_number) ? $data->te_e_number : '');
+                $sheet->setCellValue('P'.$num_row, isset($data->te_e_weight) ? $data->te_e_weight : '');
+                $sheet->setCellValue('Q'.$num_row, isset($data->te_e_number) ? $data->te_e_number : '');
+                $sheet->setCellValue('R'.$num_row, isset($data->te_e_price) ? $data->te_e_price : '');
                 $sheet->setCellValue('S'.$num_row, $value_s);
                 $sheet->setCellValue('T'.$num_row, $value_t);
                 $sheet->setCellValue('U'.$num_row, $value_u);
