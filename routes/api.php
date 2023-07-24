@@ -479,6 +479,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/general_data_service1_final', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_service1_final'])->name('registe_rate_data_general_service1_final');
         Route::post('/general_monthly_final_bonded', [\App\Http\Controllers\RateData\RateDataController::class, 'registe_rate_data_general_monthly_final_bonded'])->name('registe_rate_data_general_monthly_final_bonded');
         Route::post('/update_storage_days', [\App\Http\Controllers\RateData\RateDataController::class, 'update_storage_days'])->name('update_storage_days');
+        Route::post('/update_total_precalculate', [\App\Http\Controllers\RateData\RateDataController::class, 'update_total_precalculate'])->name('update_total_precalculate');
 
         Route::post('/get_tax_invoice_by_rgd_no', [\App\Http\Controllers\RateData\RateDataController::class, 'get_tax_invoice_by_rgd_no']);
 
