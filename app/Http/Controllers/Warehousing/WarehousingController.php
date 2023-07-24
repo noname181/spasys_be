@@ -7442,7 +7442,7 @@ class WarehousingController extends Controller
         // $sheet2 = $spreadsheet->getSheet(1);
         // $data_channels = $sheet2->toArray(null, true, true, true);
 
-        return $datas;
+        //return $datas;
 
         $results[$sheet->getTitle()] = [];
         $errors[$sheet->getTitle()] = [];
@@ -7456,32 +7456,32 @@ class WarehousingController extends Controller
         $test_i = [];
         $test_date = '';
         foreach ($datas as $key => $d) {
-            if ($key <= 1) {
+            if ($key < 2) {
                 continue;
             }
-
+            
             $validator = Validator::make($d, ExcelRequest::rules());
             if ($validator->fails()) {
                 $data_item_count =  $data_item_count - 1;
                 $errors[$sheet->getTitle()][] = $validator->errors();
                 $check_error = true;
             } else {
-                $contains = Str::contains($d['D'], 'S');
+                $contains = Str::contains($d['E'], 'S');
 
                 if ($contains) {
-                    $item = Item::with(['company', 'ContractWms'])->where('item_service_name', '수입풀필먼트')->where('option_id', $d['D'])->where('product_id', $d['C']);
-                    $item->whereHas('ContractWms.company', function ($q) use ($co_no_in) {
-                        $q->whereIn('co_no', $co_no_in);
-                    })->first();
+                    $item = Item::with(['company', 'ContractWms'])->where('item_service_name', '수입풀필먼트')->where('option_id', $d['E'])->where('product_id', $d['D']);
+                    // $item->whereHas('ContractWms.company', function ($q) use ($co_no_in) {
+                    //     $q->whereIn('co_no', $co_no_in);
+                    // })->first();
                 } else {
-                    $item = Item::with(['company', 'ContractWms'])->where('item_service_name', '수입풀필먼트')->where('product_id', $d['D']);
-                    $item->whereHas('ContractWms.company', function ($q) use ($co_no_in) {
-                        $q->whereIn('co_no', $co_no_in);
-                    })->first();
+                    $item = Item::with(['company', 'ContractWms'])->where('item_service_name', '수입풀필먼트')->where('product_id', $d['E']);
+                    // $item->whereHas('ContractWms.company', function ($q) use ($co_no_in) {
+                    //     $q->whereIn('co_no', $co_no_in);
+                    // })->first();
                 }
 
                 $item = $item->first();
-
+                
                 //$test[] = $item;
                 if (!isset($item)) {
                     $data_item_count =  $data_item_count - 1;
@@ -7490,11 +7490,11 @@ class WarehousingController extends Controller
                 } else {
                     $data_item_count =  $data_item_count + 1;
 
-                    $custom = collect(['wi_number' => $d['G']]);
+                    $custom = collect(['wi_number' => $d['J']]);
 
                     $item = $custom->merge($item);
 
-                    $index = $d['A'] . ',' . $d['H'];
+                    $index = $d['A'] . ',' . $d['I'];
                     // if (array_key_exists($index, $out)){
                     //     $out[$index] = $d['A'];
                     // }
@@ -7512,7 +7512,7 @@ class WarehousingController extends Controller
                 }
             }
         }
-
+        //return $test_i;
         foreach ($test_i as $key => $value) {
             $strArray = explode(',', $key);
             $w_no_data = Warehousing::insertGetId([
