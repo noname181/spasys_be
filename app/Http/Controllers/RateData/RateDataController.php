@@ -1630,13 +1630,19 @@ class RateDataController extends Controller
                 $q->where('set_type', 'estimated_code')
                 ->orWhere('set_type', 'precalculate');
             })->get()->count() + 1;
+            
             $rmd = RateMetaData::updateOrCreate(
                 [
                     'rmd_no' => isset($request->rmd_no) ? $request->rmd_no : null,
                     'set_type' => 'precalculate',
                     'co_no' => isset($request->co_no) ? $request->co_no : null,
                 ],
-                [
+                $request->rmd_no ? [
+                    'mb_no' => $user->mb_no,
+                    'rmd_service' => isset($request->activeTab2) ? $request->activeTab2 : null,
+                    'rmd_tab_child' => isset($request->rmd_tab_child) ? $request->rmd_tab_child : null,
+
+                ] : [
                     'mb_no' => $user->mb_no,
                     'rmd_number' => CommonFunc::generate_rmd_number($request['co_no'], $index),
                     'rmd_service' => isset($request->activeTab2) ? $request->activeTab2 : null,
