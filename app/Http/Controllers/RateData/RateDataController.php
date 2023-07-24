@@ -387,7 +387,10 @@ class RateDataController extends Controller
             DB::beginTransaction();
 
             if (!isset($request->rmd_no)) {
-                $index = RateMetaData::where('rm_no', $request['co_no'])->get()->count() + 1;
+                $index = RateMetaData::where('co_no', $request['co_no'])->where(function($q) {
+                    $q->where('set_type','=','estimated_costs')
+                    ->orWhere('set_type', 'precalculate');
+                })->get()->count() + 1;
                 $rmd_no = RateMetaData::insertGetId(
                     [
                         'co_no' => $request['co_no'],
@@ -1630,13 +1633,19 @@ class RateDataController extends Controller
                 $q->where('set_type', 'estimated_code')
                 ->orWhere('set_type', 'precalculate');
             })->get()->count() + 1;
+
             $rmd = RateMetaData::updateOrCreate(
                 [
                     'rmd_no' => isset($request->rmd_no) ? $request->rmd_no : null,
                     'set_type' => 'precalculate',
                     'co_no' => isset($request->co_no) ? $request->co_no : null,
                 ],
-                [
+                $request->rmd_no ? [
+                    'mb_no' => $user->mb_no,
+                    'rmd_service' => isset($request->activeTab2) ? $request->activeTab2 : null,
+                    'rmd_tab_child' => isset($request->rmd_tab_child) ? $request->rmd_tab_child : null,
+
+                ] : [
                     'mb_no' => $user->mb_no,
                     'rmd_number' => CommonFunc::generate_rmd_number($request['co_no'], $index),
                     'rmd_service' => isset($request->activeTab2) ? $request->activeTab2 : null,

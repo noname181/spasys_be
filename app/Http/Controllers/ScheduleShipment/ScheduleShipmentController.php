@@ -645,7 +645,8 @@ class ScheduleShipmentController extends Controller
     }
     public function getScheduleShipmentById($ss_no)
     {
-        $schedule_shipment_item = ScheduleShipmentInfo::with(['file'])->select('schedule_shipment_info.*', 'item.product_id as product_id', 'schedule_shipment_info.product_id as option_id')->leftjoin('item', 'schedule_shipment_info.product_id', '=', 'item.option_id')->where('schedule_shipment_info.ss_no', $ss_no)->get();
+        DB::statement("SET SQL_MODE=''");
+        $schedule_shipment_item = ScheduleShipmentInfo::with(['file'])->select('schedule_shipment_info.*', 'item.product_id as product_id', 'schedule_shipment_info.product_id as option_id')->leftjoin('item', 'schedule_shipment_info.product_id', '=', 'item.option_id')->where('schedule_shipment_info.ss_no', $ss_no)->whereNotNull('schedule_shipment_info.order_cs')->get();
         $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'receving_goods_delivery'])->where('ss_no', $ss_no)->get();
         $collect_test = array();
         if (!empty($schedule_shipment) && !empty($schedule_shipment_item)) {
