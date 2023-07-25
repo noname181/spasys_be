@@ -7455,12 +7455,14 @@ class WarehousingController extends Controller
         $test = [];
         $test_i = [];
         $test_date = '';
+        //return $datas;
         foreach ($datas as $key => $d) {
             if ($key < 2) {
                 continue;
             }
-            
+            //return $d;
             $validator = Validator::make($d, ExcelRequest::rules());
+            
             if ($validator->fails()) {
                 $data_item_count =  $data_item_count - 1;
                 $errors[$sheet->getTitle()][] = $validator->errors();
@@ -7494,7 +7496,7 @@ class WarehousingController extends Controller
 
                     $item = $custom->merge($item);
 
-                    $index = $d['A'] . ',' . $d['I'];
+                    $index = $d['B'] . ',' . $d['I'];
                     // if (array_key_exists($index, $out)){
                     //     $out[$index] = $d['A'];
                     // }
@@ -7515,12 +7517,15 @@ class WarehousingController extends Controller
         //return $test_i;
         foreach ($test_i as $key => $value) {
             $strArray = explode(',', $key);
+            $w_schedule_day = date('Y-m-d H:i:s', strtotime(str_replace('.', '-', $strArray[1])));
+            //return $w_schedule_day;
             $w_no_data = Warehousing::insertGetId([
                 'mb_no' => $member->mb_no,
                 'w_type' => 'IW',
                 'w_category_name' => "수입풀필먼트",
                 'co_no' => isset($validated['co_no']) ? $validated['co_no'] : $value[0]['contract_wms']['co_no'],
-                'w_schedule_day' => $strArray[1],
+                'w_schedule_day' => $w_schedule_day,
+                'w_cancel_yn' => 'n',
                 'w_completed_day' => Carbon::now()->toDateTimeString()
             ]);
 
@@ -7562,6 +7567,7 @@ class WarehousingController extends Controller
             }
 
             Warehousing::Where('w_no', $w_no_data)->update([
+                'w_schedule_amount' =>  0,
                 'w_amount' =>  $w_amount,
 
             ]);
