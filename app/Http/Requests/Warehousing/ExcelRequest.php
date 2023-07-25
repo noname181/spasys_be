@@ -37,11 +37,11 @@ class ExcelRequest extends BaseFormRequest
                 'max:255',
             ],
             'D' => [
-                '',
+                'required',
                 'max:255',
             ],
             'E' => [
-                '',
+                'required',
                 'max:255',
             ],
             'F' => [
@@ -53,6 +53,19 @@ class ExcelRequest extends BaseFormRequest
                 'max:255',
             ],
             'H' => [
+                '',
+                'max:255',
+            ],
+            'I' => [
+                'required',
+                'max:255',
+                'date_format:Y.m.d'
+            ],
+            'J' => [
+                'required',
+                'max:255',
+            ],
+            'K' => [
                 '',
                 'max:255',
             ]
