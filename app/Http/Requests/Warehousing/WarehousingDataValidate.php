@@ -21,11 +21,11 @@ class WarehousingDataValidate extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public static function rules()
     {
         return [
             'A' => [
-                'required',
+                'nullable',
                 'integer',
             ],
             'B' => [
@@ -33,33 +33,43 @@ class WarehousingDataValidate extends FormRequest
                 'max:255',
             ],
             'C' => [
-                'required',
+                'nullable',
                 'max:255',
             ],
             'D' => [
-                'required',
+                'nullable',
                 'max:255',
             ],
             'E' => [
-                'required',
+                'nullable',
                 'max:255',
             ],
             'F' => [
-                'required',
+                'nullable',
                 'max:255',
             ],
             'G' => [
-                'required',
+                'nullable',
                 'max:255',
             ],
             'H' => [
-                'required',
+                'nullable',
                 'max:255',
             ],
             'I' => [
+                'nullable',
+                'integer',
+            ],
+            'J' => [
                 'required',
                 'integer',
+            ],
+            'K' => [
+                'nullable',
+                'max:255',
+                'date_format:Y.m.d'
             ]
+            
         ];
     }
 }

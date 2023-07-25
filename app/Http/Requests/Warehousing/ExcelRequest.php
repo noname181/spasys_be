@@ -25,15 +25,15 @@ class ExcelRequest extends BaseFormRequest
     {
         return [
             'A' => [
-                '',
+                'nullable',
                 'max:255',
             ],
             'B' => [
-                '',
+                'nullable',
                 'max:255',
             ],
             'C' => [
-                '',
+                'nullable',
                 'max:255',
             ],
             'D' => [
@@ -45,15 +45,15 @@ class ExcelRequest extends BaseFormRequest
                 'max:255',
             ],
             'F' => [
-                '',
+                'nullable',
                 'max:255',
             ],
             'G' => [
-                '',
+                'nullable',
                 'max:255',
             ],
             'H' => [
-                '',
+                'nullable',
                 'max:255',
             ],
             'I' => [
@@ -63,10 +63,10 @@ class ExcelRequest extends BaseFormRequest
             ],
             'J' => [
                 'required',
-                'max:255',
+                'integer',
             ],
             'K' => [
-                '',
+                'nullable',
                 'max:255',
             ]
         ];

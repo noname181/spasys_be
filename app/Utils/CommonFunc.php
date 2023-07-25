@@ -61,7 +61,15 @@ class CommonFunc
 
     static function generate_rmd_number($id, $index)
     {
-        $string = date('Ymd') . $id . '_' . $index;
+        if($index < 10){
+            $index = '000' . $index;
+        }else  if($index < 100){
+            $index = '00' . $index;
+        }else  if($index < 1000){
+            $index = '0' . $index;
+        }
+
+        $string = date('Ymd') . '_' . $index;
         return $string;
     }
 
