@@ -7455,12 +7455,14 @@ class WarehousingController extends Controller
         $test = [];
         $test_i = [];
         $test_date = '';
+        //return $datas;
         foreach ($datas as $key => $d) {
             if ($key < 2) {
                 continue;
             }
-            
+            //return $d;
             $validator = Validator::make($d, ExcelRequest::rules());
+            
             if ($validator->fails()) {
                 $data_item_count =  $data_item_count - 1;
                 $errors[$sheet->getTitle()][] = $validator->errors();
