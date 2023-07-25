@@ -38,6 +38,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class RateDataController extends Controller
 {
@@ -10978,8 +10979,47 @@ class RateDataController extends Controller
         ], 500);
         ob_end_clean();
     }
+    public function download_pdf_send_meta($rm_no, $rmd_no){
+        $user = Auth::user();
+        $rate_data_send_meta = $this->getRateDataRaw($rm_no, $rmd_no);
+          // $Excel_writer = new Xlsx($spreadsheet);
+          if (isset($user->mb_no)) {
+            $path = 'storage/download/' . $user->mb_no . '/';
+        } else {
+            $path = 'storage/download/no-name/';
+        }
+        if (!is_dir($path)) {
+            File::makeDirectory($path, $mode = 0777, true, true);
+        }
+        $mask = $path . '요율발송_*.*';
+        array_map('unlink', glob($mask) ?: []);
+        $file_name_download = $path . '요율발송_pdf.pdf';
+        // $check_status = $Excel_writer->save($file_name_download);
+        $count1 = 0;
+        $count2 = 0;
+        $count3 = 1;
+        $array1 = [];
+        foreach($rate_data_send_meta['rate_data1'] as $key => $row){
+            if($key <= 9 && $key != 2 && $key != 4 && $key != 6 && $key != 8 && ($row['rd_data2'] || $row['rd_data1'])){
+                $array1[] = $key;
+                $count1 +=1;
+            }
+            if($key == 11 && ($row['rd_data2'] || $row['rd_data1'])){
+                $count2 = 2;
+            }
+            if(($key == 14 && ($row['rd_data1']) ) ||  ($key == 13 || $key == 12) && ($row['rd_data2'] || $row['rd_data1'])){
+                $count3 += 1;
+            }
+        }
+        $count_row2 = $count2 + $count3;
+        $pdf = Pdf::loadView('pdf.test',['rate_data_send_meta'=>$rate_data_send_meta,'count1'=>$count1,'array1'=>$array1,'count2'=>$count2,
+        'count_row2'=>$count_row2,'count3'=>$count3]);
+        $pdf->save($file_name_download);
+    }
     public function download_excel_send_meta($rm_no, $rmd_no)
     {
+        
+
         DB::beginTransaction();
         $co_no = Auth::user()->co_no;
         $rate_data_send_meta = $this->getRateDataRaw($rm_no, $rmd_no);

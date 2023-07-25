@@ -25,31 +25,25 @@
          <table id="custom_table">
             <thead>
                <tr>
-                  <th rowspan="2" style='font-family: "unbatang", Times, serif'>구분</th>
+                  <th style='font-family: "unbatang", Times, serif'>구분</th>
                   <th  colspan="4" style='font-family: "unbatang", Times, serif'>내역</th>
                </tr>
-               <tr>
-                  <th   style='font-family: "unbatang", Times, serif'>항목</th>
-                  <th   style='font-family: "unbatang", Times, serif'>상세</th>
-                  <th   style='font-family: "unbatang", Times, serif'>기본료</th>
-                  <th   style='font-family: "unbatang", Times, serif'>단가/KG</th>
-               </tr>
+            
             </thead>
             <tbody>
+               @if($count1 > 0)
                <tr>
-                  <td rowspan="6"  style='font-family: "unbatang", Times, serif'>하역비용</td>
-                  @foreach($rate_data_send_meta['rate_data1'] as $key => $row)
-                  @if($key == 0) 
-                  <!-- <td style='font-family: "unbatang", Times, serif'>{{$row->rd_cate1}}</td> -->
-                  <td style='font-family: "unbatang", Times, serif'>{{$row->rd_cate2}}</td>
-                  <td style='font-family: "unbatang", Times, serif'>{{$row->rd_cate3}}</td>
-                  <td style='font-family: "unbatang", Times, serif'>{{number_format($row->rd_data1)}}</td>
-                  <td style='font-family: "unbatang", Times, serif'>{{$key != 14 ? number_format($row->rd_data2) : ''}}</td>
-                  @endif
-                  @endforeach
+                  <td rowspan="{{$count1+1}}"  style='font-family: "unbatang", Times, serif'>하역비용</td>
+       
+                  <td   style='font-family: "unbatang", Times, serif'>항목</td>
+                  <td   style='font-family: "unbatang", Times, serif'>상세</td>
+                  <td   style='font-family: "unbatang", Times, serif'>기본료</td>
+                  <td   style='font-family: "unbatang", Times, serif'>단가/KG</td>
+            
                </tr>
                @foreach($rate_data_send_meta['rate_data1'] as $key => $row)
-               @if($key < 15 && $key != 4 && $key !=2 && $key !=6 && $key !=10 && $key !=8 && ($key == 1 || $key == 3 || $key == 5 || $key == 7 || $key == 9) )
+               @if($key < 15 && $key != 4 && $key !=2 && $key !=6 && $key !=10 && $key !=8 && ($key == 0 || $key == 1 || $key == 3 || $key == 5 || $key == 7 || $key == 9) )
+               @if(in_array($key,$array1))
                <tr>
                   <!-- <td style='font-family: "unbatang", Times, serif'>{{$row->rd_cate1}}</td> -->
                   <td style='font-family: "unbatang", Times, serif'>{{$row->rd_cate2}}</td>
@@ -58,9 +52,17 @@
                   <td style='font-family: "unbatang", Times, serif'>{{$key != 14 ? number_format($row->rd_data2) : ''}}</td>
                </tr>
                @endif
+               @endif
                @endforeach
+               @endif          
                <tr>
-                  <td rowspan="4"  style='border-bottom: 0px;font-family: "unbatang", Times, serif'>센터 작업료</td>
+                  <td rowspan="6"  style='border-bottom: 0px;font-family: "unbatang", Times, serif'>센터 작업료</td>
+                  <td colspan="2" style='font-family: "unbatang", Times, serif'>반출입</td>
+                 
+                  <td style='font-family: "unbatang", Times, serif'>기본료</td>
+                  <td style='font-family: "unbatang", Times, serif'>단가/KG 2 {{$count1}}</td>
+               </tr>
+               <tr>
                   @foreach($rate_data_send_meta['rate_data1'] as $key => $row)
                   @if($key == 11) 
                   <!-- <td style='font-family: "unbatang", Times, serif'>{{$row->rd_cate1}}</td> -->
@@ -70,6 +72,14 @@
                   <td style='font-family: "unbatang", Times, serif'>{{$key != 14 ? number_format($row->rd_data2) : ''}}</td>
                   @endif
                   @endforeach
+               </tr>
+               <tr>
+               
+                  <td colspan="2" style='font-family: "unbatang", Times, serif'>보관</td>
+                  <!-- <td style='font-family: "unbatang", Times, serif'>{{$row->rd_cate3}}</td> -->
+                  <td style='font-family: "unbatang", Times, serif'>기본료율</td>
+                  <td style='font-family: "unbatang", Times, serif'>할증료율(24시간 경과)</td>
+             
                </tr>
                @foreach($rate_data_send_meta['rate_data1'] as $key => $row)
                @if($key < 15 && $key != 4 && $key !=2 && $key !=6 && $key !=10 && $key !=8 && ($key == 12 || $key == 13 || $key == 14) )
