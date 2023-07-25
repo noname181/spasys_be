@@ -11018,7 +11018,10 @@ class RateDataController extends Controller
             $sheet->getStyle('Z10')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
             $sheet->setCellValue('Z10', '대표자명 : '. $rate_meta->rm_owner_name );
         }
+   
         if (!empty($rate_data_send_meta['rate_data1']) && count($rate_data_send_meta['rate_data1']) > 0) {
+            $table1 = 0;
+            $table2 = 0;
             for($i = 0; $i < 3;$i++){
                 if($i == 0){
                     $line1 = 'B13';
@@ -11029,19 +11032,45 @@ class RateDataController extends Controller
                     $line3 = [16,17,18,19,20,21,22,23,24,25,26,27];
                     
                 } else if($i == 1){
-                    $line1 = 'B29';
-                    $line2 = 'Z29';
-                    $title1 = 30;
-                    $title2 = 31;
+                    if($table1 > 0){
+                        $line1 = 'B29';
+                        $line2 = 'Z29';
+                        $title1 = 30;
+                        $title2 = 31;
+                        $line3 = [32,33,34,35,36,37,38,39,40,41,42,43];
+                    } else {
+                        $line1 = 'B13';
+                        $line2 = 'Z13';
+                        $title1 = 14;
+                        $title2 = 15;
+                        $content_line1 = '서비스: 보세화물 (온도화물)';
+                        $line3 = [16,17,18,19,20,21,22,23,24,25,26,27];
+                    }
                     $content_line1 = '서비스: 보세화물 (온도화물)';
-                    $line3 = [32,33,34,35,36,37,38,39,40,41,42,43];
+                 
                 } else if($i == 2){
+                    if($table2 > 0 && $table1 > 0){
                     $line1 = 'B45';
                     $line2 = 'Z45';
                     $title1 = 46;
                     $title2 = 47;
                     $content_line1 = '서비스: 보세화물 (위험물)';
                     $line3 = [48,49,50,51,52,53,54,55,56,57,58,59];
+                    } else if($table2 == 0 && $table1 == 0){
+                        $line1 = 'B13';
+                        $line2 = 'Z13';
+                        $title1 = 14;
+                        $title2 = 15;
+                        $content_line1 = '서비스: 보세화물 (위험물)';
+                        $line3 = [16,17,18,19,20,21,22,23,24,25,26,27];
+                    } else {
+                        $line1 = 'B29';
+                        $line2 = 'Z29';
+                        $title1 = 30;
+                        $title2 = 31;
+                        $line3 = [32,33,34,35,36,37,38,39,40,41,42,43];
+                        $content_line1 = '서비스: 보세화물 (위험물)';
+                    }
                 }
 
                 $sheet->getStyle($line1)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
@@ -11049,8 +11078,8 @@ class RateDataController extends Controller
                 $sheet->mergeCells($line1.':'.$line2);
                 $sheet->setCellValue($line1, $content_line1);
                 
-                $sheet->getStyle('B'. ($title1). ':F'. ($title2))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
-                $sheet->getStyle('B'. ($title1). ':F'. ($title2))->getFont()->setBold(true);
+                $sheet->getStyle('B'. ($title1). ':F'. ($title1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                $sheet->getStyle('B'. ($title1). ':F'. ($title1))->getFont()->setBold(true);
                 $sheet->getStyle('B'. ($title1). ':Z'. ($title2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
                 $sheet->getStyle('B'. ($title1). ':Z'. ($title2))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
@@ -11058,7 +11087,7 @@ class RateDataController extends Controller
                 $sheet->getStyle('B'. ($title1). ':Z'. ($title2))->getFont()->setBold(true);
                 
     
-                $sheet->mergeCells('B'. ($title1). ':F'. ($title2));
+                $sheet->mergeCells('B'. ($title1). ':F'. ($title1));
                 $sheet->getStyle('B'. ($title1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 $sheet->setCellValue('B'. ($title1), '구분');
 
@@ -11067,83 +11096,21 @@ class RateDataController extends Controller
                 $sheet->mergeCells('G'. ($title1). ':Z'. ($title1));
                 $sheet->getStyle('G'. ($title1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 $sheet->setCellValue('G'. ($title1), '내역');
-        
-                $sheet->mergeCells('G'. ($title2). ':K'. ($title2));
-                $sheet->getStyle('G'. ($title2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                $sheet->setCellValue('G'. ($title2), '항목');
-                $sheet->mergeCells('L'. ($title2). ':P'. ($title2));
-                $sheet->getStyle('L'. ($title2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                $sheet->setCellValue('L'. ($title2), '상세');
-
-                $sheet->mergeCells('Q'. ($title2). ':U'. ($title2));
-                $sheet->getStyle('Q'. ($title2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                $sheet->setCellValue('Q'. ($title2), '기본료');
-
-                $sheet->mergeCells('V'. ($title2). ':Z'. ($title2));
-                $sheet->getStyle('V'. ($title2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                $sheet->setCellValue('V'. ($title2), '단가/KG');
-
-                $sheet->getStyle('B'. ($line3[0]). ':K'. ($line3[5]))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
-                $sheet->getStyle('B'. ($line3[0]). ':K'. ($line3[5]))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
-                $sheet->mergeCells('B'. ($line3[0]). ':F'. ($line3[5]));
-                $sheet->getStyle('B'. ($line3[0]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                $sheet->setCellValue('B'. ($line3[0]), '하역비용');
-                $sheet->mergeCells('G'. ($line3[0]). ':K'. ($line3[1]));
-                $sheet->getStyle('G'. ($line3[0]). ':K'. ($line3[1]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                $sheet->setCellValue('G'. ($line3[0]), 'THC');
-                $sheet->mergeCells('G'. ($line3[2]). ':K'. ($line3[2]));
-                $sheet->getStyle('G'. ($line3[2]). ':K'. ($line3[2]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                $sheet->setCellValue('G'. ($line3[2]), '하기운송료');
-                $sheet->mergeCells('G'. ($line3[3]). ':K'. ($line3[3]));
-                $sheet->getStyle('G'. ($line3[3]). ':K'. ($line3[3]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                $sheet->setCellValue('G'. ($line3[3]), '보세운송료');
-                $sheet->mergeCells('G'. ($line3[4]). ':K'. ($line3[4]));
-                $sheet->getStyle('G'. ($line3[4]). ':K'. ($line3[4]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                $sheet->setCellValue('G'. ($line3[4]), '무진동차량');
-                $sheet->mergeCells('G'. ($line3[5]). ':K'. ($line3[5]));
-                $sheet->getStyle('G'. ($line3[5]). ':K'. ($line3[5]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                $sheet->setCellValue('G'. ($line3[5]), '온도차량');
-    
-       
-              
-                $sheet->getStyle('B'. ($line3[6]). ':P'. ($line3[11]))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
-                $sheet->getStyle('B'. ($line3[6]). ':P'. ($line3[11]))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
-                $sheet->getStyle('B'.($line3[6]).':P'.($line3[11]))->getFont()->setBold(true);
-                $sheet->mergeCells('B'. ($line3[6]). ':F'. ($line3[11]));
-                $sheet->getStyle('B'. ($line3[6]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                $sheet->setCellValue('B'. ($line3[6]), '센터 작업료');
                 
-                $current_row2 = 25;
-              
-                $sheet->getStyle('Q'. ($line3[6]). ':Z'. ($line3[6]))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
-                $sheet->getStyle('Q'. ($line3[6]). ':Z'. ($line3[6]))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
-                $sheet->getStyle('Q'.($line3[6]).':Z'.($line3[6]))->getFont()->setBold(true);
-                $sheet->mergeCells('G'. ($line3[6]). ':P'. ($line3[6]));
-                $sheet->getStyle('G'. ($line3[6]). ':P'. ($line3[6]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                $sheet->setCellValue('G'. ($line3[6]), '반출입');
-                $sheet->mergeCells('Q'. ($line3[6]). ':U'. ($line3[6]));
-                $sheet->getStyle('Q'. ($line3[6]). ':U'. ($line3[6]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                $sheet->setCellValue('Q'. ($line3[6]), '기본료');
-                $sheet->mergeCells('V'. ($line3[6]). ':Z'. ($line3[6]));
-                $sheet->getStyle('V'. ($line3[6]). ':Z'. ($line3[6]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                $sheet->setCellValue('V'. ($line3[6]), '단가/KG');
-                $sheet->getStyle('Q'. ($line3[8]). ':Z'. ($line3[8]))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
-                $sheet->getStyle('Q'. ($line3[8]). ':Z'. ($line3[8]))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
-                $sheet->getStyle('Q'.($line3[8]).':Z'.($line3[8]))->getFont()->setBold(true);
-                $sheet->mergeCells('G'. ($line3[8]). ':P'. ($line3[8]));
-                $sheet->getStyle('G'. ($line3[8]). ':P'. ($line3[8]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                $sheet->setCellValue('G'. ($line3[8]), '보관');
-                $sheet->mergeCells('Q'. ($line3[8]). ':U'. ($line3[8]));
-                $sheet->getStyle('Q'. ($line3[8]). ':U'. ($line3[8]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                $sheet->setCellValue('Q'. ($line3[8]), '기본료율');
-                $sheet->mergeCells('V'. ($line3[8]). ':Z'. ($line3[8]));
-                $sheet->getStyle('V'. ($line3[8]). ':Z'. ($line3[8]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                $sheet->setCellValue('V'. ($line3[8]), '할증료율(24시간 경과)');
+            
+
+             
                 if($i == 0){
                     $count  = 0;
                     $count2  = 0;
+                    $count3  = 0;
+                    $count4 = 0;
+                    $count5 = 0;
+                    $count6 = 0;
+                    $array_hide = [];
+                    $array_hide2 = [];
                     foreach($rate_data_send_meta['rate_data1'] as $key => $row){
-                        if($key != 2 && $key <= 9 && $key != 4 && $key != 8 && $key != 6 ){
+                        if($key != 2 && $key <= 9 && $key != 4 && $key != 8 && $key != 6 && ($row['rd_data2'] || $row['rd_data1']) ){
                             $sheet->getStyle('B'.($line3[0] + $count).':P'.($line3[0] + $count))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
                             $sheet->getStyle('B'.($line3[0] + $count).':P'.($line3[0] + $count))->getFont()->setBold(true);
                             $sheet->getStyle('B'.($line3[0] + $count).':Z'.($line3[0] + $count))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
@@ -11157,62 +11124,93 @@ class RateDataController extends Controller
                             $sheet->mergeCells('V'.($line3[0] + $count).':Z'.($line3[0] + $count));
                             $sheet->setCellValue('V'.($line3[0] + $count), $row['rd_data2']);
                             $count++;
+                        } else if($key != 2 && $key <= 9 && $key != 4 && $key != 8 && $key != 6 && (!$row['rd_data2'] && !$row['rd_data1'])){
+                            $count3++;
+                            $array_hide[] = $key;
                         }
+
+                        if($count == 0){
+                            $data = 1;
+                        } else {
+                            $data = 0;
+                        }
+
+
                         if($key == 11 || $key == 12 || $key == 13 ){
-                            if($key == 11){
-                                $sheet->getStyle('G'.($line3[7]).':P'.($line3[7]))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
-                                $sheet->getStyle('G'.($line3[7]).':P'.($line3[7]))->getFont()->setBold(true);
-                                $sheet->getStyle('B'.($line3[7]).':Z'.($line3[7]))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
-                                $sheet->getStyle('B'.($line3[7]).':Z'.($line3[7]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            if($key == 11 && (!$row['rd_data2'] && !$row['rd_data1'])){
+                                $count4 = 2;
+                            }
+                          
+                            if($key == 11  && ($row['rd_data2'] || $row['rd_data1'])){
+                                $sheet->getStyle('G'.($line3[7]-$count3-$data).':P'.($line3[7]-$count3-$data))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                                $sheet->getStyle('G'.($line3[7]-$count3-$data).':P'.($line3[7]-$count3-$data))->getFont()->setBold(true);
+                                $sheet->getStyle('B'.($line3[7]-$count3-$data).':Z'.($line3[7]-$count3-$data))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                                $sheet->getStyle('B'.($line3[7]-$count3-$data).':Z'.($line3[7]-$count3-$data))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                             
                 
-                                $sheet->mergeCells('G'.($line3[7]).':P'.($line3[7]));
-                                $sheet->setCellValue('G'.($line3[7]), '작업료');
-                                $sheet->getStyle('Q'.($line3[7]))->getNumberFormat()->setFormatCode('#,##0_-""');
-                                $sheet->mergeCells('Q'.($line3[7]).':U'.($line3[7]));
-                                $sheet->setCellValue('Q'.($line3[7]), $row['rd_data1']);
-                                $sheet->getStyle('V'.($line3[7]))->getNumberFormat()->setFormatCode('#,##0_-""');
-                                $sheet->mergeCells('V'.($line3[7]).':Z'.($line3[7]));
-                                $sheet->setCellValue('V'.($line3[7]), $row['rd_data2']);
+                                $sheet->mergeCells('G'.($line3[7]-$count3-$data).':P'.($line3[7]-$count3-$data));
+                                $sheet->setCellValue('G'.($line3[7]-$count3-$data), '작업료');
+                                $sheet->getStyle('Q'.($line3[7]-$count3-$data))->getNumberFormat()->setFormatCode('#,##0_-""');
+                                $sheet->mergeCells('Q'.($line3[7]-$count3-$data).':U'.($line3[7]-$count3-$data));
+                                $sheet->setCellValue('Q'.($line3[7]-$count3-$data), $row['rd_data1']);
+                                $sheet->getStyle('V'.($line3[7]-$count3-$data))->getNumberFormat()->setFormatCode('#,##0_-""');
+                                $sheet->mergeCells('V'.($line3[7]-$count3-$data).':Z'.($line3[7]-$count3-$data));
+                                $sheet->setCellValue('V'.($line3[7]-$count3-$data), $row['rd_data2']);
                         
-                            } else {
-                                $sheet->getStyle('G'.($line3[9] + $count2).':P'.($line3[9] + $count2))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
-                                $sheet->getStyle('G'.($line3[9] + $count2).':P'.($line3[9] + $count2))->getFont()->setBold(true);
-                                $sheet->getStyle('B'.($line3[9] + $count2).':Z'.($line3[9] + $count2))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
-                                $sheet->getStyle('B'.($line3[9] + $count2).':Z'.($line3[9] + $count2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            } else if(($key == 12 || $key == 13)  && ($row['rd_data2'] || $row['rd_data1'])) {
+                                $sheet->getStyle('G'.($line3[9] + $count2-$count3-$data-$count4).':P'.($line3[9] + $count2-$count3-$data-$count4))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                                $sheet->getStyle('G'.($line3[9] + $count2-$count3-$data-$count4).':P'.($line3[9] + $count2-$count3-$data-$count4))->getFont()->setBold(true);
+                                $sheet->getStyle('B'.($line3[9] + $count2-$count3-$data-$count4).':Z'.($line3[9] + $count2-$count3-$data-$count4))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                                $sheet->getStyle('B'.($line3[9] + $count2-$count3-$data-$count4).':Z'.($line3[9] + $count2-$count3-$data-$count4))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                             
                 
-                                $sheet->mergeCells('G'.($line3[9] + $count2).':P'.($line3[9] + $count2));
-                                $sheet->setCellValue('G'.($line3[9] + $count2), $row['rd_cate3']);
-                                $sheet->getStyle('Q'.($line3[9] + $count2))->getNumberFormat()->setFormatCode('#,##0_-""');
-                                $sheet->mergeCells('Q'.($line3[9] + $count2).':U'.($line3[9] + $count2));
-                                $sheet->setCellValue('Q'.($line3[9] + $count2), $row['rd_data1']);
-                                $sheet->getStyle('V'.($line3[9] + $count2))->getNumberFormat()->setFormatCode('#,##0_-""');
-                                $sheet->mergeCells('V'.($line3[9] + $count2).':Z'.($line3[9] + $count2));
-                                $sheet->setCellValue('V'.($line3[9] + $count2), $row['rd_data2']);
+                                $sheet->mergeCells('G'.($line3[9] + $count2-$count3-$data-$count4).':P'.($line3[9] + $count2-$count3-$data-$count4));
+                                $sheet->setCellValue('G'.($line3[9] + $count2-$count3-$data-$count4), $row['rd_cate3']);
+                                // $sheet->getStyle('Q'.($line3[9] + $count2))->getNumberFormat()->setFormatCode('#,##0_-""');
+                                $sheet->mergeCells('Q'.($line3[9] + $count2-$count3-$data-$count4).':U'.($line3[9] + $count2-$count3-$data-$count4));
+                                $sheet->setCellValue('Q'.($line3[9] + $count2-$count3-$data-$count4), $row['rd_data1']);
+                                // $sheet->getStyle('V'.($line3[9] + $count2))->getNumberFormat()->setFormatCode('#,##0_-""');
+                                $sheet->mergeCells('V'.($line3[9] + $count2-$count3-$data-$count4).':Z'.($line3[9] + $count2-$count3-$data-$count4));
+                                $sheet->setCellValue('V'.($line3[9] + $count2-$count3-$data-$count4), $row['rd_data2']);
                                 $count2++;
                             }
+                            if(($key == 12 || $key ==13) && (!$row['rd_data2'] && !$row['rd_data1'])){
+                                $count5 +=1;
+                                $array_hide2[] = $key;
+                            }
+                           
                         }
-                        if($key == 14){
-                            $sheet->getStyle('G'.($line3[11]).':P'.($line3[11]))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
-                            $sheet->getStyle('G'.($line3[11]).':P'.($line3[11]))->getFont()->setBold(true);
-                            $sheet->getStyle('B'.($line3[11]).':Z'.($line3[11]))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
-                            $sheet->getStyle('B'.($line3[11]).':Z'.($line3[11]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                        if($key == 14 && $row['rd_data1']){
+                            $sheet->getStyle('G'.($line3[11]-$count3-$data-$count4-$count5).':P'.($line3[11]-$count3-$data-$count4-$count5))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                            $sheet->getStyle('G'.($line3[11]-$count3-$data-$count4-$count5).':P'.($line3[11]-$count3-$data-$count4-$count5))->getFont()->setBold(true);
+                            $sheet->getStyle('B'.($line3[11]-$count3-$data-$count4-$count5).':Z'.($line3[11]-$count3-$data-$count4-$count5))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                            $sheet->getStyle('B'.($line3[11]-$count3-$data-$count4-$count5).':Z'.($line3[11]-$count3-$data-$count4-$count5))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                         
             
-                            $sheet->mergeCells('G'.($line3[11]).':P'.($line3[11]));
-                            $sheet->setCellValue('G'.($line3[11]), '할인율');
+                            $sheet->mergeCells('G'.($line3[11]-$count3-$data-$count4-$count5).':P'.($line3[11]-$count3-$data-$count4-$count5));
+                            $sheet->setCellValue('G'.($line3[11]-$count3-$data-$count4-$count5), '할인율');
                             // $sheet->getStyle('Q'.($line3[11]))->getNumberFormat()->setFormatCode('#,##0_-""');
-                            $sheet->mergeCells('Q'.($line3[11]).':Z'.($line3[11]));
-                            $sheet->setCellValue('Q'.($line3[11]), $row['rd_data1']);
+                            $sheet->mergeCells('Q'.($line3[11]-$count3-$data-$count4-$count5).':Z'.($line3[11]-$count3-$data-$count4-$count5));
+                            $sheet->setCellValue('Q'.($line3[11]-$count3-$data-$count4-$count5), $row['rd_data1']);
+                            $count6 = 1;
                         
+                        }
+                        if($key == 14 && (!$row['rd_data1'])){
+                            $count5 +=1;
+                            $array_hide2[] = $key;
                         }
                     }
                 } else if($i == 1){
                     $count  = 0;
                     $count2  = 0;
+                    $count3  = 0;
+                    $count4 = 0;
+                    $count5 = 0;
+                    $count6 = 0;
+                    $array_hide = [];
+                    $array_hide2 = [];
                     foreach($rate_data_send_meta['rate_data1'] as $key => $row){
-                        if($key >=15 && $key != 17 && $key <= 24 && $key != 19 && $key != 23 && $key != 21 ){
+                        if($key >=15 && $key != 17 && $key <= 24 && $key != 19 && $key != 23 && $key != 21 && ($row['rd_data2'] || $row['rd_data1']) ){
                             $sheet->getStyle('B'.($line3[0] + $count).':P'.($line3[0] + $count))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
                             $sheet->getStyle('B'.($line3[0] + $count).':P'.($line3[0] + $count))->getFont()->setBold(true);
                             $sheet->getStyle('B'.($line3[0] + $count).':Z'.($line3[0] + $count))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
@@ -11226,62 +11224,92 @@ class RateDataController extends Controller
                             $sheet->mergeCells('V'.($line3[0] + $count).':Z'.($line3[0] + $count));
                             $sheet->setCellValue('V'.($line3[0] + $count), $row['rd_data2']);
                             $count++;
+                        } else if($key >=15 && $key != 17 && $key <= 24 && $key != 19 && $key != 23 && $key != 21 && (!$row['rd_data2'] && !$row['rd_data1'])){
+                            $count3++;
+                            $array_hide[] = $key;
                         }
-                        if($key >=15 && ($key == 26 || $key == 27 || $key == 28 )){
-                            if($key == 26){
-                                $sheet->getStyle('G'.($line3[7]).':P'.($line3[7]))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
-                                $sheet->getStyle('G'.($line3[7]).':P'.($line3[7]))->getFont()->setBold(true);
-                                $sheet->getStyle('B'.($line3[7]).':Z'.($line3[7]))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
-                                $sheet->getStyle('B'.($line3[7]).':Z'.($line3[7]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+                        if($count == 0){
+                            $data = 1;
+                        } else {
+                            $data = 0;
+                        }
+
+
+                        if($key >=15 && ($key == 26 || $key == 27 || $key == 28) ){
+                            if($key == 26 && (!$row['rd_data2'] && !$row['rd_data1'])){
+                                $count4 = 2;
+                            }
+                          
+                            if($key == 26  && ($row['rd_data2'] || $row['rd_data1'])){
+                                $sheet->getStyle('G'.($line3[7]-$count3-$data).':P'.($line3[7]-$count3-$data))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                                $sheet->getStyle('G'.($line3[7]-$count3-$data).':P'.($line3[7]-$count3-$data))->getFont()->setBold(true);
+                                $sheet->getStyle('B'.($line3[7]-$count3-$data).':Z'.($line3[7]-$count3-$data))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                                $sheet->getStyle('B'.($line3[7]-$count3-$data).':Z'.($line3[7]-$count3-$data))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                             
                 
-                                $sheet->mergeCells('G'.($line3[7]).':P'.($line3[7]));
-                                $sheet->setCellValue('G'.($line3[7]), '작업료');
-                                $sheet->getStyle('Q'.($line3[7]))->getNumberFormat()->setFormatCode('#,##0_-""');
-                                $sheet->mergeCells('Q'.($line3[7]).':U'.($line3[7]));
-                                $sheet->setCellValue('Q'.($line3[7]), $row['rd_data1']);
-                                $sheet->getStyle('V'.($line3[7]))->getNumberFormat()->setFormatCode('#,##0_-""');
-                                $sheet->mergeCells('V'.($line3[7]).':Z'.($line3[7]));
-                                $sheet->setCellValue('V'.($line3[7]), $row['rd_data2']);
+                                $sheet->mergeCells('G'.($line3[7]-$count3-$data).':P'.($line3[7]-$count3-$data));
+                                $sheet->setCellValue('G'.($line3[7]-$count3-$data), '작업료');
+                                $sheet->getStyle('Q'.($line3[7]-$count3-$data))->getNumberFormat()->setFormatCode('#,##0_-""');
+                                $sheet->mergeCells('Q'.($line3[7]-$count3-$data).':U'.($line3[7]-$count3-$data));
+                                $sheet->setCellValue('Q'.($line3[7]-$count3-$data), $row['rd_data1']);
+                                $sheet->getStyle('V'.($line3[7]-$count3-$data))->getNumberFormat()->setFormatCode('#,##0_-""');
+                                $sheet->mergeCells('V'.($line3[7]-$count3-$data).':Z'.($line3[7]-$count3-$data));
+                                $sheet->setCellValue('V'.($line3[7]-$count3-$data), $row['rd_data2']);
                         
-                            } else {
-                                $sheet->getStyle('G'.($line3[9] + $count2).':P'.($line3[9] + $count2))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
-                                $sheet->getStyle('G'.($line3[9] + $count2).':P'.($line3[9] + $count2))->getFont()->setBold(true);
-                                $sheet->getStyle('B'.($line3[9] + $count2).':Z'.($line3[9] + $count2))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
-                                $sheet->getStyle('B'.($line3[9] + $count2).':Z'.($line3[9] + $count2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            } else if(($key == 27 || $key == 28)  && ($row['rd_data2'] || $row['rd_data1'])) {
+                                $sheet->getStyle('G'.($line3[9] + $count2-$count3-$data-$count4).':P'.($line3[9] + $count2-$count3-$data-$count4))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                                $sheet->getStyle('G'.($line3[9] + $count2-$count3-$data-$count4).':P'.($line3[9] + $count2-$count3-$data-$count4))->getFont()->setBold(true);
+                                $sheet->getStyle('B'.($line3[9] + $count2-$count3-$data-$count4).':Z'.($line3[9] + $count2-$count3-$data-$count4))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                                $sheet->getStyle('B'.($line3[9] + $count2-$count3-$data-$count4).':Z'.($line3[9] + $count2-$count3-$data-$count4))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                             
                 
-                                $sheet->mergeCells('G'.($line3[9] + $count2).':P'.($line3[9] + $count2));
-                                $sheet->setCellValue('G'.($line3[9] + $count2), $row['rd_cate3']);
-                                $sheet->getStyle('Q'.($line3[9] + $count2))->getNumberFormat()->setFormatCode('#,##0_-""');
-                                $sheet->mergeCells('Q'.($line3[9] + $count2).':U'.($line3[9] + $count2));
-                                $sheet->setCellValue('Q'.($line3[9] + $count2), $row['rd_data1']);
-                                $sheet->getStyle('V'.($line3[9] + $count2))->getNumberFormat()->setFormatCode('#,##0_-""');
-                                $sheet->mergeCells('V'.($line3[9] + $count2).':Z'.($line3[9] + $count2));
-                                $sheet->setCellValue('V'.($line3[9] + $count2), $row['rd_data2']);
+                                $sheet->mergeCells('G'.($line3[9] + $count2-$count3-$data-$count4).':P'.($line3[9] + $count2-$count3-$data-$count4));
+                                $sheet->setCellValue('G'.($line3[9] + $count2-$count3-$data-$count4), $row['rd_cate3']);
+                                // $sheet->getStyle('Q'.($line3[9] + $count2))->getNumberFormat()->setFormatCode('#,##0_-""');
+                                $sheet->mergeCells('Q'.($line3[9] + $count2-$count3-$data-$count4).':U'.($line3[9] + $count2-$count3-$data-$count4));
+                                $sheet->setCellValue('Q'.($line3[9] + $count2-$count3-$data-$count4), $row['rd_data1']);
+                                // $sheet->getStyle('V'.($line3[9] + $count2))->getNumberFormat()->setFormatCode('#,##0_-""');
+                                $sheet->mergeCells('V'.($line3[9] + $count2-$count3-$data-$count4).':Z'.($line3[9] + $count2-$count3-$data-$count4));
+                                $sheet->setCellValue('V'.($line3[9] + $count2-$count3-$data-$count4), $row['rd_data2']);
                                 $count2++;
                             }
+                            if(($key == 27 || $key ==28) && (!$row['rd_data2'] && !$row['rd_data1'])){
+                                $count5 +=1;
+                                $array_hide2[] = $key;
+                            }
+                           
                         }
-                        if($key == 29){
-                            $sheet->getStyle('G'.($line3[11]).':P'.($line3[11]))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
-                            $sheet->getStyle('G'.($line3[11]).':P'.($line3[11]))->getFont()->setBold(true);
-                            $sheet->getStyle('B'.($line3[11]).':Z'.($line3[11]))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
-                            $sheet->getStyle('B'.($line3[11]).':Z'.($line3[11]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                        if($key == 29 && $row['rd_data1']){
+                            $sheet->getStyle('G'.($line3[11]-$count3-$data-$count4-$count5).':P'.($line3[11]-$count3-$data-$count4-$count5))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                            $sheet->getStyle('G'.($line3[11]-$count3-$data-$count4-$count5).':P'.($line3[11]-$count3-$data-$count4-$count5))->getFont()->setBold(true);
+                            $sheet->getStyle('B'.($line3[11]-$count3-$data-$count4-$count5).':Z'.($line3[11]-$count3-$data-$count4-$count5))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                            $sheet->getStyle('B'.($line3[11]-$count3-$data-$count4-$count5).':Z'.($line3[11]-$count3-$data-$count4-$count5))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                         
             
-                            $sheet->mergeCells('G'.($line3[11]).':P'.($line3[11]));
-                            $sheet->setCellValue('G'.($line3[11]), '할인율');
+                            $sheet->mergeCells('G'.($line3[11]-$count3-$data-$count4-$count5).':P'.($line3[11]-$count3-$data-$count4-$count5));
+                            $sheet->setCellValue('G'.($line3[11]-$count3-$data-$count4-$count5), '할인율');
                             // $sheet->getStyle('Q'.($line3[11]))->getNumberFormat()->setFormatCode('#,##0_-""');
-                            $sheet->mergeCells('Q'.($line3[11]).':Z'.($line3[11]));
-                            $sheet->setCellValue('Q'.($line3[11]), $row['rd_data1']);
-                        
+                            $sheet->mergeCells('Q'.($line3[11]-$count3-$data-$count4-$count5).':Z'.($line3[11]-$count3-$data-$count4-$count5));
+                            $sheet->setCellValue('Q'.($line3[11]-$count3-$data-$count4-$count5), $row['rd_data1']);
+                            $count6 = 1;
+                        }
+                        if($key == 29 && (!$row['rd_data1'])){
+                            $count5 +=1;
+                            $array_hide2[] = $key;
                         }
                     }
-                } else if($i == 2){
+                }  else if($i == 2){
                     $count  = 0;
                     $count2  = 0;
+                    $count3  = 0;
+                    $count4 = 0;
+                    $count5 = 0;
+                    $count6 = 0;
+                    $array_hide = [];
+                    $array_hide2 = [];
                     foreach($rate_data_send_meta['rate_data1'] as $key => $row){
-                        if($key >=30 && $key != 32 && $key <= 39 && $key != 34 && $key != 38 && $key != 36 ){
+                        if($key >=30 && $key != 32 && $key <= 39 && $key != 34 && $key != 38 && $key != 36 && ($row['rd_data2'] || $row['rd_data1']) ){
                             $sheet->getStyle('B'.($line3[0] + $count).':P'.($line3[0] + $count))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
                             $sheet->getStyle('B'.($line3[0] + $count).':P'.($line3[0] + $count))->getFont()->setBold(true);
                             $sheet->getStyle('B'.($line3[0] + $count).':Z'.($line3[0] + $count))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
@@ -11295,58 +11323,595 @@ class RateDataController extends Controller
                             $sheet->mergeCells('V'.($line3[0] + $count).':Z'.($line3[0] + $count));
                             $sheet->setCellValue('V'.($line3[0] + $count), $row['rd_data2']);
                             $count++;
+                        } else if($key >=30 && $key != 32 && $key <= 39 && $key != 34 && $key != 38 && $key != 36 && (!$row['rd_data2'] && !$row['rd_data1'])){
+                            $count3++;
+                            $array_hide[] = $key;
                         }
-                        if($key >=30 && ($key == 41 || $key == 42 || $key == 43 )){
-                            if($key == 41){
-                                $sheet->getStyle('G'.($line3[7]).':P'.($line3[7]))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
-                                $sheet->getStyle('G'.($line3[7]).':P'.($line3[7]))->getFont()->setBold(true);
-                                $sheet->getStyle('B'.($line3[7]).':Z'.($line3[7]))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
-                                $sheet->getStyle('B'.($line3[7]).':Z'.($line3[7]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+                        if($count == 0){
+                            $data = 1;
+                        } else {
+                            $data = 0;
+                        }
+
+
+                        if($key >=30 && ($key == 41 || $key == 42 || $key == 43) ){
+                            if($key == 41 && (!$row['rd_data2'] && !$row['rd_data1'])){
+                                $count4 = 2;
+                            }
+                          
+                            if($key == 41  && ($row['rd_data2'] || $row['rd_data1'])){
+                                $sheet->getStyle('G'.($line3[7]-$count3-$data).':P'.($line3[7]-$count3-$data))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                                $sheet->getStyle('G'.($line3[7]-$count3-$data).':P'.($line3[7]-$count3-$data))->getFont()->setBold(true);
+                                $sheet->getStyle('B'.($line3[7]-$count3-$data).':Z'.($line3[7]-$count3-$data))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                                $sheet->getStyle('B'.($line3[7]-$count3-$data).':Z'.($line3[7]-$count3-$data))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                             
                 
-                                $sheet->mergeCells('G'.($line3[7]).':P'.($line3[7]));
-                                $sheet->setCellValue('G'.($line3[7]), '작업료');
-                                $sheet->getStyle('Q'.($line3[7]))->getNumberFormat()->setFormatCode('#,##0_-""');
-                                $sheet->mergeCells('Q'.($line3[7]).':U'.($line3[7]));
-                                $sheet->setCellValue('Q'.($line3[7]), $row['rd_data1']);
-                                $sheet->getStyle('V'.($line3[7]))->getNumberFormat()->setFormatCode('#,##0_-""');
-                                $sheet->mergeCells('V'.($line3[7]).':Z'.($line3[7]));
-                                $sheet->setCellValue('V'.($line3[7]), $row['rd_data2']);
+                                $sheet->mergeCells('G'.($line3[7]-$count3-$data).':P'.($line3[7]-$count3-$data));
+                                $sheet->setCellValue('G'.($line3[7]-$count3-$data), '작업료');
+                                $sheet->getStyle('Q'.($line3[7]-$count3-$data))->getNumberFormat()->setFormatCode('#,##0_-""');
+                                $sheet->mergeCells('Q'.($line3[7]-$count3-$data).':U'.($line3[7]-$count3-$data));
+                                $sheet->setCellValue('Q'.($line3[7]-$count3-$data), $row['rd_data1']);
+                                $sheet->getStyle('V'.($line3[7]-$count3-$data))->getNumberFormat()->setFormatCode('#,##0_-""');
+                                $sheet->mergeCells('V'.($line3[7]-$count3-$data).':Z'.($line3[7]-$count3-$data));
+                                $sheet->setCellValue('V'.($line3[7]-$count3-$data), $row['rd_data2']);
                         
-                            } else {
-                                $sheet->getStyle('G'.($line3[9] + $count2).':P'.($line3[9] + $count2))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
-                                $sheet->getStyle('G'.($line3[9] + $count2).':P'.($line3[9] + $count2))->getFont()->setBold(true);
-                                $sheet->getStyle('B'.($line3[9] + $count2).':Z'.($line3[9] + $count2))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
-                                $sheet->getStyle('B'.($line3[9] + $count2).':Z'.($line3[9] + $count2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            } 
+                             if(($key == 42 || $key == 43)  && ($row['rd_data2'] || $row['rd_data1'])) {
+                   
+                                $sheet->getStyle('G'.($line3[9] + $count2-$count3-$data-$count4).':P'.($line3[9] + $count2-$count3-$data-$count4))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                                $sheet->getStyle('G'.($line3[9] + $count2-$count3-$data-$count4).':P'.($line3[9] + $count2-$count3-$data-$count4))->getFont()->setBold(true);
+                                $sheet->getStyle('B'.($line3[9] + $count2-$count3-$data-$count4).':Z'.($line3[9] + $count2-$count3-$data-$count4))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                                $sheet->getStyle('B'.($line3[9] + $count2-$count3-$data-$count4).':Z'.($line3[9] + $count2-$count3-$data-$count4))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                             
                 
-                                $sheet->mergeCells('G'.($line3[9] + $count2).':P'.($line3[9] + $count2));
-                                $sheet->setCellValue('G'.($line3[9] + $count2), $row['rd_cate3']);
-                                $sheet->getStyle('Q'.($line3[9] + $count2))->getNumberFormat()->setFormatCode('#,##0_-""');
-                                $sheet->mergeCells('Q'.($line3[9] + $count2).':U'.($line3[9] + $count2));
-                                $sheet->setCellValue('Q'.($line3[9] + $count2), $row['rd_data1']);
-                                $sheet->getStyle('V'.($line3[9] + $count2))->getNumberFormat()->setFormatCode('#,##0_-""');
-                                $sheet->mergeCells('V'.($line3[9] + $count2).':Z'.($line3[9] + $count2));
-                                $sheet->setCellValue('V'.($line3[9] + $count2), $row['rd_data2']);
+                                $sheet->mergeCells('G'.($line3[9] + $count2-$count3-$data-$count4).':P'.($line3[9] + $count2-$count3-$data-$count4));
+                                $sheet->setCellValue('G'.($line3[9] + $count2-$count3-$data-$count4), $row['rd_cate3']);
+                                // $sheet->getStyle('Q'.($line3[9] + $count2))->getNumberFormat()->setFormatCode('#,##0_-""');
+                                $sheet->mergeCells('Q'.($line3[9] + $count2-$count3-$data-$count4).':U'.($line3[9] + $count2-$count3-$data-$count4));
+                                $sheet->setCellValue('Q'.($line3[9] + $count2-$count3-$data-$count4), $row['rd_data1']);
+                                // $sheet->getStyle('V'.($line3[9] + $count2))->getNumberFormat()->setFormatCode('#,##0_-""');
+                                $sheet->mergeCells('V'.($line3[9] + $count2-$count3-$data-$count4).':Z'.($line3[9] + $count2-$count3-$data-$count4));
+                                $sheet->setCellValue('V'.($line3[9] + $count2-$count3-$data-$count4), $row['rd_data2']);
                                 $count2++;
                             }
+                            if(($key == 42 || $key ==43) && (!$row['rd_data2'] && !$row['rd_data1'])){
+                                $count5 +=1;
+                                $array_hide2[] = $key;
+                            }
+                           
                         }
-                        if($key == 44){
-                            $sheet->getStyle('G'.($line3[11]).':P'.($line3[11]))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
-                            $sheet->getStyle('G'.($line3[11]).':P'.($line3[11]))->getFont()->setBold(true);
-                            $sheet->getStyle('B'.($line3[11]).':Z'.($line3[11]))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
-                            $sheet->getStyle('B'.($line3[11]).':Z'.($line3[11]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                        if($key == 44 && $row['rd_data1']){
+                            $sheet->getStyle('G'.($line3[11]-$count3-$data-$count4-$count5).':P'.($line3[11]-$count3-$data-$count4-$count5))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                            $sheet->getStyle('G'.($line3[11]-$count3-$data-$count4-$count5).':P'.($line3[11]-$count3-$data-$count4-$count5))->getFont()->setBold(true);
+                            $sheet->getStyle('B'.($line3[11]-$count3-$data-$count4-$count5).':Z'.($line3[11]-$count3-$data-$count4-$count5))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                            $sheet->getStyle('B'.($line3[11]-$count3-$data-$count4-$count5).':Z'.($line3[11]-$count3-$data-$count4-$count5))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                         
             
-                            $sheet->mergeCells('G'.($line3[11]).':P'.($line3[11]));
-                            $sheet->setCellValue('G'.($line3[11]), '할인율');
+                            $sheet->mergeCells('G'.($line3[11]-$count3-$data-$count4-$count5).':P'.($line3[11]-$count3-$data-$count4-$count5));
+                            $sheet->setCellValue('G'.($line3[11]-$count3-$data-$count4-$count5), '할인율');
                             // $sheet->getStyle('Q'.($line3[11]))->getNumberFormat()->setFormatCode('#,##0_-""');
-                            $sheet->mergeCells('Q'.($line3[11]).':Z'.($line3[11]));
-                            $sheet->setCellValue('Q'.($line3[11]), $row['rd_data1']);
-                        
+                            $sheet->mergeCells('Q'.($line3[11]-$count3-$data-$count4-$count5).':Z'.($line3[11]-$count3-$data-$count4-$count5));
+                            $sheet->setCellValue('Q'.($line3[11]-$count3-$data-$count4-$count5), $row['rd_data1']);
+                            $count6 = 1;
+                        }
+                        if($key == 44 && (!$row['rd_data1'])){
+                            $count5 +=1;
+                            $array_hide2[] = $key;
                         }
                     }
                 }
+                // else if($i == 1){
+                //     $count  = 0;
+                //     $count2  = 0;
+                //     foreach($rate_data_send_meta['rate_data1'] as $key => $row){
+                //         if($key >=15 && $key != 17 && $key <= 24 && $key != 19 && $key != 23 && $key != 21 ){
+                //             $sheet->getStyle('B'.($line3[0] + $count).':P'.($line3[0] + $count))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                //             $sheet->getStyle('B'.($line3[0] + $count).':P'.($line3[0] + $count))->getFont()->setBold(true);
+                //             $sheet->getStyle('B'.($line3[0] + $count).':Z'.($line3[0] + $count))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                //             $sheet->getStyle('B'.($line3[0] + $count).':Z'.($line3[0] + $count))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                //             $sheet->mergeCells('L'.($line3[0] + $count).':P'.($line3[0] + $count));
+                //             $sheet->setCellValue('L'.($line3[0] + $count), $row['rd_cate3']);
+                //             $sheet->getStyle('Q'.($line3[0] + $count))->getNumberFormat()->setFormatCode('#,##0_-""');
+                //             $sheet->mergeCells('Q'.($line3[0] + $count).':U'.($line3[0] + $count));
+                //             $sheet->setCellValue('Q'.($line3[0] + $count), $row['rd_data1']);
+                //             $sheet->getStyle('V'.($line3[0] + $count))->getNumberFormat()->setFormatCode('#,##0_-""');
+                //             $sheet->mergeCells('V'.($line3[0] + $count).':Z'.($line3[0] + $count));
+                //             $sheet->setCellValue('V'.($line3[0] + $count), $row['rd_data2']);
+                //             $count++;
+                //         }
+                //         if($key >=15 && ($key == 26 || $key == 27 || $key == 28 )){
+                //             if($key == 26){
+                //                 $sheet->getStyle('G'.($line3[7]).':P'.($line3[7]))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                //                 $sheet->getStyle('G'.($line3[7]).':P'.($line3[7]))->getFont()->setBold(true);
+                //                 $sheet->getStyle('B'.($line3[7]).':Z'.($line3[7]))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                //                 $sheet->getStyle('B'.($line3[7]).':Z'.($line3[7]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            
+                
+                //                 $sheet->mergeCells('G'.($line3[7]).':P'.($line3[7]));
+                //                 $sheet->setCellValue('G'.($line3[7]), '작업료');
+                //                 $sheet->getStyle('Q'.($line3[7]))->getNumberFormat()->setFormatCode('#,##0_-""');
+                //                 $sheet->mergeCells('Q'.($line3[7]).':U'.($line3[7]));
+                //                 $sheet->setCellValue('Q'.($line3[7]), $row['rd_data1']);
+                //                 $sheet->getStyle('V'.($line3[7]))->getNumberFormat()->setFormatCode('#,##0_-""');
+                //                 $sheet->mergeCells('V'.($line3[7]).':Z'.($line3[7]));
+                //                 $sheet->setCellValue('V'.($line3[7]), $row['rd_data2']);
+                        
+                //             } else {
+                //                 $sheet->getStyle('G'.($line3[9] + $count2).':P'.($line3[9] + $count2))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                //                 $sheet->getStyle('G'.($line3[9] + $count2).':P'.($line3[9] + $count2))->getFont()->setBold(true);
+                //                 $sheet->getStyle('B'.($line3[9] + $count2).':Z'.($line3[9] + $count2))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                //                 $sheet->getStyle('B'.($line3[9] + $count2).':Z'.($line3[9] + $count2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            
+                
+                //                 $sheet->mergeCells('G'.($line3[9] + $count2).':P'.($line3[9] + $count2));
+                //                 $sheet->setCellValue('G'.($line3[9] + $count2), $row['rd_cate3']);
+                //                 // $sheet->getStyle('Q'.($line3[9] + $count2))->getNumberFormat()->setFormatCode('#,##0_-""');
+                //                 $sheet->mergeCells('Q'.($line3[9] + $count2).':U'.($line3[9] + $count2));
+                //                 $sheet->setCellValue('Q'.($line3[9] + $count2), $row['rd_data1']);
+                //                 // $sheet->getStyle('V'.($line3[9] + $count2))->getNumberFormat()->setFormatCode('#,##0_-""');
+                //                 $sheet->mergeCells('V'.($line3[9] + $count2).':Z'.($line3[9] + $count2));
+                //                 $sheet->setCellValue('V'.($line3[9] + $count2), $row['rd_data2']);
+                //                 $count2++;
+                //             }
+                //         }
+                //         if($key == 29){
+                //             $sheet->getStyle('G'.($line3[11]).':P'.($line3[11]))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                //             $sheet->getStyle('G'.($line3[11]).':P'.($line3[11]))->getFont()->setBold(true);
+                //             $sheet->getStyle('B'.($line3[11]).':Z'.($line3[11]))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                //             $sheet->getStyle('B'.($line3[11]).':Z'.($line3[11]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                        
+            
+                //             $sheet->mergeCells('G'.($line3[11]).':P'.($line3[11]));
+                //             $sheet->setCellValue('G'.($line3[11]), '할인율');
+                //             // $sheet->getStyle('Q'.($line3[11]))->getNumberFormat()->setFormatCode('#,##0_-""');
+                //             $sheet->mergeCells('Q'.($line3[11]).':Z'.($line3[11]));
+                //             $sheet->setCellValue('Q'.($line3[11]), $row['rd_data1']);
+                        
+                //         }
+                //     }
+                // } else if($i == 2){
+                //     $count  = 0;
+                //     $count2  = 0;
+                //     foreach($rate_data_send_meta['rate_data1'] as $key => $row){
+                //         if($key >=30 && $key != 32 && $key <= 39 && $key != 34 && $key != 38 && $key != 36 ){
+                //             $sheet->getStyle('B'.($line3[0] + $count).':P'.($line3[0] + $count))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                //             $sheet->getStyle('B'.($line3[0] + $count).':P'.($line3[0] + $count))->getFont()->setBold(true);
+                //             $sheet->getStyle('B'.($line3[0] + $count).':Z'.($line3[0] + $count))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                //             $sheet->getStyle('B'.($line3[0] + $count).':Z'.($line3[0] + $count))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                //             $sheet->mergeCells('L'.($line3[0] + $count).':P'.($line3[0] + $count));
+                //             $sheet->setCellValue('L'.($line3[0] + $count), $row['rd_cate3']);
+                //             $sheet->getStyle('Q'.($line3[0] + $count))->getNumberFormat()->setFormatCode('#,##0_-""');
+                //             $sheet->mergeCells('Q'.($line3[0] + $count).':U'.($line3[0] + $count));
+                //             $sheet->setCellValue('Q'.($line3[0] + $count), $row['rd_data1']);
+                //             $sheet->getStyle('V'.($line3[0] + $count))->getNumberFormat()->setFormatCode('#,##0_-""');
+                //             $sheet->mergeCells('V'.($line3[0] + $count).':Z'.($line3[0] + $count));
+                //             $sheet->setCellValue('V'.($line3[0] + $count), $row['rd_data2']);
+                //             $count++;
+                //         }
+                //         if($key >=30 && ($key == 41 || $key == 42 || $key == 43 )){
+                //             if($key == 41){
+                //                 $sheet->getStyle('G'.($line3[7]).':P'.($line3[7]))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                //                 $sheet->getStyle('G'.($line3[7]).':P'.($line3[7]))->getFont()->setBold(true);
+                //                 $sheet->getStyle('B'.($line3[7]).':Z'.($line3[7]))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                //                 $sheet->getStyle('B'.($line3[7]).':Z'.($line3[7]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            
+                
+                //                 $sheet->mergeCells('G'.($line3[7]).':P'.($line3[7]));
+                //                 $sheet->setCellValue('G'.($line3[7]), '작업료');
+                //                 $sheet->getStyle('Q'.($line3[7]))->getNumberFormat()->setFormatCode('#,##0_-""');
+                //                 $sheet->mergeCells('Q'.($line3[7]).':U'.($line3[7]));
+                //                 $sheet->setCellValue('Q'.($line3[7]), $row['rd_data1']);
+                //                 $sheet->getStyle('V'.($line3[7]))->getNumberFormat()->setFormatCode('#,##0_-""');
+                //                 $sheet->mergeCells('V'.($line3[7]).':Z'.($line3[7]));
+                //                 $sheet->setCellValue('V'.($line3[7]), $row['rd_data2']);
+                        
+                //             } else {
+                //                 $sheet->getStyle('G'.($line3[9] + $count2).':P'.($line3[9] + $count2))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                //                 $sheet->getStyle('G'.($line3[9] + $count2).':P'.($line3[9] + $count2))->getFont()->setBold(true);
+                //                 $sheet->getStyle('B'.($line3[9] + $count2).':Z'.($line3[9] + $count2))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                //                 $sheet->getStyle('B'.($line3[9] + $count2).':Z'.($line3[9] + $count2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            
+                
+                //                 $sheet->mergeCells('G'.($line3[9] + $count2).':P'.($line3[9] + $count2));
+                //                 $sheet->setCellValue('G'.($line3[9] + $count2), $row['rd_cate3']);
+                //                 // $sheet->getStyle('Q'.($line3[9] + $count2))->getNumberFormat()->setFormatCode('#,##0_-""');
+                //                 $sheet->mergeCells('Q'.($line3[9] + $count2).':U'.($line3[9] + $count2));
+                //                 $sheet->setCellValue('Q'.($line3[9] + $count2), $row['rd_data1']);
+                //                 // $sheet->getStyle('V'.($line3[9] + $count2))->getNumberFormat()->setFormatCode('#,##0_-""');
+                //                 $sheet->mergeCells('V'.($line3[9] + $count2).':Z'.($line3[9] + $count2));
+                //                 $sheet->setCellValue('V'.($line3[9] + $count2), $row['rd_data2']);
+                //                 $count2++;
+                //             }
+                //         }
+                //         if($key == 44){
+                //             $sheet->getStyle('G'.($line3[11]).':P'.($line3[11]))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                //             $sheet->getStyle('G'.($line3[11]).':P'.($line3[11]))->getFont()->setBold(true);
+                //             $sheet->getStyle('B'.($line3[11]).':Z'.($line3[11]))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                //             $sheet->getStyle('B'.($line3[11]).':Z'.($line3[11]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                        
+            
+                //             $sheet->mergeCells('G'.($line3[11]).':P'.($line3[11]));
+                //             $sheet->setCellValue('G'.($line3[11]), '할인율');
+                //             // $sheet->getStyle('Q'.($line3[11]))->getNumberFormat()->setFormatCode('#,##0_-""');
+                //             $sheet->mergeCells('Q'.($line3[11]).':Z'.($line3[11]));
+                //             $sheet->setCellValue('Q'.($line3[11]), $row['rd_data1']);
+                        
+                //         }
+                //     }
+                // }
+
+                    if($i == 0){
+                        $data1 = 0;
+                        if($count != 0){
+                            $table1 = 1;
+                            $sheet->mergeCells('G'. ($title2). ':K'. ($title2));
+                            $sheet->getStyle('G'. ($title2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('G'. ($title2), '항목');
+                            $sheet->mergeCells('L'. ($title2). ':P'. ($title2));
+                            $sheet->getStyle('L'. ($title2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('L'. ($title2), '상세');
+                
+                            $sheet->mergeCells('Q'. ($title2). ':U'. ($title2));
+                            $sheet->getStyle('Q'. ($title2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('Q'. ($title2), '기본료');
+                
+                            $sheet->mergeCells('V'. ($title2). ':Z'. ($title2));
+                            $sheet->getStyle('V'. ($title2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('V'. ($title2), '단가/KG');
+                            $sheet->getStyle('B'. ($title2). ':K'. ($line3[5]-$count3))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                            $sheet->getStyle('B'. ($title2). ':K'. ($line3[5]-$count3))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                            $sheet->mergeCells('B'. ($title2). ':F'. ($line3[5]-$count3));
+                            $sheet->getStyle('B'. ($title2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('B'. ($title2), '하역비용');
+                            if(!in_array(0,$array_hide) && !in_array(1,$array_hide)){
+                            $sheet->mergeCells('G'. ($line3[0]). ':K'. ($line3[1]));
+                            $sheet->getStyle('G'. ($line3[0]). ':K'. ($line3[1]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('G'. ($line3[0]), 'THC');
+                            } else if(in_array(0,$array_hide) || in_array(1,$array_hide)) {
+                                $sheet->mergeCells('G'. ($line3[0]). ':K'. ($line3[0]));
+                                $sheet->getStyle('G'. ($line3[0]). ':K'. ($line3[0]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                                $sheet->setCellValue('G'. ($line3[0]), 'THC');
+                            }
+                            if(!in_array(3,$array_hide) && ( in_array(0,$array_hide) || in_array(1,$array_hide))){
+                            $array1 = [0,1];
+                            $result = array_intersect($array1, $array_hide);
+                            $sheet->mergeCells('G'. ($line3[2]-count($result)). ':K'. ($line3[2]-count($result)));
+                            $sheet->getStyle('G'. ($line3[2]-count($result)). ':K'. ($line3[2]-count($result)))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('G'. ($line3[2]-count($result)), '하기운송료');
+                            } else if(!in_array(3,$array_hide)){
+                                $sheet->mergeCells('G'. ($line3[2]). ':K'. ($line3[2]));
+                                $sheet->getStyle('G'. ($line3[2]). ':K'. ($line3[2]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                                $sheet->setCellValue('G'. ($line3[2]), '하기운송료');
+                            }
+                            if(!in_array(5,$array_hide)  && ( in_array(3,$array_hide) || in_array(0,$array_hide) || in_array(1,$array_hide))){
+                            $array1 = [0,1,3];
+                            $result = array_intersect($array1, $array_hide);
+                            
+                            $sheet->mergeCells('G'. ($line3[3]-count($result)). ':K'. ($line3[3]-count($result)));
+                            $sheet->getStyle('G'. ($line3[3]-count($result)). ':K'. ($line3[3]-count($result)))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('G'. ($line3[3]-count($result)), '보세운송료');
+                            } else if(!in_array(5,$array_hide)){
+                                $sheet->mergeCells('G'. ($line3[3]). ':K'. ($line3[3]));
+                                $sheet->getStyle('G'. ($line3[3]). ':K'. ($line3[3]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                                $sheet->setCellValue('G'. ($line3[3]), '보세운송료');
+                            }
+                            if(!in_array(7,$array_hide) && (in_array(5,$array_hide) || in_array(3,$array_hide) || 
+                            in_array(0,$array_hide) || in_array(1,$array_hide))){
+                                $array1 = [0,1,3,5];
+                                $result = array_intersect($array1, $array_hide);
+                            $sheet->mergeCells('G'. ($line3[4]-count($result)). ':K'. ($line3[4]-count($result)));
+                            $sheet->getStyle('G'. ($line3[4]-count($result)). ':K'. ($line3[4]-count($result)))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('G'. ($line3[4]-count($result)), '무진동차량');
+                            } else if(!in_array(7,$array_hide)){
+                                $sheet->mergeCells('G'. ($line3[4]). ':K'. ($line3[4]));
+                                $sheet->getStyle('G'. ($line3[4]). ':K'. ($line3[4]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                                $sheet->setCellValue('G'. ($line3[4]), '무진동차량');
+                            }
+                            if(!in_array(9,$array_hide) && (in_array(7,$array_hide) || in_array(5,$array_hide) || in_array(3,$array_hide) || 
+                            in_array(0,$array_hide) || in_array(1,$array_hide))){
+                            $sheet->mergeCells('G'. ($line3[5]-$count3). ':K'. ($line3[5]-$count3));
+                            $sheet->getStyle('G'. ($line3[5]-$count3). ':K'. ($line3[5]-$count3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('G'. ($line3[5]-$count3), '온도차량');
+                            } else if(!in_array(9,$array_hide)){
+                                $sheet->mergeCells('G'. ($line3[5]). ':K'. ($line3[5]));
+                                $sheet->getStyle('G'. ($line3[5]). ':K'. ($line3[5]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                                $sheet->setCellValue('G'. ($line3[5]), '온도차량');
+                            }
+                        } else if($count == 0){
+                            $data1 = 1;
+                        }
+                        if($count5 < 3 || $count4 != 2){
+                            $table1 = 1;
+                            if($count5 == 3){
+                                $count5 = 4;
+                            }
+                            $sheet->getStyle('B'. ($line3[6]-$count3-$data1). ':P'. ($line3[11]-$count3-$data1-$count4-$count5))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                            $sheet->getStyle('B'. ($line3[6]-$count3-$data1). ':P'. ($line3[11]-$count3-$data1-$count4-$count5))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                            $sheet->getStyle('B'.($line3[6]-$count3-$data1).':P'.($line3[11]-$count3-$data1-$count4-$count5))->getFont()->setBold(true);
+                            $sheet->mergeCells('B'. ($line3[6]-$count3-$data1). ':F'. ($line3[11]-$count3-$data1-$count4-$count5));
+                            $sheet->getStyle('B'. ($line3[6]-$count3-$data1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('B'. ($line3[6]-$count3-$data1), '센터 작업료');
+                            
+                            $current_row2 = 25;
+                            if($count4 == 0){
+                            $sheet->getStyle('Q'. ($line3[6]-$count3-$data1). ':Z'. ($line3[6]-$count3-$data1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                            $sheet->getStyle('Q'. ($line3[6]-$count3-$data1). ':Z'. ($line3[6]-$count3-$data1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                            $sheet->getStyle('Q'.($line3[6]-$count3-$data1).':Z'.($line3[6]-$count3-$data1))->getFont()->setBold(true);
+                            $sheet->mergeCells('G'. ($line3[6]-$count3-$data1). ':P'. ($line3[6]-$count3-$data1));
+                            $sheet->getStyle('G'. ($line3[6]-$count3-$data1). ':P'. ($line3[6]-$count3-$data1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('G'. ($line3[6]-$count3-$data1), '반출입');
+                            $sheet->mergeCells('Q'. ($line3[6]-$count3-$data1). ':U'. ($line3[6]-$count3-$data1));
+                            $sheet->getStyle('Q'. ($line3[6]-$count3-$data1). ':U'. ($line3[6]-$count3-$data1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('Q'. ($line3[6]-$count3-$data1), '기본료');
+                            $sheet->mergeCells('V'. ($line3[6]-$count3-$data1). ':Z'. ($line3[6]-$count3-$data1));
+                            $sheet->getStyle('V'. ($line3[6]-$count3-$data1). ':Z'. ($line3[6]-$count3-$data1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('V'. ($line3[6]-$count3-$data1), '단가/KG');
+                            }
+                            if(($count5 == 0 || $count2 > 0 || $count6  > 0)){
+                            $sheet->getStyle('Q'. ($line3[8]-$count3-$data1-$count4). ':Z'. ($line3[8]-$count3-$data1-$count4))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                            $sheet->getStyle('Q'. ($line3[8]-$count3-$data1-$count4). ':Z'. ($line3[8]-$count3-$data1-$count4))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                            $sheet->getStyle('Q'.($line3[8]-$count3-$data1-$count4).':Z'.($line3[8]))->getFont()->setBold(true);
+                            $sheet->mergeCells('G'. ($line3[8]-$count3-$data1-$count4). ':P'. ($line3[8]-$count3-$data1-$count4));
+                            $sheet->getStyle('G'. ($line3[8]-$count3-$data1-$count4). ':P'. ($line3[8]-$count3-$data1-$count4))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('G'. ($line3[8]-$count3-$data1-$count4), '보관');
+                            $sheet->mergeCells('Q'. ($line3[8]-$count3-$data1-$count4). ':U'. ($line3[8]-$count3-$data1-$count4));
+                            $sheet->getStyle('Q'. ($line3[8]-$count3-$data1-$count4). ':U'. ($line3[8]-$count3-$data1-$count4))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('Q'. ($line3[8]-$count3-$data1-$count4), '기본료율');
+                            $sheet->mergeCells('V'. ($line3[8]-$count3-$data1-$count4). ':Z'. ($line3[8]-$count3-$data1-$count4));
+                            $sheet->getStyle('V'. ($line3[8]-$count3-$data1-$count4). ':Z'. ($line3[8]-$count3-$data1-$count4))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('V'. ($line3[8]-$count3-$data1-$count4), '할증료율(24시간 경과)');
+                            }
+                        }
+                    } else if($i == 1){
+                            
+                        $data1 = 0;
+                        if($count != 0){
+                            $table2 = 1;
+                            $sheet->mergeCells('G'. ($title2). ':K'. ($title2));
+                            $sheet->getStyle('G'. ($title2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('G'. ($title2), '항목');
+                            $sheet->mergeCells('L'. ($title2). ':P'. ($title2));
+                            $sheet->getStyle('L'. ($title2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('L'. ($title2), '상세');
+                
+                            $sheet->mergeCells('Q'. ($title2). ':U'. ($title2));
+                            $sheet->getStyle('Q'. ($title2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('Q'. ($title2), '기본료');
+                
+                            $sheet->mergeCells('V'. ($title2). ':Z'. ($title2));
+                            $sheet->getStyle('V'. ($title2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('V'. ($title2), '단가/KG');
+                            $sheet->getStyle('B'. ($title2). ':K'. ($line3[5]-$count3))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                            $sheet->getStyle('B'. ($title2). ':K'. ($line3[5]-$count3))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                            $sheet->mergeCells('B'. ($title2). ':F'. ($line3[5]-$count3));
+                            $sheet->getStyle('B'. ($title2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('B'. ($title2), '하역비용');
+                            if(!in_array(15,$array_hide) && !in_array(16,$array_hide)){
+                            $sheet->mergeCells('G'. ($line3[0]). ':K'. ($line3[1]));
+                            $sheet->getStyle('G'. ($line3[0]). ':K'. ($line3[1]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('G'. ($line3[0]), 'THC');
+                            } else if(in_array(15,$array_hide) || in_array(16,$array_hide)) {
+                                $sheet->mergeCells('G'. ($line3[0]). ':K'. ($line3[0]));
+                                $sheet->getStyle('G'. ($line3[0]). ':K'. ($line3[0]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                                $sheet->setCellValue('G'. ($line3[0]), 'THC');
+                            }
+                            if(!in_array(18,$array_hide) && ( in_array(15,$array_hide) || in_array(16,$array_hide))){
+                            $array1 = [15,16];
+                            $result = array_intersect($array1, $array_hide);
+                            $sheet->mergeCells('G'. ($line3[2]-count($result)). ':K'. ($line3[2]-count($result)));
+                            $sheet->getStyle('G'. ($line3[2]-count($result)). ':K'. ($line3[2]-count($result)))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('G'. ($line3[2]-count($result)), '하기운송료');
+                            } else if(!in_array(18,$array_hide)){
+                                $sheet->mergeCells('G'. ($line3[2]). ':K'. ($line3[2]));
+                                $sheet->getStyle('G'. ($line3[2]). ':K'. ($line3[2]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                                $sheet->setCellValue('G'. ($line3[2]), '하기운송료');
+                            }
+                            if(!in_array(20,$array_hide)  && ( in_array(18,$array_hide) || in_array(15,$array_hide) || in_array(16,$array_hide))){
+                            $array1 = [15,16,18];
+                            $result = array_intersect($array1, $array_hide);
+                            
+                            $sheet->mergeCells('G'. ($line3[3]-count($result)). ':K'. ($line3[3]-count($result)));
+                            $sheet->getStyle('G'. ($line3[3]-count($result)). ':K'. ($line3[3]-count($result)))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('G'. ($line3[3]-count($result)), '보세운송료');
+                            } else if(!in_array(20,$array_hide)){
+                                $sheet->mergeCells('G'. ($line3[3]). ':K'. ($line3[3]));
+                                $sheet->getStyle('G'. ($line3[3]). ':K'. ($line3[3]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                                $sheet->setCellValue('G'. ($line3[3]), '보세운송료');
+                            }
+                            if(!in_array(22,$array_hide) && (in_array(20,$array_hide) || in_array(18,$array_hide) || 
+                            in_array(15,$array_hide) || in_array(16,$array_hide))){
+                                $array1 = [15,16,18,20];
+                                $result = array_intersect($array1, $array_hide);
+                            $sheet->mergeCells('G'. ($line3[4]-count($result)). ':K'. ($line3[4]-count($result)));
+                            $sheet->getStyle('G'. ($line3[4]-count($result)). ':K'. ($line3[4]-count($result)))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('G'. ($line3[4]-count($result)), '무진동차량');
+                            } else if(!in_array(22,$array_hide)){
+                                $sheet->mergeCells('G'. ($line3[4]). ':K'. ($line3[4]));
+                                $sheet->getStyle('G'. ($line3[4]). ':K'. ($line3[4]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                                $sheet->setCellValue('G'. ($line3[4]), '무진동차량');
+                            }
+                            if(!in_array(24,$array_hide) && (in_array(22,$array_hide) || in_array(20,$array_hide) || in_array(18,$array_hide) || 
+                            in_array(15,$array_hide) || in_array(16,$array_hide))){
+                            $sheet->mergeCells('G'. ($line3[5]-$count3). ':K'. ($line3[5]-$count3));
+                            $sheet->getStyle('G'. ($line3[5]-$count3). ':K'. ($line3[5]-$count3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('G'. ($line3[5]-$count3), '온도차량');
+                            } else if(!in_array(24,$array_hide)){
+                                $sheet->mergeCells('G'. ($line3[5]). ':K'. ($line3[5]));
+                                $sheet->getStyle('G'. ($line3[5]). ':K'. ($line3[5]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                                $sheet->setCellValue('G'. ($line3[5]), '온도차량');
+                            }
+                        } else if($count == 0){
+                            $data1 = 1;
+                        }
+                        if($count5 < 3 || $count4 != 2){
+                            $table2 = 1;
+                            if($count5 == 3){
+                                $count5 = 4;
+                            }
+                            $sheet->getStyle('B'. ($line3[6]-$count3-$data1). ':P'. ($line3[11]-$count3-$data1-$count4-$count5))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                            $sheet->getStyle('B'. ($line3[6]-$count3-$data1). ':P'. ($line3[11]-$count3-$data1-$count4-$count5))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                            $sheet->getStyle('B'.($line3[6]-$count3-$data1).':P'.($line3[11]-$count3-$data1-$count4-$count5))->getFont()->setBold(true);
+                            $sheet->mergeCells('B'. ($line3[6]-$count3-$data1). ':F'. ($line3[11]-$count3-$data1-$count4-$count5));
+                            $sheet->getStyle('B'. ($line3[6]-$count3-$data1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('B'. ($line3[6]-$count3-$data1), '센터 작업료');
+                            
+                            $current_row2 = 25;
+                       
+                            if($count4 == 0){
+                            
+                            $sheet->getStyle('Q'. ($line3[6]-$count3-$data1). ':Z'. ($line3[6]-$count3-$data1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                            $sheet->getStyle('Q'. ($line3[6]-$count3-$data1). ':Z'. ($line3[6]-$count3-$data1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                            $sheet->getStyle('Q'.($line3[6]-$count3-$data1).':Z'.($line3[6]-$count3-$data1))->getFont()->setBold(true);
+                            $sheet->mergeCells('G'. ($line3[6]-$count3-$data1). ':P'. ($line3[6]-$count3-$data1));
+                            $sheet->getStyle('G'. ($line3[6]-$count3-$data1). ':P'. ($line3[6]-$count3-$data1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('G'. ($line3[6]-$count3-$data1), '반출입');
+                            $sheet->mergeCells('Q'. ($line3[6]-$count3-$data1). ':U'. ($line3[6]-$count3-$data1));
+                            $sheet->getStyle('Q'. ($line3[6]-$count3-$data1). ':U'. ($line3[6]-$count3-$data1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('Q'. ($line3[6]-$count3-$data1), '기본료');
+                            $sheet->mergeCells('V'. ($line3[6]-$count3-$data1). ':Z'. ($line3[6]-$count3-$data1));
+                            $sheet->getStyle('V'. ($line3[6]-$count3-$data1). ':Z'. ($line3[6]-$count3-$data1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('V'. ($line3[6]-$count3-$data1), '단가/KG');
+                            }
+                            if(($count5 == 0 || $count2 > 0 || $count6  > 0)){
+                            $sheet->getStyle('Q'. ($line3[8]-$count3-$data1-$count4). ':Z'. ($line3[8]-$count3-$data1-$count4))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                            $sheet->getStyle('Q'. ($line3[8]-$count3-$data1-$count4). ':Z'. ($line3[8]-$count3-$data1-$count4))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                            $sheet->getStyle('Q'.($line3[8]-$count3-$data1-$count4).':Z'.($line3[8]))->getFont()->setBold(true);
+                            $sheet->mergeCells('G'. ($line3[8]-$count3-$data1-$count4). ':P'. ($line3[8]-$count3-$data1-$count4));
+                            $sheet->getStyle('G'. ($line3[8]-$count3-$data1-$count4). ':P'. ($line3[8]-$count3-$data1-$count4))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('G'. ($line3[8]-$count3-$data1-$count4), '보관');
+                            $sheet->mergeCells('Q'. ($line3[8]-$count3-$data1-$count4). ':U'. ($line3[8]-$count3-$data1-$count4));
+                            $sheet->getStyle('Q'. ($line3[8]-$count3-$data1-$count4). ':U'. ($line3[8]-$count3-$data1-$count4))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('Q'. ($line3[8]-$count3-$data1-$count4), '기본료율');
+                            $sheet->mergeCells('V'. ($line3[8]-$count3-$data1-$count4). ':Z'. ($line3[8]-$count3-$data1-$count4));
+                            $sheet->getStyle('V'. ($line3[8]-$count3-$data1-$count4). ':Z'. ($line3[8]-$count3-$data1-$count4))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('V'. ($line3[8]-$count3-$data1-$count4), '할증료율(24시간 경과)');
+                            }
+                        }
+                    }  else if($i == 2){
+                        $data1 = 0;
+                        if($count != 0){
+                    
+                            $sheet->mergeCells('G'. ($title2). ':K'. ($title2));
+                            $sheet->getStyle('G'. ($title2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('G'. ($title2), '항목');
+                            $sheet->mergeCells('L'. ($title2). ':P'. ($title2));
+                            $sheet->getStyle('L'. ($title2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('L'. ($title2), '상세');
+                
+                            $sheet->mergeCells('Q'. ($title2). ':U'. ($title2));
+                            $sheet->getStyle('Q'. ($title2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('Q'. ($title2), '기본료');
+                
+                            $sheet->mergeCells('V'. ($title2). ':Z'. ($title2));
+                            $sheet->getStyle('V'. ($title2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('V'. ($title2), '단가/KG');
+                            $sheet->getStyle('B'. ($title2). ':K'. ($line3[5]-$count3))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                            $sheet->getStyle('B'. ($title2). ':K'. ($line3[5]-$count3))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                            $sheet->mergeCells('B'. ($title2). ':F'. ($line3[5]-$count3));
+                            $sheet->getStyle('B'. ($title2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('B'. ($title2), '하역비용');
+                            if(!in_array(30,$array_hide) && !in_array(31,$array_hide)){
+                            $sheet->mergeCells('G'. ($line3[0]). ':K'. ($line3[1]));
+                            $sheet->getStyle('G'. ($line3[0]). ':K'. ($line3[1]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('G'. ($line3[0]), 'THC');
+                            } else if(in_array(30,$array_hide) || in_array(31,$array_hide)) {
+                                $sheet->mergeCells('G'. ($line3[0]). ':K'. ($line3[0]));
+                                $sheet->getStyle('G'. ($line3[0]). ':K'. ($line3[0]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                                $sheet->setCellValue('G'. ($line3[0]), 'THC');
+                            }
+                            if(!in_array(33,$array_hide) && ( in_array(30,$array_hide) || in_array(31,$array_hide))){
+                            $array1 = [30,31];
+                            $result = array_intersect($array1, $array_hide);
+                            $sheet->mergeCells('G'. ($line3[2]-count($result)). ':K'. ($line3[2]-count($result)));
+                            $sheet->getStyle('G'. ($line3[2]-count($result)). ':K'. ($line3[2]-count($result)))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('G'. ($line3[2]-count($result)), '하기운송료');
+                            } else if(!in_array(33,$array_hide)){
+                                $sheet->mergeCells('G'. ($line3[2]). ':K'. ($line3[2]));
+                                $sheet->getStyle('G'. ($line3[2]). ':K'. ($line3[2]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                                $sheet->setCellValue('G'. ($line3[2]), '하기운송료');
+                            }
+                            if(!in_array(35,$array_hide)  && ( in_array(33,$array_hide) || in_array(30,$array_hide) || in_array(31,$array_hide))){
+                            $array1 = [30,31,33];
+                            $result = array_intersect($array1, $array_hide);
+                            
+                            $sheet->mergeCells('G'. ($line3[3]-count($result)). ':K'. ($line3[3]-count($result)));
+                            $sheet->getStyle('G'. ($line3[3]-count($result)). ':K'. ($line3[3]-count($result)))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('G'. ($line3[3]-count($result)), '보세운송료');
+                            } else if(!in_array(35,$array_hide)){
+                                $sheet->mergeCells('G'. ($line3[3]). ':K'. ($line3[3]));
+                                $sheet->getStyle('G'. ($line3[3]). ':K'. ($line3[3]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                                $sheet->setCellValue('G'. ($line3[3]), '보세운송료');
+                            }
+                            if(!in_array(37,$array_hide) && (in_array(35,$array_hide) || in_array(33,$array_hide) || 
+                            in_array(30,$array_hide) || in_array(31,$array_hide))){
+                                $array1 = [30,31,33,35];
+                                $result = array_intersect($array1, $array_hide);
+                            $sheet->mergeCells('G'. ($line3[4]-count($result)). ':K'. ($line3[4]-count($result)));
+                            $sheet->getStyle('G'. ($line3[4]-count($result)). ':K'. ($line3[4]-count($result)))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('G'. ($line3[4]-count($result)), '무진동차량');
+                            } else if(!in_array(37,$array_hide)){
+                                $sheet->mergeCells('G'. ($line3[4]). ':K'. ($line3[4]));
+                                $sheet->getStyle('G'. ($line3[4]). ':K'. ($line3[4]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                                $sheet->setCellValue('G'. ($line3[4]), '무진동차량');
+                            }
+                            if(!in_array(39,$array_hide) && (in_array(37,$array_hide) || in_array(30,$array_hide) || in_array(33,$array_hide) || 
+                            in_array(35,$array_hide) || in_array(31,$array_hide))){
+                            $sheet->mergeCells('G'. ($line3[5]-$count3). ':K'. ($line3[5]-$count3));
+                            $sheet->getStyle('G'. ($line3[5]-$count3). ':K'. ($line3[5]-$count3))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('G'. ($line3[5]-$count3), '온도차량');
+                            } else if(!in_array(39,$array_hide)){
+                                $sheet->mergeCells('G'. ($line3[5]). ':K'. ($line3[5]));
+                                $sheet->getStyle('G'. ($line3[5]). ':K'. ($line3[5]))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                                $sheet->setCellValue('G'. ($line3[5]), '온도차량');
+                            }
+                        } else if($count == 0){
+                            $data1 = 1;
+                        }
+                        if($count5 < 3 || $count4 != 2){
+                         
+                            if($count5 == 3){
+                                $count5 = 4;
+                            }
+                            $sheet->getStyle('B'. ($line3[6]-$count3-$data1). ':P'. ($line3[11]-$count3-$data1-$count4-$count5))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                            $sheet->getStyle('B'. ($line3[6]-$count3-$data1). ':P'. ($line3[11]-$count3-$data1-$count4-$count5))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                            $sheet->getStyle('B'.($line3[6]-$count3-$data1).':P'.($line3[11]-$count3-$data1-$count4-$count5))->getFont()->setBold(true);
+                            $sheet->mergeCells('B'. ($line3[6]-$count3-$data1). ':F'. ($line3[11]-$count3-$data1-$count4-$count5));
+                            $sheet->getStyle('B'. ($line3[6]-$count3-$data1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('B'. ($line3[6]-$count3-$data1), '센터 작업료');
+                            
+                            $current_row2 = 25;
+                            if($count4 == 0){
+                            $sheet->getStyle('Q'. ($line3[6]-$count3-$data1). ':Z'. ($line3[6]-$count3-$data1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                            $sheet->getStyle('Q'. ($line3[6]-$count3-$data1). ':Z'. ($line3[6]-$count3-$data1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                            $sheet->getStyle('Q'.($line3[6]-$count3-$data1).':Z'.($line3[6]-$count3-$data1))->getFont()->setBold(true);
+                            $sheet->mergeCells('G'. ($line3[6]-$count3-$data1). ':P'. ($line3[6]-$count3-$data1));
+                            $sheet->getStyle('G'. ($line3[6]-$count3-$data1). ':P'. ($line3[6]-$count3-$data1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('G'. ($line3[6]-$count3-$data1), '반출입');
+                            $sheet->mergeCells('Q'. ($line3[6]-$count3-$data1). ':U'. ($line3[6]-$count3-$data1));
+                            $sheet->getStyle('Q'. ($line3[6]-$count3-$data1). ':U'. ($line3[6]-$count3-$data1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('Q'. ($line3[6]-$count3-$data1), '기본료');
+                            $sheet->mergeCells('V'. ($line3[6]-$count3-$data1). ':Z'. ($line3[6]-$count3-$data1));
+                            $sheet->getStyle('V'. ($line3[6]-$count3-$data1). ':Z'. ($line3[6]-$count3-$data1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('V'. ($line3[6]-$count3-$data1), '단가/KG');
+                            }
+                            if(($count5 == 0 || $count2 > 0 || $count6  > 0)){
+                           
+                            $sheet->getStyle('Q'. ($line3[8]-$count3-$data1-$count4). ':Z'. ($line3[8]-$count3-$data1-$count4))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('E3E6EB'));
+                            $sheet->getStyle('Q'. ($line3[8]-$count3-$data1-$count4). ':Z'. ($line3[8]-$count3-$data1-$count4))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('F3F4FB');
+                            $sheet->getStyle('Q'.($line3[8]-$count3-$data1-$count4).':Z'.($line3[8]))->getFont()->setBold(true);
+                            $sheet->mergeCells('G'. ($line3[8]-$count3-$data1-$count4). ':P'. ($line3[8]-$count3-$data1-$count4));
+                            $sheet->getStyle('G'. ($line3[8]-$count3-$data1-$count4). ':P'. ($line3[8]-$count3-$data1-$count4))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('G'. ($line3[8]-$count3-$data1-$count4), '보관');
+                            $sheet->mergeCells('Q'. ($line3[8]-$count3-$data1-$count4). ':U'. ($line3[8]-$count3-$data1-$count4));
+                            $sheet->getStyle('Q'. ($line3[8]-$count3-$data1-$count4). ':U'. ($line3[8]-$count3-$data1-$count4))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('Q'. ($line3[8]-$count3-$data1-$count4), '기본료율');
+                            $sheet->mergeCells('V'. ($line3[8]-$count3-$data1-$count4). ':Z'. ($line3[8]-$count3-$data1-$count4));
+                            $sheet->getStyle('V'. ($line3[8]-$count3-$data1-$count4). ':Z'. ($line3[8]-$count3-$data1-$count4))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                            $sheet->setCellValue('V'. ($line3[8]-$count3-$data1-$count4), '할증료율(24시간 경과)');
+                            }
+                        }
+                    }
             }
 
        
