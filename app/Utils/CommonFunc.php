@@ -69,7 +69,7 @@ class CommonFunc
             $index = '0' + $index;
         }
 
-        $string = date('Ymd') . $id . '_' . $index;
+        $string = date('Ymd') . '_' . $index;
         return $string;
     }
 
