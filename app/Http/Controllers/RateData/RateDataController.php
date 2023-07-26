@@ -2927,6 +2927,53 @@ class RateDataController extends Controller
                 }
 
 
+                $word_type = '';
+                if($rgd->service_korean_name == '수입풀필먼트'){
+                    $word_type = 'MF';
+                }else if(str_contains($request->bill_type, 'final') && str_contains($request->bill_type, 'month')){
+                    $word_type = 'MF';
+                } else if(str_contains($request->bill_type, 'expectation') && str_contains($request->bill_type, 'month')){
+                    $word_type = 'M';
+                }else if(str_contains($request->bill_type, 'expectation') && !str_contains($request->bill_type, 'month')){
+                    $word_type = 'C';
+                }else if(str_contains($request->bill_type, 'final') && !str_contains($request->bill_type, 'month')){
+                    $word_type = 'CF';
+                }
+
+
+                if($word_type == 'C' || $word_type == 'M'){
+                    $count = ReceivingGoodsDelivery::select(DB::raw('receiving_goods_delivery.*'))
+                    ->whereNotNull('rgd_settlement_number')
+                    ->whereMonth('created_at', Carbon::today()->month)
+                    ->whereYear('created_at', Carbon::today()->year)
+                    ->where(\DB::raw('substr(rgd_settlement_number, -1)'), '=', $word_type)
+                    ->orderBy('rgd_no', 'DESC')
+                    ->first();
+                    $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+                }else if($word_type == 'CF' || $word_type == 'MF'){
+                    $count = ReceivingGoodsDelivery::select(DB::raw('receiving_goods_delivery.*'))
+                    ->whereNotNull('rgd_settlement_number')
+                    ->whereMonth('created_at', Carbon::today()->month)
+                    ->whereYear('created_at', Carbon::today()->year)
+                    ->where(\DB::raw('substr(rgd_settlement_number, -2)'), '=', $word_type)
+                    ->orderBy('rgd_no', 'DESC')
+                    ->first();
+                    $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+                }
+               
+                if($count >= 0  && $count < 10){
+                    $count = "0000" . $count;
+                    }else if($count >= 10 && $count < 100 ){
+                    $count = "000" . $count;
+                    }else if($count >= 100 && $count < 1000 ){
+                    $count = "00" . $count;
+                    }else if($count >= 1000 && $count < 10000 ){
+                    $count = "0" . $count;
+                }
+
+                $rgd_settlement_number = Carbon::now()->format('Ym') . '_' . $count . '_' . $word_type;
+
+
                 $final_rgd = $rgd->replicate();
                 $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
                 $final_rgd->rgd_status4 = $request->status;
@@ -2941,7 +2988,7 @@ class RateDataController extends Controller
                 $final_rgd->rgd_tax_invoice_date = null;
                 $final_rgd->rgd_tax_invoice_number = null;
                 $final_rgd->rgd_calculate_deadline_yn = $user->mb_type == 'spasys' ? 'y' : ($request->rgd_calculate_deadline_yn ? $request->rgd_calculate_deadline_yn : $rgd->rgd_calculate_deadline_yn);
-                $final_rgd->rgd_settlement_number = $request->settlement_number ? $request->settlement_number : null;
+                $final_rgd->rgd_settlement_number = $rgd_settlement_number ? $rgd_settlement_number : null;
                 $final_rgd->mb_no = Auth::user()->mb_no;
                 $final_rgd->save();
 
@@ -3748,6 +3795,52 @@ class RateDataController extends Controller
                 ]);
             } else {
 
+                $word_type = '';
+                if($request->rgds[0]['service_korean_name'] == '수입풀필먼트'){
+                    $word_type = 'MF';
+                }else if(str_contains($request->bill_type, 'final') && str_contains($request->bill_type, 'month')){
+                    $word_type = 'MF';
+                } else if(str_contains($request->bill_type, 'expectation') && str_contains($request->bill_type, 'month')){
+                    $word_type = 'M';
+                }else if(str_contains($request->bill_type, 'expectation') && !str_contains($request->bill_type, 'month')){
+                    $word_type = 'C';
+                }else if(str_contains($request->bill_type, 'final') && !str_contains($request->bill_type, 'month')){
+                    $word_type = 'CF';
+                }
+
+
+                if($word_type == 'C' || $word_type == 'M'){
+                    $count = ReceivingGoodsDelivery::select(DB::raw('receiving_goods_delivery.*'))
+                    ->whereNotNull('rgd_settlement_number')
+                    ->whereMonth('created_at', Carbon::today()->month)
+                    ->whereYear('created_at', Carbon::today()->year)
+                    ->where(\DB::raw('substr(rgd_settlement_number, -1)'), '=', $word_type)
+                    ->orderBy('rgd_no', 'DESC')
+                    ->first();
+                    $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+                }else if($word_type == 'CF' || $word_type == 'MF'){
+                    $count = ReceivingGoodsDelivery::select(DB::raw('receiving_goods_delivery.*'))
+                    ->whereNotNull('rgd_settlement_number')
+                    ->whereMonth('created_at', Carbon::today()->month)
+                    ->whereYear('created_at', Carbon::today()->year)
+                    ->where(\DB::raw('substr(rgd_settlement_number, -2)'), '=', $word_type)
+                    ->orderBy('rgd_no', 'DESC')
+                    ->first();
+                    $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+                }
+               
+                if($count >= 0  && $count < 10){
+                    $count = "0000" . $count;
+                    }else if($count >= 10 && $count < 100 ){
+                    $count = "000" . $count;
+                    }else if($count >= 100 && $count < 1000 ){
+                    $count = "00" . $count;
+                    }else if($count >= 1000 && $count < 10000 ){
+                    $count = "0" . $count;
+                }
+
+                $rgd_settlement_number = Carbon::now()->format('Ym') . '_' . $count . '_' . $word_type;
+
                 foreach ($request->rgds as $key => $rgd) {
                     $is_exist = RateDataGeneral::where('rgd_no_expectation', $rgd['rgd_no'])->where('rdg_bill_type', 'final_monthly')->first();
                     if (!$is_exist) {
@@ -3837,7 +3930,7 @@ class RateDataController extends Controller
                         $final_rgd->rgd_status7 = null;
                         $final_rgd->rgd_is_show = ($i == 0 ? 'y' : 'n');
                         $final_rgd->rgd_parent_no = $expectation_rgd->rgd_no;
-                        $final_rgd->rgd_settlement_number = $request->settlement_number;
+                        $final_rgd->rgd_settlement_number = $rgd_settlement_number ? $rgd_settlement_number : null;
                         $final_rgd->mb_no = $user->mb_no;
                         $final_rgd->save();
 
@@ -4041,6 +4134,52 @@ class RateDataController extends Controller
                 $rdg_sum14 = $rdg_sum14 + $is_exist['rdg_sum14'];
             }
 
+            $word_type = '';
+            if($request->rgds[0]['service_korean_name'] == '수입풀필먼트'){
+                $word_type = 'MF';
+            }else if(str_contains($request->bill_type, 'final') && str_contains($request->bill_type, 'month')){
+                $word_type = 'MF';
+            } else if(str_contains($request->bill_type, 'expectation') && str_contains($request->bill_type, 'month')){
+                $word_type = 'M';
+            }else if(str_contains($request->bill_type, 'expectation') && !str_contains($request->bill_type, 'month')){
+                $word_type = 'C';
+            }else if(str_contains($request->bill_type, 'final') && !str_contains($request->bill_type, 'month')){
+                $word_type = 'CF';
+            }
+
+
+            if($word_type == 'C' || $word_type == 'M'){
+                $count = ReceivingGoodsDelivery::select(DB::raw('receiving_goods_delivery.*'))
+                ->whereNotNull('rgd_settlement_number')
+                ->whereMonth('created_at', Carbon::today()->month)
+                ->whereYear('created_at', Carbon::today()->year)
+                ->where(\DB::raw('substr(rgd_settlement_number, -1)'), '=', $word_type)
+                ->orderBy('rgd_no', 'DESC')
+                ->first();
+                $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+            }else if($word_type == 'CF' || $word_type == 'MF'){
+                $count = ReceivingGoodsDelivery::select(DB::raw('receiving_goods_delivery.*'))
+                ->whereNotNull('rgd_settlement_number')
+                ->whereMonth('created_at', Carbon::today()->month)
+                ->whereYear('created_at', Carbon::today()->year)
+                ->where(\DB::raw('substr(rgd_settlement_number, -2)'), '=', $word_type)
+                ->orderBy('rgd_no', 'DESC')
+                ->first();
+                $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+            }
+           
+            if($count >= 0  && $count < 10){
+                $count = "0000" . $count;
+                }else if($count >= 10 && $count < 100 ){
+                $count = "000" . $count;
+                }else if($count >= 100 && $count < 1000 ){
+                $count = "00" . $count;
+                }else if($count >= 1000 && $count < 10000 ){
+                $count = "0" . $count;
+            }
+
+            $rgd_settlement_number = Carbon::now()->format('Ym') . '_' . $count . '_' . $word_type;
+
             //Loop through  rgds from the request
             foreach ($request->rgds as $key => $rgd) {
 
@@ -4169,6 +4308,8 @@ class RateDataController extends Controller
                     $expectation_rgd->rgd_status5 = 'issued';
                     $expectation_rgd->save();
 
+                  
+
                     $final_rgd = $expectation_rgd->replicate();
                     $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
                     $final_rgd->rgd_status4 = '확정청구서';
@@ -4178,7 +4319,7 @@ class RateDataController extends Controller
                     $final_rgd->rgd_status7 = null;
                     $final_rgd->rgd_is_show = ($i == 0 ? 'y' : 'n');
                     $final_rgd->rgd_parent_no = $expectation_rgd->rgd_no;
-                    $final_rgd->rgd_settlement_number = $request->settlement_number;
+                    $final_rgd->rgd_settlement_number = $rgd_settlement_number;
                     $final_rgd->mb_no = $user->mb_no;
                     $final_rgd->save();
 
@@ -4417,6 +4558,54 @@ class RateDataController extends Controller
                 $previous_rgd->rgd_status5 = $user->mb_type == 'spasys' ? 'issued' : $previous_rgd->rgd_status5;
                 $previous_rgd->save();
 
+
+                $word_type = '';
+                if($previous_rgd->service_korean_name == '수입풀필먼트'){
+                    $word_type = 'MF';
+                }else if(str_contains($request->bill_type, 'final') && str_contains($request->bill_type, 'month')){
+                    $word_type = 'MF';
+                } else if(str_contains($request->bill_type, 'expectation') && str_contains($request->bill_type, 'month')){
+                    $word_type = 'M';
+                }else if(str_contains($request->bill_type, 'expectation') && !str_contains($request->bill_type, 'month')){
+                    $word_type = 'C';
+                }else if(str_contains($request->bill_type, 'final') && !str_contains($request->bill_type, 'month')){
+                    $word_type = 'CF';
+                }
+
+
+                if($word_type == 'C' || $word_type == 'M'){
+                    $count = ReceivingGoodsDelivery::select(DB::raw('receiving_goods_delivery.*'))
+                    ->whereNotNull('rgd_settlement_number')
+                    ->whereMonth('created_at', Carbon::today()->month)
+                    ->whereYear('created_at', Carbon::today()->year)
+                    ->where(\DB::raw('substr(rgd_settlement_number, -1)'), '=', $word_type)
+                    ->orderBy('rgd_no', 'DESC')
+                    ->first();
+                    $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+                }else if($word_type == 'CF' || $word_type == 'MF'){
+                    $count = ReceivingGoodsDelivery::select(DB::raw('receiving_goods_delivery.*'))
+                    ->whereNotNull('rgd_settlement_number')
+                    ->whereMonth('created_at', Carbon::today()->month)
+                    ->whereYear('created_at', Carbon::today()->year)
+                    ->where(\DB::raw('substr(rgd_settlement_number, -2)'), '=', $word_type)
+                    ->orderBy('rgd_no', 'DESC')
+                    ->first();
+                    $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+                }
+               
+                if($count >= 0  && $count < 10){
+                    $count = "0000" . $count;
+                    }else if($count >= 10 && $count < 100 ){
+                    $count = "000" . $count;
+                    }else if($count >= 100 && $count < 1000 ){
+                    $count = "00" . $count;
+                    }else if($count >= 1000 && $count < 10000 ){
+                    $count = "0" . $count;
+                }
+
+                $rgd_settlement_number = Carbon::now()->format('Ym') . '_' . $count . '_' . $word_type;
+
+
                 $final_rgd = $previous_rgd->replicate();
                 $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
                 $final_rgd->rgd_status3 = null;
@@ -4430,7 +4619,7 @@ class RateDataController extends Controller
                 $final_rgd->rgd_tax_invoice_date = null;
                 $final_rgd->rgd_tax_invoice_number = null;
                 $final_rgd->rgd_parent_no = $previous_rgd->rgd_no;
-                $final_rgd->rgd_settlement_number = $request->settlement_number;
+                $final_rgd->rgd_settlement_number = $rgd_settlement_number;
                 $final_rgd->rgd_calculate_deadline_yn = $user->mb_type == 'spasys' ? 'y' : ($request->rgd_calculate_deadline_yn ? $request->rgd_calculate_deadline_yn : $previous_rgd->rgd_calculate_deadline_yn);
                 $final_rgd->mb_no = $user->mb_no;
                 $final_rgd->save();
@@ -4666,13 +4855,63 @@ class RateDataController extends Controller
                 $previous_rgd->rgd_status4 = $user->mb_type == 'shop' ? 'issued' : $previous_rgd->rgd_status4;
                 $previous_rgd->rgd_status5 = $user->mb_type == 'spasys' ? 'issued' : $previous_rgd->rgd_status5;
                 $previous_rgd->save();
+
+
+                
+                $word_type = '';
+                if($previous_rgd->service_korean_name == '수입풀필먼트'){
+                    $word_type = 'MF';
+                }else if(str_contains($request->bill_type, 'final') && str_contains($request->bill_type, 'month')){
+                    $word_type = 'MF';
+                } else if(str_contains($request->bill_type, 'expectation') && str_contains($request->bill_type, 'month')){
+                    $word_type = 'M';
+                }else if(str_contains($request->bill_type, 'expectation') && !str_contains($request->bill_type, 'month')){
+                    $word_type = 'C';
+                }else if(str_contains($request->bill_type, 'final') && !str_contains($request->bill_type, 'month')){
+                    $word_type = 'CF';
+                }
+
+
+                if($word_type == 'C' || $word_type == 'M'){
+                    $count = ReceivingGoodsDelivery::select(DB::raw('receiving_goods_delivery.*'))
+                    ->whereNotNull('rgd_settlement_number')
+                    ->whereMonth('created_at', Carbon::today()->month)
+                    ->whereYear('created_at', Carbon::today()->year)
+                    ->where(\DB::raw('substr(rgd_settlement_number, -1)'), '=', $word_type)
+                    ->orderBy('rgd_no', 'DESC')
+                    ->first();
+                    $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+                }else if($word_type == 'CF' || $word_type == 'MF'){
+                    $count = ReceivingGoodsDelivery::select(DB::raw('receiving_goods_delivery.*'))
+                    ->whereNotNull('rgd_settlement_number')
+                    ->whereMonth('created_at', Carbon::today()->month)
+                    ->whereYear('created_at', Carbon::today()->year)
+                    ->where(\DB::raw('substr(rgd_settlement_number, -2)'), '=', $word_type)
+                    ->orderBy('rgd_no', 'DESC')
+                    ->first();
+                    $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+                }
+               
+                if($count >= 0  && $count < 10){
+                    $count = "0000" . $count;
+                    }else if($count >= 10 && $count < 100 ){
+                    $count = "000" . $count;
+                    }else if($count >= 100 && $count < 1000 ){
+                    $count = "00" . $count;
+                    }else if($count >= 1000 && $count < 10000 ){
+                    $count = "0" . $count;
+                }
+
+                $rgd_settlement_number = Carbon::now()->format('Ym') . '_' . $count . '_' . $word_type;
+
+
                 //Copy final bill from est bill
                 $final_rgd = $previous_rgd->replicate();
                 $final_rgd->rgd_bill_type = $request->bill_type; // the new project_id
                 $final_rgd->rgd_status3 = null;
                 $final_rgd->rgd_status4 = $request->status;
                 $final_rgd->rgd_issue_date = Carbon::now()->toDateTimeString();
-                $final_rgd->rgd_settlement_number = $request->rgd_settlement_number;
+                $final_rgd->rgd_settlement_number = $rgd_settlement_number;
                 $final_rgd->rgd_status5 = null;
                 $final_rgd->rgd_status6 = null;
                 $final_rgd->rgd_status7 = null;
