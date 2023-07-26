@@ -3148,8 +3148,8 @@ class ReceivingGoodsDeliveryController extends Controller
                         // 'p_price' => $request->sumprice,
                         // 'p_method' => $request->p_method,
                         'p_success_yn' => 'y',
-                        'p_cancel_yn' => 'y',
-                        'p_cancel_time' => Carbon::now(),
+                        // 'p_cancel_yn' => 'y',
+                        // 'p_cancel_time' => Carbon::now(),
                     ]
                 );
 
