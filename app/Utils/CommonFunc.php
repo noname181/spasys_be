@@ -912,6 +912,8 @@ class CommonFunc
             $aaaaa = $content;
             $cargo_number = $w_no->w_schedule_number;
         } else if ($w_no->w_category_name == '보세화물') {
+            $aaaaa = $content;
+            $cargo_number = $w_no->order_number;
         } else if ($w_no->w_category_name == '수입풀필먼트') {
         }
 
@@ -923,8 +925,10 @@ class CommonFunc
         $alarm_content = str_replace('ccccc', $ccccc, $alarm_content);
         $alarm_content = str_replace('ddddd', $ddddd, $alarm_content);
 
-        if ($w_no->receving_goods_delivery[0]->rgd_status1 && $w_no->w_schedule_number) {
+        if (isset($w_no->receving_goods_delivery[0]->rgd_status1) && isset($w_no->w_schedule_number)) {
             $alarm_content = '[' . $w_no->receving_goods_delivery[0]->rgd_status1 . ']' . ' ' . $w_no->w_schedule_number . ' ' . $alarm_content;
+        }elseif(isset($w_no->rgd_status1) && isset($w_no->order_number)){
+            $alarm_content = '[' . $w_no->rgd_status1 . ']' . ' ' . $w_no->order_number . ' ' . $alarm_content;
         }
 
 
@@ -938,14 +942,18 @@ class CommonFunc
                 $receiver_spasys = $w_no->company->co_parent->co_parent;
             } else if ($sender->mb_type == 'shipper') {
                 $receiver_spasys = $w_no->company->co_parent->co_parent;
+            } else {
+                $receiver_spasys = $w_no->company->co_parent->co_parent;
             }
             //ad_must_yn == 'n' send only members who have mb_push_yn = 'y'
-
+            
             $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->get();
         } else if ($alarm_data->ad_must_yn == 'n') {
             if ($sender->mb_type == 'shop') {
                 $receiver_spasys = $w_no->company->co_parent->co_parent;
             } else if ($sender->mb_type == 'shipper') {
+                $receiver_spasys = $w_no->company->co_parent->co_parent;
+            } else {
                 $receiver_spasys = $w_no->company->co_parent->co_parent;
             }
             //ad_must_yn == 'n' send only members who have mb_push_yn = 'y'
@@ -959,7 +967,7 @@ class CommonFunc
             //INSERT ALARM FOR RECEIVER LIST USER
             Alarm::insertGetId(
                 [
-                    'w_no' => $w_no->w_no,
+                    'w_no' => isset($w_no->w_no) ? $w_no->w_no : $w_no->is_no,
                     'mb_no' => $sender->mb_no,
                     'receiver_no' => $receiver->mb_no,
                     'alarm_content' => $alarm_content,
