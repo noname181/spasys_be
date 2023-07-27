@@ -186,7 +186,7 @@ class ScheduleShipmentController extends Controller
             $schedule_shipment = $schedule_shipment->paginate($per_page, ['*'], 'page', $page);
             $schedule_shipment->setCollection(
                 $schedule_shipment->getCollection()->map(function ($q) {
-                    $schedule_shipment_item = DB::table('schedule_shipment_info')->where('schedule_shipment_info.ss_no', $q->ss_no)->get();
+                    $schedule_shipment_item = DB::table('schedule_shipment_info')->whereNotNull('order_cs')->where('schedule_shipment_info.ss_no', $q->ss_no)->get();
                     $count_item = 0;
                     foreach ($schedule_shipment_item as $item) {
                         $q->total_amount += $item->qty;

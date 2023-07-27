@@ -1319,6 +1319,8 @@ class ReceivingGoodsDeliveryController extends Controller
                         'wr_type' => 'IW',
                     ]);
                 }
+
+                
             }
 
             //alert
