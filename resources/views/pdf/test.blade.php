@@ -25,16 +25,16 @@
    </head>
    <body>
       <div style="width: 100%;border:1px solid black;margin-bottom:20px;text-align: center;padding: 50px 0;">
-         <p>{{$rm_biz_name}}</p>
+         <p style='font-family: "unbatang", Times, serif'>{{$rm_biz_name}}</p>
       </div>
       <div style="width: 100%;margin-bottom:20px;text-align: right;">
-         <p>{{$rm_biz_number}}</p>
-         <p>{{$rm_biz_address}}</p>
+         <p style='font-family: "unbatang", Times, serif'>{{$rm_biz_number}}</p>
+         <p style='font-family: "unbatang", Times, serif'>{{$rm_biz_address}}</p>
          @if($rm_owner_name)
          @if($rm_owner_name && !$rm_biz_email)
-         <p>{{$rm_owner_name}}</p>
+         <p style='font-family: "unbatang", Times, serif'>{{$rm_owner_name}}</p>
          @else
-         <p>{{$rm_owner_name}} ({{$rm_biz_email}})</p>
+         <p style='font-family: "unbatang", Times, serif'>{{$rm_owner_name}} ({{$rm_biz_email}})</p>
          @endif
          @endif
       </div>
