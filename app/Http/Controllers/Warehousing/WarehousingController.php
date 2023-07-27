@@ -4437,17 +4437,18 @@ class WarehousingController extends Controller
                         $q->where('ti_h_bl', 'like', '%' .  $validated['w_schedule_number2'] . '%');
                     });
                 });
-                // $warehousing_fulfillment->where(function ($q) use ($validated) {
-                //     $q->whereHas('warehousing', function ($q) use ($validated) {
-                //         $q->where('w_category_name', '=', '수입풀필먼트')->where('w_schedule_number2', 'like', '%' .  $validated['w_schedule_number2'] . '%');
-                //     })->orwhereHas('warehousing', function ($q) use ($validated) {
-                //         $q->where('w_category_name', '=', '유통가공')->whereHas('company', function ($q1) use ($validated) {
-                //             $q1->where('w_schedule_number2', 'like', '%' .  $validated['w_schedule_number2'] . '%');
-                //         });
-                //     })->orwhereHas('t_import', function ($q) use ($validated) {
-                //         $q->where('ti_h_bl', 'like', '%' .  $validated['w_schedule_number2'] . '%');
-                //     });
-                // });
+                $warehousing_fulfillment->where(function ($q) use ($validated) {
+                    $q->whereNull('rgd_no');
+                    // $q->whereHas('warehousing', function ($q) use ($validated) {
+                    //     $q->where('w_category_name', '=', '수입풀필먼트')->where('w_schedule_number2', 'like', '%' .  $validated['w_schedule_number2'] . '%');
+                    // })->orwhereHas('warehousing', function ($q) use ($validated) {
+                    //     $q->where('w_category_name', '=', '유통가공')->whereHas('company', function ($q1) use ($validated) {
+                    //         $q1->where('w_schedule_number2', 'like', '%' .  $validated['w_schedule_number2'] . '%');
+                    //     });
+                    // })->orwhereHas('t_import', function ($q) use ($validated) {
+                    //     $q->where('ti_h_bl', 'like', '%' .  $validated['w_schedule_number2'] . '%');
+                    // });
+                });
             }
             if (isset($validated['rgd_settlement_number'])) {
                 $warehousing->where('rgd_settlement_number', 'like', '%' .  $validated['rgd_settlement_number'] . '%');
