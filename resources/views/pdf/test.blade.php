@@ -38,7 +38,7 @@
          @endif
          @endif
       </div>
-
+      @if(count($array1) > 0)
       @if(count($rate_data_send_meta['rate_data1']))
       <div style="border-bottom:1px solid #ddd">
          <table id="custom_table">
@@ -138,8 +138,12 @@
          </table>
       </div>
       @endif
+      @endif
+      @if(count($array2) > 0)
       @if(count($rate_data_send_meta['rate_data1']))
+      @if(count($array1) > 0)
       <div class="page-break"></div>
+      @endif
       <div style="border-bottom:1px solid #ddd">
          <table id="custom_table">
             <thead>
@@ -238,8 +242,12 @@
          </table>
       </div>
       @endif
+      @endif
+      @if(count($array3) > 0)
       @if(count($rate_data_send_meta['rate_data1']))
+      @if(count($array1) > 0 || count($array2) > 0)
       <div class="page-break"></div>
+      @endif
       <div style="border-bottom:1px solid #ddd">
          <table id="custom_table">
             <thead>
@@ -337,6 +345,7 @@
             </tbody>
          </table>
       </div>
+      @endif
       @endif
      
       <!-- @if(count($rate_data_send_meta['rate_data1']))
