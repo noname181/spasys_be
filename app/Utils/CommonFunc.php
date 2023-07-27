@@ -915,6 +915,8 @@ class CommonFunc
             $aaaaa = $content;
             $cargo_number = $w_no->order_number;
         } else if ($w_no->w_category_name == '수입풀필먼트') {
+            $aaaaa = $content;
+            $cargo_number = $w_no->order_id;
         }
 
         $alarm_data = AlarmData::where('ad_title', $ad_title)->first();
@@ -929,31 +931,43 @@ class CommonFunc
             $alarm_content = '[' . $w_no->receving_goods_delivery[0]->rgd_status1 . ']' . ' ' . $w_no->w_schedule_number . ' ' . $alarm_content;
         }elseif(isset($w_no->rgd_status1) && isset($w_no->order_number)){
             $alarm_content = '[' . $w_no->rgd_status1 . ']' . ' ' . $w_no->order_number . ' ' . $alarm_content;
+        }elseif (isset($w_no->receving_goods_delivery[0]->rgd_status1) && isset($w_no->order_id)) {
+            $alarm_content = '[' . $w_no->receving_goods_delivery[0]->rgd_status1 . ']' . ' ' . $w_no->order_id . ' ' . $alarm_content;
         }
-
 
         if ($type == 'cargo_request') {
             $alarm_type = 'cargo_request';
         }
 
-
         if ($alarm_data->ad_must_yn == 'y') {
-            if ($sender->mb_type == 'shop') {
-                $receiver_spasys = $w_no->company->co_parent->co_parent;
-            } else if ($sender->mb_type == 'shipper') {
-                $receiver_spasys = $w_no->company->co_parent->co_parent;
-            } else {
+
+            if ($w_no->w_category_name == '수입풀필먼트') {
+                // if ($sender->mb_type == 'shop') {
+                //     $receiver_spasys = $w_no->company->co_parent->co_parent;
+                // } else if ($sender->mb_type == 'shipper') {
+                //     $receiver_spasys = $w_no->company->co_parent->co_parent;
+                // } else {
+                    //$receiver_spasys = $w_no->company->co_parent->co_parent;
+                //}
+                $receiver_spasys = $w_no->ContractWms->company->co_parent->co_parent;
+            }else{
                 $receiver_spasys = $w_no->company->co_parent->co_parent;
             }
             //ad_must_yn == 'n' send only members who have mb_push_yn = 'y'
             
             $receiver_list = Member::where('co_no', $receiver_spasys->co_no)->get();
         } else if ($alarm_data->ad_must_yn == 'n') {
-            if ($sender->mb_type == 'shop') {
-                $receiver_spasys = $w_no->company->co_parent->co_parent;
-            } else if ($sender->mb_type == 'shipper') {
-                $receiver_spasys = $w_no->company->co_parent->co_parent;
-            } else {
+            if ($w_no->w_category_name == '수입풀필먼트') {
+                // if ($sender->mb_type == 'shop') {
+                //     $receiver_spasys = $w_no->company->co_parent->co_parent;
+                    
+                // } else if ($sender->mb_type == 'shipper') {
+                //     $receiver_spasys = $w_no->company->co_parent->co_parent;
+                // } else {
+                    //$receiver_spasys = $w_no->company->co_parent->co_parent;
+                //}
+                $receiver_spasys = $w_no->ContractWms->company->co_parent->co_parent;
+            }else{
                 $receiver_spasys = $w_no->company->co_parent->co_parent;
             }
             //ad_must_yn == 'n' send only members who have mb_push_yn = 'y'
@@ -967,7 +981,8 @@ class CommonFunc
             //INSERT ALARM FOR RECEIVER LIST USER
             Alarm::insertGetId(
                 [
-                    'w_no' => isset($w_no->w_no) ? $w_no->w_no : $w_no->is_no,
+                    'w_no' => isset($w_no->w_no) ? $w_no->w_no : (isset($w_no->is_no) ? $w_no->is_no : null),
+                    'ss_no' => isset($w_no->ss_no) ? $w_no->ss_no : null,
                     'mb_no' => $sender->mb_no,
                     'receiver_no' => $receiver->mb_no,
                     'alarm_content' => $alarm_content,

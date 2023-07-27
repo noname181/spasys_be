@@ -15,7 +15,7 @@ use \Carbon\Carbon;
 use App\Utils\CommonFunc;
 use App\Models\Company;
 use App\Models\Member;
-
+use App\Models\ScheduleShipment;
 class AlarmDataController extends Controller
 {
     /**
@@ -267,6 +267,15 @@ class AlarmDataController extends Controller
         try {
             DB::beginTransaction();
 
+            // $schedule_shipment = ScheduleShipment::get();
+            // foreach($schedule_shipment as $ss_no){
+            //     $text = $ss_no->status == '출고' ? "EWC" : "EW";
+            //     $w_schedule_number = (new CommonFunc)->generate_w_schedule_number_service2($ss_no->ss_no, $text, $ss_no->created_at);
+            //     ScheduleShipment::where(['ss_no' => $ss_no->ss_no])->update([
+            //         'w_schedule_number' => $w_schedule_number
+            //     ]);
+            // }
+            
             $companies = Member::with(['company'])->whereNotNull('co_no')->get();
            
             foreach ($companies as $company) {
