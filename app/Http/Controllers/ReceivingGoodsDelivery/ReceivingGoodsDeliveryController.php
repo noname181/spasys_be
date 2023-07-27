@@ -1321,6 +1321,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 }
 
                 
+
             }
 
             //alert
@@ -1332,10 +1333,13 @@ class ReceivingGoodsDeliveryController extends Controller
 
             $rgd_status3  = isset($w_no_alert->receving_goods_delivery[0]->rgd_status3) ? $w_no_alert->receving_goods_delivery[0]->rgd_status3 : null;
 
-            if ($check_alarm_first === null && $rgd_status3 == '배송중')
+            if ($check_alarm_first === null && $rgd_status3 == '배송중'){
                 CommonFunc::insert_alarm_cargo('[수입풀필먼트] 배송중', null, $user, $w_no_alert, 'cargo_delivery');
-
-
+            }
+            //return $w_no_alert;
+            if ($request->wr_contents) {
+                CommonFunc::insert_alarm_cargo_request('[수입풀필먼트]', $request->wr_contents, $user, $w_no_alert, 'cargo_request');
+            }
 
             DB::commit();
             return response()->json([

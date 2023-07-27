@@ -2030,7 +2030,7 @@ class WarehousingController extends Controller
                     });
                 }
                 if (isset($validated['w_schedule_number'])) {
-                    $schedule_shipment->where('ss_no', 'like', '%' . $validated['w_schedule_number'] . '%');
+                    $schedule_shipment->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
                 }
                 if (isset($validated['status'])) {
                     // if ($validated['status'] == "배송준비") {
@@ -2105,12 +2105,12 @@ class WarehousingController extends Controller
 
 
                 $schedule_shipment = $schedule_shipment->paginate($per_page, ['*'], 'page', $page);
-                $schedule_shipment->setCollection(
-                    $schedule_shipment->getCollection()->map(function ($q) { 
-                        $text = $q->status == '출고' ? "EWC" : "EW";
-                        $q->w_schedule_number = isset($q->w_schedule_number) ? $q->w_schedule_number : (new CommonFunc)->generate_w_schedule_number_service2($q->ss_no, $text, $q->created_at);
-                        return  $q;
-                }));
+                // $schedule_shipment->setCollection(
+                //     $schedule_shipment->getCollection()->map(function ($q) { 
+                //         $text = $q->status == '출고' ? "EWC" : "EW";
+                //         $q->w_schedule_number = isset($q->w_schedule_number) ? $q->w_schedule_number : (new CommonFunc)->generate_w_schedule_number_service2($q->ss_no, $text, $q->created_at);
+                //         return  $q;
+                // }));
                 return response()->json($schedule_shipment);
             } else if ($validated['service'] == "보세화물") {
                 // If per_page is null set default data = 15
@@ -4437,17 +4437,18 @@ class WarehousingController extends Controller
                         $q->where('ti_h_bl', 'like', '%' .  $validated['w_schedule_number2'] . '%');
                     });
                 });
-                // $warehousing_fulfillment->where(function ($q) use ($validated) {
-                //     $q->whereHas('warehousing', function ($q) use ($validated) {
-                //         $q->where('w_category_name', '=', '수입풀필먼트')->where('w_schedule_number2', 'like', '%' .  $validated['w_schedule_number2'] . '%');
-                //     })->orwhereHas('warehousing', function ($q) use ($validated) {
-                //         $q->where('w_category_name', '=', '유통가공')->whereHas('company', function ($q1) use ($validated) {
-                //             $q1->where('w_schedule_number2', 'like', '%' .  $validated['w_schedule_number2'] . '%');
-                //         });
-                //     })->orwhereHas('t_import', function ($q) use ($validated) {
-                //         $q->where('ti_h_bl', 'like', '%' .  $validated['w_schedule_number2'] . '%');
-                //     });
-                // });
+                $warehousing_fulfillment->where(function ($q) use ($validated) {
+                    $q->whereNull('rgd_no');
+                    // $q->whereHas('warehousing', function ($q) use ($validated) {
+                    //     $q->where('w_category_name', '=', '수입풀필먼트')->where('w_schedule_number2', 'like', '%' .  $validated['w_schedule_number2'] . '%');
+                    // })->orwhereHas('warehousing', function ($q) use ($validated) {
+                    //     $q->where('w_category_name', '=', '유통가공')->whereHas('company', function ($q1) use ($validated) {
+                    //         $q1->where('w_schedule_number2', 'like', '%' .  $validated['w_schedule_number2'] . '%');
+                    //     });
+                    // })->orwhereHas('t_import', function ($q) use ($validated) {
+                    //     $q->where('ti_h_bl', 'like', '%' .  $validated['w_schedule_number2'] . '%');
+                    // });
+                });
             }
             if (isset($validated['rgd_settlement_number'])) {
                 $warehousing->where('rgd_settlement_number', 'like', '%' .  $validated['rgd_settlement_number'] . '%');
