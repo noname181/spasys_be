@@ -2030,7 +2030,7 @@ class WarehousingController extends Controller
                     });
                 }
                 if (isset($validated['w_schedule_number'])) {
-                    $schedule_shipment->where('ss_no', 'like', '%' . $validated['w_schedule_number'] . '%');
+                    $schedule_shipment->where('w_schedule_number', 'like', '%' . $validated['w_schedule_number'] . '%');
                 }
                 if (isset($validated['status'])) {
                     // if ($validated['status'] == "배송준비") {
@@ -2105,12 +2105,12 @@ class WarehousingController extends Controller
 
 
                 $schedule_shipment = $schedule_shipment->paginate($per_page, ['*'], 'page', $page);
-                $schedule_shipment->setCollection(
-                    $schedule_shipment->getCollection()->map(function ($q) { 
-                        $text = $q->status == '출고' ? "EWC" : "EW";
-                        $q->w_schedule_number = isset($q->w_schedule_number) ? $q->w_schedule_number : (new CommonFunc)->generate_w_schedule_number_service2($q->ss_no, $text, $q->created_at);
-                        return  $q;
-                }));
+                // $schedule_shipment->setCollection(
+                //     $schedule_shipment->getCollection()->map(function ($q) { 
+                //         $text = $q->status == '출고' ? "EWC" : "EW";
+                //         $q->w_schedule_number = isset($q->w_schedule_number) ? $q->w_schedule_number : (new CommonFunc)->generate_w_schedule_number_service2($q->ss_no, $text, $q->created_at);
+                //         return  $q;
+                // }));
                 return response()->json($schedule_shipment);
             } else if ($validated['service'] == "보세화물") {
                 // If per_page is null set default data = 15

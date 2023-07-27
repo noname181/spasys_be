@@ -550,6 +550,14 @@ class ScheduleShipmentController extends Controller
                 ];
                 $ss_no = ScheduleShipment::updateOrCreate(['order_id' => $schedule['order_id']], $data_schedule);
 
+                if($ss_no->ss_no){
+                    $text = $ss_no->status == '출고' ? "EWC" : "EW";
+                    $w_schedule_number = (new CommonFunc)->generate_w_schedule_number_service2($ss_no->ss_no, $text, $ss_no->created_at);
+                    ScheduleShipment::where(['ss_no' => $ss_no->ss_no])->update([
+                        'w_schedule_number' => $w_schedule_number
+                    ]);
+                }
+
 
                 if ($ss_no->ss_no && isset($schedule['order_products'])) {
                     $i_temp = 0;
@@ -652,8 +660,8 @@ class ScheduleShipmentController extends Controller
         if (!empty($schedule_shipment) && !empty($schedule_shipment_item)) {
             $collect_test = collect($schedule_shipment)->map(function ($item) use ($schedule_shipment_item) {
                 $item->item2 = isset($schedule_shipment_item) ? $schedule_shipment_item : array();
-                $text = $item->status == '출고' ? "EWC" : "EW";
-                $item->w_schedule_number = (new CommonFunc)->generate_w_schedule_number_service2($item->ss_no, $text, $item->created_at);
+                // $text = $item->status == '출고' ? "EWC" : "EW";
+                // $item->w_schedule_number = (new CommonFunc)->generate_w_schedule_number_service2($item->ss_no, $text, $item->created_at);
                 return $item;
             });
             return response()->json(
