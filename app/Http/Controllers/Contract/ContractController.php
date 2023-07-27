@@ -7,6 +7,8 @@ use App\Http\Requests\Contract\ContractRegisterController\ContractRegisterReques
 use App\Http\Requests\Contract\ContractUpdateController\ContractUpdateRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Contract;
+use App\Models\ReceivingGoodsDelivery;
+use App\Models\Payment;
 use App\Models\Company;
 use App\Models\CompanySettlement;
 use App\Models\CompanyPayment;
@@ -295,6 +297,23 @@ class ContractController extends Controller
                     'cp_cvc' => isset($validated['cp_cvc']) ? $validated['cp_cvc'] : null,
                 ]
             );
+
+            $rgds = ReceivingGoodsDelivery::with(['payment'])->whereHas('member', function($q) use ($co_no){
+                $q->where('co_no', $co_no);
+            })->whereHas('payment', function($q) {
+                $q->where('p_method', 'deposit_without_bankbook');
+            })->where('rgd_status6', 'deposit_without_bankbook')
+            ->get();
+
+            foreach($rgds as $index => $rgd){
+                Payment::where('p_no', $rgd['payment']['p_no'])->update([
+                    'p_method_number' => isset($validated['cp_bank_number']) ? $validated['cp_bank_number'] : null,
+                    'p_card_name' => isset($validated['cp_card_name']) ? $validated['cp_card_name'] : null,
+                    'p_method_name' => isset($validated['cp_bank_name']) ? $validated['cp_bank_name'] : null,
+                ]);
+            }
+
+            // return $rgds;
 
             DB::commit();
             return response()->json([

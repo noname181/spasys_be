@@ -15,6 +15,8 @@ use App\Models\Company;
 use App\Models\CompanyPayment;
 use App\Models\Member;
 use App\Models\Service;
+use App\Models\ReceivingGoodsDelivery;
+use App\Models\Payment;
 use App\Utils\Messages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -456,6 +458,19 @@ class MemberController extends Controller
                     'cp_method' => 'card'
                 ]
             );
+
+            $rgds = ReceivingGoodsDelivery::with(['payment'])->whereHas('member', function($q) use ($memeber){
+                $q->where('co_no', $memeber['co_no']);
+            })->whereHas('payment', function($q) {
+                $q->where('p_method', 'deposit_without_bankbook');
+            })->where('rgd_status6', 'deposit_without_bankbook')
+            ->get();
+
+            foreach($rgds as $index => $rgd){
+                Payment::where('p_no', $rgd['payment']['p_no'])->update([
+                    'p_method_number' => isset($validated['cp_bank_number']) ? $validated['cp_bank_number'] : null,
+                ]);
+            }
 
             DB::commit();
             return response()->json([

@@ -1319,6 +1319,8 @@ class ReceivingGoodsDeliveryController extends Controller
                         'wr_type' => 'IW',
                     ]);
                 }
+
+                
             }
 
             //alert
@@ -2210,8 +2212,12 @@ class ReceivingGoodsDeliveryController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $rgd = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->where('is_no', $is_no)->whereNull('rgd_parent_no')->get();
             $rgd = collect($rgd)->map(function ($item) use ($is_no) {
-                $export = Export::with(['import', 'import_expected', 't_export_confirm'])->where('te_carry_out_number', $is_no)->first();
+                $export = Export::where('te_carry_out_number', $is_no)->first();
+                $import = Import::where('ti_carry_in_number', $is_no)->first();
+                $import_expected = ImportExpected::where('tie_logistic_manage_number', $is_no)->first();
                 $item->export = $export;
+                $item->import = $import;
+                $item->import_expected = $import_expected;
                 return $item;
             });
             return response()->json($rgd);
@@ -2353,6 +2359,17 @@ class ReceivingGoodsDeliveryController extends Controller
                     if ($check_alarm_first === null && $rgd_status3 == '배송완료')
                         CommonFunc::insert_alarm_cargo('[보세화물] 배송완료', null, $user, $w_no_alert, 'cargo_delivery');
                 }
+
+                if (isset($validated['wr_contents'])) {
+                    $w_no_alert = (object)$rgd;
+                    $w_no_alert->w_category_name = '보세화물';
+
+                    $w_no_alert->company = (object)$request->company;
+                    $w_no_alert->company->co_parent = (object)$request->company['co_parent'];
+                    $w_no_alert->company->co_parent->co_parent = (object)$w_no_alert->company->co_parent->co_parent;
+
+                    CommonFunc::insert_alarm_cargo_request('[보세화물]', $validated['wr_contents'], $user, $w_no_alert, 'cargo_request');
+                }
             }
 
 
@@ -2406,6 +2423,8 @@ class ReceivingGoodsDeliveryController extends Controller
                             'wr_contents' => $validated['wr_contents'],
                         ]);
                     }
+                    
+                    
                 }
 
 
