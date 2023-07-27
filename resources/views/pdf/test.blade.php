@@ -3,6 +3,10 @@
    <head>
       <title>Send Mail</title>
       <style>
+       
+         /* tr{
+           page-break-after: avoid
+         } */
          .page-break {
          page-break-after: always;
          }
@@ -12,9 +16,10 @@
          }
          #custom_table td,#custom_table th{
          border: 1px solid #ddd;
-         padding:8px;
+         padding:5px;
          text-align: center;
          }
+        
          .background_title{
             background-color: #f3f4fb !important;
             font-weight: bold;
@@ -24,17 +29,17 @@
       </style>
    </head>
    <body>
-      <div style="width: 100%;border:1px solid black;margin-bottom:20px;text-align: center;padding: 50px 0;">
-         <p style='font-family: "unbatang", Times, serif'>{{$rm_biz_name}}</p>
+      <div style="width: 100%;border:1px solid black;text-align: center;padding: 20px 0;">
+         <p style='padding:0px;font-family: "unbatang", Times, serif'>{{$rm_biz_name}}</p>
       </div>
-      <div style="width: 100%;margin-bottom:20px;text-align: right;">
-         <p style='font-family: "unbatang", Times, serif'>{{$rm_biz_number}}</p>
-         <p style='font-family: "unbatang", Times, serif'>{{$rm_biz_address}}</p>
+      <div style="width: 100%;margin-bottom:10px;text-align: right;">
+         <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$rm_biz_number}}</p>
+         <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$rm_biz_address}}</p>
          @if($rm_owner_name)
          @if($rm_owner_name && !$rm_biz_email)
-         <p style='font-family: "unbatang", Times, serif'>{{$rm_owner_name}}</p>
+         <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$rm_owner_name}}</p>
          @else
-         <p style='font-family: "unbatang", Times, serif'>{{$rm_owner_name}} ({{$rm_biz_email}})</p>
+         <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$rm_owner_name}} ({{$rm_biz_email}})</p>
          @endif
          @endif
       </div>
@@ -43,6 +48,9 @@
       <div style="border-bottom:1px solid #ddd">
          <table id="custom_table">
             <thead>
+            <tr style="background:#EDEDED;font-weight:bold"> 
+                  <th colspan="5"  style='text-align:left;font-family: "unbatang", Times, serif'>서비스: 보세화물 (창고화물)</th>
+               </tr>
                <tr class="background_title">
                   <th style='font-family: "unbatang", Times, serif' class="background_title">구분</th>
                   <th  colspan="4" style='font-family: "unbatang", Times, serif' class="background_title">내역</th>
@@ -147,6 +155,9 @@
       <div style="border-bottom:1px solid #ddd">
          <table id="custom_table">
             <thead>
+               <tr style="background:#EDEDED;font-weight:bold"> 
+                  <th colspan="5"  style='text-align:left;font-family: "unbatang", Times, serif'>서비스: 보세화물 (온도화물)</th>
+               </tr>
                <tr class="background_title">
                   <th style='font-family: "unbatang", Times, serif'>구분</th>
                   <th  colspan="4" style='font-family: "unbatang", Times, serif'>내역</th>
@@ -251,6 +262,9 @@
       <div style="border-bottom:1px solid #ddd">
          <table id="custom_table">
             <thead>
+               <tr style="background:#EDEDED;font-weight:bold"> 
+                  <th colspan="5"  style='text-align:left;font-family: "unbatang", Times, serif'>서비스: 보세화물 (위험물)</th>
+               </tr>
                <tr class="background_title">
                   <th style='font-family: "unbatang", Times, serif'>구분</th>
                   <th  colspan="4" style='font-family: "unbatang", Times, serif'>내역</th>
@@ -365,6 +379,9 @@
       <div style="border-bottom:1px solid #ddd">
          <table id="custom_table">
             <thead>
+               <tr style="background:#EDEDED;font-weight:bold"> 
+                  <th colspan="5"  style='text-align:left;font-family: "unbatang", Times, serif'>서비스: 수입풀필먼트</th>
+               </tr>
                <tr  class="background_title"> 
                   <th colspan="2"  style='font-family: "unbatang", Times, serif'>기준</th>
                   <th   style='font-family: "unbatang", Times, serif'>단위</th>
@@ -688,6 +705,7 @@
                </tr>
                @endif
                @endif
+           
                @if($count_service2_5 > 0)
                @if($rate_data_send_meta['rate_data2'][14]['rd_data3'] == 'ON')
                <tr>
@@ -808,6 +826,7 @@
                </tr>
                @endif
                @endif
+              
                @if($count_service2_6 > 0)
                @if($rate_data_send_meta['rate_data2'][22]['rd_data3'] == 'ON')
                <tr>
@@ -859,6 +878,9 @@
       <div style="border-bottom:1px solid #ddd">
          <table id="custom_table">
             <thead>
+               <tr style="background:#EDEDED;font-weight:bold"> 
+                  <th colspan="5"  style='text-align:left;font-family: "unbatang", Times, serif'>서비스: 유통가공</th>
+               </tr>
                <tr class="background_title">
                   <th colspan="2"  style='font-family: "unbatang", Times, serif' class="background_title">구분</th>
                   <th   style='font-family: "unbatang", Times, serif' class="background_title">단위</th>
