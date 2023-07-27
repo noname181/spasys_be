@@ -24,6 +24,21 @@
       </style>
    </head>
    <body>
+      <div style="width: 100%;border:1px solid black;margin-bottom:20px;text-align: center;padding: 50px 0;">
+         <p>{{$rm_biz_name}}</p>
+      </div>
+      <div style="width: 100%;margin-bottom:20px;text-align: right;">
+         <p>{{$rm_biz_number}}</p>
+         <p>{{$rm_biz_address}}</p>
+         @if($rm_owner_name)
+         @if($rm_owner_name && !$rm_biz_email)
+         <p>{{$rm_owner_name}}</p>
+         @else
+         <p>{{$rm_owner_name}} ({{$rm_biz_email}})</p>
+         @endif
+         @endif
+      </div>
+
       @if(count($rate_data_send_meta['rate_data1']))
       <div style="border-bottom:1px solid #ddd">
          <table id="custom_table">
@@ -843,132 +858,186 @@
                </tr>
             </thead>
             <tbody>
-              <tr>
-                    <td rowspan="4" style='font-family: "unbatang", Times, serif' class="background_title">
-                    원산지 표시
-                    </td>
-                    <td style='font-family: "unbatang", Times, serif' class="background_title">
-                    각인
-                    </td>
-                    <td style='font-family: "unbatang", Times, serif'>
-                      {{$rate_data_send_meta['rate_data3'][0]['rd_data1']}}
-                    </td>
-                    <td>
-                      {{number_format($rate_data_send_meta['rate_data3'][0]['rd_data2'])}}
-                    </td>
-                    <td>
-                      {{$rate_data_send_meta['rate_data3'][0]['rd_data3']}}
-                    </td>
-                </tr>
-                <tr>
-                  <td style='font-family: "unbatang", Times, serif' class="background_title">불멸잉크</td>
-                  <td style='font-family: "unbatang", Times, serif'>
-                     {{$rate_data_send_meta['rate_data3'][1]['rd_data1']}}
-                  </td>
-                  <td>
-                     {{number_format($rate_data_send_meta['rate_data3'][1]['rd_data2'])}}
-                  </td>
-                  <td>
-                     {{$rate_data_send_meta['rate_data3'][1]['rd_data3']}}
-                  </td>
-               </tr>
-               <tr>
-                  <td style='font-family: "unbatang", Times, serif' class="background_title">스티커</td>
-                  <td style='font-family: "unbatang", Times, serif'>
-                     {{$rate_data_send_meta['rate_data3'][2]['rd_data1']}}
-                  </td>
-                  <td>
-                     {{number_format($rate_data_send_meta['rate_data3'][2]['rd_data2'])}}
-                  </td>
-                  <td>
-                     {{$rate_data_send_meta['rate_data3'][2]['rd_data3']}}
-                  </td>
-               </tr>
-               <tr>
-                  <td style='font-family: "unbatang", Times, serif' class="background_title">박음질</td>
-                  <td style='font-family: "unbatang", Times, serif'>
-                     {{$rate_data_send_meta['rate_data3'][3]['rd_data1']}}
-                  </td>
-                  <td>
-                     {{number_format($rate_data_send_meta['rate_data3'][3]['rd_data2'])}}
-                  </td>
-                  <td>
-                     {{$rate_data_send_meta['rate_data3'][3]['rd_data3']}}
-                  </td>
-               </tr>
-
-               <tr>
-                    <td rowspan="3" style='font-family: "unbatang", Times, serif' class="background_title">
-                    TAG
-                    </td>
-                    <td style='font-family: "unbatang", Times, serif' class="background_title">
-                    발행
-                    </td>
-                    <td style='font-family: "unbatang", Times, serif'>
-                      {{$rate_data_send_meta['rate_data3'][4]['rd_data1']}}
-                    </td>
-                    <td>
-                      {{number_format($rate_data_send_meta['rate_data3'][4]['rd_data2'])}}
-                    </td>
-                    <td>
-                      {{$rate_data_send_meta['rate_data3'][4]['rd_data3']}}
-                    </td>
-                </tr>
-                <tr>
-                  <td style='font-family: "unbatang", Times, serif' class="background_title">부착</td>
-                  <td style='font-family: "unbatang", Times, serif'>
-                     {{$rate_data_send_meta['rate_data3'][5]['rd_data1']}}
-                  </td>
-                  <td>
-                     {{number_format($rate_data_send_meta['rate_data3'][5]['rd_data2'])}}
-                  </td>
-                  <td>
-                     {{$rate_data_send_meta['rate_data3'][5]['rd_data3']}}
-                  </td>
-               </tr>
-               <tr>
-                  <td style='font-family: "unbatang", Times, serif' class="background_title">교체</td>
-                  <td style='font-family: "unbatang", Times, serif'>
-                     {{$rate_data_send_meta['rate_data3'][6]['rd_data1']}}
-                  </td>
-                  <td>
-                     {{number_format($rate_data_send_meta['rate_data3'][6]['rd_data2'])}}
-                  </td>
-                  <td>
-                     {{$rate_data_send_meta['rate_data3'][6]['rd_data3']}}
-                  </td>
-               </tr>
-
-               <tr>
-                    <td rowspan="2" style='font-family: "unbatang", Times, serif' class="background_title">
-                    라벨
-                    </td>
-                    <td style='font-family: "unbatang", Times, serif' class="background_title">
-                    발행
-                    </td>
-                    <td style='font-family: "unbatang", Times, serif'>
-                      {{$rate_data_send_meta['rate_data3'][7]['rd_data1']}}
-                    </td>
-                    <td>
-                      {{number_format($rate_data_send_meta['rate_data3'][7]['rd_data2'])}}
-                    </td>
-                    <td>
-                      {{$rate_data_send_meta['rate_data3'][7]['rd_data3']}}
-                    </td>
-                </tr>
-                <tr>
-                  <td style='font-family: "unbatang", Times, serif' class="background_title">부착</td>
-                  <td style='font-family: "unbatang", Times, serif'>
-                     {{$rate_data_send_meta['rate_data3'][8]['rd_data1']}}
-                  </td>
-                  <td>
-                     {{number_format($rate_data_send_meta['rate_data3'][8]['rd_data2'])}}
-                  </td>
-                  <td>
-                     {{$rate_data_send_meta['rate_data3'][8]['rd_data3']}}
-                  </td>
-               </tr>
+               @if($count_service3_1 > 0)  
+                  @if($rate_data_send_meta['rate_data3'][0]['rd_data3'] == 'ON')
+                  <tr>
+                     <td rowspan="{{$count_service3_1}}" style='font-family: "unbatang", Times, serif' class="background_title">
+                     원산지 표시
+                     </td>
+                     <td style='font-family: "unbatang", Times, serif' class="background_title">
+                     각인
+                     </td>
+                     <td style='font-family: "unbatang", Times, serif'>
+                        {{$rate_data_send_meta['rate_data3'][0]['rd_data1']}}
+                     </td>
+                     <td>
+                        {{number_format($rate_data_send_meta['rate_data3'][0]['rd_data2'])}}
+                     </td>
+                     <td>
+                        {{$rate_data_send_meta['rate_data3'][0]['rd_data3']}}
+                     </td>
+                  </tr>
+                  @endif
+                  @if($rate_data_send_meta['rate_data3'][1]['rd_data3'] == 'ON')
+                  <tr>
+                     @if($rate_data_send_meta['rate_data3'][0]['rd_data3'] != 'ON')
+                     <td rowspan="{{$count_service3_1}}" style='font-family: "unbatang", Times, serif' class="background_title">
+                     원산지 표시
+                     </td>
+                     @endif
+                     <td style='font-family: "unbatang", Times, serif' class="background_title">불멸잉크</td>
+                     <td style='font-family: "unbatang", Times, serif'>
+                        {{$rate_data_send_meta['rate_data3'][1]['rd_data1']}}
+                     </td>
+                     <td>
+                        {{number_format($rate_data_send_meta['rate_data3'][1]['rd_data2'])}}
+                     </td>
+                     <td>
+                        {{$rate_data_send_meta['rate_data3'][1]['rd_data3']}}
+                     </td>
+                  </tr>
+                  @endif
+                  @if($rate_data_send_meta['rate_data3'][2]['rd_data3'] == 'ON')
+                  <tr>
+                     @if($rate_data_send_meta['rate_data3'][0]['rd_data3'] != 'ON' && $rate_data_send_meta['rate_data3'][1]['rd_data3'] != 'ON')
+                     <td rowspan="{{$count_service3_1}}" style='font-family: "unbatang", Times, serif' class="background_title">
+                     원산지 표시
+                     </td>
+                     @endif
+                     <td style='font-family: "unbatang", Times, serif' class="background_title">스티커</td>
+                     <td style='font-family: "unbatang", Times, serif'>
+                        {{$rate_data_send_meta['rate_data3'][2]['rd_data1']}}
+                     </td>
+                     <td>
+                        {{number_format($rate_data_send_meta['rate_data3'][2]['rd_data2'])}}
+                     </td>
+                     <td>
+                        {{$rate_data_send_meta['rate_data3'][2]['rd_data3']}}
+                     </td>
+                  </tr>
+                  @endif
+                  @if($rate_data_send_meta['rate_data3'][3]['rd_data3'] == 'ON')
+                  <tr>
+                     @if($rate_data_send_meta['rate_data3'][0]['rd_data3'] != 'ON' && $rate_data_send_meta['rate_data3'][1]['rd_data3'] != 'ON' 
+                     && $rate_data_send_meta['rate_data3'][2]['rd_data3'] != 'ON')
+                     <td rowspan="{{$count_service3_1}}" style='font-family: "unbatang", Times, serif' class="background_title">
+                     원산지 표시
+                     </td>
+                     @endif
+                     <td style='font-family: "unbatang", Times, serif' class="background_title">박음질</td>
+                     <td style='font-family: "unbatang", Times, serif'>
+                        {{$rate_data_send_meta['rate_data3'][3]['rd_data1']}}
+                     </td>
+                     <td>
+                        {{number_format($rate_data_send_meta['rate_data3'][3]['rd_data2'])}}
+                     </td>
+                     <td>
+                        {{$rate_data_send_meta['rate_data3'][3]['rd_data3']}}
+                     </td>
+                  </tr>
+                  @endif
+               @endif
+               @if($count_service3_2 > 0)   
                
+                  @if($rate_data_send_meta['rate_data3'][4]['rd_data3'] == 'ON')
+                  <tr>
+                     <td rowspan="{{$count_service3_2}}" style='font-family: "unbatang", Times, serif' class="background_title">
+                     TAG
+                     </td>
+                     <td style='font-family: "unbatang", Times, serif' class="background_title">
+                     발행
+                     </td>
+                     <td style='font-family: "unbatang", Times, serif'>
+                        {{$rate_data_send_meta['rate_data3'][4]['rd_data1']}}
+                     </td>
+                     <td>
+                        {{number_format($rate_data_send_meta['rate_data3'][4]['rd_data2'])}}
+                     </td>
+                     <td>
+                        {{$rate_data_send_meta['rate_data3'][4]['rd_data3']}}
+                     </td>
+                  </tr>
+                  @endif
+                  @if($rate_data_send_meta['rate_data3'][5]['rd_data3'] == 'ON')
+                  <tr>
+                     @if($rate_data_send_meta['rate_data3'][4]['rd_data3'] != 'ON')
+                        <td rowspan="{{$count_service3_2}}" style='font-family: "unbatang", Times, serif' class="background_title">
+                        TAG
+                        </td>
+                     @endif
+                     <td style='font-family: "unbatang", Times, serif' class="background_title">부착</td>
+                     <td style='font-family: "unbatang", Times, serif'>
+                        {{$rate_data_send_meta['rate_data3'][5]['rd_data1']}}
+                     </td>
+                     <td>
+                        {{number_format($rate_data_send_meta['rate_data3'][5]['rd_data2'])}}
+                     </td>
+                     <td>
+                        {{$rate_data_send_meta['rate_data3'][5]['rd_data3']}}
+                     </td>
+                  </tr>
+                  @endif
+                  @if($rate_data_send_meta['rate_data3'][6]['rd_data3'] == 'ON')
+                  <tr>
+                     @if($rate_data_send_meta['rate_data3'][5]['rd_data3'] != 'ON' && $rate_data_send_meta['rate_data3'][4]['rd_data3'] != 'ON')
+                        <td rowspan="{{$count_service3_2}}" style='font-family: "unbatang", Times, serif' class="background_title">
+                        TAG
+                        </td>
+                     @endif
+                     <td style='font-family: "unbatang", Times, serif' class="background_title">교체</td>
+                     <td style='font-family: "unbatang", Times, serif'>
+                        {{$rate_data_send_meta['rate_data3'][6]['rd_data1']}}
+                     </td>
+                     <td>
+                        {{number_format($rate_data_send_meta['rate_data3'][6]['rd_data2'])}}
+                     </td>
+                     <td>
+                        {{$rate_data_send_meta['rate_data3'][6]['rd_data3']}}
+                     </td>
+                  </tr>
+                  @endif
+               @endif
+               @if($count_service3_3 > 0)
+                  @if($rate_data_send_meta['rate_data3'][7]['rd_data3'] == 'ON')
+                  <tr>
+                        <td rowspan="{{$count_service3_3}}" style='font-family: "unbatang", Times, serif' class="background_title">
+                        라벨
+                        </td>
+                        <td style='font-family: "unbatang", Times, serif' class="background_title">
+                        발행
+                        </td>
+                        <td style='font-family: "unbatang", Times, serif'>
+                           {{$rate_data_send_meta['rate_data3'][7]['rd_data1']}}
+                        </td>
+                        <td>
+                           {{number_format($rate_data_send_meta['rate_data3'][7]['rd_data2'])}}
+                        </td>
+                        <td>
+                           {{$rate_data_send_meta['rate_data3'][7]['rd_data3']}}
+                        </td>
+                  </tr>
+                  @endif
+                  @if($rate_data_send_meta['rate_data3'][8]['rd_data3'] == 'ON')
+                  <tr>
+                     @if($rate_data_send_meta['rate_data3'][7]['rd_data3'] != 'ON')
+                     <td rowspan="{{$count_service3_3}}" style='font-family: "unbatang", Times, serif' class="background_title">
+                        라벨
+                     </td>
+                     @endif
+                     <td style='font-family: "unbatang", Times, serif' class="background_title">부착</td>
+                     <td style='font-family: "unbatang", Times, serif'>
+                        {{$rate_data_send_meta['rate_data3'][8]['rd_data1']}}
+                     </td>
+                     <td>
+                        {{number_format($rate_data_send_meta['rate_data3'][8]['rd_data2'])}}
+                     </td>
+                     <td>
+                        {{$rate_data_send_meta['rate_data3'][8]['rd_data3']}}
+                     </td>
+                  </tr>
+                  @endif
+               @endif
+               @if($rate_data_send_meta['rate_data3'][9]['rd_data3'] == 'ON')
                <tr>
                     <td colspan="2" style='font-family: "unbatang", Times, serif' class="background_title">
                     화지(상품포장)
@@ -983,6 +1052,8 @@
                       {{$rate_data_send_meta['rate_data3'][9]['rd_data3']}}
                     </td>
                 </tr>
+                @endif
+                @if($rate_data_send_meta['rate_data3'][10]['rd_data3'] == 'ON')
                 <tr>
                     <td colspan="2" style='font-family: "unbatang", Times, serif' class="background_title">
                     스티커작업
@@ -997,6 +1068,8 @@
                       {{$rate_data_send_meta['rate_data3'][10]['rd_data3']}}
                     </td>
                 </tr>
+                @endif
+                @if($rate_data_send_meta['rate_data3'][11]['rd_data3'] == 'ON')
                 <tr>
                     <td colspan="2" style='font-family: "unbatang", Times, serif' class="background_title">
                     폴리백 교체
@@ -1011,6 +1084,8 @@
                       {{$rate_data_send_meta['rate_data3'][11]['rd_data3']}}
                     </td>
                 </tr>
+                @endif
+                @if($rate_data_send_meta['rate_data3'][12]['rd_data3'] == 'ON')
                 <tr>
                     <td colspan="2" style='font-family: "unbatang", Times, serif' class="background_title">
                     추가 동봉
@@ -1025,6 +1100,8 @@
                       {{$rate_data_send_meta['rate_data3'][12]['rd_data3']}}
                     </td>
                 </tr>
+                @endif
+                @if($rate_data_send_meta['rate_data3'][13]['rd_data3'] == 'ON')
                 <tr>
                     <td colspan="2" style='font-family: "unbatang", Times, serif' class="background_title">
                     박스교체
@@ -1039,6 +1116,8 @@
                       {{$rate_data_send_meta['rate_data3'][13]['rd_data3']}}
                     </td>
                 </tr>
+                @endif
+                @if($rate_data_send_meta['rate_data3'][14]['rd_data3'] == 'ON')
                 <tr>
                     <td colspan="2" style='font-family: "unbatang", Times, serif' class="background_title">
                     GIFT 포장
@@ -1053,6 +1132,8 @@
                       {{$rate_data_send_meta['rate_data3'][14]['rd_data3']}}
                     </td>
                 </tr>
+                @endif
+                @if($rate_data_send_meta['rate_data3'][15]['rd_data3'] == 'ON')
                 <tr>
                     <td colspan="2" style='font-family: "unbatang", Times, serif' class="background_title">
                     위험물포장
@@ -1067,6 +1148,8 @@
                       {{$rate_data_send_meta['rate_data3'][15]['rd_data3']}}
                     </td>
                 </tr>
+                @endif
+                @if($rate_data_send_meta['rate_data3'][16]['rd_data3'] == 'ON')
                 <tr>
                     <td colspan="2" style='font-family: "unbatang", Times, serif' class="background_title">
                     패키지
@@ -1081,6 +1164,8 @@
                       {{$rate_data_send_meta['rate_data3'][16]['rd_data3']}}
                     </td>
                 </tr>
+                @endif
+                @if($rate_data_send_meta['rate_data3'][17]['rd_data3'] == 'ON')
                 <tr>
                     <td colspan="2" style='font-family: "unbatang", Times, serif' class="background_title">
                     압축포장
@@ -1095,6 +1180,8 @@
                       {{$rate_data_send_meta['rate_data3'][17]['rd_data3']}}
                     </td>
                 </tr>
+                @endif
+                @if($rate_data_send_meta['rate_data3'][18]['rd_data3'] == 'ON')
                 <tr>
                     <td colspan="2" style='font-family: "unbatang", Times, serif' class="background_title">
                     분할
@@ -1109,6 +1196,8 @@
                       {{$rate_data_send_meta['rate_data3'][18]['rd_data3']}}
                     </td>
                 </tr>
+                @endif
+                @if($rate_data_send_meta['rate_data3'][19]['rd_data3'] == 'ON')
                 <tr>
                     <td colspan="2" style='font-family: "unbatang", Times, serif' class="background_title">
                     병합
@@ -1123,6 +1212,8 @@
                       {{$rate_data_send_meta['rate_data3'][19]['rd_data3']}}
                     </td>
                 </tr>
+                @endif
+                @if($rate_data_send_meta['rate_data3'][20]['rd_data3'] == 'ON')
                 <tr>
                     <td colspan="2" style='font-family: "unbatang", Times, serif' class="background_title">
                     사전물품학인
@@ -1137,6 +1228,7 @@
                       {{$rate_data_send_meta['rate_data3'][20]['rd_data3']}}
                     </td>
                 </tr>
+                @endif
             </tbody>
          </table>
       </div>
