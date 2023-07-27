@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\File;
 use App\Http\Requests\SendMail\SendMailOtpRequest;
 use Illuminate\Support\Str;
 use App\Models\Member;
+use App\Models\RateMeta;
 
 class SendEmailController extends Controller
 {
@@ -88,10 +89,12 @@ class SendEmailController extends Controller
         $validated = $request->validated();
         DB::beginTransaction();
         $co_no = Auth::user()->co_no;
-        $rate_data_send_meta = $this->getRateDataRaw($validated['rm_no'], $validated['rmd_no']);
+        $rmd_last = RateMetaData::where('rm_no', $validated['rm_no'])->orderBy('rmd_no','desc')->first();
+        $rate_data_send_meta = $this->getRateDataRaw($validated['rm_no'], $rmd_last['rmd_no']);
         DB::commit();
         $user = Auth::user();
-
+        $rmd = RateMetaData::where('rm_no', $validated['rm_no'])->first();
+        $rate_meta = RateMeta::where('rm_no',$validated['rm_no'])->first();
         // $data_sheet3 = $data_sheet2 = $rate_data = array();
 
         // $spreadsheet = new Spreadsheet();
@@ -225,11 +228,124 @@ class SendEmailController extends Controller
         }
         $mask = $path . '요율발송_*.*';
         array_map('unlink', glob($mask) ?: []);
-        $file_name_download = $path . '요율발송_' . $validated['rmd_number'] . '.pdf';
+        $file_name_download = $path . '요율발송_' . $rmd['rmd_number'] . '.pdf';
         // $check_status = $Excel_writer->save($file_name_download);
-        $pdf = Pdf::loadView('pdf.test',['rate_data_send_meta'=>$rate_data_send_meta]);
+        // $pdf = Pdf::loadView('pdf.test',['rate_data_send_meta'=>$rate_data_send_meta]);
+        // $pdf->save($file_name_download);
+        $count1 = 0;
+        $count2 = 0;
+        $count3 = 1;
+        $array1 = [];
+
+        $count1_2 = 0;
+        $count2_2 = 0;
+        $count3_2 = 1;
+        $array2 = [];
+
+        $count1_3 = 0;
+        $count2_3 = 0;
+        $count3_3 = 1;
+        $array3 = [];
+        if(count($rate_data_send_meta['rate_data1']) > 0){
+        foreach($rate_data_send_meta['rate_data1'] as $key => $row){
+            if($key <= 9 && $key != 2 && $key != 4 && $key != 6 && $key != 8 && ($row['rd_data2'] || $row['rd_data1'])){
+                $array1[] = $key;
+                $count1 +=1;
+            }
+            if($key == 11 && ($row['rd_data2'] || $row['rd_data1'])){
+                $count2 = 2;
+                $array1[]=$key;
+            }
+            if(($key == 14 && ($row['rd_data1']) ) ||  ($key == 13 || $key == 12) && ($row['rd_data2'] || $row['rd_data1'])){
+                $count3 += 1;
+                $array1[] = $key;
+            }
+            if($key >= 15 && $key <= 24 && $key != 17 && $key != 19 && $key != 21 && $key != 23 && ($row['rd_data2'] || $row['rd_data1'])){
+                $array2[] = $key;
+                $count1_2 +=1;
+            }
+            if($key >= 15 && $key == 26 && ($row['rd_data2'] || $row['rd_data1'])){
+                $count2_2 = 2;
+                $array2[]=$key;
+            }
+            if(($key == 29 && ($row['rd_data1']) ) ||  ($key == 27 || $key == 28) && ($row['rd_data2'] || $row['rd_data1'])){
+                $count3_2 += 1;
+                $array2[] = $key;
+            }
+            if($key >= 30 && $key <= 39 && $key != 32 && $key != 34 && $key != 36 && $key != 38 && ($row['rd_data2'] || $row['rd_data1'])){
+                $array3[] = $key;
+                $count1_3 +=1;
+            }
+            if($key >= 30 && $key == 41 && ($row['rd_data2'] || $row['rd_data1'])){
+                $count2_3 = 2;
+                $array3[]=$key;
+            }
+            if(($key == 44 && ($row['rd_data1']) ) ||  ($key == 42 || $key == 43) && ($row['rd_data2'] || $row['rd_data1'])){
+                $count3_3 += 1;
+                $array3[] = $key;
+            }
+        }
+        }
+        $count_row2 = $count2 + $count3;
+        $count_row2_2 = $count2_2 + $count3_2;
+        $count_row2_3 = $count2_3 + $count3_3;
+        $count_service2_1 = 0;
+        $count_service2_2 = 0;
+        $count_service2_3 = 0;
+        $count_service2_4 = 0;
+        $count_service2_5 = 0;
+        $count_service2_6 = 0;
+        if(count($rate_data_send_meta['rate_data2']) > 0){
+        foreach($rate_data_send_meta['rate_data2'] as $key => $row){
+           if(($key == 1 || $key == 2 || $key == 3 || $key == 4) && $row['rd_data3'] == 'ON'){
+                $count_service2_1+=1;
+           }
+           if(($key == 5 || $key == 6 || $key == 7 || $key == 8 || $key == 9 || $key == 10) && $row['rd_data3'] == 'ON'){
+                $count_service2_2+=1;
+           }
+           if(($key == 0 || $key == 24 || $key == 25) && $row['rd_data3'] == 'ON'){
+                $count_service2_3+=1;
+           }
+           if(($key == 27 || $key == 26) && $row['rd_data3'] == 'ON'){
+                $count_service2_4+=1;
+           }
+           if(($key == 14 || $key == 15 || $key == 16 || $key == 17 || $key == 18 || $key == 19) && $row['rd_data3'] == 'ON'){
+                $count_service2_5+=1;
+           }
+           if(($key == 22 || $key == 23) && $row['rd_data3'] == 'ON'){
+                $count_service2_6+=1;
+           }
+            
+        }
+        }
+        $count_service3_1 = 0;
+        $count_service3_2 = 0;
+        $count_service3_3 = 0;
+        if(count($rate_data_send_meta['rate_data3']) > 0){
+            foreach($rate_data_send_meta['rate_data3'] as $key => $row){
+               if(($key == 0 || $key == 1 || $key == 2 || $key == 3) && $row['rd_data3'] == 'ON'){
+                    $count_service3_1+=1;
+               }
+               if(($key == 5 || $key == 6 || $key == 4 ) && $row['rd_data3'] == 'ON'){
+                    $count_service3_2+=1;
+               }
+               if(($key == 7 || $key == 8) && $row['rd_data3'] == 'ON'){
+                    $count_service3_3+=1;
+               }
+            }
+        }
+       
+        $pdf = Pdf::loadView('pdf.test',['rate_data_send_meta'=>$rate_data_send_meta,
+        'count1'=>$count1,'array1'=>$array1,'count2'=>$count2,'count_row2'=>$count_row2,'count3'=>$count3,
+        'count1_2'=>$count1_2,'array2'=>$array2,'count2_2'=>$count2_2,'count_row2_2'=>$count_row2_2,'count3_2'=>$count3_2,
+        'count1_3'=>$count1_3,'array3'=>$array3,'count2_3'=>$count2_3,'count_row2_3'=>$count_row2_3,'count3_3'=>$count3_3,
+        'count_service2_1'=>$count_service2_1,'count_service2_2'=>$count_service2_2,'count_service2_3'=>$count_service2_3,
+        'count_service2_4'=>$count_service2_4,'count_service2_5'=>$count_service2_5,'count_service2_6'=>$count_service2_6,
+        'count_service3_1'=>$count_service3_1,'count_service3_2'=>$count_service3_2,'count_service3_3'=>$count_service3_3,
+        'rm_biz_name'=>$rate_meta['rm_biz_name'],'rm_biz_number'=>$rate_meta['rm_biz_number'],'rm_biz_address'=>$rate_meta['rm_biz_address'],
+        'rm_owner_name'=>$rate_meta['rm_owner_name'],'rm_biz_email'=>$rate_meta['rm_biz_email']
+        ]);
         $pdf->save($file_name_download);
-      
         try {
             $push = SendEmailHistory::insertGetId([
                 'mb_no' => Auth::user()->mb_no,
