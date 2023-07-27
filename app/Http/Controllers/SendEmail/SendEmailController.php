@@ -89,9 +89,11 @@ class SendEmailController extends Controller
         $validated = $request->validated();
         DB::beginTransaction();
         $co_no = Auth::user()->co_no;
-        $rate_data_send_meta = $this->getRateDataRaw($validated['rm_no'], $validated['rmd_no']);
+        $rmd_last = RateMetaData::where('rm_no', $validated['rm_no'])->orderBy('rmd_no','desc')->first();
+        $rate_data_send_meta = $this->getRateDataRaw($validated['rm_no'], $rmd_last['rmd_no']);
         DB::commit();
         $user = Auth::user();
+        $rmd = RateMetaData::where('rm_no', $validated['rm_no'])->first();
         $rate_meta = RateMeta::where('rm_no',$validated['rm_no'])->first();
         // $data_sheet3 = $data_sheet2 = $rate_data = array();
 
@@ -226,7 +228,7 @@ class SendEmailController extends Controller
         }
         $mask = $path . '요율발송_*.*';
         array_map('unlink', glob($mask) ?: []);
-        $file_name_download = $path . '요율발송_' . $validated['rmd_number'] . '.pdf';
+        $file_name_download = $path . '요율발송_' . $rmd['rmd_number'] . '.pdf';
         // $check_status = $Excel_writer->save($file_name_download);
         // $pdf = Pdf::loadView('pdf.test',['rate_data_send_meta'=>$rate_data_send_meta]);
         // $pdf->save($file_name_download);
