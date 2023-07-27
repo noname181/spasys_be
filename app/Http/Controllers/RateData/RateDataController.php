@@ -11355,6 +11355,7 @@ class RateDataController extends Controller
             'status' => 1,
             'link_download' => $file_name_download,
             'message' => 'Download File',
+            'namefile'=> '요율발송_' . $rmd['rmd_number'] . '.pdf',
         ], 200);
         ob_end_clean();
     }
