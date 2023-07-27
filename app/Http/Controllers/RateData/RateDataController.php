@@ -3930,6 +3930,7 @@ class RateDataController extends Controller
                         $final_rgd->rgd_status7 = null;
                         $final_rgd->rgd_is_show = ($i == 0 ? 'y' : 'n');
                         $final_rgd->rgd_parent_no = $expectation_rgd->rgd_no;
+                        $final_rgd->rgd_calculate_deadline_yn = $user->mb_type == 'spasys' ? 'y' : $expectation_rgd->rgd_calculate_deadline_yn;
                         $final_rgd->rgd_settlement_number = $rgd_settlement_number ? $rgd_settlement_number : null;
                         $final_rgd->mb_no = $user->mb_no;
                         $final_rgd->save();
@@ -4320,6 +4321,7 @@ class RateDataController extends Controller
                     $final_rgd->rgd_is_show = ($i == 0 ? 'y' : 'n');
                     $final_rgd->rgd_parent_no = $expectation_rgd->rgd_no;
                     $final_rgd->rgd_settlement_number = $rgd_settlement_number;
+                    $final_rgd->rgd_calculate_deadline_yn = $user->mb_type == 'spasys' ? 'y' : $expectation_rgd->rgd_calculate_deadline_yn;
                     $final_rgd->mb_no = $user->mb_no;
                     $final_rgd->save();
 
@@ -4966,6 +4968,7 @@ class RateDataController extends Controller
                 $final_rgd->rgd_paid_date = null;
                 $final_rgd->rgd_tax_invoice_date = null;
                 $final_rgd->rgd_tax_invoice_number = null;
+                $final_rgd->rgd_calculate_deadline_yn = $user->mb_type == 'spasys' ? 'y' : $previous_rgd->rgd_calculate_deadline_yn;
                 $final_rgd->mb_no = Auth::user()->mb_no;
                 $final_rgd->rgd_parent_no = $previous_rgd->rgd_no;
                 $final_rgd->save();
