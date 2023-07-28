@@ -1645,13 +1645,13 @@ class RateDataController extends Controller
                     'mb_no' => $user->mb_no,
                     'rmd_service' => isset($request->activeTab2) ? $request->activeTab2 : null,
                     'rmd_tab_child' => isset($request->rmd_tab_child) ? $request->rmd_tab_child : null,
-
+                    'rmd_device' => $request->device == 'web' ? 1 : 0,
                 ] : [
                     'mb_no' => $user->mb_no,
                     'rmd_number' => CommonFunc::generate_rmd_number($request['co_no'], $index),
                     'rmd_service' => isset($request->activeTab2) ? $request->activeTab2 : null,
                     'rmd_tab_child' => isset($request->rmd_tab_child) ? $request->rmd_tab_child : null,
-
+                    'rmd_device' => $request->device == 'web' ? 1 : 0,
                 ]
             );
 
