@@ -41,7 +41,7 @@ class ExcelRequest extends BaseFormRequest
                 'max:255',
             ],
             'E' => [
-                'required',
+                'nullable',
                 'max:255',
             ],
             'F' => [

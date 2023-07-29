@@ -462,23 +462,23 @@ class ScheduleShipmentController extends Controller
 
                         $check = ScheduleShipmentInfo::where('ss_no', $ss_no->ss_no)->get();
 
-                        $order_cs_status = "정상";
+                        $order_cs_status = "출고";
 
                         foreach ($check as $key => $c) {
 
-                            if ($order_cs_status == "정상") {
+                            if ($order_cs_status == "출고") {
                                 if ($c == end($check)) {
                                     if ($c->order_cs == "1") {
-                                        $order_cs_status = "전체취소";
+                                        $order_cs_status = "출고예정";
                                     } else if ($c->order_cs == "2") { 
-                                        $order_cs_status = "부분취소";
+                                        $order_cs_status = "출고예정 취소";
                                     }
                                 }
                             }
                        
                         
                             if ($c->order_cs == "1" || $c->order_cs == "2") {
-                                $order_cs_status = "부분취소";
+                                $order_cs_status = "출고예정 취소";
                             }
                         }
 
@@ -608,9 +608,9 @@ class ScheduleShipmentController extends Controller
                                 $order_cs_status = "";
                                 foreach ($check as $c) {
                                     if ($c->order_cs == "1" || $c->order_cs == "2") {
-                                        $order_cs_status = "부분취소";
+                                        $order_cs_status = "출고예정 취소";
                                     } else {
-                                        $order_cs_status = "정상";
+                                        $order_cs_status = "출고";
                                     }
                                 }
 
