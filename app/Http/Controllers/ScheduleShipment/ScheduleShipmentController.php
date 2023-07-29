@@ -334,7 +334,7 @@ class ScheduleShipmentController extends Controller
         try {
             DB::beginTransaction();
             $user = Auth::user();
-
+            //return $data_schedule;
             foreach ($data_schedule as $i_schedule => $schedule) {
                 foreach ($schedule['data_item'] as $schedule_item) {
                     if (str_contains($schedule_item['shop_product_id'], 'S')) {
@@ -395,8 +395,16 @@ class ScheduleShipmentController extends Controller
                     // if($i_schedule == "610001"){
                     //     return $data_schedule;
                     // }
-
                     if (isset($schedule_item['order_id'])) $ss_no = ScheduleShipment::updateOrCreate(['order_id' => $i_schedule], $data_schedule);
+
+                    if($ss_no->ss_no){
+                        $text = $ss_no->status == '출고' ? "EWC" : "EW";
+                        $w_schedule_number = (new CommonFunc)->generate_w_schedule_number_service2($ss_no->ss_no, $text, $ss_no->created_at);
+                        ScheduleShipment::where(['ss_no' => $ss_no->ss_no])->update([
+                            'w_schedule_number' => $w_schedule_number
+                        ]);
+                    }
+
                     if ($ss_no->ss_no && isset($schedule_item['order_products'])) {
                         $check_fisrt = 0;
                         foreach ($schedule_item['order_products'] as $ss_info => $schedule_info) {
@@ -460,27 +468,69 @@ class ScheduleShipmentController extends Controller
                             }
                         }
 
-                        $check = ScheduleShipmentInfo::where('ss_no', $ss_no->ss_no)->get();
+                        $check = ScheduleShipmentInfo::where('ss_no', $ss_no->ss_no)->whereNotNull("order_cs")->get();
+                        // if($ss_no->ss_no == "3429"){
+                        //     return count($check);
+                        // }
+                        
+                        if(isset($schedule_item['status']) && $schedule_item['status'] == 8){
+                            
+            
+                            $order_cs_status = "출고";
 
-                        $order_cs_status = "정상";
+                            foreach ($check as $key => $c) {
 
-                        foreach ($check as $key => $c) {
+                                // if ($order_cs_status == "출고") {
+                                //     if ($c == end($check)) {
+                                //         if ($c->order_cs == "1") {
+                                //             $order_cs_status = "출고예정";
+                                //         } else if ($c->order_cs == "2") { 
+                                //             $order_cs_status = "출고예정 취소";
+                                //         }
+                                //     }
+                                // }
+                        
+                                if ($order_cs_status == "정상") {
+                                    if (count($check) > 1 && ($c->order_cs == "1" || $c->order_cs == "2" || $c->order_cs == "7")) {
+                                        $order_cs_status = "출고예정 취소";
+                                    } else {
+                                        if ($c->order_cs == "1") {
+                                            $order_cs_status = "출고예정";
+                                        } else if ($c->order_cs == "2") { 
+                                            $order_cs_status = "출고예정 취소";
+                                        }
+                                    }
+                                }
+                        }
+                        }else{
+                            $order_cs_status = "정상";
 
-                            if ($order_cs_status == "정상") {
-                                if ($c == end($check)) {
-                                    if ($c->order_cs == "1") {
-                                        $order_cs_status = "전체취소";
-                                    } else if ($c->order_cs == "2") { 
+                            foreach ($check as $key => $c) {
+
+                                // if ($order_cs_status == "정상") {
+                                //     if ($c == end($check)) {
+                                //         if ($c->order_cs == "1") {
+                                //             $order_cs_status = "전체취소";
+                                //         } else if ($c->order_cs == "2") { 
+                                //             $order_cs_status = "부분취소";
+                                //         }
+                                //     }
+                                // }
+                        
+                                if ($order_cs_status == "정상") {
+                                    if (count($check) > 1 && ($c->order_cs == "1" || $c->order_cs == "2" || $c->order_cs == "7")) {
                                         $order_cs_status = "부분취소";
+                                    }else{
+                                        if ($c->order_cs == "1") {
+                                            $order_cs_status = "전체취소";
+                                        } else if ($c->order_cs == "2") { 
+                                            $order_cs_status = "부분취소";
+                                        }
                                     }
                                 }
                             }
-                       
-                        
-                            if ($c->order_cs == "1" || $c->order_cs == "2") {
-                                $order_cs_status = "부분취소";
-                            }
                         }
+                        
 
                         ScheduleShipment::where(['ss_no' => $ss_no->ss_no])->update([
                             'order_cs_status' => $order_cs_status
@@ -606,6 +656,7 @@ class ScheduleShipmentController extends Controller
                                 $check = ScheduleShipmentInfo::where('ss_no', $ss_no->ss_no)->where('barcode', $schedule_info['barcode'])->get();
 
                                 $order_cs_status = "";
+
                                 foreach ($check as $c) {
                                     if ($c->order_cs == "1" || $c->order_cs == "2") {
                                         $order_cs_status = "부분취소";
@@ -655,7 +706,12 @@ class ScheduleShipmentController extends Controller
     {
         DB::statement("SET SQL_MODE=''");
         $schedule_shipment_item = ScheduleShipmentInfo::with(['file'])->select('schedule_shipment_info.*', 'item.product_id as product_id', 'schedule_shipment_info.product_id as option_id')->leftjoin('item', 'schedule_shipment_info.product_id', '=', 'item.option_id')->where('schedule_shipment_info.ss_no', $ss_no)->whereNotNull('schedule_shipment_info.order_cs')->get();
-        $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'receving_goods_delivery'])->where('ss_no', $ss_no)->get();
+        $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'receving_goods_delivery'])
+        ->where(function ($query) {
+            $query->whereHas('receving_goods_delivery', function ($q) {
+                $q->whereNull('rgd_monthbill_start');
+            })->ordoesntHave('receving_goods_delivery');
+        })->where('ss_no', $ss_no)->get();
         $collect_test = array();
         if (!empty($schedule_shipment) && !empty($schedule_shipment_item)) {
             $collect_test = collect($schedule_shipment)->map(function ($item) use ($schedule_shipment_item) {
@@ -869,7 +925,7 @@ class ScheduleShipmentController extends Controller
                 // if($page == 3)
                 //     return $data_schedule['data_temp'];
                 if (!empty($data_schedule['data_temp'])) {
-                    //if($page == 7)
+                    //if($page == 9)
                     $this->apiScheduleShipmentsRaw($data_schedule['data_temp']);
                 }
             }
