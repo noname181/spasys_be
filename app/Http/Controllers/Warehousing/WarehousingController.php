@@ -4213,6 +4213,168 @@ class WarehousingController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
+    public function countcheckbill()
+    {
+        try {
+            DB::enableQueryLog();
+            ini_set('max_execution_time', 0);
+            ini_set('memory_limit', '4000M');
+            $user = Auth::user();
+        
+            if ($user->mb_type == 'shop') {
+                $warehousing = ReceivingGoodsDelivery::whereHas('warehousing', function ($query) use ($user) {
+                    $query->whereHas('co_no.co_parent', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
+                    });
+                })->whereHas('mb_no', function ($q) {
+                    $q->where('mb_type', 'spasys');
+                });
+            } else if ($user->mb_type == 'shipper') {
+                $warehousing = ReceivingGoodsDelivery::whereHas('warehousing', function ($query) use ($user) {
+                    $query->whereHas('co_no', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
+                    });
+                })->whereHas('mb_no', function ($q) {
+                    $q->where('mb_type', 'shop');
+                })->orderBy('created_at', 'DESC');
+            } 
+
+            $warehousing->where(function ($q) {
+                $q->where('rgd_status4', '=', '예상경비청구서')
+                    ->orWhere('rgd_status4', '=', '확정청구서');
+            })
+                ->whereHas('warehousing', function ($query) {
+                    $query->where('w_category_name', '=', '유통가공');
+                })
+                ->where('rgd_is_show', 'y')->orderBy('created_at', 'DESC');
+
+            if ($user->mb_type == 'shop') {
+                $warehousing_fulfillment = ReceivingGoodsDelivery::whereHas('warehousing', function ($query) use ($user) {
+                    $query->whereHas('co_no', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
+                    });
+                })->whereHas('mb_no', function ($q) {
+                    $q->where('mb_type', 'spasys');
+                });
+            } else if ($user->mb_type == 'shipper') {
+                $warehousing_fulfillment = ReceivingGoodsDelivery::whereHas('warehousing', function ($query) use ($user) {
+                    $query->whereHas('co_no', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
+                    });
+                })->whereHas('mb_no', function ($q) {
+                    $q->where('mb_type', 'shop');
+                });
+            } 
+
+            $warehousing_fulfillment->where(function ($q) {
+                $q->where('rgd_status4', '=', '예상경비청구서')
+                    ->orWhere('rgd_status4', '=', '확정청구서');
+            })
+                ->whereHas('warehousing', function ($query) {
+                    $query->where('w_category_name', '=', '수입풀필먼트');
+                })
+                ->where('rgd_is_show', 'y');
+
+                if ($user->mb_type == 'shop') {
+                    $warehousing_bonded = ReceivingGoodsDelivery::whereHas('warehousing', function ($query) use ($user) {
+                        $query->whereHas('co_no.co_parent', function ($q) use ($user) {
+                            $q->where('co_no', $user->co_no);
+                        });
+                    })->whereHas('mb_no', function ($q) use ($user) {
+                        $q->where('mb_type', 'spasys');
+                    });
+                } else if ($user->mb_type == 'shipper') {
+                    $warehousing_bonded = ReceivingGoodsDelivery::whereHas('warehousing', function ($query) use ($user) {
+                        $query->whereHas('co_no', function ($q) use ($user) {
+                            $q->where('co_no', $user->co_no);
+                        });
+                    })->whereHas('mb_no', function ($q) {
+                        $q->where('mb_type', 'shop');
+                    });
+                }
+                $warehousing_bonded->where(function ($q) {
+                    $q->where('rgd_status4', '=', '예상경비청구서')
+                        ->orWhere('rgd_status4', '=', '확정청구서');
+                });
+        
+            $warehousing->where(function ($q) {
+                $q->where('rgd_calculate_deadline_yn', 'y')->where(function ($q2) {
+                    $q2->where('rgd_status4', '예상경비청구서')
+                        ->where('service_korean_name', '보세화물')
+                        ->where('rgd_bill_type', 'not like', '%' . 'month' . '%')
+                        ->where(function ($q4) {
+                            $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                        })
+                        ->whereNull('rgd_status6');
+                })->orWhere(function ($q3) {
+                    $q3->where('rgd_calculate_deadline_yn', 'y')->where(function ($q4) {
+                        $q4->Where('rgd_status5', 'confirmed');
+                    })
+                        ->where(function ($q4) {
+                            $q4->whereNull('rgd_status6');
+                        })
+                        ->where(function ($q4) {
+                            $q4->where('rgd_status4', '추가청구서')->orWhere('rgd_status4', '확정청구서');
+                        });
+                });
+            });
+            $warehousing_bonded->where(function ($q) {
+                $q->where('rgd_calculate_deadline_yn', 'y')->where(function ($q2) {
+                    $q2->where('rgd_status4', '예상경비청구서')
+                        ->where('service_korean_name', '보세화물')
+                        ->where('rgd_bill_type', 'not like', '%' . 'month' . '%')
+                        ->where(function ($q4) {
+                            $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                        })
+                        ->whereNull('rgd_status6');
+                })->orWhere(function ($q3) {
+                    $q3->where('rgd_calculate_deadline_yn', 'y')->where(function ($q4) {
+                        $q4->Where('rgd_status5', 'confirmed');
+                    })->where(function ($q4) {
+                        $q4->whereNull('rgd_status6');
+                    })
+                        ->where(function ($q4) {
+                            $q4->where('rgd_status4', '추가청구서')->orWhere('rgd_status4', '확정청구서');
+                        });
+                });
+            });
+            $warehousing_fulfillment->where(function ($q) {
+                $q->where('rgd_calculate_deadline_yn', 'y')->where(function ($q2) {
+                    $q2->where('rgd_status4', '예상경비청구서')
+                        ->where('service_korean_name', '보세화물')
+                        ->where('rgd_bill_type', 'not like', '%' . 'month' . '%')
+                        ->where(function ($q4) {
+                            $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                        })
+                        ->whereNull('rgd_status6');
+                })->orWhere(function ($q3) {
+                    $q3->where('rgd_calculate_deadline_yn', 'y')->where(function ($q4) {
+                        $q4->Where('rgd_status5', 'confirmed');
+                    })
+                        ->where(function ($q4) {
+                            $q4->whereNull('rgd_status6');
+                        })
+                        ->where(function ($q4) {
+                            $q4->where('rgd_status4', '추가청구서')->orWhere('rgd_status4', '확정청구서');
+                        });
+                });
+            });
+            $warehousing->union($warehousing_fulfillment)->union($warehousing_bonded)->orderBy('updated_at', 'DESC')
+            ->orderBy('rgd_no', 'DESC');
+
+            $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
+            // If page is null set default data = 1
+            $page = isset($validated['page']) ? $validated['page'] : 1;
+            $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
+            // $warehousing = $warehousing->get();
+         
+            return response()->json($warehousing);
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0018], 500);
+        }
+    }
     public function getWarehousingImportStatus4(WarehousingSearchRequest $request) //page 144 show EW,rgd_status1 and rgd_status2 = complete
 
     {
