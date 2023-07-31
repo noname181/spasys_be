@@ -4365,9 +4365,164 @@ class WarehousingController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
+            $warehousing_ = clone $warehousing;
+
+            $contract = Contract::where('co_no',  $user->co_no)->first();
+
+            $company_payment = null;
+            if($warehousing_->count() > 0){
+                $issuer = Member::where('mb_no', $warehousing_->first()->mb_no)->first();
+                $company_payment = CompanyPayment::where('co_no',  $issuer->co_no)->first();
+            };
             $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
             // $warehousing = $warehousing->get();
-         
+            $warehousing->setCollection(
+                $warehousing->getCollection()->map(function ($item) use ($contract, $company_payment) {
+                    if (isset($contract->c_calculate_deadline_yn))
+                        $item->c_calculate_deadline_yn = $contract->c_calculate_deadline_yn;
+                    else
+                        $item->c_calculate_deadline_yn = 'n';
+
+
+                    $service_name = $item->service_korean_name;
+
+                    $co_no = Warehousing::where('w_no', $item->w_no)->first()->co_no;
+                    $service_no = Service::where('service_name', $service_name)->first()->service_no;
+
+                    $company_settlement = CompanySettlement::where([
+                        'co_no' => $co_no,
+                        'service_no' => $service_no,
+                    ])->first();
+
+                    if (isset($item->payment->p_method_fee)) {
+                        $item->p_method_fee = $item->payment->p_method_fee + isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : 0;
+                    } else {
+                        $item->p_method_fee = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : 0;
+                    }
+
+                    $item->settlement_cycle = $company_settlement ? $company_settlement->cs_payment_cycle : "";
+
+                    $i = 0;
+                    $k = 0;
+                    $completed_date = null;
+                    foreach ($item->warehousing->warehousing_child as $child) {
+                        $i++;
+                        if ($child['w_completed_day'] != null) {
+                            $completed_date = $child['w_completed_day'];
+                            $k++;
+                        }
+                    }
+                    if ($item->service_korean_name == '보세화물') {
+                        if ($item->rgd_bill_type == 'final_monthly') {
+                            $item->discount = '';
+                            $total_discount = 0;
+                            foreach ($item->rgd_settlement as $row) {
+                                if (isset($row->rate_meta_data_parent[0])) {
+                                    $rate_data = RateData::where('rmd_no', $row->rate_meta_data_parent[0]->rate_data[0]->rmd_no)->where('rd_cate2', '할인금액')->first();
+                                    $total_discount += isset($rate_data->rd_data4) ? (int)$rate_data->rd_data4 : 0;
+                                } else {
+                                    $total_discount += 0;
+                                }
+                            }
+                            $item->discount = $total_discount;
+                            $item->sum_price_total2 = $item->rate_data_general->rdg_sum7 + $item->rate_data_general->rdg_sum14 + $total_discount;
+                        } else if (count($item->rate_meta_data) > 0) {
+                            $total_discount = 0;
+
+                            $rate_data = RateData::where('rmd_no', $item->rate_meta_data[0]->rate_data[0]->rmd_no)->where('rd_cate2', '할인금액')->first();
+                            $total_discount += isset($rate_data->rd_data4) ? (int)$rate_data->rd_data4 : 0;
+
+                            $item->sum_price_total2 = $item->rate_data_general->rdg_sum7 + $item->rate_data_general->rdg_sum14 + $total_discount;
+                            $item->discount = $total_discount;
+                        } else if (count($item->rate_meta_data_parent) > 0) {
+                            $total_discount = 0;
+
+                            $rate_data = RateData::where('rmd_no', $item->rate_meta_data_parent[0]->rate_data[0]->rmd_no)->where('rd_cate2', '할인금액')->first();
+                            $total_discount += isset($rate_data->rd_data4) ? (int)$rate_data->rd_data4 : 0;
+
+                            $item->sum_price_total2 = $item->rate_data_general->rdg_sum7 + $item->rate_data_general->rdg_sum14 + $total_discount;
+                            $item->discount = $total_discount;
+                        }
+
+                        $item->sum_price_total = isset($item->rate_data_general) ? ($item->rate_data_general->rdg_sum7 + $item->rate_data_general->rdg_sum14) : 0;
+                        if ($item->rgd_bill_type == 'final_monthly_shop' || $item->rgd_bill_type == 'final_monthly_spasys' || $item->rgd_bill_type == 'final_monthly') {
+                            $created_at = Carbon::createFromFormat('Y.m.d H:i:s', $item->created_at->format('Y.m.d H:i:s'));
+
+                            $start_date = $created_at->startOfMonth()->toDateString();
+                            $end_date = $created_at->endOfMonth()->toDateString();
+
+                            $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent', 't_export', 't_import', 't_import_expected'])
+                                ->whereHas('w_no', function ($q) use ($co_no) {
+                                    $q->where('w_category_name', '보세화물');
+                                })
+                                // ->doesntHave('rgd_child')
+                                ->where('rgd_settlement_number', $item->rgd_settlement_number)
+                                // ->whereDoesntHave('rgd_child')
+                                ->orderBy('rgd_no')
+                                ->count();
+                            $item->rgds = $rgds;
+                        }
+                    } else if ($item->service_korean_name == '수입풀필먼트') {
+                        $item->discount = "";
+                        $item->sum_price_total2 =  isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum6 : 0;
+                        $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum6 : 0;
+                    } else {
+                        $item->discount = "";
+                        $item->sum_price_total2 = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : 0;
+                        $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : 0;
+                        if ($item->rgd_bill_type == 'final_monthly_shop' || $item->rgd_bill_type == 'final_monthly_spasys' || $item->rgd_bill_type == 'final_monthly') {
+                            $created_at = Carbon::createFromFormat('Y.m.d H:i:s', $item->created_at->format('Y.m.d H:i:s'));
+
+                            $start_date = $created_at->startOfMonth()->toDateString();
+                            $end_date = $created_at->endOfMonth()->toDateString();
+
+                            $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent'])
+                                ->whereHas('w_no', function ($q) use ($item) {
+                                    $q->where('w_category_name', '유통가공');
+                                })
+                                // ->doesntHave('rgd_child')
+                                ->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
+                                ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
+                                ->where('rgd_status1', '=', '입고')
+                                ->where('rgd_settlement_number', $item->rgd_settlement_number)
+                                ->orderBy('rgd_no')
+                                ->count();
+
+
+                            $item->rgds = $rgds;
+                        }
+                    }
+
+                    if (isset($item->rate_data_general)) {
+                        if ($item->rate_data_general->rdg_sum7) {
+                            $item->sum_price_total3 = $item->rate_data_general->rdg_sum7;
+                        } else if ($item->rate_data_general->rdg_sum6) {
+                            $item->sum_price_total3 = $item->rate_data_general->rdg_sum6;
+                        } else if ($item->rate_data_general->rdg_sum4) {
+                            $item->sum_price_total3 = $item->rate_data_general->rdg_sum4;
+                        } else {
+                            $item->sum_price_total3 = 0;
+                        }
+                    } else {
+                        $item->sum_price_total3 = 0;
+                    }
+
+
+                    if ($i == $k) {
+                        $item->is_completed = true;
+                        $item->completed_date = Carbon::parse($completed_date)->format('Y.m.d');
+                    } else {
+                        $item->is_completed = false;
+                        $item->completed_date = null;
+                    }
+
+
+                    //GET ISSUER BANK ACCOUNT
+                    $item->issuer_bank_account = isset($company_payment) ? $company_payment->cp_bank_number : null;
+
+                    return $item;
+                })
+            );
             return response()->json($warehousing);
         } catch (\Exception $e) {
             Log::error($e);
