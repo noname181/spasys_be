@@ -145,6 +145,11 @@
             </tbody>
          </table>
       </div>
+      @if($rmd_mail_detail1a)
+      <div style='margin:10px 0px;border:1px solid black;padding: 20px;text-align:left;font-family: "unbatang", Times, serif'>
+      {!! $rmd_mail_detail1a !!}
+      </div>
+     @endif
       @endif
       @endif
       @if(count($array2) > 0)
@@ -252,6 +257,11 @@
             </tbody>
          </table>
       </div>
+      @if($rmd_mail_detail1b)
+      <div style='margin:10px 0px;border:1px solid black;padding: 20px;text-align:left;font-family: "unbatang", Times, serif'>
+      {!! $rmd_mail_detail1b !!}
+      </div>
+     @endif
       @endif
       @endif
       @if(count($array3) > 0)
@@ -359,6 +369,11 @@
             </tbody>
          </table>
       </div>
+      @if($rmd_mail_detail1c)
+      <div style='margin:10px 0px;border:1px solid black;padding: 20px;text-align:left;font-family: "unbatang", Times, serif'>
+      {!! $rmd_mail_detail1c !!}
+      </div>
+     @endif
       @endif
       @endif
      
@@ -1264,5 +1279,10 @@
          </table>
       </div>
       @endif
+      <div style="margin:10px 0px;">
+      <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>1 이 요율표의 유효기간은 제출일자로부터 1개월 입니다.</p>
+      <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>2 이 견적 금액은 부가가치세 별도 금액입니다.</p>
+      <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>3 상세 업무 내역에 따라 제공 요율은 변경될 수 있습니다.</p>
+      </div>
    </body>
 </html>
