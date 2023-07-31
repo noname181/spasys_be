@@ -1211,7 +1211,7 @@ class WarehousingController extends Controller
                     continue;
                 }
 
-                
+                //return $warehousing_data;
                 $validator = Validator::make($warehouse, WarehousingDataValidate::rules());
                 if ($validator->fails()) {
                     $errors[$sheet->getTitle()][] = $validator->errors();
