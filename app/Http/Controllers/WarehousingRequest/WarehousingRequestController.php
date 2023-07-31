@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Filesystem\Filesystem;
+use App\Models\ScheduleShipment;
 use App\Http\Requests\WarehousingRequest\WarehousingRequestRequest;
 
 class WarehousingRequestController extends Controller
@@ -63,12 +64,44 @@ class WarehousingRequestController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $warehousing = Warehousing::where('w_no', '=', $validated['w_no'])->first();
 
-            $warehousing_request = WarehousingRequest::with(['mb_no','warehousing'])->where('wr_type','<>','List')->orderBy('wr_no', 'DESC');
+            $warehousing_request = WarehousingRequest::with(['mb_no','shedule_shipment','warehousing'])->where('wr_type','<>','List')->orderBy('wr_no', 'DESC');
+
+            // if(isset($validated['w_category_name']) && $validated['w_category_name'] == '수입풀필먼트'){
+            //     $warehousing_request = WarehousingRequest::with(['mb_no','shedule_shipment'])->where('wr_type','<>','List')->orderBy('wr_no', 'DESC');
+            // } elseif(isset($validated['w_category_name']) && $validated['w_category_name'] == '유통가공'){
+            //     $warehousing_request = WarehousingRequest::with(['mb_no','warehousing'])->where('wr_type','<>','List')->orderBy('wr_no', 'DESC');
+            // }
+            // $warehousing_request = WarehousingRequest::with(['mb_no','warehousing','shedule_shipment'])
+            // ->where(function ($query) use ($validated) {
+            //     if(isset($validated['w_category_name']) && $validated['w_category_name'] == '수입풀필먼트'){
+            //         $query->whereHas('shedule_shipment', function ($q) use ($validated) {
+            //             $q->where('w_category_name', $validated['w_category_name']);
+            //         });
+            //     }
+            //     if(isset($validated['w_category_name']) && $validated['w_category_name'] == '유통가공'){
+            //         $query->whereHas('warehousing', function ($q) use ($validated) {
+            //             $q->where('w_category_name', $validated['w_category_name']);
+            //         });
+            //     }
+            // })
+            // ->where('wr_type','<>','List')->orderBy('wr_no', 'DESC');
             if($warehousing){
-                $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no']);
+                if(isset($validated['w_category_name']) && $validated['w_category_name'] == '수입풀필먼트'){
+                    $warehousing_request = $warehousing_request->where('ss_no', '=', $validated['w_no']);
+                }elseif(isset($validated['w_category_name']) && $validated['w_category_name'] == '유통가공'){
+                    $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no']);
+                }else{
+                    $warehousing_request = $warehousing_request->where('is_no', '=', $validated['w_no']);
+                }
                 //->orwhere('w_no', '=', $warehousing->w_import_no);
             }else{
-                $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no']);
+                if(isset($validated['w_category_name']) && $validated['w_category_name'] == '수입풀필먼트'){
+                    $warehousing_request = $warehousing_request->where('ss_no', '=', $validated['w_no']);
+                }elseif(isset($validated['w_category_name']) && $validated['w_category_name'] == '유통가공'){
+                    $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no']);
+                }else{
+                    $warehousing_request = $warehousing_request->where('is_no', '=', $validated['w_no']);
+                }
             }
 
             $warehousing_request = $warehousing_request->paginate($per_page, ['*'], 'page', $page);
@@ -88,11 +121,30 @@ class WarehousingRequestController extends Controller
             $warehousing = Warehousing::where('w_no', '=', $validated['w_no'])->first();
 
             $warehousing_request = WarehousingRequest::with(['mb_no','warehousing'])->where('wr_type','=','List')->orderBy('wr_no', 'DESC');
+
             if($warehousing){
-                $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no'])->orwhere('w_no', '=', $warehousing->w_import_no);
+                if(isset($validated['w_category_name']) && $validated['w_category_name'] == '수입풀필먼트'){
+                    $warehousing_request = $warehousing_request->where('ss_no', '=', $validated['w_no'])->orwhere('w_no', '=', $warehousing->w_import_no);
+                }elseif(isset($validated['w_category_name']) && $validated['w_category_name'] == '유통가공'){
+                    $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no'])->orwhere('w_no', '=', $warehousing->w_import_no);
+                }else{
+                    $warehousing_request = $warehousing_request->where('is_no', '=', $validated['w_no'])->orwhere('w_no', '=', $warehousing->w_import_no);
+                }
+                //->orwhere('w_no', '=', $warehousing->w_import_no);
             }else{
-                $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no']);
+                if(isset($validated['w_category_name']) && $validated['w_category_name'] == '수입풀필먼트'){
+                    $warehousing_request = $warehousing_request->where('ss_no', '=', $validated['w_no']);
+                }elseif(isset($validated['w_category_name']) && $validated['w_category_name'] == '유통가공'){
+                    $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no']);
+                }else{
+                    $warehousing_request = $warehousing_request->where('is_no', '=', $validated['w_no']);
+                }
             }
+            // if($warehousing){
+            //     $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no'])->orwhere('w_no', '=', $warehousing->w_import_no);
+            // }else{
+            //     $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no']);
+            // }
 
             $warehousing_request = $warehousing_request->first();
 

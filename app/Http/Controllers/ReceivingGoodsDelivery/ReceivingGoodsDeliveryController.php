@@ -1313,7 +1313,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                 if ($request->wr_contents) {
                     WarehousingRequest::insert([
-                        'w_no' => $request->ss_no,
+                        'ss_no' => $request->ss_no,
                         'mb_no' => $member->mb_no,
                         'wr_contents' => $request->wr_contents,
                         'wr_type' => 'IW',
@@ -2344,8 +2344,8 @@ class ReceivingGoodsDeliveryController extends Controller
                     $w_no_alert->w_category_name = '보세화물';
 
                     $w_no_alert->company = (object)$request->company;
-                    $w_no_alert->company->co_parent = (object)$request->company['co_parent'];
-                    $w_no_alert->company->co_parent->co_parent = (object)$w_no_alert->company->co_parent->co_parent;
+                    $w_no_alert->company->co_parent = isset($request->company['co_parent']) ? (object)$request->company['co_parent'] : null;
+                    $w_no_alert->company->co_parent->co_parent = isset($w_no_alert->company->co_parent->co_parent) ? (object)$w_no_alert->company->co_parent->co_parent : null;
 
                     $rgd_status3  = isset($rgd['rgd_status3']) ? $rgd['rgd_status3'] : null;
 
@@ -2421,7 +2421,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         ]);
                     } else {
                         WarehousingRequest::insert([
-                            'w_no' => $validated['is_no'],
+                            'is_no' => $validated['is_no'],
                             'wr_type' => "IW",
                             'mb_no' => $member->mb_no,
                             'wr_contents' => $validated['wr_contents'],
@@ -2510,7 +2510,7 @@ class ReceivingGoodsDeliveryController extends Controller
             if ($validated['wr_contents'] && $validated['is_no']) {
                 WarehousingRequest::insert([
                     'wr_type' => "IW",
-                    'w_no' => $validated['is_no'],
+                    'is_no' => $validated['is_no'],
                     'mb_no' => $member->mb_no,
                     'wr_contents' => $validated['wr_contents'],
                 ]);

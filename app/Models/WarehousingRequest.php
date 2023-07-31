@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use DateTimeInterface;
 use App\Models\Member;
 use App\Models\Warehousing;
+use App\Models\ScheduleShipment;
 class WarehousingRequest extends Model
 {
     use HasFactory;
@@ -50,5 +51,10 @@ class WarehousingRequest extends Model
     public function warehousing()
     {
         return $this->belongsTo(Warehousing::class, 'w_no', 'w_no')->with('w_import_parent');
+    }
+
+    public function shedule_shipment()
+    {
+        return $this->belongsTo(ScheduleShipment::class, 'w_no', 'ss_no');
     }
 }
