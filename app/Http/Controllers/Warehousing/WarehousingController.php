@@ -1205,13 +1205,29 @@ class WarehousingController extends Controller
             $rows_number_item_add = 0;
             $check_error = false;
             $test_i = [];
+            if(Auth::user()->mb_type == "spasys"){
+                $company = Company::with(["co_parent"])->where("co_type", "shipper")->where(function ($query) {
+                    $query->whereHas('co_parent.co_parent', function ($q) {
+                        $q->where('co_no', Auth::user()->co_no);
+                    });
+                })->get();
+            }elseif(Auth::user()->mb_type == "shop"){
+                $company = Company::with(["co_parent"])->where("co_type", "shipper")->where(function ($query) {
+                    $query->whereHas('co_parent', function ($q) {
+                        $q->where('co_no', Auth::user()->co_no);
+                    });
+                })->get();
+            }else{
+                $company = Company::with(["co_parent"])->where("co_type", "shipper")->where("co_no", Auth::user()->co_no)->get();
+            }
             
+
+            //return $company;
             foreach ($warehousing_data as $key => $warehouse) {
                 if ($key < 2) {
                     continue;
                 }
-
-                //return $warehousing_data;
+             
                 $validator = Validator::make($warehouse, WarehousingDataValidate::rules());
                 if ($validator->fails()) {
                     $errors[$sheet->getTitle()][] = $validator->errors();
@@ -1219,6 +1235,8 @@ class WarehousingController extends Controller
 
                     return $errors;
                 } else {
+                    $excel_co = Company::where("co_name", $warehouse['B'])->first();
+                   
                     if(isset($warehouse['I']) && $warehouse['I']){
                         $item = Item::with(['company'])->where('item_service_name', '유통가공')->where('item_name', $warehouse['G'])->where('item_option2', $warehouse['I']);
                     }else{

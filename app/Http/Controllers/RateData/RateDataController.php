@@ -2949,7 +2949,11 @@ class RateDataController extends Controller
                     ->where(\DB::raw('substr(rgd_settlement_number, -1)'), '=', $word_type)
                     ->orderBy('rgd_no', 'DESC')
                     ->first();
-                    $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+                    if(isset($count->rgd_no)){
+                        $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+                    }else {
+                        $count = 1;
+                    }
                 }else if($word_type == 'CF' || $word_type == 'MF'){
                     $count = ReceivingGoodsDelivery::select(DB::raw('receiving_goods_delivery.*'))
                     ->whereNotNull('rgd_settlement_number')
@@ -2958,7 +2962,11 @@ class RateDataController extends Controller
                     ->where(\DB::raw('substr(rgd_settlement_number, -2)'), '=', $word_type)
                     ->orderBy('rgd_no', 'DESC')
                     ->first();
-                    $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+                    if(isset($count->rgd_no)){
+                        $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+                    }else {
+                        $count = 1;
+                    }
                 }
                
                 if($count >= 0  && $count < 10){
@@ -3817,7 +3825,11 @@ class RateDataController extends Controller
                     ->where(\DB::raw('substr(rgd_settlement_number, -1)'), '=', $word_type)
                     ->orderBy('rgd_no', 'DESC')
                     ->first();
-                    $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+                    if(isset($count->rgd_no)){
+                        $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+                    }else {
+                        $count = 1;
+                    }
                 }else if($word_type == 'CF' || $word_type == 'MF'){
                     $count = ReceivingGoodsDelivery::select(DB::raw('receiving_goods_delivery.*'))
                     ->whereNotNull('rgd_settlement_number')
@@ -3826,7 +3838,11 @@ class RateDataController extends Controller
                     ->where(\DB::raw('substr(rgd_settlement_number, -2)'), '=', $word_type)
                     ->orderBy('rgd_no', 'DESC')
                     ->first();
-                    $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+                    if(isset($count->rgd_no)){
+                        $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+                    }else {
+                        $count = 1;
+                    }
                 }
                
                 if($count >= 0  && $count < 10){
@@ -4157,7 +4173,11 @@ class RateDataController extends Controller
                 ->where(\DB::raw('substr(rgd_settlement_number, -1)'), '=', $word_type)
                 ->orderBy('rgd_no', 'DESC')
                 ->first();
-                $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+                if(isset($count->rgd_no)){
+                        $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+                    }else {
+                        $count = 1;
+                    }
             }else if($word_type == 'CF' || $word_type == 'MF'){
                 $count = ReceivingGoodsDelivery::select(DB::raw('receiving_goods_delivery.*'))
                 ->whereNotNull('rgd_settlement_number')
@@ -4166,7 +4186,11 @@ class RateDataController extends Controller
                 ->where(\DB::raw('substr(rgd_settlement_number, -2)'), '=', $word_type)
                 ->orderBy('rgd_no', 'DESC')
                 ->first();
-                $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+                if(isset($count->rgd_no)){
+                        $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+                    }else {
+                        $count = 1;
+                    }
             }
            
             if($count >= 0  && $count < 10){
@@ -4583,7 +4607,11 @@ class RateDataController extends Controller
                     ->where(\DB::raw('substr(rgd_settlement_number, -1)'), '=', $word_type)
                     ->orderBy('rgd_no', 'DESC')
                     ->first();
-                    $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+                    if(isset($count->rgd_no)){
+                        $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+                    }else {
+                        $count = 1;
+                    }
                 }else if($word_type == 'CF' || $word_type == 'MF'){
                     $count = ReceivingGoodsDelivery::select(DB::raw('receiving_goods_delivery.*'))
                     ->whereNotNull('rgd_settlement_number')
@@ -4592,7 +4620,11 @@ class RateDataController extends Controller
                     ->where(\DB::raw('substr(rgd_settlement_number, -2)'), '=', $word_type)
                     ->orderBy('rgd_no', 'DESC')
                     ->first();
-                    $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+                    if(isset($count->rgd_no)){
+                        $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+                    }else {
+                        $count = 1;
+                    }
                 }
                
                 if($count >= 0  && $count < 10){
@@ -4882,7 +4914,12 @@ class RateDataController extends Controller
                     ->where(\DB::raw('substr(rgd_settlement_number, -1)'), '=', $word_type)
                     ->orderBy('rgd_no', 'DESC')
                     ->first();
-                    $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+                    if(isset($count->rgd_no)){
+                        $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+                    }else {
+                        $count = 1;
+                    }
+                    
                 }else if($word_type == 'CF' || $word_type == 'MF'){
                     $count = ReceivingGoodsDelivery::select(DB::raw('receiving_goods_delivery.*'))
                     ->whereNotNull('rgd_settlement_number')
@@ -4891,7 +4928,11 @@ class RateDataController extends Controller
                     ->where(\DB::raw('substr(rgd_settlement_number, -2)'), '=', $word_type)
                     ->orderBy('rgd_no', 'DESC')
                     ->first();
-                    $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+                    if(isset($count->rgd_no)){
+                        $count = substr($count->rgd_settlement_number, 7, 5) + 1;
+                    }else {
+                        $count = 1;
+                    }
                 }
                
                 if($count >= 0  && $count < 10){
