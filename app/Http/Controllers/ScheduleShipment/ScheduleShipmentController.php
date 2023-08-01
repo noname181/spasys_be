@@ -476,7 +476,7 @@ class ScheduleShipmentController extends Controller
                         //if(isset($schedule_item['status']) && $schedule_item['status'] == 8){
                             
             
-                            $order_cs_status = "출고";
+                            $order_cs_status = "출고예정";
 
                             foreach ($check as $key => $c) {
 
@@ -490,12 +490,12 @@ class ScheduleShipmentController extends Controller
                                     //     }
                                     // }
                             
-                                    if ($order_cs_status == "출고") {
+                                    if ($order_cs_status == "출고예정") {
                                         if (count($check) > 1 && ($c->order_cs == "1" || $c->order_cs == "2" || $c->order_cs == "7")) {
                                             $order_cs_status = "출고예정 취소";
                                         } else {
                                             if ($c->order_cs == "1") {
-                                                $order_cs_status = "출고예정";
+                                                $order_cs_status = "출고";
                                             } else if ($c->order_cs == "2") { 
                                                 $order_cs_status = "출고예정 취소";
                                             }
