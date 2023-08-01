@@ -473,63 +473,63 @@ class ScheduleShipmentController extends Controller
                         //     return count($check);
                         // }
                         
-                        if(isset($schedule_item['status']) && $schedule_item['status'] == 8){
+                        //if(isset($schedule_item['status']) && $schedule_item['status'] == 8){
                             
             
                             $order_cs_status = "출고";
 
                             foreach ($check as $key => $c) {
 
-                                // if ($order_cs_status == "출고") {
-                                //     if ($c == end($check)) {
-                                //         if ($c->order_cs == "1") {
-                                //             $order_cs_status = "출고예정";
-                                //         } else if ($c->order_cs == "2") { 
-                                //             $order_cs_status = "출고예정 취소";
-                                //         }
-                                //     }
-                                // }
-                        
-                                if ($order_cs_status == "정상") {
-                                    if (count($check) > 1 && ($c->order_cs == "1" || $c->order_cs == "2" || $c->order_cs == "7")) {
-                                        $order_cs_status = "출고예정 취소";
-                                    } else {
-                                        if ($c->order_cs == "1") {
-                                            $order_cs_status = "출고예정";
-                                        } else if ($c->order_cs == "2") { 
+                                    // if ($order_cs_status == "출고") {
+                                    //     if ($c == end($check)) {
+                                    //         if ($c->order_cs == "1") {
+                                    //             $order_cs_status = "출고예정";
+                                    //         } else if ($c->order_cs == "2") { 
+                                    //             $order_cs_status = "출고예정 취소";
+                                    //         }
+                                    //     }
+                                    // }
+                            
+                                    if ($order_cs_status == "출고") {
+                                        if (count($check) > 1 && ($c->order_cs == "1" || $c->order_cs == "2" || $c->order_cs == "7")) {
                                             $order_cs_status = "출고예정 취소";
+                                        } else {
+                                            if ($c->order_cs == "1") {
+                                                $order_cs_status = "출고예정";
+                                            } else if ($c->order_cs == "2") { 
+                                                $order_cs_status = "출고예정 취소";
+                                            }
                                         }
                                     }
-                                }
-                        }
-                        }else{
-                            $order_cs_status = "정상";
-
-                            foreach ($check as $key => $c) {
-
-                                // if ($order_cs_status == "정상") {
-                                //     if ($c == end($check)) {
-                                //         if ($c->order_cs == "1") {
-                                //             $order_cs_status = "전체취소";
-                                //         } else if ($c->order_cs == "2") { 
-                                //             $order_cs_status = "부분취소";
-                                //         }
-                                //     }
-                                // }
-                        
-                                if ($order_cs_status == "정상") {
-                                    if (count($check) > 1 && ($c->order_cs == "1" || $c->order_cs == "2" || $c->order_cs == "7")) {
-                                        $order_cs_status = "부분취소";
-                                    }else{
-                                        if ($c->order_cs == "1") {
-                                            $order_cs_status = "전체취소";
-                                        } else if ($c->order_cs == "2") { 
-                                            $order_cs_status = "부분취소";
-                                        }
-                                    }
-                                }
                             }
-                        }
+                        // }else{
+                        //     $order_cs_status = "정상";
+
+                        //     foreach ($check as $key => $c) {
+
+                        //         // if ($order_cs_status == "정상") {
+                        //         //     if ($c == end($check)) {
+                        //         //         if ($c->order_cs == "1") {
+                        //         //             $order_cs_status = "전체취소";
+                        //         //         } else if ($c->order_cs == "2") { 
+                        //         //             $order_cs_status = "부분취소";
+                        //         //         }
+                        //         //     }
+                        //         // }
+                        
+                        //         if ($order_cs_status == "정상") {
+                        //             if (count($check) > 1 && ($c->order_cs == "1" || $c->order_cs == "2" || $c->order_cs == "7")) {
+                        //                 $order_cs_status = "부분취소";
+                        //             }else{
+                        //                 if ($c->order_cs == "1") {
+                        //                     $order_cs_status = "전체취소";
+                        //                 } else if ($c->order_cs == "2") { 
+                        //                     $order_cs_status = "부분취소";
+                        //                 }
+                        //             }
+                        //         }
+                        //     }
+                        // }
                         
 
                         ScheduleShipment::where(['ss_no' => $ss_no->ss_no])->update([
