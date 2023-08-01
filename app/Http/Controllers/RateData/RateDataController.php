@@ -2952,7 +2952,7 @@ class RateDataController extends Controller
                     if(isset($count->rgd_no)){
                         $count = substr($count->rgd_settlement_number, 7, 5) + 1;
                     }else {
-                        $count = '00001';
+                        $count = 1;
                     }
                 }else if($word_type == 'CF' || $word_type == 'MF'){
                     $count = ReceivingGoodsDelivery::select(DB::raw('receiving_goods_delivery.*'))
@@ -2965,7 +2965,7 @@ class RateDataController extends Controller
                     if(isset($count->rgd_no)){
                         $count = substr($count->rgd_settlement_number, 7, 5) + 1;
                     }else {
-                        $count = '00001';
+                        $count = 1;
                     }
                 }
                
@@ -3828,7 +3828,7 @@ class RateDataController extends Controller
                     if(isset($count->rgd_no)){
                         $count = substr($count->rgd_settlement_number, 7, 5) + 1;
                     }else {
-                        $count = '00001';
+                        $count = 1;
                     }
                 }else if($word_type == 'CF' || $word_type == 'MF'){
                     $count = ReceivingGoodsDelivery::select(DB::raw('receiving_goods_delivery.*'))
@@ -3841,7 +3841,7 @@ class RateDataController extends Controller
                     if(isset($count->rgd_no)){
                         $count = substr($count->rgd_settlement_number, 7, 5) + 1;
                     }else {
-                        $count = '00001';
+                        $count = 1;
                     }
                 }
                
@@ -4176,7 +4176,7 @@ class RateDataController extends Controller
                 if(isset($count->rgd_no)){
                         $count = substr($count->rgd_settlement_number, 7, 5) + 1;
                     }else {
-                        $count = '00001';
+                        $count = 1;
                     }
             }else if($word_type == 'CF' || $word_type == 'MF'){
                 $count = ReceivingGoodsDelivery::select(DB::raw('receiving_goods_delivery.*'))
@@ -4189,7 +4189,7 @@ class RateDataController extends Controller
                 if(isset($count->rgd_no)){
                         $count = substr($count->rgd_settlement_number, 7, 5) + 1;
                     }else {
-                        $count = '00001';
+                        $count = 1;
                     }
             }
            
@@ -4610,7 +4610,7 @@ class RateDataController extends Controller
                     if(isset($count->rgd_no)){
                         $count = substr($count->rgd_settlement_number, 7, 5) + 1;
                     }else {
-                        $count = '00001';
+                        $count = 1;
                     }
                 }else if($word_type == 'CF' || $word_type == 'MF'){
                     $count = ReceivingGoodsDelivery::select(DB::raw('receiving_goods_delivery.*'))
@@ -4623,7 +4623,7 @@ class RateDataController extends Controller
                     if(isset($count->rgd_no)){
                         $count = substr($count->rgd_settlement_number, 7, 5) + 1;
                     }else {
-                        $count = '00001';
+                        $count = 1;
                     }
                 }
                
@@ -4917,7 +4917,7 @@ class RateDataController extends Controller
                     if(isset($count->rgd_no)){
                         $count = substr($count->rgd_settlement_number, 7, 5) + 1;
                     }else {
-                        $count = '00001';
+                        $count = 1;
                     }
                     
                 }else if($word_type == 'CF' || $word_type == 'MF'){
@@ -4931,7 +4931,7 @@ class RateDataController extends Controller
                     if(isset($count->rgd_no)){
                         $count = substr($count->rgd_settlement_number, 7, 5) + 1;
                     }else {
-                        $count = '00001';
+                        $count = 1;
                     }
                 }
                
