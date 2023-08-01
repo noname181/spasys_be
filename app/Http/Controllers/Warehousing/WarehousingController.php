@@ -1221,8 +1221,12 @@ class WarehousingController extends Controller
                 $company = Company::with(["co_parent"])->where("co_type", "shipper")->where("co_no", Auth::user()->co_no)->get();
             }
             
+            $company_shipper = [];
+            foreach($company as $co){
+                $company_shipper[] = $co->co_no;
+            }
 
-            //return $company;
+            
             foreach ($warehousing_data as $key => $warehouse) {
                 if ($key < 2) {
                     continue;
@@ -1235,8 +1239,8 @@ class WarehousingController extends Controller
 
                     return $errors;
                 } else {
-                    $excel_co = Company::where("co_name", $warehouse['B'])->first();
-                   
+                    
+                    //return $excel_company;
                     if(isset($warehouse['I']) && $warehouse['I']){
                         $item = Item::with(['company'])->where('item_service_name', '유통가공')->where('item_name', $warehouse['G'])->where('item_option2', $warehouse['I']);
                     }else{
@@ -1274,87 +1278,94 @@ class WarehousingController extends Controller
                 }
                 $check_key++;
             }
-            //return $test_i;
+            
             foreach ($test_i as $key => $value) {
+                
                     $strArray = explode(',', $key);
                     $w_schedule_day = date('Y-m-d', strtotime(str_replace('.', '-', $strArray[1])));
-                   
-                    $rows_warehousing_add = $rows_warehousing_add + 1;
-                    $warehousing_id = Warehousing::insertGetId([
-                        'mb_no' => Auth::user()->mb_no,
-                        
-                        'w_type' => 'IW',
-                        'w_category_name' => '유통가공',
-                        'mb_no' => $member->mb_no,
-                        'co_no' => $value[0]['company']['co_no'],
-                        'w_schedule_day' => $w_schedule_day,
-                        'w_cancel_yn' => 'n',
-                    ]);
-                    if ($warehousing_id) {
-                        ReceivingGoodsDelivery::insert([
-                            'mb_no' => $member->mb_no,
-                            'w_no' => $warehousing_id,
-                            'service_korean_name' => '유통가공',
-                            // 'rgd_contents' => $warehouse['C'],
-                            // 'rgd_address' => $warehouse['D'],
-                            // 'rgd_address_detail' => $warehouse['E'],
-                            // 'rgd_receiver' => $warehouse['F'],
-                            // 'rgd_hp' => $warehouse['G'],
-                            // 'rgd_memo' => $warehouse['H'],
-                            'rgd_status1' => '입고예정',
-                            'rgd_status2' => '작업대기',
-                            'rgd_status3' => '배송준비',
-                            'rgd_delivery_company' => '택배',
-                            'rgd_delivery_schedule_day' => date('Y-m-d'),
-                            'rgd_arrive_day' => date('Y-m-d'),
-                        ]);
 
-                        $w_amount = 0;
-                        foreach ($value as $warehousing_item) {
-                            WarehousingItem::insert([
-                                'item_no' => $warehousing_item['item_no'],
+                    $excel_company = Company::where("co_name", $strArray[0])->whereIn('co_no', $company_shipper)->first();
+
+
+                    
+                    if($excel_company){
+                        $rows_warehousing_add = $rows_warehousing_add + 1;
+                        $warehousing_id = Warehousing::insertGetId([
+                            'mb_no' => Auth::user()->mb_no,
+                            
+                            'w_type' => 'IW',
+                            'w_category_name' => '유통가공',
+                            'mb_no' => $member->mb_no,
+                            'co_no' => $value[0]['company']['co_no'],
+                            'w_schedule_day' => $w_schedule_day,
+                            'w_cancel_yn' => 'n',
+                        ]);
+                        if ($warehousing_id) {
+                            ReceivingGoodsDelivery::insert([
+                                'mb_no' => $member->mb_no,
                                 'w_no' => $warehousing_id,
-                                'wi_number' => isset($warehousing_item['wi_number']) ? $warehousing_item['wi_number'] : null,
-                                'wi_type' => '입고_shipper'
+                                'service_korean_name' => '유통가공',
+                                // 'rgd_contents' => $warehouse['C'],
+                                // 'rgd_address' => $warehouse['D'],
+                                // 'rgd_address_detail' => $warehouse['E'],
+                                // 'rgd_receiver' => $warehouse['F'],
+                                // 'rgd_hp' => $warehouse['G'],
+                                // 'rgd_memo' => $warehouse['H'],
+                                'rgd_status1' => '입고예정',
+                                'rgd_status2' => '작업대기',
+                                'rgd_status3' => '배송준비',
+                                'rgd_delivery_company' => '택배',
+                                'rgd_delivery_schedule_day' => date('Y-m-d'),
+                                'rgd_arrive_day' => date('Y-m-d'),
                             ]);
 
-                            // WarehousingItem::insert([
-                            //     'item_no' => $warehousing_item['item_no'],
-                            //     'w_no' => $warehousing_id,
-                            //     'wi_number' => isset($warehousing_item['wi_number']) ? $warehousing_item['wi_number'] : null,
-                            //     'wi_type' => '입고_spasys'
-                            // ]);
-                            $w_amount += $warehousing_item['wi_number'];
+                            $w_amount = 0;
+                            foreach ($value as $warehousing_item) {
+                                WarehousingItem::insert([
+                                    'item_no' => $warehousing_item['item_no'],
+                                    'w_no' => $warehousing_id,
+                                    'wi_number' => isset($warehousing_item['wi_number']) ? $warehousing_item['wi_number'] : null,
+                                    'wi_type' => '입고_shipper'
+                                ]);
+
+                                // WarehousingItem::insert([
+                                //     'item_no' => $warehousing_item['item_no'],
+                                //     'w_no' => $warehousing_id,
+                                //     'wi_number' => isset($warehousing_item['wi_number']) ? $warehousing_item['wi_number'] : null,
+                                //     'wi_type' => '입고_spasys'
+                                // ]);
+                                $w_amount += $warehousing_item['wi_number'];
+                            }
+                            $schedule_number = 'SPA_' . date('Ymd') . ((int) $warehousing_id) . '_IW';
+                            Warehousing::Where('w_no', $warehousing_id)->update([
+                                'w_schedule_number' => $schedule_number,
+                                'w_schedule_amount' =>  $w_amount,
+                                'w_amount' =>  0,
+
+                            ]);
+                            // foreach ($warehousing_item_data as $key => $warehouse_item) {
+                            //     if ($key <= 2) {
+                            //         continue;
+                            //     }
+
+                            //     $validator_item = Validator::make($warehouse_item, WarehousingItemValidate::rules());
+                            //     if ($validator_item->fails()) {
+                            //         $errors[$sheet->getTitle()][] = $validator_item->errors();
+                            //         $check_error = true;
+                            //     } else {
+                            //         if ($warehouse['A'] === $warehouse_item['A']) {
+                            //             $rows_number_item_add = $rows_number_item_add + 1;
+                            //             $item_no = WarehousingItem::insert([
+                            //                 'item_no' => $warehouse_item['B'],
+                            //                 'w_no' => $warehousing_id,
+                            //                 'wi_number' => $warehouse_item['C'],
+                            //                 'wi_type' => '입고_shipper',
+                            //             ]);
+                            //         }
+                            //     }
+                            // }
                         }
-                        $schedule_number = 'SPA_' . date('Ymd') . ((int) $warehousing_id) . '_IW';
-                        Warehousing::Where('w_no', $warehousing_id)->update([
-                            'w_schedule_number' => $schedule_number,
-                            'w_schedule_amount' =>  $w_amount,
-                            'w_amount' =>  0,
-
-                        ]);
-                        // foreach ($warehousing_item_data as $key => $warehouse_item) {
-                        //     if ($key <= 2) {
-                        //         continue;
-                        //     }
-
-                        //     $validator_item = Validator::make($warehouse_item, WarehousingItemValidate::rules());
-                        //     if ($validator_item->fails()) {
-                        //         $errors[$sheet->getTitle()][] = $validator_item->errors();
-                        //         $check_error = true;
-                        //     } else {
-                        //         if ($warehouse['A'] === $warehouse_item['A']) {
-                        //             $rows_number_item_add = $rows_number_item_add + 1;
-                        //             $item_no = WarehousingItem::insert([
-                        //                 'item_no' => $warehouse_item['B'],
-                        //                 'w_no' => $warehousing_id,
-                        //                 'wi_number' => $warehouse_item['C'],
-                        //                 'wi_type' => '입고_shipper',
-                        //             ]);
-                        //         }
-                        //     }
-                        // }
-                    }
+                    }     
             }
 
             if ($check_error == true) {
