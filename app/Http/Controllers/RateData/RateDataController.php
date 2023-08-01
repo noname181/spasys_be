@@ -11268,6 +11268,9 @@ class RateDataController extends Controller
         $rate_data_send_meta = $this->getRateDataRaw($rm_no, $rmd_last['rmd_no']);
         $rmd = RateMetaData::where('rm_no', $rm_no)->first();
         $rate_meta = RateMeta::where('rm_no',$rm_no)->first();
+        $member = Member::where('mb_no',$rmd_last->mb_no)->first();
+        $co_info = Company::where('co_no',$member->co_no)->first();
+   
           // $Excel_writer = new Xlsx($spreadsheet);
           if (isset($user->mb_no)) {
             $path = 'storage/download/' . $user->mb_no . '/';
@@ -11393,7 +11396,8 @@ class RateDataController extends Controller
         'count_service3_1'=>$count_service3_1,'count_service3_2'=>$count_service3_2,'count_service3_3'=>$count_service3_3,
         'rm_biz_name'=>$rate_meta['rm_biz_name'],'rm_biz_number'=>$rate_meta['rm_biz_number'],'rm_biz_address'=>$rate_meta['rm_biz_address'],
         'rm_owner_name'=>$rate_meta['rm_owner_name'],'rm_biz_email'=>$rate_meta['rm_biz_email'],'rmd_mail_detail1a'=>nl2br($rmd_last['rmd_mail_detail1a']),
-        'rmd_mail_detail1b'=>nl2br($rmd_last['rmd_mail_detail1b']),'rmd_mail_detail1c'=>nl2br($rmd_last['rmd_mail_detail1c'])
+        'rmd_mail_detail1b'=>nl2br($rmd_last['rmd_mail_detail1b']),'rmd_mail_detail1c'=>nl2br($rmd_last['rmd_mail_detail1c']),
+        'co_name'=>$co_info['co_name'],'co_address'=>$co_info['co_address'],'co_address_detail'=>$co_info['co_address_detail'],'co_tel'=>$co_info['co_tel'],'co_email'=>$co_info['co_email'],'date'=>Date('Y-m-d',strtotime($rmd_last['created_at']))
         ]);
         $pdf->save($file_name_download);
         return response()->json([
@@ -11412,6 +11416,8 @@ class RateDataController extends Controller
         $co_no = Auth::user()->co_no;
         $rmd_last = RateMetaData::where('rm_no', $rm_no)->orderBy('rmd_no','desc')->first();
         $rate_data_send_meta = $this->getRateDataRaw($rm_no, $rmd_last['rmd_no']);
+        $member = Member::where('mb_no',$rmd_last->mb_no)->first();
+        $co_info = Company::where('co_no',$member->co_no)->first();
         DB::commit();
         $user = Auth::user();
         $rate_meta = RateMeta::where('rm_no',$rm_no)->first();
@@ -11420,7 +11426,7 @@ class RateDataController extends Controller
         $spreadsheet->getDefaultStyle()->getFont()->setSize(10);
         $sheet = $spreadsheet->getActiveSheet(0);
         $sheet->getDefaultColumnDimension()->setWidth(4.5);
-        $spreadsheet->getActiveSheet()->getProtection()->setSheet(true);
+        $spreadsheet->getActiveSheet()->getProtection()->setSheet(false);
         $sheet->getColumnDimension('B')->setWidth(16);
         $sheet->getColumnDimension('C')->setWidth(12);
         $sheet->getStyle('A1:Z200')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
@@ -11447,6 +11453,7 @@ class RateDataController extends Controller
         if (!empty($rate_data_send_meta['rate_data1']) && count($rate_data_send_meta['rate_data1']) > 0) {
             $table1 = 0;
             $table2 = 0;
+            $table3 = 0;
             for($i = 0; $i < 3;$i++){
                 if($i == 0){
                     $line1 = 'B13';
@@ -11458,11 +11465,11 @@ class RateDataController extends Controller
                     
                 } else if($i == 1){
                     if($table1 > 0){
-                        $line1 = 'B29';
-                        $line2 = 'Z29';
-                        $title1 = 30;
-                        $title2 = 31;
-                        $line3 = [32,33,34,35,36,37,38,39,40,41,42,43];
+                        $line1 = 'B36';
+                        $line2 = 'Z36';
+                        $title1 = 37;
+                        $title2 = 38;
+                        $line3 = [39,40,41,42,43,44,45,46,47,48,49,50];
                     } else {
                         $line1 = 'B13';
                         $line2 = 'Z13';
@@ -11475,12 +11482,12 @@ class RateDataController extends Controller
                  
                 } else if($i == 2){
                     if($table2 > 0 && $table1 > 0){
-                    $line1 = 'B45';
-                    $line2 = 'Z45';
-                    $title1 = 46;
-                    $title2 = 47;
+                    $line1 = 'B59';
+                    $line2 = 'Z59';
+                    $title1 = 60;
+                    $title2 = 61;
                     $content_line1 = '서비스: 보세화물 (위험물)';
-                    $line3 = [48,49,50,51,52,53,54,55,56,57,58,59];
+                    $line3 = [62,63,64,65,66,67,68,69,70,71,72,73];
                     } else if($table2 == 0 && $table1 == 0){
                         $line1 = 'B13';
                         $line2 = 'Z13';
@@ -11489,11 +11496,11 @@ class RateDataController extends Controller
                         $content_line1 = '서비스: 보세화물 (위험물)';
                         $line3 = [16,17,18,19,20,21,22,23,24,25,26,27];
                     } else {
-                        $line1 = 'B29';
-                        $line2 = 'Z29';
-                        $title1 = 30;
-                        $title2 = 31;
-                        $line3 = [32,33,34,35,36,37,38,39,40,41,42,43];
+                        $line1 = 'B36';
+                        $line2 = 'Z36';
+                        $title1 = 37;
+                        $title2 = 38;
+                        $line3 = [39,40,41,42,43,44,45,46,47,48,49,50];
                         $content_line1 = '서비스: 보세화물 (위험물)';
                     }
                 }
@@ -12078,7 +12085,7 @@ class RateDataController extends Controller
                     }  else if($i == 2){
                         $data1 = 0;
                         if($count != 0){
-                    
+                            $table3 = 1;
                             $sheet->mergeCells('G'. ($title2). ':K'. ($title2));
                             $sheet->getStyle('G'. ($title2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                             $sheet->setCellValue('G'. ($title2), '항목');
@@ -12156,7 +12163,7 @@ class RateDataController extends Controller
                             $data1 = 1;
                         }
                         if($count5 < 3 || $count4 != 2){
-                         
+                            $table3 = 1;
                             if($count5 == 3){
                                 $count5 = 4;
                             }
@@ -12198,6 +12205,39 @@ class RateDataController extends Controller
                             $sheet->setCellValue('V'. ($line3[8]-$count3-$data1-$count4), '할증료율(24시간 경과)');
                             }
                         }
+                    }
+                    if(($i == 0 && $table1 == 1 ) || ($i == 1 && $table2 == 1 ) || ($i == 2 && $table3 == 1 ) ){
+                        $sheet->getStyle('B'. ($line3[11]-$count3-$data-$count4-$count5 + 2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT)->setWrapText(true);
+                        $sheet->getStyle('B'. ($line3[11]-$count3-$data-$count4-$count5 + 2). ':Z'. ($line3[11]-$count3-$data-$count4-$count5 + 7))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+                        $sheet->getStyle('B'. ($line3[11]-$count3-$data-$count4-$count5 + 2). ':Z'. ($line3[11]-$count3-$data-$count4-$count5 + 7))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('EDEDED'));
+                        $sheet->mergeCells('B'. ($line3[11]-$count3-$data-$count4-$count5 + 2). ':Z'. ($line3[11]-$count3-$data-$count4-$count5 + 7));
+                        if($i == 0){
+                            $sheet->setCellValue('B'. ($line3[11]-$count3-$data-$count4-$count5 + 2),$rmd_last['rmd_mail_detail1a'] );
+                        }
+                        if($i == 1){
+                            $sheet->setCellValue('B'. ($line3[11]-$count3-$data-$count4-$count5 + 2),$rmd_last['rmd_mail_detail1b'] );
+                        }
+                        if($i == 2){
+                            
+                            $sheet->setCellValue('B'. ($line3[11]-$count3-$data-$count4-$count5 + 2),$rmd_last['rmd_mail_detail1c'] );
+                        }
+                    }
+                    if($i == 2){
+                        $sheet->setCellValue('B'. ($line3[11]-$count3-$data-$count4-$count5 + 9), '1 이 요율표의 유효기간은 제출일자로부터 1개월 입니다.');
+                        $sheet->setCellValue('B'. ($line3[11]-$count3-$data-$count4-$count5 + 10), '2 이 견적 금액은 부가가치세 별도 금액입니다.');
+                        $sheet->setCellValue('B'. ($line3[11]-$count3-$data-$count4-$count5 + 11), '3 상세 업무 내역에 따라 제공 요율은 변경될 수 있습니다.');
+                        // $sheet->getStyle('B'. ($line3[11]-$count3-$data-$count4-$count5 + 5). ':Z'. ($line3[11]-$count3-$data-$count4-$count5 + 9))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('EDEDED'));
+                        $sheet->getStyle('B'. ($line3[11]-$count3-$data-$count4-$count5 + 13). ':Z'. ($line3[11]-$count3-$data-$count4-$count5 + 17))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+                        $sheet->mergeCells('B'. ($line3[11]-$count3-$data-$count4-$count5 + 13). ':Z'. ($line3[11]-$count3-$data-$count4-$count5 + 13));
+                        $sheet->setCellValue('B'. ($line3[11]-$count3-$data-$count4-$count5 + 13), $co_info->co_name);
+                        $sheet->mergeCells('B'. ($line3[11]-$count3-$data-$count4-$count5 + 14). ':Z'. ($line3[11]-$count3-$data-$count4-$count5 + 14));
+                        $sheet->setCellValue('B'. ($line3[11]-$count3-$data-$count4-$count5 + 14), $co_info->co_address . ' ' . $co_info->co_address_detail);
+                        $sheet->mergeCells('B'. ($line3[11]-$count3-$data-$count4-$count5 + 15). ':Z'. ($line3[11]-$count3-$data-$count4-$count5 + 15));
+                        $sheet->setCellValue('B'. ($line3[11]-$count3-$data-$count4-$count5 + 15), $co_info->co_tel);
+                        $sheet->mergeCells('B'. ($line3[11]-$count3-$data-$count4-$count5 + 16). ':Z'. ($line3[11]-$count3-$data-$count4-$count5 + 16));
+                        $sheet->setCellValue('B'. ($line3[11]-$count3-$data-$count4-$count5 + 16), $co_info->co_email);
+                        $sheet->mergeCells('B'. ($line3[11]-$count3-$data-$count4-$count5 + 17). ':Z'. ($line3[11]-$count3-$data-$count4-$count5 + 17));
+                        $sheet->setCellValue('B'. ($line3[11]-$count3-$data-$count4-$count5 + 17), Date('Y-m-d',strtotime($rmd_last->created_at)));
                     }
             }
 
@@ -12333,6 +12373,23 @@ class RateDataController extends Controller
                 $sheet->getStyle('B'. ($current_row + $count1 + $count2))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 $sheet->setCellValue('B'. ($current_row + $count1 + $count2), '라벨');
             }
+
+                       
+            $sheet->setCellValue('B'. ($current_row+$count1+$count2 + $count3 + $count4 +  1), '1 이 요율표의 유효기간은 제출일자로부터 1개월 입니다.');
+            $sheet->setCellValue('B'. ($current_row+$count1+$count2 + $count3 + $count4 + 2), '2 이 견적 금액은 부가가치세 별도 금액입니다.');
+            $sheet->setCellValue('B'. ($current_row+$count1+$count2 + $count3 + $count4 + 3), '3 상세 업무 내역에 따라 제공 요율은 변경될 수 있습니다.');
+            // $sheet->getStyle('B'. ($current_row+$count1+$count2 + $count3 + $count4 + 5). ':Z'. ($current_row+$count1+$count2 + $count3 + $count4 + 9))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('EDEDED'));
+            $sheet->getStyle('B'. ($current_row+$count1+$count2 + $count3 + $count4 + 5). ':R'. ($current_row+$count1+$count2 + $count3 + $count4 + 9))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+            $sheet->mergeCells('B'. ($current_row+$count1+$count2 + $count3 + $count4 + 5). ':Z'. ($current_row+$count1+$count2 + $count3 + $count4 + 5));
+            $sheet->setCellValue('B'. ($current_row+$count1+$count2 + $count3 + $count4 + 5), $co_info->co_name);
+            $sheet->mergeCells('B'. ($current_row+$count1+$count2 + $count3 + $count4 + 6). ':Z'. ($current_row+$count1+$count2 + $count3 + $count4 + 6));
+            $sheet->setCellValue('B'. ($current_row+$count1+$count2 + $count3 + $count4 + 6), $co_info->co_address . ' ' . $co_info->co_address_detail);
+            $sheet->mergeCells('B'. ($current_row+$count1+$count2 + $count3 + $count4 + 7). ':Z'. ($current_row+$count1+$count2 + $count3 + $count4 + 7));
+            $sheet->setCellValue('B'. ($current_row+$count1+$count2 + $count3 + $count4 + 7), $co_info->co_tel);
+            $sheet->mergeCells('B'. ($current_row+$count1+$count2 + $count3 + $count4 + 8). ':Z'. ($current_row+$count1+$count2 + $count3 + $count4 + 8));
+            $sheet->setCellValue('B'. ($current_row+$count1+$count2 + $count3 + $count4 + 8), $co_info->co_email);
+            $sheet->mergeCells('B'. ($current_row+$count1+$count2 + $count3 + $count4 + 9). ':Z'. ($current_row+$count1+$count2 + $count3 + $count4 + 9));
+            $sheet->setCellValue('B'. ($current_row+$count1+$count2 + $count3 + $count4 + 9), Date('Y-m-d',strtotime($rmd_last->created_at)));
 
         }
         if (!empty($rate_data_send_meta['rate_data2']) && count($rate_data_send_meta['rate_data2']) > 0) {
@@ -12566,6 +12623,23 @@ class RateDataController extends Controller
                 $sheet->setCellValue('B'. ($current_row + $count1 + $count2  + $count3 + $count4 + $count5), '부자재');
             }
             
+    
+           
+            $sheet->setCellValue('B'. ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 1), '1 이 요율표의 유효기간은 제출일자로부터 1개월 입니다.');
+            $sheet->setCellValue('B'. ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 2), '2 이 견적 금액은 부가가치세 별도 금액입니다.');
+            $sheet->setCellValue('B'. ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 3), '3 상세 업무 내역에 따라 제공 요율은 변경될 수 있습니다.');
+            // $sheet->getStyle('B'. ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 5). ':Z'. ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 9))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('EDEDED'));
+            $sheet->getStyle('B'. ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 5). ':R'. ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 9))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+            $sheet->mergeCells('B'. ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 5). ':Z'. ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 5));
+            $sheet->setCellValue('B'. ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 5), $co_info->co_name);
+            $sheet->mergeCells('B'. ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 6). ':Z'. ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 6));
+            $sheet->setCellValue('B'. ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 6), $co_info->co_address . ' ' . $co_info->co_address_detail);
+            $sheet->mergeCells('B'. ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 7). ':Z'. ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 7));
+            $sheet->setCellValue('B'. ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 7), $co_info->co_tel);
+            $sheet->mergeCells('B'. ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 8). ':Z'. ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 8));
+            $sheet->setCellValue('B'. ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 8), $co_info->co_email);
+            $sheet->mergeCells('B'. ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 9). ':Z'. ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 9));
+            $sheet->setCellValue('B'. ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 9), Date('Y-m-d',strtotime($rmd_last->created_at)));
 
         }
 
