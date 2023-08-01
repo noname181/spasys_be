@@ -1284,5 +1284,24 @@
       <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>2 이 견적 금액은 부가가치세 별도 금액입니다.</p>
       <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>3 상세 업무 내역에 따라 제공 요율은 변경될 수 있습니다.</p>
       </div>
+      <div style="text-align:right">
+         @if($co_name)
+         <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_name}}</p>
+         @endif
+         @if($co_address && $co_address_detail)
+         <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address}}  {{$co_address_detail}}</p>
+         @elseif($co_address)
+         <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address}}</p>
+         @endif
+         @if($co_tel)
+         <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_tel}}</p>
+         @endif
+         @if($co_email)
+         <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_email}}</p>
+         @endif
+         @if($date)
+         <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$date}}</p>
+         @endif
+      </div>
    </body>
 </html>

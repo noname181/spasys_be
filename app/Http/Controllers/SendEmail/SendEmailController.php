@@ -89,8 +89,13 @@ class SendEmailController extends Controller
         $validated = $request->validated();
         DB::beginTransaction();
         $co_no = Auth::user()->co_no;
+       
+
         $rmd_last = RateMetaData::where('rm_no', $validated['rm_no'])->orderBy('rmd_no','desc')->first();
         $rate_data_send_meta = $this->getRateDataRaw($validated['rm_no'], $rmd_last['rmd_no']);
+
+        $member = Member::where('mb_no',$rmd_last->mb_no)->first();
+        $co_info = Company::where('co_no',$member->co_no)->first();
         DB::commit();
         $user = Auth::user();
         $rmd = RateMetaData::where('rm_no', $validated['rm_no'])->first();
@@ -343,7 +348,9 @@ class SendEmailController extends Controller
         'count_service2_4'=>$count_service2_4,'count_service2_5'=>$count_service2_5,'count_service2_6'=>$count_service2_6,
         'count_service3_1'=>$count_service3_1,'count_service3_2'=>$count_service3_2,'count_service3_3'=>$count_service3_3,
         'rm_biz_name'=>$rate_meta['rm_biz_name'],'rm_biz_number'=>$rate_meta['rm_biz_number'],'rm_biz_address'=>$rate_meta['rm_biz_address'],
-        'rm_owner_name'=>$rate_meta['rm_owner_name'],'rm_biz_email'=>$rate_meta['rm_biz_email']
+        'rm_owner_name'=>$rate_meta['rm_owner_name'],'rm_biz_email'=>$rate_meta['rm_biz_email'],'rmd_mail_detail1a'=>nl2br($rmd_last['rmd_mail_detail1a']),
+        'rmd_mail_detail1b'=>nl2br($rmd_last['rmd_mail_detail1b']),'rmd_mail_detail1c'=>nl2br($rmd_last['rmd_mail_detail1c']),
+        'co_name'=>$co_info['co_name'],'co_address'=>$co_info['co_address'],'co_address_detail'=>$co_info['co_address_detail'],'co_tel'=>$co_info['co_tel'],'co_email'=>$co_info['co_email'],'date'=>Date('Y-m-d',strtotime($rmd_last['created_at']))
         ]);
         $pdf->save($file_name_download);
         try {
