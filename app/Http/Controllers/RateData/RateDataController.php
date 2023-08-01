@@ -11351,7 +11351,8 @@ class RateDataController extends Controller
         'count_service2_4'=>$count_service2_4,'count_service2_5'=>$count_service2_5,'count_service2_6'=>$count_service2_6,
         'count_service3_1'=>$count_service3_1,'count_service3_2'=>$count_service3_2,'count_service3_3'=>$count_service3_3,
         'rm_biz_name'=>$rate_meta['rm_biz_name'],'rm_biz_number'=>$rate_meta['rm_biz_number'],'rm_biz_address'=>$rate_meta['rm_biz_address'],
-        'rm_owner_name'=>$rate_meta['rm_owner_name'],'rm_biz_email'=>$rate_meta['rm_biz_email']
+        'rm_owner_name'=>$rate_meta['rm_owner_name'],'rm_biz_email'=>$rate_meta['rm_biz_email'],'rmd_mail_detail1a'=>nl2br($rmd_last['rmd_mail_detail1a']),
+        'rmd_mail_detail1b'=>nl2br($rmd_last['rmd_mail_detail1b']),'rmd_mail_detail1c'=>nl2br($rmd_last['rmd_mail_detail1c'])
         ]);
         $pdf->save($file_name_download);
         return response()->json([
