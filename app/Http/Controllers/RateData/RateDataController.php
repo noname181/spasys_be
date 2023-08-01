@@ -2949,7 +2949,7 @@ class RateDataController extends Controller
                     ->where(\DB::raw('substr(rgd_settlement_number, -1)'), '=', $word_type)
                     ->orderBy('rgd_no', 'DESC')
                     ->first();
-                    if($count->rgd_no){
+                    if(isset($count->rgd_no)){
                         $count = substr($count->rgd_settlement_number, 7, 5) + 1;
                     }else {
                         $count = '00001';
@@ -2962,7 +2962,7 @@ class RateDataController extends Controller
                     ->where(\DB::raw('substr(rgd_settlement_number, -2)'), '=', $word_type)
                     ->orderBy('rgd_no', 'DESC')
                     ->first();
-                    if($count->rgd_no){
+                    if(isset($count->rgd_no)){
                         $count = substr($count->rgd_settlement_number, 7, 5) + 1;
                     }else {
                         $count = '00001';
@@ -3825,7 +3825,7 @@ class RateDataController extends Controller
                     ->where(\DB::raw('substr(rgd_settlement_number, -1)'), '=', $word_type)
                     ->orderBy('rgd_no', 'DESC')
                     ->first();
-                    if($count->rgd_no){
+                    if(isset($count->rgd_no)){
                         $count = substr($count->rgd_settlement_number, 7, 5) + 1;
                     }else {
                         $count = '00001';
@@ -3838,7 +3838,7 @@ class RateDataController extends Controller
                     ->where(\DB::raw('substr(rgd_settlement_number, -2)'), '=', $word_type)
                     ->orderBy('rgd_no', 'DESC')
                     ->first();
-                    if($count->rgd_no){
+                    if(isset($count->rgd_no)){
                         $count = substr($count->rgd_settlement_number, 7, 5) + 1;
                     }else {
                         $count = '00001';
@@ -4173,7 +4173,7 @@ class RateDataController extends Controller
                 ->where(\DB::raw('substr(rgd_settlement_number, -1)'), '=', $word_type)
                 ->orderBy('rgd_no', 'DESC')
                 ->first();
-                if($count->rgd_no){
+                if(isset($count->rgd_no)){
                         $count = substr($count->rgd_settlement_number, 7, 5) + 1;
                     }else {
                         $count = '00001';
@@ -4186,7 +4186,7 @@ class RateDataController extends Controller
                 ->where(\DB::raw('substr(rgd_settlement_number, -2)'), '=', $word_type)
                 ->orderBy('rgd_no', 'DESC')
                 ->first();
-                if($count->rgd_no){
+                if(isset($count->rgd_no)){
                         $count = substr($count->rgd_settlement_number, 7, 5) + 1;
                     }else {
                         $count = '00001';
@@ -4607,7 +4607,7 @@ class RateDataController extends Controller
                     ->where(\DB::raw('substr(rgd_settlement_number, -1)'), '=', $word_type)
                     ->orderBy('rgd_no', 'DESC')
                     ->first();
-                    if($count->rgd_no){
+                    if(isset($count->rgd_no)){
                         $count = substr($count->rgd_settlement_number, 7, 5) + 1;
                     }else {
                         $count = '00001';
@@ -4620,7 +4620,7 @@ class RateDataController extends Controller
                     ->where(\DB::raw('substr(rgd_settlement_number, -2)'), '=', $word_type)
                     ->orderBy('rgd_no', 'DESC')
                     ->first();
-                    if($count->rgd_no){
+                    if(isset($count->rgd_no)){
                         $count = substr($count->rgd_settlement_number, 7, 5) + 1;
                     }else {
                         $count = '00001';
@@ -4914,7 +4914,7 @@ class RateDataController extends Controller
                     ->where(\DB::raw('substr(rgd_settlement_number, -1)'), '=', $word_type)
                     ->orderBy('rgd_no', 'DESC')
                     ->first();
-                    if($count->rgd_no){
+                    if(isset($count->rgd_no)){
                         $count = substr($count->rgd_settlement_number, 7, 5) + 1;
                     }else {
                         $count = '00001';
@@ -4928,7 +4928,7 @@ class RateDataController extends Controller
                     ->where(\DB::raw('substr(rgd_settlement_number, -2)'), '=', $word_type)
                     ->orderBy('rgd_no', 'DESC')
                     ->first();
-                    if($count->rgd_no){
+                    if(isset($count->rgd_no)){
                         $count = substr($count->rgd_settlement_number, 7, 5) + 1;
                     }else {
                         $count = '00001';
