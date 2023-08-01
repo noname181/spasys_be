@@ -33,13 +33,13 @@
          <p style='padding:0px;font-family: "unbatang", Times, serif'>{{$rm_biz_name}}</p>
       </div>
       <div style="width: 100%;margin-bottom:10px;text-align: right;">
-         <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$rm_biz_number}}</p>
-         <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$rm_biz_address}}</p>
+         <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>사업자번호 : {{$rm_biz_number}}</p>
+         <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>사업장 주소 : {{$rm_biz_address}}</p>
          @if($rm_owner_name)
          @if($rm_owner_name && !$rm_biz_email)
-         <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$rm_owner_name}}</p>
+         <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$rm_owner_name}}</p>
          @else
-         <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$rm_owner_name}} ({{$rm_biz_email}})</p>
+         <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$rm_owner_name}} ({{$rm_biz_email}})</p>
          @endif
          @endif
       </div>
