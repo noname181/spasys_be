@@ -480,9 +480,12 @@ class ScheduleShipmentController extends Controller
                             $number = array("1","2");
                             
                             foreach ($check as $key => $c) {
+                                if($order_cs_status == "출고예정 취소"){
                                     if(!in_array($c->order_cs, $number)){
                                         $order_cs_status = "출고예정";
                                     }
+                                }
+                                    
                                     // if ($order_cs_status == "출고") {
                                     //     if ($c == end($check)) {
                                     //         if ($c->order_cs == "1") {
