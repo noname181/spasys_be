@@ -36,6 +36,7 @@ use App\Models\Warehousing;
 use App\Models\WarehousingItem;
 use App\Models\WarehousingSettlement;
 use App\Models\Item;
+use App\Models\Qna;
 use App\Utils\CommonFunc;
 use App\Utils\Messages;
 use Carbon\Carbon;
@@ -4256,6 +4257,94 @@ class WarehousingController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
+
+            $member_type = Member::with(['company'])->where('mb_id', Auth::user()->mb_id)->first();
+    
+            $count_qna_question = 0;
+
+            if($member_type->mb_type == 'spasys'){
+                $qna = Qna::with(['member','company','member_question'])->where('qna_status','!=','삭제')->where(function ($query) use ($member_type){
+                    $query->where('co_no_target', '=', Auth::user()->co_no)->orwhere('spasys_no',$member_type->co_no)
+                        ->orWhereHas('member',function ($query) use ($member_type){
+                            $query->where('co_no','=',$member_type->co_no);
+                        })->orWhereHas('company',function ($query) use ($member_type){
+                            $query->where('co_no','=',$member_type->co_no);
+                        });
+                })->with(['mb_no'=>function($query){
+                    $query->select(['mb_name','mb_no']);
+                }])->with('files')->with(['childQna'=>function($query){
+
+                    $query->with('files')->with(['mb_no_target'=>function($query){
+                        $query->select(['mb_name','mb_no']);
+                    }])->with(['mb_no'=>function($query){
+                        $query->select(['mb_name','mb_no']);
+                    }]);
+
+                }])->with(['member' => function($query){
+
+                }])
+                ->orderBy('answer_for','DESC')
+                ->orderBy('depth_path','ASC')
+                ->orderBy('qna_no', 'DESC');
+                
+                
+            }else if($member_type->mb_type == 'shop'){
+                $qna = Qna::with(['member','company','member_question'])->where('qna_status','!=','삭제')->where(function ($query) use ($member_type) {
+                    $query->where('co_no_target', '=', Auth::user()->co_no)->orWhere('mb_no_question',$member_type->mb_no)//->orWhere('co_no_target', '=', $member_type->company->co_parent->co_no) this shop can see other shop with the same spasys
+                        ->orWhereHas('member',function ($query) use ($member_type){
+                            $query->where('co_no','=',$member_type->co_no);
+                            
+                        })->orwhereHas('company.co_parent',function ($query2) use ($member_type){
+                            $query2->where('co_no','=',$member_type->co_no);
+                        });
+                })->with(['mb_no'=>function($query){
+                    $query->select(['mb_name','mb_no']);
+                }])->with('files')->with(['childQna'=>function($query){
+
+                    $query->with('files')->with(['mb_no_target'=>function($query){
+                        $query->select(['mb_name','mb_no']);
+                    }])->with(['mb_no'=>function($query){
+                        $query->select(['mb_name','mb_no']);
+                    }]);
+
+                }])->with(['member' => function($query){
+
+                }])
+                ->orderBy('answer_for','DESC')
+                ->orderBy('depth_path','ASC')
+                ->orderBy('qna_no', 'DESC');
+             
+            } else if($member_type->mb_type == 'shipper') {
+                $qna = Qna::with(['member','company','member_question'])->where('qna_status','!=','삭제')->where(function ($query) use ($member_type) {
+                    $query->where('co_no_target', '=', Auth::user()->co_no)->orWhere('mb_no_question',$member_type->mb_no)
+                        ->orWhereHas('member',function ($query) use ($member_type){
+                            $query->where('co_no','=',$member_type->co_no);
+                        });
+                })->with(['mb_no'=>function($query){
+                    $query->select(['mb_name','mb_no']);
+                }])->with('files')->with(['childQna'=>function($query){
+
+                    $query->with('files')->with(['mb_no_target'=>function($query){
+                        $query->select(['mb_name','mb_no']);
+                    }])->with(['mb_no'=>function($query){
+                        $query->select(['mb_name','mb_no']);
+                    }]);
+
+                }])->with(['member' => function($query){
+
+                }])
+                ->orderBy('answer_for','DESC')
+                ->orderBy('depth_path','ASC')
+                ->orderBy('qna_no', 'DESC');
+            }
+            // $today = Date('Y-m-d').' 00:00:01';
+         
+            $qna->where('created_at', '>=', date('Y-m-d 00:00:00'));
+            $qna->where('created_at', '<=', date('Y-m-d 23:59:00'));
+        
+            $qna =  $qna->count();
+      
+
             $warehousing = ReceivingGoodsDelivery::with(['rate_meta_data', 'rate_meta_data_parent', 'rate_data_general', 'payment', 't_import', 'cancel_bill_history', 'rgd_child']);
             if ($user->mb_type == 'shop' && $request->type == 'check_list') {
                 $warehousing->whereHas('warehousing', function ($query) use ($user) {
@@ -4976,313 +5065,14 @@ class WarehousingController extends Controller
 
                     //GET ISSUER BANK ACCOUNT
                     $item->issuer_bank_account = isset($company_payment) ? $company_payment->cp_bank_number : null;
-
+        
                     return $item;
                 })
             );
-            // if ($user->mb_type == 'shop') {
-            //     $warehousing = ReceivingGoodsDelivery::whereHas('warehousing', function ($query) use ($user) {
-            //         $query->whereHas('co_no.co_parent', function ($q) use ($user) {
-            //             $q->where('co_no', $user->co_no);
-            //         });
-            //     })->whereHas('mb_no', function ($q) {
-            //         $q->where('mb_type', 'spasys');
-            //     });
-            // } else if ($user->mb_type == 'shipper') {
-            //     $warehousing = ReceivingGoodsDelivery::whereHas('warehousing', function ($query) use ($user) {
-            //         $query->whereHas('co_no', function ($q) use ($user) {
-            //             $q->where('co_no', $user->co_no);
-            //         });
-            //     })->whereHas('mb_no', function ($q) {
-            //         $q->where('mb_type', 'shop');
-            //     })->orderBy('created_at', 'DESC');
-            // } 
+            $custom = collect(['qna' => $qna]);
 
-            // $warehousing->where(function ($q) {
-            //     $q->where('rgd_status4', '=', '예상경비청구서')
-            //         ->orWhere('rgd_status4', '=', '확정청구서');
-            // })
-            //     ->whereHas('warehousing', function ($query) {
-            //         $query->where('w_category_name', '=', '유통가공');
-            //     })
-            //     ->where('rgd_is_show', 'y')->orderBy('created_at', 'DESC');
-
-            // if ($user->mb_type == 'shop') {
-            //     $warehousing_fulfillment = ReceivingGoodsDelivery::whereHas('warehousing', function ($query) use ($user) {
-            //         $query->whereHas('co_no', function ($q) use ($user) {
-            //             $q->where('co_no', $user->co_no);
-            //         });
-            //     })->whereHas('mb_no', function ($q) {
-            //         $q->where('mb_type', 'spasys');
-            //     });
-            // } else if ($user->mb_type == 'shipper') {
-            //     $warehousing_fulfillment = ReceivingGoodsDelivery::whereHas('warehousing', function ($query) use ($user) {
-            //         $query->whereHas('co_no', function ($q) use ($user) {
-            //             $q->where('co_no', $user->co_no);
-            //         });
-            //     })->whereHas('mb_no', function ($q) {
-            //         $q->where('mb_type', 'shop');
-            //     });
-            // } 
-
-            // $warehousing_fulfillment->where(function ($q) {
-            //     $q->where('rgd_status4', '=', '예상경비청구서')
-            //         ->orWhere('rgd_status4', '=', '확정청구서');
-            // })
-            //     ->whereHas('warehousing', function ($query) {
-            //         $query->where('w_category_name', '=', '수입풀필먼트');
-            //     })
-            //     ->where('rgd_is_show', 'y');
-
-            //     if ($user->mb_type == 'shop') {
-            //         $warehousing_bonded = ReceivingGoodsDelivery::whereHas('warehousing', function ($query) use ($user) {
-            //             $query->whereHas('co_no.co_parent', function ($q) use ($user) {
-            //                 $q->where('co_no', $user->co_no);
-            //             });
-            //         })->whereHas('mb_no', function ($q) use ($user) {
-            //             $q->where('mb_type', 'spasys');
-            //         });
-            //     } else if ($user->mb_type == 'shipper') {
-            //         $warehousing_bonded = ReceivingGoodsDelivery::whereHas('warehousing', function ($query) use ($user) {
-            //             $query->whereHas('co_no', function ($q) use ($user) {
-            //                 $q->where('co_no', $user->co_no);
-            //             });
-            //         })->whereHas('mb_no', function ($q) {
-            //             $q->where('mb_type', 'shop');
-            //         });
-            //     }
-            //     $warehousing_bonded->where(function ($q) {
-            //         $q->where('rgd_status4', '=', '예상경비청구서')
-            //             ->orWhere('rgd_status4', '=', '확정청구서');
-            //     });
-        
-            // $warehousing->where(function ($q) {
-            //     $q->where('rgd_calculate_deadline_yn', 'y')->where(function ($q2) {
-            //         $q2->where('rgd_status4', '예상경비청구서')
-            //             ->where('service_korean_name', '보세화물')
-            //             ->where('rgd_bill_type', 'not like', '%' . 'month' . '%')
-            //             ->where(function ($q4) {
-            //                 $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
-            //             })
-            //             ->whereNull('rgd_status6');
-            //     })->orWhere(function ($q3) {
-            //         $q3->where('rgd_calculate_deadline_yn', 'y')->where(function ($q4) {
-            //             $q4->Where('rgd_status5', 'confirmed');
-            //         })
-            //             ->where(function ($q4) {
-            //                 $q4->whereNull('rgd_status6');
-            //             })
-            //             ->where(function ($q4) {
-            //                 $q4->where('rgd_status4', '추가청구서')->orWhere('rgd_status4', '확정청구서');
-            //             });
-            //     });
-            // });
-            // $warehousing_bonded->where(function ($q) {
-            //     $q->where('rgd_calculate_deadline_yn', 'y')->where(function ($q2) {
-            //         $q2->where('rgd_status4', '예상경비청구서')
-            //             ->where('service_korean_name', '보세화물')
-            //             ->where('rgd_bill_type', 'not like', '%' . 'month' . '%')
-            //             ->where(function ($q4) {
-            //                 $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
-            //             })
-            //             ->whereNull('rgd_status6');
-            //     })->orWhere(function ($q3) {
-            //         $q3->where('rgd_calculate_deadline_yn', 'y')->where(function ($q4) {
-            //             $q4->Where('rgd_status5', 'confirmed');
-            //         })->where(function ($q4) {
-            //             $q4->whereNull('rgd_status6');
-            //         })
-            //             ->where(function ($q4) {
-            //                 $q4->where('rgd_status4', '추가청구서')->orWhere('rgd_status4', '확정청구서');
-            //             });
-            //     });
-            // });
-            // $warehousing_fulfillment->where(function ($q) {
-            //     $q->where('rgd_calculate_deadline_yn', 'y')->where(function ($q2) {
-            //         $q2->where('rgd_status4', '예상경비청구서')
-            //             ->where('service_korean_name', '보세화물')
-            //             ->where('rgd_bill_type', 'not like', '%' . 'month' . '%')
-            //             ->where(function ($q4) {
-            //                 $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
-            //             })
-            //             ->whereNull('rgd_status6');
-            //     })->orWhere(function ($q3) {
-            //         $q3->where('rgd_calculate_deadline_yn', 'y')->where(function ($q4) {
-            //             $q4->Where('rgd_status5', 'confirmed');
-            //         })
-            //             ->where(function ($q4) {
-            //                 $q4->whereNull('rgd_status6');
-            //             })
-            //             ->where(function ($q4) {
-            //                 $q4->where('rgd_status4', '추가청구서')->orWhere('rgd_status4', '확정청구서');
-            //             });
-            //     });
-            // });
-            // $warehousing->union($warehousing_fulfillment)->union($warehousing_bonded)->orderBy('updated_at', 'DESC')
-            // ->orderBy('rgd_no', 'DESC');
-
-            // $per_page = isset($validated['per_page']) ? $validated['per_page'] : 46;
-            // // If page is null set default data = 1
-            // $page = isset($validated['page']) ? $validated['page'] : 1;
-            // $warehousing_ = clone $warehousing;
-
-            // $contract = Contract::where('co_no',  $user->co_no)->first();
-
-            // $company_payment = null;
-            // if($warehousing_->count() > 0){
-            //     $issuer = Member::where('mb_no', $warehousing_->first()->mb_no)->first();
-            //     $company_payment = CompanyPayment::where('co_no',  $issuer->co_no)->first();
-            // };
-            // $warehousing = $warehousing->paginate($per_page, ['*'], 'page', $page);
-            // // $warehousing = $warehousing->get();
-            // $warehousing->setCollection(
-            //     $warehousing->getCollection()->map(function ($item) use ($contract, $company_payment) {
-            //         if (isset($contract->c_calculate_deadline_yn))
-            //             $item->c_calculate_deadline_yn = $contract->c_calculate_deadline_yn;
-            //         else
-            //             $item->c_calculate_deadline_yn = 'n';
-
-
-            //         $service_name = $item->service_korean_name;
-
-            //         $co_no = Warehousing::where('w_no', $item->w_no)->first()->co_no;
-            //         $service_no = Service::where('service_name', $service_name)->first()->service_no;
-
-            //         $company_settlement = CompanySettlement::where([
-            //             'co_no' => $co_no,
-            //             'service_no' => $service_no,
-            //         ])->first();
-
-            //         if (isset($item->payment->p_method_fee)) {
-            //             $item->p_method_fee = $item->payment->p_method_fee + isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : 0;
-            //         } else {
-            //             $item->p_method_fee = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : 0;
-            //         }
-
-            //         $item->settlement_cycle = $company_settlement ? $company_settlement->cs_payment_cycle : "";
-
-            //         $i = 0;
-            //         $k = 0;
-            //         $completed_date = null;
-            //         foreach ($item->warehousing->warehousing_child as $child) {
-            //             $i++;
-            //             if ($child['w_completed_day'] != null) {
-            //                 $completed_date = $child['w_completed_day'];
-            //                 $k++;
-            //             }
-            //         }
-            //         if ($item->service_korean_name == '보세화물') {
-            //             if ($item->rgd_bill_type == 'final_monthly') {
-            //                 $item->discount = '';
-            //                 $total_discount = 0;
-            //                 foreach ($item->rgd_settlement as $row) {
-            //                     if (isset($row->rate_meta_data_parent[0])) {
-            //                         $rate_data = RateData::where('rmd_no', $row->rate_meta_data_parent[0]->rate_data[0]->rmd_no)->where('rd_cate2', '할인금액')->first();
-            //                         $total_discount += isset($rate_data->rd_data4) ? (int)$rate_data->rd_data4 : 0;
-            //                     } else {
-            //                         $total_discount += 0;
-            //                     }
-            //                 }
-            //                 $item->discount = $total_discount;
-            //                 $item->sum_price_total2 = $item->rate_data_general->rdg_sum7 + $item->rate_data_general->rdg_sum14 + $total_discount;
-            //             } else if (count($item->rate_meta_data) > 0) {
-            //                 $total_discount = 0;
-
-            //                 $rate_data = RateData::where('rmd_no', $item->rate_meta_data[0]->rate_data[0]->rmd_no)->where('rd_cate2', '할인금액')->first();
-            //                 $total_discount += isset($rate_data->rd_data4) ? (int)$rate_data->rd_data4 : 0;
-
-            //                 $item->sum_price_total2 = $item->rate_data_general->rdg_sum7 + $item->rate_data_general->rdg_sum14 + $total_discount;
-            //                 $item->discount = $total_discount;
-            //             } else if (count($item->rate_meta_data_parent) > 0) {
-            //                 $total_discount = 0;
-
-            //                 $rate_data = RateData::where('rmd_no', $item->rate_meta_data_parent[0]->rate_data[0]->rmd_no)->where('rd_cate2', '할인금액')->first();
-            //                 $total_discount += isset($rate_data->rd_data4) ? (int)$rate_data->rd_data4 : 0;
-
-            //                 $item->sum_price_total2 = $item->rate_data_general->rdg_sum7 + $item->rate_data_general->rdg_sum14 + $total_discount;
-            //                 $item->discount = $total_discount;
-            //             }
-
-            //             $item->sum_price_total = isset($item->rate_data_general) ? ($item->rate_data_general->rdg_sum7 + $item->rate_data_general->rdg_sum14) : 0;
-            //             if ($item->rgd_bill_type == 'final_monthly_shop' || $item->rgd_bill_type == 'final_monthly_spasys' || $item->rgd_bill_type == 'final_monthly') {
-            //                 $created_at = Carbon::createFromFormat('Y.m.d H:i:s', $item->created_at->format('Y.m.d H:i:s'));
-
-            //                 $start_date = $created_at->startOfMonth()->toDateString();
-            //                 $end_date = $created_at->endOfMonth()->toDateString();
-
-            //                 $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent', 't_export', 't_import', 't_import_expected'])
-            //                     ->whereHas('w_no', function ($q) use ($co_no) {
-            //                         $q->where('w_category_name', '보세화물');
-            //                     })
-            //                     // ->doesntHave('rgd_child')
-            //                     ->where('rgd_settlement_number', $item->rgd_settlement_number)
-            //                     // ->whereDoesntHave('rgd_child')
-            //                     ->orderBy('rgd_no')
-            //                     ->count();
-            //                 $item->rgds = $rgds;
-            //             }
-            //         } else if ($item->service_korean_name == '수입풀필먼트') {
-            //             $item->discount = "";
-            //             $item->sum_price_total2 =  isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum6 : 0;
-            //             $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum6 : 0;
-            //         } else {
-            //             $item->discount = "";
-            //             $item->sum_price_total2 = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : 0;
-            //             $item->sum_price_total = isset($item->rate_data_general) ? $item->rate_data_general->rdg_sum4 : 0;
-            //             if ($item->rgd_bill_type == 'final_monthly_shop' || $item->rgd_bill_type == 'final_monthly_spasys' || $item->rgd_bill_type == 'final_monthly') {
-            //                 $created_at = Carbon::createFromFormat('Y.m.d H:i:s', $item->created_at->format('Y.m.d H:i:s'));
-
-            //                 $start_date = $created_at->startOfMonth()->toDateString();
-            //                 $end_date = $created_at->endOfMonth()->toDateString();
-
-            //                 $rgds = ReceivingGoodsDelivery::with(['w_no', 'rate_data_general', 'rgd_child', 'rate_meta_data', 'rate_meta_data_parent'])
-            //                     ->whereHas('w_no', function ($q) use ($item) {
-            //                         $q->where('w_category_name', '유통가공');
-            //                     })
-            //                     // ->doesntHave('rgd_child')
-            //                     ->where('created_at', '>=', date('Y-m-d 00:00:00', strtotime($start_date)))
-            //                     ->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($end_date)))
-            //                     ->where('rgd_status1', '=', '입고')
-            //                     ->where('rgd_settlement_number', $item->rgd_settlement_number)
-            //                     ->orderBy('rgd_no')
-            //                     ->count();
-
-
-            //                 $item->rgds = $rgds;
-            //             }
-            //         }
-
-            //         if (isset($item->rate_data_general)) {
-            //             if ($item->rate_data_general->rdg_sum7) {
-            //                 $item->sum_price_total3 = $item->rate_data_general->rdg_sum7;
-            //             } else if ($item->rate_data_general->rdg_sum6) {
-            //                 $item->sum_price_total3 = $item->rate_data_general->rdg_sum6;
-            //             } else if ($item->rate_data_general->rdg_sum4) {
-            //                 $item->sum_price_total3 = $item->rate_data_general->rdg_sum4;
-            //             } else {
-            //                 $item->sum_price_total3 = 0;
-            //             }
-            //         } else {
-            //             $item->sum_price_total3 = 0;
-            //         }
-
-
-            //         if ($i == $k) {
-            //             $item->is_completed = true;
-            //             $item->completed_date = Carbon::parse($completed_date)->format('Y.m.d');
-            //         } else {
-            //             $item->is_completed = false;
-            //             $item->completed_date = null;
-            //         }
-
-
-            //         //GET ISSUER BANK ACCOUNT
-            //         $item->issuer_bank_account = isset($company_payment) ? $company_payment->cp_bank_number : null;
-
-            //         return $item;
-            //     })
-            // );
-            return response()->json($warehousing);
+            $data = $custom->merge($warehousing);
+            return response()->json($data);
         } catch (\Exception $e) {
             Log::error($e);
             return $e;
