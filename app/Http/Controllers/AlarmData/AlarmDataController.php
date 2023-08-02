@@ -16,6 +16,7 @@ use App\Utils\CommonFunc;
 use App\Models\Company;
 use App\Models\Member;
 use App\Models\ScheduleShipment;
+use App\Models\ScheduleShipmentInfo;
 class AlarmDataController extends Controller
 {
     /**
@@ -276,6 +277,39 @@ class AlarmDataController extends Controller
             //     ]);
             // }
             
+            // $schedule_shipment = ScheduleShipment::get();
+            // foreach($schedule_shipment as $ss_no){
+            //     $check = ScheduleShipmentInfo::where('ss_no', $ss_no['ss_no'])->whereNotNull("order_cs")->get();
+            //     if(isset($ss_no['status']) && $ss_no['status'] == "출고"){
+                            
+            
+            //         $order_cs_status = "출고예정 취소";
+            //         $number = array("1","2");
+                    
+            //         foreach ($check as $key => $c) {
+            //             if($order_cs_status == "출고예정 취소"){
+            //                 if(!in_array($c->order_cs, $number)){
+            //                     $order_cs_status = "출고";
+            //                 }
+            //             }
+            //         }
+            //     }else{
+            //         $order_cs_status = "출고예정 취소";
+            //         $number = array("1","2");
+                    
+            //         foreach ($check as $key => $c) {
+            //             if($order_cs_status == "출고예정 취소"){
+            //                 if(!in_array($c->order_cs, $number)){
+            //                     $order_cs_status = "출고예정";
+            //                 }
+            //             }
+            //         }
+            //     } 
+            //     ScheduleShipment::where(['ss_no' => $ss_no['ss_no']])->update([
+            //         'order_cs_status' => $order_cs_status
+            //     ]);
+            // }
+
             $companies = Member::with(['company'])->whereNotNull('co_no')->get();
            
             foreach ($companies as $company) {
