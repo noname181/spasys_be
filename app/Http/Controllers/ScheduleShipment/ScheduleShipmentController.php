@@ -473,9 +473,20 @@ class ScheduleShipmentController extends Controller
                         //     return count($check);
                         // }
                         
-                        //if(isset($schedule_item['status']) && $schedule_item['status'] == 8){
+                        if(isset($schedule_item['status']) && $schedule_item['status'] == 8){
                             
             
+                            $order_cs_status = "출고예정 취소";
+                            $number = array("1","2");
+                            
+                            foreach ($check as $key => $c) {
+                                if($order_cs_status == "출고예정 취소"){
+                                    if(!in_array($c->order_cs, $number)){
+                                        $order_cs_status = "출고";
+                                    }
+                                }
+                            }
+                        }else{
                             $order_cs_status = "출고예정 취소";
                             $number = array("1","2");
                             
@@ -485,7 +496,10 @@ class ScheduleShipmentController extends Controller
                                         $order_cs_status = "출고예정";
                                     }
                                 }
-                                    
+                            }
+                        }
+                        
+                            //foreach ($check as $key => $c) {       
                                     // if ($order_cs_status == "출고") {
                                     //     if ($c == end($check)) {
                                     //         if ($c->order_cs == "1") {
@@ -507,7 +521,7 @@ class ScheduleShipmentController extends Controller
                                     //         }
                                     //     }
                                     // }
-                            }
+                            //}
                         // }else{
                         //     $order_cs_status = "정상";
 
