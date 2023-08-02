@@ -7762,6 +7762,7 @@ class WarehousingController extends Controller
                             'service_korean_name' => '수입풀필먼트',
                             'rgd_status1' => "출고",
                             'rgd_status3' => "배송완료",
+                            'rgd_status3_time' => Carbon::now()->toDateTimeString(),
                         ]
                     );
                 }
