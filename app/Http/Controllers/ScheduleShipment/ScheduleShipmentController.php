@@ -595,7 +595,7 @@ class ScheduleShipmentController extends Controller
                     'recv_address' => isset($schedule['recv_address']) ? $schedule['recv_address'] : null,
                     'recv_zip' => isset($schedule['recv_zip']) ? $schedule['recv_zip'] : null,
                     'memo' => isset($schedule['memo']) ? $schedule['memo'] : null,
-                    'status' => isset($schedule['status']) ? $schedule['status'] : null,
+                    'status' => isset($schedule['status']) && $schedule['status'] == 8 ? '출고' : '출고예정',
                     'delivery_status' => '택배',
                     'w_category_name' => '수입풀필먼트',
                     'order_cs' => isset($schedule['order_cs']) ? $schedule['order_cs'] : null,
@@ -675,13 +675,29 @@ class ScheduleShipmentController extends Controller
 
                                 $check = ScheduleShipmentInfo::where('ss_no', $ss_no->ss_no)->where('barcode', $schedule_info['barcode'])->get();
 
-                                $order_cs_status = "";
-
-                                foreach ($check as $c) {
-                                    if ($c->order_cs == "1" || $c->order_cs == "2") {
-                                        $order_cs_status = "부분취소";
-                                    } else {
-                                        $order_cs_status = "정상";
+                                if(isset($schedule['status']) && $schedule['status'] == 8){
+                            
+            
+                                    $order_cs_status = "출고예정 취소";
+                                    $number = array("1","2");
+                                    
+                                    foreach ($check as $key => $c) {
+                                        if($order_cs_status == "출고예정 취소"){
+                                            if(!in_array($c->order_cs, $number)){
+                                                $order_cs_status = "출고";
+                                            }
+                                        }
+                                    }
+                                }else{
+                                    $order_cs_status = "출고예정 취소";
+                                    $number = array("1","2");
+                                    
+                                    foreach ($check as $key => $c) {
+                                        if($order_cs_status == "출고예정 취소"){
+                                            if(!in_array($c->order_cs, $number)){
+                                                $order_cs_status = "출고예정";
+                                            }
+                                        }
                                     }
                                 }
 
