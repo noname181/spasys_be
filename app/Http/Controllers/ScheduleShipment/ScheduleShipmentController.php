@@ -646,7 +646,7 @@ class ScheduleShipmentController extends Controller
                             if (!empty($ss_no->ss_no) && !empty($schedule_info['barcode'])) {
                                 $ss_info_no = ScheduleShipmentInfo::updateOrCreate([
                                     'ss_no' => $ss_no->ss_no,
-                                    'barcode' => $schedule_info['barcode']
+                                    'prd_seq' => $schedule_info['prd_seq']
                                 ], [
                                     'ss_no' => $ss_no->ss_no,
                                     'co_no' => null,
