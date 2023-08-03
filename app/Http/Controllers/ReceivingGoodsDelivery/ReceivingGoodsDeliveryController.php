@@ -2344,24 +2344,27 @@ class ReceivingGoodsDeliveryController extends Controller
                     $w_no_alert->w_category_name = '보세화물';
 
                     $w_no_alert->company = (object)$request->company;
-                    $w_no_alert->company->co_parent = isset($request->company['co_parent']) ? (object)$request->company['co_parent'] : null;
-                    $w_no_alert->company->co_parent->co_parent = isset($w_no_alert->company->co_parent->co_parent) ? (object)$w_no_alert->company->co_parent->co_parent : null;
+                    $w_no_alert->company->co_parent = isset($request->company['co_parent']) ? (object)$request->company['co_parent'] : "";
+                    if(isset($w_no_alert->company->co_parent->co_parent)){
+                        $w_no_alert->company->co_parent->co_parent = (object)$w_no_alert->company->co_parent->co_parent;
+                        $rgd_status3  = isset($rgd['rgd_status3']) ? $rgd['rgd_status3'] : null;
 
-                    $rgd_status3  = isset($rgd['rgd_status3']) ? $rgd['rgd_status3'] : null;
+                        $check_alarm_first = Alarm::with(['alarm_data'])->where('w_no', $validated['is_no'])->whereHas('alarm_data', function ($query) {
+                            $query->where(DB::raw('lower(ad_title)'), 'like', '%' . strtolower('[보세화물] 배송중') . '%');
+                        })->first();
 
-                    $check_alarm_first = Alarm::with(['alarm_data'])->where('w_no', $validated['is_no'])->whereHas('alarm_data', function ($query) {
-                        $query->where(DB::raw('lower(ad_title)'), 'like', '%' . strtolower('[보세화물] 배송중') . '%');
-                    })->first();
+                        if ($check_alarm_first === null && $rgd_status3 == '배송중')
+                            CommonFunc::insert_alarm_cargo('[보세화물] 배송중', null, $user, $w_no_alert, 'cargo_delivery');
 
-                    if ($check_alarm_first === null && $rgd_status3 == '배송중')
-                        CommonFunc::insert_alarm_cargo('[보세화물] 배송중', null, $user, $w_no_alert, 'cargo_delivery');
+                        $check_alarm_first = Alarm::with(['alarm_data'])->where('w_no', $validated['is_no'])->whereHas('alarm_data', function ($query) {
+                            $query->where(DB::raw('lower(ad_title)'), 'like', '%' . strtolower('[보세화물] 배송완료') . '%');
+                        })->first();
 
-                    $check_alarm_first = Alarm::with(['alarm_data'])->where('w_no', $validated['is_no'])->whereHas('alarm_data', function ($query) {
-                        $query->where(DB::raw('lower(ad_title)'), 'like', '%' . strtolower('[보세화물] 배송완료') . '%');
-                    })->first();
+                        if ($check_alarm_first === null && $rgd_status3 == '배송완료')
+                            CommonFunc::insert_alarm_cargo('[보세화물] 배송완료', null, $user, $w_no_alert, 'cargo_delivery');
+                    }
 
-                    if ($check_alarm_first === null && $rgd_status3 == '배송완료')
-                        CommonFunc::insert_alarm_cargo('[보세화물] 배송완료', null, $user, $w_no_alert, 'cargo_delivery');
+                    
                 }
 
                 if (isset($validated['wr_contents'])) {
@@ -2370,9 +2373,12 @@ class ReceivingGoodsDeliveryController extends Controller
 
                     $w_no_alert->company = (object)$request->company;
                     $w_no_alert->company->co_parent = isset($request->company['co_parent']) ? (object)$request->company['co_parent'] : null;
-                    $w_no_alert->company->co_parent->co_parent = isset($w_no_alert->company->co_parent->co_parent) ? (object)$w_no_alert->company->co_parent->co_parent : null;
+                    if(isset($w_no_alert->company->co_parent->co_parent)){
+                        $w_no_alert->company->co_parent->co_parent = (object)$w_no_alert->company->co_parent->co_parent;
+                        CommonFunc::insert_alarm_cargo_request('[보세화물]', $validated['wr_contents'], $user, $w_no_alert, 'cargo_request');
+                    }
 
-                    CommonFunc::insert_alarm_cargo_request('[보세화물]', $validated['wr_contents'], $user, $w_no_alert, 'cargo_request');
+                    
                 }
             }
 
@@ -4875,23 +4881,28 @@ class ReceivingGoodsDeliveryController extends Controller
 
                     $w_no_alert->company = (object)$request->company;
                     $w_no_alert->company->co_parent = isset($request->company['co_parent']) ? (object)$request->company['co_parent'] : null;
-                    $w_no_alert->company->co_parent->co_parent = isset($w_no_alert->company->co_parent->co_parent) ? (object)$w_no_alert->company->co_parent->co_parent : null;
+                    if(isset($w_no_alert->company->co_parent->co_parent)){
+                        $w_no_alert->company->co_parent->co_parent = (object)$w_no_alert->company->co_parent->co_parent;
 
-                    $rgd_status3  = isset($dataSubmit['rgd_status3']) ? $dataSubmit['rgd_status3'] : null;
+                        $rgd_status3  = isset($dataSubmit['rgd_status3']) ? $dataSubmit['rgd_status3'] : null;
 
-                    $check_alarm_first = Alarm::with(['alarm_data'])->where('w_no', $dataSubmit['is_no'])->whereHas('alarm_data', function ($query) {
-                        $query->where(DB::raw('lower(ad_title)'), 'like', '%' . strtolower('[보세화물] 배송중') . '%');
-                    })->first();
+                        $check_alarm_first = Alarm::with(['alarm_data'])->where('w_no', $dataSubmit['is_no'])->whereHas('alarm_data', function ($query) {
+                            $query->where(DB::raw('lower(ad_title)'), 'like', '%' . strtolower('[보세화물] 배송중') . '%');
+                        })->first();
 
-                    if ($check_alarm_first === null && $rgd_status3 == '배송중')
-                        CommonFunc::insert_alarm_cargo('[보세화물] 배송중', null, $user, $w_no_alert, 'cargo_delivery');
+                        if ($check_alarm_first === null && $rgd_status3 == '배송중')
+                            CommonFunc::insert_alarm_cargo('[보세화물] 배송중', null, $user, $w_no_alert, 'cargo_delivery');
 
-                    $check_alarm_first = Alarm::with(['alarm_data'])->where('w_no', $dataSubmit['is_no'])->whereHas('alarm_data', function ($query) {
-                        $query->where(DB::raw('lower(ad_title)'), 'like', '%' . strtolower('[보세화물] 배송완료') . '%');
-                    })->first();
+                        $check_alarm_first = Alarm::with(['alarm_data'])->where('w_no', $dataSubmit['is_no'])->whereHas('alarm_data', function ($query) {
+                            $query->where(DB::raw('lower(ad_title)'), 'like', '%' . strtolower('[보세화물] 배송완료') . '%');
+                        })->first();
 
-                    if ($check_alarm_first === null && $rgd_status3 == '배송완료')
-                        CommonFunc::insert_alarm_cargo('[보세화물] 배송완료', null, $user, $w_no_alert, 'cargo_delivery');
+                        if ($check_alarm_first === null && $rgd_status3 == '배송완료')
+                            CommonFunc::insert_alarm_cargo('[보세화물] 배송완료', null, $user, $w_no_alert, 'cargo_delivery');
+                    }
+                    
+
+                    
                 }
             }
             if (isset($data['remove'])) {
