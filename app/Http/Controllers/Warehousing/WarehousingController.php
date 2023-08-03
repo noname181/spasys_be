@@ -8374,7 +8374,7 @@ class WarehousingController extends Controller
         $spreadsheet = $reader->load($path);
 
         $sheet = $spreadsheet->getSheet(0);
-        $datas = $sheet->toArray(null, true, true, true);
+        $datas = $sheet->toArray2(null, true, true, true);
 
         // $sheet2 = $spreadsheet->getSheet(1);
         // $data_channels = $sheet2->toArray(null, true, true, true);
