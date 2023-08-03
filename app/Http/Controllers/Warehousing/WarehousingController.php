@@ -1189,7 +1189,7 @@ class WarehousingController extends Controller
             $spreadsheet = $reader->load($path);
 
             $sheet = $spreadsheet->getSheet(0);
-            $warehousing_data = $sheet->toArray(null, true, true, true);
+            $warehousing_data = $sheet->toArray2(null, true, true, true);
 
             // $sheet2 = $spreadsheet->getSheet(1);
             // $warehousing_item_data = $sheet2->toArray(null, true, true, true);
@@ -7581,9 +7581,9 @@ class WarehousingController extends Controller
         $member = Member::where('mb_id', Auth::user()->mb_id)->first();
 
         $sheet = $spreadsheet->getSheet(0);
-        $warehousing_data = $sheet->toArray(null, true, true, true);
+        $warehousing_data = $sheet->toArray2(null, true, true, true);
         $sheet2 = $spreadsheet->getSheet(1);
-        $warehousing_item_data = $sheet2->toArray(null, true, true, true);
+        $warehousing_item_data = $sheet2->toArray2(null, true, true, true);
 
         $check_update = 0;
         foreach ($warehousing_data as $key => $warehouse) {
