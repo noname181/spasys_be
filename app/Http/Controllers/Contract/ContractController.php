@@ -236,6 +236,31 @@ class ContractController extends Controller
             $company = Company::where('co_no', $co_no)->update([
                 'co_service' => $validated['co_service'],
             ]);
+
+            //UPDATE SERVICE FOR MEMBER
+            $members = Member::where('co_no', $co_no)->get();
+            
+
+            
+            foreach($members as $member){
+                
+                $member_service = $member['mb_service_no_array'];
+                $service_arr = explode(" ", $member_service);
+
+                foreach($service_arr as $service_){
+                    if(!str_contains($validated['co_service'], $service_)) {
+                        $member_service = str_replace($service_, "", $member_service);
+                    }
+                }
+
+                Member::where('mb_no', $member->mb_no)->update(
+                    [
+                        'mb_service_no_array' => trim($member_service),
+                    ]
+                );
+                
+            }
+
             $i = 0;
            
             // $member = Member::where('co_no', $co_no)->get();
