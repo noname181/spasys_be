@@ -2369,8 +2369,8 @@ class ReceivingGoodsDeliveryController extends Controller
                     $w_no_alert->w_category_name = '보세화물';
 
                     $w_no_alert->company = (object)$request->company;
-                    $w_no_alert->company->co_parent = (object)$request->company['co_parent'];
-                    $w_no_alert->company->co_parent->co_parent = (object)$w_no_alert->company->co_parent->co_parent;
+                    $w_no_alert->company->co_parent = isset($request->company['co_parent']) ? (object)$request->company['co_parent'] : null;
+                    $w_no_alert->company->co_parent->co_parent = isset($w_no_alert->company->co_parent->co_parent) ? (object)$w_no_alert->company->co_parent->co_parent : null;
 
                     CommonFunc::insert_alarm_cargo_request('[보세화물]', $validated['wr_contents'], $user, $w_no_alert, 'cargo_request');
                 }
@@ -4874,8 +4874,8 @@ class ReceivingGoodsDeliveryController extends Controller
                     $w_no_alert->w_category_name = '보세화물';
 
                     $w_no_alert->company = (object)$request->company;
-                    $w_no_alert->company->co_parent = (object)$request->company['co_parent'];
-                    $w_no_alert->company->co_parent->co_parent = (object)$w_no_alert->company->co_parent->co_parent;
+                    $w_no_alert->company->co_parent = isset($request->company['co_parent']) ? (object)$request->company['co_parent'] : null;
+                    $w_no_alert->company->co_parent->co_parent = isset($w_no_alert->company->co_parent->co_parent) ? (object)$w_no_alert->company->co_parent->co_parent : null;
 
                     $rgd_status3  = isset($dataSubmit['rgd_status3']) ? $dataSubmit['rgd_status3'] : null;
 
