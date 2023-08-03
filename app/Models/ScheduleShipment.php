@@ -98,7 +98,7 @@ class ScheduleShipment extends Model
     }
     public function schedule_shipment_info()
     {
-        return $this->hasMany(ScheduleShipmentInfo::class, 'ss_no', 'ss_no')->with('item');
+        return $this->hasMany(ScheduleShipmentInfo::class, 'ss_no', 'ss_no')->with('item')->whereNotNull("order_cs");
     }
 
     public function ContractWms()
