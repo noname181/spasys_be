@@ -1011,7 +1011,7 @@ class SendEmailController extends Controller
                         $total5_5 = 0;
                         $total6_5 = 0;
                         $total7_5 = 0;
-                        for($i = 0;$i < count($arr4);$i++){
+                        for($i = 0;$i < count($arr5);$i++){
                             $check = 0;
                          
                             foreach($bonded5b as $row){
@@ -1279,7 +1279,7 @@ class SendEmailController extends Controller
                         $total5_5 = 0;
                         $total6_5 = 0;
                         $total7_5 = 0;
-                        for($i = 0;$i < count($arr4);$i++){
+                        for($i = 0;$i < count($arr5);$i++){
                             $check = 0;
                          
                             foreach($bonded5c as $row){
