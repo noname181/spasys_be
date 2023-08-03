@@ -2815,7 +2815,7 @@ class RateDataController extends Controller
     {
         try {
             DB::beginTransaction();
-            $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general'])->where('rgd_no', $rgd_no)->first();
+            $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general', 'payment'])->where('rgd_no', $rgd_no)->first();
 
             $rdg = RateDataGeneral::with(['warehousing'])->where('rgd_no', $rgd_no)->where('rdg_bill_type', 'final')->first();
             if (empty($rdg)) {
