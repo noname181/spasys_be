@@ -8413,7 +8413,7 @@ class WarehousingController extends Controller
                     //     $q->whereIn('co_no', $co_no_in);
                     // })->first();
                 } else {
-                    $item = Item::with(['company', 'ContractWms'])->where('item_service_name', '수입풀필먼트')->where('product_id', $d['E']);
+                    $item = Item::with(['company', 'ContractWms'])->where('item_service_name', '수입풀필먼트')->where('product_id', $d['D']);
                     // $item->whereHas('ContractWms.company', function ($q) use ($co_no_in) {
                     //     $q->whereIn('co_no', $co_no_in);
                     // })->first();
