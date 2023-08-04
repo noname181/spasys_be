@@ -10,6 +10,8 @@ use App\Models\ExportConfirm;
 use App\Models\Export;
 use App\Utils\Messages;
 use App\Models\ReceivingGoodsDelivery;
+use App\Models\WarehousingRequest;
+
 use App\Utils\CommonFunc;
 use Illuminate\Http\Request;
 use PhpParser\Node\Stmt\TryCatch;
@@ -83,6 +85,12 @@ class EWHPController extends Controller
                         'tie_co_license' => isset($value['co_license']) ? $value['co_license'] : null,
                     ]);
 
+                    WarehousingRequest::where("is_no", $value['logistic_manage_number'])->update(
+                        [
+                            'is_no' =>  'in_' . $value['carry_in_number'],
+                        ]
+                    );
+
                     $check_alarm = Alarm::with(['alarm_data'])->where('w_no', 'in_' . $value['carry_in_number'])->where('alarm_h_bl', $value['h_bl'])->whereHas('alarm_data', function ($query) {
                         $query->where(DB::raw('lower(ad_title)'), 'like', '' . strtolower('[보세화물] 반입') . '');
                     })->first();
@@ -152,6 +160,12 @@ class EWHPController extends Controller
                             'rgd_status3' => '배송준비',
                         ]);
                     }
+
+                    WarehousingRequest::where("is_no", $te_carry_in_number)->update(
+                        [
+                            'is_no' =>  $te_carry_out_number,
+                        ]
+                    );
 
                     $check_alarm = Alarm::with(['alarm_data'])->where('w_no', 'out_' . $value['carry_out_number'])->where('alarm_h_bl', $value['h_bl'])->whereHas('alarm_data', function ($query) {
                         $query->where(DB::raw('lower(ad_title)'), 'like', '' . strtolower('[보세화물] 반출') . '');
