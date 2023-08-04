@@ -8414,14 +8414,14 @@ class WarehousingController extends Controller
 
                     if ($contains) {
                         $item = Item::with(['company', 'ContractWms'])->where('item_service_name', '수입풀필먼트')->where('option_id', $d['E'])->where('product_id', $d['D']);
-                        // $item->whereHas('ContractWms.company', function ($q) use ($co_no_in) {
-                        //     $q->whereIn('co_no', $co_no_in);
-                        // })->first();
+                        $item->whereHas('ContractWms.company', function ($q) use ($co_no_in) {
+                            $q->whereIn('co_no', $co_no_in);
+                        });
                     } else {
                         $item = Item::with(['company', 'ContractWms'])->where('item_service_name', '수입풀필먼트')->where('product_id', $d['D']);
-                        // $item->whereHas('ContractWms.company', function ($q) use ($co_no_in) {
-                        //     $q->whereIn('co_no', $co_no_in);
-                        // })->first();
+                        $item->whereHas('ContractWms.company', function ($q) use ($co_no_in) {
+                            $q->whereIn('co_no', $co_no_in);
+                        });
                     }
                 }else{
                     $item = Item::with(['company', 'ContractWms'])->where('item_service_name', '수입풀필먼트')->where('product_id', $d['D']);
