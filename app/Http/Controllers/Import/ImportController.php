@@ -74,10 +74,28 @@ class ImportController extends Controller
 
                 $members = Member::where('mb_no', '!=', 0)->get();
 
-                if ($warehousing) {
-                    $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no'])->orwhere('w_no', '=', $warehousing->w_import_no);
-                } else {
-                    $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no']);
+                // if ($warehousing) {
+                //     $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no'])->orwhere('w_no', '=', $warehousing->w_import_no);
+                // } else {
+                //     $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no']);
+                // }
+                if($warehousing){
+                    if(isset($validated['w_category_name']) && $validated['w_category_name'] == '수입풀필먼트'){
+                        $warehousing_request = $warehousing_request->where('ss_no', '=', $validated['w_no']);
+                    }elseif(isset($validated['w_category_name']) && $validated['w_category_name'] == '유통가공'){
+                        $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no']);
+                    }else{
+                        $warehousing_request = $warehousing_request->where('is_no', '=', $validated['w_no']);
+                    }
+                    //->orwhere('w_no', '=', $warehousing->w_import_no);
+                }else{
+                    if(isset($validated['w_category_name']) && $validated['w_category_name'] == '수입풀필먼트'){
+                        $warehousing_request = $warehousing_request->where('ss_no', '=', $validated['w_no']);
+                    }elseif(isset($validated['w_category_name']) && $validated['w_category_name'] == '유통가공'){
+                        $warehousing_request = $warehousing_request->where('w_no', '=', $validated['w_no']);
+                    }else{
+                        $warehousing_request = $warehousing_request->where('is_no', '=', $validated['w_no']);
+                    }
                 }
                 $warehousing_request = $warehousing_request->paginate($per_page, ['*'], 'page', $page);
             } else {

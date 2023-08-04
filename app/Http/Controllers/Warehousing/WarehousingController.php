@@ -8392,7 +8392,7 @@ class WarehousingController extends Controller
         $test = [];
         $test_i = [];
         $test_date = '';
-        //return $datas;
+        
         foreach ($datas as $key => $d) {
             if ($key < 2) {
                 continue;
