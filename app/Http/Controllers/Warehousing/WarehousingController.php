@@ -1289,7 +1289,11 @@ class WarehousingController extends Controller
 
 
                     
-                    if($excel_company){
+                    if(!isset($excel_company)){
+                        $errors["type"] = "Register only affiliated shippers!";
+                        $errors[$sheet->getTitle()][] = "소속된 화주가 아닙니다. 소속된 화주만 등록하세요!";
+                        $check_error = true;
+                    }else{
                         $rows_warehousing_add = $rows_warehousing_add + 1;
                         $warehousing_id = Warehousing::insertGetId([
                             'mb_no' => Auth::user()->mb_no,
