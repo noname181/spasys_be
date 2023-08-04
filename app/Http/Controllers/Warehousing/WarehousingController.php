@@ -1229,7 +1229,7 @@ class WarehousingController extends Controller
 
             
             foreach ($warehousing_data as $key => $warehouse) {
-                if ($key < 2) {
+                if ($key < 1) {
                     continue;
                 }
              
@@ -7587,7 +7587,7 @@ class WarehousingController extends Controller
 
         $check_update = 0;
         foreach ($warehousing_data as $key => $warehouse) {
-            if ($key <= 2) {
+            if ($key < 1) {
                 continue;
             }
             if (!empty($warehouse['A'])) {
@@ -8394,10 +8394,10 @@ class WarehousingController extends Controller
         $test_date = '';
         
         foreach ($datas as $key => $d) {
-            if ($key < 2) {
+            if ($key < 1) {
                 continue;
             }
-            //return $d;
+           
             $validator = Validator::make($d, ExcelRequest::rules());
             
             if ($validator->fails()) {
@@ -8405,19 +8405,24 @@ class WarehousingController extends Controller
                 $errors[$sheet->getTitle()][] = $validator->errors();
                 $check_error = true;
             } else {
-                $contains = Str::contains($d['E'], 'S');
+                if(isset($d['E'])){
+                    $contains = Str::contains($d['E'], 'S');
 
-                if ($contains) {
-                    $item = Item::with(['company', 'ContractWms'])->where('item_service_name', '수입풀필먼트')->where('option_id', $d['E'])->where('product_id', $d['D']);
-                    // $item->whereHas('ContractWms.company', function ($q) use ($co_no_in) {
-                    //     $q->whereIn('co_no', $co_no_in);
-                    // })->first();
-                } else {
+                    if ($contains) {
+                        $item = Item::with(['company', 'ContractWms'])->where('item_service_name', '수입풀필먼트')->where('option_id', $d['E'])->where('product_id', $d['D']);
+                        // $item->whereHas('ContractWms.company', function ($q) use ($co_no_in) {
+                        //     $q->whereIn('co_no', $co_no_in);
+                        // })->first();
+                    } else {
+                        $item = Item::with(['company', 'ContractWms'])->where('item_service_name', '수입풀필먼트')->where('product_id', $d['D']);
+                        // $item->whereHas('ContractWms.company', function ($q) use ($co_no_in) {
+                        //     $q->whereIn('co_no', $co_no_in);
+                        // })->first();
+                    }
+                }else{
                     $item = Item::with(['company', 'ContractWms'])->where('item_service_name', '수입풀필먼트')->where('product_id', $d['D']);
-                    // $item->whereHas('ContractWms.company', function ($q) use ($co_no_in) {
-                    //     $q->whereIn('co_no', $co_no_in);
-                    // })->first();
                 }
+               
 
                 $item = $item->first();
                 
@@ -8427,7 +8432,15 @@ class WarehousingController extends Controller
                     $errors[$sheet->getTitle()][] = $validator->errors();
                     $check_error = true;
                 } else {
+                    
+
                     $data_item_count =  $data_item_count + 1;
+
+                    //Update option
+                    Item::where('item_no', $item->item_no)->update([
+                        'item_option1' =>  isset($d['G']) ? $d['G'] : null,
+                        'item_option2' =>  isset($d['H']) ? $d['H'] : null,
+                    ]);
 
                     $custom = collect(['wi_number' => $d['J']]);
 
@@ -8451,19 +8464,21 @@ class WarehousingController extends Controller
                 }
             }
         }
-        //return $test_i;
+        
         foreach ($test_i as $key => $value) {
             $strArray = explode(',', $key);
-            $w_schedule_day = date('Y-m-d H:i:s', strtotime(str_replace('.', '-', $strArray[1])));
+            $w_completed_day = date('Y-m-d H:i:s', strtotime(str_replace('.', '-', $strArray[1])));
+
+           
             //return $w_schedule_day;
             $w_no_data = Warehousing::insertGetId([
                 'mb_no' => $member->mb_no,
                 'w_type' => 'IW',
                 'w_category_name' => "수입풀필먼트",
                 'co_no' => isset($validated['co_no']) ? $validated['co_no'] : $value[0]['contract_wms']['co_no'],
-                'w_schedule_day' => $w_schedule_day,
+                'w_schedule_day' => null,
                 'w_cancel_yn' => 'n',
-                'w_completed_day' => Carbon::now()->toDateTimeString()
+                'w_completed_day' => $w_completed_day,
             ]);
 
             ReceivingGoodsDelivery::insertGetId([
@@ -8487,6 +8502,8 @@ class WarehousingController extends Controller
 
             $w_amount = 0;
             foreach ($value as $warehousing_item) {
+                
+
                 WarehousingItem::insert([
                     'item_no' => $warehousing_item['item_no'],
                     'w_no' => $w_no,

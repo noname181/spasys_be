@@ -1340,7 +1340,7 @@ class ItemController extends Controller
         $check_error = false;
         //return $datas;
         foreach ($datas as $key => $d) {
-            if ($key < 2) { 
+            if ($key < 1) { 
                 continue;
             }
            
