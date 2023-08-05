@@ -81,6 +81,10 @@ class EWHPController extends Controller
                 ]);
 
                 if (isset($value['logistic_manage_number']) && $value['logistic_manage_number']) {
+                    ReceivingGoodsDelivery::where("is_no", $value['logistic_manage_number'])->update([
+                        'is_no' => 'in_' . $value['carry_in_number'],
+                    ]);
+
                     ImportExpected::where('tie_logistic_manage_number', $value['logistic_manage_number'])->update([
                         'tie_co_license' => isset($value['co_license']) ? $value['co_license'] : null,
                     ]);
@@ -151,11 +155,20 @@ class EWHPController extends Controller
 
                 
                 if (isset($te_carry_out_number)) {
+                    ReceivingGoodsDelivery::where("is_no", $te_carry_in_number)->update([
+                        'is_no' => $te_carry_out_number,
+                    ]);
+
                     $check = ReceivingGoodsDelivery::where('is_no', $te_carry_out_number)->first();
                     if ($check === null) {
                         ReceivingGoodsDelivery::insertGetId([
                             'is_no' => $te_carry_out_number,
                             'service_korean_name' => '보세화물',
+                            'rgd_status1' => '반출',
+                            'rgd_status3' => '배송준비',
+                        ]);
+                    } else {
+                        ReceivingGoodsDelivery::where("is_no", $te_carry_out_number)->update([
                             'rgd_status1' => '반출',
                             'rgd_status3' => '배송준비',
                         ]);
