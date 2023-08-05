@@ -2767,7 +2767,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     't_status' => '0',
                 ]);
 
-                $BaroService_URL = 'https://testws.baroservice.com/TI.asmx?WSDL';    //테스트베드용
+                $BaroService_URL = 'https://ws.baroservice.com/TI.asmx?wsdl';    //테스트베드용
                 //$BaroService_URL = 'https://ws.baroservice.com/TI.asmx?WSDL';		//실서비스용
 
                 $BaroService_TI = new SoapClient($BaroService_URL, array(
@@ -2776,7 +2776,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 ));
 
                 // GetTaxInvoiceStatesEX.php 파일에서도 수정해야 함
-                $CERTKEY = '813FD596-7CBB-490A-84D2-31570487790E';                            //인증키
+                $CERTKEY = '985417C4-240F-4FA4-B9AD-EA54E25C0F7E';                            //인증키
 
                 $apis  = Tax::where('rgd_no', $request->rgd_no)->where('t_status', 1)->get();
 
@@ -2905,7 +2905,7 @@ class ReceivingGoodsDeliveryController extends Controller
             $text = "";
             $text_delete = "";
 
-            $BaroService_URL = 'https://testws.baroservice.com/TI.asmx?WSDL';    //테스트베드용
+            $BaroService_URL = 'https://ws.baroservice.com/TI.asmx?wsdl';    //테스트베드용
             //$BaroService_URL = 'https://ws.baroservice.com/TI.asmx?WSDL';		//실서비스용
 
             $BaroService_TI = new SoapClient($BaroService_URL, array(
@@ -2915,11 +2915,11 @@ class ReceivingGoodsDeliveryController extends Controller
 
 
             // GetTaxInvoiceStatesEX.php 파일에서도 수정해야 함
-            $CERTKEY = '813FD596-7CBB-490A-84D2-31570487790E';                            //인증키
+            $CERTKEY = '985417C4-240F-4FA4-B9AD-EA54E25C0F7E';                            //인증키
 
             // 사업자등록증 확인 프로세스
             // 바로빌 연동서비스 웹서비스 참조(WebService Reference) URL
-            $BaroService_URL_staus = 'https://testws.baroservice.com/CORPSTATE.asmx?WSDL';    //테스트베드용
+            $BaroService_URL_staus = 'https://ws.baroservice.com/CORPSTATE.asmx?wsdl';    //테스트베드용
             // $BaroService_URL_staus = 'https://ws.baroservice.com/CORPSTATE.asmx?WSDL';	//실서비스용
 
             $BaroService_CORPSTATE = new SoapClient($BaroService_URL_staus, array(
