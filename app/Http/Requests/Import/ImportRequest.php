@@ -36,7 +36,10 @@ class ImportRequest extends BaseFormRequest
             ],
             'page_type' => [
                 '',
-            ]
+            ],
+            'w_category_name' => [
+                '',
+            ],
         ];
     }
 
