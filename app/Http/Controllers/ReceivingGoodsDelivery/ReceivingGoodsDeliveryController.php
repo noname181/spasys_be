@@ -2470,7 +2470,7 @@ class ReceivingGoodsDeliveryController extends Controller
     public function create_import_schedule_list(ReceivingGoodsDeliveryCreateRequest $request)
     {
         $validated = $request->validated();
-
+        $user = Auth::user();
         try {
             DB::beginTransaction();
 
@@ -2506,6 +2506,20 @@ class ReceivingGoodsDeliveryController extends Controller
 
                     ]);
                 }
+
+                if (isset($validated['wr_contents'])) {
+                    $w_no_alert = (object)$rgd;
+                    $w_no_alert->w_category_name = '보세화물';
+
+                    $w_no_alert->company = (object)$request->company;
+                    $w_no_alert->company->co_parent = isset($request->company['co_parent']) ? (object)$request->company['co_parent'] : null;
+                    if(isset($w_no_alert->company->co_parent->co_parent)){
+                        $w_no_alert->company->co_parent->co_parent = (object)$w_no_alert->company->co_parent->co_parent;
+                        CommonFunc::insert_alarm_cargo_request('[보세화물]', $validated['wr_contents'], $user, $w_no_alert, 'cargo_request');
+                    }
+
+                    
+                }
             }
 
             foreach ($validated['remove'] as $remove) {
@@ -2534,6 +2548,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 //     ]
                 // );
             }
+            
 
 
             DB::commit();
