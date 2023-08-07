@@ -2341,6 +2341,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 //alert
                 if (isset($request->company)) {
                     $w_no_alert = (object)$rgd;
+                    
                     $w_no_alert->w_category_name = '보세화물';
 
                     $w_no_alert->company = (object)$request->company;
@@ -2366,20 +2367,21 @@ class ReceivingGoodsDeliveryController extends Controller
 
                     
                 }
+            }
 
-                if (isset($validated['wr_contents'])) {
-                    $w_no_alert = (object)$rgd;
-                    $w_no_alert->w_category_name = '보세화물';
+            if (isset($validated['wr_contents'])) {
+                $w_no_alert = (object)end($validated['location']);
+                $w_no_alert->w_category_name = '보세화물';
 
-                    $w_no_alert->company = (object)$request->company;
-                    $w_no_alert->company->co_parent = isset($request->company['co_parent']) ? (object)$request->company['co_parent'] : null;
-                    if(isset($w_no_alert->company->co_parent->co_parent)){
-                        $w_no_alert->company->co_parent->co_parent = (object)$w_no_alert->company->co_parent->co_parent;
-                        CommonFunc::insert_alarm_cargo_request('[보세화물]', $validated['wr_contents'], $user, $w_no_alert, 'cargo_request');
-                    }
-
-                    
+                $w_no_alert->company = (object)$request->company;
+                $w_no_alert->company->co_parent = isset($request->company['co_parent']) ? (object)$request->company['co_parent'] : null;
+                
+                if(isset($w_no_alert->company->co_parent->co_parent)){
+                    $w_no_alert->company->co_parent->co_parent = (object)$w_no_alert->company->co_parent->co_parent;
+                    CommonFunc::insert_alarm_cargo_request('[보세화물]', $validated['wr_contents'], $user, $w_no_alert, 'cargo_request');
                 }
+
+                
             }
 
 
@@ -2507,19 +2509,23 @@ class ReceivingGoodsDeliveryController extends Controller
                     ]);
                 }
 
-                if (isset($validated['wr_contents'])) {
-                    $w_no_alert = (object)$rgd;
-                    $w_no_alert->w_category_name = '보세화물';
+                
+            }
 
-                    $w_no_alert->company = (object)$request->company;
-                    $w_no_alert->company->co_parent = isset($request->company['co_parent']) ? (object)$request->company['co_parent'] : null;
-                    if(isset($w_no_alert->company->co_parent->co_parent)){
-                        $w_no_alert->company->co_parent->co_parent = (object)$w_no_alert->company->co_parent->co_parent;
-                        CommonFunc::insert_alarm_cargo_request('[보세화물]', $validated['wr_contents'], $user, $w_no_alert, 'cargo_request');
-                    }
+            if (isset($validated['wr_contents'])) {
+                $w_no_alert = (object)end($validated['location']);
+            
+                $w_no_alert->w_category_name = '보세화물';
 
-                    
+                $w_no_alert->company = (object)$request->company;
+                $w_no_alert->company->co_parent = isset($request->company['co_parent']) ? (object)$request->company['co_parent'] : null;
+                
+                if(isset($w_no_alert->company->co_parent->co_parent)){
+                    $w_no_alert->company->co_parent->co_parent = (object)$w_no_alert->company->co_parent->co_parent;
+                    CommonFunc::insert_alarm_cargo_request('[보세화물]', $validated['wr_contents'], $user, $w_no_alert, 'cargo_request');
                 }
+
+                
             }
 
             foreach ($validated['remove'] as $remove) {
