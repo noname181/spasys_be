@@ -186,7 +186,7 @@ class EWHPController extends Controller
                         ]
                     );
 
-                    Alarm::where("is_no", $te_carry_in_number)->update(
+                    Alarm::where("w_no", $te_carry_in_number)->update(
                         [
                             'w_no' =>  $te_carry_out_number,
                         ]
