@@ -920,13 +920,13 @@ class CommonFunc
         }
 
         $alarm_data = AlarmData::where('ad_title', $ad_title)->first();
-
+        
         $alarm_content = $alarm_data->ad_content;
         $alarm_content = str_replace('aaaaa', $aaaaa, $alarm_content);
         $alarm_content = str_replace('bbbbb', $bbbbb, $alarm_content);
         $alarm_content = str_replace('ccccc', $ccccc, $alarm_content);
         $alarm_content = str_replace('ddddd', $ddddd, $alarm_content);
-
+       
         if (isset($w_no->receving_goods_delivery[0]->rgd_status1) && isset($w_no->w_schedule_number)) {
             $alarm_content = '[' . $w_no->receving_goods_delivery[0]->rgd_status1 . ']' . ' ' . $w_no->w_schedule_number . ' ' . $alarm_content;
         }elseif(isset($w_no->rgd_status1) && isset($w_no->order_number)){
@@ -934,7 +934,7 @@ class CommonFunc
         }elseif (isset($w_no->receving_goods_delivery[0]->rgd_status1) && isset($w_no->order_id)) {
             $alarm_content = '[' . $w_no->receving_goods_delivery[0]->rgd_status1 . ']' . ' ' . $w_no->order_id . ' ' . $alarm_content;
         }
-
+        
         if ($type == 'cargo_request') {
             $alarm_type = 'cargo_request';
         }

@@ -548,7 +548,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     $w_no_alert = Warehousing::with(['receving_goods_delivery'])->where('w_no', $w_no)->first();
                     CommonFunc::insert_alarm_cargo('[유통가공] 입고예정', null, $user, $w_no_alert, 'cargo_IW');
                 }
-                if ($user->mb_type != 'spasys' && $validated['wr_contents']) {
+                if (isset($validated['wr_contents'])) {
                     $w_no_alert = Warehousing::with(['receving_goods_delivery'])->where('w_no', $w_no)->first();
                     CommonFunc::insert_alarm_cargo_request('[유통가공]', $validated['wr_contents'], $user, $w_no_alert, 'cargo_request');
                 }
@@ -1222,7 +1222,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     }
                 }
             } else {
-                if ($user->mb_type != 'spasys' && $request->wr_contents) {
+                if (isset($request->wr_contents)) {
                     $w_no_alert = Warehousing::with(['receving_goods_delivery'])->where('w_no', isset($request->w_no) ? $request->w_no : $w_no)->first();
                     CommonFunc::insert_alarm_cargo_request('[유통가공]', $request->wr_contents, $user, $w_no_alert, 'cargo_request');
                 }
@@ -1336,8 +1336,8 @@ class ReceivingGoodsDeliveryController extends Controller
             if ($check_alarm_first === null && $rgd_status3 == '배송중'){
                 CommonFunc::insert_alarm_cargo('[수입풀필먼트] 배송중', null, $user, $w_no_alert, 'cargo_delivery');
             }
-            //return $w_no_alert;
-            if ($request->wr_contents) {
+            
+            if (isset($request->wr_contents)) {
                 CommonFunc::insert_alarm_cargo_request('[수입풀필먼트]', $request->wr_contents, $user, $w_no_alert, 'cargo_request');
             }
 
