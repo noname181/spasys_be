@@ -1297,12 +1297,11 @@ class WarehousingController extends Controller
                         $rows_warehousing_add = $rows_warehousing_add + 1;
                         $warehousing_id = Warehousing::insertGetId([
                             'mb_no' => Auth::user()->mb_no,
-                            
                             'w_type' => 'IW',
                             'w_category_name' => '유통가공',
                             'mb_no' => $member->mb_no,
-                            'co_no' => $value[0]['company']['co_no'],
-                            'w_schedule_day' => $w_schedule_day,
+                            'co_no' => isset($value[0]['company']['co_no']) ? $value[0]['company']['co_no'] : null,
+                            'w_schedule_day' => isset($w_schedule_day) ? $w_schedule_day : null,
                             'w_cancel_yn' => 'n',
                         ]);
                         if ($warehousing_id) {
