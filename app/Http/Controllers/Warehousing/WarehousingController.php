@@ -1206,33 +1206,33 @@ class WarehousingController extends Controller
             $rows_number_item_add = 0;
             $check_error = false;
             $test_i = [];
-            if(Auth::user()->mb_type == "spasys"){
+            if (Auth::user()->mb_type == "spasys") {
                 $company = Company::with(["co_parent"])->where("co_type", "shipper")->where(function ($query) {
                     $query->whereHas('co_parent.co_parent', function ($q) {
                         $q->where('co_no', Auth::user()->co_no);
                     });
                 })->get();
-            }elseif(Auth::user()->mb_type == "shop"){
+            } elseif (Auth::user()->mb_type == "shop") {
                 $company = Company::with(["co_parent"])->where("co_type", "shipper")->where(function ($query) {
                     $query->whereHas('co_parent', function ($q) {
                         $q->where('co_no', Auth::user()->co_no);
                     });
                 })->get();
-            }else{
+            } else {
                 $company = Company::with(["co_parent"])->where("co_type", "shipper")->where("co_no", Auth::user()->co_no)->get();
             }
-            
+
             $company_shipper = [];
-            foreach($company as $co){
+            foreach ($company as $co) {
                 $company_shipper[] = $co->co_no;
             }
 
-            
+
             foreach ($warehousing_data as $key => $warehouse) {
                 if ($key < 1) {
                     continue;
                 }
-             
+
                 $validator = Validator::make($warehouse, WarehousingDataValidate::rules());
                 if ($validator->fails()) {
                     $errors[$sheet->getTitle()][] = $validator->errors();
@@ -1240,70 +1240,69 @@ class WarehousingController extends Controller
 
                     return $errors;
                 } else {
-                    
+
                     //return $excel_company;
-                    if(isset($warehouse['I']) && $warehouse['I']){
-                        $item = Item::with(['company'])->where('item_service_name', '유통가공')->where('item_name', $warehouse['G'])->where('item_option2', $warehouse['I']);
-                    }else{
+                    if (isset($warehouse['H']) && $warehouse['H']) {
                         $item = Item::with(['company'])->where('item_service_name', '유통가공')->where('item_name', $warehouse['G'])->where('item_option1', $warehouse['H']);
+                    } else {
+                        $item = Item::with(['company'])->where('item_service_name', '유통가공')->where('item_name', $warehouse['G']);
                     }
-                    
+
                     $item = $item->first();
-                    
+
                     if (!isset($item)) {
-                        $errors[$sheet->getTitle()][] = $validator->errors();
-                        $check_error = true;
+                        continue;
+                        //$errors[$sheet->getTitle()][] = $validator->errors();
+                        //$check_error = true;
                     } else {
 
-                        $custom = collect(['wi_number' => $warehouse['J']]);
+                        $custom = collect(['wi_number' => $warehouse['J'], 'company_shipper' => $warehouse['B'], 'w_schedule_day' => $warehouse['K']]);
 
                         $item = $custom->merge($item);
 
-                        $index = $warehouse['B'] . ',' . $warehouse['K'];
-                        // if (array_key_exists($index, $out)){
-                        //     $out[$index] = $d['A'];
+                        $test_i[] = $item;
+                        // $index = $warehouse['B'] . ',' . $warehouse['K'];
+
+                        // $test[$index] = $warehouse['A'];
+
+                        // if (isset($test_i[$index])) {
+                        //     $tmp = $test_i[$index];
+                        //     $tmp[] = $item;
+                        //     $test_i[$index] = $tmp;
+                        // } else {
+                        //     $tmp = [];
+                        //     $tmp[] = $item;
+                        //     $test_i[$index] = $tmp;
                         // }
-                        $test[$index] = $warehouse['A'];
-                        
-                        if (isset($test_i[$index])) {
-                            $tmp = $test_i[$index];
-                            $tmp[] = $item;
-                            $test_i[$index] = $tmp;
-                        } else {
-                            $tmp = [];
-                            $tmp[] = $item;
-                            $test_i[$index] = $tmp;
-                        }
                     }
-                    
                 }
                 $check_key++;
             }
-            
+            //return $test_i;
             foreach ($test_i as $key => $value) {
-                
-                    $strArray = explode(',', $key);
-                    $w_schedule_day = date('Y-m-d', strtotime(str_replace('.', '-', $strArray[1])));
 
-                    $excel_company = Company::where("co_name", $strArray[0])->whereIn('co_no', $company_shipper)->first();
+                $strArray = explode(',', $key);
+                $w_schedule_day = date('Y-m-d', strtotime(str_replace('.', '-', $value['w_schedule_day'])));
 
+                $excel_company = Company::where("co_name", $value['company_shipper'])->whereIn('co_no', $company_shipper)->first();
 
-                    
-                    if(!isset($excel_company)){
-                        $errors["type"] = "Register only affiliated shippers!";
-                        $errors[$sheet->getTitle()][] = "소속된 화주가 아닙니다. 소속된 화주만 등록하세요!";
-                        $check_error = true;
-                    }else{
+                if (!isset($excel_company)) {
+                    $errors["type"] = "Register only affiliated shippers!";
+                    $errors[$sheet->getTitle()][] = "소속된 화주가 아닙니다. 소속된 화주만 등록하세요!";
+                    $check_error = true;
+                } else {
+                    if (isset($value['company'])) {
                         $rows_warehousing_add = $rows_warehousing_add + 1;
                         $warehousing_id = Warehousing::insertGetId([
                             'mb_no' => Auth::user()->mb_no,
                             'w_type' => 'IW',
                             'w_category_name' => '유통가공',
                             'mb_no' => $member->mb_no,
-                            'co_no' => isset($value[0]['company']['co_no']) ? $value[0]['company']['co_no'] : null,
+                            'co_no' => isset($value['co_no']) ? $value['co_no'] : null,
                             'w_schedule_day' => isset($w_schedule_day) ? $w_schedule_day : null,
                             'w_cancel_yn' => 'n',
                         ]);
+
                         if ($warehousing_id) {
                             ReceivingGoodsDelivery::insert([
                                 'mb_no' => $member->mb_no,
@@ -1324,22 +1323,23 @@ class WarehousingController extends Controller
                             ]);
 
                             $w_amount = 0;
-                            foreach ($value as $warehousing_item) {
-                                WarehousingItem::insert([
-                                    'item_no' => $warehousing_item['item_no'],
-                                    'w_no' => $warehousing_id,
-                                    'wi_number' => isset($warehousing_item['wi_number']) ? $warehousing_item['wi_number'] : null,
-                                    'wi_type' => '입고_shipper'
-                                ]);
+                            //foreach ($value as $warehousing_item) {
+                            WarehousingItem::insert([
+                                'item_no' => $value['item_no'],
+                                'w_no' => $warehousing_id,
+                                'wi_number' => isset($value['wi_number']) ? $value['wi_number'] : null,
+                                'wi_type' => '입고_shipper'
+                            ]);
 
-                                // WarehousingItem::insert([
-                                //     'item_no' => $warehousing_item['item_no'],
-                                //     'w_no' => $warehousing_id,
-                                //     'wi_number' => isset($warehousing_item['wi_number']) ? $warehousing_item['wi_number'] : null,
-                                //     'wi_type' => '입고_spasys'
-                                // ]);
-                                $w_amount += $warehousing_item['wi_number'];
-                            }
+                            // WarehousingItem::insert([
+                            //     'item_no' => $warehousing_item['item_no'],
+                            //     'w_no' => $warehousing_id,
+                            //     'wi_number' => isset($warehousing_item['wi_number']) ? $warehousing_item['wi_number'] : null,
+                            //     'wi_type' => '입고_spasys'
+                            // ]);
+                            $w_amount = $value['wi_number'];
+                            //}
+
                             $schedule_number = 'SPA_' . date('Ymd') . ((int) $warehousing_id) . '_IW';
                             Warehousing::Where('w_no', $warehousing_id)->update([
                                 'w_schedule_number' => $schedule_number,
@@ -1369,7 +1369,8 @@ class WarehousingController extends Controller
                             //     }
                             // }
                         }
-                    }     
+                    }
+                }
             }
 
             if ($check_error == true) {
@@ -2694,7 +2695,7 @@ class WarehousingController extends Controller
                         });
                     }
                 }
-                
+
                 DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
                 $user = Auth::user();
                 if ($user->mb_type == 'shop') {
@@ -2939,7 +2940,7 @@ class WarehousingController extends Controller
                 $schedule_shipment = $schedule_shipment->get();
 
                 $import_schedule = $import_schedule->get();
-                
+
                 //$final =  $warehousing->merge($schedule_shipment)->merge($import_schedule);
                 $final = collect($warehousing)->map(function ($q) {
 
@@ -4170,7 +4171,6 @@ class WarehousingController extends Controller
                         return $q->where('cs_payment_cycle', $validated['settlement_cycle']);
                     });
                 }
-
             }
 
             $warehousing->orderBy('created_at', 'DESC');
@@ -4249,7 +4249,7 @@ class WarehousingController extends Controller
     public function countcheckbill(WarehousingSearchRequest $request)
     {
         try {
-            
+
             DB::enableQueryLog();
             ini_set('max_execution_time', 0);
             ini_set('memory_limit', '4000M');
@@ -4262,91 +4262,81 @@ class WarehousingController extends Controller
             $user = Auth::user();
 
             $member_type = Member::with(['company'])->where('mb_id', Auth::user()->mb_id)->first();
-    
+
             $count_qna_question = 0;
 
-            if($member_type->mb_type == 'spasys'){
-                $qna = Qna::with(['member','company','member_question'])->where('qna_status','!=','삭제')->where(function ($query) use ($member_type){
-                    $query->where('co_no_target', '=', Auth::user()->co_no)->orwhere('spasys_no',$member_type->co_no)
-                        ->orWhereHas('member',function ($query) use ($member_type){
-                            $query->where('co_no','=',$member_type->co_no);
-                        })->orWhereHas('company',function ($query) use ($member_type){
-                            $query->where('co_no','=',$member_type->co_no);
+            if ($member_type->mb_type == 'spasys') {
+                $qna = Qna::with(['member', 'company', 'member_question'])->where('qna_status', '!=', '삭제')->where(function ($query) use ($member_type) {
+                    $query->where('co_no_target', '=', Auth::user()->co_no)->orwhere('spasys_no', $member_type->co_no)
+                        ->orWhereHas('member', function ($query) use ($member_type) {
+                            $query->where('co_no', '=', $member_type->co_no);
+                        })->orWhereHas('company', function ($query) use ($member_type) {
+                            $query->where('co_no', '=', $member_type->co_no);
                         });
-                })->with(['mb_no'=>function($query){
-                    $query->select(['mb_name','mb_no']);
-                }])->with('files')->with(['childQna'=>function($query){
+                })->with(['mb_no' => function ($query) {
+                    $query->select(['mb_name', 'mb_no']);
+                }])->with('files')->with(['childQna' => function ($query) {
 
-                    $query->with('files')->with(['mb_no_target'=>function($query){
-                        $query->select(['mb_name','mb_no']);
-                    }])->with(['mb_no'=>function($query){
-                        $query->select(['mb_name','mb_no']);
+                    $query->with('files')->with(['mb_no_target' => function ($query) {
+                        $query->select(['mb_name', 'mb_no']);
+                    }])->with(['mb_no' => function ($query) {
+                        $query->select(['mb_name', 'mb_no']);
                     }]);
-
-                }])->with(['member' => function($query){
-
+                }])->with(['member' => function ($query) {
                 }])
-                ->orderBy('answer_for','DESC')
-                ->orderBy('depth_path','ASC')
-                ->orderBy('qna_no', 'DESC');
-                
-                
-            }else if($member_type->mb_type == 'shop'){
-                $qna = Qna::with(['member','company','member_question'])->where('qna_status','!=','삭제')->where(function ($query) use ($member_type) {
-                    $query->where('co_no_target', '=', Auth::user()->co_no)->orWhere('mb_no_question',$member_type->mb_no)//->orWhere('co_no_target', '=', $member_type->company->co_parent->co_no) this shop can see other shop with the same spasys
-                        ->orWhereHas('member',function ($query) use ($member_type){
-                            $query->where('co_no','=',$member_type->co_no);
-                            
-                        })->orwhereHas('company.co_parent',function ($query2) use ($member_type){
-                            $query2->where('co_no','=',$member_type->co_no);
+                    ->orderBy('answer_for', 'DESC')
+                    ->orderBy('depth_path', 'ASC')
+                    ->orderBy('qna_no', 'DESC');
+            } else if ($member_type->mb_type == 'shop') {
+                $qna = Qna::with(['member', 'company', 'member_question'])->where('qna_status', '!=', '삭제')->where(function ($query) use ($member_type) {
+                    $query->where('co_no_target', '=', Auth::user()->co_no)->orWhere('mb_no_question', $member_type->mb_no) //->orWhere('co_no_target', '=', $member_type->company->co_parent->co_no) this shop can see other shop with the same spasys
+                        ->orWhereHas('member', function ($query) use ($member_type) {
+                            $query->where('co_no', '=', $member_type->co_no);
+                        })->orwhereHas('company.co_parent', function ($query2) use ($member_type) {
+                            $query2->where('co_no', '=', $member_type->co_no);
                         });
-                })->with(['mb_no'=>function($query){
-                    $query->select(['mb_name','mb_no']);
-                }])->with('files')->with(['childQna'=>function($query){
+                })->with(['mb_no' => function ($query) {
+                    $query->select(['mb_name', 'mb_no']);
+                }])->with('files')->with(['childQna' => function ($query) {
 
-                    $query->with('files')->with(['mb_no_target'=>function($query){
-                        $query->select(['mb_name','mb_no']);
-                    }])->with(['mb_no'=>function($query){
-                        $query->select(['mb_name','mb_no']);
+                    $query->with('files')->with(['mb_no_target' => function ($query) {
+                        $query->select(['mb_name', 'mb_no']);
+                    }])->with(['mb_no' => function ($query) {
+                        $query->select(['mb_name', 'mb_no']);
                     }]);
-
-                }])->with(['member' => function($query){
-
+                }])->with(['member' => function ($query) {
                 }])
-                ->orderBy('answer_for','DESC')
-                ->orderBy('depth_path','ASC')
-                ->orderBy('qna_no', 'DESC');
-             
-            } else if($member_type->mb_type == 'shipper') {
-                $qna = Qna::with(['member','company','member_question'])->where('qna_status','!=','삭제')->where(function ($query) use ($member_type) {
-                    $query->where('co_no_target', '=', Auth::user()->co_no)->orWhere('mb_no_question',$member_type->mb_no)
-                        ->orWhereHas('member',function ($query) use ($member_type){
-                            $query->where('co_no','=',$member_type->co_no);
+                    ->orderBy('answer_for', 'DESC')
+                    ->orderBy('depth_path', 'ASC')
+                    ->orderBy('qna_no', 'DESC');
+            } else if ($member_type->mb_type == 'shipper') {
+                $qna = Qna::with(['member', 'company', 'member_question'])->where('qna_status', '!=', '삭제')->where(function ($query) use ($member_type) {
+                    $query->where('co_no_target', '=', Auth::user()->co_no)->orWhere('mb_no_question', $member_type->mb_no)
+                        ->orWhereHas('member', function ($query) use ($member_type) {
+                            $query->where('co_no', '=', $member_type->co_no);
                         });
-                })->with(['mb_no'=>function($query){
-                    $query->select(['mb_name','mb_no']);
-                }])->with('files')->with(['childQna'=>function($query){
+                })->with(['mb_no' => function ($query) {
+                    $query->select(['mb_name', 'mb_no']);
+                }])->with('files')->with(['childQna' => function ($query) {
 
-                    $query->with('files')->with(['mb_no_target'=>function($query){
-                        $query->select(['mb_name','mb_no']);
-                    }])->with(['mb_no'=>function($query){
-                        $query->select(['mb_name','mb_no']);
+                    $query->with('files')->with(['mb_no_target' => function ($query) {
+                        $query->select(['mb_name', 'mb_no']);
+                    }])->with(['mb_no' => function ($query) {
+                        $query->select(['mb_name', 'mb_no']);
                     }]);
-
-                }])->with(['member' => function($query){
-
+                }])->with(['member' => function ($query) {
                 }])
-                ->orderBy('answer_for','DESC')
-                ->orderBy('depth_path','ASC')
-                ->orderBy('qna_no', 'DESC');
+                    ->orderBy('answer_for', 'DESC')
+                    ->orderBy('depth_path', 'ASC')
+                    ->orderBy('qna_no', 'DESC');
             }
             // $today = Date('Y-m-d').' 00:00:01';
-         
+
             $qna->where('created_at', '>=', date('Y-m-d 00:00:00'));
             $qna->where('created_at', '<=', date('Y-m-d 23:59:00'));
-        
+
             $qna =  $qna->count();
-      
+
 
             $warehousing = ReceivingGoodsDelivery::with(['rate_meta_data', 'rate_meta_data_parent', 'rate_data_general', 'payment', 't_import', 'cancel_bill_history', 'rgd_child']);
             if ($user->mb_type == 'shop' && $request->type == 'check_list') {
@@ -4919,7 +4909,7 @@ class WarehousingController extends Controller
             $contract = Contract::where('co_no',  $user->co_no)->first();
 
             $company_payment = null;
-            if($warehousing_->count() > 0){
+            if ($warehousing_->count() > 0) {
                 $issuer = Member::where('mb_no', $warehousing_->first()->mb_no)->first();
                 $company_payment = CompanyPayment::where('co_no',  $issuer->co_no)->first();
             };
@@ -5068,7 +5058,7 @@ class WarehousingController extends Controller
 
                     //GET ISSUER BANK ACCOUNT
                     $item->issuer_bank_account = isset($company_payment) ? $company_payment->cp_bank_number : null;
-        
+
                     return $item;
                 })
             );
@@ -5668,7 +5658,7 @@ class WarehousingController extends Controller
             $contract = Contract::where('co_no',  $user->co_no)->first();
 
             $company_payment = null;
-            if($warehousing_->count() > 0){
+            if ($warehousing_->count() > 0) {
                 $issuer = Member::where('mb_no', $warehousing_->first()->mb_no)->first();
                 $company_payment = CompanyPayment::where('co_no',  $issuer->co_no)->first();
             };
@@ -6176,7 +6166,6 @@ class WarehousingController extends Controller
                         return $q->where('cs_payment_cycle', $validated['settlement_cycle']);
                     });
                 }
-
             }
             if (isset($validated['w_schedule_number'])) {
                 $warehousing->whereHas('warehousing', function ($q) use ($validated) {
@@ -6226,10 +6215,10 @@ class WarehousingController extends Controller
 
                     //GET PRECALCULATE INFO
 
-                    $precalculate = RateMetaData::where('co_no', $user->mb_type == 'spasys' ? $item->warehousing->company->co_parent->co_no : $item->warehousing->co_no)->where(function($q){
-                        $q->where('set_type','=','estimated_costs')
-                        ->orWhere('set_type', 'precalculate');
-                    })->whereHas('rate_data_general', function($q) use($item){
+                    $precalculate = RateMetaData::where('co_no', $user->mb_type == 'spasys' ? $item->warehousing->company->co_parent->co_no : $item->warehousing->co_no)->where(function ($q) {
+                        $q->where('set_type', '=', 'estimated_costs')
+                            ->orWhere('set_type', 'precalculate');
+                    })->whereHas('rate_data_general', function ($q) use ($item) {
                         $q->where('rdg_sum1', $item->t_import_expected->tie_h_bl)->orWhere('rdg_supply_price1', $item->t_import_expected->tie_h_bl)->orWhere('rdg_vat1', $item->t_import_expected->tie_h_bl);
                     })->first();
 
@@ -6562,13 +6551,13 @@ class WarehousingController extends Controller
                         $q->where('co_no', $user->co_no);
                     });
                 });
-                    // ->whereHas('warehousing', function ($query) use ($user) {
-                    //     $query->whereHas('company.co_parent.contract', function ($q) use ($user) {
-                    //         $q->where('c_calculate_deadline_yn', 'y');
-                    //     })->orWhereHas('company.contract', function ($q) use ($user) {
-                    //         $q->where('c_calculate_deadline_yn', 'y');
-                    //     });
-                    // });
+                // ->whereHas('warehousing', function ($query) use ($user) {
+                //     $query->whereHas('company.co_parent.contract', function ($q) use ($user) {
+                //         $q->where('c_calculate_deadline_yn', 'y');
+                //     })->orWhereHas('company.contract', function ($q) use ($user) {
+                //         $q->where('c_calculate_deadline_yn', 'y');
+                //     });
+                // });
             }
             $warehousing->where(function ($q) {
                 $q->where('rgd_status4', '확정청구서');
@@ -6728,15 +6717,15 @@ class WarehousingController extends Controller
             $warehousing_data = $warehousing->get();
 
             $arr_data = collect($warehousing_data)->map(function ($item) {
-                if(isset($item['rate_data_general']))
-                return [
-                    'sum_supply_price' => $item['service_korean_name'] == '유통가공' ? $item['rate_data_general']['rdg_supply_price4'] : ($item['service_korean_name'] == '수입풀필먼트' ? $item['rate_data_general']['rdg_supply_price6'] : $item['rate_data_general']['rdg_supply_price7']),
+                if (isset($item['rate_data_general']))
+                    return [
+                        'sum_supply_price' => $item['service_korean_name'] == '유통가공' ? $item['rate_data_general']['rdg_supply_price4'] : ($item['service_korean_name'] == '수입풀필먼트' ? $item['rate_data_general']['rdg_supply_price6'] : $item['rate_data_general']['rdg_supply_price7']),
 
-                    'sum_vat' => $item['service_korean_name'] == '유통가공' ? $item['rate_data_general']['rdg_vat4'] : ($item['service_korean_name'] == '수입풀필먼트' ? $item['rate_data_general']['rdg_vat6'] : $item['rate_data_general']['rdg_vat7']),
+                        'sum_vat' => $item['service_korean_name'] == '유통가공' ? $item['rate_data_general']['rdg_vat4'] : ($item['service_korean_name'] == '수입풀필먼트' ? $item['rate_data_general']['rdg_vat6'] : $item['rate_data_general']['rdg_vat7']),
 
-                    'sum_sum' => $item['service_korean_name'] == '유통가공' ? $item['rate_data_general']['rdg_sum4'] : ($item['service_korean_name'] == '수입풀필먼트' ? $item['rate_data_general']['rdg_sum6'] : $item['rate_data_general']['rdg_sum7']),
+                        'sum_sum' => $item['service_korean_name'] == '유통가공' ? $item['rate_data_general']['rdg_sum4'] : ($item['service_korean_name'] == '수입풀필먼트' ? $item['rate_data_general']['rdg_sum6'] : $item['rate_data_general']['rdg_sum7']),
 
-                ];
+                    ];
             });
 
             $sum_supply_price = $arr_data->sum('sum_supply_price');
@@ -6746,8 +6735,8 @@ class WarehousingController extends Controller
             $sum_sum = $arr_data->sum('sum_sum');
 
             DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
-            $x = clone($warehousing);
-            $y = clone($warehousing);
+            $x = clone ($warehousing);
+            $y = clone ($warehousing);
 
             $all_bill = $x->groupby('receiving_goods_delivery.rgd_no')->get()->count();
 
@@ -6763,7 +6752,7 @@ class WarehousingController extends Controller
                 'all_bill' => $all_bill,
                 'issued_tax_bill' => $issued_tax_bill,
             ]);
-           
+
 
 
 
@@ -6771,20 +6760,20 @@ class WarehousingController extends Controller
             //return DB::getQueryLog();
             $warehousing->setCollection(
                 $warehousing->getCollection()->map(function ($item) {
-                    if(isset($item['rate_data_general']))
-                    if ($item->service_korean_name === "유통가공") {
-                        $item->supply_price_total = $item->rate_data_general->rdg_supply_price4 ? $item->rate_data_general->rdg_supply_price4 : 0;
-                        $item->vat_price_total = $item->rate_data_general->rdg_vat4 ? $item->rate_data_general->rdg_vat4 : 0;
-                        $item->sum_price_total = $item->rate_data_general->rdg_sum4 ? $item->rate_data_general->rdg_sum4 : 0;
-                    } else if ($item->service_korean_name === "수입풀필먼트") {
-                        $item->supply_price_total = $item->rate_data_general->rdg_supply_price6 ? $item->rate_data_general->rdg_supply_price6 : 0;
-                        $item->vat_price_total = $item->rate_data_general->rdg_vat6 ? $item->rate_data_general->rdg_vat6 : 0;
-                        $item->sum_price_total = $item->rate_data_general->rdg_sum6 ? $item->rate_data_general->rdg_sum6 : 0;
-                    } else {
-                        $item->supply_price_total = $item->rate_data_general->rdg_supply_price7 ? $item->rate_data_general->rdg_supply_price7 : 0;
-                        $item->vat_price_total = $item->rate_data_general->rdg_vat7 ? $item->rate_data_general->rdg_vat7 : 0;
-                        $item->sum_price_total = $item->rate_data_general->rdg_sum7 ? $item->rate_data_general->rdg_sum7 : 0;
-                    }
+                    if (isset($item['rate_data_general']))
+                        if ($item->service_korean_name === "유통가공") {
+                            $item->supply_price_total = $item->rate_data_general->rdg_supply_price4 ? $item->rate_data_general->rdg_supply_price4 : 0;
+                            $item->vat_price_total = $item->rate_data_general->rdg_vat4 ? $item->rate_data_general->rdg_vat4 : 0;
+                            $item->sum_price_total = $item->rate_data_general->rdg_sum4 ? $item->rate_data_general->rdg_sum4 : 0;
+                        } else if ($item->service_korean_name === "수입풀필먼트") {
+                            $item->supply_price_total = $item->rate_data_general->rdg_supply_price6 ? $item->rate_data_general->rdg_supply_price6 : 0;
+                            $item->vat_price_total = $item->rate_data_general->rdg_vat6 ? $item->rate_data_general->rdg_vat6 : 0;
+                            $item->sum_price_total = $item->rate_data_general->rdg_sum6 ? $item->rate_data_general->rdg_sum6 : 0;
+                        } else {
+                            $item->supply_price_total = $item->rate_data_general->rdg_supply_price7 ? $item->rate_data_general->rdg_supply_price7 : 0;
+                            $item->vat_price_total = $item->rate_data_general->rdg_vat7 ? $item->rate_data_general->rdg_vat7 : 0;
+                            $item->sum_price_total = $item->rate_data_general->rdg_sum7 ? $item->rate_data_general->rdg_sum7 : 0;
+                        }
 
                     $item->tid_no = $item->tid_no ? $item->tid_no : $item->tid_no2;
 
@@ -6823,12 +6812,12 @@ class WarehousingController extends Controller
         try {
 
             $th = CancelBillHistory::with('member')->where('rgd_no', $request->rgd_no)
-            ->where(function($q){
-                $q->where('cbh_status_after', 'taxed')->orwhere('cbh_status_after', 'cancel')->orwhere('cbh_status_after', 'edited');
-            })
-            ->where('cbh_type', 'tax')
-            ->orderby('cbh_no', 'DESC')
-            ->get();
+                ->where(function ($q) {
+                    $q->where('cbh_status_after', 'taxed')->orwhere('cbh_status_after', 'cancel')->orwhere('cbh_status_after', 'edited');
+                })
+                ->where('cbh_type', 'tax')
+                ->orderby('cbh_no', 'DESC')
+                ->get();
 
             return response()->json($th);
         } catch (\Exception $e) {
@@ -6873,13 +6862,13 @@ class WarehousingController extends Controller
                         $q->where('co_no', $user->co_no);
                     });
                 });
-                    // ->whereHas('warehousing', function ($query) use ($user) {
-                    //     $query->whereHas('company.co_parent.contract', function ($q) use ($user) {
-                    //         $q->where('c_calculate_deadline_yn', 'y');
-                    //     })->orWhereHas('company.contract', function ($q) use ($user) {
-                    //         $q->where('c_calculate_deadline_yn', 'y');
-                    //     });
-                    // });
+                // ->whereHas('warehousing', function ($query) use ($user) {
+                //     $query->whereHas('company.co_parent.contract', function ($q) use ($user) {
+                //         $q->where('c_calculate_deadline_yn', 'y');
+                //     })->orWhereHas('company.contract', function ($q) use ($user) {
+                //         $q->where('c_calculate_deadline_yn', 'y');
+                //     });
+                // });
             }
             $warehousing->where(function ($q) {
                 $q->where('rgd_status4', '확정청구서');
@@ -7163,7 +7152,7 @@ class WarehousingController extends Controller
 
                         $api = $this->update_tax_invoice_api($rgd, $user, $tid, $tid['tid_number'], null, $request['company']);
 
-                        if($key == 0){
+                        if ($key == 0) {
                             $cbh = CancelBillHistory::insertGetId([
                                 'rgd_no' => $request->rgd_no,
                                 'mb_no' => $user->mb_no,
@@ -7172,8 +7161,6 @@ class WarehousingController extends Controller
                                 'cbh_status_after' => 'edited'
                             ]);
                         }
-
-
                     } else {
                         $id = TaxInvoiceDivide::insertGetId([
                             'tid_supply_price' => $tid['tid_supply_price'],
@@ -7192,7 +7179,7 @@ class WarehousingController extends Controller
                             'tid_type' => 'option',
                         ]);
 
-                        if($key == 0){
+                        if ($key == 0) {
                             $cbh = CancelBillHistory::insertGetId([
                                 'rgd_no' => $request->rgd_no,
                                 'mb_no' => $user->mb_no,
@@ -7201,7 +7188,7 @@ class WarehousingController extends Controller
                             ]);
                         }
 
-                        $tax_number = CommonFunc::generate_tax_number($id,$request->rgd_no);
+                        $tax_number = CommonFunc::generate_tax_number($id, $request->rgd_no);
 
                         $api = $this->tax_invoice_api($rgd, $user, $tid, $tax_number, null, null);
 
@@ -7243,13 +7230,13 @@ class WarehousingController extends Controller
                     $ids[] = $id;
                 }
 
-                if($request->is_edit == 'y' && $request->tid_list[0]['tid_type'] == 'add_all'){
+                if ($request->is_edit == 'y' && $request->tid_list[0]['tid_type'] == 'add_all') {
                     ReceivingGoodsDelivery::where('tid_no', $request->tid_list[0]['tid_no'])->update([
                         'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
                         'rgd_status7' => 'taxed',
                         'rgd_tax_invoice_number' => isset($tax_number) ? $tax_number : (isset($api['tax_number']) ? $api['tax_number'] : null),
                     ]);
-                }else {
+                } else {
                     ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
                         'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
                         'rgd_status7' => 'taxed',
@@ -7260,9 +7247,9 @@ class WarehousingController extends Controller
                 TaxInvoiceDivide::where('rgd_no', $request->rgd_no)
                     ->whereNotIn('tid_no', $ids)->delete();
 
-                if($api['message'] == "tax_err"){
+                if ($api['message'] == "tax_err") {
                     DB::rollBack();
-                }else{
+                } else {
                     DB::commit();
                 }
 
@@ -7394,7 +7381,7 @@ class WarehousingController extends Controller
                     'tid_type' => 'add_all',
                 ]);
 
-                $tax_number = CommonFunc::generate_tax_number($id,$request->rgd_no);
+                $tax_number = CommonFunc::generate_tax_number($id, $request->rgd_no);
 
                 TaxInvoiceDivide::where('tid_no', $id)->update([
                     'tid_number' => $tax_number ? $tax_number : null,
@@ -7453,15 +7440,15 @@ class WarehousingController extends Controller
                         }
                     }
                 }
-                if($api['message'] == "tax_err"){
+                if ($api['message'] == "tax_err") {
                     DB::rollBack();
-                }else{
+                } else {
                     DB::commit();
                 }
                 return response()->json([
                     'message' => Messages::MSG_0007,
                     'api' => isset($api['message']) ? $api['message'] : null,
-                'api_message' => isset($api['txt']) ? $api['txt'] : null,
+                    'api_message' => isset($api['txt']) ? $api['txt'] : null,
                 ]);
             } else if ($request->type == 'separate') {
                 $user = Auth::user();
@@ -7500,7 +7487,7 @@ class WarehousingController extends Controller
                         'tid_type' => 'seperate',
                     ]);
 
-                    $tax_number = CommonFunc::generate_tax_number($id,$rgd['rgd_no']);
+                    $tax_number = CommonFunc::generate_tax_number($id, $rgd['rgd_no']);
 
                     $api = $this->tax_invoice_api($rgd, $user, null, $tax_number, null, null);
 
@@ -7552,9 +7539,9 @@ class WarehousingController extends Controller
 
                     //$this->tax_invoice_api($rgd, $user, null);
                 }
-                if($api['message'] == "tax_err"){
+                if ($api['message'] == "tax_err") {
                     DB::rollBack();
-                }else{
+                } else {
                     DB::commit();
                 }
                 return response()->json([
@@ -7563,7 +7550,6 @@ class WarehousingController extends Controller
                     'api_message' => isset($api['txt']) ? $api['txt'] : null,
                 ]);
             }
-
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e);
@@ -8027,7 +8013,7 @@ class WarehousingController extends Controller
 
             $amount = $warehousing->orWhereIn('w_no', $w_no_in)->orderBy('w_no', 'DESC')->sum('w_amount');
 
-            $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->withSum(['schedule_shipment_info' => function($query) {
+            $schedule_shipment = ScheduleShipment::with(['schedule_shipment_info', 'ContractWms'])->withSum(['schedule_shipment_info' => function ($query) {
                 $query->whereIn('order_cs', [0, 3, 4, 5, 6, 7, 8]);
             }], 'qty')->whereNotNull('trans_no')->where('status', '출고');
 
@@ -8084,21 +8070,21 @@ class WarehousingController extends Controller
             // ]);
 
             //GET STOCK FROM API
-            if($user->mb_type == 'shop'){
+            if ($user->mb_type == 'shop') {
                 $start_stock = StockStatusCompany::where('co_no', $request->co_no)
-                ->where('created_at', '>=' , Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->from_date))->format('Y-m-d') . ' 00:00:00')
-                ->where('created_at', '<=' , Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->from_date)->addDays(1))->format('Y-m-d') . ' 00:00:00')
-                ->orderBy('created_at')->sum('stock');
+                    ->where('created_at', '>=', Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->from_date))->format('Y-m-d') . ' 00:00:00')
+                    ->where('created_at', '<=', Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->from_date)->addDays(1))->format('Y-m-d') . ' 00:00:00')
+                    ->orderBy('created_at')->sum('stock');
 
                 $end_stock = StockStatusCompany::where('co_no', $request->co_no)
-                ->where('created_at', '>=', Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date)->addDays(1))->format('Y-m-d') . ' 00:00:00')
-                ->where('created_at', '<=' , Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date)->addDays(2))->format('Y-m-d') . ' 00:00:00')
-                ->orderBy('created_at')->sum('stock');
+                    ->where('created_at', '>=', Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date)->addDays(1))->format('Y-m-d') . ' 00:00:00')
+                    ->where('created_at', '<=', Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date)->addDays(2))->format('Y-m-d') . ' 00:00:00')
+                    ->orderBy('created_at')->sum('stock');
 
                 $start_stock = isset($start_stock) ? $start_stock : 0;
                 $end_stock = isset($end_stock) ? $end_stock : 0;
 
-                if(Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date))->format('Y-m-d') == Carbon::now()->format('Y-m-d')){
+                if (Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date))->format('Y-m-d') == Carbon::now()->format('Y-m-d')) {
                     DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
                     $item = StockStatusBad::with(['item_status_bad'])->whereHas('item_status_bad', function ($q) use ($user, $request) {
                         $q->whereHas('ContractWms.company', function ($k) use ($request) {
@@ -8107,7 +8093,7 @@ class WarehousingController extends Controller
                     })->whereNotNull('stock')->groupby('product_id')->groupby('option_id')->orderBy('product_id', 'DESC');
 
                     $end_stock = collect($item->get())->map(function ($q) {
-                      
+
                         if (isset($q->option_id)) {
                             $status = StockStatusBad::where('product_id', $q->product_id)->where('option_id', $q->option_id)->get();
                         } else {
@@ -8123,32 +8109,30 @@ class WarehousingController extends Controller
                     })->sum('total_amount');
                     DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
                 }
+            } else if ($user->mb_type == 'spasys') {
 
-            }else if($user->mb_type == 'spasys'){
-
-                $shipper_companies = Company::wherehas('co_parent', function($q) use($request){
+                $shipper_companies = Company::wherehas('co_parent', function ($q) use ($request) {
                     $q->where('co_no', $request->co_no);
                 })->get();
 
                 $start_stock = 0;
                 $end_stock = 0;
 
-                foreach($shipper_companies as $index => $shipper_company){
+                foreach ($shipper_companies as $index => $shipper_company) {
                     $start_stock_ = StockStatusCompany::where('co_no', $shipper_company->co_no)
-                    ->where('created_at', '>=' , Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->from_date))->format('Y-m-d') . ' 00:00:00')
-                    ->where('created_at', '<=' , Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->from_date)->addDays(1))->format('Y-m-d') . ' 00:00:00')
-                    ->orderBy('created_at')->sum('stock');
+                        ->where('created_at', '>=', Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->from_date))->format('Y-m-d') . ' 00:00:00')
+                        ->where('created_at', '<=', Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->from_date)->addDays(1))->format('Y-m-d') . ' 00:00:00')
+                        ->orderBy('created_at')->sum('stock');
                     $start_stock += isset($start_stock_) ? $start_stock_ : 0;
 
                     $end_stock_ = StockStatusCompany::where('co_no', $shipper_company->co_no)
-                    ->where('created_at', '>=', Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date)->addDays(1))->format('Y-m-d') . ' 00:00:00')
-                    ->where('created_at', '<=' , Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date)->addDays(2))->format('Y-m-d') . ' 00:00:00')
-                    ->orderBy('created_at')->sum('stock');
+                        ->where('created_at', '>=', Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date)->addDays(1))->format('Y-m-d') . ' 00:00:00')
+                        ->where('created_at', '<=', Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date)->addDays(2))->format('Y-m-d') . ' 00:00:00')
+                        ->orderBy('created_at')->sum('stock');
                     $end_stock += isset($end_stock_) ? $end_stock_ : 0;
-
                 }
 
-                if(Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date))->format('Y-m-d') == Carbon::now()->format('Y-m-d')){
+                if (Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date))->format('Y-m-d') == Carbon::now()->format('Y-m-d')) {
                     DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
                     $item = StockStatusBad::with(['item_status_bad'])->whereHas('item_status_bad', function ($q) use ($user, $request) {
                         $q->whereHas('ContractWms.company.co_parent', function ($k) use ($request) {
@@ -8157,7 +8141,7 @@ class WarehousingController extends Controller
                     })->whereNotNull('stock')->groupby('product_id')->groupby('option_id')->orderBy('product_id', 'DESC');
 
                     $end_stock = collect($item->get())->map(function ($q) {
-                      
+
                         if (isset($q->option_id)) {
                             $status = StockStatusBad::where('product_id', $q->product_id)->where('option_id', $q->option_id)->get();
                         } else {
@@ -8173,7 +8157,6 @@ class WarehousingController extends Controller
                     })->sum('total_amount');
                     DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
                 }
-
             }
 
             //END GET STOCK FROM API
@@ -8229,7 +8212,8 @@ class WarehousingController extends Controller
         }
     }
 
-    public static function get_stock_api($from_date, $to_date){
+    public static function get_stock_api($from_date, $to_date)
+    {
         $param_arrays = array(
             'partner_key' => '50e2331771d085ddccbcd2188a03800c',
             'domain_key' => '50e2331771d085ddeab1bc2f91a39ae14e1b924b8df05d11ff40eea3aff3d9fb',
@@ -8260,7 +8244,7 @@ class WarehousingController extends Controller
                     break;
                 }
             }
-        }else {
+        } else {
             return 'no_data';
         }
 
@@ -8397,20 +8381,20 @@ class WarehousingController extends Controller
         $test = [];
         $test_i = [];
         $test_date = '';
-        
+
         foreach ($datas as $key => $d) {
             if ($key < 1) {
                 continue;
             }
-           
+
             $validator = Validator::make($d, ExcelRequest::rules());
-            
+
             if ($validator->fails()) {
                 $data_item_count =  $data_item_count - 1;
                 $errors[$sheet->getTitle()][] = $validator->errors();
                 $check_error = true;
             } else {
-                if(isset($d['E'])){
+                if (isset($d['E'])) {
                     $contains = Str::contains($d['E'], 'S');
 
                     if ($contains) {
@@ -8424,20 +8408,20 @@ class WarehousingController extends Controller
                             $q->whereIn('co_no', $co_no_in);
                         });
                     }
-                }else{
+                } else {
                     $item = Item::with(['company', 'ContractWms'])->where('item_service_name', '수입풀필먼트')->where('product_id', $d['D']);
                 }
-               
+
 
                 $item = $item->first();
-                
+
                 //$test[] = $item;
                 if (!isset($item)) {
                     $data_item_count =  $data_item_count - 1;
                     $errors[$sheet->getTitle()][] = $validator->errors();
                     $check_error = true;
                 } else {
-                    
+
 
                     $data_item_count =  $data_item_count + 1;
 
@@ -8474,7 +8458,7 @@ class WarehousingController extends Controller
             $strArray = explode(',', $key);
             $w_completed_day = date('Y-m-d H:i:s', strtotime(str_replace('.', '-', $strArray[1])));
 
-           
+
             //return $w_schedule_day;
             $w_no_data = Warehousing::insertGetId([
                 'mb_no' => $member->mb_no,
@@ -8507,7 +8491,7 @@ class WarehousingController extends Controller
 
             $w_amount = 0;
             foreach ($value as $warehousing_item) {
-                
+
 
                 WarehousingItem::insert([
                     'item_no' => $warehousing_item['item_no'],
@@ -9233,7 +9217,7 @@ class WarehousingController extends Controller
     }
 
 
-    public static function tax_invoice_api($rgd, $user, $price, $tax_number, $rgds, $is_check)//$company1, $company2, $total_price, $b_no
+    public static function tax_invoice_api($rgd, $user, $price, $tax_number, $rgds, $is_check) //$company1, $company2, $total_price, $b_no
     {
 
         // issuer
@@ -9243,19 +9227,19 @@ class WarehousingController extends Controller
 
         $cc_no = $issuer_user->co_no;
 
-        if($rgd->service_korean_name == '수입풀필먼트'){
+        if ($rgd->service_korean_name == '수입풀필먼트') {
             $receiver_company = Company::where('co_no', $rgd->warehousing->co_no)->first();
             $s_no = $rgd->warehousing->co_no;
-        }else if($user->mb_type == 'shop' && $is_check == true){
+        } else if ($user->mb_type == 'shop' && $is_check == true) {
             $receiver_company = Company::where('co_no', $rgd->warehousing->company->co_parent->co_no)->first();
             $s_no = $rgd->warehousing->company->co_parent->co_no;
-        }else if($user->mb_type == 'shop'){
+        } else if ($user->mb_type == 'shop') {
             $receiver_company = Company::where('co_no', $rgd->warehousing->co_no)->first();
             $s_no = $rgd->warehousing->co_no;
-        }else if($user->mb_type == 'shipper' && $is_check == true){
+        } else if ($user->mb_type == 'shipper' && $is_check == true) {
             $receiver_company = Company::where('co_no', $rgd->warehousing->co_no)->first();
             $s_no = $rgd->warehousing->co_no;
-        }else if($user->mb_type == 'spasys'){
+        } else if ($user->mb_type == 'spasys') {
             $receiver_company = Company::where('co_no', $rgd->warehousing->company->co_parent->co_no)->first();
             $s_no = $rgd->warehousing->company->co_parent->co_no;
         }
@@ -9264,91 +9248,88 @@ class WarehousingController extends Controller
         $total_price = 0;
         $vat_price = 0;
 
-        if($rgd->service_korean_name == '보세화물'){
-            if($price){
+        if ($rgd->service_korean_name == '보세화물') {
+            if ($price) {
                 $amount_price = $price['tid_supply_price'];
                 $total_price = $price['tid_sum'];
                 $vat_price = $price['tid_vat'];
-            }else{
-                if($rgds){
+            } else {
+                if ($rgds) {
                     $total_price = 0;
-                    foreach($rgds as $rgdp){
-                        if($rgdp['service_korean_name'] == '보세화물'){
+                    foreach ($rgds as $rgdp) {
+                        if ($rgdp['service_korean_name'] == '보세화물') {
                             $amount_price += $rgdp['rate_data_general']['rdg_supply_price7'];
                             $total_price += $rgdp['rate_data_general']['rdg_sum7'];
                             $vat_price += $rgdp['rate_data_general']['rdg_vat7'];
-                        }else if($rgdp['service_korean_name'] == '수입풀필먼트'){
+                        } else if ($rgdp['service_korean_name'] == '수입풀필먼트') {
                             $amount_price += $rgdp['rate_data_general']['rdg_supply_price6'];
                             $total_price += $rgdp['rate_data_general']['rdg_sum6'];
                             $vat_price += $rgdp['rate_data_general']['rdg_vat6'];
-                        }else if($rgdp['service_korean_name'] == '유통가공'){
+                        } else if ($rgdp['service_korean_name'] == '유통가공') {
                             $amount_price += $rgdp['rate_data_general']['rdg_supply_price4'];
                             $total_price += $rgdp['rate_data_general']['rdg_sum4'];
                             $vat_price += $rgdp['rate_data_general']['rdg_vat4'];
                         }
                     }
-                }else{
+                } else {
                     $amount_price = $rgd->rate_data_general->rdg_supply_price7;
                     $total_price = $rgd->rate_data_general->rdg_sum7;
                     $vat_price = $rgd->rate_data_general->rdg_vat7;
                 }
-
             }
-
-        }else if($rgd->service_korean_name == '수입풀필먼트'){
-            if($price){
+        } else if ($rgd->service_korean_name == '수입풀필먼트') {
+            if ($price) {
                 $amount_price = $price['tid_supply_price'];
                 $total_price = $price['tid_sum'];
                 $vat_price = $price['tid_vat'];
-            }else{
-                if($rgds){
+            } else {
+                if ($rgds) {
                     $total_price = 0;
-                    foreach($rgds as $rgdp){
-                        if($rgdp['service_korean_name'] == '보세화물'){
+                    foreach ($rgds as $rgdp) {
+                        if ($rgdp['service_korean_name'] == '보세화물') {
                             $amount_price += $rgdp['rate_data_general']['rdg_supply_price7'];
                             $total_price += $rgdp['rate_data_general']['rdg_sum7'];
                             $vat_price += $rgdp['rate_data_general']['rdg_vat7'];
-                        }else if($rgdp['service_korean_name'] == '수입풀필먼트'){
+                        } else if ($rgdp['service_korean_name'] == '수입풀필먼트') {
                             $amount_price += $rgdp['rate_data_general']['rdg_supply_price6'];
                             $total_price += $rgdp['rate_data_general']['rdg_sum6'];
                             $vat_price += $rgdp['rate_data_general']['rdg_vat6'];
-                        }else if($rgdp['service_korean_name'] == '유통가공'){
+                        } else if ($rgdp['service_korean_name'] == '유통가공') {
                             $amount_price += $rgdp['rate_data_general']['rdg_supply_price4'];
                             $total_price += $rgdp['rate_data_general']['rdg_sum4'];
                             $vat_price += $rgdp['rate_data_general']['rdg_vat4'];
                         }
                     }
-                }else{
+                } else {
                     $amount_price = $rgd->rate_data_general->rdg_supply_price6;
                     $total_price = $rgd->rate_data_general->rdg_sum6;
                     $vat_price = $rgd->rate_data_general->rdg_vat6;
                 }
             }
-
-        }else if($rgd->service_korean_name == '유통가공'){
-            if($price){
+        } else if ($rgd->service_korean_name == '유통가공') {
+            if ($price) {
                 $amount_price = $price['tid_supply_price'];
                 $total_price = $price['tid_sum'];
                 $vat_price = $price['tid_vat'];
-            }else{
-                if($rgds){
+            } else {
+                if ($rgds) {
                     $total_price = 0;
-                    foreach($rgds as $rgdp){
-                        if($rgdp['service_korean_name'] == '보세화물'){
+                    foreach ($rgds as $rgdp) {
+                        if ($rgdp['service_korean_name'] == '보세화물') {
                             $amount_price += $rgdp['rate_data_general']['rdg_supply_price7'];
                             $total_price += $rgdp['rate_data_general']['rdg_sum7'];
                             $vat_price += $rgdp['rate_data_general']['rdg_vat7'];
-                        }else if($rgdp['service_korean_name'] == '수입풀필먼트'){
+                        } else if ($rgdp['service_korean_name'] == '수입풀필먼트') {
                             $amount_price += $rgdp['rate_data_general']['rdg_supply_price6'];
                             $total_price += $rgdp['rate_data_general']['rdg_sum6'];
                             $vat_price += $rgdp['rate_data_general']['rdg_vat6'];
-                        }else if($rgdp['service_korean_name'] == '유통가공'){
+                        } else if ($rgdp['service_korean_name'] == '유통가공') {
                             $amount_price += $rgdp['rate_data_general']['rdg_supply_price4'];
                             $total_price += $rgdp['rate_data_general']['rdg_sum4'];
                             $vat_price += $rgdp['rate_data_general']['rdg_vat4'];
                         }
                     }
-                }else{
+                } else {
                     $amount_price = $rgd->rate_data_general->rdg_supply_price4;
                     $total_price = $rgd->rate_data_general->rdg_sum4;
                     $vat_price = $rgd->rate_data_general->rdg_vat4;
@@ -9356,9 +9337,9 @@ class WarehousingController extends Controller
             }
         }
 
-        if($user->mb_type == 'spasys'){
+        if ($user->mb_type == 'spasys') {
             $cc_license1 = "2168142360";
-        }else{
+        } else {
             $cc_license1 = $issuer_company->co_license;
         }
 
@@ -9371,7 +9352,7 @@ class WarehousingController extends Controller
         $cc_name1 = $issuer_company->co_name;
         $cc_ceo1 = $issuer_company->co_owner ? $issuer_company->co_owner : '모상희';
         $cc_address1 = $issuer_company->co_address;
-        $cc_service1 = "창고업";//$issuer_company->co_service;
+        $cc_service1 = "창고업"; //$issuer_company->co_service;
         $cc_service2 = "서비스 운수 및 창고업";
 
 
@@ -9389,7 +9370,7 @@ class WarehousingController extends Controller
         $t_type = "차주발행";
 
 
-        $s_service1 = "창고업";//$receiver_company->co_service;
+        $s_service1 = "창고업"; //$receiver_company->co_service;
         $s_service2 = "";
         // issued
 
@@ -9448,9 +9429,9 @@ class WarehousingController extends Controller
         */
 
         $IssueDirection = 1;                    //1-정발행, 2-역발행(위수탁 세금계산서는 정발행만 허용)
-        if($user->mb_type == 'spasys'){
+        if ($user->mb_type == 'spasys') {
             $TaxInvoiceType = 1;                    //1-세금계산서, 2-계산서, 4-위수탁세금계산서, 5-위수탁계산서
-        }else{
+        } else {
             $TaxInvoiceType = 4;                    //1-세금계산서, 2-계산서, 4-위수탁세금계산서, 5-위수탁계산서
         }
         //-------------------------------------------
@@ -9472,9 +9453,9 @@ class WarehousingController extends Controller
         //-------------------------------------------
         //return $tax_number;
         $check_mgtnum = Tax::where('t_mgtnum', $tax_number)->first();
-        if($check_mgtnum == null){
+        if ($check_mgtnum == null) {
             $ModifyCode = '';
-        }else{
+        } else {
             $ModifyCode = 1;
         }
 
@@ -9486,7 +9467,7 @@ class WarehousingController extends Controller
         //-------------------------------------------
         //공급가액 총액
         //-------------------------------------------
-        $AmountTotal = $amount_price;//$total_price - round($total_price * 10 / 110);    // total price without tax
+        $AmountTotal = $amount_price; //$total_price - round($total_price * 10 / 110);    // total price without tax
 
         //-------------------------------------------
         //세액합계
@@ -9494,14 +9475,14 @@ class WarehousingController extends Controller
         //$TaxType 이 2 또는 3 으로 셋팅된 경우 0으로 입력
         //-------------------------------------------
 
-        $TaxTotal = $vat_price;//round($total_price * 10 / 110);        // total tax
+        $TaxTotal = $vat_price; //round($total_price * 10 / 110);        // total tax
 
         //-------------------------------------------
         //합계금액
         //-------------------------------------------
         //공급가액 총액 + 세액합계 와 일치해야 합니다.
         //-------------------------------------------
-        $TotalAmount = $total_price;//$AmountTotal + $TaxTotal;            // total price
+        $TotalAmount = $total_price; //$AmountTotal + $TaxTotal;            // total price
 
 
         $Cash = '';                                //현금
@@ -9560,23 +9541,23 @@ class WarehousingController extends Controller
         //------------------------------------------
 
 
-        if($user->mb_type == 'spasys'){
+        if ($user->mb_type == 'spasys') {
             $BrokerParty = array(
-                'MgtNum' 		=> '',
-                'CorpNum' 		=> '',
-                'TaxRegID' 		=> '',
-                'CorpName' 		=> '',
-                'CEOName' 		=> '',
-                'Addr' 			=> '',
-                'BizType' 		=> '',
-                'BizClass' 		=> '',
-                'ContactID' 	=> '',
-                'ContactName' 	=> '',
-                'TEL' 			=> '',
-                'HP' 			=> '',
-                'Email' 		=> ''
+                'MgtNum'         => '',
+                'CorpNum'         => '',
+                'TaxRegID'         => '',
+                'CorpName'         => '',
+                'CEOName'         => '',
+                'Addr'             => '',
+                'BizType'         => '',
+                'BizClass'         => '',
+                'ContactID'     => '',
+                'ContactName'     => '',
+                'TEL'             => '',
+                'HP'             => '',
+                'Email'         => ''
             );
-        }else{
+        } else {
             $BrokerParty = array(
                 'MgtNum'         => $tax_number,                //필수입력 - 연동사부여 문서키
                 'CorpNum'         => '2168142360',                //필수입력 - 바로빌 회원 사업자번호 ('-' 제외, 10자리)
@@ -9690,7 +9671,7 @@ class WarehousingController extends Controller
         //     'MailTitle'    => $MailTitle,
         // );
         //정발행
-        if($user->mb_type == 'spasys'){
+        if ($user->mb_type == 'spasys') {
             $Result = $BaroService_TI->RegistAndIssueTaxInvoice(array(
                 'CERTKEY'    => $CERTKEY,
                 'CorpNum'    => '2168142360',
@@ -9699,9 +9680,7 @@ class WarehousingController extends Controller
                 'ForceIssue' => $ForceIssue,
                 'MailTitle'    => $MailTitle,
             ))->RegistAndIssueTaxInvoiceResult;
-
-
-        }else{
+        } else {
             $Result = $BaroService_TI->RegistAndIssueBrokerTaxInvoice(array(
                 'CERTKEY'    => $CERTKEY,
                 'CorpNum'    => '2168142360',
@@ -9774,7 +9753,7 @@ class WarehousingController extends Controller
         }
     }
 
-    public static function update_tax_invoice_api($rgd, $user, $price, $tax_number, $rgds, $company = null)//$company1, $company2, $total_price, $b_no
+    public static function update_tax_invoice_api($rgd, $user, $price, $tax_number, $rgds, $company = null) //$company1, $company2, $total_price, $b_no
     {
 
         // issuer
@@ -9784,10 +9763,10 @@ class WarehousingController extends Controller
 
         $cc_no = $issuer_user->co_no;
 
-        if($rgd->service_korean_name == '수입풀필먼트' || $user->mb_type == 'shop'){
+        if ($rgd->service_korean_name == '수입풀필먼트' || $user->mb_type == 'shop') {
             $receiver_company = Company::where('co_no', $rgd->warehousing->co_no)->first();
             $s_no = $rgd->warehousing->co_no;
-        }else if($user->mb_type == 'spasys'){
+        } else if ($user->mb_type == 'spasys') {
             $receiver_company = Company::where('co_no', $rgd->warehousing->company->co_parent->co_no)->first();
             $s_no = $rgd->warehousing->company->co_parent->co_no;
         }
@@ -9796,61 +9775,58 @@ class WarehousingController extends Controller
         $total_price = 0;
         $vat_price = 0;
 
-        if($rgd->service_korean_name == '보세화물'){
-            if($price){
+        if ($rgd->service_korean_name == '보세화물') {
+            if ($price) {
                 $amount_price = $price['tid_supply_price'];
                 $total_price = $price['tid_sum'];
                 $vat_price = $price['tid_vat'];
-            }else{
-                if($rgds){
+            } else {
+                if ($rgds) {
                     $total_price = 0;
-                    foreach($rgds as $rgdp){
+                    foreach ($rgds as $rgdp) {
                         $amount_price += $rgdp['rate_data_general']['rdg_supply_price7'];
                         $total_price += $rgdp['rate_data_general']['rdg_sum7'];
                         $vat_price += $rgdp['rate_data_general']['rdg_vat7'];
                     }
-                }else{
+                } else {
                     $amount_price = $rgd->rate_data_general->rdg_supply_price7;
                     $total_price = $rgd->rate_data_general->rdg_sum7;
                     $vat_price = $rgd->rate_data_general->rdg_vat7;
                 }
-
             }
-
-        }else if($rgd->service_korean_name == '수입풀필먼트'){
-            if($price){
+        } else if ($rgd->service_korean_name == '수입풀필먼트') {
+            if ($price) {
                 $amount_price = $price['tid_supply_price'];
                 $total_price = $price['tid_sum'];
                 $vat_price = $price['tid_vat'];
-            }else{
-                if($rgds){
+            } else {
+                if ($rgds) {
                     $total_price = 0;
-                    foreach($rgds as $rgdp){
+                    foreach ($rgds as $rgdp) {
                         $amount_price += $rgdp['rate_data_general']['rdg_supply_price6'];
                         $total_price += $rgdp['rate_data_general']['rdg_sum6'];
                         $vat_price += $rgdp['rate_data_general']['rdg_vat6'];
                     }
-                }else{
+                } else {
                     $amount_price = $rgd->rate_data_general->rdg_supply_price6;
                     $total_price = $rgd->rate_data_general->rdg_sum6;
                     $vat_price = $rgd->rate_data_general->rdg_vat6;
                 }
             }
-
-        }else if($rgd->service_korean_name == '유통가공'){
-            if($price){
+        } else if ($rgd->service_korean_name == '유통가공') {
+            if ($price) {
                 $amount_price = $price['tid_supply_price'];
                 $total_price = $price['tid_sum'];
                 $vat_price = $price['tid_vat'];
-            }else{
-                if($rgds){
+            } else {
+                if ($rgds) {
                     $total_price = 0;
-                    foreach($rgds as $rgdp){
+                    foreach ($rgds as $rgdp) {
                         $amount_price += $rgdp['rate_data_general']['rdg_supply_price4'];
                         $total_price += $rgdp['rate_data_general']['rdg_sum4'];
                         $vat_price += $rgdp['rate_data_general']['rdg_vat4'];
                     }
-                }else{
+                } else {
                     $amount_price = $rgd->rate_data_general->rdg_supply_price4;
                     $total_price = $rgd->rate_data_general->rdg_sum4;
                     $vat_price = $rgd->rate_data_general->rdg_vat4;
@@ -9858,9 +9834,9 @@ class WarehousingController extends Controller
             }
         }
 
-        if($user->mb_type == 'spasys'){
+        if ($user->mb_type == 'spasys') {
             $cc_license1 = "2168142360";
-        }else{
+        } else {
             $cc_license1 = $issuer_company->co_license;
         }
 
@@ -9873,7 +9849,7 @@ class WarehousingController extends Controller
         $cc_name1 = $issuer_company->co_name;
         $cc_ceo1 = $issuer_company->co_owner ? $issuer_company->co_owner : '모상희';
         $cc_address1 = $issuer_company->co_address;
-        $cc_service1 = "창고업";//$issuer_company->co_service;
+        $cc_service1 = "창고업"; //$issuer_company->co_service;
         $cc_service2 = "서비스 운수 및 창고업";
 
 
@@ -9891,7 +9867,7 @@ class WarehousingController extends Controller
         $t_type = "차주발행";
 
 
-        $s_service1 = "창고업";//$receiver_company->co_service;
+        $s_service1 = "창고업"; //$receiver_company->co_service;
         $s_service2 = "";
         // issued
 
@@ -9962,9 +9938,9 @@ class WarehousingController extends Controller
 
         $pieces = explode('_', $tax->t_mgtnum);
         $last_word = array_pop($pieces);
-        $count_last_word = ((int)$last_word+1);
+        $count_last_word = ((int)$last_word + 1);
 
-        $tax_number =  substr_replace($tax->t_mgtnum,$count_last_word,-1);
+        $tax_number =  substr_replace($tax->t_mgtnum, $count_last_word, -1);
 
         TaxInvoiceDivide::where('tid_no', $price['tid_no'])->update([
             'tid_number' => $tax_number ? $tax_number : null,
@@ -9979,9 +9955,9 @@ class WarehousingController extends Controller
         */
 
         $IssueDirection = 1;                    //1-정발행, 2-역발행(위수탁 세금계산서는 정발행만 허용)
-        if($user->mb_type == 'spasys'){
+        if ($user->mb_type == 'spasys') {
             $TaxInvoiceType = 1;                    //1-세금계산서, 2-계산서, 4-위수탁세금계산서, 5-위수탁계산서
-        }else{
+        } else {
             $TaxInvoiceType = 4;                    //1-세금계산서, 2-계산서, 4-위수탁세금계산서, 5-위수탁계산서
         }
         //-------------------------------------------
@@ -10003,9 +9979,9 @@ class WarehousingController extends Controller
         //-------------------------------------------
         //return $tax_number;
         $check_mgtnum = Tax::where('t_mgtnum', $tax_number)->first();
-        if($check_mgtnum == null){
+        if ($check_mgtnum == null) {
             $ModifyCode = '';
-        }else{
+        } else {
             $ModifyCode = 1;
         }
 
@@ -10017,7 +9993,7 @@ class WarehousingController extends Controller
         //-------------------------------------------
         //공급가액 총액
         //-------------------------------------------
-        $AmountTotal = $amount_price;//$total_price - round($total_price * 10 / 110);    // total price without tax
+        $AmountTotal = $amount_price; //$total_price - round($total_price * 10 / 110);    // total price without tax
 
         //-------------------------------------------
         //세액합계
@@ -10025,14 +10001,14 @@ class WarehousingController extends Controller
         //$TaxType 이 2 또는 3 으로 셋팅된 경우 0으로 입력
         //-------------------------------------------
 
-        $TaxTotal = $vat_price;//round($total_price * 10 / 110);        // total tax
+        $TaxTotal = $vat_price; //round($total_price * 10 / 110);        // total tax
 
         //-------------------------------------------
         //합계금액
         //-------------------------------------------
         //공급가액 총액 + 세액합계 와 일치해야 합니다.
         //-------------------------------------------
-        $TotalAmount = $total_price;//$AmountTotal + $TaxTotal;            // total price
+        $TotalAmount = $total_price; //$AmountTotal + $TaxTotal;            // total price
 
 
         $Cash = '';                                //현금
@@ -10091,23 +10067,23 @@ class WarehousingController extends Controller
         //------------------------------------------
 
 
-        if($user->mb_type == 'spasys'){
+        if ($user->mb_type == 'spasys') {
             $BrokerParty = array(
-                'MgtNum' 		=> '',
-                'CorpNum' 		=> '',
-                'TaxRegID' 		=> '',
-                'CorpName' 		=> '',
-                'CEOName' 		=> '',
-                'Addr' 			=> '',
-                'BizType' 		=> '',
-                'BizClass' 		=> '',
-                'ContactID' 	=> '',
-                'ContactName' 	=> '',
-                'TEL' 			=> '',
-                'HP' 			=> '',
-                'Email' 		=> ''
+                'MgtNum'         => '',
+                'CorpNum'         => '',
+                'TaxRegID'         => '',
+                'CorpName'         => '',
+                'CEOName'         => '',
+                'Addr'             => '',
+                'BizType'         => '',
+                'BizClass'         => '',
+                'ContactID'     => '',
+                'ContactName'     => '',
+                'TEL'             => '',
+                'HP'             => '',
+                'Email'         => ''
             );
-        }else{
+        } else {
             $BrokerParty = array(
                 'MgtNum'         => $tax_number,                //필수입력 - 연동사부여 문서키
                 'CorpNum'         => '2168142360',                //필수입력 - 바로빌 회원 사업자번호 ('-' 제외, 10자리)
@@ -10223,7 +10199,7 @@ class WarehousingController extends Controller
         //     'MailTitle'    => $MailTitle,
         // );
         //정발행
-        if($user->mb_type == 'spasys'){
+        if ($user->mb_type == 'spasys') {
             $Result = $BaroService_TI->RegistAndIssueTaxInvoice(array(
                 'CERTKEY'    => $CERTKEY,
                 'CorpNum'    => '2168142360',
@@ -10232,7 +10208,7 @@ class WarehousingController extends Controller
                 'ForceIssue' => $ForceIssue,
                 'MailTitle'    => $MailTitle,
             ))->RegistAndIssueTaxInvoiceResult;
-        }else{
+        } else {
             $Result = $BaroService_TI->RegistAndIssueBrokerTaxInvoice(array(
                 'CERTKEY'    => $CERTKEY,
                 'CorpNum'    => '2168142360',
@@ -10303,14 +10279,15 @@ class WarehousingController extends Controller
         }
     }
 
-    public static function getErrStr($BaroService_TI, $CERTKEY, $ErrCode){
+    public static function getErrStr($BaroService_TI, $CERTKEY, $ErrCode)
+    {
         //global $BaroService_TI;
 
         $ErrStr = $BaroService_TI->GetErrString(array(
-          'CERTKEY' => $CERTKEY,
-          'ErrCode' => $ErrCode
+            'CERTKEY' => $CERTKEY,
+            'ErrCode' => $ErrCode
         ))->GetErrStringResult;
 
         return $ErrStr;
-      }
+    }
 }
