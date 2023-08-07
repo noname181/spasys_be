@@ -6065,6 +6065,8 @@ class WarehousingController extends Controller
     {
         try {
             DB::enableQueryLog();
+            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+
             $validated = $request->validated();
 
             // If per_page is null set default data = 15
@@ -6128,7 +6130,7 @@ class WarehousingController extends Controller
                 ->whereHas('warehousing', function ($query) {
                     $query->where('w_type', '=', 'SET')
                         ->where('w_category_name', '=', '보세화물');
-                });
+                })->groupBy('rgd_no');
             // ->whereHas('mb_no', function ($q) {
             //     $q->whereHas('company', function ($q) {
             //         $q->where('co_type', 'spasys');
@@ -6237,7 +6239,7 @@ class WarehousingController extends Controller
                     return $item;
                 })
             );
-
+            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
             return response()->json($warehousing);
         } catch (\Exception $e) {
             Log::error($e);
