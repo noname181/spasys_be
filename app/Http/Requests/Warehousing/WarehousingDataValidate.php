@@ -58,7 +58,7 @@ class WarehousingDataValidate extends FormRequest
             ],
             'I' => [
                 'nullable',
-                'integer',
+                'max:255',
             ],
             'J' => [
                 'required',
