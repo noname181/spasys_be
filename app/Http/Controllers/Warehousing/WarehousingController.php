@@ -1243,9 +1243,13 @@ class WarehousingController extends Controller
 
                     //return $excel_company;
                     if (isset($warehouse['H']) && $warehouse['H']) {
-                        $item = Item::with(['company'])->where('item_service_name', '유통가공')->where('item_name', $warehouse['G'])->where('item_option1', $warehouse['H']);
+                        $item = Item::with(['company'])->where('item_service_name', '유통가공')->where('item_name', $warehouse['G'])->where('item_option1', $warehouse['H'])->whereHas('company', function ($q) use ($warehouse) {
+                            $q->where('co_name', $warehouse['B']);
+                        });
                     } else {
-                        $item = Item::with(['company'])->where('item_service_name', '유통가공')->where('item_name', $warehouse['G']);
+                        $item = Item::with(['company'])->where('item_service_name', '유통가공')->where('item_name', $warehouse['G'])->whereHas('company', function ($q) use ($warehouse) {
+                            $q->where('co_name', $warehouse['B']);
+                        });
                     }
 
                     $item = $item->first();

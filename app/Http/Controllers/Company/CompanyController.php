@@ -545,7 +545,7 @@ class CompanyController extends Controller
             $export = [];
             $import = Import::with(['import_expected', 'export_confirm'])->where('ti_carry_in_number', $request->is_no)->first();
             $export['import'] = $import;
-            $export['import_expected'] = $import->import_expected;
+            $export['import_expected'] = isset($import->import_expected) ? $import->import_expected : null;
             $company = Company::with(['co_parent'])->where('co_license', $import->import_expect->tie_co_license)->first();
             if (isset($company->co_no)) {
                 $adjustment_group = AdjustmentGroup::where('co_no', '=', $company->co_no)->first();
