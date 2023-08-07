@@ -79,7 +79,7 @@ class CommonFunc
 
         $randomletter = substr(str_shuffle("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 4);
 
-        $string = $string . '_' . date('Ymd'). $randomletter . $data . "_1";
+        $string = $string . '_' . date('Ymd') . $data . $randomletter . "_1";
 
 
         // $tax = Tax::where('rgd_no', $rgd_no)->first();
