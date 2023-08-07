@@ -24,7 +24,7 @@ class ChangePasswordController extends Controller
         try {
             if ($input['mb_current_pw'] === $input['mb_new_pw']) {
                 return response()->json([
-                    'message' => Messages::MSG_0011,
+                    'message' => '현재 비밀번호를 재설정할 수 없습니다.',
                 ], 400);
             }
 
@@ -32,7 +32,7 @@ class ChangePasswordController extends Controller
 
             if (!Hash::check($input['mb_current_pw'], $member->mb_pw)) {
                 return response()->json([
-                    'message' => Messages::MSG_0010,
+                    'message' => '비밀번호가 일치하지 않습니다.',
                 ], 400);
             }
 
