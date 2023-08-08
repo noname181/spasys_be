@@ -6531,7 +6531,7 @@ class WarehousingController extends Controller
                 })->with(['payment', 'member', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('company.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    })->whereHas('company.contract', function ($q) use ($user) {
+                    })->whereHas('company.co_parent.contract', function ($q) use ($user) {
                         $q->where('c_calculate_deadline_yn', 'y');
                     });
                 });
@@ -6550,8 +6550,6 @@ class WarehousingController extends Controller
                     $join->on('tax_invoice_divide.rgd_no', '=', 'receiving_goods_delivery.rgd_no');
                 })->with(['payment', 'member', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('company.co_parent.co_parent', function ($q) use ($user) {
-                        $q->where('co_no', $user->co_no);
-                    })->orWhereHas('company.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
                 });
