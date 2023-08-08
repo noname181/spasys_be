@@ -9516,7 +9516,8 @@ class WarehousingController extends Controller
             'ContactName'     => $cc_ceo1,                //필수입력
             'TEL'             => '',
             'HP'             => '',
-            'Email'         => $cc_license1 . '@bantalk.com'                //필수입력
+            'Email'         => $issuer_company->co_email               //필수입력
+            // 'Email'         => $cc_license1 . '@bantalk.com'                //필수입력
         );
 
         //-------------------------------------------
@@ -9535,7 +9536,8 @@ class WarehousingController extends Controller
             'ContactName'     => $cc_ceo2,                //필수입력
             'TEL'             => '',
             'HP'             => '',
-            'Email'         => $cc_license2 . '@bantalk.com'
+            'Email'         => $receiver_company->co_email               //필수입력
+            // 'Email'         => $cc_license2 . '@bantalk.com'
         );
 
         //-------------------------------------------
@@ -10042,7 +10044,8 @@ class WarehousingController extends Controller
             'ContactName'     => $cc_ceo1,                //필수입력
             'TEL'             => '',
             'HP'             => '',
-            'Email'         => $cc_license1 . '@bantalk.com'                //필수입력
+            'Email'         => $issuer_company->co_email               //필수입력
+            // 'Email'         => $cc_license1 . '@bantalk.com'                //필수입력
         );
 
         //-------------------------------------------
@@ -10061,7 +10064,8 @@ class WarehousingController extends Controller
             'ContactName'     => $cc_ceo2,                //필수입력
             'TEL'             => '',
             'HP'             => '',
-            'Email'         => $cc_license2 . '@bantalk.com'
+            'Email'         => isset($company['co_email']) ? $company['co_email'] : $receiver_company->co_email              //필수입력
+            // 'Email'         => $cc_license2 . '@bantalk.com'
         );
 
         //-------------------------------------------
