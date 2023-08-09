@@ -7560,6 +7560,33 @@ class WarehousingController extends Controller
         }
     }
 
+    public function check_tax_status(Request $request) //page277
+    {
+        $BaroService_URL = 'https://ws.baroservice.com/TI.asmx?wsdl';    //테스트베드용
+        //$BaroService_URL = 'https://ws.baroservice.com/TI.asmx?WSDL';		//실서비스용
+
+        $BaroService_TI = new SoapClient($BaroService_URL, array(
+            'trace'        => 'true',
+            'encoding'    => 'UTF-8'
+        ));
+
+        $CERTKEY = '985417C4-240F-4FA4-B9AD-EA54E25C0F7E';
+        $CorpNum = $request->CorpNum;
+        $MgtKey = $request->MgtKey;
+
+        $Result = $BaroService_TI->GetTaxInvoiceStateEX([
+            'CERTKEY' => $CERTKEY,
+            'CorpNum' => '2168142360',
+            'MgtKey' => $MgtKey,
+        ])->GetTaxInvoiceStateEXResult;
+
+        if ($Result->BarobillState < 0) { // 호출 실패
+            echo $Result->BarobillState;
+        } else { // 호출 성공
+            // 필드정보는 레퍼런스를 참고해주세요.
+            print_r($Result);
+        }
+    }
     public function importExcelDistribution(WarehousingSearchRequest $request)
     {
         DB::beginTransaction();

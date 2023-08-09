@@ -226,6 +226,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/get_tid_list', [\App\Http\Controllers\Warehousing\WarehousingController::class,'get_tid_list']); //page 277
     Route::post('/get_cr_list', [\App\Http\Controllers\Warehousing\WarehousingController::class,'get_cr_list']); //page 277
     Route::post('/create_tid', [\App\Http\Controllers\Warehousing\WarehousingController::class,'create_tid']); //page 277
+    Route::post('/check_tax_status', [\App\Http\Controllers\Warehousing\WarehousingController::class,'check_tax_status']); //page 277
 
     Route::get('/warehousing_request', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class,'__invoke']);
     Route::post('/warehousing_request_paginate', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class,'paginateWarehousingRequest']);
