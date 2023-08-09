@@ -2733,101 +2733,100 @@ class ReceivingGoodsDeliveryController extends Controller
 
 
 
-                foreach ($rgds as $rgd) {
-                    $BaroService_URL = 'https://ws.baroservice.com/TI.asmx?wsdl';    //테스트베드용
-                    //$BaroService_URL = 'https://ws.baroservice.com/TI.asmx?WSDL';		//실서비스용
 
-                    $BaroService_TI = new SoapClient($BaroService_URL, array(
-                        'trace'        => 'true',
-                        'encoding'    => 'UTF-8'
-                    ));
+                $BaroService_URL = 'https://ws.baroservice.com/TI.asmx?wsdl';    //테스트베드용
+                //$BaroService_URL = 'https://ws.baroservice.com/TI.asmx?WSDL';		//실서비스용
 
-                    // GetTaxInvoiceStatesEX.php 파일에서도 수정해야 함
-                    $CERTKEY = '985417C4-240F-4FA4-B9AD-EA54E25C0F7E';                            //인증키
+                $BaroService_TI = new SoapClient($BaroService_URL, array(
+                    'trace'        => 'true',
+                    'encoding'    => 'UTF-8'
+                ));
 
-                    $apis  = Tax::where('rgd_no', $rgd['rgd_no'])->where('t_status', 1)->get();
+                // GetTaxInvoiceStatesEX.php 파일에서도 수정해야 함
+                $CERTKEY = '985417C4-240F-4FA4-B9AD-EA54E25C0F7E';                            //인증키
 
-                    $procType = "ISSUE_CANCEL";
+                $apis  = Tax::where('rgd_no', $rgd->rgd_no)->where('t_status', 1)->get();
 
-                    foreach ($apis as $api) {
+                $procType = "ISSUE_CANCEL";
+
+                foreach ($apis as $api) {
 
 
-                        $Result = $BaroService_TI->ProcTaxInvoice(array(
-                            'CERTKEY'    => $CERTKEY,
-                            'CorpNum'    => '2168142360',
-                            'MgtKey'    => $api->t_mgtnum,
-                            'ProcType'    => $procType,
-                        ))->ProcTaxInvoiceResult;
+                    $Result = $BaroService_TI->ProcTaxInvoice(array(
+                        'CERTKEY'    => $CERTKEY,
+                        'CorpNum'    => '2168142360',
+                        'MgtKey'    => $api->t_mgtnum,
+                        'ProcType'    => $procType,
+                    ))->ProcTaxInvoiceResult;
 
-                        //Delete t_mgtnum
-                        // $Result_delete = $BaroService_TI->DeleteTaxInvoice(array(
-                        //     'CERTKEY'    => $CERTKEY,
-                        //     'CorpNum'    => '2168142360',
-                        //     'MgtKey'    => $api->t_mgtnum,
+                    //Delete t_mgtnum
+                    // $Result_delete = $BaroService_TI->DeleteTaxInvoice(array(
+                    //     'CERTKEY'    => $CERTKEY,
+                    //     'CorpNum'    => '2168142360',
+                    //     'MgtKey'    => $api->t_mgtnum,
 
-                        // ))->DeleteTaxInvoiceResult;
+                    // ))->DeleteTaxInvoiceResult;
 
-                        $text_error = $this->getErrStr($BaroService_TI, $CERTKEY, $Result);
+                    $text_error = $this->getErrStr($BaroService_TI, $CERTKEY, $Result);
 
-                        if ($Result == 1 && $text == "") {
-                            $text = "";
-                            $text_delete = "";
-                        } else {
-                            $text = $text_error;
-                            $text_delete = "";
-                        }
+                    if ($Result == 1 && $text == "") {
+                        $text = "";
+                        $text_delete = "";
+                    } else {
+                        $text = $text_error;
+                        $text_delete = "";
                     }
+                }
 
-                    //$text_delete = $this->getErrStr($BaroService_TI, $CERTKEY, $Result_delete);
+                //$text_delete = $this->getErrStr($BaroService_TI, $CERTKEY, $Result_delete);
 
-                    if ($text == "") {
-                        CommonFunc::insert_alarm('[공통] 계산서취소 안내', $rgd, $user, null, 'settle_payment', null);
+                if ($text == "") {
+                    CommonFunc::insert_alarm('[공통] 계산서취소 안내', $rgd, $user, null, 'settle_payment', null);
 
 
-                        $cbh = CancelBillHistory::insertGetId([
-                            'rgd_no' => $rgd['rgd_no'],
+                    $cbh = CancelBillHistory::insertGetId([
+                        'rgd_no' => $rgd->rgd_no,
+                        'mb_no' => $user->mb_no,
+                        'cbh_type' => 'tax',
+                        'cbh_status_before' => 'taxed',
+                        'cbh_status_after' => 'cancel'
+                    ]);
+
+                    if ($rgd->rgd_status8 == 'completed') {
+                        ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                            'rgd_status8' => 'in_process',
+                        ]);
+
+                        CancelBillHistory::insertGetId([
+                            'rgd_no' => $rgd->rgd_no,
                             'mb_no' => $user->mb_no,
                             'cbh_type' => 'tax',
-                            'cbh_status_before' => 'taxed',
-                            'cbh_status_after' => 'cancel'
+                            'cbh_status_before' => $rgd->rgd_status8,
+                            'cbh_status_after' => 'in_process'
                         ]);
 
-                        if ($rgd->rgd_status8 == 'completed') {
-                            ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd->rgd_settlement_number)->update([
+                        //UPDATE EST BILL
+                        $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
+                        if ($est_rgd->rgd_status8 != 'in_process') {
+                            ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
                                 'rgd_status8' => 'in_process',
                             ]);
-
                             CancelBillHistory::insertGetId([
-                                'rgd_no' => $rgd['rgd_no'],
+                                'rgd_no' => $est_rgd->rgd_no,
                                 'mb_no' => $user->mb_no,
                                 'cbh_type' => 'tax',
-                                'cbh_status_before' => $rgd->rgd_status8,
+                                'cbh_status_before' => $est_rgd->rgd_status8,
                                 'cbh_status_after' => 'in_process'
                             ]);
-
-                            //UPDATE EST BILL
-                            $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_parent_no'])->first();
-                            if ($est_rgd->rgd_status8 != 'in_process') {
-                                ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
-                                    'rgd_status8' => 'in_process',
-                                ]);
-                                CancelBillHistory::insertGetId([
-                                    'rgd_no' => $est_rgd->rgd_no,
-                                    'mb_no' => $user->mb_no,
-                                    'cbh_type' => 'tax',
-                                    'cbh_status_before' => $est_rgd->rgd_status8,
-                                    'cbh_status_after' => 'in_process'
-                                ]);
-                            }
                         }
-
-                        ReceivingGoodsDelivery::where('tid_no', $rgd['tid_no'])->update([
-                            'rgd_status7' => 'cancel',
-                            'rgd_tax_invoice_date' => NULL,
-                            'rgd_tax_invoice_number' => NULL,
-                            'tid_no' => NULL,
-                        ]);
                     }
+
+                    ReceivingGoodsDelivery::where('tid_no', $rgd->tid_no)->update([
+                        'rgd_status7' => 'cancel',
+                        'rgd_tax_invoice_date' => NULL,
+                        'rgd_tax_invoice_number' => NULL,
+                        'tid_no' => NULL,
+                    ]);
                 }
 
               
