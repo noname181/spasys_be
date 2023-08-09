@@ -6772,9 +6772,9 @@ class WarehousingController extends Controller
                             $item->vat_price_total = $item->rate_data_general->rdg_vat6 ? $item->rate_data_general->rdg_vat6 : 0;
                             $item->sum_price_total = $item->rate_data_general->rdg_sum6 ? $item->rate_data_general->rdg_sum6 : 0;
                         } else {
-                            $item->supply_price_total = $item->rate_data_general->rdg_supply_price7 ? $item->rate_data_general->rdg_supply_price7 : 0;
-                            $item->vat_price_total = $item->rate_data_general->rdg_vat7 ? $item->rate_data_general->rdg_vat7 : 0;
-                            $item->sum_price_total = $item->rate_data_general->rdg_sum7 ? $item->rate_data_general->rdg_sum7 : 0;
+                            $item->supply_price_total = $item->rate_data_general->rdg_supply_price7 ? ($item->rate_data_general->rdg_supply_price7 + ($item->rate_data_general->rdg_supply_price14 ? $item->rate_data_general->rdg_supply_price14 : 0)) : 0;
+                            $item->vat_price_total = $item->rate_data_general->rdg_vat7 ? ($item->rate_data_general->rdg_vat7 + ($item->rate_data_general->rdg_vat14 ? $item->rate_data_general->rdg_vat14 : 0)) : 0;
+                            $item->sum_price_total = $item->rate_data_general->rdg_sum7 ? ($item->rate_data_general->rdg_sum7 + ($item->rate_data_general->rdg_sum14 ? $item->rate_data_general->rdg_sum14 : 0)) : 0;
                         }
 
                     $item->tid_no = $item->tid_no ? $item->tid_no : $item->tid_no2;
@@ -7442,6 +7442,7 @@ class WarehousingController extends Controller
                         }
                     }
                 }
+
                 if ($api['message'] == "tax_err") {
                     DB::rollBack();
                 } else {
@@ -9291,95 +9292,46 @@ class WarehousingController extends Controller
             $s_no = $rgd->warehousing->company->co_parent->co_no;
         }
 
-        $amount_price = 0;
-        $total_price = 0;
-        $vat_price = 0;
-
+       
         if ($rgd->service_korean_name == '보세화물') {
             if ($price) {
                 $amount_price = $price['tid_supply_price'];
                 $total_price = $price['tid_sum'];
                 $vat_price = $price['tid_vat'];
-            } else {
-                if ($rgds) {
-                    $total_price = 0;
-                    foreach ($rgds as $rgdp) {
-                        if ($rgdp['service_korean_name'] == '보세화물') {
-                            $amount_price += $rgdp['rate_data_general']['rdg_supply_price7'];
-                            $total_price += $rgdp['rate_data_general']['rdg_sum7'];
-                            $vat_price += $rgdp['rate_data_general']['rdg_vat7'];
-                        } else if ($rgdp['service_korean_name'] == '수입풀필먼트') {
-                            $amount_price += $rgdp['rate_data_general']['rdg_supply_price6'];
-                            $total_price += $rgdp['rate_data_general']['rdg_sum6'];
-                            $vat_price += $rgdp['rate_data_general']['rdg_vat6'];
-                        } else if ($rgdp['service_korean_name'] == '유통가공') {
-                            $amount_price += $rgdp['rate_data_general']['rdg_supply_price4'];
-                            $total_price += $rgdp['rate_data_general']['rdg_sum4'];
-                            $vat_price += $rgdp['rate_data_general']['rdg_vat4'];
-                        }
-                    }
-                } else {
-                    $amount_price = $rgd->rate_data_general->rdg_supply_price7;
-                    $total_price = $rgd->rate_data_general->rdg_sum7;
-                    $vat_price = $rgd->rate_data_general->rdg_vat7;
-                }
-            }
+            } 
         } else if ($rgd->service_korean_name == '수입풀필먼트') {
             if ($price) {
                 $amount_price = $price['tid_supply_price'];
                 $total_price = $price['tid_sum'];
                 $vat_price = $price['tid_vat'];
-            } else {
-                if ($rgds) {
-                    $total_price = 0;
-                    foreach ($rgds as $rgdp) {
-                        if ($rgdp['service_korean_name'] == '보세화물') {
-                            $amount_price += $rgdp['rate_data_general']['rdg_supply_price7'];
-                            $total_price += $rgdp['rate_data_general']['rdg_sum7'];
-                            $vat_price += $rgdp['rate_data_general']['rdg_vat7'];
-                        } else if ($rgdp['service_korean_name'] == '수입풀필먼트') {
-                            $amount_price += $rgdp['rate_data_general']['rdg_supply_price6'];
-                            $total_price += $rgdp['rate_data_general']['rdg_sum6'];
-                            $vat_price += $rgdp['rate_data_general']['rdg_vat6'];
-                        } else if ($rgdp['service_korean_name'] == '유통가공') {
-                            $amount_price += $rgdp['rate_data_general']['rdg_supply_price4'];
-                            $total_price += $rgdp['rate_data_general']['rdg_sum4'];
-                            $vat_price += $rgdp['rate_data_general']['rdg_vat4'];
-                        }
-                    }
-                } else {
-                    $amount_price = $rgd->rate_data_general->rdg_supply_price6;
-                    $total_price = $rgd->rate_data_general->rdg_sum6;
-                    $vat_price = $rgd->rate_data_general->rdg_vat6;
-                }
-            }
+            } 
         } else if ($rgd->service_korean_name == '유통가공') {
             if ($price) {
                 $amount_price = $price['tid_supply_price'];
                 $total_price = $price['tid_sum'];
                 $vat_price = $price['tid_vat'];
-            } else {
-                if ($rgds) {
-                    $total_price = 0;
-                    foreach ($rgds as $rgdp) {
-                        if ($rgdp['service_korean_name'] == '보세화물') {
-                            $amount_price += $rgdp['rate_data_general']['rdg_supply_price7'];
-                            $total_price += $rgdp['rate_data_general']['rdg_sum7'];
-                            $vat_price += $rgdp['rate_data_general']['rdg_vat7'];
-                        } else if ($rgdp['service_korean_name'] == '수입풀필먼트') {
-                            $amount_price += $rgdp['rate_data_general']['rdg_supply_price6'];
-                            $total_price += $rgdp['rate_data_general']['rdg_sum6'];
-                            $vat_price += $rgdp['rate_data_general']['rdg_vat6'];
-                        } else if ($rgdp['service_korean_name'] == '유통가공') {
-                            $amount_price += $rgdp['rate_data_general']['rdg_supply_price4'];
-                            $total_price += $rgdp['rate_data_general']['rdg_sum4'];
-                            $vat_price += $rgdp['rate_data_general']['rdg_vat4'];
-                        }
-                    }
-                } else {
-                    $amount_price = $rgd->rate_data_general->rdg_supply_price4;
-                    $total_price = $rgd->rate_data_general->rdg_sum4;
-                    $vat_price = $rgd->rate_data_general->rdg_vat4;
+            } 
+        }
+
+        if (count($rgds) > 0) {
+            $total_price = 0;
+            $amount_price = 0;
+            $total_price = 0;
+            $vat_price = 0;
+    
+            foreach ($rgds as $rgdp) {
+                if ($rgdp['service_korean_name'] == '보세화물') {
+                    $amount_price += ($rgdp['rate_data_general']['rdg_supply_price7'] + $rgdp['rate_data_general']['rdg_supply_price14']);
+                    $total_price += ($rgdp['rate_data_general']['rdg_sum7'] + $rgdp['rate_data_general']['rdg_sum14']);
+                    $vat_price += ($rgdp['rate_data_general']['rdg_vat7'] + $rgdp['rate_data_general']['rdg_vat14']);
+                } else if ($rgdp['service_korean_name'] == '수입풀필먼트') {
+                    $amount_price += $rgdp['rate_data_general']['rdg_supply_price6'];
+                    $total_price += $rgdp['rate_data_general']['rdg_sum6'];
+                    $vat_price += $rgdp['rate_data_general']['rdg_vat6'];
+                } else if ($rgdp['service_korean_name'] == '유통가공') {
+                    $amount_price += $rgdp['rate_data_general']['rdg_supply_price4'];
+                    $total_price += $rgdp['rate_data_general']['rdg_sum4'];
+                    $vat_price += $rgdp['rate_data_general']['rdg_vat4'];
                 }
             }
         }
