@@ -7790,6 +7790,7 @@ class WarehousingController extends Controller
                                 'service_korean_name' => '보세화물',
                                 'rgd_status3' => "배송완료",
                                 'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
+                                'rgd_arrive_day' => date('Y-m-d'),
                             ]
                         );
                     } else {
@@ -7799,7 +7800,7 @@ class WarehousingController extends Controller
                             'rgd_status3' => "배송완료",
                             'is_no' => $is_no,
                             'rgd_confirmed_date' => Carbon::now()->toDateTimeString(),
-
+                            'rgd_arrive_day' => date('Y-m-d'),
                         ]);
                     }
                 }
@@ -7824,6 +7825,7 @@ class WarehousingController extends Controller
                                 'service_korean_name' => '수입풀필먼트',
                                 'rgd_status1' => "출고",
                                 'rgd_status3' => "배송완료",
+                                'rgd_arrive_day' => date('Y-m-d'),
                             ]
                         );
                     } else {
