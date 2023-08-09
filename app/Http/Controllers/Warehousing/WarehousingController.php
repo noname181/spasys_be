@@ -9313,7 +9313,7 @@ class WarehousingController extends Controller
             } 
         }
 
-        if (count($rgds) > 0) {
+        if ($rgds) {
             $total_price = 0;
             $amount_price = 0;
             $total_price = 0;
