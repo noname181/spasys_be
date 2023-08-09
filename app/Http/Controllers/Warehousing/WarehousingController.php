@@ -9521,7 +9521,7 @@ class WarehousingController extends Controller
         //------------------------------------------
         $InvoicerParty = array(
             'MgtNum'         => $tax_number,
-            'CorpNum'         => $cc_license1,                //필수입력 - 바로빌 회원 사업자번호 ('-' 제외, 10자리)
+            'CorpNum'         => preg_replace('/\s+/','',$cc_license1),                //필수입력 - 바로빌 회원 사업자번호 ('-' 제외, 10자리)
             'TaxRegID'         => '',
             'CorpName'         => $cc_name1,                    //필수입력
             'CEOName'         => $cc_ceo1,                //필수입력
@@ -9532,7 +9532,8 @@ class WarehousingController extends Controller
             'ContactName'     => $cc_ceo1,                //필수입력
             'TEL'             => '',
             'HP'             => '',
-            'Email'         => $cc_license1 . '@bantalk.com'                //필수입력
+            'Email'         => $issuer_company->co_email               //필수입력
+            // 'Email'         => $cc_license1 . '@bantalk.com'                //필수입력
         );
 
         //-------------------------------------------
@@ -9540,7 +9541,7 @@ class WarehousingController extends Controller
         //------------------------------------------
         $InvoiceeParty = array(
             'MgtNum'         => $tax_number,
-            'CorpNum'         => $cc_license2,                //필수입력
+            'CorpNum'         => preg_replace('/\s+/','',$cc_license2),                //필수입력
             'TaxRegID'         => '',
             'CorpName'         => $cc_name2,                //필수입력
             'CEOName'         => $cc_ceo2,                //필수입력
@@ -9551,7 +9552,8 @@ class WarehousingController extends Controller
             'ContactName'     => $cc_ceo2,                //필수입력
             'TEL'             => '',
             'HP'             => '',
-            'Email'         => $cc_license2 . '@bantalk.com'
+            'Email'         => $receiver_company->co_email               //필수입력
+            // 'Email'         => $cc_license2 . '@bantalk.com'
         );
 
         //-------------------------------------------
@@ -10047,7 +10049,7 @@ class WarehousingController extends Controller
         //------------------------------------------
         $InvoicerParty = array(
             'MgtNum'         => $tax_number,
-            'CorpNum'         => $cc_license1,                //필수입력 - 바로빌 회원 사업자번호 ('-' 제외, 10자리)
+            'CorpNum'         => preg_replace('/\s+/','',$cc_license1),                //필수입력 - 바로빌 회원 사업자번호 ('-' 제외, 10자리)
             'TaxRegID'         => '',
             'CorpName'         => $cc_name1,                    //필수입력
             'CEOName'         => $cc_ceo1,                //필수입력
@@ -10058,7 +10060,8 @@ class WarehousingController extends Controller
             'ContactName'     => $cc_ceo1,                //필수입력
             'TEL'             => '',
             'HP'             => '',
-            'Email'         => $cc_license1 . '@bantalk.com'                //필수입력
+            'Email'         => $issuer_company->co_email               //필수입력
+            // 'Email'         => $cc_license1 . '@bantalk.com'                //필수입력
         );
 
         //-------------------------------------------
@@ -10066,7 +10069,7 @@ class WarehousingController extends Controller
         //------------------------------------------
         $InvoiceeParty = array(
             'MgtNum'         => $tax_number,
-            'CorpNum'         => $cc_license2,                //필수입력
+            'CorpNum'         => preg_replace('/\s+/','',$cc_license2),                //필수입력
             'TaxRegID'         => '',
             'CorpName'         => $cc_name2,                //필수입력
             'CEOName'         => $cc_ceo2,                //필수입력
@@ -10077,7 +10080,8 @@ class WarehousingController extends Controller
             'ContactName'     => $cc_ceo2,                //필수입력
             'TEL'             => '',
             'HP'             => '',
-            'Email'         => $cc_license2 . '@bantalk.com'
+            'Email'         => isset($company['co_email']) ? $company['co_email'] : $receiver_company->co_email              //필수입력
+            // 'Email'         => $cc_license2 . '@bantalk.com'
         );
 
         //-------------------------------------------
