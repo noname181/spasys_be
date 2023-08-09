@@ -8388,7 +8388,7 @@ class WarehousingController extends Controller
             if ($key < 1) {
                 continue;
             }
-
+           
             $validator = Validator::make($d, ExcelRequest::rules());
 
             if ($validator->fails()) {
@@ -8396,27 +8396,43 @@ class WarehousingController extends Controller
                 $errors[$sheet->getTitle()][] = $validator->errors();
                 $check_error = true;
             } else {
-                if (isset($d['E'])) {
-                    $contains = Str::contains($d['E'], 'S');
-
-                    if ($contains) {
-                        $item = Item::with(['company', 'ContractWms'])->where('item_service_name', '수입풀필먼트')->where('option_id', $d['E'])->where('product_id', $d['D']);
-                        $item->whereHas('ContractWms.company', function ($q) use ($co_no_in) {
-                            $q->whereIn('co_no', $co_no_in);
-                        });
-                    } else {
-                        $item = Item::with(['company', 'ContractWms'])->where('item_service_name', '수입풀필먼트')->where('product_id', $d['D']);
-                        $item->whereHas('ContractWms.company', function ($q) use ($co_no_in) {
+                if(isset($d['D'])){
+                    $items = Item::where('item_service_name', '수입풀필먼트')->where('product_id', $d['D'])->whereNull('option_id')->first();
+                    if($items === null){
+                        if(!isset($d['E'])){
+                            $data_item_count =  $data_item_count - 1;
+                            
+                            $errors["type"] = "No option id";
+                            $errors[$sheet->getTitle()][] = "옵션코드 확인하세요";
+                            $check_error = true;
+                            break;
+                        }else{
+                            $contains = Str::contains($d['E'], 'S');
+        
+                            if ($contains) {
+                                $item = Item::with(['company', 'ContractWms'])->where('item_service_name', '수입풀필먼트')->where('option_id', $d['E'])->where('product_id', $d['D']);
+                                $item->whereHas('ContractWms.company', function ($q) use ($co_no_in) {
+                                    $q->whereIn('co_no', $co_no_in);
+                                });
+                            } else {
+                                $item = Item::with(['company', 'ContractWms'])->where('item_service_name', '수입풀필먼트')->where('product_id', $d['D']);
+                                $item->whereHas('ContractWms.company', function ($q) use ($co_no_in) {
+                                    $q->whereIn('co_no', $co_no_in);
+                                });
+                            }
+                        }
+                    }else{
+                        $item = Item::with(['company', 'ContractWms'])->where('item_service_name', '수입풀필먼트')->where('product_id', $d['D'])->whereHas('ContractWms.company', function ($q) use ($co_no_in) {
                             $q->whereIn('co_no', $co_no_in);
                         });
                     }
-                } else {
-                    $item = Item::with(['company', 'ContractWms'])->where('item_service_name', '수입풀필먼트')->where('product_id', $d['D']);
                 }
+
+                
 
 
                 $item = $item->first();
-
+                
                 //$test[] = $item;
                 if (!isset($item)) {
                     $data_item_count =  $data_item_count - 1;
