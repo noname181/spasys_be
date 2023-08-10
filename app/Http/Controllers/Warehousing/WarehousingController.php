@@ -1286,7 +1286,7 @@ class WarehousingController extends Controller
             foreach ($test_i as $key => $value) {
 
                 $strArray = explode(',', $key);
-                $w_schedule_day = date('Y-m-d', strtotime(str_replace('.', '-', $value['w_schedule_day'])));
+                $w_schedule_day = isset($value['w_schedule_day']) ? date('Y-m-d', strtotime(str_replace('.', '-', $value['w_schedule_day']))) : null;
 
                 $excel_company = Company::where("co_name", $value['company_shipper'])->whereIn('co_no', $company_shipper)->first();
 
