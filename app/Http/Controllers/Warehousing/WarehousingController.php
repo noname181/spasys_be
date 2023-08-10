@@ -9741,7 +9741,7 @@ class WarehousingController extends Controller
                 }
 
                 $items[] = array(
-                    'PurchaseExpiry' => "",            //YYYYMMDD
+                    'PurchaseExpiry' => Carbon::now()->format('Ymd'),            //YYYYMMDD
                     'Name'            => $item_name,
                     'Information'    => '',
                     'ChargeableUnit' => '',
@@ -9774,7 +9774,7 @@ class WarehousingController extends Controller
             }
 
             $items[] = array(
-                'PurchaseExpiry' => "",            //YYYYMMDD
+                'PurchaseExpiry' => Carbon::now()->format('Ymd'),            //YYYYMMDD
                 'Name'            => $item_name,
                 'Information'    => '',
                 'ChargeableUnit' => '',
@@ -10336,7 +10336,7 @@ class WarehousingController extends Controller
                 }
 
                 $items[] = array(
-                    'PurchaseExpiry' => "",            //YYYYMMDD
+                    'PurchaseExpiry' => Carbon::now()->format('Ymd'),            //YYYYMMDD
                     'Name'            => $item_name,
                     'Information'    => '',
                     'ChargeableUnit' => '',
@@ -10369,7 +10369,7 @@ class WarehousingController extends Controller
             }
 
             $items[] = array(
-                'PurchaseExpiry' => "",            //YYYYMMDD
+                'PurchaseExpiry' => Carbon::now()->format('Ymd'),            //YYYYMMDD
                 'Name'            => $item_name,
                 'Information'    => '',
                 'ChargeableUnit' => '',
