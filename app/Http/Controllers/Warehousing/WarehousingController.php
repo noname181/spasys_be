@@ -1260,7 +1260,7 @@ class WarehousingController extends Controller
                         //$check_error = true;
                     } else {
 
-                        $custom = collect(['wi_number' => $warehouse['J'], 'company_shipper' => $warehouse['B'], 'w_schedule_day' => $warehouse['K'],'connection_number' => $warehouse['C']]);
+                        $custom = collect(['wi_number' => (int)$warehouse['J'], 'company_shipper' => $warehouse['B'], 'w_schedule_day' => $warehouse['K'],'connection_number' => $warehouse['C']]);
 
                         $item = $custom->merge($item);
                         //$test_i["connection_number"] = isset($warehouse['C']) ? $warehouse['C'] : null;
@@ -8568,7 +8568,7 @@ class WarehousingController extends Controller
                         'item_option2' =>  isset($d['H']) ? $d['H'] : null,
                     ]);
 
-                    $custom = collect(['wi_number' => $d['J']]);
+                    $custom = collect(['wi_number' => (int)$d['J']]);
 
                     $item = $custom->merge($item);
 
@@ -8632,7 +8632,8 @@ class WarehousingController extends Controller
             $w_amount = 0;
             
                 foreach ($value as $k => $warehousing_item) {
-                    if($k != "connection_number"){
+                    if($k !== "connection_number"){
+                        
                         WarehousingItem::insert([
                             'item_no' => $warehousing_item['item_no'],
                             'w_no' => $w_no,
@@ -8643,10 +8644,10 @@ class WarehousingController extends Controller
                         WarehousingItem::insert([
                             'item_no' => $warehousing_item['item_no'],
                             'w_no' => $w_no,
-                            'wi_number' => isset($warehousing_item['wi_number']) ? $warehousing_item['wi_number'] : null,
+                            'wi_number' => isset($warehousing_item['wi_number']) ? (int)$warehousing_item['wi_number'] : null,
                             'wi_type' => '입고_spasys'
                         ]);
-                        $w_amount += $warehousing_item['wi_number'];
+                        $w_amount += (int)$warehousing_item['wi_number'];
                     }
                 } 
             
