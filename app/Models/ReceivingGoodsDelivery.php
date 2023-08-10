@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use DateTimeInterface;
 use App\Models\Member;
+use App\Models\Tax;
 use App\Models\Warehousing;
 use App\Models\RateMetaData;
 use App\Models\Export;
@@ -158,6 +159,10 @@ class ReceivingGoodsDelivery extends Model
 
     public function tax(){
         return $this->hasMany(TaxInvoiceDivide::class, 'rgd_no', 'rgd_no');
+    }
+
+    public function tax_invoice(){
+        return $this->hasOne(Tax::class, 't_mgtnum', 'rgd_tax_invoice_number')->select(['t_status', 't_mgtnum'])->where('t_status', '!=', 0);
     }
 
 }
