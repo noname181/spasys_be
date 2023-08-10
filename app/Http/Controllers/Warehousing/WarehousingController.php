@@ -7114,6 +7114,18 @@ class WarehousingController extends Controller
         try {
             DB::beginTransaction();
 
+            if($request->is_edit == 'y'){
+                $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general', 't_import_expected'])->where('rgd_no', $request->rgd_no)->first();
+                $count = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general', 't_import_expected'])->where('rgd_tax_invoice_number', $rgd->rgd_tax_invoice_number)->count();
+
+                if($count > 1){
+                    $request->type = 'add_all';
+                    $request->rgds = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general', 't_import_expected'])->where('rgd_tax_invoice_number', $rgd->rgd_tax_invoice_number)->get();
+                }
+            }
+
+            
+
             if ($request->type == 'option') {
                 $user = Auth::user();
 
@@ -7364,27 +7376,77 @@ class WarehousingController extends Controller
             else if ($request->type == 'add_all') {
                 $user = Auth::user();
 
-                $id = TaxInvoiceDivide::insertGetId([
-                    'tid_supply_price' => $request->supply_price,
-                    'tid_vat' => $request->vat,
-                    'tid_sum' => $request->sum,
-                    'rgd_number' => $request->rgd_number,
-                    'co_license' => $request['company']['co_license'],
-                    'co_owner' => $request['company']['co_owner'],
-                    'co_name' => $request['company']['co_name'],
-                    'co_major' => $request['company']['co_major'],
-                    'co_address' => $request['company']['co_address'],
-                    'co_email' => $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null,
-                    'co_email2' => $request['ag']['ag_email2'] ? $request['ag']['ag_email2'] : null,
-                    'mb_no' => $user->mb_no,
-                    'tid_type' => 'add_all',
-                ]);
+                if($request->is_edit == 'y'){
+                    $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general'])->where('rgd_no', $request->rgd_no)->first();
 
-                $tax_number = CommonFunc::generate_tax_number($id, $request->rgd_no);
+                    $tax = Tax::where('t_mgtnum', $rgd->rgd_tax_invoice_number)->first();
 
-                TaxInvoiceDivide::where('tid_no', $id)->update([
-                    'tid_number' => $tax_number ? $tax_number : null,
-                ]);
+                    $pieces = explode('_', $tax->t_mgtnum);
+                    $last_word = array_pop($pieces);
+                    $count_last_word = ((int)$last_word + 1);
+
+                    $tax_number =  substr_replace($tax->t_mgtnum, $count_last_word, -1);
+
+                    TaxInvoiceDivide::where('tid_number',  $rgd->rgd_tax_invoice_number)->update([
+                        'tid_number' => $tax_number ? $tax_number : null,
+                    ]);
+
+                    $BaroService_URL = 'https://ws.baroservice.com/TI.asmx?wsdl';
+
+                    $CERTKEY = '985417C4-240F-4FA4-B9AD-EA54E25C0F7E';   
+                    //인증키
+                    $BaroService_TI = new SoapClient($BaroService_URL, array(
+                        'trace'        => 'true',
+                        'encoding'    => 'UTF-8'
+                    ));
+                    //Cancel old invoice
+            
+                    $procType = "ISSUE_CANCEL";
+            
+                    $Result = $BaroService_TI->ProcTaxInvoice(array(
+                        'CERTKEY'    => $CERTKEY,
+                        'CorpNum'    => '2168142360',
+                        'MgtKey'    => $rgd->rgd_tax_invoice_number,
+                        'ProcType'    => $procType,
+                    ))->ProcTaxInvoiceResult;
+
+                    if ($Result < 0) { // 호출 실패
+                        DB::rollBack();    
+                        return response()->json([
+                            'message' => Messages::MSG_0007,
+                            'api' => "tax_err",
+                            'api_message' => $Result,
+                        ]);
+                    }
+
+                    Tax::where('t_mgtnum', $rgd->rgd_tax_invoice_number)->update([
+                        't_status' => 0,
+                    ]);
+
+                }else {
+                    $id = TaxInvoiceDivide::insertGetId([
+                        'tid_supply_price' => $request->supply_price,
+                        'tid_vat' => $request->vat,
+                        'tid_sum' => $request->sum,
+                        'rgd_number' => $request->rgd_number,
+                        'co_license' => $request['company']['co_license'],
+                        'co_owner' => $request['company']['co_owner'],
+                        'co_name' => $request['company']['co_name'],
+                        'co_major' => $request['company']['co_major'],
+                        'co_address' => $request['company']['co_address'],
+                        'co_email' => $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null,
+                        'co_email2' => $request['ag']['ag_email2'] ? $request['ag']['ag_email2'] : null,
+                        'mb_no' => $user->mb_no,
+                        'tid_type' => 'add_all',
+                    ]);
+    
+                    $tax_number = CommonFunc::generate_tax_number($id, $request->rgd_no);
+
+                    TaxInvoiceDivide::where('tid_no', $id)->update([
+                        'tid_number' => $tax_number ? $tax_number : null,
+                    ]);
+                }
+              
                 $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general'])->where('rgd_no', $request->rgd_no)->first();
 
                 $api = $this->tax_invoice_api($rgd, $user, null, $tax_number, $request->rgds, null);
@@ -7396,7 +7458,7 @@ class WarehousingController extends Controller
                         'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
                         'rgd_tax_invoice_number' => $tax_number ? $tax_number : null,
                         'rgd_status7' => 'taxed',
-                        'tid_no' => $id
+                        'tid_no' => $request->is_edit == 'y' ? $rgd['tid_no'] : $id
                     ]);
 
                     $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general', 't_import_expected'])->where('rgd_no', $rgd['rgd_no'])->first();
@@ -7595,23 +7657,24 @@ class WarehousingController extends Controller
             'trace'        => 'true',
             'encoding'    => 'UTF-8'
         ));
-
+        
         $CERTKEY = '985417C4-240F-4FA4-B9AD-EA54E25C0F7E';
-        $CorpNum = $request->CorpNum;
         $MgtKey = $request->MgtKey;
 
-        $Result = $BaroService_TI->GetTaxInvoiceStateEX([
+        $Result = $BaroService_TI->GetTaxInvoicePrintURL([
             'CERTKEY' => $CERTKEY,
             'CorpNum' => '2168142360',
             'MgtKey' => $MgtKey,
-        ])->GetTaxInvoiceStateEXResult;
-
-        if ($Result->BarobillState < 0) { // 호출 실패
-            echo $Result->BarobillState;
+            'ID' => 'spasysone',
+        ])->GetTaxInvoicePrintURLResult;
+    
+        if ($Result < 0) { // 호출 실패
+            return $Result;
         } else { // 호출 성공
-            // 필드정보는 레퍼런스를 참고해주세요.
-            print_r($Result);
+            return($Result);
         }
+      
+     
     }
 
     public function importExcelDistribution(WarehousingSearchRequest $request)
@@ -9637,43 +9700,93 @@ class WarehousingController extends Controller
         //-------------------------------------------
 
         $items = [];
+        $item_name = '';
+
         if($rgds){
             foreach($rgds as $rgdp){
-                $item_name = '';
+                $amount_price = 0;
+                $total_price = 0;
+                $vat_price = 0;
                 if ($rgdp['service_korean_name'] == '보세화물') {
                     if(str_contains($rgdp['rgd_bill_type'], 'month')){
                         $count = ReceivingGoodsDelivery::where('rgd_settlement_number', $rgdp['rgd_settlement_number'])->count();
-                        $item_name = $rgdp['t_import']['ti_h_bl'] + ($count == 1 ? '' : ('외 ' + ($count - 1) + '건'));
+                        $item_name = $rgdp['t_import']['ti_h_bl'] . ($count == 1 ? '' : ('외 ' . ($count - 1) . '건'));
                     }else {
                         $item_name = $rgdp['t_import']['ti_h_bl'];
                     }
+                    $amount_price += ($rgdp['rate_data_general']['rdg_supply_price7'] + $rgdp['rate_data_general']['rdg_supply_price14']);
+                    $total_price += ($rgdp['rate_data_general']['rdg_sum7'] + $rgdp['rate_data_general']['rdg_sum14']);
+                    $vat_price += ($rgdp['rate_data_general']['rdg_vat7'] + $rgdp['rate_data_general']['rdg_vat14']);
                 } else if ($rgdp['service_korean_name'] == '수입풀필먼트') {
-                  if(str_contains($rgdp['rgd_bill_type'], 'month')){
+                    if(str_contains($rgdp['rgd_bill_type'], 'month')){
                         $count = ReceivingGoodsDelivery::where('rgd_settlement_number', $rgdp['rgd_settlement_number'])->count();
-                        $item_name = $rgdp['t_import']['ti_h_bl'] + ($count == 1 ? '' : ('외 ' + ($count - 1) + '건'));
+                        $item_name = $rgdp['rgd_settlement_number'] . ($count == 1 ? '' : ('외 ' . ($count - 1) . '건'));
                     }else {
-                        $item_name = $rgdp['t_import']['ti_h_bl'];
+                        $item_name = $rgdp['rgd_settlement_number'];
                     }
+                    $amount_price += $rgdp['rate_data_general']['rdg_supply_price6'];
+                    $total_price += $rgdp['rate_data_general']['rdg_sum6'];
+                    $vat_price += $rgdp['rate_data_general']['rdg_vat6'];
                 } else if ($rgdp['service_korean_name'] == '유통가공') {
-                   
+                    if(str_contains($rgdp['rgd_bill_type'], 'month')){
+                        $count = ReceivingGoodsDelivery::where('rgd_settlement_number', $rgdp['rgd_settlement_number'])->count();
+                        $item_name = $rgdp['warehousing']['w_schedule_number2'] . ($count == 1 ? '' : ('외 ' . ($count - 1) . '건'));
+                    }else {
+                        $item_name = $rgdp['warehousing']['w_schedule_number2'];
+                    }
+                    $amount_price += $rgdp['rate_data_general']['rdg_supply_price4'];
+                    $total_price += $rgdp['rate_data_general']['rdg_sum4'];
+                    $vat_price += $rgdp['rate_data_general']['rdg_vat4'];
                 }
+
+                $items[] = array(
+                    'PurchaseExpiry' => "",            //YYYYMMDD
+                    'Name'            => $item_name,
+                    'Information'    => '',
+                    'ChargeableUnit' => '',
+                    'UnitPrice'        => '',
+                    'Amount'        => $amount_price,
+                    'Tax'            => $vat_price,
+                    'Description'    => ''
+                );
             }
+        }else {
+            $amount_price = 0;
+            $total_price = 0;
+            $vat_price = 0;
+
+            if ($rgd['service_korean_name'] == '보세화물') {
+                $item_name = $rgd['t_import']['ti_h_bl'];
+                $amount_price += ($rgd['rate_data_general']['rdg_supply_price7'] + $rgd['rate_data_general']['rdg_supply_price14']);
+                $total_price += ($rgd['rate_data_general']['rdg_sum7'] + $rgd['rate_data_general']['rdg_sum14']);
+                $vat_price += ($rgd['rate_data_general']['rdg_vat7'] + $rgd['rate_data_general']['rdg_vat14']);
+            } else if ($rgd['service_korean_name'] == '수입풀필먼트') {
+                $item_name = $rgd['rgd_settlement_number'];
+                $amount_price += $rgd['rate_data_general']['rdg_supply_price6'];
+                $total_price += $rgd['rate_data_general']['rdg_sum6'];
+                $vat_price += $rgd['rate_data_general']['rdg_vat6'];
+            } else if ($rgd['service_korean_name'] == '유통가공') {
+                $item_name = $rgd['warehousing']['w_schedule_number2'];
+                $amount_price += $rgd['rate_data_general']['rdg_supply_price4'];
+                $total_price += $rgd['rate_data_general']['rdg_sum4'];
+                $vat_price += $rgd['rate_data_general']['rdg_vat4'];
+            }
+
+            $items[] = array(
+                'PurchaseExpiry' => "",            //YYYYMMDD
+                'Name'            => $item_name,
+                'Information'    => '',
+                'ChargeableUnit' => '',
+                'UnitPrice'        => '',
+                'Amount'        => $amount_price,
+                'Tax'            => $vat_price,
+                'Description'    => ''
+            );
         }
 
 
         $TaxInvoiceTradeLineItems = array(
-            'TaxInvoiceTradeLineItem'    => array(
-                array(
-                    'PurchaseExpiry' => "",            //YYYYMMDD
-                    'Name'            => $tax_number,
-                    'Information'    => '',
-                    'ChargeableUnit' => '',
-                    'UnitPrice'        => '',
-                    'Amount'        => $AmountTotal,
-                    'Tax'            => $TaxTotal,
-                    'Description'    => ''
-                ),
-            )
+            'TaxInvoiceTradeLineItem'    => $items,
         );
 
         //-------------------------------------------
@@ -10181,19 +10294,94 @@ class WarehousingController extends Controller
         //-------------------------------------------
         //품목
         //-------------------------------------------
-        $TaxInvoiceTradeLineItems = array(
-            'TaxInvoiceTradeLineItem'    => array(
-                array(
+        $items = [];
+        $item_name = '';
+
+        if($rgds){
+            foreach($rgds as $rgdp){
+                $amount_price = 0;
+                $total_price = 0;
+                $vat_price = 0;
+                if ($rgdp['service_korean_name'] == '보세화물') {
+                    if(str_contains($rgdp['rgd_bill_type'], 'month')){
+                        $count = ReceivingGoodsDelivery::where('rgd_settlement_number', $rgdp['rgd_settlement_number'])->count();
+                        $item_name = $rgdp['t_import']['ti_h_bl'] . ($count == 1 ? '' : ('외 ' . ($count - 1) . '건'));
+                    }else {
+                        $item_name = $rgdp['t_import']['ti_h_bl'];
+                    }
+                    $amount_price += ($rgdp['rate_data_general']['rdg_supply_price7'] + $rgdp['rate_data_general']['rdg_supply_price14']);
+                    $total_price += ($rgdp['rate_data_general']['rdg_sum7'] + $rgdp['rate_data_general']['rdg_sum14']);
+                    $vat_price += ($rgdp['rate_data_general']['rdg_vat7'] + $rgdp['rate_data_general']['rdg_vat14']);
+                } else if ($rgdp['service_korean_name'] == '수입풀필먼트') {
+                    if(str_contains($rgdp['rgd_bill_type'], 'month')){
+                        $count = ReceivingGoodsDelivery::where('rgd_settlement_number', $rgdp['rgd_settlement_number'])->count();
+                        $item_name = $rgdp['rgd_settlement_number'] . ($count == 1 ? '' : ('외 ' . ($count - 1) . '건'));
+                    }else {
+                        $item_name = $rgdp['rgd_settlement_number'];
+                    }
+                    $amount_price += $rgdp['rate_data_general']['rdg_supply_price6'];
+                    $total_price += $rgdp['rate_data_general']['rdg_sum6'];
+                    $vat_price += $rgdp['rate_data_general']['rdg_vat6'];
+                } else if ($rgdp['service_korean_name'] == '유통가공') {
+                    if(str_contains($rgdp['rgd_bill_type'], 'month')){
+                        $count = ReceivingGoodsDelivery::where('rgd_settlement_number', $rgdp['rgd_settlement_number'])->count();
+                        $item_name = $rgdp['warehousing']['w_schedule_number2'] . ($count == 1 ? '' : ('외 ' . ($count - 1) .'건'));
+                    }else {
+                        $item_name = $rgdp['warehousing']['w_schedule_number2'];
+                    }
+                    $amount_price += $rgdp['rate_data_general']['rdg_supply_price4'];
+                    $total_price += $rgdp['rate_data_general']['rdg_sum4'];
+                    $vat_price += $rgdp['rate_data_general']['rdg_vat4'];
+                }
+
+                $items[] = array(
                     'PurchaseExpiry' => "",            //YYYYMMDD
-                    'Name'            => $tax_number,
+                    'Name'            => $item_name,
                     'Information'    => '',
                     'ChargeableUnit' => '',
                     'UnitPrice'        => '',
-                    'Amount'        => $AmountTotal,
-                    'Tax'            => $TaxTotal,
+                    'Amount'        => $amount_price,
+                    'Tax'            => $vat_price,
                     'Description'    => ''
-                ),
-            )
+                );
+            }
+        }else {
+            $amount_price = 0;
+            $total_price = 0;
+            $vat_price = 0;
+
+            if ($rgd['service_korean_name'] == '보세화물') {
+                $item_name = $rgd['t_import']['ti_h_bl'];
+                $amount_price += ($rgd['rate_data_general']['rdg_supply_price7'] + $rgd['rate_data_general']['rdg_supply_price14']);
+                $total_price += ($rgd['rate_data_general']['rdg_sum7'] + $rgd['rate_data_general']['rdg_sum14']);
+                $vat_price += ($rgd['rate_data_general']['rdg_vat7'] + $rgd['rate_data_general']['rdg_vat14']);
+            } else if ($rgd['service_korean_name'] == '수입풀필먼트') {
+                $item_name = $rgd['rgd_settlement_number'];
+                $amount_price += $rgd['rate_data_general']['rdg_supply_price6'];
+                $total_price += $rgd['rate_data_general']['rdg_sum6'];
+                $vat_price += $rgd['rate_data_general']['rdg_vat6'];
+            } else if ($rgd['service_korean_name'] == '유통가공') {
+                $item_name = $rgd['warehousing']['w_schedule_number2'];
+                $amount_price += $rgd['rate_data_general']['rdg_supply_price4'];
+                $total_price += $rgd['rate_data_general']['rdg_sum4'];
+                $vat_price += $rgd['rate_data_general']['rdg_vat4'];
+            }
+
+            $items[] = array(
+                'PurchaseExpiry' => "",            //YYYYMMDD
+                'Name'            => $item_name,
+                'Information'    => '',
+                'ChargeableUnit' => '',
+                'UnitPrice'        => '',
+                'Amount'        => $amount_price,
+                'Tax'            => $vat_price,
+                'Description'    => ''
+            );
+        }
+
+
+        $TaxInvoiceTradeLineItems = array(
+            'TaxInvoiceTradeLineItem'    => $items,
         );
 
         //-------------------------------------------
