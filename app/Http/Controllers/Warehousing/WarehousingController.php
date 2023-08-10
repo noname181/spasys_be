@@ -6531,9 +6531,7 @@ class WarehousingController extends Controller
                 })->with(['payment', 'member', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('company.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    })->whereHas('company.co_parent.contract', function ($q) use ($user) {
-                        $q->where('c_calculate_deadline_yn', 'y');
-                    });
+                    })->where('rgd_calculate_deadline_yn', 'y');
                 });
             } else if ($user->mb_type == 'shipper') {
                 $warehousing = ReceivingGoodsDelivery::select('receiving_goods_delivery.*', 'tax_invoice_divide.tid_no as tid_no2', 'tax_invoice_divide.tid_sum', 'tax_invoice_divide.tid_type', 'tax_invoice_divide.rgd_number', 'tax_invoice_divide.tid_supply_price', 'tax_invoice_divide.tid_vat', 'tax_invoice_divide.tid_number')->leftjoin('tax_invoice_divide', function ($join) {
@@ -7588,6 +7586,35 @@ class WarehousingController extends Controller
             print_r($Result);
         }
     }
+
+    public function print_tax_invoice(Request $request) //page277
+    {
+        $BaroService_URL = 'https://ws.baroservice.com/TI.asmx?wsdl';    //테스트베드용
+        //$BaroService_URL = 'https://ws.baroservice.com/TI.asmx?WSDL';		//실서비스용
+
+        $BaroService_TI = new SoapClient($BaroService_URL, array(
+            'trace'        => 'true',
+            'encoding'    => 'UTF-8'
+        ));
+
+        $CERTKEY = '985417C4-240F-4FA4-B9AD-EA54E25C0F7E';
+        $CorpNum = $request->CorpNum;
+        $MgtKey = $request->MgtKey;
+
+        $Result = $BaroService_TI->GetTaxInvoiceStateEX([
+            'CERTKEY' => $CERTKEY,
+            'CorpNum' => '2168142360',
+            'MgtKey' => $MgtKey,
+        ])->GetTaxInvoiceStateEXResult;
+
+        if ($Result->BarobillState < 0) { // 호출 실패
+            echo $Result->BarobillState;
+        } else { // 호출 성공
+            // 필드정보는 레퍼런스를 참고해주세요.
+            print_r($Result);
+        }
+    }
+
     public function importExcelDistribution(WarehousingSearchRequest $request)
     {
         DB::beginTransaction();
@@ -9298,19 +9325,37 @@ class WarehousingController extends Controller
                 $amount_price = $price['tid_supply_price'];
                 $total_price = $price['tid_sum'];
                 $vat_price = $price['tid_vat'];
-            } 
+            } else {
+             
+                $amount_price = $rgd->rate_data_general->rdg_supply_price7;
+                $total_price = $rgd->rate_data_general->rdg_sum7;
+                $vat_price = $rgd->rate_data_general->rdg_vat7;
+                
+            }
         } else if ($rgd->service_korean_name == '수입풀필먼트') {
             if ($price) {
                 $amount_price = $price['tid_supply_price'];
                 $total_price = $price['tid_sum'];
                 $vat_price = $price['tid_vat'];
-            } 
+            } else {
+               
+                $amount_price = $rgd->rate_data_general->rdg_supply_price6;
+                $total_price = $rgd->rate_data_general->rdg_sum6;
+                $vat_price = $rgd->rate_data_general->rdg_vat6;
+                
+            }
         } else if ($rgd->service_korean_name == '유통가공') {
             if ($price) {
                 $amount_price = $price['tid_supply_price'];
                 $total_price = $price['tid_sum'];
                 $vat_price = $price['tid_vat'];
-            } 
+            }  else {
+                
+                $amount_price = $rgd->rate_data_general->rdg_supply_price4;
+                $total_price = $rgd->rate_data_general->rdg_sum4;
+                $vat_price = $rgd->rate_data_general->rdg_vat4;
+                
+            }
         }
 
         if ($rgds) {
@@ -9585,6 +9630,32 @@ class WarehousingController extends Controller
         //-------------------------------------------
         //품목
         //-------------------------------------------
+
+        $items = [];
+        if($rgds){
+            foreach($rgds as $rgdp){
+                $item_name = '';
+                if ($rgdp['service_korean_name'] == '보세화물') {
+                    if(str_contains($rgdp['rgd_bill_type'], 'month')){
+                        $count = ReceivingGoodsDelivery::where('rgd_settlement_number', $rgdp['rgd_settlement_number'])->count();
+                        $item_name = $rgdp['t_import']['ti_h_bl'] + ($count == 1 ? '' : ('외 ' + ($count - 1) + '건'));
+                    }else {
+                        $item_name = $rgdp['t_import']['ti_h_bl'];
+                    }
+                } else if ($rgdp['service_korean_name'] == '수입풀필먼트') {
+                  if(str_contains($rgdp['rgd_bill_type'], 'month')){
+                        $count = ReceivingGoodsDelivery::where('rgd_settlement_number', $rgdp['rgd_settlement_number'])->count();
+                        $item_name = $rgdp['t_import']['ti_h_bl'] + ($count == 1 ? '' : ('외 ' + ($count - 1) + '건'));
+                    }else {
+                        $item_name = $rgdp['t_import']['ti_h_bl'];
+                    }
+                } else if ($rgdp['service_korean_name'] == '유통가공') {
+                   
+                }
+            }
+        }
+
+
         $TaxInvoiceTradeLineItems = array(
             'TaxInvoiceTradeLineItem'    => array(
                 array(
@@ -9597,16 +9668,6 @@ class WarehousingController extends Controller
                     'Tax'            => $TaxTotal,
                     'Description'    => ''
                 ),
-                array(
-                    'PurchaseExpiry' => "",            //YYYYMMDD
-                    'Name'            => $tax_number,
-                    'Information'    => '',
-                    'ChargeableUnit' => '',
-                    'UnitPrice'        => '',
-                    'Amount'        => $AmountTotal,
-                    'Tax'            => $TaxTotal,
-                    'Description'    => ''
-                )
             )
         );
 
@@ -9782,18 +9843,11 @@ class WarehousingController extends Controller
                 $total_price = $price['tid_sum'];
                 $vat_price = $price['tid_vat'];
             } else {
-                if ($rgds) {
-                    $total_price = 0;
-                    foreach ($rgds as $rgdp) {
-                        $amount_price += $rgdp['rate_data_general']['rdg_supply_price7'];
-                        $total_price += $rgdp['rate_data_general']['rdg_sum7'];
-                        $vat_price += $rgdp['rate_data_general']['rdg_vat7'];
-                    }
-                } else {
-                    $amount_price = $rgd->rate_data_general->rdg_supply_price7;
-                    $total_price = $rgd->rate_data_general->rdg_sum7;
-                    $vat_price = $rgd->rate_data_general->rdg_vat7;
-                }
+             
+                $amount_price = $rgd->rate_data_general->rdg_supply_price7;
+                $total_price = $rgd->rate_data_general->rdg_sum7;
+                $vat_price = $rgd->rate_data_general->rdg_vat7;
+                
             }
         } else if ($rgd->service_korean_name == '수입풀필먼트') {
             if ($price) {
@@ -9801,18 +9855,11 @@ class WarehousingController extends Controller
                 $total_price = $price['tid_sum'];
                 $vat_price = $price['tid_vat'];
             } else {
-                if ($rgds) {
-                    $total_price = 0;
-                    foreach ($rgds as $rgdp) {
-                        $amount_price += $rgdp['rate_data_general']['rdg_supply_price6'];
-                        $total_price += $rgdp['rate_data_general']['rdg_sum6'];
-                        $vat_price += $rgdp['rate_data_general']['rdg_vat6'];
-                    }
-                } else {
-                    $amount_price = $rgd->rate_data_general->rdg_supply_price6;
-                    $total_price = $rgd->rate_data_general->rdg_sum6;
-                    $vat_price = $rgd->rate_data_general->rdg_vat6;
-                }
+               
+                $amount_price = $rgd->rate_data_general->rdg_supply_price6;
+                $total_price = $rgd->rate_data_general->rdg_sum6;
+                $vat_price = $rgd->rate_data_general->rdg_vat6;
+                
             }
         } else if ($rgd->service_korean_name == '유통가공') {
             if ($price) {
@@ -9820,17 +9867,33 @@ class WarehousingController extends Controller
                 $total_price = $price['tid_sum'];
                 $vat_price = $price['tid_vat'];
             } else {
-                if ($rgds) {
-                    $total_price = 0;
-                    foreach ($rgds as $rgdp) {
-                        $amount_price += $rgdp['rate_data_general']['rdg_supply_price4'];
-                        $total_price += $rgdp['rate_data_general']['rdg_sum4'];
-                        $vat_price += $rgdp['rate_data_general']['rdg_vat4'];
-                    }
-                } else {
-                    $amount_price = $rgd->rate_data_general->rdg_supply_price4;
-                    $total_price = $rgd->rate_data_general->rdg_sum4;
-                    $vat_price = $rgd->rate_data_general->rdg_vat4;
+                
+                $amount_price = $rgd->rate_data_general->rdg_supply_price4;
+                $total_price = $rgd->rate_data_general->rdg_sum4;
+                $vat_price = $rgd->rate_data_general->rdg_vat4;
+                
+            }
+        }
+
+        if ($rgds) {
+            $total_price = 0;
+            $amount_price = 0;
+            $total_price = 0;
+            $vat_price = 0;
+    
+            foreach ($rgds as $rgdp) {
+                if ($rgdp['service_korean_name'] == '보세화물') {
+                    $amount_price += ($rgdp['rate_data_general']['rdg_supply_price7'] + $rgdp['rate_data_general']['rdg_supply_price14']);
+                    $total_price += ($rgdp['rate_data_general']['rdg_sum7'] + $rgdp['rate_data_general']['rdg_sum14']);
+                    $vat_price += ($rgdp['rate_data_general']['rdg_vat7'] + $rgdp['rate_data_general']['rdg_vat14']);
+                } else if ($rgdp['service_korean_name'] == '수입풀필먼트') {
+                    $amount_price += $rgdp['rate_data_general']['rdg_supply_price6'];
+                    $total_price += $rgdp['rate_data_general']['rdg_sum6'];
+                    $vat_price += $rgdp['rate_data_general']['rdg_vat6'];
+                } else if ($rgdp['service_korean_name'] == '유통가공') {
+                    $amount_price += $rgdp['rate_data_general']['rdg_supply_price4'];
+                    $total_price += $rgdp['rate_data_general']['rdg_sum4'];
+                    $vat_price += $rgdp['rate_data_general']['rdg_vat4'];
                 }
             }
         }
@@ -10125,16 +10188,6 @@ class WarehousingController extends Controller
                     'Tax'            => $TaxTotal,
                     'Description'    => ''
                 ),
-                array(
-                    'PurchaseExpiry' => "",            //YYYYMMDD
-                    'Name'            => $tax_number,
-                    'Information'    => '',
-                    'ChargeableUnit' => '',
-                    'UnitPrice'        => '',
-                    'Amount'        => $AmountTotal,
-                    'Tax'            => $TaxTotal,
-                    'Description'    => ''
-                )
             )
         );
 
