@@ -1298,7 +1298,7 @@ class ReceivingGoodsDeliveryController extends Controller
                             'rgd_delivery_man' => isset($location['rgd_delivery_man']) ? $location['rgd_delivery_man'] : '',
                             'rgd_delivery_man_hp' => isset($location['rgd_delivery_man_hp']) ? $location['rgd_delivery_man_hp'] : '',
                             'rgd_delivery_schedule_day' => isset($location['rgd_delivery_schedule_day']) ? DateTime::createFromFormat('Y-m-d', $location['rgd_delivery_schedule_day']) : null,
-                            'rgd_arrive_day' =>  isset($location['rgd_arrive_day']) ? DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']) : null,
+                            'rgd_arrive_day' =>  isset($location['rgd_arrive_day']) ? DateTime::createFromFormat('Y-m-d', $location['rgd_arrive_day']) : ( isset($location['rgd_status3']) && $location['rgd_status3'] == "배송완료" ? Carbon::now()->toDateTimeString() : null),
                         ]
                     );
                 }

@@ -1260,10 +1260,10 @@ class WarehousingController extends Controller
                         //$check_error = true;
                     } else {
 
-                        $custom = collect(['wi_number' => $warehouse['J'], 'company_shipper' => $warehouse['B'], 'w_schedule_day' => $warehouse['K']]);
+                        $custom = collect(['wi_number' => $warehouse['J'], 'company_shipper' => $warehouse['B'], 'w_schedule_day' => $warehouse['K'],'connection_number' => $warehouse['C']]);
 
                         $item = $custom->merge($item);
-
+                        //$test_i["connection_number"] = isset($warehouse['C']) ? $warehouse['C'] : null;
                         $test_i[] = $item;
                         // $index = $warehouse['B'] . ',' . $warehouse['K'];
 
@@ -1305,6 +1305,7 @@ class WarehousingController extends Controller
                             'co_no' => isset($value['co_no']) ? $value['co_no'] : null,
                             'w_schedule_day' => isset($w_schedule_day) ? $w_schedule_day : null,
                             'w_cancel_yn' => 'n',
+                            'connection_number' => isset($value['connection_number']) ? $value['connection_number'] : null,
                         ]);
 
                         if ($warehousing_id) {
@@ -8515,14 +8516,16 @@ class WarehousingController extends Controller
                     //     $out[$index] = $d['A'];
                     // }
                     $test[$index] = $d['A'];
-
+                    
                     if (isset($test_i[$index])) {
                         $tmp = $test_i[$index];
                         $tmp[] = $item;
+                        $tmp["connection_number"] = isset($d['C']) ? $d['C'] : null;
                         $test_i[$index] = $tmp;
                     } else {
                         $tmp = [];
                         $tmp[] = $item;
+                        $tmp["connection_number"] = isset($d['C']) ? $d['C'] : null;
                         $test_i[$index] = $tmp;
                     }
                 }
@@ -8543,6 +8546,7 @@ class WarehousingController extends Controller
                 'w_schedule_day' => null,
                 'w_cancel_yn' => 'n',
                 'w_completed_day' => $w_completed_day,
+                'connection_number' => isset($value['connection_number']) ? $value['connection_number'] : null
             ]);
 
             ReceivingGoodsDelivery::insertGetId([
@@ -8565,24 +8569,27 @@ class WarehousingController extends Controller
             ]);
 
             $w_amount = 0;
-            foreach ($value as $warehousing_item) {
-
-
-                WarehousingItem::insert([
-                    'item_no' => $warehousing_item['item_no'],
-                    'w_no' => $w_no,
-                    'wi_number' => 0,
-                    'wi_type' => '입고_shipper'
-                ]);
-
-                WarehousingItem::insert([
-                    'item_no' => $warehousing_item['item_no'],
-                    'w_no' => $w_no,
-                    'wi_number' => isset($warehousing_item['wi_number']) ? $warehousing_item['wi_number'] : null,
-                    'wi_type' => '입고_spasys'
-                ]);
-                $w_amount += $warehousing_item['wi_number'];
-            }
+            
+                foreach ($value as $k => $warehousing_item) {
+                    if($k != "connection_number"){
+                        WarehousingItem::insert([
+                            'item_no' => $warehousing_item['item_no'],
+                            'w_no' => $w_no,
+                            'wi_number' => 0,
+                            'wi_type' => '입고_shipper'
+                        ]);
+        
+                        WarehousingItem::insert([
+                            'item_no' => $warehousing_item['item_no'],
+                            'w_no' => $w_no,
+                            'wi_number' => isset($warehousing_item['wi_number']) ? $warehousing_item['wi_number'] : null,
+                            'wi_type' => '입고_spasys'
+                        ]);
+                        $w_amount += $warehousing_item['wi_number'];
+                    }
+                } 
+            
+            
 
             Warehousing::Where('w_no', $w_no_data)->update([
                 'w_schedule_amount' =>  0,
