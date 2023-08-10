@@ -6540,9 +6540,7 @@ class WarehousingController extends Controller
                 })->with(['payment', 'member', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('company', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
-                    })->whereHas('company.contract', function ($q) use ($user) {
-                        $q->where('c_calculate_deadline_yn', 'y');
-                    });
+                    })->where('rgd_calculate_deadline_yn', 'y');
                 });
             } else if ($user->mb_type == 'spasys') {
                 $warehousing = ReceivingGoodsDelivery::select('receiving_goods_delivery.*', 'tax_invoice_divide.tid_no as tid_no2', 'tax_invoice_divide.tid_sum', 'tax_invoice_divide.tid_type', 'tax_invoice_divide.rgd_number', 'tax_invoice_divide.tid_supply_price', 'tax_invoice_divide.tid_vat', 'tax_invoice_divide.tid_number')->leftjoin('tax_invoice_divide', function ($join) {
