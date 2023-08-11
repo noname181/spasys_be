@@ -18,6 +18,7 @@ class Kernel extends ConsoleKernel
         //$schedule->command('inspire')->hourly();
         $schedule->call('App\Http\Controllers\Item\ItemController@apiItemsCargoList')->name('apiItemsCargoList')->withoutOverlapping()->cron('*/5 * * * *');
         $schedule->call('App\Http\Controllers\RateData\RateDataController@check_payment')->name('check_payment')->withoutOverlapping()->everyMinute();
+        $schedule->call('App\Http\Controllers\Warehousing\WarehousingController@update_tax_status')->name('update_tax_status')->withoutOverlapping()->everyMinute();
         $schedule->call('App\Http\Controllers\Item\ItemController@updateStockItemsApiNoLogin')->name('updateStockItemsApiNoLogin')->withoutOverlapping()->cron('*/15 * * * *');
         $schedule->call('App\Http\Controllers\Item\ItemController@apiItemCronNoLogin')->name('apiItemCronNoLogin')->withoutOverlapping()->cron('*/20 * * * *');
         $schedule->call('App\Http\Controllers\ScheduleShipment\ScheduleShipmentController@getScheduleFromApiNoLogin')->name('getScheduleFromApiNoLogin')->withoutOverlapping()->cron('*/30 * * * *');
