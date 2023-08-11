@@ -37,6 +37,7 @@ Route::get('/daily_alarm_insulace30', [App\Http\Controllers\AlarmData\AlarmDataC
 Route::get('/alarm_pw_90d', [App\Http\Controllers\AlarmData\AlarmDataController::class, 'alarmPw90d'])->name('alarmPw90d');
 Route::get('/api_item_cargo_list', [App\Http\Controllers\Item\ItemController::class, 'apiItemsCargoList'])->name('api_item_cargo_list');
 Route::get('/create_bonded_settlement', [App\Http\Controllers\Item\ItemController::class, 'createBondedSettlement'])->name('create_bonded_settlement');
+Route::get('/update_tax_status', [\App\Http\Controllers\Warehousing\WarehousingController::class,'update_tax_status']); //page 277
 
 Route::prefix('payment')->name('payment.')->group(function () {
     Route::post('/payment_result', [App\Http\Controllers\RateData\RateDataController::class, 'payment_result'])->name('payment_result');
