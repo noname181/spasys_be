@@ -6530,9 +6530,14 @@ class WarehousingController extends Controller
                 $warehousing = ReceivingGoodsDelivery::select('receiving_goods_delivery.*', 'tax_invoice_divide.tid_no as tid_no2', 'tax_invoice_divide.tid_sum', 'tax_invoice_divide.tid_type', 'tax_invoice_divide.rgd_number', 'tax_invoice_divide.tid_supply_price', 'tax_invoice_divide.tid_vat', 'tax_invoice_divide.tid_number')->leftjoin('tax_invoice_divide', function ($join) {
                     $join->on('tax_invoice_divide.rgd_no', '=', 'receiving_goods_delivery.rgd_no');
                 })->with(['tax_invoice', 'payment', 'member', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
-                    $query->whereHas('company.co_parent', function ($q) use ($user) {
-                        $q->where('co_no', $user->co_no);
-                    })->where('rgd_calculate_deadline_yn', 'y');
+                    $query->where(function ($query) use ($user) {
+                        $query->whereHas('company.co_parent', function ($q) use ($user) {
+                            $q->where('co_no', $user->co_no);
+                        })->orwhereHas('company', function ($q) use ($user) {
+                            $q->where('co_no', $user->co_no);
+                        });
+                    })
+                    ->where('rgd_calculate_deadline_yn', 'y');
                 });
             } else if ($user->mb_type == 'shipper') {
                 $warehousing = ReceivingGoodsDelivery::select('receiving_goods_delivery.*', 'tax_invoice_divide.tid_no as tid_no2', 'tax_invoice_divide.tid_sum', 'tax_invoice_divide.tid_type', 'tax_invoice_divide.rgd_number', 'tax_invoice_divide.tid_supply_price', 'tax_invoice_divide.tid_vat', 'tax_invoice_divide.tid_number')->leftjoin('tax_invoice_divide', function ($join) {
@@ -6547,6 +6552,8 @@ class WarehousingController extends Controller
                     $join->on('tax_invoice_divide.rgd_no', '=', 'receiving_goods_delivery.rgd_no');
                 })->with(['tax_invoice', 'payment', 'member', 'warehousing', 'rate_data_general', 't_export', 't_import'])->whereHas('warehousing', function ($query) use ($user) {
                     $query->whereHas('company.co_parent.co_parent', function ($q) use ($user) {
+                        $q->where('co_no', $user->co_no);
+                    })->orwhereHas('company.co_parent', function ($q) use ($user) {
                         $q->where('co_no', $user->co_no);
                     });
                 });
