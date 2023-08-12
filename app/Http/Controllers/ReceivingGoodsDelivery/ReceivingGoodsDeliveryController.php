@@ -819,6 +819,15 @@ class ReceivingGoodsDeliveryController extends Controller
                     }
                     //}
                 }
+
+                $message_url = [];
+                if (isset($package['reciever_contract'])){
+                    $phone = trim($package['reciever_contract']);
+                    $url = "http://localhost:3000/delivery_confirm/".$request->w_no;
+                    $message_url["phone"] = $phone;
+                    $message_url["url"] = $url;
+                }
+
             } else {
                 //Page141
                 $warehousing_data = Warehousing::where('w_no', $request->w_no)->first();
@@ -1253,6 +1262,7 @@ class ReceivingGoodsDeliveryController extends Controller
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
+                'message_url' => $message_url,
                 'w_schedule_number' =>  isset($w_schedule_number) ? $w_schedule_number : '',
                 'w_schedule_number2' => isset($w_schedule_number2) ? $w_schedule_number2 : '',
                 'w_no' => isset($w_no) ? $w_no :  $request->w_no,
