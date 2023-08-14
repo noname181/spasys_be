@@ -10361,7 +10361,7 @@ class WarehousingController extends Controller
                 'ContactName'     => '모상희',                //필수입력
                 'TEL'             => '07046597289',
                 'HP'             => '',
-                'Email'         => 'ly.kim@spasysone.com'                //필수입력
+                'Email'         => 'spasys1@spasysone.com'                //필수입력
             );
         }
 
