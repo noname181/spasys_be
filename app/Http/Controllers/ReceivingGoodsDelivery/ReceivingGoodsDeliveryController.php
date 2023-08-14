@@ -4899,11 +4899,21 @@ class ReceivingGoodsDeliveryController extends Controller
             $dataSubmit = $request->dataSubmit;
 
             $user = Auth::user();
+            $status = 0;
+            if (isset($request->signature)) {
+                Package::where('w_no', $request->w_no)->update([
+                    'signature_url' => $request->signature
+                ]);
+                ReceivingGoodsDelivery::where('w_no', $request->w_no)->update([
+                    'rgd_status3' => "배송완료"
+                ]);
+                $status = 1;
+            }else{
+                $status = 2;
+            }
 
-
-            if ($dataSubmit) {
+            if (isset($dataSubmit)) {
                 $rgd = ReceivingGoodsDelivery::updateOrCreate(
-
                     [
                         'rgd_no' =>  isset($dataSubmit['rgd_no']) ? $dataSubmit['rgd_no'] : null,
                     ],
@@ -4986,6 +4996,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     
                 }
             }
+
             if (isset($data['remove'])) {
                 foreach ($data['remove'] as $remove) {
                     ReceivingGoodsDelivery::where('rgd_no', $remove['rgd_no'])->delete();
@@ -5007,6 +5018,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
             DB::commit();
             return response()->json([
+                'status' => $status,
                 'message' => Messages::MSG_0007,
                 'is_no' => isset($dataSubmit['is_no']) ? $dataSubmit['is_no'] :  null,
                 'w_no_alert' => isset($w_no_alert) ? $w_no_alert :  null,

@@ -1255,9 +1255,9 @@ class WarehousingController extends Controller
                     $item = $item->first();
 
                     if (!isset($item)) {
-                        continue;
-                        //$errors[$sheet->getTitle()][] = $validator->errors();
-                        //$check_error = true;
+                        //continue;
+                        $errors[$sheet->getTitle()][] = $validator->errors();
+                        $check_error = true;
                     } else {
 
                         $custom = collect(['wi_number' => (int)$warehouse['J'], 'company_shipper' => $warehouse['B'], 'w_schedule_day' => $warehouse['K'],'connection_number' => $warehouse['C']]);
