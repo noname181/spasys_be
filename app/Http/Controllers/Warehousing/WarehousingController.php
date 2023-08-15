@@ -6822,7 +6822,7 @@ class WarehousingController extends Controller
 
             $all_bill = $x->groupby('receiving_goods_delivery.rgd_no')->get()->count();
 
-            $issued_tax_bill = $y->where('rgd_status7', 'taxed')->groupby('tax_invoice_divide.tid_no')->get()->count();
+            $issued_tax_bill = $y->where('rgd_status7', 'taxed')->groupby('receiving_goods_delivery.rgd_tax_invoice_number')->get()->count();
 
             DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
 
