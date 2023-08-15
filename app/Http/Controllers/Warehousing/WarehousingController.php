@@ -1181,8 +1181,9 @@ class WarehousingController extends Controller
     {
         try {
             DB::beginTransaction();
+            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
             $f = Storage::disk('public')->put('files/tmp', $request['file']);
-
+            $user = Auth::user();
             $path = storage_path('app/public') . '/' . $f;
             $reader = IOFactory::createReaderForFile($path);
             $reader->setReadDataOnly(true);
@@ -1206,6 +1207,7 @@ class WarehousingController extends Controller
             $rows_number_item_add = 0;
             $check_error = false;
             $test_i = [];
+            
             if (Auth::user()->mb_type == "spasys") {
                 $company = Company::with(["co_parent"])->where("co_type", "shipper")->where(function ($query) {
                     $query->whereHas('co_parent.co_parent', function ($q) {
@@ -1255,9 +1257,38 @@ class WarehousingController extends Controller
                     $item = $item->first();
 
                     if (!isset($item)) {
+
                         //continue;
-                        $errors[$sheet->getTitle()][] = $validator->errors();
-                        $check_error = true;
+                        // $errors[$sheet->getTitle()][] = $validator->errors();
+                        // $check_error = true;
+
+                        $shipper_check = Company::with(["co_parent"])->where("co_type", "shipper")->where("co_name", $warehouse['B'])->whereIn('co_no', $company_shipper)->first();
+
+                        if (!isset($shipper_check)) {
+                            $errors["type"] = "Register only affiliated shippers!";
+                            $errors[$sheet->getTitle()][] = "소속된 화주가 아닙니다. 소속된 화주만 등록하세요!";
+                            $check_error = true;
+                           
+                        } else {
+                            $item_no = Item::insertGetId([
+                                'mb_no' => Auth::user()->mb_no,
+                                'co_no' => isset($shipper_check['co_no']) ? $shipper_check['co_no'] : null,
+                                'item_brand' => $warehouse['D'],
+                                'item_bar_code' => $warehouse['E'],
+                                'item_service_name' => "유통가공",
+                                'item_name' => $warehouse['G'],
+                                'item_option1' => $warehouse['H'],
+                                'item_option2' => $warehouse['I'],
+                            ]);
+                            
+                            $item = Item::with(['company'])->where('item_no', $item_no)->first();
+
+                            $custom = collect(['wi_number' => (int)$warehouse['J'], 'company_shipper' => $warehouse['B'], 'w_schedule_day' => $warehouse['K'],'connection_number' => $warehouse['C']]);
+    
+                            $item = $custom->merge($item);
+    
+                            $test_i[] = $item;
+                        }
                     } else {
 
                         $custom = collect(['wi_number' => (int)$warehouse['J'], 'company_shipper' => $warehouse['B'], 'w_schedule_day' => $warehouse['K'],'connection_number' => $warehouse['C']]);
@@ -1296,7 +1327,51 @@ class WarehousingController extends Controller
                     $check_error = true;
                 } else {
                     if (isset($value['company'])) {
+
+                        if(isset($value['connection_number']) && $value['connection_number']){
+                            $sub = ImportExpected::select('company.co_no', 'company.co_name', 't_import_expected.tie_h_bl')
+                            ->leftjoin('company', function ($join) {
+                                $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
+                            })->leftjoin('company as parent_shop', function ($join) {
+                                $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
+                            })->leftjoin('company as parent_spasys', function ($join) {
+                                $join->on('parent_shop.co_parent_no', '=', 'parent_spasys.co_no');
+                            })->where('company.co_no', $excel_company['co_no'])->where('tie_is_date', '>=', '2022-01-04')
+                            ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
+                            ->where('t_import_expected.tie_h_bl','=',$value['connection_number'])
+                            ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number'])->first();
+                       
+                            if (!isset($sub)) {
+
+                                $warehousing2 = Warehousing::join(
+                                    DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
+                                    'm.w_no',
+                                    '=',
+                                    'warehousing.w_no'
+                                )->where('warehousing.w_type', '=', 'EW')->where('w_category_name', '=', '수입풀필먼트')->whereHas('co_no', function ($q) use ($excel_company) {
+                                    $q->where('co_no', $excel_company['co_no']);
+                                })->get();
+
+                                $w_import_no = collect($warehousing2)->map(function ($q) {
+                                    return $q->w_import_no;
+                                });
+                               
+                                $warehousing = Warehousing::with('mb_no')
+                                    ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')->where('w_category_name', '=', '수입풀필먼트')
+                                    ->whereHas('co_no', function ($q) use ($excel_company) {
+                                        $q->where('co_no', $excel_company['co_no']);
+                                    })->where('w_schedule_number', $value['connection_number'])->orderby('w_completed_day', 'DESC')->first();
+                                
+                                if(!isset($warehousing)){
+                                    $errors["type"] = "Wrong connection number";
+                                    $errors[$sheet->getTitle()][] = "화물연계번호가 올바르지 않습니다";
+                                    $check_error = true;
+                                }
+                            }
+                        }
+
                         $rows_warehousing_add = $rows_warehousing_add + 1;
+
                         $warehousing_id = Warehousing::insertGetId([
                             'mb_no' => Auth::user()->mb_no,
                             'w_type' => 'IW',
@@ -1378,6 +1453,7 @@ class WarehousingController extends Controller
                 }
             }
 
+            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
             if ($check_error == true) {
                 DB::rollback();
                 return response()->json([
