@@ -87,20 +87,22 @@ class WarehousingController extends Controller
     {
         try {
             $warehousing = Warehousing::with(['co_no', 'warehousing_request'])->find($w_no);
-            //$warehousings = Warehousing::where('w_import_no', $w_no)->get();
-            if (isset($warehousing->w_import_no) && $warehousing->w_import_no) {
-                $warehousing_import = Warehousing::where('w_no', $warehousing->w_import_no)->first();
-            } else {
-                $warehousing_import = '';
-            }
-            if ($warehousing->w_import_no) {
-                $warehousings = Warehousing::with('receving_goods_delivery')->whereHas('receving_goods_delivery', function ($q) {
-                    $q->whereNull("rgd_parent_no");
-                })->where('w_import_no', $warehousing->w_import_no)->get();
-            } else {
-                $warehousings = [];
-            }
+
             if (!empty($warehousing)) {
+                //$warehousings = Warehousing::where('w_import_no', $w_no)->get();
+                if (isset($warehousing->w_import_no) && $warehousing->w_import_no) {
+                    $warehousing_import = Warehousing::where('w_no', $warehousing->w_import_no)->first();
+                } else {
+                    $warehousing_import = '';
+                }
+                if ($warehousing->w_import_no) {
+                    $warehousings = Warehousing::with('receving_goods_delivery')->whereHas('receving_goods_delivery', function ($q) {
+                        $q->whereNull("rgd_parent_no");
+                    })->where('w_import_no', $warehousing->w_import_no)->get();
+                } else {
+                    $warehousings = [];
+                }
+
                 return response()->json(
                     [
                         'message' => Messages::MSG_0007,
@@ -111,11 +113,22 @@ class WarehousingController extends Controller
                     200
                 );
             } else {
-                return response()->json(['message' => Messages::MSG_0018], 400);
+                $export = Export::with(['import', 'import_expected', 't_export_confirm'])->where('te_carry_out_number', $w_no)->first();
+                $company = Company::with(['co_parent'])->where('co_license', $export->import_expected->tie_co_license)->first();
+                //return response()->json(['message' => Messages::MSG_0018], 400);
+                $export['co_no'] = isset($company) ? $company : null;
+                return response()->json(
+                    [
+                        'message' => Messages::MSG_0007,
+                        'data' => $export,
+                        'company' => $company,
+                    ],
+                    200
+                );
             }
         } catch (\Exception $e) {
             Log::error($e);
-
+            return $e;
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
@@ -1207,7 +1220,7 @@ class WarehousingController extends Controller
             $rows_number_item_add = 0;
             $check_error = false;
             $test_i = [];
-            
+
             if (Auth::user()->mb_type == "spasys") {
                 $company = Company::with(["co_parent"])->where("co_type", "shipper")->where(function ($query) {
                     $query->whereHas('co_parent.co_parent', function ($q) {
@@ -1268,7 +1281,6 @@ class WarehousingController extends Controller
                             $errors["type"] = "Register only affiliated shippers!";
                             $errors[$sheet->getTitle()][] = "소속된 화주가 아닙니다. 소속된 화주만 등록하세요!";
                             $check_error = true;
-                           
                         } else {
                             $item_no = Item::insertGetId([
                                 'mb_no' => Auth::user()->mb_no,
@@ -1280,18 +1292,18 @@ class WarehousingController extends Controller
                                 'item_option1' => $warehouse['H'],
                                 'item_option2' => $warehouse['I'],
                             ]);
-                            
+
                             $item = Item::with(['company'])->where('item_no', $item_no)->first();
 
-                            $custom = collect(['wi_number' => (int)$warehouse['J'], 'company_shipper' => $warehouse['B'], 'w_schedule_day' => $warehouse['K'],'connection_number' => $warehouse['C']]);
-    
+                            $custom = collect(['wi_number' => (int)$warehouse['J'], 'company_shipper' => $warehouse['B'], 'w_schedule_day' => $warehouse['K'], 'connection_number' => $warehouse['C']]);
+
                             $item = $custom->merge($item);
-    
+
                             $test_i[] = $item;
                         }
                     } else {
 
-                        $custom = collect(['wi_number' => (int)$warehouse['J'], 'company_shipper' => $warehouse['B'], 'w_schedule_day' => $warehouse['K'],'connection_number' => $warehouse['C']]);
+                        $custom = collect(['wi_number' => (int)$warehouse['J'], 'company_shipper' => $warehouse['B'], 'w_schedule_day' => $warehouse['K'], 'connection_number' => $warehouse['C']]);
 
                         $item = $custom->merge($item);
                         //$test_i["connection_number"] = isset($warehouse['C']) ? $warehouse['C'] : null;
@@ -1328,19 +1340,19 @@ class WarehousingController extends Controller
                 } else {
                     if (isset($value['company'])) {
 
-                        if(isset($value['connection_number']) && $value['connection_number']){
+                        if (isset($value['connection_number']) && $value['connection_number']) {
                             $sub = ImportExpected::select('company.co_no', 'company.co_name', 't_import_expected.tie_h_bl')
-                            ->leftjoin('company', function ($join) {
-                                $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
-                            })->leftjoin('company as parent_shop', function ($join) {
-                                $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
-                            })->leftjoin('company as parent_spasys', function ($join) {
-                                $join->on('parent_shop.co_parent_no', '=', 'parent_spasys.co_no');
-                            })->where('company.co_no', $excel_company['co_no'])->where('tie_is_date', '>=', '2022-01-04')
-                            ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
-                            ->where('t_import_expected.tie_h_bl','=',$value['connection_number'])
-                            ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number'])->first();
-                       
+                                ->leftjoin('company', function ($join) {
+                                    $join->on('company.co_license', '=', 't_import_expected.tie_co_license');
+                                })->leftjoin('company as parent_shop', function ($join) {
+                                    $join->on('company.co_parent_no', '=', 'parent_shop.co_no');
+                                })->leftjoin('company as parent_spasys', function ($join) {
+                                    $join->on('parent_shop.co_parent_no', '=', 'parent_spasys.co_no');
+                                })->where('company.co_no', $excel_company['co_no'])->where('tie_is_date', '>=', '2022-01-04')
+                                ->where('tie_is_date', '<=', Carbon::now()->format('Y-m-d'))
+                                ->where('t_import_expected.tie_h_bl', '=', $value['connection_number'])
+                                ->groupBy(['tie_logistic_manage_number', 't_import_expected.tie_is_number'])->first();
+
                             if (!isset($sub)) {
 
                                 $warehousing2 = Warehousing::join(
@@ -1355,14 +1367,14 @@ class WarehousingController extends Controller
                                 $w_import_no = collect($warehousing2)->map(function ($q) {
                                     return $q->w_import_no;
                                 });
-                               
+
                                 $warehousing = Warehousing::with('mb_no')
                                     ->with(['co_no', 'warehousing_item', 'receving_goods_delivery', 'w_import_parent'])->whereNotIn('w_no', $w_import_no)->where('w_type', 'IW')->where('w_category_name', '=', '수입풀필먼트')
                                     ->whereHas('co_no', function ($q) use ($excel_company) {
                                         $q->where('co_no', $excel_company['co_no']);
                                     })->where('w_schedule_number', $value['connection_number'])->orderby('w_completed_day', 'DESC')->first();
-                                
-                                if(!isset($warehousing)){
+
+                                if (!isset($warehousing)) {
                                     $errors["type"] = "Wrong connection number";
                                     $errors[$sheet->getTitle()][] = "화물연계번호가 올바르지 않습니다";
                                     $check_error = true;
@@ -6613,7 +6625,7 @@ class WarehousingController extends Controller
                             $q->where('co_no', $user->co_no);
                         });
                     })
-                    ->where('rgd_calculate_deadline_yn', 'y');
+                        ->where('rgd_calculate_deadline_yn', 'y');
                 });
             } else if ($user->mb_type == 'shipper') {
                 $warehousing = ReceivingGoodsDelivery::select('receiving_goods_delivery.*', 'tax_invoice_divide.tid_no as tid_no2', 'tax_invoice_divide.tid_sum', 'tax_invoice_divide.tid_type', 'tax_invoice_divide.rgd_number', 'tax_invoice_divide.tid_supply_price', 'tax_invoice_divide.tid_vat', 'tax_invoice_divide.tid_number')->leftjoin('tax_invoice_divide', function ($join) {
@@ -7197,17 +7209,17 @@ class WarehousingController extends Controller
         try {
             DB::beginTransaction();
 
-            if($request->is_edit == 'y'){
+            if ($request->is_edit == 'y') {
                 $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general', 't_import_expected'])->where('rgd_no', $request->rgd_no)->first();
                 $count = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general', 't_import_expected'])->where('rgd_tax_invoice_number', $rgd->rgd_tax_invoice_number)->count();
 
-                if($count > 1){
+                if ($count > 1) {
                     $request->type = 'add_all';
                     $request->rgds = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general', 't_import_expected'])->where('rgd_tax_invoice_number', $rgd->rgd_tax_invoice_number)->get();
                 }
             }
 
-            
+
 
             if ($request->type == 'option') {
                 $user = Auth::user();
@@ -7459,7 +7471,7 @@ class WarehousingController extends Controller
             else if ($request->type == 'add_all') {
                 $user = Auth::user();
 
-                if($request->is_edit == 'y'){
+                if ($request->is_edit == 'y') {
                     $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general'])->where('rgd_no', $request->rgd_no)->first();
 
                     $tax = Tax::where('t_mgtnum', $rgd->rgd_tax_invoice_number)->first();
@@ -7476,16 +7488,16 @@ class WarehousingController extends Controller
 
                     $BaroService_URL = 'https://ws.baroservice.com/TI.asmx?wsdl';
 
-                    $CERTKEY = '985417C4-240F-4FA4-B9AD-EA54E25C0F7E';   
+                    $CERTKEY = '985417C4-240F-4FA4-B9AD-EA54E25C0F7E';
                     //인증키
                     $BaroService_TI = new SoapClient($BaroService_URL, array(
                         'trace'        => 'true',
                         'encoding'    => 'UTF-8'
                     ));
                     //Cancel old invoice
-            
+
                     $procType = "ISSUE_CANCEL";
-            
+
                     $Result = $BaroService_TI->ProcTaxInvoice(array(
                         'CERTKEY'    => $CERTKEY,
                         'CorpNum'    => '2168142360',
@@ -7494,7 +7506,7 @@ class WarehousingController extends Controller
                     ))->ProcTaxInvoiceResult;
 
                     if ($Result < 0) { // 호출 실패
-                        DB::rollBack();    
+                        DB::rollBack();
                         return response()->json([
                             'message' => Messages::MSG_0007,
                             'api' => "tax_err",
@@ -7505,8 +7517,7 @@ class WarehousingController extends Controller
                     Tax::where('t_mgtnum', $rgd->rgd_tax_invoice_number)->update([
                         't_status' => 0,
                     ]);
-
-                }else {
+                } else {
                     $id = TaxInvoiceDivide::insertGetId([
                         'tid_supply_price' => $request->supply_price,
                         'tid_vat' => $request->vat,
@@ -7522,14 +7533,14 @@ class WarehousingController extends Controller
                         'mb_no' => $user->mb_no,
                         'tid_type' => 'add_all',
                     ]);
-    
+
                     $tax_number = CommonFunc::generate_tax_number($id, $request->rgd_no);
 
                     TaxInvoiceDivide::where('tid_no', $id)->update([
                         'tid_number' => $tax_number ? $tax_number : null,
                     ]);
                 }
-              
+
                 $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general'])->where('rgd_no', $request->rgd_no)->first();
 
                 $api = $this->tax_invoice_api($rgd, $user, null, $tax_number, $request->rgds, null);
@@ -7740,7 +7751,7 @@ class WarehousingController extends Controller
             'trace'        => 'true',
             'encoding'    => 'UTF-8'
         ));
-        
+
         $CERTKEY = '985417C4-240F-4FA4-B9AD-EA54E25C0F7E';
         $MgtKey = $request->MgtKey;
 
@@ -7750,14 +7761,12 @@ class WarehousingController extends Controller
             'MgtKey' => $MgtKey,
             'ID' => 'spasysone',
         ])->GetTaxInvoicePrintURLResult;
-    
+
         if ($Result < 0) { // 호출 실패
             return $Result;
         } else { // 호출 성공
-            return($Result);
+            return ($Result);
         }
-      
-     
     }
 
     public function update_tax_status(Request $request) //page277
@@ -7774,48 +7783,47 @@ class WarehousingController extends Controller
                 'encoding'    => 'UTF-8'
             ));
 
-            $taxs = Tax::whereIn('t_status', [1,3,4])->get();
+            $taxs = Tax::whereIn('t_status', [1, 3, 4])->get();
             $errors = [];
 
-            if(count($taxs) == 1){
+            if (count($taxs) == 1) {
                 $Result = $BaroService_TI->GetTaxInvoiceStateEX(array(
-                    'CERTKEY'		=> $CERTKEY,
-                    'CorpNum'		=> '2168142360',
-                    'MgtKey'		=> $taxs[0]['t_mgtnum'],
+                    'CERTKEY'        => $CERTKEY,
+                    'CorpNum'        => '2168142360',
+                    'MgtKey'        => $taxs[0]['t_mgtnum'],
                 ))->GetTaxInvoiceStateEXResult;
 
-                if ($Result->BarobillState < 0){ //실패
+                if ($Result->BarobillState < 0) { //실패
                     $errors[] = $Result->BarobillState;
-                }else{
+                } else {
                     Tax::where('t_no', $taxs[0]['t_no'])->update([
-                        't_status' => $Result->NTSSendState 
+                        't_status' => $Result->NTSSendState
                     ]);
                 }
-
-            }else if(count($taxs) > 1) {
+            } else if (count($taxs) > 1) {
                 $MgtKeyList = [];
-                foreach($taxs as $tax){
+                foreach ($taxs as $tax) {
                     $MgtKeyList[] = $tax['t_mgtnum'];
                 }
 
                 $Result = $BaroService_TI->GetTaxInvoiceStatesEX(array(
-                    'CERTKEY'		=> $CERTKEY,
-                    'CorpNum'		=> '2168142360',
-                    'MgtKeyList'	=> $MgtKeyList
+                    'CERTKEY'        => $CERTKEY,
+                    'CorpNum'        => '2168142360',
+                    'MgtKeyList'    => $MgtKeyList
                 ))->GetTaxInvoiceStatesEXResult->TaxInvoiceStateEX;
 
-                if (!is_array($Result) && $Result->BarobillState < 0){ //실패
+                if (!is_array($Result) && $Result->BarobillState < 0) { //실패
                     $errors[] =  $Result->BarobillState;
-                }else{ //성공
-                    for($i=0;$i<count($Result);$i++){
+                } else { //성공
+                    for ($i = 0; $i < count($Result); $i++) {
                         $MgtKey = $Result[$i]->MgtKey;
                         Tax::where('t_mgtnum', $MgtKey)->update([
-                            't_status' => $Result[$i]->NTSSendState 
+                            't_status' => $Result[$i]->NTSSendState
                         ]);
                     }
                 }
             }
-            
+
             DB::commit();
             return response()->json([
                 'message' => 'Success',
@@ -7829,7 +7837,6 @@ class WarehousingController extends Controller
                 'status' => 0,
             ], 201);
         }
-     
     }
 
     public function importExcelDistribution(WarehousingSearchRequest $request)
@@ -8662,7 +8669,7 @@ class WarehousingController extends Controller
             if ($key < 1) {
                 continue;
             }
-           
+
             $validator = Validator::make($d, ExcelRequest::rules());
 
             if ($validator->fails()) {
@@ -8670,19 +8677,19 @@ class WarehousingController extends Controller
                 $errors[$sheet->getTitle()][] = $validator->errors();
                 $check_error = true;
             } else {
-                if(isset($d['D'])){
+                if (isset($d['D'])) {
                     $items = Item::where('item_service_name', '수입풀필먼트')->where('product_id', $d['D'])->whereNull('option_id')->first();
-                    if($items === null){
-                        if(!isset($d['E'])){
+                    if ($items === null) {
+                        if (!isset($d['E'])) {
                             $data_item_count =  $data_item_count - 1;
-                            
+
                             $errors["type"] = "No option id";
                             $errors[$sheet->getTitle()][] = "옵션코드 확인하세요";
                             $check_error = true;
                             break;
-                        }else{
+                        } else {
                             $contains = Str::contains($d['E'], 'S');
-        
+
                             if ($contains) {
                                 $item = Item::with(['company', 'ContractWms'])->where('item_service_name', '수입풀필먼트')->where('option_id', $d['E'])->where('product_id', $d['D']);
                                 $item->whereHas('ContractWms.company', function ($q) use ($co_no_in) {
@@ -8695,18 +8702,18 @@ class WarehousingController extends Controller
                                 });
                             }
                         }
-                    }else{
+                    } else {
                         $item = Item::with(['company', 'ContractWms'])->where('item_service_name', '수입풀필먼트')->where('product_id', $d['D'])->whereHas('ContractWms.company', function ($q) use ($co_no_in) {
                             $q->whereIn('co_no', $co_no_in);
                         });
                     }
                 }
 
-                
+
 
 
                 $item = $item->first();
-                
+
                 //$test[] = $item;
                 if (!isset($item)) {
                     $data_item_count =  $data_item_count - 1;
@@ -8732,7 +8739,7 @@ class WarehousingController extends Controller
                     //     $out[$index] = $d['A'];
                     // }
                     $test[$index] = $d['A'];
-                    
+
                     if (isset($test_i[$index])) {
                         $tmp = $test_i[$index];
                         $tmp[] = $item;
@@ -8785,28 +8792,28 @@ class WarehousingController extends Controller
             ]);
 
             $w_amount = 0;
-            
-                foreach ($value as $k => $warehousing_item) {
-                    if($k !== "connection_number"){
-                        
-                        WarehousingItem::insert([
-                            'item_no' => $warehousing_item['item_no'],
-                            'w_no' => $w_no,
-                            'wi_number' => 0,
-                            'wi_type' => '입고_shipper'
-                        ]);
-        
-                        WarehousingItem::insert([
-                            'item_no' => $warehousing_item['item_no'],
-                            'w_no' => $w_no,
-                            'wi_number' => isset($warehousing_item['wi_number']) ? (int)$warehousing_item['wi_number'] : null,
-                            'wi_type' => '입고_spasys'
-                        ]);
-                        $w_amount += (int)$warehousing_item['wi_number'];
-                    }
-                } 
-            
-            
+
+            foreach ($value as $k => $warehousing_item) {
+                if ($k !== "connection_number") {
+
+                    WarehousingItem::insert([
+                        'item_no' => $warehousing_item['item_no'],
+                        'w_no' => $w_no,
+                        'wi_number' => 0,
+                        'wi_type' => '입고_shipper'
+                    ]);
+
+                    WarehousingItem::insert([
+                        'item_no' => $warehousing_item['item_no'],
+                        'w_no' => $w_no,
+                        'wi_number' => isset($warehousing_item['wi_number']) ? (int)$warehousing_item['wi_number'] : null,
+                        'wi_type' => '입고_spasys'
+                    ]);
+                    $w_amount += (int)$warehousing_item['wi_number'];
+                }
+            }
+
+
 
             Warehousing::Where('w_no', $w_no_data)->update([
                 'w_schedule_amount' =>  0,
@@ -9543,18 +9550,17 @@ class WarehousingController extends Controller
             $s_no = $rgd->warehousing->company->co_parent->co_no;
         }
 
-       
+
         if ($rgd->service_korean_name == '보세화물') {
             if ($price) {
                 $amount_price = $price['tid_supply_price'];
                 $total_price = $price['tid_sum'];
                 $vat_price = $price['tid_vat'];
             } else {
-             
+
                 $amount_price = $rgd->rate_data_general->rdg_supply_price7;
                 $total_price = $rgd->rate_data_general->rdg_sum7;
                 $vat_price = $rgd->rate_data_general->rdg_vat7;
-                
             }
         } else if ($rgd->service_korean_name == '수입풀필먼트') {
             if ($price) {
@@ -9562,23 +9568,21 @@ class WarehousingController extends Controller
                 $total_price = $price['tid_sum'];
                 $vat_price = $price['tid_vat'];
             } else {
-               
+
                 $amount_price = $rgd->rate_data_general->rdg_supply_price6;
                 $total_price = $rgd->rate_data_general->rdg_sum6;
                 $vat_price = $rgd->rate_data_general->rdg_vat6;
-                
             }
         } else if ($rgd->service_korean_name == '유통가공') {
             if ($price) {
                 $amount_price = $price['tid_supply_price'];
                 $total_price = $price['tid_sum'];
                 $vat_price = $price['tid_vat'];
-            }  else {
-                
+            } else {
+
                 $amount_price = $rgd->rate_data_general->rdg_supply_price4;
                 $total_price = $rgd->rate_data_general->rdg_sum4;
                 $vat_price = $rgd->rate_data_general->rdg_vat4;
-                
             }
         }
 
@@ -9587,7 +9591,7 @@ class WarehousingController extends Controller
             $amount_price = 0;
             $total_price = 0;
             $vat_price = 0;
-    
+
             foreach ($rgds as $rgdp) {
                 if ($rgdp['service_korean_name'] == '보세화물') {
                     $amount_price += ($rgdp['rate_data_general']['rdg_supply_price7'] + $rgdp['rate_data_general']['rdg_supply_price14']);
@@ -9771,7 +9775,7 @@ class WarehousingController extends Controller
         //------------------------------------------
         $InvoicerParty = array(
             'MgtNum'         => $tax_number,
-            'CorpNum'         => preg_replace('/\s+/','',$cc_license1),                //필수입력 - 바로빌 회원 사업자번호 ('-' 제외, 10자리)
+            'CorpNum'         => preg_replace('/\s+/', '', $cc_license1),                //필수입력 - 바로빌 회원 사업자번호 ('-' 제외, 10자리)
             'TaxRegID'         => '',
             'CorpName'         => $cc_name1,                    //필수입력
             'CEOName'         => $cc_ceo1,                //필수입력
@@ -9791,7 +9795,7 @@ class WarehousingController extends Controller
         //------------------------------------------
         $InvoiceeParty = array(
             'MgtNum'         => $tax_number,
-            'CorpNum'         => preg_replace('/\s+/','',$cc_license2),                //필수입력
+            'CorpNum'         => preg_replace('/\s+/', '', $cc_license2),                //필수입력
             'TaxRegID'         => '',
             'CorpName'         => $cc_name2,                //필수입력
             'CEOName'         => $cc_ceo2,                //필수입력
@@ -9858,36 +9862,36 @@ class WarehousingController extends Controller
         $items = [];
         $item_name = '';
 
-        if($rgds){
-            foreach($rgds as $rgdp){
+        if ($rgds) {
+            foreach ($rgds as $rgdp) {
                 $amount_price = 0;
                 $total_price = 0;
                 $vat_price = 0;
                 if ($rgdp['service_korean_name'] == '보세화물') {
-                    if(str_contains($rgdp['rgd_bill_type'], 'month')){
+                    if (str_contains($rgdp['rgd_bill_type'], 'month')) {
                         $count = ReceivingGoodsDelivery::where('rgd_settlement_number', $rgdp['rgd_settlement_number'])->count();
                         $item_name = $rgdp['t_import']['ti_h_bl'] . ($count == 1 ? '' : ('외 ' . ($count - 1) . '건'));
-                    }else {
+                    } else {
                         $item_name = $rgdp['t_import']['ti_h_bl'];
                     }
                     $amount_price += ($rgdp['rate_data_general']['rdg_supply_price7'] + $rgdp['rate_data_general']['rdg_supply_price14']);
                     $total_price += ($rgdp['rate_data_general']['rdg_sum7'] + $rgdp['rate_data_general']['rdg_sum14']);
                     $vat_price += ($rgdp['rate_data_general']['rdg_vat7'] + $rgdp['rate_data_general']['rdg_vat14']);
                 } else if ($rgdp['service_korean_name'] == '수입풀필먼트') {
-                    if(str_contains($rgdp['rgd_bill_type'], 'month')){
+                    if (str_contains($rgdp['rgd_bill_type'], 'month')) {
                         $count = ReceivingGoodsDelivery::where('rgd_settlement_number', $rgdp['rgd_settlement_number'])->count();
                         $item_name = $rgdp['rgd_settlement_number'] . ($count == 1 ? '' : ('외 ' . ($count - 1) . '건'));
-                    }else {
+                    } else {
                         $item_name = $rgdp['rgd_settlement_number'];
                     }
                     $amount_price += $rgdp['rate_data_general']['rdg_supply_price6'];
                     $total_price += $rgdp['rate_data_general']['rdg_sum6'];
                     $vat_price += $rgdp['rate_data_general']['rdg_vat6'];
                 } else if ($rgdp['service_korean_name'] == '유통가공') {
-                    if(str_contains($rgdp['rgd_bill_type'], 'month')){
+                    if (str_contains($rgdp['rgd_bill_type'], 'month')) {
                         $count = ReceivingGoodsDelivery::where('rgd_settlement_number', $rgdp['rgd_settlement_number'])->count();
                         $item_name = $rgdp['warehousing']['w_schedule_number2'] . ($count == 1 ? '' : ('외 ' . ($count - 1) . '건'));
-                    }else {
+                    } else {
                         $item_name = $rgdp['warehousing']['w_schedule_number2'];
                     }
                     $amount_price += $rgdp['rate_data_general']['rdg_supply_price4'];
@@ -9906,7 +9910,7 @@ class WarehousingController extends Controller
                     'Description'    => ''
                 );
             }
-        }else {
+        } else {
             $amount_price = 0;
             $total_price = 0;
             $vat_price = 0;
@@ -10117,11 +10121,10 @@ class WarehousingController extends Controller
                 $total_price = $price['tid_sum'];
                 $vat_price = $price['tid_vat'];
             } else {
-             
+
                 $amount_price = $rgd->rate_data_general->rdg_supply_price7;
                 $total_price = $rgd->rate_data_general->rdg_sum7;
                 $vat_price = $rgd->rate_data_general->rdg_vat7;
-                
             }
         } else if ($rgd->service_korean_name == '수입풀필먼트') {
             if ($price) {
@@ -10129,11 +10132,10 @@ class WarehousingController extends Controller
                 $total_price = $price['tid_sum'];
                 $vat_price = $price['tid_vat'];
             } else {
-               
+
                 $amount_price = $rgd->rate_data_general->rdg_supply_price6;
                 $total_price = $rgd->rate_data_general->rdg_sum6;
                 $vat_price = $rgd->rate_data_general->rdg_vat6;
-                
             }
         } else if ($rgd->service_korean_name == '유통가공') {
             if ($price) {
@@ -10141,11 +10143,10 @@ class WarehousingController extends Controller
                 $total_price = $price['tid_sum'];
                 $vat_price = $price['tid_vat'];
             } else {
-                
+
                 $amount_price = $rgd->rate_data_general->rdg_supply_price4;
                 $total_price = $rgd->rate_data_general->rdg_sum4;
                 $vat_price = $rgd->rate_data_general->rdg_vat4;
-                
             }
         }
 
@@ -10154,7 +10155,7 @@ class WarehousingController extends Controller
             $amount_price = 0;
             $total_price = 0;
             $vat_price = 0;
-    
+
             foreach ($rgds as $rgdp) {
                 if ($rgdp['service_korean_name'] == '보세화물') {
                     $amount_price += ($rgdp['rate_data_general']['rdg_supply_price7'] + $rgdp['rate_data_general']['rdg_supply_price14']);
@@ -10367,7 +10368,7 @@ class WarehousingController extends Controller
         //------------------------------------------
         $InvoicerParty = array(
             'MgtNum'         => $tax_number,
-            'CorpNum'         => preg_replace('/\s+/','',$cc_license1),                //필수입력 - 바로빌 회원 사업자번호 ('-' 제외, 10자리)
+            'CorpNum'         => preg_replace('/\s+/', '', $cc_license1),                //필수입력 - 바로빌 회원 사업자번호 ('-' 제외, 10자리)
             'TaxRegID'         => '',
             'CorpName'         => $cc_name1,                    //필수입력
             'CEOName'         => $cc_ceo1,                //필수입력
@@ -10387,7 +10388,7 @@ class WarehousingController extends Controller
         //------------------------------------------
         $InvoiceeParty = array(
             'MgtNum'         => $tax_number,
-            'CorpNum'         => preg_replace('/\s+/','',$cc_license2),                //필수입력
+            'CorpNum'         => preg_replace('/\s+/', '', $cc_license2),                //필수입력
             'TaxRegID'         => '',
             'CorpName'         => $cc_name2,                //필수입력
             'CEOName'         => $cc_ceo2,                //필수입력
@@ -10453,36 +10454,36 @@ class WarehousingController extends Controller
         $items = [];
         $item_name = '';
 
-        if($rgds){
-            foreach($rgds as $rgdp){
+        if ($rgds) {
+            foreach ($rgds as $rgdp) {
                 $amount_price = 0;
                 $total_price = 0;
                 $vat_price = 0;
                 if ($rgdp['service_korean_name'] == '보세화물') {
-                    if(str_contains($rgdp['rgd_bill_type'], 'month')){
+                    if (str_contains($rgdp['rgd_bill_type'], 'month')) {
                         $count = ReceivingGoodsDelivery::where('rgd_settlement_number', $rgdp['rgd_settlement_number'])->count();
                         $item_name = $rgdp['t_import']['ti_h_bl'] . ($count == 1 ? '' : ('외 ' . ($count - 1) . '건'));
-                    }else {
+                    } else {
                         $item_name = $rgdp['t_import']['ti_h_bl'];
                     }
                     $amount_price += ($rgdp['rate_data_general']['rdg_supply_price7'] + $rgdp['rate_data_general']['rdg_supply_price14']);
                     $total_price += ($rgdp['rate_data_general']['rdg_sum7'] + $rgdp['rate_data_general']['rdg_sum14']);
                     $vat_price += ($rgdp['rate_data_general']['rdg_vat7'] + $rgdp['rate_data_general']['rdg_vat14']);
                 } else if ($rgdp['service_korean_name'] == '수입풀필먼트') {
-                    if(str_contains($rgdp['rgd_bill_type'], 'month')){
+                    if (str_contains($rgdp['rgd_bill_type'], 'month')) {
                         $count = ReceivingGoodsDelivery::where('rgd_settlement_number', $rgdp['rgd_settlement_number'])->count();
                         $item_name = $rgdp['rgd_settlement_number'] . ($count == 1 ? '' : ('외 ' . ($count - 1) . '건'));
-                    }else {
+                    } else {
                         $item_name = $rgdp['rgd_settlement_number'];
                     }
                     $amount_price += $rgdp['rate_data_general']['rdg_supply_price6'];
                     $total_price += $rgdp['rate_data_general']['rdg_sum6'];
                     $vat_price += $rgdp['rate_data_general']['rdg_vat6'];
                 } else if ($rgdp['service_korean_name'] == '유통가공') {
-                    if(str_contains($rgdp['rgd_bill_type'], 'month')){
+                    if (str_contains($rgdp['rgd_bill_type'], 'month')) {
                         $count = ReceivingGoodsDelivery::where('rgd_settlement_number', $rgdp['rgd_settlement_number'])->count();
-                        $item_name = $rgdp['warehousing']['w_schedule_number2'] . ($count == 1 ? '' : ('외 ' . ($count - 1) .'건'));
-                    }else {
+                        $item_name = $rgdp['warehousing']['w_schedule_number2'] . ($count == 1 ? '' : ('외 ' . ($count - 1) . '건'));
+                    } else {
                         $item_name = $rgdp['warehousing']['w_schedule_number2'];
                     }
                     $amount_price += $rgdp['rate_data_general']['rdg_supply_price4'];
@@ -10501,7 +10502,7 @@ class WarehousingController extends Controller
                     'Description'    => ''
                 );
             }
-        }else {
+        } else {
             $amount_price = 0;
             $total_price = 0;
             $vat_price = 0;

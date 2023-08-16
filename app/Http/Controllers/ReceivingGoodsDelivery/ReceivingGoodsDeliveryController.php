@@ -787,6 +787,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     if (isset($package['p_no'])) {
                         Package::where('p_no', $package['p_no'])->update([
                             'w_no' => $request->w_no,
+                            'rgd_no' => isset($rgd_data->rgd_no) ? $rgd_data->rgd_no : null,
                             'note' => $package['note'],
                             'order_number' => $package['order_number'] ? $package['order_number'] : CommonFunc::generate_w_schedule_number($request->w_no, 'EWC'),
                             'pack_type' => $package['pack_type'],
@@ -803,6 +804,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     } else {
                         Package::insert([
                             'w_no' => $request->w_no,
+                            'rgd_no' => isset($rgd_data->rgd_no) ? $rgd_data->rgd_no : null,
                             'note' => $package['note'],
                             'order_number' => $package['order_number'] ? $package['order_number'] : CommonFunc::generate_w_schedule_number($request->w_no, 'EWC'),
                             'pack_type' => $package['pack_type'],
@@ -823,7 +825,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 $message_url = [];
                 if (isset($package['reciever_contract'])){
                     $phone = trim($package['reciever_contract']);
-                    $url = "http://localhost:3000/delivery_confirm/".$request->w_no;
+                    $url = "http://localhost:3000/delivery_confirm/".$request->w_no.'/'.$rgd_data->rgd_no;
                     $message_url["phone"] = $phone;
                     $message_url["url"] = $url;
                 }
@@ -1419,6 +1421,9 @@ class ReceivingGoodsDeliveryController extends Controller
                             ]);
                         }
                     }
+
+                    $rgd_data = ReceivingGoodsDelivery::where('w_no', $request->w_no)->first();
+
                     $package = $request->package;
 
                     if (isset($package)) {
@@ -1426,6 +1431,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         if (isset($package['p_no'])) {
                             Package::where('p_no', $package['p_no'])->update([
                                 'w_no' => $request->w_no,
+                                'rgd_no' => isset($rgd_data->rgd_no) ? $rgd_data->rgd_no : null,
                                 'note' => $package['note'],
                                 'order_number' => $package['order_number'],
                                 'pack_type' => $package['pack_type'],
@@ -1442,6 +1448,7 @@ class ReceivingGoodsDeliveryController extends Controller
                         } else {
                             Package::insert([
                                 'w_no' => $request->w_no,
+                                'rgd_no' => isset($rgd_data->rgd_no) ? $rgd_data->rgd_no : null,
                                 'note' => $package['note'],
                                 'order_number' => $package['order_number'],
                                 'pack_type' => $package['pack_type'],
@@ -2242,7 +2249,7 @@ class ReceivingGoodsDeliveryController extends Controller
         }
     }
 
-    public function getReceivingGoodsDeliveryWarehousing($w_no)
+    public function getReceivingGoodsDeliveryWarehousing($rgd_no)
     {
 
         try {
@@ -2251,13 +2258,18 @@ class ReceivingGoodsDeliveryController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $rgd = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->whereHas('w_no', function ($q) use ($w_no) {
-                return $q->where('w_no', $w_no);
-            })->get();
+            $rgd = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->where("rgd_no", $rgd_no)->get();
 
-            return response()->json($rgd);
+            if(count($rgd)){
+                return response()->json($rgd);
+            }else{
+                $rgd = ReceivingGoodsDelivery::with('mb_no')->with('w_no')->where("rgd_no", $rgd_no)->where("rgd_status3", "배송중")->get();
+               
+                return response()->json($rgd);
+            }
+            
         } catch (\Exception $e) {
-            Log::error($e);
+            Log::error($e); 
 
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
@@ -4199,11 +4211,11 @@ class ReceivingGoodsDeliveryController extends Controller
         }
     }
 
-    public function get_rgd_package($w_no)
+    public function get_rgd_package(Request $request)
     {
 
         try {
-            $package = Package::where('w_no', $w_no)->get();
+            $package = Package::where('w_no', $request->w_no)->where('rgd_no', $request->rgd_no)->get();
             return response()->json($package);
         } catch (\Exception $e) {
             Log::error($e);
@@ -4887,6 +4899,7 @@ class ReceivingGoodsDeliveryController extends Controller
             return response()->json(['message' => Messages::MSG_0018], 500);
         }
     }
+
     public function create_package_delivery(Request $request)
     {
 
@@ -4897,7 +4910,7 @@ class ReceivingGoodsDeliveryController extends Controller
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
             $data = $request->data;
             $dataSubmit = $request->dataSubmit;
-
+            $message_url = [];
             $user = Auth::user();
             $status = 0;
             if (isset($request->signature)) {
@@ -4965,6 +4978,14 @@ class ReceivingGoodsDeliveryController extends Controller
 
                 );
 
+                //message
+                if (isset($dataSubmit['reciever_contract'])){
+                    $phone = trim($dataSubmit['reciever_contract']);
+                    $url = "http://localhost:3000/delivery_confirm/".$dataSubmit['is_no'].'/'.$rgd['rgd_no'];
+                    $message_url["phone"] = $phone;
+                    $message_url["url"] = $url;
+                }
+
                 //alert
                 if (isset($request->company)) {
                     $w_no_alert = (object)$dataSubmit;
@@ -5019,9 +5040,41 @@ class ReceivingGoodsDeliveryController extends Controller
             DB::commit();
             return response()->json([
                 'status' => $status,
+                'message_url' => $message_url,
                 'message' => Messages::MSG_0007,
                 'is_no' => isset($dataSubmit['is_no']) ? $dataSubmit['is_no'] :  null,
                 'w_no_alert' => isset($w_no_alert) ? $w_no_alert :  null,
+            ], 201);
+        } catch (\Throwable $e) {
+            DB::rollback();
+            Log::error($e);
+            return $e;
+            return response()->json(['message' => Messages::MSG_0001], 500);
+        }
+    }
+
+    public function create_package_delivery_offline(Request $request)
+    {
+
+        try {
+            DB::beginTransaction();
+            $status = 0;
+            if (isset($request->signature)) {
+                Package::where('w_no', $request->w_no)->update([
+                    'signature_url' => $request->signature
+                ]);
+                ReceivingGoodsDelivery::where('w_no', $request->w_no)->update([
+                    'rgd_status3' => "배송완료"
+                ]);
+                $status = 1;
+            }else{
+                $status = 2;
+            }
+
+            DB::commit();
+            return response()->json([
+                'status' => $status,
+                'message' => Messages::MSG_0007,
             ], 201);
         } catch (\Throwable $e) {
             DB::rollback();

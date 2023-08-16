@@ -39,6 +39,12 @@ Route::get('/api_item_cargo_list', [App\Http\Controllers\Item\ItemController::cl
 Route::get('/create_bonded_settlement', [App\Http\Controllers\Item\ItemController::class, 'createBondedSettlement'])->name('create_bonded_settlement');
 Route::get('/update_tax_status', [\App\Http\Controllers\Warehousing\WarehousingController::class,'update_tax_status']); //page 277
 
+
+Route::get('/get_warehousing_offline/{w_no}', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingById']);
+Route::post('get_rgd_package_offline', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'get_rgd_package'])->name('get_rgd_package_offline');
+Route::get('receiving_goods_delivery/get_rgd_warehousing_offline/{w_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'getReceivingGoodsDeliveryWarehousing']);
+Route::post('receiving_goods_delivery/package_delivery_offline/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_package_delivery_offline'])->name('package_delivery_offline');
+
 Route::prefix('payment')->name('payment.')->group(function () {
     Route::post('/payment_result', [App\Http\Controllers\RateData\RateDataController::class, 'payment_result'])->name('payment_result');
     Route::get('/check_payment', [App\Http\Controllers\RateData\RateDataController::class, 'check_payment'])->name('check_payment');
@@ -238,7 +244,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/create', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class,'createWarehousingRequest']);
 
     Route::get('receiving_goods_delivery/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'__invoke']);
-    Route::get('/get_rgd_package/{co_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'get_rgd_package'])->name('get_rgd_package');
+    Route::post('get_rgd_package', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'get_rgd_package'])->name('get_rgd_package');
     Route::post('receiving_goods_delivery/update_status5', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_status5']);
     Route::post('receiving_goods_delivery/update_request', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_request']);
     Route::post('receiving_goods_delivery/update_settlement_status', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_settlement_status']);
