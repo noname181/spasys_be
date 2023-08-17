@@ -825,7 +825,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 $message_url = [];
                 if (isset($package['reciever_contract'])){
                     $phone = trim($package['reciever_contract']);
-                    $url = "https://blp.spasysone.com/delivery_confirm/".$request->w_no.'??'.$rgd_data->rgd_no;
+                    $url = "https://blp.spasysone.com/delivery_confirm/".$request->w_no.'&='.$rgd_data->rgd_no;
                     $message_url["phone"] = $phone;
                     $message_url["url"] = $url;
                 }
@@ -4981,7 +4981,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 //message
                 if (isset($dataSubmit['reciever_contract'])){
                     $phone = trim($dataSubmit['reciever_contract']);
-                    $url = "https://blp.spasysone.com/delivery_confirm/".$dataSubmit['is_no'].'??'.$rgd['rgd_no'];
+                    $url = "https://blp.spasysone.com/delivery_confirm/".$dataSubmit['is_no'].'&='.$rgd['rgd_no'];
                     $message_url["phone"] = $phone;
                     $message_url["url"] = $url;
                 }
