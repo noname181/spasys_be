@@ -145,7 +145,7 @@ class CompanyController extends Controller
 
             if (isset($validated['co_name'])) {
                 $companies->where(function ($query) use ($validated) {
-                    $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%');
+                    $query->where(DB::raw('lower(co_name)'), 'like', '%' . strtolower($validated['co_name']) . '%')->where('co_type', '=', 'shipper');
                 });
             }
 

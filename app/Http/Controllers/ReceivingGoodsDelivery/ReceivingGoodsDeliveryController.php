@@ -5063,7 +5063,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 Package::where('w_no', $request->w_no)->update([
                     'signature_url' => $request->signature
                 ]);
-                ReceivingGoodsDelivery::where('w_no', $request->w_no)->update([
+                ReceivingGoodsDelivery::where('w_no', $request->w_no)->orwhere('is_no', $request->w_no)->update([
                     'rgd_status3' => "배송완료"
                 ]);
                 $status = 1;
