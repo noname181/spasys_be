@@ -1338,7 +1338,29 @@ class ItemController extends Controller
         $data_channel_count = 0;
 
         $check_error = false;
-        //return $datas;
+        
+
+        if (Auth::user()->mb_type == "spasys") {
+            $company = Company::with(["co_parent"])->where("co_type", "shipper")->where(function ($query) {
+                $query->whereHas('co_parent.co_parent', function ($q) {
+                    $q->where('co_no', Auth::user()->co_no);
+                });
+            })->get();
+        } elseif (Auth::user()->mb_type == "shop") {
+            $company = Company::with(["co_parent"])->where("co_type", "shipper")->where(function ($query) {
+                $query->whereHas('co_parent', function ($q) {
+                    $q->where('co_no', Auth::user()->co_no);
+                });
+            })->get();
+        } else {
+            $company = Company::with(["co_parent"])->where("co_type", "shipper")->where("co_no", Auth::user()->co_no)->get();
+        }
+
+        $company_shipper = [];
+        foreach ($company as $co) {
+            $company_shipper[] = $co->co_no;
+        }
+        
         foreach ($datas as $key => $d) {
             if ($key < 1) { 
                 continue;
@@ -1352,58 +1374,66 @@ class ItemController extends Controller
                 $check_error = true;
             } else {
                 $data_item_count =  $data_item_count + 1;
-                $company = Company::where('co_name', $d['B'])->first();
-               
-                $item_no = Item::insertGetId([
-                    'item_service_name' => '유통가공',
-                    'mb_no' => Auth::user()->mb_no,
-                    //'co_no' => Auth::user()->co_no,
-                    'co_no' => $company->co_no,
-                    'item_brand' => $d['C'],
-                    'item_name' => $d['D'],
-                    'item_option1' => $d['E'],
-                    'item_option2' => $d['F'],
-                    'item_cargo_bar_code' => $d['G'],
-                    'item_upc_code' => $d['H'],
-                    'item_bar_code' => $d['I'],
-                    'item_weight' => $d['J'],
-                    'item_url' => $d['K'],
-                    'item_price1' => $d['L'],
-                    'item_price2' => $d['M'],
-                    'item_price3' => $d['N'],
-                    'item_price4' => $d['O'],
-                    'item_cate1' => $d['P'],
-                    'item_cate2' => $d['Q'],
-                    'item_cate3' => $d['R'],
-                    // 'item_origin' => $d['R'],
-                    // 'item_manufacturer' => $d['S']
-                ]);
+                $shipper_check = Company::where("co_type", "shipper")->where('co_name', $d['B'])->whereIn('co_no', $company_shipper)->first();
 
-                // Check validator item_channel
-                if (isset($data_channels)) {
-                    $validator = [];
-                    foreach ($data_channels as $key2 => $channel) {
-                        if ($key2 == 1) {
-                            continue;
+                if (!isset($shipper_check)) {
+                    $errors["type"] = "Register only affiliated shippers!";
+                    $errors[$sheet->getTitle()][] = "소속된 화주가 아닙니다. 소속된 화주만 등록하세요!";
+                    $check_error = true;
+                } else {
+                    $item_no = Item::insertGetId([
+                        'item_service_name' => '유통가공',
+                        'mb_no' => Auth::user()->mb_no,
+                        //'co_no' => Auth::user()->co_no,
+                        'co_no' => $shipper_check->co_no,
+                        'item_brand' => $d['C'],
+                        'item_name' => $d['D'],
+                        'item_option1' => $d['E'],
+                        'item_option2' => $d['F'],
+                        'item_cargo_bar_code' => $d['G'],
+                        'item_upc_code' => $d['H'],
+                        'item_bar_code' => $d['I'],
+                        'item_weight' => $d['J'],
+                        'item_url' => $d['K'],
+                        'item_price1' => $d['L'],
+                        'item_price2' => $d['M'],
+                        'item_price3' => $d['N'],
+                        'item_price4' => $d['O'],
+                        'item_cate1' => $d['P'],
+                        'item_cate2' => $d['Q'],
+                        'item_cate3' => $d['R'],
+                        // 'item_origin' => $d['R'],
+                        // 'item_manufacturer' => $d['S']
+                    ]);
+    
+                    // Check validator item_channel
+                    if (isset($data_channels)) {
+                        $validator = [];
+                        foreach ($data_channels as $key2 => $channel) {
+                            if ($key2 == 1) {
+                                continue;
+                            }
+                            $validator = Validator::make($channel, ChannelRequest::rules());
+                            if ($d['A'] === $channel['A']) {
+                                $data_channel_count = $data_channel_count + 1;
+                                ItemChannel::insert([
+                                    'item_no' => $item_no,
+                                    'item_channel_code' => $channel['C'],
+                                    'item_channel_name' => $channel['D']
+                                ]);
+                            }
                         }
-                        $validator = Validator::make($channel, ChannelRequest::rules());
-                        if ($d['A'] === $channel['A']) {
-                            $data_channel_count = $data_channel_count + 1;
-                            ItemChannel::insert([
-                                'item_no' => $item_no,
-                                'item_channel_code' => $channel['C'],
-                                'item_channel_name' => $channel['D']
-                            ]);
+                        if ($validator->fails()) {
+                            DB::rollback();
+                            $data_channel_count =   $data_channel_count - 1;
+                            $errors[$sheet->getTitle()][] = $validator->errors();
+                            return $errors;
+                            $check_error = true;
                         }
-                    }
-                    if ($validator->fails()) {
-                        DB::rollback();
-                        $data_channel_count =   $data_channel_count - 1;
-                        $errors[$sheet->getTitle()][] = $validator->errors();
-                        return $errors;
-                        $check_error = true;
                     }
                 }
+               
+                
             }
         }
 

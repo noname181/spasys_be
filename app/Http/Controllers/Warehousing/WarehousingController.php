@@ -8677,6 +8677,12 @@ class WarehousingController extends Controller
                 $errors[$sheet->getTitle()][] = $validator->errors();
                 $check_error = true;
             } else {
+                // if (!isset($d['K'])) {
+                //     $data_item_count =  $data_item_count - 1;
+                //     $errors[$sheet->getTitle()][] = $validator->errors();
+                //     $check_error = true;
+                // }
+
                 if (isset($d['D'])) {
                     $items = Item::where('item_service_name', '수입풀필먼트')->where('product_id', $d['D'])->whereNull('option_id')->first();
                     if ($items === null) {
@@ -8708,9 +8714,6 @@ class WarehousingController extends Controller
                         });
                     }
                 }
-
-
-
 
                 $item = $item->first();
 
