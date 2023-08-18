@@ -8715,6 +8715,11 @@ class WarehousingController extends Controller
                     }
                 }
 
+                if(isset($d['B'])){
+                    $item->whereHas('ContractWms.company', function ($q) use ($d) {
+                        $q->where('co_name', $d['B']);
+                    });
+                }
                 $item = $item->first();
 
                 //$test[] = $item;
