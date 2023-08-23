@@ -428,7 +428,7 @@
                   </tr> -->
 
             @if($count_service2_1 > 0)
-            @if($rate_data_send_meta['rate_data2'][1]['rd_data3'] == 'ON')
+            @if($rate_data_send_meta['rate_data2'][1]['rd_data3'] == 'ON' && $rate_data_send_meta['rate_data2'][1]['rd_data2'] != 0 && $rate_data_send_meta['rate_data2'][1]['rd_data2'])
             <tr>
                <td rowspan="{{$count_service2_1}}" style='font-family: "unbatang", Times, serif' class="background_title">
                   입고
@@ -445,9 +445,9 @@
                </td>
             </tr>
             @endif
-            @if($rate_data_send_meta['rate_data2'][2]['rd_data3'] == 'ON')
+            @if($rate_data_send_meta['rate_data2'][2]['rd_data3'] == 'ON' && $rate_data_send_meta['rate_data2'][2]['rd_data2'] != 0 && $rate_data_send_meta['rate_data2'][2]['rd_data2'])
             <tr>
-               @if($rate_data_send_meta['rate_data2'][1]['rd_data3'] != 'ON')
+               @if($rate_data_send_meta['rate_data2'][1]['rd_data3'] != 'ON' || ($rate_data_send_meta['rate_data2'][1]['rd_data2'] == 0 || !$rate_data_send_meta['rate_data2'][1]['rd_data2']) )
                <td rowspan="{{$count_service2_1}}" style='font-family: "unbatang", Times, serif' class="background_title">
                   입고
                </td>
@@ -464,7 +464,7 @@
                </td>
             </tr>
             @endif
-            @if($rate_data_send_meta['rate_data2'][3]['rd_data3'] == 'ON')
+            @if($rate_data_send_meta['rate_data2'][3]['rd_data3'] == 'ON' && $rate_data_send_meta['rate_data2'][3]['rd_data2'] != 0 && $rate_data_send_meta['rate_data2'][3]['rd_data2'])
             <tr>
                @if($rate_data_send_meta['rate_data2'][1]['rd_data3'] != 'ON' && $rate_data_send_meta['rate_data2'][2]['rd_data3'] != 'ON')
                <td rowspan="{{$count_service2_1}}" style='font-family: "unbatang", Times, serif' class="background_title">
@@ -483,7 +483,7 @@
                </td>
             </tr>
             @endif
-            @if($rate_data_send_meta['rate_data2'][4]['rd_data3'] == 'ON')
+            @if($rate_data_send_meta['rate_data2'][4]['rd_data3'] == 'ON' && $rate_data_send_meta['rate_data2'][4]['rd_data2'] != 0 && $rate_data_send_meta['rate_data2'][4]['rd_data2'])
             <tr>
                @if($rate_data_send_meta['rate_data2'][1]['rd_data3'] != 'ON' && $rate_data_send_meta['rate_data2'][2]['rd_data3'] != 'ON'
                && $rate_data_send_meta['rate_data2'][3]['rd_data3'] != 'ON')
@@ -505,7 +505,7 @@
             @endif
             @endif
             @if($count_service2_2 > 0)
-            @if($rate_data_send_meta['rate_data2'][5]['rd_data3'] == 'ON')
+            @if($rate_data_send_meta['rate_data2'][5]['rd_data3'] == 'ON' && $rate_data_send_meta['rate_data2'][5]['rd_data2'] != 0 && $rate_data_send_meta['rate_data2'][5]['rd_data2'])
             <tr>
                <td rowspan="{{$count_service2_2}}" style='font-family: "unbatang", Times, serif' class="background_title">
                   출고
@@ -522,7 +522,7 @@
                </td>
             </tr>
             @endif
-            @if($rate_data_send_meta['rate_data2'][6]['rd_data3'] == 'ON')
+            @if($rate_data_send_meta['rate_data2'][6]['rd_data3'] == 'ON' && $rate_data_send_meta['rate_data2'][6]['rd_data2'] != 0 && $rate_data_send_meta['rate_data2'][6]['rd_data2'])
             <tr>
                @if($rate_data_send_meta['rate_data2'][5]['rd_data3'] != 'ON')
                <td rowspan="{{$count_service2_2}}" style='font-family: "unbatang", Times, serif' class="background_title">
@@ -541,7 +541,7 @@
                </td>
             </tr>
             @endif
-            @if($rate_data_send_meta['rate_data2'][7]['rd_data3'] == 'ON')
+            @if($rate_data_send_meta['rate_data2'][7]['rd_data3'] == 'ON' && $rate_data_send_meta['rate_data2'][7]['rd_data2'] != 0 && $rate_data_send_meta['rate_data2'][7]['rd_data2'])
             <tr>
                @if($rate_data_send_meta['rate_data2'][5]['rd_data3'] != 'ON' && $rate_data_send_meta['rate_data2'][6]['rd_data3'] != 'ON')
                <td rowspan="{{$count_service2_2}}" style='font-family: "unbatang", Times, serif' class="background_title">
@@ -560,7 +560,7 @@
                </td>
             </tr>
             @endif
-            @if($rate_data_send_meta['rate_data2'][8]['rd_data3'] == 'ON')
+            @if($rate_data_send_meta['rate_data2'][8]['rd_data3'] == 'ON' && $rate_data_send_meta['rate_data2'][8]['rd_data2'] != 0 && $rate_data_send_meta['rate_data2'][8]['rd_data2'])
             <tr>
                @if($rate_data_send_meta['rate_data2'][5]['rd_data3'] != 'ON' && $rate_data_send_meta['rate_data2'][6]['rd_data3'] != 'ON'
                && $rate_data_send_meta['rate_data2'][7]['rd_data3'] != 'ON')
@@ -580,7 +580,7 @@
                </td>
             </tr>
             @endif
-            @if($rate_data_send_meta['rate_data2'][9]['rd_data3'] == 'ON')
+            @if($rate_data_send_meta['rate_data2'][9]['rd_data3'] == 'ON' && $rate_data_send_meta['rate_data2'][9]['rd_data2'] != 0 && $rate_data_send_meta['rate_data2'][9]['rd_data2'])
             <tr>
                @if($rate_data_send_meta['rate_data2'][5]['rd_data3'] != 'ON' && $rate_data_send_meta['rate_data2'][6]['rd_data3'] != 'ON'
                && $rate_data_send_meta['rate_data2'][7]['rd_data3'] != 'ON' && $rate_data_send_meta['rate_data2'][8]['rd_data3'] != 'ON')
@@ -600,7 +600,7 @@
                </td>
             </tr>
             @endif
-            @if($rate_data_send_meta['rate_data2'][10]['rd_data3'] == 'ON')
+            @if($rate_data_send_meta['rate_data2'][10]['rd_data3'] == 'ON' && $rate_data_send_meta['rate_data2'][10]['rd_data2'] != 0 && $rate_data_send_meta['rate_data2'][10]['rd_data2'])
             <tr>
                @if($rate_data_send_meta['rate_data2'][5]['rd_data3'] != 'ON' && $rate_data_send_meta['rate_data2'][6]['rd_data3'] != 'ON'
                && $rate_data_send_meta['rate_data2'][7]['rd_data3'] != 'ON' && $rate_data_send_meta['rate_data2'][8]['rd_data3'] != 'ON'
@@ -623,7 +623,7 @@
             @endif
             @endif
             @if($count_service2_3 > 0)
-            @if($rate_data_send_meta['rate_data2'][0]['rd_data3'] == 'ON')
+            @if($rate_data_send_meta['rate_data2'][0]['rd_data3'] == 'ON' && $rate_data_send_meta['rate_data2'][0]['rd_data2'] != 0 && $rate_data_send_meta['rate_data2'][0]['rd_data2'])
             <tr>
                <td rowspan="{{$count_service2_3}}" style='font-family: "unbatang", Times, serif' class="background_title">
                   국내운송
@@ -642,7 +642,7 @@
                </td>
             </tr>
             @endif
-            @if($rate_data_send_meta['rate_data2'][24]['rd_data3'] == 'ON')
+            @if($rate_data_send_meta['rate_data2'][24]['rd_data3'] == 'ON' && $rate_data_send_meta['rate_data2'][24]['rd_data2'] != 0 && $rate_data_send_meta['rate_data2'][24]['rd_data2'])
             <tr>
                @if($rate_data_send_meta['rate_data2'][0]['rd_data3'] != 'ON')
                <td rowspan="{{$count_service2_3}}" style='font-family: "unbatang", Times, serif' class="background_title">
@@ -661,7 +661,7 @@
                </td>
             </tr>
             @endif
-            @if($rate_data_send_meta['rate_data2'][25]['rd_data3'] == 'ON')
+            @if($rate_data_send_meta['rate_data2'][25]['rd_data3'] == 'ON' && $rate_data_send_meta['rate_data2'][25]['rd_data2'] != 0 && $rate_data_send_meta['rate_data2'][25]['rd_data2'])
             <tr>
                @if($rate_data_send_meta['rate_data2'][0]['rd_data3'] != 'ON' && $rate_data_send_meta['rate_data2'][24]['rd_data3'] != 'ON')
                <td rowspan="{{$count_service2_3}}" style='font-family: "unbatang", Times, serif' class="background_title">
@@ -682,7 +682,7 @@
             @endif
             @endif
             @if($count_service2_4 > 0)
-            @if($rate_data_send_meta['rate_data2'][26]['rd_data3'] == 'ON')
+            @if($rate_data_send_meta['rate_data2'][26]['rd_data3'] == 'ON' && $rate_data_send_meta['rate_data2'][26]['rd_data2'] != 0 && $rate_data_send_meta['rate_data2'][26]['rd_data2'])
             <tr>
                <td rowspan="{{$count_service2_4}}" style='font-family: "unbatang", Times, serif' class="background_title">
                   해외운송
@@ -701,7 +701,7 @@
                </td>
             </tr>
             @endif
-            @if($rate_data_send_meta['rate_data2'][27]['rd_data3'] == 'ON')
+            @if($rate_data_send_meta['rate_data2'][27]['rd_data3'] == 'ON' && $rate_data_send_meta['rate_data2'][1]['rd_data2'] != 0 && $rate_data_send_meta['rate_data2'][1]['rd_data2'])
             <tr>
                @if($rate_data_send_meta['rate_data2'][26]['rd_data3'] != 'ON')
                <td rowspan="{{$count_service2_4}}" style='font-family: "unbatang", Times, serif' class="background_title">
@@ -723,7 +723,7 @@
             @endif
 
             @if($count_service2_5 > 0)
-            @if($rate_data_send_meta['rate_data2'][14]['rd_data3'] == 'ON')
+            @if($rate_data_send_meta['rate_data2'][14]['rd_data3'] == 'ON' && $rate_data_send_meta['rate_data2'][14]['rd_data2'] != 0 && $rate_data_send_meta['rate_data2'][14]['rd_data2'])
             <tr>
                <td rowspan="{{$count_service2_5}}" style='font-family: "unbatang", Times, serif' class="background_title">
                   보관
@@ -742,7 +742,7 @@
                </td>
             </tr>
             @endif
-            @if($rate_data_send_meta['rate_data2'][15]['rd_data3'] == 'ON')
+            @if($rate_data_send_meta['rate_data2'][15]['rd_data3'] == 'ON' && $rate_data_send_meta['rate_data2'][15]['rd_data2'] != 0 && $rate_data_send_meta['rate_data2'][15]['rd_data2'])
             <tr>
                @if($rate_data_send_meta['rate_data2'][14]['rd_data3'] != 'ON')
                <td rowspan="{{$count_service2_5}}" style='font-family: "unbatang", Times, serif' class="background_title">
@@ -761,7 +761,7 @@
                </td>
             </tr>
             @endif
-            @if($rate_data_send_meta['rate_data2'][16]['rd_data3'] == 'ON')
+            @if($rate_data_send_meta['rate_data2'][16]['rd_data3'] == 'ON' && $rate_data_send_meta['rate_data2'][16]['rd_data2'] != 0 && $rate_data_send_meta['rate_data2'][16]['rd_data2'])
             <tr>
                @if($rate_data_send_meta['rate_data2'][14]['rd_data3'] != 'ON' && $rate_data_send_meta['rate_data2'][15]['rd_data3'] != 'ON')
                <td rowspan="{{$count_service2_5}}" style='font-family: "unbatang", Times, serif' class="background_title">
@@ -780,7 +780,7 @@
                </td>
             </tr>
             @endif
-            @if($rate_data_send_meta['rate_data2'][17]['rd_data3'] == 'ON')
+            @if($rate_data_send_meta['rate_data2'][17]['rd_data3'] == 'ON' && $rate_data_send_meta['rate_data2'][17]['rd_data2'] != 0 && $rate_data_send_meta['rate_data2'][17]['rd_data2'])
             <tr>
                @if($rate_data_send_meta['rate_data2'][14]['rd_data3'] != 'ON' && $rate_data_send_meta['rate_data2'][15]['rd_data3'] != 'ON'
                && $rate_data_send_meta['rate_data2'][16]['rd_data3'] != 'ON')
@@ -800,7 +800,7 @@
                </td>
             </tr>
             @endif
-            @if($rate_data_send_meta['rate_data2'][18]['rd_data3'] == 'ON')
+            @if($rate_data_send_meta['rate_data2'][18]['rd_data3'] == 'ON' && $rate_data_send_meta['rate_data2'][18]['rd_data2'] != 0 && $rate_data_send_meta['rate_data2'][18]['rd_data2'])
             <tr>
                @if($rate_data_send_meta['rate_data2'][14]['rd_data3'] != 'ON' && $rate_data_send_meta['rate_data2'][15]['rd_data3'] != 'ON'
                && $rate_data_send_meta['rate_data2'][16]['rd_data3'] != 'ON' && $rate_data_send_meta['rate_data2'][17]['rd_data3'] != 'ON')
@@ -820,7 +820,7 @@
                </td>
             </tr>
             @endif
-            @if($rate_data_send_meta['rate_data2'][19]['rd_data3'] == 'ON')
+            @if($rate_data_send_meta['rate_data2'][19]['rd_data3'] == 'ON' && $rate_data_send_meta['rate_data2'][19]['rd_data2'] != 0 && $rate_data_send_meta['rate_data2'][19]['rd_data2'])
             <tr>
                @if($rate_data_send_meta['rate_data2'][14]['rd_data3'] != 'ON' && $rate_data_send_meta['rate_data2'][15]['rd_data3'] != 'ON'
                && $rate_data_send_meta['rate_data2'][16]['rd_data3'] != 'ON' && $rate_data_send_meta['rate_data2'][17]['rd_data3'] != 'ON'
@@ -844,7 +844,7 @@
             @endif
 
             @if($count_service2_6 > 0)
-            @if($rate_data_send_meta['rate_data2'][22]['rd_data3'] == 'ON')
+            @if($rate_data_send_meta['rate_data2'][22]['rd_data3'] == 'ON' && $rate_data_send_meta['rate_data2'][22]['rd_data2'] != 0 && $rate_data_send_meta['rate_data2'][22]['rd_data2'])
             <tr>
                <td rowspan="{{$count_service2_6}}" style='font-family: "unbatang", Times, serif' class="background_title">
                   부자재
@@ -863,7 +863,7 @@
                </td>
             </tr>
             @endif
-            @if($rate_data_send_meta['rate_data2'][23]['rd_data3'] == 'ON')
+            @if($rate_data_send_meta['rate_data2'][23]['rd_data3'] == 'ON' && $rate_data_send_meta['rate_data2'][23]['rd_data2'] != 0 && $rate_data_send_meta['rate_data2'][23]['rd_data2'])
             <tr>
                @if($rate_data_send_meta['rate_data2'][22]['rd_data3'] != 'ON')
                <td rowspan="{{$count_service2_6}}" style='font-family: "unbatang", Times, serif' class="background_title">
