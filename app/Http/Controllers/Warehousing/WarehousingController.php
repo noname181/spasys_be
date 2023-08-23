@@ -7256,7 +7256,7 @@ class WarehousingController extends Controller
 
                         //$tax_number = CommonFunc::generate_tax_number($id,$request->rgd_no);
 
-                        $api = $this->update_tax_invoice_api($rgd, $user, $tid, $tid['tid_number'], null, $request['company']);
+                        $api = $this->update_tax_invoice_api($rgd, $user, $tid, $tid['tid_number'], null, $request['company'], $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null);
 
                         if ($key == 0) {
                             $cbh = CancelBillHistory::insertGetId([
@@ -7296,7 +7296,7 @@ class WarehousingController extends Controller
 
                         $tax_number = CommonFunc::generate_tax_number($id, $request->rgd_no);
 
-                        $api = $this->tax_invoice_api($rgd, $user, $tid, $tax_number, null, null);
+                        $api = $this->tax_invoice_api($rgd, $user, $tid, $tax_number, null, null, $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null);
 
                         TaxInvoiceDivide::where('tid_no', $id)->update([
                             'tid_number' => $tax_number ? $tax_number : null,
@@ -7543,7 +7543,7 @@ class WarehousingController extends Controller
 
                 $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general'])->where('rgd_no', $request->rgd_no)->first();
 
-                $api = $this->tax_invoice_api($rgd, $user, null, $tax_number, $request->rgds, null);
+                $api = $this->tax_invoice_api($rgd, $user, null, $tax_number, $request->rgds, null, $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null);
 
                 foreach ($request->rgds as $rgd) {
 
@@ -7645,7 +7645,7 @@ class WarehousingController extends Controller
 
                     $tax_number = CommonFunc::generate_tax_number($id, $rgd['rgd_no']);
 
-                    $api = $this->tax_invoice_api($rgd, $user, null, $tax_number, null, null);
+                    $api = $this->tax_invoice_api($rgd, $user, null, $tax_number, null, null, isset($ag['ag_email']) ? $ag['ag_email'] : null);
 
                     TaxInvoiceDivide::where('tid_no', $id)->update([
                         'tid_number' => $tax_number ? $tax_number : null,
@@ -9531,7 +9531,7 @@ class WarehousingController extends Controller
     }
 
 
-    public static function tax_invoice_api($rgd, $user, $price, $tax_number, $rgds, $is_check) //$company1, $company2, $total_price, $b_no
+    public static function tax_invoice_api($rgd, $user, $price, $tax_number, $rgds, $is_check, $custom_email = null) //$company1, $company2, $total_price, $b_no
     {
 
         // issuer
@@ -9814,7 +9814,7 @@ class WarehousingController extends Controller
             'ContactName'     => $cc_ceo2,                //필수입력
             'TEL'             => '',
             'HP'             => '',
-            'Email'         => $receiver_company->co_email               //필수입력
+            'Email'         => $custom_email ? $custom_email : $receiver_company->co_email               //필수입력
             // 'Email'         => $cc_license2 . '@bantalk.com'
         );
 
@@ -10131,7 +10131,7 @@ class WarehousingController extends Controller
         }
     }
 
-    public static function update_tax_invoice_api($rgd, $user, $price, $tax_number, $rgds, $company = null) //$company1, $company2, $total_price, $b_no
+    public static function update_tax_invoice_api($rgd, $user, $price, $tax_number, $rgds, $company = null, $custom_email = null) //$company1, $company2, $total_price, $b_no
     {
 
         // issuer
@@ -10437,7 +10437,7 @@ class WarehousingController extends Controller
             'ContactName'     => $cc_ceo2,                //필수입력
             'TEL'             => '',
             'HP'             => '',
-            'Email'         => isset($company['co_email']) ? $company['co_email'] : $receiver_company->co_email              //필수입력
+            'Email'         => $custom_email ? $custom_email : (isset($company['co_email']) ? $company['co_email'] : $receiver_company->co_email)              //필수입력
             // 'Email'         => $cc_license2 . '@bantalk.com'
         );
 
