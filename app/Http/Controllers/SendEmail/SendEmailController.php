@@ -443,6 +443,7 @@ class SendEmailController extends Controller
         DB::commit();
         $user = Auth::user();
         $co_no = Company::with(['contract'])->where('co_no', $validated['co_no_services'])->first();
+        $rmd_last = RateMetaData::where('rmd_no', $validated['rmd_no'])->first();
         $rate_data = [];
         $rate_data_general = [];
         $bonded1a = [];
@@ -1318,7 +1319,8 @@ class SendEmailController extends Controller
             'count_arr4' => $count_arr4, 'arr4' => $arr4, 'bonded4a' => $bonded4a, 'sum4' => $sum4,
             'count_arr5' => $count_arr5, 'arr5' => $arr5, 'bonded5a' => $bonded5a, 'sum5' => $sum5,
             'bonded5b' => $bonded5b, 'bonded5c' => $bonded5c, 'bonded4b' => $bonded4b, 'bonded4c' => $bonded4c,
-            'bonded3b' => $bonded3b, 'bonded3c' => $bonded3c, 'bonded2b' => $bonded2b, 'bonded2c' => $bonded2c
+            'bonded3b' => $bonded3b, 'bonded3c' => $bonded3c, 'bonded2b' => $bonded2b, 'bonded2c' => $bonded2c,
+            'co_name' => $co_no['co_name'], 'co_address' => $co_no['co_address'], 'co_address_detail' => $co_no['co_address_detail'], 'co_tel' => $co_no['co_tel'], 'co_email' => $co_no['co_email'], 'date' => Date('Y-m-d', strtotime($rmd_last['created_at']))
         ]);
         $pdf->save($file_name_download);
 
