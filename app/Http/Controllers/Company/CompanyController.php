@@ -101,6 +101,7 @@ class CompanyController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
+            
             $companies = Company::with(['contract', 'co_parent', 'company_settlement', 'company_payment', 'mb_no'])
                 ->where(function ($q) use ($user) {
                     $q->where('co_no', $user->co_no)
@@ -137,10 +138,17 @@ class CompanyController extends Controller
             }
 
             if (isset($validated['co_parent_name'])) {
-                $companies->whereHas('co_parent', function ($query) use ($validated) {
-                    $query->where('co_name', 'like', '%' . strtolower($validated['co_parent_name']) . '%');
-                    //$query->orWhere('company.co_name', 'like', '%' . strtolower($validated['co_parent_name']) . '%');
-                })->orWhere('company.co_name', 'like', '%' . strtolower($validated['co_parent_name']) . '%')->where('co_type', '=', 'shop');
+                if($user->mb_type == 'spasys'){
+                    $companies->whereHas('co_parent', function ($query) use ($validated) {
+                        $query->where('co_name', 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                        //$query->orWhere('company.co_name', 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                    })->orWhere('company.co_name', 'like', '%' . strtolower($validated['co_parent_name']) . '%')->where('co_type', '=', 'shop');
+                }else{
+                    $companies->whereHas('co_parent', function ($query) use ($validated) {
+                        $query->where('co_name', 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                        //$query->orWhere('company.co_name', 'like', '%' . strtolower($validated['co_parent_name']) . '%');
+                    });
+                }
             }
 
             if (isset($validated['co_name'])) {
