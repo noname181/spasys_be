@@ -2767,12 +2767,11 @@ class ReceivingGoodsDeliveryController extends Controller
                 // GetTaxInvoiceStatesEX.php 파일에서도 수정해야 함
                 $CERTKEY = '985417C4-240F-4FA4-B9AD-EA54E25C0F7E';                            //인증키
 
-                $apis  = Tax::where('rgd_no', $rgd->rgd_no)->where('t_status', 1)->get();
+                $apis  = Tax::where('t_mgtnum', $request->tid_no)->where('t_status', 1)->get();
 
                 $procType = "ISSUE_CANCEL";
 
-                foreach ($apis as $api) {
-
+                foreach ($apis as $index => $api) {
 
                     $Result = $BaroService_TI->ProcTaxInvoice(array(
                         'CERTKEY'    => $CERTKEY,
@@ -2805,6 +2804,13 @@ class ReceivingGoodsDeliveryController extends Controller
                 if ($text == "") {
                     CommonFunc::insert_alarm('[공통] 계산서취소 안내', $rgd, $user, null, 'settle_payment', null);
 
+                    if($request->tid_no){
+                        Tax::where('t_mgtnum', $request->tid_no)->where('t_status', 1)->update(
+                            [
+                                't_status' => '0'
+                            ]
+                        );
+                    }
 
                     $cbh = CancelBillHistory::insertGetId([
                         'rgd_no' => $rgd->rgd_no,
