@@ -19,6 +19,7 @@ Route::post('/import_excel', \App\Http\Controllers\Excel\ImportExcelController::
 Route::get('/export_excel', [\App\Http\Controllers\Excel\ExportExcelController::class, 'exportExcel']);
 
 Route::post('/login', \App\Http\Controllers\Auth\AuthController::class)->name('login');
+Route::post('/login_token', \App\Http\Controllers\Auth\AuthController::class, 'loginToken')->name('loginToken');
 Route::post('/forgot_password', [\App\Http\Controllers\Api\SendMailController::class, 'forgotPassword']);
 Route::post('/send_email_otp', [\App\Http\Controllers\SendEmail\SendEmailController::class, 'sendEmailOtp']);
 Route::post('/validate_otp', [\App\Http\Controllers\Api\SendMailController::class, 'validateOtp']);
@@ -37,13 +38,13 @@ Route::get('/daily_alarm_insulace30', [App\Http\Controllers\AlarmData\AlarmDataC
 Route::get('/alarm_pw_90d', [App\Http\Controllers\AlarmData\AlarmDataController::class, 'alarmPw90d'])->name('alarmPw90d');
 Route::get('/api_item_cargo_list', [App\Http\Controllers\Item\ItemController::class, 'apiItemsCargoList'])->name('api_item_cargo_list');
 Route::get('/create_bonded_settlement', [App\Http\Controllers\Item\ItemController::class, 'createBondedSettlement'])->name('create_bonded_settlement');
-Route::get('/update_tax_status', [\App\Http\Controllers\Warehousing\WarehousingController::class,'update_tax_status']); //page 277
+Route::get('/update_tax_status', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'update_tax_status']); //page 277
 
 
-Route::get('/get_warehousing_offline/{w_no}', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingById']);
+Route::get('/get_warehousing_offline/{w_no}', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'getWarehousingById']);
 Route::post('get_rgd_package_offline', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'get_rgd_package'])->name('get_rgd_package_offline');
-Route::get('receiving_goods_delivery/get_rgd_warehousing_offline/{w_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'getReceivingGoodsDeliveryWarehousing']);
-Route::post('receiving_goods_delivery/package_delivery_offline/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_package_delivery_offline'])->name('package_delivery_offline');
+Route::get('receiving_goods_delivery/get_rgd_warehousing_offline/{w_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'getReceivingGoodsDeliveryWarehousing']);
+Route::post('receiving_goods_delivery/package_delivery_offline/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'create_package_delivery_offline'])->name('package_delivery_offline');
 
 Route::prefix('payment')->name('payment.')->group(function () {
     Route::post('/payment_result', [App\Http\Controllers\RateData\RateDataController::class, 'payment_result'])->name('payment_result');
@@ -57,7 +58,7 @@ Route::middleware('auth')->group(function () {
         Route::middleware('role:spasys_manager,spasys_admin,shop_manager')->group(function () {
             Route::post('/register', \App\Http\Controllers\Member\MemberController::class)->name('register');
             Route::patch('/update_by_id', [\App\Http\Controllers\Member\MemberController::class, 'updateProfileById'])->name('update_profile_by_id');
-            Route::delete('/delete_member/{mb_no}',[\App\Http\Controllers\Member\MemberController::class, 'deleteMember'])->name('delete_member');
+            Route::delete('/delete_member/{mb_no}', [\App\Http\Controllers\Member\MemberController::class, 'deleteMember'])->name('delete_member');
         });
 
         Route::post('/update_push', [\App\Http\Controllers\Member\MemberController::class, 'updatePush'])->name('updatePush');
@@ -70,9 +71,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/{mb_no}', [\App\Http\Controllers\Member\MemberController::class, 'getMember'])->name('member');
 
         Route::middleware('role:admin')->group(function () {
-            Route::post('/create_account',[\App\Http\Controllers\Member\MemberController::class, 'createAccount'])->name('create_account');
-            Route::patch('/update_account/{memeber}',[\App\Http\Controllers\Member\MemberController::class, 'updateAccount'])->name('update_account');
-            Route::delete('/delete_account/{mb_no}',[\App\Http\Controllers\Member\MemberController::class, 'deleteAccount'])->name('delete_account');
+            Route::post('/create_account', [\App\Http\Controllers\Member\MemberController::class, 'createAccount'])->name('create_account');
+            Route::patch('/update_account/{memeber}', [\App\Http\Controllers\Member\MemberController::class, 'updateAccount'])->name('update_account');
+            Route::delete('/delete_account/{mb_no}', [\App\Http\Controllers\Member\MemberController::class, 'deleteAccount'])->name('delete_account');
             Route::post('/spasys', [\App\Http\Controllers\Member\MemberController::class, 'getSpasys'])->name('get_spasys');
         });
     });
@@ -177,111 +178,111 @@ Route::middleware('auth')->group(function () {
     Route::get('/notices/{id}', [\App\Http\Controllers\Notice\NoticeController::class, 'getNoticeById']);
     Route::patch('/update_notices', [\App\Http\Controllers\Notice\NoticeController::class, 'update']);
     Route::post('/delete_notices', [App\Http\Controllers\Notice\NoticeController::class, 'deleteNotices'])->name('delete_notices');
-    Route::get('/notices', [\App\Http\Controllers\Notice\NoticeController::class,'__invoke']);
-    Route::post('/search_notices', [\App\Http\Controllers\Notice\NoticeController::class,'searchNotice']);
+    Route::get('/notices', [\App\Http\Controllers\Notice\NoticeController::class, '__invoke']);
+    Route::post('/search_notices', [\App\Http\Controllers\Notice\NoticeController::class, 'searchNotice']);
     Route::post('/get_notices', [\App\Http\Controllers\Notice\NoticeController::class, 'getNotice']);
     Route::post('/delete', [\App\Http\Controllers\Notice\NoticeController::class, 'delete']);
 
-    Route::get('/import_schedule', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'__invoke']);
-    Route::post('/get_import_schedule', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'getImportSchedule']);
-    Route::post('/get_import_api', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'getImportAPI']);
-    Route::post('/get_import_api2', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'getImportAPI2']);
-    Route::post('/get_import_api_popup', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class,'getImportAPIPOPUP']);
+    Route::get('/import_schedule', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class, '__invoke']);
+    Route::post('/get_import_schedule', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class, 'getImportSchedule']);
+    Route::post('/get_import_api', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class, 'getImportAPI']);
+    Route::post('/get_import_api2', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class, 'getImportAPI2']);
+    Route::post('/get_import_api_popup', [\App\Http\Controllers\ImportSchedule\ImportScheduleController::class, 'getImportAPIPOPUP']);
 
-    Route::get('/warehousing', [\App\Http\Controllers\Warehousing\WarehousingController::class,'__invoke']);
-    Route::post('/warehousing_import', [\App\Http\Controllers\Warehousing\WarehousingController::class,'warehousingImport']);
+    Route::get('/warehousing', [\App\Http\Controllers\Warehousing\WarehousingController::class, '__invoke']);
+    Route::post('/warehousing_import', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'warehousingImport']);
 
-    Route::get('/get_warehousing/{w_no}', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingById']);
-    Route::get('/get_warehousing_from_rgd/{rgd_no}/{type}', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingByRgd']);
-    Route::get('/get_warehousing_from_rgd_fulfillment/{rgd_no}/{type}', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingByRgdFulfillment']);
+    Route::get('/get_warehousing/{w_no}', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'getWarehousingById']);
+    Route::get('/get_warehousing_from_rgd/{rgd_no}/{type}', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'getWarehousingByRgd']);
+    Route::get('/get_warehousing_from_rgd_fulfillment/{rgd_no}/{type}', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'getWarehousingByRgdFulfillment']);
 
-    Route::post('/import_excel_fulfillment_processing', [\App\Http\Controllers\Warehousing\WarehousingController::class,'importExcelFulfillmentProcessing']);//page 7102
-    Route::post('/get_warehousing', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousing']);
-    Route::post('/get_warehousing_api', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingApi']);
-    Route::post('/get_warehousing_api_popup', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingApiPOPUP']);
-    Route::post('/get_warehousing2', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousing2']);
-    Route::post('/get_warehousing_export', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingExport']);
-    Route::post('/get_warehousing_import', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingImport']); //page 129
-    Route::post('/get_warehousing_import_status1', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingImportStatus1']); //page 134
-    Route::post('/get_warehousing_import_status1_popup', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingImportStatus1POPUP']);
-    Route::post('/get_warehousing_import_7103', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingImport7103']); // page7103 popup
-    Route::post('/get_warehousing_delivery', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingDelivery']); //page 715
-    Route::post('/get_warehousing_delivery_3', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingDelivery3']); //page 715_3
-    Route::post('/get_warehousing_delivery_2', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingDelivery2']); //page 715_2
-    Route::post('/get_warehousing_delivery_1', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingDelivery1']); //page 715_1
-    Route::post('/get_warehousing_3_status', [\App\Http\Controllers\Warehousing\WarehousingController::class,'get_warehousing_3_status']); //page 74
+    Route::post('/import_excel_fulfillment_processing', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'importExcelFulfillmentProcessing']); //page 7102
+    Route::post('/get_warehousing', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'getWarehousing']);
+    Route::post('/get_warehousing_api', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'getWarehousingApi']);
+    Route::post('/get_warehousing_api_popup', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'getWarehousingApiPOPUP']);
+    Route::post('/get_warehousing2', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'getWarehousing2']);
+    Route::post('/get_warehousing_export', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'getWarehousingExport']);
+    Route::post('/get_warehousing_import', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'getWarehousingImport']); //page 129
+    Route::post('/get_warehousing_import_status1', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'getWarehousingImportStatus1']); //page 134
+    Route::post('/get_warehousing_import_status1_popup', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'getWarehousingImportStatus1POPUP']);
+    Route::post('/get_warehousing_import_7103', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'getWarehousingImport7103']); // page7103 popup
+    Route::post('/get_warehousing_delivery', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'getWarehousingDelivery']); //page 715
+    Route::post('/get_warehousing_delivery_3', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'getWarehousingDelivery3']); //page 715_3
+    Route::post('/get_warehousing_delivery_2', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'getWarehousingDelivery2']); //page 715_2
+    Route::post('/get_warehousing_delivery_1', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'getWarehousingDelivery1']); //page 715_1
+    Route::post('/get_warehousing_3_status', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'get_warehousing_3_status']); //page 74
 
-    Route::post('/update_status_delivery', [\App\Http\Controllers\Warehousing\WarehousingController::class,'UpdateStatusDelivery']); //page 715 update status
+    Route::post('/update_status_delivery', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'UpdateStatusDelivery']); //page 715 update status
 
-    Route::post('/get_warehousing_status1', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingStatus1']); //page 140
-    Route::post('/get_warehousing_export_status12', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingExportStatus12']); //page 144
+    Route::post('/get_warehousing_status1', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'getWarehousingStatus1']); //page 140
+    Route::post('/get_warehousing_export_status12', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'getWarehousingExportStatus12']); //page 144
 
-    Route::post('/get_warehousing_import_status_complete', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingImportStatusComplete']); //Page259
-    Route::post('/get_fulfillment_export_status_complete', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getFulfillmentExportStatusComplete']); //Page243
-    Route::post('/get_bonded_export_status_complete', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getBondedExportStatusComplete']); //Page243
-    Route::post('/countcheckbill', [\App\Http\Controllers\Warehousing\WarehousingController::class,'countcheckbill']);
-    Route::post('/get_warehousing_import_status4', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getWarehousingImportStatus4']); //page 263
-    Route::post('/get_fulfillment_export_status4', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getFulfillmentExportStatus4']); //page 252
-    Route::post('/get_bonded_export_status4', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getBondedExportStatus4']); //page 221
+    Route::post('/get_warehousing_import_status_complete', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'getWarehousingImportStatusComplete']); //Page259
+    Route::post('/get_fulfillment_export_status_complete', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'getFulfillmentExportStatusComplete']); //Page243
+    Route::post('/get_bonded_export_status_complete', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'getBondedExportStatusComplete']); //Page243
+    Route::post('/countcheckbill', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'countcheckbill']);
+    Route::post('/get_warehousing_import_status4', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'getWarehousingImportStatus4']); //page 263
+    Route::post('/get_fulfillment_export_status4', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'getFulfillmentExportStatus4']); //page 252
+    Route::post('/get_bonded_export_status4', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'getBondedExportStatus4']); //page 221
 
-    Route::get('/get_fulfillment_export_status4_by_id/{rgd_no}', [\App\Http\Controllers\Warehousing\WarehousingController::class,'getFulfillmentExportStatus4ById']); //page 253 mobile
+    Route::get('/get_fulfillment_export_status4_by_id/{rgd_no}', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'getFulfillmentExportStatus4ById']); //page 253 mobile
 
-    Route::post('/get_tax_history', [\App\Http\Controllers\Warehousing\WarehousingController::class,'get_tax_history']); //right table
-    Route::post('/get_tax_history_popup', [\App\Http\Controllers\Warehousing\WarehousingController::class,'get_tax_history_popup']); //page 277
-    Route::post('/get_tax_invoice_list', [\App\Http\Controllers\Warehousing\WarehousingController::class,'get_tax_invoice_list']); //page 277
-    Route::post('/get_tax_invoice_completed_list', [\App\Http\Controllers\Warehousing\WarehousingController::class,'get_tax_invoice_completed_list']); //page 282
-    Route::post('/get_tid_list', [\App\Http\Controllers\Warehousing\WarehousingController::class,'get_tid_list']); //page 277
-    Route::post('/get_cr_list', [\App\Http\Controllers\Warehousing\WarehousingController::class,'get_cr_list']); //page 277
-    Route::post('/create_tid', [\App\Http\Controllers\Warehousing\WarehousingController::class,'create_tid']); //page 277
-    Route::post('/check_tax_status', [\App\Http\Controllers\Warehousing\WarehousingController::class,'check_tax_status']); //page 277
-    Route::post('/print_tax_invoice', [\App\Http\Controllers\Warehousing\WarehousingController::class,'print_tax_invoice']); //page 277
+    Route::post('/get_tax_history', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'get_tax_history']); //right table
+    Route::post('/get_tax_history_popup', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'get_tax_history_popup']); //page 277
+    Route::post('/get_tax_invoice_list', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'get_tax_invoice_list']); //page 277
+    Route::post('/get_tax_invoice_completed_list', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'get_tax_invoice_completed_list']); //page 282
+    Route::post('/get_tid_list', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'get_tid_list']); //page 277
+    Route::post('/get_cr_list', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'get_cr_list']); //page 277
+    Route::post('/create_tid', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'create_tid']); //page 277
+    Route::post('/check_tax_status', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'check_tax_status']); //page 277
+    Route::post('/print_tax_invoice', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'print_tax_invoice']); //page 277
 
-    Route::get('/warehousing_request', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class,'__invoke']);
-    Route::post('/warehousing_request_paginate', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class,'paginateWarehousingRequest']);
-    Route::post('/get_warehousing_request', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class,'getWarehousingRequest']);
-    Route::post('/get_warehousing_request_list', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class,'getWarehousingRequestList']);
+    Route::get('/warehousing_request', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class, '__invoke']);
+    Route::post('/warehousing_request_paginate', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class, 'paginateWarehousingRequest']);
+    Route::post('/get_warehousing_request', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class, 'getWarehousingRequest']);
+    Route::post('/get_warehousing_request_list', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class, 'getWarehousingRequestList']);
 
-    Route::post('/create', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class,'createWarehousingRequest']);
+    Route::post('/create', [\App\Http\Controllers\WarehousingRequest\WarehousingRequestController::class, 'createWarehousingRequest']);
 
-    Route::get('receiving_goods_delivery/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'__invoke']);
+    Route::get('receiving_goods_delivery/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, '__invoke']);
     Route::post('get_rgd_package', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'get_rgd_package'])->name('get_rgd_package');
-    Route::post('receiving_goods_delivery/update_status5', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_status5']);
-    Route::post('receiving_goods_delivery/update_request', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_request']);
-    Route::post('receiving_goods_delivery/update_settlement_status', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_settlement_status']);
-    Route::post('receiving_goods_delivery/update_status7', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_status7']);
-    Route::post('receiving_goods_delivery/update_status_co_license', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_status_co_license']);
+    Route::post('receiving_goods_delivery/update_status5', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'update_status5']);
+    Route::post('receiving_goods_delivery/update_request', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'update_request']);
+    Route::post('receiving_goods_delivery/update_settlement_status', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'update_settlement_status']);
+    Route::post('receiving_goods_delivery/update_status7', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'update_status7']);
+    Route::post('receiving_goods_delivery/update_status_co_license', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'update_status_co_license']);
 
-    Route::post('receiving_goods_delivery/payment_from_est', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'payment_from_est']);
-    Route::post('receiving_goods_delivery/payment', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'payment']);
-    Route::post('receiving_goods_delivery/cancel_payment', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'cancel_payment']);
-    Route::post('receiving_goods_delivery/load_payment', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'load_payment']);
+    Route::post('receiving_goods_delivery/payment_from_est', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'payment_from_est']);
+    Route::post('receiving_goods_delivery/payment', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'payment']);
+    Route::post('receiving_goods_delivery/cancel_payment', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'cancel_payment']);
+    Route::post('receiving_goods_delivery/load_payment', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'load_payment']);
 
 
-    Route::post('receiving_goods_delivery/connection', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'connection']);
+    Route::post('receiving_goods_delivery/connection', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'connection']);
 
-    Route::post('receiving_goods_delivery/cancel_settlement', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'cancel_settlement']);
-    Route::get('receiving_goods_delivery/cancel_rgd/{rgd_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_ReceivingGoodsDelivery_cancel']);
-    Route::get('receiving_goods_delivery/get_rgd/{is_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'getReceivingGoodsDelivery']);
-    Route::get('receiving_goods_delivery/get_rgd_warehousing/{w_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'getReceivingGoodsDeliveryWarehousing']);
+    Route::post('receiving_goods_delivery/cancel_settlement', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'cancel_settlement']);
+    Route::get('receiving_goods_delivery/cancel_rgd/{rgd_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'update_ReceivingGoodsDelivery_cancel']);
+    Route::get('receiving_goods_delivery/get_rgd/{is_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'getReceivingGoodsDelivery']);
+    Route::get('receiving_goods_delivery/get_rgd_warehousing/{w_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'getReceivingGoodsDeliveryWarehousing']);
     //130
-    Route::post('receiving_goods_delivery/warehousing/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_warehousing'])->name('rgd_warehousing');
-    Route::post('receiving_goods_delivery/warehousing/update_rdc_cancel', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_rdc_cancel'])->name('update_rdc_cancel');
-    Route::post('receiving_goods_delivery/warehousing/update_rdc_cancel_warehousing', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_rdc_cancel_warehousing'])->name('update_rdc_cancel_warehousing');
-    Route::post('receiving_goods_delivery/warehousing/update_rdc_api_cancel', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'update_rdc_api_cancel'])->name('update_rdc_api_cancel');
-    Route::post('receiving_goods_delivery/create_item_mobile/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_item_mobile'])->name('create_item_mobile');
+    Route::post('receiving_goods_delivery/warehousing/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'create_warehousing'])->name('rgd_warehousing');
+    Route::post('receiving_goods_delivery/warehousing/update_rdc_cancel', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'update_rdc_cancel'])->name('update_rdc_cancel');
+    Route::post('receiving_goods_delivery/warehousing/update_rdc_cancel_warehousing', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'update_rdc_cancel_warehousing'])->name('update_rdc_cancel_warehousing');
+    Route::post('receiving_goods_delivery/warehousing/update_rdc_api_cancel', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'update_rdc_api_cancel'])->name('update_rdc_api_cancel');
+    Route::post('receiving_goods_delivery/create_item_mobile/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'create_item_mobile'])->name('create_item_mobile');
     //141
-    Route::post('receiving_goods_delivery/warehousing_release/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_warehousing_release'])->name('rgd_warehousing_release');
-    Route::post('receiving_goods_delivery/warehousing_release_mobile/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_warehousing_release_mobile'])->name('rgd_warehousing_release_mobile');
-    Route::post('receiving_goods_delivery/warehousing_release_fulfillment/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_warehousing_release_fulfillment'])->name('create_warehousing_release_fulfillment');
-    Route::post('receiving_goods_delivery/import_schedule/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_import_schedule'])->name('rgd_import_schedule');
-    Route::post('receiving_goods_delivery/import_schedule_list/rgd_list', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_import_schedule_list'])->name('rgd_import_schedule_list');
+    Route::post('receiving_goods_delivery/warehousing_release/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'create_warehousing_release'])->name('rgd_warehousing_release');
+    Route::post('receiving_goods_delivery/warehousing_release_mobile/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'create_warehousing_release_mobile'])->name('rgd_warehousing_release_mobile');
+    Route::post('receiving_goods_delivery/warehousing_release_fulfillment/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'create_warehousing_release_fulfillment'])->name('create_warehousing_release_fulfillment');
+    Route::post('receiving_goods_delivery/import_schedule/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'create_import_schedule'])->name('rgd_import_schedule');
+    Route::post('receiving_goods_delivery/import_schedule_list/rgd_list', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'create_import_schedule_list'])->name('rgd_import_schedule_list');
     //715-116
-    Route::post('receiving_goods_delivery/package_delivery/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_package_delivery'])->name('package_delivery');
+    Route::post('receiving_goods_delivery/package_delivery/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'create_package_delivery'])->name('package_delivery');
 
-    Route::post('receiving_goods_delivery/warehousing_api', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_warehousing_api'])->name('rgd_warehousing_api');
-    Route::post('receiving_goods_delivery/rgd_settlement_number', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'check_settlement_number'])->name('rgd_settlement_number');
+    Route::post('receiving_goods_delivery/warehousing_api', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'create_warehousing_api'])->name('rgd_warehousing_api');
+    Route::post('receiving_goods_delivery/rgd_settlement_number', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'check_settlement_number'])->name('rgd_settlement_number');
 
-    Route::post('import_schedule/rgd_mobile', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class,'create_import_schedule_mobile'])->name('rgd_import_schedule_mobile');
+    Route::post('import_schedule/rgd_mobile', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'create_import_schedule_mobile'])->name('rgd_import_schedule_mobile');
 
     //upload
     //Route::post('receiving_goods_delivery/register', [App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'register_rgd_file'])->name('register_rgd_file');
@@ -291,11 +292,11 @@ Route::middleware('auth')->group(function () {
     Route::prefix('adjustment_group')->name('adjustment_group.')->group(function () {
         Route::post('/create_or_update/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create'])->name('register_adjustment_group');
         Route::post('/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create_with_co_no'])->name('register_adjustment_group_co_no');
-		//popup mobile
-		Route::post('/create_popup/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create_with_popup'])->name('register_adjustment_group_popup_popup');
+        //popup mobile
+        Route::post('/create_popup/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'create_with_popup'])->name('register_adjustment_group_popup_popup');
         //Route::patch('{adjustment}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'update'])->name('update_adjustment_group');
         Route::patch('/update_adjustment_group', [\App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'updateAG']);
-		//
+        //
         Route::get('/{co_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'get_all'])->name('get_all_adjustment_group');
         Route::delete('/{ag_no}', [App\Http\Controllers\Adjustment\AdjustmentGroupController::class, 'delete'])->name('delete_adjustment_group');
     });
@@ -303,10 +304,10 @@ Route::middleware('auth')->group(function () {
     Route::prefix('co_address')->name('co_address.')->group(function () {
         Route::post('/create_or_update/{co_no}', [App\Http\Controllers\CoAddress\CoAddressController::class, 'create'])->name('register_co_address');
         Route::post('/{co_no}', [App\Http\Controllers\CoAddress\CoAddressController::class, 'create_with_co_no'])->name('register_co_address_no_no');
-		//popup mobile
-		Route::post('/create_popup/{co_no}', [App\Http\Controllers\CoAddress\CoAddressController::class, 'create_with_popup'])->name('register_co_address_popup');
-		Route::patch('/update_co_address', [\App\Http\Controllers\CoAddress\CoAddressController::class, 'updateCA']);
-		//
+        //popup mobile
+        Route::post('/create_popup/{co_no}', [App\Http\Controllers\CoAddress\CoAddressController::class, 'create_with_popup'])->name('register_co_address_popup');
+        Route::patch('/update_co_address', [\App\Http\Controllers\CoAddress\CoAddressController::class, 'updateCA']);
+        //
         Route::get('/{co_no}', [App\Http\Controllers\CoAddress\CoAddressController::class, 'get_all'])->name('get_all_co_address');
         Route::delete('/{ca_no}', [App\Http\Controllers\CoAddress\CoAddressController::class, 'delete'])->name('delete_co_address');
     });
@@ -404,7 +405,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/api_update_stock_items', [App\Http\Controllers\Item\ItemController::class, 'apiupdateStockItems'])->name('api_update_stock_items');
         Route::post('/caculate_total_item', [App\Http\Controllers\Item\ItemController::class, 'caculateItem'])->name('caculate_total_item');
         Route::post('/update_stock_items_api', [App\Http\Controllers\Item\ItemController::class, 'updateStockItemsApi'])->name('update_stock_items_api');
-
     });
     Route::prefix('scheduleshipment')->name('scheduleshipment.')->group(function () {
         Route::post('/paginate', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'paginateScheduleShipments'])->name('paginate');
@@ -415,7 +415,6 @@ Route::middleware('auth')->group(function () {
         Route::delete('/schedule_shipment/{schedule_shipment}', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'deleteScheduleShipment'])->name('delete_schedule_shipment');
         Route::post('/create_or_update', [\App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'CreateOrUpdateByCoPu'])->name('create_or_update');
         Route::get('/get_schedule_shipment_info_by_co_no/{co_no}', [App\Http\Controllers\ScheduleShipment\ScheduleShipmentController::class, 'getScheduleShipmentInfoByCono'])->name('get_schedule_shipment_info_by_co_no');
-
     });
     Route::prefix('contractwms')->name('contractwms.')->group(function () {
         Route::delete('/contractwms/{contract_wms}', [App\Http\Controllers\ContractWms\ContractwmsController::class, 'deleteContractWms'])->name('delete_contract_wms');
@@ -441,7 +440,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/check2', [App\Http\Controllers\RateMetaData\RateMetaDataController::class, 'checkCO2'])->name('check_co2');
         Route::post('/get_precalculate_details', [App\Http\Controllers\RateMetaData\RateMetaDataController::class, 'get_precalculate_details'])->name('get_all_co_precalculate_details');
         Route::post('/get_mail/{rmd_no}', [App\Http\Controllers\RateMetaData\RateMetaDataController::class, 'getMail'])->name('get_mail');
-        Route::post('/file_rmd',[\App\Http\Controllers\RateMetaData\RateMetaDataController::class, 'file_rmd']);
+        Route::post('/file_rmd', [\App\Http\Controllers\RateMetaData\RateMetaDataController::class, 'file_rmd']);
     });
 
     Route::prefix('rate_data')->name('rate_data.')->group(function () {
@@ -494,46 +493,46 @@ Route::middleware('auth')->group(function () {
 
 
         //distribution
-        Route::get('/download_distribution_monthbill_excel/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_distribution_monthbill_excel']);
+        Route::get('/download_distribution_monthbill_excel/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'download_distribution_monthbill_excel']);
         //distribution
-        Route::get('/download_distribution_casebill_excel/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_distribution_casebill_excel']);
+        Route::get('/download_distribution_casebill_excel/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'download_distribution_casebill_excel']);
         //bonded
-        Route::get('/download_bonded_casebill_excel/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_bonded_casebill_excel']);
+        Route::get('/download_bonded_casebill_excel/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'download_bonded_casebill_excel']);
         //fulfillment
-        Route::get('/download_fulfill_excel/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_fulfill_excel']);
+        Route::get('/download_fulfill_excel/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'download_fulfill_excel']);
         //bonded
-        Route::get('/download_bonded_monthbill_excel/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_bonded_monthbill_excel']);
+        Route::get('/download_bonded_monthbill_excel/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'download_bonded_monthbill_excel']);
         //settlement list
-        Route::post('/download_settlement_list_excel',[\App\Http\Controllers\RateData\RateDataController::class, 'download_settlement_list_excel']);
+        Route::post('/download_settlement_list_excel', [\App\Http\Controllers\RateData\RateDataController::class, 'download_settlement_list_excel']);
 
         //distribution_final_casebill
-        Route::get('/download_final_case_bill/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_final_case_bill']);
+        Route::get('/download_final_case_bill/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'download_final_case_bill']);
         //distribution_final_monthbill_edit
-        Route::get('/download_final_month_bill/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_final_month_bill']);
+        Route::get('/download_final_month_bill/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'download_final_month_bill']);
         //distribution_est_monthbill_edit
-        Route::get('/download_est_month_bill/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_est_month_bill']);
+        Route::get('/download_est_month_bill/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'download_est_month_bill']);
         //distribution_add_monthbill_edit
-        Route::get('/download_add_month_bill/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_add_month_bill']);
+        Route::get('/download_add_month_bill/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'download_add_month_bill']);
         //distribution_est_monthbill_check
-        Route::get('/download_est_month_check/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_est_month_check']);
+        Route::get('/download_est_month_check/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'download_est_month_check']);
         //distribution_final_casebill_check
-        Route::get('/download_distribution_final/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_distribution_final']);
+        Route::get('/download_distribution_final/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'download_distribution_final']);
         //fulfillment_final_monthbill_check
-        Route::get('/download_full_fillment_final/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_full_fillment_final']);
+        Route::get('/download_full_fillment_final/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'download_full_fillment_final']);
         //distribution_final_monthbill_issue
-        Route::post('/download_final_monthbill_issue',[\App\Http\Controllers\RateData\RateDataController::class, 'download_final_monthbill_issue']);
+        Route::post('/download_final_monthbill_issue', [\App\Http\Controllers\RateData\RateDataController::class, 'download_final_monthbill_issue']);
         //distribution_add_casebill_issue
-        Route::get('/download_add_casebill_issue/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_add_casebill_issue']);
+        Route::get('/download_add_casebill_issue/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'download_add_casebill_issue']);
         //distribution_add_monthbill_issue
-        Route::post('/download_distribution_monthbill',[\App\Http\Controllers\RateData\RateDataController::class, 'download_distribution_monthbill']);
+        Route::post('/download_distribution_monthbill', [\App\Http\Controllers\RateData\RateDataController::class, 'download_distribution_monthbill']);
         //distribution_final_monthbill_check
-        Route::post('/download_distribution_final_monthbill',[\App\Http\Controllers\RateData\RateDataController::class, 'download_distribution_final_monthbill']);
+        Route::post('/download_distribution_final_monthbill', [\App\Http\Controllers\RateData\RateDataController::class, 'download_distribution_final_monthbill']);
         //fulfillment_final_monthbill_edit
-        Route::get('/download_fulfillment_final_monthbill/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_fulfillment_final_monthbill']);
+        Route::get('/download_fulfillment_final_monthbill/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'download_fulfillment_final_monthbill']);
         //fulfillment_add_monthbill_issue
-        Route::get('/download_fulfillment_additional/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'download_fulfillment_additional']);
+        Route::get('/download_fulfillment_additional/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'download_fulfillment_additional']);
         //fulfillment_add_monthbill_check
-        Route::get('/fulfillment_add_monthbill_check/{rgd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'fulfillment_add_monthbill_check']);
+        Route::get('/fulfillment_add_monthbill_check/{rgd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'fulfillment_add_monthbill_check']);
 
         //GET GENERAL DATA FOLLOW BILL TYPE
         Route::get('/general/{rgd_no}/{bill_type}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rate_data_general'])->name('get_rate_data_general');
@@ -556,23 +555,23 @@ Route::middleware('auth')->group(function () {
 
         Route::post('/', \App\Http\Controllers\RateData\RateDataController::class)->name('registe_rate_data');
         //REGISTER RATE DATA
-        Route::post('/set_data',[\App\Http\Controllers\RateData\RateDataController::class, 'register_set_data'])->name('registe_set_data');
+        Route::post('/set_data', [\App\Http\Controllers\RateData\RateDataController::class, 'register_set_data'])->name('registe_set_data');
 
         //REGISTER RATE DATA FOR 보세화물 PRECALCULATE
-        Route::post('/set_data_precalculate',[\App\Http\Controllers\RateData\RateDataController::class, 'register_set_data_precalculate'])->name('registe_set_data_precalculate');
-        Route::post('/register_data_general_precalculate',[\App\Http\Controllers\RateData\RateDataController::class, 'register_data_general_precalculate']);
-        Route::get('/get_set_data_precalculate/{rmd_no}/{meta_cate}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_set_data_precalculate']);
-        Route::get('/get_data_general_precalculate/{rmd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_data_general_precalculate']);
+        Route::post('/set_data_precalculate', [\App\Http\Controllers\RateData\RateDataController::class, 'register_set_data_precalculate'])->name('registe_set_data_precalculate');
+        Route::post('/register_data_general_precalculate', [\App\Http\Controllers\RateData\RateDataController::class, 'register_data_general_precalculate']);
+        Route::get('/get_set_data_precalculate/{rmd_no}/{meta_cate}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_set_data_precalculate']);
+        Route::get('/get_data_general_precalculate/{rmd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_data_general_precalculate']);
 
         //GET RATE DATA
-        Route::get('/get_set_data/{rmd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_set_data'])->name('get_set_data');
-        Route::get('/get_set_data_mobile/{bill_type}/{rmd_no}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_set_data_mobile'])->name('get_set_data2');
+        Route::get('/get_set_data/{rmd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_set_data'])->name('get_set_data');
+        Route::get('/get_set_data_mobile/{bill_type}/{rmd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_set_data_mobile'])->name('get_set_data2');
         //GET RATE META DATA
-        Route::get('/get_rmd_no/{rgd_no}/{set_type}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_rmd_no'])->name('get_rmd_no');
-        Route::get('/get_rmd_no_fulfill/{rgd_no}/{type}/{pretype}',[\App\Http\Controllers\RateData\RateDataController::class, 'get_rmd_no_fulfill'])->name('get_rmd_no_fulfill');
-        Route::delete('/delete_row_rate_data/{rd_no}/',[\App\Http\Controllers\RateData\RateDataController::class, 'deleteRowRateData'])->name('delete_row_rate_data');
+        Route::get('/get_rmd_no/{rgd_no}/{set_type}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rmd_no'])->name('get_rmd_no');
+        Route::get('/get_rmd_no_fulfill/{rgd_no}/{type}/{pretype}', [\App\Http\Controllers\RateData\RateDataController::class, 'get_rmd_no_fulfill'])->name('get_rmd_no_fulfill');
+        Route::delete('/delete_row_rate_data/{rd_no}/', [\App\Http\Controllers\RateData\RateDataController::class, 'deleteRowRateData'])->name('delete_row_rate_data');
         //DELETE SET RATE DATA FOR BONDED SERVICE
-        Route::delete('/delete_set_rate_data/{rd_no}/',[\App\Http\Controllers\RateData\RateDataController::class, 'deleteSetRateData']);
+        Route::delete('/delete_set_rate_data/{rd_no}/', [\App\Http\Controllers\RateData\RateDataController::class, 'deleteSetRateData']);
 
         Route::get('/by_rmd_no/{by_rmd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateDataByRmdNo']);
         Route::get('/by_rm_no/{rm_no}/{rmd_no}', [App\Http\Controllers\RateData\RateDataController::class, 'getRateData'])->name('get_rate_data');
@@ -585,12 +584,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/download_pdf_send_meta/{rm_no}/{rmd_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'download_pdf_send_meta']);
         Route::delete('/delete_rate_data/{rm_no}', [\App\Http\Controllers\RateData\RateDataController::class, 'deleteRateData'])->name('delete_rate_data');
         //cancel_bill
-        Route::post('/cancel_bill', [\App\Http\Controllers\RateData\RateDataController::class,'cancel_bill'])->name('cancel_bill');
-        Route::post('/get_list_cancel_bill', [\App\Http\Controllers\RateData\RateDataController::class,'get_list_cancel_bill'])->name('get_list_cancel_bill');
-        Route::post('/get_list_payment_history', [\App\Http\Controllers\RateData\RateDataController::class,'get_list_payment_history'])->name('get_list_payment_history');
-        Route::post('/get_approval_history', [\App\Http\Controllers\RateData\RateDataController::class,'get_approval_history'])->name('get_approval_history');
+        Route::post('/cancel_bill', [\App\Http\Controllers\RateData\RateDataController::class, 'cancel_bill'])->name('cancel_bill');
+        Route::post('/get_list_cancel_bill', [\App\Http\Controllers\RateData\RateDataController::class, 'get_list_cancel_bill'])->name('get_list_cancel_bill');
+        Route::post('/get_list_payment_history', [\App\Http\Controllers\RateData\RateDataController::class, 'get_list_payment_history'])->name('get_list_payment_history');
+        Route::post('/get_approval_history', [\App\Http\Controllers\RateData\RateDataController::class, 'get_approval_history'])->name('get_approval_history');
 
-        Route::post('/update_memo', [\App\Http\Controllers\RateData\RateDataController::class,'update_memo'])->name('update_memo');
+        Route::post('/update_memo', [\App\Http\Controllers\RateData\RateDataController::class, 'update_memo'])->name('update_memo');
     });
 
     Route::prefix('alarm')->name('alarm.')->group(function () {
@@ -611,25 +610,25 @@ Route::middleware('auth')->group(function () {
         Route::get('/settlement_amount_trend', [App\Http\Controllers\Orders\OrdersController::class, 'settlementAmountTrend'])->name('settlement_amount_trend');
     });
 
-    Route::post('get_import_data', [\App\Http\Controllers\Import\ImportController::class,'get_import_data'])->name('get_import_data');
-    Route::post('get_import_data_api', [\App\Http\Controllers\Import\ImportController::class,'get_import_data_api'])->name('get_import_data_api');
-    Route::post('get_export_data', [\App\Http\Controllers\Export\ExportController::class,'get_export_data'])->name('get_export_data');
-    Route::post('/download_distribution_stocklist', [\App\Http\Controllers\Excel\ExportExcelController::class,'download_distribution_stocklist'])->name('download_distribution_stocklist');
-    Route::post('/dowload_fulfillment_stock_list', [\App\Http\Controllers\Excel\ExportExcelController::class,'dowload_fulfillment_stock_list'])->name('dowload_fulfillment_stock_list');
-    Route::post('/download_bonded_cargo', [\App\Http\Controllers\Excel\ExportExcelController::class,'download_bonded_cargo'])->name('download_bonded_cargo');
-    Route::post('/download_distribution_release_list', [\App\Http\Controllers\Excel\ExportExcelController::class,'download_distribution_release_list'])->name('download_distribution_release_list');
-    Route::post('/download_fullwarehousing_list', [\App\Http\Controllers\Excel\ExportExcelController::class,'download_fullwarehousing_list'])->name('download_fullwarehousing_list');
-    Route::post('get_package_data', [\App\Http\Controllers\Package\PackageController::class,'get_package_data'])->name('get_package_data');
+    Route::post('get_import_data', [\App\Http\Controllers\Import\ImportController::class, 'get_import_data'])->name('get_import_data');
+    Route::post('get_import_data_api', [\App\Http\Controllers\Import\ImportController::class, 'get_import_data_api'])->name('get_import_data_api');
+    Route::post('get_export_data', [\App\Http\Controllers\Export\ExportController::class, 'get_export_data'])->name('get_export_data');
+    Route::post('/download_distribution_stocklist', [\App\Http\Controllers\Excel\ExportExcelController::class, 'download_distribution_stocklist'])->name('download_distribution_stocklist');
+    Route::post('/dowload_fulfillment_stock_list', [\App\Http\Controllers\Excel\ExportExcelController::class, 'dowload_fulfillment_stock_list'])->name('dowload_fulfillment_stock_list');
+    Route::post('/download_bonded_cargo', [\App\Http\Controllers\Excel\ExportExcelController::class, 'download_bonded_cargo'])->name('download_bonded_cargo');
+    Route::post('/download_distribution_release_list', [\App\Http\Controllers\Excel\ExportExcelController::class, 'download_distribution_release_list'])->name('download_distribution_release_list');
+    Route::post('/download_fullwarehousing_list', [\App\Http\Controllers\Excel\ExportExcelController::class, 'download_fullwarehousing_list'])->name('download_fullwarehousing_list');
+    Route::post('get_package_data', [\App\Http\Controllers\Package\PackageController::class, 'get_package_data'])->name('get_package_data');
 
-    Route::post('/dowload_fulfillment_schedule_list', [\App\Http\Controllers\Excel\ExportExcelController::class,'dowload_fulfillment_schedule_list'])->name('dowload_fulfillment_schedule_list');
-    Route::post('/import_excel_distribution', [\App\Http\Controllers\Warehousing\WarehousingController::class,'importExcelDistribution']);
+    Route::post('/dowload_fulfillment_schedule_list', [\App\Http\Controllers\Excel\ExportExcelController::class, 'dowload_fulfillment_schedule_list'])->name('dowload_fulfillment_schedule_list');
+    Route::post('/import_excel_distribution', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'importExcelDistribution']);
     Route::post('/update_rgd_status3', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'updateRgdState3'])->name('update_rgd_status3');
 
     Route::post('/schedule_list_import', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'scheduleListImport']);
-    Route::post('/save_import_storeday', [\App\Http\Controllers\Import\ImportController::class,'save_import_storeday'])->name('save_import_storeday');
-    Route::post('/download_bonded_settlement', [\App\Http\Controllers\Warehousing\WarehousingController::class,'downloadBondedSettlement']);
+    Route::post('/save_import_storeday', [\App\Http\Controllers\Import\ImportController::class, 'save_import_storeday'])->name('save_import_storeday');
+    Route::post('/download_bonded_settlement', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'downloadBondedSettlement']);
     Route::post('/download_final_month_bill_issue', [\App\Http\Controllers\RateData\RateDataController::class, 'download_final_month_bill_issue']);
-    Route::post('/download_est_casebill', function(){
+    Route::post('/download_est_casebill', function () {
         $data['status'] = 1;
         return json_encode($data);
     });
@@ -641,8 +640,4 @@ Route::middleware('auth')->group(function () {
     Route::post('/get_warehousing_status', [\App\Http\Controllers\WarehousingStatus\WarehousingStatusController::class, 'getWarehousingStatus']);
     Route::post('/get_warehousing_status_mobile', [\App\Http\Controllers\WarehousingStatus\WarehousingStatusController::class, 'getWarehousingStatusMobile']);
     Route::get('/load_table_top_right/{rgd_no}', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'load_table_top_right']);
-
-
-
 });
-
