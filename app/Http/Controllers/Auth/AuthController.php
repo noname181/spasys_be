@@ -101,7 +101,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'message' => Messages::MSG_0007,
-                'mb_token' => $$request['token'],
+                'mb_token' => $request['token'],
                 'mb_name' => $member['mb_name'],
                 'mb_email' => $member['mb_email'],
                 'mb_hp' => $member['mb_hp'],
@@ -118,7 +118,7 @@ class AuthController extends Controller
             ]);
         } catch (\Exception $error) {
             Log::error($error);
-            // return $error;
+            return $error;
             return response()->json(['message' => Messages::MSG_0009], 500);
         }
     }
