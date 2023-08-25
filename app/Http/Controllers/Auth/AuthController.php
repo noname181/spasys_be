@@ -82,11 +82,10 @@ class AuthController extends Controller
     }
     public function loginToken(Request $request)
     {
-
         try {
 
             $member = Member::with('role')
-                ->where('mb_token', strtolower($request['token']))
+                ->where('mb_token', $request['token'])
                 ->first();
             if (is_null($member)) {
                 return response()->json([
