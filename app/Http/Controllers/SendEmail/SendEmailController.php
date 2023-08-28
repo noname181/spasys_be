@@ -443,7 +443,8 @@ class SendEmailController extends Controller
         DB::commit();
         $user = Auth::user();
         $co_no = Company::with(['contract'])->where('co_no', $validated['co_no_services'])->first();
-        $rmd_last = RateMetaData::where('rmd_no', $validated['rmd_no'])->first();
+        $rmd_last = RateMetaData::with('member_all')->where('rmd_no', $validated['rmd_no'])->first();
+        $rdg = RateDataGeneral::where('rmd_no', $validated['rmd_no'])->where('rdg_set_type', 'bonded_estimated_costs')->first();
         $rate_data = [];
         $rate_data_general = [];
         $bonded1a = [];
@@ -1312,47 +1313,69 @@ class SendEmailController extends Controller
         array_map('unlink', glob($mask) ?: []);
         $rmd_name_file = isset($validated['rmd_number']) ? $validated['rmd_number'] : '';
         $file_name_download = $path . '예상비용 미리보기_' . $rmd_name_file . '.pdf';
-        $pdf = Pdf::loadView('pdf.test2', [
-            'rate_data_general' => $rate_data_general, 'rate_data' => $rate_data, 'service' => $service, 'bonded1a' => $bonded1a, 'bonded1b' => $bonded1b, 'bonded1c' => $bonded1c, 'tab_child' => $validated['rmd_tab_child'] ? $validated['rmd_tab_child'] : '',
-            'count3' => $count3, 'count2' => $count2, 'count1' => $count1, 'total_1' => $total_1, 'total_2' => $total_2, 'total_3' => $total_3, 'mb_type' => Auth::user()->mb_type, 'bonded2a' => $bonded2a, 'count4_2' => $count4_2, 'count3_2' => $count3_2, 'count1_2' => $count1_2, 'count2_2' => $count2_2, 'count_arr2' => $count_arr2, 'arr2' => $arr2,
-            'count_arr3' => $count_arr3, 'arr3' => $arr3, 'bonded3a' => $bonded3a, 'sum3' => $sum3, 'sum2' => $sum2,
-            'count_arr4' => $count_arr4, 'arr4' => $arr4, 'bonded4a' => $bonded4a, 'sum4' => $sum4,
-            'count_arr5' => $count_arr5, 'arr5' => $arr5, 'bonded5a' => $bonded5a, 'sum5' => $sum5,
-            'bonded5b' => $bonded5b, 'bonded5c' => $bonded5c, 'bonded4b' => $bonded4b, 'bonded4c' => $bonded4c,
-            'bonded3b' => $bonded3b, 'bonded3c' => $bonded3c, 'bonded2b' => $bonded2b, 'bonded2c' => $bonded2c,
-            'co_name' => $co_no['co_name'], 'co_address' => $co_no['co_address'], 'co_address_detail' => $co_no['co_address_detail'], 'co_tel' => $co_no['co_tel'], 'co_email' => $co_no['co_email'], 'date' => Date('Y-m-d', strtotime($rmd_last['created_at']))
-        ]);
+        if ($validated['rmd_service'] == 0) {
+            $pdf = Pdf::loadView('pdf.test2', [
+                'rate_data_general' => $rate_data_general, 'rate_data' => $rate_data, 'service' => $service, 'bonded1a' => $bonded1a, 'bonded1b' => $bonded1b, 'bonded1c' => $bonded1c, 'tab_child' => isset($validated['rmd_tab_child']) ? $validated['rmd_tab_child'] : '',
+                'count3' => $count3, 'count2' => $count2, 'count1' => $count1, 'total_1' => $total_1, 'total_2' => $total_2, 'total_3' => $total_3, 'mb_type' => Auth::user()->mb_type, 'bonded2a' => $bonded2a, 'count4_2' => $count4_2, 'count3_2' => $count3_2, 'count1_2' => $count1_2, 'count2_2' => $count2_2, 'count_arr2' => $count_arr2, 'arr2' => $arr2,
+                'count_arr3' => $count_arr3, 'arr3' => $arr3, 'bonded3a' => $bonded3a, 'sum3' => $sum3, 'sum2' => $sum2,
+                'count_arr4' => $count_arr4, 'arr4' => $arr4, 'bonded4a' => $bonded4a, 'sum4' => $sum4,
+                'count_arr5' => $count_arr5, 'arr5' => $arr5, 'bonded5a' => $bonded5a, 'sum5' => $sum5,
+                'bonded5b' => $bonded5b, 'bonded5c' => $bonded5c, 'bonded4b' => $bonded4b, 'bonded4c' => $bonded4c,
+                'bonded3b' => $bonded3b, 'bonded3c' => $bonded3c, 'bonded2b' => $bonded2b, 'bonded2c' => $bonded2c,
+                'co_name' => $co_no['co_name'], 'co_address' => $co_no['co_address'], 'co_address_detail' => $co_no['co_address_detail'], 'co_tel' => $co_no['co_tel'], 'co_email' => $co_no['co_email'], 'date' => Date('Y-m-d', strtotime($rmd_last['created_at'])),
+                'rdg_sum1' => $rdg['rdg_sum1'], 'rdg_sum2' => $rdg['rdg_sum2'], 'rdg_sum3' => $rdg['rdg_sum3'], 'rdg_sum4' => $rdg['rdg_sum4'], 'rdg_sum5' => $rdg['rdg_sum5'],
+                'rdg_vat1' => $rdg['rdg_vat1'], 'rdg_vat2' => $rdg['rdg_vat2'], 'rdg_vat3' => $rdg['rdg_vat3'], 'rdg_vat4' => $rdg['rdg_vat4'], 'rdg_vat5' => $rdg['rdg_vat5'],
+                'rdg_supply_price1' => $rdg['rdg_supply_price1'], 'rdg_supply_price2' => $rdg['rdg_supply_price2'], 'rdg_supply_price3' => $rdg['rdg_supply_price3'], 'rdg_supply_price4' => $rdg['rdg_supply_price4'], 'rdg_supply_price5' => $rdg['rdg_supply_price5'],
+                'co_license' => $co_no['co_license'], 'co_owner' => $co_no['co_owner'], 'rmd_number' => $rmd_last['rmd_number'],
+                'co_name_send' => $rmd_last['member_all']['company']['co_name'], 'co_address_send' => $rmd_last['member_all']['company']['co_address'], 'co_address_detail_send' => $rmd_last['member_all']['company']['co_address_detail'],
+                'co_tel_send' => $rmd_last['member_all']['company']['co_tel'], 'co_email_send' => $rmd_last['member_all']['company']['co_email']
+            ]);
+        } else {
+            $pdf = Pdf::loadView('pdf.test2', [
+                'rate_data_general' => $rate_data_general, 'rate_data' => $rate_data, 'service' => $service, 'bonded1a' => $bonded1a, 'bonded1b' => $bonded1b, 'bonded1c' => $bonded1c, 'tab_child' => isset($validated['rmd_tab_child']) ? $validated['rmd_tab_child'] : '',
+                'count3' => $count3, 'count2' => $count2, 'count1' => $count1, 'total_1' => $total_1, 'total_2' => $total_2, 'total_3' => $total_3, 'mb_type' => Auth::user()->mb_type, 'bonded2a' => $bonded2a, 'count4_2' => $count4_2, 'count3_2' => $count3_2, 'count1_2' => $count1_2, 'count2_2' => $count2_2, 'count_arr2' => $count_arr2, 'arr2' => $arr2,
+                'count_arr3' => $count_arr3, 'arr3' => $arr3, 'bonded3a' => $bonded3a, 'sum3' => $sum3, 'sum2' => $sum2,
+                'count_arr4' => $count_arr4, 'arr4' => $arr4, 'bonded4a' => $bonded4a, 'sum4' => $sum4,
+                'count_arr5' => $count_arr5, 'arr5' => $arr5, 'bonded5a' => $bonded5a, 'sum5' => $sum5,
+                'bonded5b' => $bonded5b, 'bonded5c' => $bonded5c, 'bonded4b' => $bonded4b, 'bonded4c' => $bonded4c,
+                'bonded3b' => $bonded3b, 'bonded3c' => $bonded3c, 'bonded2b' => $bonded2b, 'bonded2c' => $bonded2c,
+                'co_name' => $co_no['co_name'], 'co_address' => $co_no['co_address'], 'co_address_detail' => $co_no['co_address_detail'], 'co_tel' => $co_no['co_tel'], 'co_email' => $co_no['co_email'], 'date' => Date('Y-m-d', strtotime($rmd_last['created_at'])),
+                'co_license' => $co_no['co_license'], 'co_owner' => $co_no['co_owner'], 'rmd_number' => $rmd_last['rmd_number'],
+                'co_name_send' => $rmd_last['member_all']['company']['co_name'], 'co_address_send' => $rmd_last['member_all']['company']['co_address'], 'co_address_detail_send' => $rmd_last['member_all']['company']['co_address_detail'],
+                'co_tel_send' => $rmd_last['member_all']['company']['co_tel'], 'co_email_send' => $rmd_last['member_all']['company']['co_email']
+            ]);
+        }
         $pdf->save($file_name_download);
 
         try {
-            $push = SendEmailHistory::insertGetId([
-                'mb_no' => Auth::user()->mb_no,
-                'rm_no' => isset($validated['rm_no']) ? $validated['rm_no'] : null,
-                'rmd_no' => isset($validated['rmd_no']) ? $validated['rmd_no'] : null,
-                'se_email_cc' => $validated['se_email_cc'],
-                'se_email_receiver' => $validated['se_email_receiver'],
-                'se_name_receiver' => $validated['se_name_receiver'],
-                'se_title' => $validated['se_title'],
-                'se_content' => $validated['se_content'],
-                'se_rmd_number' => isset($validated['rmd_number']) ? $validated['rmd_number'] : null,
-                'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
-                'updated_at' => Carbon::now()->format('Y-m-d H:i:s')
-            ]);
-            $mail_details = [
-                'title' => $validated['se_title'],
-                'body' => nl2br($validated['se_content']),
-            ];
-            $path2 = '/var/www/html/' . $file_name_download;
-            Mail::send('emails.quotation', ['details' => $mail_details], function ($message) use ($validated, $path2) {
-                $message->to($validated['se_email_receiver'])->from('Bonded_Logistics_Platform@spasysone.com');
-                if ($validated['se_email_cc']) {
-                    $message->cc([$validated['se_email_cc']]);
-                }
-                $message->subject($validated['se_title']);
+            // $push = SendEmailHistory::insertGetId([
+            //     'mb_no' => Auth::user()->mb_no,
+            //     'rm_no' => isset($validated['rm_no']) ? $validated['rm_no'] : null,
+            //     'rmd_no' => isset($validated['rmd_no']) ? $validated['rmd_no'] : null,
+            //     'se_email_cc' => $validated['se_email_cc'],
+            //     'se_email_receiver' => $validated['se_email_receiver'],
+            //     'se_name_receiver' => $validated['se_name_receiver'],
+            //     'se_title' => $validated['se_title'],
+            //     'se_content' => $validated['se_content'],
+            //     'se_rmd_number' => isset($validated['rmd_number']) ? $validated['rmd_number'] : null,
+            //     'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+            //     'updated_at' => Carbon::now()->format('Y-m-d H:i:s')
+            // ]);
+            // $mail_details = [
+            //     'title' => $validated['se_title'],
+            //     'body' => nl2br($validated['se_content']),
+            // ];
+            // $path2 = '/var/www/html/' . $file_name_download;
+            // Mail::send('emails.quotation', ['details' => $mail_details], function ($message) use ($validated, $path2) {
+            //     $message->to($validated['se_email_receiver'])->from('Bonded_Logistics_Platform@spasysone.com');
+            //     if ($validated['se_email_cc']) {
+            //         $message->cc([$validated['se_email_cc']]);
+            //     }
+            //     $message->subject($validated['se_title']);
 
 
-                $message->attach($path2);
-            });
+            //     $message->attach($path2);
+            // });
 
             return response()->json([
                 'message' => Messages::MSG_0007,

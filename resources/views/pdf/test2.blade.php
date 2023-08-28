@@ -16,7 +16,7 @@
     #custom_table td,
     #custom_table th {
       border: 1px solid #ddd;
-      padding: 8px;
+      padding: 5px;
       text-align: center;
       font-family: "unbatang", Times, serif;
       font-size: 13px;
@@ -29,6 +29,77 @@
 
 <body>
   @if($service == '보세화물' && $mb_type == 'spasys')
+  <div style="width: 100%;border:1px solid black;text-align: center;padding: 20px 0;">
+    @if($tab_child == '창고화물')
+    <p style='padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_sum1}}) 예상비용_No{{$rmd_number}}</p>
+    @endif
+    @if($tab_child == '위험물')
+    <p style='padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_vat1}}) 예상비용_No{{$rmd_number}}</p>
+    @endif
+    @if($tab_child == '온도화물')
+    <p style='padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_supply_price1}}) 예상비용_No{{$rmd_number}}</p>
+    @endif
+  </div>
+  <div style="width: 100%;margin-bottom:10px;text-align: right;">
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_name}}</p>
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>사업자번호 : {{$co_license}}</p>
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>사업장 주소 : {{$co_address}} {{$co_address_detail}}</p>
+    @if($co_owner)
+    @if($co_owner && !$co_email)
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$co_owner}}</p>
+    @else
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$co_owner}} ({{$co_email}})</p>
+    @endif
+    @endif
+  </div>
+  <div style="margin-bottom:10px">
+    <table id="custom_table">
+      <thead>
+        <tr>
+          <th colspan="5">화물 정보</th>
+        </tr>
+        <tr>
+          <th>BL번호</th>
+
+          <th>보관일수</th>
+
+          <th>반출중량</th>
+
+          <th>반출수량</th>
+
+          <th>과세금액</th>
+
+        </tr>
+        @if($tab_child == '창고화물')
+        <tr>
+          <th>{{$rdg_sum1}}</th>
+          <th>{{$rdg_sum2}}</th>
+          <th>{{$rdg_sum3}}</th>
+          <th>{{$rdg_sum4}}</th>
+          <th>{{$rdg_sum5}}</th>
+        </tr>
+        @endif
+        @if($tab_child == '위험물')
+        <tr>
+          <th>{{$rdg_vat1}}</th>
+          <th>{{$rdg_vat2}}</th>
+          <th>{{$rdg_vat3}}</th>
+          <th>{{$rdg_vat4}}</th>
+          <th>{{$rdg_vat5}}</th>
+        </tr>
+        @endif
+        @if($tab_child == '온도화물')
+        <tr>
+          <th>{{$rdg_supply_price1}}</th>
+          <th>{{$rdg_supply_price2}}</th>
+          <th>{{$rdg_supply_price3}}</th>
+          <th>{{$rdg_supply_price4}}</th>
+          <th>{{$rdg_supply_price5}}</th>
+        </tr>
+        @endif
+      </thead>
+    </table>
+  </div>
   <div>
     <table id="custom_table">
       <thead>
@@ -74,24 +145,23 @@
     </table>
   </div>
   <div style="margin:10px 0px;">
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>1. 이 요율표의 유효기간은 제출일자로부터 1개월 입니다.</p>
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>2. 이 견적 금액은 부가가치세 별도 금액입니다.</p>
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>3. 상세 업무 내역에 따라 제공 요율은 변경될 수 있습니다.</p>
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>1. 상세 업무 내역에 따라 예상비용은 변경될 수 있습니다.</p>
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>2. 본 내역은 실제 비용이 아님을 명시합니다.</p>
   </div>
   <div style="text-align:right">
-    @if($co_name)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_name}}</p>
+    @if($co_name_send)
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_name_send}}</p>
     @endif
-    @if($co_address && $co_address_detail)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address}} {{$co_address_detail}}</p>
-    @elseif($co_address)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address}}</p>
+    @if($co_address_send && $co_address_detail_send)
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address_send}} {{$co_address_detail_send}}</p>
+    @elseif($co_address_send)
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address_send}}</p>
     @endif
-    @if($co_tel)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_tel}}</p>
+    @if($co_tel_send)
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_tel_send}}</p>
     @endif
-    @if($co_email)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_email}}</p>
+    @if($co_email_send)
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_email_send}}</p>
     @endif
     @if($date)
     <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$date}}</p>
@@ -473,6 +543,77 @@
   @endif
 
   @if($service == '보세화물' && $mb_type != 'spasys')
+  <div style="width: 100%;border:1px solid black;text-align: center;padding: 20px 0;">
+    @if($tab_child == '창고화물')
+    <p style='padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_sum1}}) 예상비용_No{{$rmd_number}}</p>
+    @endif
+    @if($tab_child == '위험물')
+    <p style='padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_vat1}}) 예상비용_No{{$rmd_number}}</p>
+    @endif
+    @if($tab_child == '온도화물')
+    <p style='padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_supply_price1}}) 예상비용_No{{$rmd_number}}</p>
+    @endif
+  </div>
+  <div style="width: 100%;margin-bottom:10px;text-align: right;">
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_name}}</p>
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>사업자번호 : {{$co_license}}</p>
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>사업장 주소 : {{$co_address}} {{$co_address_detail}}</p>
+    @if($co_owner)
+    @if($co_owner && !$co_email)
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$co_owner}}</p>
+    @else
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$co_owner}} ({{$co_email}})</p>
+    @endif
+    @endif
+  </div>
+  <div style="margin-bottom:10px">
+    <table id="custom_table">
+      <thead>
+        <tr>
+          <th colspan="5">화물 정보</th>
+        </tr>
+        <tr>
+          <th>BL번호</th>
+
+          <th>보관일수</th>
+
+          <th>반출중량</th>
+
+          <th>반출수량</th>
+
+          <th>과세금액</th>
+
+        </tr>
+        @if($tab_child == '창고화물')
+        <tr>
+          <th>{{$rdg_sum1}}</th>
+          <th>{{$rdg_sum2}}</th>
+          <th>{{$rdg_sum3}}</th>
+          <th>{{$rdg_sum4}}</th>
+          <th>{{$rdg_sum5}}</th>
+        </tr>
+        @endif
+        @if($tab_child == '위험물')
+        <tr>
+          <th>{{$rdg_vat1}}</th>
+          <th>{{$rdg_vat2}}</th>
+          <th>{{$rdg_vat3}}</th>
+          <th>{{$rdg_vat4}}</th>
+          <th>{{$rdg_vat5}}</th>
+        </tr>
+        @endif
+        @if($tab_child == '온도화물')
+        <tr>
+          <th>{{$rdg_supply_price1}}</th>
+          <th>{{$rdg_supply_price2}}</th>
+          <th>{{$rdg_supply_price3}}</th>
+          <th>{{$rdg_supply_price4}}</th>
+          <th>{{$rdg_supply_price5}}</th>
+        </tr>
+        @endif
+      </thead>
+    </table>
+  </div>
   <div>
     <table id="custom_table">
       <thead>
@@ -567,24 +708,23 @@
   </div>
   </div>
   <div style="margin:10px 0px;">
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>1. 이 요율표의 유효기간은 제출일자로부터 1개월 입니다.</p>
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>2. 이 견적 금액은 부가가치세 별도 금액입니다.</p>
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>3. 상세 업무 내역에 따라 제공 요율은 변경될 수 있습니다.</p>
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>1. 상세 업무 내역에 따라 예상비용은 변경될 수 있습니다.</p>
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>2. 본 내역은 실제 비용이 아님을 명시합니다.</p>
   </div>
   <div style="text-align:right">
-    @if($co_name)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_name}}</p>
+    @if($co_name_send)
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_name_send}}</p>
     @endif
-    @if($co_address && $co_address_detail)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address}} {{$co_address_detail}}</p>
-    @elseif($co_address)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address}}</p>
+    @if($co_address_send && $co_address_detail_send)
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address_send}} {{$co_address_detail_send}}</p>
+    @elseif($co_address_send)
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address_send}}</p>
     @endif
-    @if($co_tel)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_tel}}</p>
+    @if($co_tel_send)
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_tel_send}}</p>
     @endif
-    @if($co_email)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_email}}</p>
+    @if($co_email_send)
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_email_send}}</p>
     @endif
     @if($date)
     <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$date}}</p>
@@ -2123,6 +2263,23 @@
   @endif
 
   @if($service == '수입풀필먼트')
+  <div style="width: 100%;border:1px solid black;text-align: center;padding: 20px 0;">
+
+    <p style='padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>수입풀필먼트 예상비용_No{{$rmd_number}}</p>
+
+  </div>
+  <div style="width: 100%;margin-bottom:10px;text-align: right;">
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_name}}</p>
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>사업자번호 : {{$co_license}}</p>
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>사업장 주소 : {{$co_address}} {{$co_address_detail}}</p>
+    @if($co_owner)
+    @if($co_owner && !$co_email)
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$co_owner}}</p>
+    @else
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$co_owner}} ({{$co_email}})</p>
+    @endif
+    @endif
+  </div>
   <div style="border-bottom:1px solid #ddd">
     <table id="custom_table">
       <thead>
@@ -2191,24 +2348,23 @@
     </table>
   </div>
   <div style="margin:10px 0px;">
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>1. 이 요율표의 유효기간은 제출일자로부터 1개월 입니다.</p>
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>2. 이 견적 금액은 부가가치세 별도 금액입니다.</p>
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>3. 상세 업무 내역에 따라 제공 요율은 변경될 수 있습니다.</p>
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>1. 상세 업무 내역에 따라 예상비용은 변경될 수 있습니다.</p>
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>2. 본 내역은 실제 비용이 아님을 명시합니다.</p>
   </div>
   <div style="text-align:right">
-    @if($co_name)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_name}}</p>
+    @if($co_name_send)
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_name_send}}</p>
     @endif
-    @if($co_address && $co_address_detail)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address}} {{$co_address_detail}}</p>
-    @elseif($co_address)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address}}</p>
+    @if($co_address_send && $co_address_detail_send)
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address_send}} {{$co_address_detail_send}}</p>
+    @elseif($co_address_send)
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address_send}}</p>
     @endif
-    @if($co_tel)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_tel}}</p>
+    @if($co_tel_send)
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_tel_send}}</p>
     @endif
-    @if($co_email)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_email}}</p>
+    @if($co_email_send)
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_email_send}}</p>
     @endif
     @if($date)
     <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$date}}</p>
@@ -3187,24 +3343,23 @@
     </table>
   </div>
   <div style="margin:10px 0px;">
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>1. 이 요율표의 유효기간은 제출일자로부터 1개월 입니다.</p>
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>2. 이 견적 금액은 부가가치세 별도 금액입니다.</p>
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>3. 상세 업무 내역에 따라 제공 요율은 변경될 수 있습니다.</p>
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>1. 상세 업무 내역에 따라 예상비용은 변경될 수 있습니다.</p>
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>2. 본 내역은 실제 비용이 아님을 명시합니다.</p>
   </div>
   <div style="text-align:right">
-    @if($co_name)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_name}}</p>
+    @if($co_name_send)
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_name_send}}</p>
     @endif
-    @if($co_address && $co_address_detail)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address}} {{$co_address_detail}}</p>
-    @elseif($co_address)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address}}</p>
+    @if($co_address_send && $co_address_detail_send)
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address_send}} {{$co_address_detail_send}}</p>
+    @elseif($co_address_send)
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address_send}}</p>
     @endif
-    @if($co_tel)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_tel}}</p>
+    @if($co_tel_send)
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_tel_send}}</p>
     @endif
-    @if($co_email)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_email}}</p>
+    @if($co_email_send)
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_email_send}}</p>
     @endif
     @if($date)
     <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$date}}</p>

@@ -8,6 +8,7 @@ use DateTimeInterface;
 use App\Models\RateData;
 use App\Models\RateDataGeneral;
 use App\Models\File;
+
 class RateMetaData extends Model
 {
     use HasFactory;
@@ -17,7 +18,7 @@ class RateMetaData extends Model
 
     protected $primaryKey = 'rmd_no';
 
-        public $timestamps = true;
+    public $timestamps = true;
 
     protected function serializeDate(DateTimeInterface $date)
     {
@@ -52,31 +53,42 @@ class RateMetaData extends Model
         'updated_at' => "date:Y.m.d",
     ];
 
-    public function rate_meta() {
+    public function rate_meta()
+    {
         return $this->hasOne(RateMeta::class, 'rm_no', 'rm_no')->with('send_email');
     }
-    public function rate_data(){
+    public function rate_data()
+    {
         return $this->hasMany(RateData::class, 'rmd_no', 'rmd_no');
     }
-    public function rate_data_general(){
+    public function rate_data_general()
+    {
         return $this->hasOne(RateDataGeneral::class, 'rmd_no', 'rmd_no');
     }
     // public function total1(){
     //     return $this->hasOne(RateData::class, 'rmd_no', 'rmd_no')->where('set_type','=','work')->sum('rd_data7');
     // }
-    public function company() {
-        return $this->hasOne(Company::class, 'co_no', 'co_no')->with(['contract', 'co_parent','adjustment_group','manager']);
+    public function company()
+    {
+        return $this->hasOne(Company::class, 'co_no', 'co_no')->with(['contract', 'co_parent', 'adjustment_group', 'manager']);
     }
 
-    public function member() {
+    public function member()
+    {
         return $this->hasOne(Member::class, 'mb_no', 'mb_no')->with('company:co_no,co_name,co_service');
     }
+    public function member_all()
+    {
+        return $this->hasOne(Member::class, 'mb_no', 'mb_no')->with('company');
+    }
 
-    public function rate_data_one(){
+    public function rate_data_one()
+    {
         return $this->hasOne(RateData::class, 'rmd_no', 'rmd_no');
     }
-    public function send_email_rmd(){
-        return $this->hasOne(SendEmailHistory::class, 'rmd_no', 'rmd_no')->orderBy('se_no','desc')->with('member');
+    public function send_email_rmd()
+    {
+        return $this->hasOne(SendEmailHistory::class, 'rmd_no', 'rmd_no')->orderBy('se_no', 'desc')->with('member');
     }
     public function files()
     {
