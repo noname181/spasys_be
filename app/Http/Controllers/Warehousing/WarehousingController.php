@@ -9771,7 +9771,7 @@ class WarehousingController extends Controller
         $Note = '';                                //어음
         $Credit = '';                            //외상미수금
 
-        $Remark1 = $tax_number;
+        $Remark1 = '';
         $Remark2 = '';
         $Remark3 = '';
 
@@ -10447,7 +10447,7 @@ class WarehousingController extends Controller
         $Note = '';                                //어음
         $Credit = '';                            //외상미수금
 
-        $Remark1 = $tax_number;
+        $Remark1 = '';
         $Remark2 = '';
         $Remark3 = '';
 
