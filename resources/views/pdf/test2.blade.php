@@ -3302,6 +3302,23 @@
   @endif
   @endif
   @if($service == '유통가공')
+  <div style="width: 100%;border:1px solid black;text-align: center;padding: 20px 0;">
+
+    <p style='padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>유통가공 예상비용_No{{$rmd_number}}</p>
+
+  </div>
+  <div style="width: 100%;margin-bottom:10px;text-align: right;">
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_name}}</p>
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>사업자번호 : {{$co_license}}</p>
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>사업장 주소 : {{$co_address}} {{$co_address_detail}}</p>
+    @if($co_owner)
+    @if($co_owner && !$co_email)
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$co_owner}}</p>
+    @else
+    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$co_owner}} ({{$co_email}})</p>
+    @endif
+    @endif
+  </div>
   <div style="border-bottom:1px solid #ddd">
     <table id="custom_table">
       <thead>
