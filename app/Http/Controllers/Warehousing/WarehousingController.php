@@ -9935,9 +9935,7 @@ class WarehousingController extends Controller
                 } else {
                     $item_name = $rgd['t_import']['ti_h_bl'];
                 }
-                $amount_price += ($rgd['rate_data_general']['rdg_supply_price7'] + $rgd['rate_data_general']['rdg_supply_price14']);
-                $total_price += ($rgd['rate_data_general']['rdg_sum7'] + $rgd['rate_data_general']['rdg_sum14']);
-                $vat_price += ($rgd['rate_data_general']['rdg_vat7'] + $rgd['rate_data_general']['rdg_vat14']);
+               
             } else if ($rgd['service_korean_name'] == '수입풀필먼트') {
                 if (str_contains($rgd['rgd_bill_type'], 'month')) {
                     $count = ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd['rgd_settlement_number'])->count();
@@ -9945,9 +9943,7 @@ class WarehousingController extends Controller
                 } else {
                     $item_name = $rgd['rgd_settlement_number'];
                 }
-                $amount_price += $rgd['rate_data_general']['rdg_supply_price6'];
-                $total_price += $rgd['rate_data_general']['rdg_sum6'];
-                $vat_price += $rgd['rate_data_general']['rdg_vat6'];
+            
             } else if ($rgd['service_korean_name'] == '유통가공') {
                 if (str_contains($rgd['rgd_bill_type'], 'month')) {
                     $count = ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd['rgd_settlement_number'])->count();
@@ -9955,9 +9951,6 @@ class WarehousingController extends Controller
                 } else {
                     $item_name = $rgd['warehousing']['w_schedule_number2'];
                 }
-                $amount_price += $rgd['rate_data_general']['rdg_supply_price4'];
-                $total_price += $rgd['rate_data_general']['rdg_sum4'];
-                $vat_price += $rgd['rate_data_general']['rdg_vat4'];
             }
 
             $items[] = array(
@@ -9976,28 +9969,13 @@ class WarehousingController extends Controller
             $vat_price = 0;
 
             if ($rgd['service_korean_name'] == '보세화물') {
-
-                $amount_price += ($rgd['rate_data_general']['rdg_supply_price7'] + $rgd['rate_data_general']['rdg_supply_price14']);
-                $total_price += ($rgd['rate_data_general']['rdg_sum7'] + $rgd['rate_data_general']['rdg_sum14']);
-                $vat_price += ($rgd['rate_data_general']['rdg_vat7'] + $rgd['rate_data_general']['rdg_vat14']);
-            } else if ($rgd['service_korean_name'] == '수입풀필먼트') {
-
-                $amount_price += $rgd['rate_data_general']['rdg_supply_price6'];
-                $total_price += $rgd['rate_data_general']['rdg_sum6'];
-                $vat_price += $rgd['rate_data_general']['rdg_vat6'];
-            } else if ($rgd['service_korean_name'] == '유통가공') {
-
-                $amount_price += $rgd['rate_data_general']['rdg_supply_price4'];
-                $total_price += $rgd['rate_data_general']['rdg_sum4'];
-                $vat_price += $rgd['rate_data_general']['rdg_vat4'];
-            }
-
-            if ($rgd['service_korean_name'] == '보세화물') {
                 if (str_contains($rgd['rgd_bill_type'], 'month')) {
                     $count = ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd['rgd_settlement_number'])->count();
-                    $item_name = $rgd['t_import']['ti_h_bl'] . ($count == 1 ? '' : ('외 ' . ($count - 1) . '건'));
+                    $item_name = $rgd['rgd_settlement_number'];
+                    $Remark1 = $rgd['t_import']['ti_h_bl'] . ($count == 1 ? '' : ('외 ' . ($count - 1) . '건'));
                 } else {
-                    $item_name = $rgd['t_import']['ti_h_bl'];
+                    $item_name = $rgd['rgd_settlement_number'];
+                    $Remark1 = $rgd['t_import']['ti_h_bl'];
                 }
                 $amount_price += ($rgd['rate_data_general']['rdg_supply_price7'] + $rgd['rate_data_general']['rdg_supply_price14']);
                 $total_price += ($rgd['rate_data_general']['rdg_sum7'] + $rgd['rate_data_general']['rdg_sum14']);
@@ -10005,7 +9983,7 @@ class WarehousingController extends Controller
             } else if ($rgd['service_korean_name'] == '수입풀필먼트') {
                 if (str_contains($rgd['rgd_bill_type'], 'month')) {
                     $count = ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd['rgd_settlement_number'])->count();
-                    $item_name = $rgd['rgd_settlement_number'] . ($count == 1 ? '' : ('외 ' . ($count - 1) . '건'));
+                    $item_name = $rgd['rgd_settlement_number'];
                 } else {
                     $item_name = $rgd['rgd_settlement_number'];
                 }
@@ -10015,9 +9993,11 @@ class WarehousingController extends Controller
             } else if ($rgd['service_korean_name'] == '유통가공') {
                 if (str_contains($rgd['rgd_bill_type'], 'month')) {
                     $count = ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd['rgd_settlement_number'])->count();
-                    $item_name = $rgd['warehousing']['w_schedule_number2'] . ($count == 1 ? '' : ('외 ' . ($count - 1) . '건'));
+                    $item_name = $rgd['rgd_settlement_number'];
+                    $Remark1 = $rgd['warehousing']['w_schedule_number2'] . ($count == 1 ? '' : ('외 ' . ($count - 1) . '건'));
                 } else {
-                    $item_name = $rgd['warehousing']['w_schedule_number2'];
+                    $item_name = $rgd['rgd_settlement_number'];
+                    $Remark1 = $rgd['warehousing']['w_schedule_number2'] . ($count == 1 ? '' : ('외 ' . ($count - 1) . '건'));
                 }
                 $amount_price += $rgd['rate_data_general']['rdg_supply_price4'];
                 $total_price += $rgd['rate_data_general']['rdg_sum4'];
@@ -10604,29 +10584,13 @@ class WarehousingController extends Controller
             $vat_price = $price['tid_vat'];
 
             if ($rgd['service_korean_name'] == '보세화물') {
-                $amount_price += ($rgd['rate_data_general']['rdg_supply_price7'] + $rgd['rate_data_general']['rdg_supply_price14']);
-                $total_price += ($rgd['rate_data_general']['rdg_sum7'] + $rgd['rate_data_general']['rdg_sum14']);
-                $vat_price += ($rgd['rate_data_general']['rdg_vat7'] + $rgd['rate_data_general']['rdg_vat14']);
-            } else if ($rgd['service_korean_name'] == '수입풀필먼트') {
-                $amount_price += $rgd['rate_data_general']['rdg_supply_price6'];
-                $total_price += $rgd['rate_data_general']['rdg_sum6'];
-                $vat_price += $rgd['rate_data_general']['rdg_vat6'];
-            } else if ($rgd['service_korean_name'] == '유통가공') {
-                $amount_price += $rgd['rate_data_general']['rdg_supply_price4'];
-                $total_price += $rgd['rate_data_general']['rdg_sum4'];
-                $vat_price += $rgd['rate_data_general']['rdg_vat4'];
-            }
-
-            if ($rgd['service_korean_name'] == '보세화물') {
                 if (str_contains($rgd['rgd_bill_type'], 'month')) {
                     $count = ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd['rgd_settlement_number'])->count();
                     $item_name = $rgd['t_import']['ti_h_bl'] . ($count == 1 ? '' : ('외 ' . ($count - 1) . '건'));
                 } else {
                     $item_name = $rgd['t_import']['ti_h_bl'];
                 }
-                $amount_price += ($rgd['rate_data_general']['rdg_supply_price7'] + $rgd['rate_data_general']['rdg_supply_price14']);
-                $total_price += ($rgd['rate_data_general']['rdg_sum7'] + $rgd['rate_data_general']['rdg_sum14']);
-                $vat_price += ($rgd['rate_data_general']['rdg_vat7'] + $rgd['rate_data_general']['rdg_vat14']);
+               
             } else if ($rgd['service_korean_name'] == '수입풀필먼트') {
                 if (str_contains($rgd['rgd_bill_type'], 'month')) {
                     $count = ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd['rgd_settlement_number'])->count();
@@ -10634,9 +10598,7 @@ class WarehousingController extends Controller
                 } else {
                     $item_name = $rgd['rgd_settlement_number'];
                 }
-                $amount_price += $rgd['rate_data_general']['rdg_supply_price6'];
-                $total_price += $rgd['rate_data_general']['rdg_sum6'];
-                $vat_price += $rgd['rate_data_general']['rdg_vat6'];
+                
             } else if ($rgd['service_korean_name'] == '유통가공') {
                 if (str_contains($rgd['rgd_bill_type'], 'month')) {
                     $count = ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd['rgd_settlement_number'])->count();
@@ -10644,9 +10606,7 @@ class WarehousingController extends Controller
                 } else {
                     $item_name = $rgd['warehousing']['w_schedule_number2'];
                 }
-                $amount_price += $rgd['rate_data_general']['rdg_supply_price4'];
-                $total_price += $rgd['rate_data_general']['rdg_sum4'];
-                $vat_price += $rgd['rate_data_general']['rdg_vat4'];
+               
             }
 
             $items[] = array(
@@ -10665,25 +10625,13 @@ class WarehousingController extends Controller
             $vat_price = 0;
 
             if ($rgd['service_korean_name'] == '보세화물') {
-                $amount_price += ($rgd['rate_data_general']['rdg_supply_price7'] + $rgd['rate_data_general']['rdg_supply_price14']);
-                $total_price += ($rgd['rate_data_general']['rdg_sum7'] + $rgd['rate_data_general']['rdg_sum14']);
-                $vat_price += ($rgd['rate_data_general']['rdg_vat7'] + $rgd['rate_data_general']['rdg_vat14']);
-            } else if ($rgd['service_korean_name'] == '수입풀필먼트') {
-                $amount_price += $rgd['rate_data_general']['rdg_supply_price6'];
-                $total_price += $rgd['rate_data_general']['rdg_sum6'];
-                $vat_price += $rgd['rate_data_general']['rdg_vat6'];
-            } else if ($rgd['service_korean_name'] == '유통가공') {
-                $amount_price += $rgd['rate_data_general']['rdg_supply_price4'];
-                $total_price += $rgd['rate_data_general']['rdg_sum4'];
-                $vat_price += $rgd['rate_data_general']['rdg_vat4'];
-            }
-
-            if ($rgd['service_korean_name'] == '보세화물') {
                 if (str_contains($rgd['rgd_bill_type'], 'month')) {
                     $count = ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd['rgd_settlement_number'])->count();
-                    $item_name = $rgd['t_import']['ti_h_bl'] . ($count == 1 ? '' : ('외 ' . ($count - 1) . '건'));
+                    $item_name = $rgd['rgd_settlement_number'];
+                    $Remark1 = $rgd['t_import']['ti_h_bl'] . ($count == 1 ? '' : ('외 ' . ($count - 1) . '건'));
                 } else {
-                    $item_name = $rgd['t_import']['ti_h_bl'];
+                    $item_name = $rgd['rgd_settlement_number'];
+                    $Remark1 = $rgd['t_import']['ti_h_bl'];
                 }
                 $amount_price += ($rgd['rate_data_general']['rdg_supply_price7'] + $rgd['rate_data_general']['rdg_supply_price14']);
                 $total_price += ($rgd['rate_data_general']['rdg_sum7'] + $rgd['rate_data_general']['rdg_sum14']);
@@ -10701,9 +10649,11 @@ class WarehousingController extends Controller
             } else if ($rgd['service_korean_name'] == '유통가공') {
                 if (str_contains($rgd['rgd_bill_type'], 'month')) {
                     $count = ReceivingGoodsDelivery::where('rgd_settlement_number', $rgd['rgd_settlement_number'])->count();
-                    $item_name = $rgd['warehousing']['w_schedule_number2'] . ($count == 1 ? '' : ('외 ' . ($count - 1) . '건'));
+                    $item_name = $rgd['rgd_settlement_number'];
+                    $Remark1 = $rgd['warehousing']['w_schedule_number2'] . ($count == 1 ? '' : ('외 ' . ($count - 1) . '건'));
                 } else {
-                    $item_name = $rgd['warehousing']['w_schedule_number2'];
+                    $item_name = $rgd['rgd_settlement_number'];
+                    $Remark1 = $rgd['warehousing']['w_schedule_number2'] . ($count == 1 ? '' : ('외 ' . ($count - 1) . '건'));
                 }
                 $amount_price += $rgd['rate_data_general']['rdg_supply_price4'];
                 $total_price += $rgd['rate_data_general']['rdg_sum4'];
