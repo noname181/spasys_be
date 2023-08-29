@@ -38,6 +38,12 @@ class CreateAccountRequest extends BaseFormRequest
                 'max:20',
                 'min:2',
             ],
+            'co_owner' => [
+                'required',
+                'string',
+                'max:20',
+                'min:2',
+            ],
             'mb_pw' => [
                 '',
             ],
