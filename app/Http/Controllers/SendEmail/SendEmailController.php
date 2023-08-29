@@ -503,7 +503,7 @@ class SendEmailController extends Controller
             $rate_data_general = RateDataGeneral::where('rmd_no', $validated['rmd_no'])->where('rdg_set_type', 'estimated_costs')->first();
         } else if ((isset($validated['rmd_service']) && $validated['rmd_service'] == 0) || (!isset($validated['rmd_service']) || !$validated['rmd_service'])) {
             $service = '보세화물';
-            if ($validated['rmd_tab_child'] == '창고화물') {
+            if ($validated['rmd_tab_child'] == '창고화물' || $rmd_last['rmd_tab_child'] == '창고화물') {
                 if (Auth::user()->mb_type == 'spasys' || $co_no['contract']['c_integrated_calculate_yn'] == 'n' || $co_no['contract']['c_integrated_calculate_yn'] == '') {
                     $bonded1a = $rate_data = RateData::where('rmd_no', $validated['rmd_no'])->where(function ($q) {
                         $q->where('rd_cate_meta1', 'bonded1a');
@@ -767,7 +767,7 @@ class SendEmailController extends Controller
                         $sum5[] = $total7_5;
                     }
                 }
-            } else if ($validated['rmd_tab_child'] == '온도화물') {
+            } else if ($validated['rmd_tab_child'] == '온도화물' || $rmd_last['rmd_tab_child'] == '온도화물') {
                 if (Auth::user()->mb_type == 'spasys' || $co_no['contract']['c_integrated_calculate_yn'] == 'n' || $co_no['contract']['c_integrated_calculate_yn'] == '') {
                     $bonded1b = $rate_data = RateData::where('rmd_no', $validated['rmd_no'])->where(function ($q) {
                         $q->where('rd_cate_meta1', 'bonded1b');
@@ -1030,7 +1030,7 @@ class SendEmailController extends Controller
                         $sum5[] = $total7_5;
                     }
                 }
-            } else if ($validated['rmd_tab_child'] == '위험물') {
+            } else if ($validated['rmd_tab_child'] == '위험물' || $rmd_last['rmd_tab_child'] == '위험물') {
                 if (Auth::user()->mb_type == 'spasys' || $co_no['contract']['c_integrated_calculate_yn'] == 'n' || $co_no['contract']['c_integrated_calculate_yn'] == '') {
                     $bonded1c = $rate_data = RateData::where('rmd_no', $validated['rmd_no'])->where(function ($q) {
                         $q->where('rd_cate_meta1', 'bonded1c');
