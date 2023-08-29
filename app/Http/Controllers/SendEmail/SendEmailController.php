@@ -1315,7 +1315,7 @@ class SendEmailController extends Controller
         $file_name_download = $path . '예상비용 미리보기_' . $rmd_name_file . '.pdf';
         if ($validated['rmd_service'] == 0) {
             $pdf = Pdf::loadView('pdf.test2', [
-                'rate_data_general' => $rate_data_general, 'rate_data' => $rate_data, 'service' => $service, 'bonded1a' => $bonded1a, 'bonded1b' => $bonded1b, 'bonded1c' => $bonded1c, 'tab_child' => isset($validated['rmd_tab_child']) ? $validated['rmd_tab_child'] : '',
+                'rate_data_general' => $rate_data_general, 'rate_data' => $rate_data, 'service' => $service, 'bonded1a' => $bonded1a, 'bonded1b' => $bonded1b, 'bonded1c' => $bonded1c, 'tab_child' => $validated['rmd_tab_child'] ? $validated['rmd_tab_child'] : $rmd_last['rmd_tab_child'],
                 'count3' => $count3, 'count2' => $count2, 'count1' => $count1, 'total_1' => $total_1, 'total_2' => $total_2, 'total_3' => $total_3, 'mb_type' => Auth::user()->mb_type, 'bonded2a' => $bonded2a, 'count4_2' => $count4_2, 'count3_2' => $count3_2, 'count1_2' => $count1_2, 'count2_2' => $count2_2, 'count_arr2' => $count_arr2, 'arr2' => $arr2,
                 'count_arr3' => $count_arr3, 'arr3' => $arr3, 'bonded3a' => $bonded3a, 'sum3' => $sum3, 'sum2' => $sum2,
                 'count_arr4' => $count_arr4, 'arr4' => $arr4, 'bonded4a' => $bonded4a, 'sum4' => $sum4,
