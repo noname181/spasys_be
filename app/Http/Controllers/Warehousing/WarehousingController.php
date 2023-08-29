@@ -9997,7 +9997,7 @@ class WarehousingController extends Controller
                     $Remark1 = $rgd['warehousing']['w_schedule_number2'] . ($count == 1 ? '' : ('외 ' . ($count - 1) . '건'));
                 } else {
                     $item_name = $rgd['rgd_settlement_number'];
-                    $Remark1 = $rgd['warehousing']['w_schedule_number2'] . ($count == 1 ? '' : ('외 ' . ($count - 1) . '건'));
+                    $Remark1 = $rgd['warehousing']['w_schedule_number2'];
                 }
                 $amount_price += $rgd['rate_data_general']['rdg_supply_price4'];
                 $total_price += $rgd['rate_data_general']['rdg_sum4'];
@@ -10653,7 +10653,7 @@ class WarehousingController extends Controller
                     $Remark1 = $rgd['warehousing']['w_schedule_number2'] . ($count == 1 ? '' : ('외 ' . ($count - 1) . '건'));
                 } else {
                     $item_name = $rgd['rgd_settlement_number'];
-                    $Remark1 = $rgd['warehousing']['w_schedule_number2'] . ($count == 1 ? '' : ('외 ' . ($count - 1) . '건'));
+                    $Remark1 = $rgd['warehousing']['w_schedule_number2'];
                 }
                 $amount_price += $rgd['rate_data_general']['rdg_supply_price4'];
                 $total_price += $rgd['rate_data_general']['rdg_sum4'];
