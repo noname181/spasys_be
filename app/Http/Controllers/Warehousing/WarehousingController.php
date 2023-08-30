@@ -8734,16 +8734,27 @@ class WarehousingController extends Controller
                     $data_item_count =  $data_item_count + 1;
 
                     //Update option
-                    Item::where('item_no', $item->item_no)->update([
-                        'item_option1' =>  isset($d['G']) ? $d['G'] : null,
-                        'item_option2' =>  isset($d['H']) ? $d['H'] : null,
-                    ]);
+                    if(isset($d['G']) && $d['G'] != ""){
+                        Item::where('item_no', $item->item_no)->update([
+                            'item_option1' =>  $d['G']
+                        ]);
+                    }
+
+                    if(isset($d['H']) && $d['H'] != ""){
+                        Item::where('item_no', $item->item_no)->update([
+                            'item_option2' =>  $d['H']
+                        ]);
+                    }
 
                     $custom = collect(['wi_number' => (int)$d['J']]);
 
                     $item = $custom->merge($item);
 
-                    $index = $d['B'] . ',' . $d['I'];
+                    // if(isset($d['B']) && $d['B'] != ""){
+                    //     $index = $d['B'] . ',' . $d['I'];
+                    // }else{     
+                        $index = $item['contract_wms']['co_no'] . ',' . $d['I'];
+                    //}
                     // if (array_key_exists($index, $out)){
                     //     $out[$index] = $d['A'];
                     // }
