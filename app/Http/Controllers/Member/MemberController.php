@@ -356,6 +356,7 @@ class MemberController extends Controller
                 'mb_no' => Auth::user()->mb_no,
                 'co_type' => Member::SPASYS,
                 'co_name' => $validated['mb_name'],
+                'co_owner' => $validated['co_owner'],
                 'co_tel' => isset($validated['mb_tel']) ? $validated['mb_tel'] : '',
                 'co_etc' => $validated['mb_note'],
                 'co_operating_time' => isset($validated['co_operating_time']) ? $validated['co_operating_time'] : '',
@@ -438,6 +439,7 @@ class MemberController extends Controller
 
             Company::where('co_no', $memeber->co_no)->update([
                 'co_operating_time' => $validated['co_operating_time'],
+                'co_owner' => $validated['co_owner'],
                 'co_lunch_break' => $validated['co_lunch_break'],
                 'co_email' => $validated['co_email'],
                 'co_tel' => $validated['mb_tel'],
