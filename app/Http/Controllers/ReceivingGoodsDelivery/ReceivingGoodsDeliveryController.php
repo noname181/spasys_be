@@ -1261,6 +1261,23 @@ class ReceivingGoodsDeliveryController extends Controller
                 }
             }
 
+            // $url = "https://unipass.customs.go.kr:38010/ext/rest/cargCsclPrgsInfoQry/retrieveCargCsclPrgsInfo?crkyCn=s230z262h044b104n070k070a3&cargMtNo=" . $logistic_manage_number . "";
+            //     $ch = curl_init();
+            //     curl_setopt($ch, CURLOPT_URL, $url);
+            //     curl_setopt($ch, CURLOPT_HEADER, 0);
+            //     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // Return data inplace of echoing on screen
+            //     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0); // Skip SSL Verification
+            //     curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+
+            //     //$xmlString = simplexml_load_string(file_get_contents($url));
+            //     $data = curl_exec($ch);
+            //     if ($data === false) {
+            //         $result = curl_error($ch);
+            //     } else {
+            //         $result = $data;
+            //     }
+            //     curl_close($ch);
+
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
