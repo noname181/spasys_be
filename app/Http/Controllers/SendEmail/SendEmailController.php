@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use App\Utils\sendEmail2;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -61,7 +62,7 @@ class SendEmailController extends Controller
                     'otp' => $mb_otp,
                 ];
 
-                // Member::where('mb_email', '=', $validated['mb_email'])->update(['mb_otp' => Hash::make($mb_otp)]);
+                Member::where('mb_email', '=', $validated['mb_email'])->update(['mb_otp' => Hash::make($mb_otp)]);
 
                 // $check =  Mail::to($member->mb_email)->send(new sendEmail($mail_details));
                 Mail::send('emails.mailOTP', ['details' => $mail_details], function ($message) use ($validated, $member) {
