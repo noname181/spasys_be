@@ -77,6 +77,8 @@ class MemberController extends Controller
                 $validated['co_no'] = Auth::user()->co_no;
             }
 
+            $validated['mb_id'] = strtolower($validated['mb_id']);
+
             $check_exists = Member::where('mb_id', $validated['mb_id'])->first();
             if ($check_exists) {
                 return response()->json(['message' => '이미 가입된 ID입니다.'], 500);
@@ -377,7 +379,7 @@ class MemberController extends Controller
                 'mb_name' => $validated['mb_name'],
                 'mb_pw' => $validated['mb_pw'],
                 'mb_tel' => isset($validated['mb_tel']) ? $validated['mb_tel'] : '',
-                'mb_id' => $validated['mb_id'],
+                'mb_id' => strtolower($validated['mb_id']),
                 'mb_note' => $validated['mb_note'],
                 'mb_email' => isset($validated['co_email']) ? $validated['co_email'] : '',
                 'mb_type' => $validated['mb_type'],
