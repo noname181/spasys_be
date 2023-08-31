@@ -648,7 +648,7 @@ class ReceivingGoodsDeliveryController extends Controller
             $response = curl_exec($ch);
             curl_close($ch);
 
-            return $response;
+            //return $response;
             $user = Auth::user();
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
@@ -1302,6 +1302,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 'w_schedule_number2' => isset($w_schedule_number2) ? $w_schedule_number2 : '',
                 'w_no' => isset($w_no) ? $w_no :  $request->w_no,
                 'w_no_alert' => isset($w_no_alert) ? $w_no_alert : null,
+                'response' => isset($response) ? $response : null,
                 //'check_alarm_first' => isset($check_alarm_first) ? $check_alarm_first : null,
             ], 201);
         } catch (\Throwable $e) {
