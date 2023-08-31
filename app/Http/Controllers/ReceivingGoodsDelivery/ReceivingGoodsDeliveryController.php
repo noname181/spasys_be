@@ -617,6 +617,38 @@ class ReceivingGoodsDeliveryController extends Controller
 
         try {
             DB::beginTransaction();
+
+            $tokenheaders  = array();
+
+            array_push($tokenheaders, "content-type: multipart/form-data; charset=utf-8");
+            array_push($tokenheaders, "sejongApiKey: LzRveURKTmJBeEZhZVFWMHJoSUFTRlZobmxweWV6dUk1T25NRzYzbitFbnZXVEtzMjRMZC9DTWkwMFBxREZiWg==");
+
+            $token_url  = "https://apimsg-dev.wideshot.co.kr/api/v1/message/sms";
+
+            $token_request_data = array(
+                'callback' => '16882200',
+                'contents' => 'SMS API테스트 발송 0004',
+                'receiverTelNo' => '01020097723',
+                'userKey' => '001',
+            );
+
+            $req_json  = json_encode($token_request_data, TRUE);
+
+            $ch = curl_init(); // curl 초기화
+
+            curl_setopt($ch, CURLOPT_URL, $token_url);
+            curl_setopt($ch, CURLOPT_POST, false);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $req_json);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $tokenheaders);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+
+            $response = curl_exec($ch);
+            curl_close($ch);
+
+            return $response;
             $user = Auth::user();
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
@@ -1261,22 +1293,6 @@ class ReceivingGoodsDeliveryController extends Controller
                 }
             }
 
-            // $url = "https://unipass.customs.go.kr:38010/ext/rest/cargCsclPrgsInfoQry/retrieveCargCsclPrgsInfo?crkyCn=s230z262h044b104n070k070a3&cargMtNo=" . $logistic_manage_number . "";
-            //     $ch = curl_init();
-            //     curl_setopt($ch, CURLOPT_URL, $url);
-            //     curl_setopt($ch, CURLOPT_HEADER, 0);
-            //     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // Return data inplace of echoing on screen
-            //     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0); // Skip SSL Verification
-            //     curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-
-            //     //$xmlString = simplexml_load_string(file_get_contents($url));
-            //     $data = curl_exec($ch);
-            //     if ($data === false) {
-            //         $result = curl_error($ch);
-            //     } else {
-            //         $result = $data;
-            //     }
-            //     curl_close($ch);
 
             DB::commit();
             return response()->json([
