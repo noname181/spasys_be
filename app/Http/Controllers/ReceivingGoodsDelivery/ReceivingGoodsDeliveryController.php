@@ -19,6 +19,7 @@ use App\Models\ItemChannel;
 use App\Models\Company;
 use App\Models\TaxInvoiceDivide;
 use App\Models\Tax;
+use App\Models\Sms;
 use App\Models\CancelBillHistory;
 //use App\Models\CargoConnect;
 use App\Utils\Messages;
@@ -625,7 +626,7 @@ class ReceivingGoodsDeliveryController extends Controller
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
             $message_url = [];
-            
+
             //Page130146 spasys
             if ($request->page_type == 'Page130146') {
                 $warehousing_data = Warehousing::where('w_no', $request->w_no)->first();
@@ -832,6 +833,13 @@ class ReceivingGoodsDeliveryController extends Controller
                     $phone = trim($package['reciever_contract']);
                     $url = "https://blp.spasysone.com/delivery_confirm/".$request->w_no.'param'.$rgd_data->rgd_no;
 
+                    $sms_no = Sms::insertGetId([
+                        'mb_no' => $member->mb_no,
+                        'callback' => "07046597289",
+                        'receiverTelNo' => $phone,
+                        'contents' => $url,
+                    ]);
+
                     $tokenheaders  = array();
 
                     array_push($tokenheaders, "content-type: multipart/form-data; charset=utf-8");
@@ -840,10 +848,10 @@ class ReceivingGoodsDeliveryController extends Controller
                     $token_url  = "https://apimsg.wideshot.co.kr/api/v1/message/sms";
 
                     $token_request_data = array(
-                        'callback' => '2201250584',
+                        'callback' => '07046597289',
                         'contents' => $url,
-                        'receiverTelNo' => '01020097723',
-                        'userKey' => '001',
+                        'receiverTelNo' => '01075582547',
+                        'userKey' => $sms_no,
                     );
 
                     $req_json  = json_encode($token_request_data, TRUE);
@@ -5026,6 +5034,14 @@ class ReceivingGoodsDeliveryController extends Controller
                     $phone = trim($dataSubmit['reciever_contract']);
                     $url = "https://blp.spasysone.com/delivery_confirm/".$dataSubmit['is_no'].'param'.$rgd['rgd_no'];
 
+                    
+                    $sms_no = Sms::insertGetId([
+                        'mb_no' => $member->mb_no,
+                        'callback' => "07046597289",
+                        'receiverTelNo' => $phone,
+                        'contents' => $url,
+                    ]);
+
                     $tokenheaders  = array();
 
                     array_push($tokenheaders, "content-type: multipart/form-data; charset=utf-8");
@@ -5034,10 +5050,10 @@ class ReceivingGoodsDeliveryController extends Controller
                     $token_url  = "https://apimsg.wideshot.co.kr/api/v1/message/sms";
 
                     $token_request_data = array(
-                        'callback' => '2201250584',
+                        'callback' => '07046597289',
                         'contents' => $url,
-                        'receiverTelNo' => '01020097723',
-                        'userKey' => '001',
+                        'receiverTelNo' => '01075582547',
+                        'userKey' => $sms_no,
                     );
 
                     $req_json  = json_encode($token_request_data, TRUE);
