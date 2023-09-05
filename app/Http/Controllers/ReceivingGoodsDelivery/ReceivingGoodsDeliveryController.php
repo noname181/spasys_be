@@ -618,41 +618,14 @@ class ReceivingGoodsDeliveryController extends Controller
         try {
             DB::beginTransaction();
 
-            $tokenheaders  = array();
-
-            array_push($tokenheaders, "content-type: multipart/form-data; charset=utf-8");
-            array_push($tokenheaders, "sejongApiKey: LzRveURKTmJBeEZhZVFWMHJoSUFTRlZobmxweWV6dUk1T25NRzYzbitFbnZXVEtzMjRMZC9DTWkwMFBxREZiWg==");
-
-            $token_url  = "https://apimsg-dev.wideshot.co.kr/api/v1/message/sms";
-
-            $token_request_data = array(
-                'callback' => '16882200',
-                'contents' => 'SMS API테스트 발송 0004',
-                'receiverTelNo' => '01020097723',
-                'userKey' => '001',
-            );
-
-            $req_json  = json_encode($token_request_data, TRUE);
-
-            $ch = curl_init(); // curl 초기화
-
-            curl_setopt($ch, CURLOPT_URL, $token_url);
-            curl_setopt($ch, CURLOPT_POST, false);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $req_json);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 20);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $tokenheaders);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-
-            $response = curl_exec($ch);
-            curl_close($ch);
+            
 
             //return $response;
             $user = Auth::user();
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
             $member = Member::where('mb_id', Auth::user()->mb_id)->first();
-
+            $message_url = [];
+            
             //Page130146 spasys
             if ($request->page_type == 'Page130146') {
                 $warehousing_data = Warehousing::where('w_no', $request->w_no)->first();
@@ -854,10 +827,41 @@ class ReceivingGoodsDeliveryController extends Controller
                     //}
                 }
 
-                $message_url = [];
+                
                 if (isset($package['reciever_contract'])){
                     $phone = trim($package['reciever_contract']);
                     $url = "https://blp.spasysone.com/delivery_confirm/".$request->w_no.'param'.$rgd_data->rgd_no;
+
+                    $tokenheaders  = array();
+
+                    array_push($tokenheaders, "content-type: multipart/form-data; charset=utf-8");
+                    array_push($tokenheaders, "sejongApiKey: VFlaS05GVi92L21lL3FpTDM2NWhTT25zdVFGOXNuSGthRTdrU2dqekRMVWkwa0ZlZGs0K1E4YlBaamtaL25KMA==");
+
+                    $token_url  = "https://apimsg.wideshot.co.kr/api/v1/message/sms";
+
+                    $token_request_data = array(
+                        'callback' => '2201250584',
+                        'contents' => $url,
+                        'receiverTelNo' => '01020097723',
+                        'userKey' => '001',
+                    );
+
+                    $req_json  = json_encode($token_request_data, TRUE);
+
+                    $ch = curl_init(); // curl 초기화
+
+                    curl_setopt($ch, CURLOPT_URL, $token_url);
+                    curl_setopt($ch, CURLOPT_POST, true);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $token_request_data);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
+                    curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, $tokenheaders);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+
+                    $response = curl_exec($ch);
+                    curl_close($ch);
+
                     $message_url["phone"] = $phone;
                     $message_url["url"] = $url;
                 }
@@ -1292,7 +1296,6 @@ class ReceivingGoodsDeliveryController extends Controller
                     }
                 }
             }
-
 
             DB::commit();
             return response()->json([
@@ -5022,6 +5025,37 @@ class ReceivingGoodsDeliveryController extends Controller
                 if (isset($dataSubmit['reciever_contract'])){
                     $phone = trim($dataSubmit['reciever_contract']);
                     $url = "https://blp.spasysone.com/delivery_confirm/".$dataSubmit['is_no'].'param'.$rgd['rgd_no'];
+
+                    $tokenheaders  = array();
+
+                    array_push($tokenheaders, "content-type: multipart/form-data; charset=utf-8");
+                    array_push($tokenheaders, "sejongApiKey: VFlaS05GVi92L21lL3FpTDM2NWhTT25zdVFGOXNuSGthRTdrU2dqekRMVWkwa0ZlZGs0K1E4YlBaamtaL25KMA==");
+
+                    $token_url  = "https://apimsg.wideshot.co.kr/api/v1/message/sms";
+
+                    $token_request_data = array(
+                        'callback' => '2201250584',
+                        'contents' => $url,
+                        'receiverTelNo' => '01020097723',
+                        'userKey' => '001',
+                    );
+
+                    $req_json  = json_encode($token_request_data, TRUE);
+
+                    $ch = curl_init(); // curl 초기화
+
+                    curl_setopt($ch, CURLOPT_URL, $token_url);
+                    curl_setopt($ch, CURLOPT_POST, true);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $token_request_data);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
+                    curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, $tokenheaders);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+
+                    $response = curl_exec($ch);
+                    curl_close($ch);
+
                     $message_url["phone"] = $phone;
                     $message_url["url"] = $url;
                 }
@@ -5084,6 +5118,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 'message' => Messages::MSG_0007,
                 'is_no' => isset($dataSubmit['is_no']) ? $dataSubmit['is_no'] :  null,
                 'w_no_alert' => isset($w_no_alert) ? $w_no_alert :  null,
+                'response' => isset($response) ? $response : null,
             ], 201);
         } catch (\Throwable $e) {
             DB::rollback();
