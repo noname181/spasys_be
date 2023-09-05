@@ -8812,24 +8812,36 @@ class WarehousingController extends Controller
             ]);
 
             $w_amount = 0;
-
+            $number_amount_array = 0;
             foreach ($value as $k => $warehousing_item) {
                 if ($k !== "connection_number") {
+                    $check_dup =  WarehousingItem::where('w_no', $w_no)->where('item_no', $warehousing_item['item_no'])->first();
 
-                    WarehousingItem::insert([
-                        'item_no' => $warehousing_item['item_no'],
-                        'w_no' => $w_no,
-                        'wi_number' => 0,
-                        'wi_type' => '입고_shipper'
-                    ]);
-
-                    WarehousingItem::insert([
-                        'item_no' => $warehousing_item['item_no'],
-                        'w_no' => $w_no,
-                        'wi_number' => isset($warehousing_item['wi_number']) ? (int)$warehousing_item['wi_number'] : null,
-                        'wi_type' => '입고_spasys'
-                    ]);
-                    $w_amount += (int)$warehousing_item['wi_number'];
+                    if($check_dup === null){
+                        WarehousingItem::insert([
+                            'item_no' => $warehousing_item['item_no'],
+                            'w_no' => $w_no,
+                            'wi_number' => 0,
+                            'wi_type' => '입고_shipper'
+                        ]);
+    
+                        WarehousingItem::insert([
+                            'item_no' => $warehousing_item['item_no'],
+                            'w_no' => $w_no,
+                            'wi_number' => isset($warehousing_item['wi_number']) ? (int)$warehousing_item['wi_number'] : null,
+                            'wi_type' => '입고_spasys'
+                        ]);
+                        $number_amount_array = (int)$warehousing_item['wi_number'];
+                        
+                    }else{
+                        WarehousingItem::where('w_no', $w_no)->where('item_no', $warehousing_item['item_no'])->where('wi_type', '입고_spasys')->update([
+                            'item_no' => $warehousing_item['item_no'],
+                            'w_no' => $w_no,
+                            'wi_number' => $number_amount_array + (int)$warehousing_item['wi_number'],
+                            'wi_type' => '입고_spasys'
+                        ]);
+                    }
+                    $w_amount += (int)$warehousing_item['wi_number'];  
                 }
             }
 
