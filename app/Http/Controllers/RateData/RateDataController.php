@@ -4618,7 +4618,7 @@ class RateDataController extends Controller
                     'rgd_no' => $final_rgd->rgd_no,
                 ]);
 
-                $final_rgd = ReceivingGoodsDelivery::with(['warehousing'])->where('rgd_no', $final_rgd->rgd_no)->first();
+                $final_rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general'])->where('rgd_no', $final_rgd->rgd_no)->first();
 
                 CommonFunc::insert_alarm('[수입풀필먼트] 확정청구서 발송', $final_rgd, $user, null, 'settle_payment', null);
             } else if ($request->bill_type == 'additional' && $request->type != 'edit_additional') {
@@ -5219,7 +5219,7 @@ class RateDataController extends Controller
             Import::where('ti_logistic_manage_number', $request->ti_logistic_manage_number)->update([
                 'ti_co_license' => isset($company->co_license) ? $company->co_license : null,
                 'ti_logistic_type' => isset($request->ti_logistic_type) ? $request->ti_logistic_type : null,
-                // 'ti_i_storeday' => $request->storage_days || $request->storage_days == '0' ? $request->storage_days : $request->storagedays, 
+                // 'ti_i_storeday' => $request->storage_days || $request->storage_days == '0' ? $request->storage_days : $request->storagedays,
             ]);
 
             ImportExpected::where('tie_logistic_manage_number', $request->ti_logistic_manage_number)->update([
