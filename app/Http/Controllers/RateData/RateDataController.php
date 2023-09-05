@@ -4610,7 +4610,9 @@ class RateDataController extends Controller
                 $final_rgd->mb_no = $user->mb_no;
                 $final_rgd->save();
 
-                RateDataGeneral::where('rgd_no_expectation', $previous_rgd->rgd_no)->whereNull('rgd_no')->update([
+                RateDataGeneral::where('rgd_no_expectation', $previous_rgd->rgd_no)->where(function($q) use($previous_rgd) {
+                    $q->whereNull('rgd_no')->orwhere('rgd_no', $previous_rgd->rgd_no);
+                })->update([
                     'rgd_no' => $final_rgd->rgd_no,
                 ]);
 
