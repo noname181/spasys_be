@@ -31,24 +31,24 @@
   @if($service == '보세화물' && $mb_type == 'spasys')
   <div style="width: 100%;border:1px solid black;text-align: center;padding: 20px 0;">
     @if($tab_child == '창고화물')
-    <p style='padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_sum1}}) 예상비용_No{{$rmd_number}}</p>
+    <p style='font-size:16px;padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_sum1}}) 예상비용_No{{$rmd_number}}</p>
     @endif
     @if($tab_child == '위험물')
-    <p style='padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_vat1}}) 예상비용_No{{$rmd_number}}</p>
+    <p style='font-size:16px;padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_vat1}}) 예상비용_No{{$rmd_number}}</p>
     @endif
     @if($tab_child == '온도화물')
-    <p style='padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_supply_price1}}) 예상비용_No{{$rmd_number}}</p>
+    <p style='font-size:16px;padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_supply_price1}}) 예상비용_No{{$rmd_number}}</p>
     @endif
   </div>
-  <div style="width: 100%;margin-bottom:10px;text-align: right;">
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_name}}</p>
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>사업자번호 : {{$co_license}}</p>
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>사업장 주소 : {{$co_address}} {{$co_address_detail}}</p>
+  <div style="width: 100%;margin-bottom:10px;margin-top:10px;text-align: right;">
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>{{$co_name}}</p>
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>사업자번호 : {{$co_license}}</p>
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>사업장 주소 : {{$co_address}} {{$co_address_detail}}</p>
     @if($co_owner)
     @if($co_owner && !$co_email)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$co_owner}}</p>
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$co_owner}}</p>
     @else
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$co_owner}} ({{$co_email}})</p>
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$co_owner}} ({{$co_email}})</p>
     @endif
     @endif
   </div>
@@ -73,28 +73,28 @@
         @if($tab_child == '창고화물')
         <tr>
           <th>{{$rdg_sum1}}</th>
-          <th>{{$rdg_sum2}}</th>
-          <th>{{$rdg_sum3}}</th>
-          <th>{{$rdg_sum4}}</th>
-          <th>{{$rdg_sum5}}</th>
+          <th>{{number_format($rdg_sum2)}}</th>
+          <th>{{number_format($rdg_sum3)}}</th>
+          <th>{{number_format($rdg_sum4)}}</th>
+          <th>{{number_format($rdg_sum5)}}</th>
         </tr>
         @endif
         @if($tab_child == '위험물')
         <tr>
           <th>{{$rdg_vat1}}</th>
-          <th>{{$rdg_vat2}}</th>
-          <th>{{$rdg_vat3}}</th>
-          <th>{{$rdg_vat4}}</th>
-          <th>{{$rdg_vat5}}</th>
+          <th>{{number_format($rdg_vat2)}}</th>
+          <th>{{number_format($rdg_vat3)}}</th>
+          <th>{{number_format($rdg_vat4)}}</th>
+          <th>{{number_format($rdg_vat5)}}</th>
         </tr>
         @endif
         @if($tab_child == '온도화물')
         <tr>
           <th>{{$rdg_supply_price1}}</th>
-          <th>{{$rdg_supply_price2}}</th>
-          <th>{{$rdg_supply_price3}}</th>
-          <th>{{$rdg_supply_price4}}</th>
-          <th>{{$rdg_supply_price5}}</th>
+          <th>{{number_format($rdg_supply_price2)}}</th>
+          <th>{{number_format($rdg_supply_price3)}}</th>
+          <th>{{number_format($rdg_supply_price4)}}</th>
+          <th>{{number_format($rdg_supply_price5)}}</th>
         </tr>
         @endif
       </thead>
@@ -143,29 +143,6 @@
         </tr>
       </tbody>
     </table>
-  </div>
-  <div style="margin:10px 0px;">
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>1. 상세 업무 내역에 따라 예상비용은 변경될 수 있습니다.</p>
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>2. 본 내역은 실제 비용이 아님을 명시합니다.</p>
-  </div>
-  <div style="text-align:right">
-    @if($co_name_send)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_name_send}}</p>
-    @endif
-    @if($co_address_send && $co_address_detail_send)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address_send}} {{$co_address_detail_send}}</p>
-    @elseif($co_address_send)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address_send}}</p>
-    @endif
-    @if($co_tel_send)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_tel_send}}</p>
-    @endif
-    @if($co_email_send)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_email_send}}</p>
-    @endif
-    @if($date)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$date}}</p>
-    @endif
   </div>
   @if($tab_child == '창고화물')
   @if(count($bonded1a) > 0)
@@ -539,30 +516,54 @@
   </div>
   @endif
   @endif
+
+  </div>
+  <div style="margin:10px 0px;">
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>1. 상세 업무 내역에 따라 예상비용은 변경될 수 있습니다.</p>
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>2. 본 내역은 실제 비용이 아님을 명시합니다.</p>
+  </div>
+  <div style="text-align:right">
+    @if($co_name_send)
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>{{$co_name_send}}</p>
+    @endif
+    @if($co_address_send && $co_address_detail_send)
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>{{$co_address_send}} {{$co_address_detail_send}}</p>
+    @elseif($co_address_send)
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>{{$co_address_send}}</p>
+    @endif
+    @if($co_tel_send)
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>{{$co_tel_send}}</p>
+    @endif
+    @if($co_email_send)
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>{{$co_email_send}}</p>
+    @endif
+    @if($date)
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>{{$date}}</p>
+    @endif
   </div>
   @endif
 
   @if($service == '보세화물' && $mb_type != 'spasys')
   <div style="width: 100%;border:1px solid black;text-align: center;padding: 20px 0;">
     @if($tab_child == '창고화물')
-    <p style='padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_sum1}}) 예상비용_No{{$rmd_number}}</p>
+    <p style='font-size:16px;padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_sum1}}) 예상비용_No{{$rmd_number}}</p>
     @endif
     @if($tab_child == '위험물')
-    <p style='padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_vat1}}) 예상비용_No{{$rmd_number}}</p>
+    <p style='font-size:16px;padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_vat1}}) 예상비용_No{{$rmd_number}}</p>
     @endif
     @if($tab_child == '온도화물')
-    <p style='padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_supply_price1}}) 예상비용_No{{$rmd_number}}</p>
+    <p style='font-size:16px;padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_supply_price1}}) 예상비용_No{{$rmd_number}}</p>
     @endif
   </div>
-  <div style="width: 100%;margin-bottom:10px;text-align: right;">
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_name}}</p>
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>사업자번호 : {{$co_license}}</p>
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>사업장 주소 : {{$co_address}} {{$co_address_detail}}</p>
+  <div style="width: 100%;margin-top:10px;margin-bottom:10px;text-align: right;">
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>{{$co_name}}</p>
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>사업자번호 : {{$co_license}}</p>
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>사업장 주소 : {{$co_address}} {{$co_address_detail}}</p>
     @if($co_owner)
     @if($co_owner && !$co_email)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$co_owner}}</p>
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$co_owner}}</p>
     @else
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$co_owner}} ({{$co_email}})</p>
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$co_owner}} ({{$co_email}})</p>
     @endif
     @endif
   </div>
@@ -587,28 +588,28 @@
         @if($tab_child == '창고화물')
         <tr>
           <th>{{$rdg_sum1}}</th>
-          <th>{{$rdg_sum2}}</th>
-          <th>{{$rdg_sum3}}</th>
-          <th>{{$rdg_sum4}}</th>
-          <th>{{$rdg_sum5}}</th>
+          <th>{{number_format($rdg_sum2)}}</th>
+          <th>{{number_format($rdg_sum3)}}</th>
+          <th>{{number_format($rdg_sum4)}}</th>
+          <th>{{number_format($rdg_sum5)}}</th>
         </tr>
         @endif
         @if($tab_child == '위험물')
         <tr>
           <th>{{$rdg_vat1}}</th>
-          <th>{{$rdg_vat2}}</th>
-          <th>{{$rdg_vat3}}</th>
-          <th>{{$rdg_vat4}}</th>
-          <th>{{$rdg_vat5}}</th>
+          <th>{{number_format($rdg_vat2)}}</th>
+          <th>{{number_format($rdg_vat3)}}</th>
+          <th>{{number_format($rdg_vat4)}}</th>
+          <th>{{number_format($rdg_vat5)}}</th>
         </tr>
         @endif
         @if($tab_child == '온도화물')
         <tr>
           <th>{{$rdg_supply_price1}}</th>
-          <th>{{$rdg_supply_price2}}</th>
-          <th>{{$rdg_supply_price3}}</th>
-          <th>{{$rdg_supply_price4}}</th>
-          <th>{{$rdg_supply_price5}}</th>
+          <th>{{number_format($rdg_supply_price2)}}</th>
+          <th>{{number_format($rdg_supply_price3)}}</th>
+          <th>{{number_format($rdg_supply_price4)}}</th>
+          <th>{{number_format($rdg_supply_price5)}}</th>
         </tr>
         @endif
       </thead>
@@ -707,29 +708,7 @@
     </table>
   </div>
   </div>
-  <div style="margin:10px 0px;">
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>1. 상세 업무 내역에 따라 예상비용은 변경될 수 있습니다.</p>
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>2. 본 내역은 실제 비용이 아님을 명시합니다.</p>
-  </div>
-  <div style="text-align:right">
-    @if($co_name_send)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_name_send}}</p>
-    @endif
-    @if($co_address_send && $co_address_detail_send)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address_send}} {{$co_address_detail_send}}</p>
-    @elseif($co_address_send)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address_send}}</p>
-    @endif
-    @if($co_tel_send)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_tel_send}}</p>
-    @endif
-    @if($co_email_send)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_email_send}}</p>
-    @endif
-    @if($date)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$date}}</p>
-    @endif
-  </div>
+
   @if($tab_child == '창고화물')
   @if(count($bonded1a) > 0)
   <div class="page-break"></div>
@@ -2260,23 +2239,46 @@
   </div>
   @endif
   @endif
+  <div style="margin:10px 0px;">
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>1. 상세 업무 내역에 따라 예상비용은 변경될 수 있습니다.</p>
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>2. 본 내역은 실제 비용이 아님을 명시합니다.</p>
+  </div>
+  <div style="text-align:right">
+    @if($co_name_send)
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>{{$co_name_send}}</p>
+    @endif
+    @if($co_address_send && $co_address_detail_send)
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>{{$co_address_send}} {{$co_address_detail_send}}</p>
+    @elseif($co_address_send)
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>{{$co_address_send}}</p>
+    @endif
+    @if($co_tel_send)
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>{{$co_tel_send}}</p>
+    @endif
+    @if($co_email_send)
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>{{$co_email_send}}</p>
+    @endif
+    @if($date)
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>{{$date}}</p>
+    @endif
+  </div>
   @endif
 
   @if($service == '수입풀필먼트')
   <div style="width: 100%;border:1px solid black;text-align: center;padding: 20px 0;">
 
-    <p style='padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>수입풀필먼트 예상비용_No{{$rmd_number}}</p>
+    <p style='font-size:16px;padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>수입풀필먼트 예상비용_No{{$rmd_number}}</p>
 
   </div>
-  <div style="width: 100%;margin-bottom:10px;text-align: right;">
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_name}}</p>
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>사업자번호 : {{$co_license}}</p>
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>사업장 주소 : {{$co_address}} {{$co_address_detail}}</p>
+  <div style="width: 100%;margin-bottom:10px;margin-top:10px;text-align: right;">
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>{{$co_name}}</p>
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>사업자번호 : {{$co_license}}</p>
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>사업장 주소 : {{$co_address}} {{$co_address_detail}}</p>
     @if($co_owner)
     @if($co_owner && !$co_email)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$co_owner}}</p>
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$co_owner}}</p>
     @else
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$co_owner}} ({{$co_email}})</p>
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$co_owner}} ({{$co_email}})</p>
     @endif
     @endif
   </div>
@@ -2331,9 +2333,9 @@
         @if($rate_data_general['rdg_etc5'] || $rate_data_general['rdg_sum5'])
         <tr>
           <td>부자재</td>
-          <td>{{$rate_data_general['rdg_supply_price5']}}</td>
-          <td>{{$rate_data_general['rdg_vat5']}}</td>
-          <td>{{$rate_data_general['rdg_sum5']}}</td>
+          <td>{{number_format($rate_data_general['rdg_supply_price5'])}}</td>
+          <td>{{number_format($rate_data_general['rdg_vat5'])}}</td>
+          <td>{{number_format($rate_data_general['rdg_sum5'])}}</td>
           <td>{{$rate_data_general['rdg_etc5']}}</td>
         </tr>
         @endif
@@ -2347,32 +2349,10 @@
       </tbody>
     </table>
   </div>
-  <div style="margin:10px 0px;">
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>1. 상세 업무 내역에 따라 예상비용은 변경될 수 있습니다.</p>
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>2. 본 내역은 실제 비용이 아님을 명시합니다.</p>
-  </div>
-  <div style="text-align:right">
-    @if($co_name_send)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_name_send}}</p>
-    @endif
-    @if($co_address_send && $co_address_detail_send)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address_send}} {{$co_address_detail_send}}</p>
-    @elseif($co_address_send)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address_send}}</p>
-    @endif
-    @if($co_tel_send)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_tel_send}}</p>
-    @endif
-    @if($co_email_send)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_email_send}}</p>
-    @endif
-    @if($date)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$date}}</p>
-    @endif
-  </div>
+
   @if($rate_data_general['rdg_sum1'] && $rate_data_general['rdg_sum1'] > 0 )
-  <div class="page-break"></div>
-  <div style="border-bottom:1px solid #ddd">
+
+  <div style="margin-top:20px;border-bottom:1px solid #ddd">
     <table id="custom_table">
       <thead>
         <tr>
@@ -2892,8 +2872,8 @@
   </div>
   @endif
   @if($rate_data_general['rdg_sum3'] && $rate_data_general['rdg_sum3'] > 0 )
-  <div class="page-break"></div>
-  <div style="border-bottom:1px solid #ddd">
+
+  <div style="margin-top:20px;border-bottom:1px solid #ddd">
     <table id="custom_table">
       <thead>
         <tr>
@@ -2992,8 +2972,8 @@
   </div>
   @endif
   @if($rate_data_general['rdg_sum4'] && $rate_data_general['rdg_sum4'] > 0 )
-  <div class="page-break"></div>
-  <div style="border-bottom:1px solid #ddd">
+
+  <div style="margin-top:20px;border-bottom:1px solid #ddd">
     <table id="custom_table">
       <thead>
         <tr>
@@ -3200,9 +3180,9 @@
     </table>
   </div>
   @endif
-  @if($rate_data_general['rdg_sum3'] && $rate_data_general['rdg_sum3'] > 0 )
-  <div class="page-break"></div>
-  <div style="border-bottom:1px solid #ddd">
+  @if($rate_data_general['rdg_sum5'] && $rate_data_general['rdg_sum5'] > 0 )
+
+  <div style="margin-top:20px;border-bottom:1px solid #ddd">
     <table id="custom_table">
       <thead>
         <tr>
@@ -3300,22 +3280,45 @@
     </table>
   </div>
   @endif
+  <div style="margin:10px 0px;">
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>1. 상세 업무 내역에 따라 예상비용은 변경될 수 있습니다.</p>
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>2. 본 내역은 실제 비용이 아님을 명시합니다.</p>
+  </div>
+  <div style="text-align:right">
+    @if($co_name_send)
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>{{$co_name_send}}</p>
+    @endif
+    @if($co_address_send && $co_address_detail_send)
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>{{$co_address_send}} {{$co_address_detail_send}}</p>
+    @elseif($co_address_send)
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>{{$co_address_send}}</p>
+    @endif
+    @if($co_tel_send)
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>{{$co_tel_send}}</p>
+    @endif
+    @if($co_email_send)
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>{{$co_email_send}}</p>
+    @endif
+    @if($date)
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>{{$date}}</p>
+    @endif
+  </div>
   @endif
   @if($service == '유통가공')
   <div style="width: 100%;border:1px solid black;text-align: center;padding: 20px 0;">
 
-    <p style='padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>유통가공 예상비용_No{{$rmd_number}}</p>
+    <p style='font-size:16px;padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>유통가공 예상비용_No{{$rmd_number}}</p>
 
   </div>
-  <div style="width: 100%;margin-bottom:10px;text-align: right;">
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_name}}</p>
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>사업자번호 : {{$co_license}}</p>
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>사업장 주소 : {{$co_address}} {{$co_address_detail}}</p>
+  <div style="width: 100%;margin-bottom:10px;margin-top:10px;text-align: right;">
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>{{$co_name}}</p>
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>사업자번호 : {{$co_license}}</p>
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>사업장 주소 : {{$co_address}} {{$co_address_detail}}</p>
     @if($co_owner)
     @if($co_owner && !$co_email)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$co_owner}}</p>
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$co_owner}}</p>
     @else
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$co_owner}} ({{$co_email}})</p>
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$co_owner}} ({{$co_email}})</p>
     @endif
     @endif
   </div>
@@ -3359,32 +3362,9 @@
       </tbody>
     </table>
   </div>
-  <div style="margin:10px 0px;">
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>1. 상세 업무 내역에 따라 예상비용은 변경될 수 있습니다.</p>
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>2. 본 내역은 실제 비용이 아님을 명시합니다.</p>
-  </div>
-  <div style="text-align:right">
-    @if($co_name_send)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_name_send}}</p>
-    @endif
-    @if($co_address_send && $co_address_detail_send)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address_send}} {{$co_address_detail_send}}</p>
-    @elseif($co_address_send)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address_send}}</p>
-    @endif
-    @if($co_tel_send)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_tel_send}}</p>
-    @endif
-    @if($co_email_send)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_email_send}}</p>
-    @endif
-    @if($date)
-    <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$date}}</p>
-    @endif
-  </div>
   @if($rate_data_general['rdg_sum1'] && $rate_data_general['rdg_sum1'] > 0 )
-  <div class="page-break"></div>
-  <div style="border-bottom:1px solid #ddd">
+
+  <div style="margin-top:20px;border-bottom:1px solid #ddd">
     <table id="custom_table">
       <thead>
         <tr>
@@ -4130,6 +4110,29 @@
     </table>
   </div>
   @endif
+  <div style="margin:10px 0px;">
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>1. 상세 업무 내역에 따라 예상비용은 변경될 수 있습니다.</p>
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>2. 본 내역은 실제 비용이 아님을 명시합니다.</p>
+  </div>
+  <div style="text-align:right">
+    @if($co_name_send)
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>{{$co_name_send}}</p>
+    @endif
+    @if($co_address_send && $co_address_detail_send)
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>{{$co_address_send}} {{$co_address_detail_send}}</p>
+    @elseif($co_address_send)
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>{{$co_address_send}}</p>
+    @endif
+    @if($co_tel_send)
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>{{$co_tel_send}}</p>
+    @endif
+    @if($co_email_send)
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>{{$co_email_send}}</p>
+    @endif
+    @if($date)
+    <p style='font-size:12px;padding:0px;margin:0px;margin-top:5px;font-family: "unbatang", Times, serif'>{{$date}}</p>
+    @endif
+  </div>
   @endif
 
 </body>

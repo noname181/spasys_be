@@ -35,16 +35,16 @@
 
 <body>
    <div style="width: 100%;border:1px solid black;text-align: center;padding: 20px 0;">
-      <p style='padding:0px;font-family: "unbatang", Times, serif'>{{$rm_biz_name}}</p>
+      <p style='font-size:16px;padding:0px;font-family: "unbatang", Times, serif'>{{$rm_biz_name}}</p>
    </div>
-   <div style="width: 100%;margin-bottom:10px;text-align: right;">
-      <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>사업자번호 : {{$rm_biz_number}}</p>
-      <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>사업장 주소 : {{$rm_biz_address}}</p>
+   <div style="width: 100%;margin-top:10px;margin-bottom:10px;text-align: right;">
+      <p style='margin:0px;font-size:12px;margin-top:5px;padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>사업자번호 : {{$rm_biz_number}}</p>
+      <p style='margin:0px;font-size:12px;margin-top:5px;padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>사업장 주소 : {{$rm_biz_address}}</p>
       @if($rm_owner_name)
       @if($rm_owner_name && !$rm_biz_email)
-      <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$rm_owner_name}}</p>
+      <p style='margin:0px;font-size:12px;margin-top:5px;padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$rm_owner_name}}</p>
       @else
-      <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$rm_owner_name}} ({{$rm_biz_email}})</p>
+      <p style='margin:0px;font-size:12px;margin-top:5px;padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>대표자명 : {{$rm_owner_name}} ({{$rm_biz_email}})</p>
       @endif
       @endif
    </div>
@@ -1303,27 +1303,27 @@
    </div>
    @endif
    <div style="margin:10px 0px;">
-      <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>1. 이 요율표의 유효기간은 제출일자로부터 1개월 입니다.</p>
-      <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>2. 이 견적 금액은 부가가치세 별도 금액입니다.</p>
-      <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>3. 상세 업무 내역에 따라 제공 요율은 변경될 수 있습니다.</p>
+      <p style='margin:0px;font-size:12px;margin-top:5px;padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>1. 이 요율표의 유효기간은 제출일자로부터 1개월 입니다.</p>
+      <p style='margin:0px;font-size:12px;margin-top:5px;padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>2. 이 견적 금액은 부가가치세 별도 금액입니다.</p>
+      <p style='margin:0px;font-size:12px;margin-top:5px;padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>3. 상세 업무 내역에 따라 제공 요율은 변경될 수 있습니다.</p>
    </div>
    <div style="text-align:right">
       @if($co_name)
-      <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_name}}</p>
+      <p style='margin:0px;font-size:12px;margin-top:5px;padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_name}}</p>
       @endif
       @if($co_address && $co_address_detail)
-      <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address}} {{$co_address_detail}}</p>
+      <p style='margin:0px;font-size:12px;margin-top:5px;padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address}} {{$co_address_detail}}</p>
       @elseif($co_address)
-      <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address}}</p>
+      <p style='margin:0px;font-size:12px;margin-top:5px;padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_address}}</p>
       @endif
       @if($co_tel)
-      <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_tel}}</p>
+      <p style='margin:0px;font-size:12px;margin-top:5px;padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_tel}}</p>
       @endif
       @if($co_email)
-      <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_email}}</p>
+      <p style='margin:0px;font-size:12px;margin-top:5px;padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$co_email}}</p>
       @endif
       @if($date)
-      <p style='padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$date}}</p>
+      <p style='margin:0px;font-size:12px;margin-top:5px;padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>{{$date}}</p>
       @endif
    </div>
 </body>
