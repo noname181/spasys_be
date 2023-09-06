@@ -7213,10 +7213,10 @@ class WarehousingController extends Controller
             if($today < $request->tax_date){
                 $check_tax_date = 2;
             }
-
+            $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general', 't_import_expected'])->where('rgd_no', $request->rgd_no)->first();
 
             if ($request->is_edit == 'y' && $check_tax_date == 1) {
-                $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general', 't_import_expected'])->where('rgd_no', $request->rgd_no)->first();
+                
                 $count = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general', 't_import_expected'])->where('rgd_tax_invoice_number', $rgd->rgd_tax_invoice_number)->count();
 
                 if ($count > 1) {
@@ -7273,8 +7273,10 @@ class WarehousingController extends Controller
                         $id = $tid_->first()->tid_no;
 
                         //$tax_number = CommonFunc::generate_tax_number($id,$request->rgd_no);
-                        if($check_tax_date == 1){
+                        if($check_tax_date == 1 && $rgd->rgd_status7 == 'taxed'){
                             $api = $this->update_tax_invoice_api($rgd, $user, $tid, $tid['tid_number'], null, $request['company'], $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null);
+                        }else if($check_tax_date == 1) {
+                            $api = $this->tax_invoice_api($rgd, $user, $tid, $tid['tid_number'], null, null, $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null);
                         }
                         if ($key == 0) {
                             $cbh = CancelBillHistory::insertGetId([
@@ -7411,7 +7413,7 @@ class WarehousingController extends Controller
                     'txt' => '',
                 ];
 
-                if ($request->is_edit == 'y') {
+                if ($request->is_edit == 'y'  && $rgd->rgd_status7 == 'taxed') {
                     $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general'])->where('rgd_no', $request->rgd_no)->first();
 
                     if($check_tax_date == 1){
@@ -7464,7 +7466,33 @@ class WarehousingController extends Controller
                             'rgd_schedule_issue_tax_invoice' => $request->tax_date
                         ]);
                     }
-                } else {
+                } else if ($check_tax_date == 1 && $request->is_edit == 'y' && $rgd->rgd_status7 == 'request_taxed'){
+                    $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general'])->where('rgd_no', $request->rgd_no)->first();
+                    $tax_number = $rgd->rgd_tax_invoice_number;
+                    
+                    foreach ($request->tid_list as $key => $tid) {
+
+                        if (isset($tid['tid_no'])) {
+                            // if(false){
+                            $tid_ = TaxInvoiceDivide::where('tid_no', $tid['tid_no']);
+                            $tid_->update([
+                                'tid_supply_price' => $tid['tid_supply_price'],
+                                'tid_vat' => $tid['tid_vat'],
+                                'tid_sum' => $tid['tid_sum'],
+                                'rgd_no' => isset($tid['rgd_no']) ? $tid['rgd_no'] : $request->rgd_no,
+                                'rgd_number' => isset($tid['rgd_number']) ? $tid['rgd_number'] : $rgd->rgd_settlement_number,
+                                'co_license' => $request['company']['co_license'],
+                                'co_owner' => $request['company']['co_owner'],
+                                'co_name' => $request['company']['co_name'],
+                                'co_major' => $request['company']['co_major'],
+                                'co_address' => $request['company']['co_address'],
+                                'co_email' => $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null,
+                                'co_email2' => $request['ag']['ag_email2'] ? $request['ag']['ag_email2'] : null,
+                                'mb_no' => $user->mb_no,
+                            ]);
+                        }
+                    }
+                } else if ($rgd->rgd_status7 != 'taxed' && $rgd->rgd_status7 != 'request_taxed'){
                     $id = TaxInvoiceDivide::insertGetId([
                         'tid_supply_price' => $request->supply_price,
                         'tid_vat' => $request->vat,
