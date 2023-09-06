@@ -7208,8 +7208,14 @@ class WarehousingController extends Controller
     {
         try {
             DB::beginTransaction();
+            $today = date("Y-m-d");
+            $check_tax_date = 1;
+            if($today < $request->tax_date){
+                $check_tax_date = 2;
+            }
 
-            if ($request->is_edit == 'y') {
+
+            if ($request->is_edit == 'y' && $check_tax_date == 1) {
                 $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general', 't_import_expected'])->where('rgd_no', $request->rgd_no)->first();
                 $count = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general', 't_import_expected'])->where('rgd_tax_invoice_number', $rgd->rgd_tax_invoice_number)->count();
 
@@ -7219,7 +7225,12 @@ class WarehousingController extends Controller
                 }
             }
 
-
+         
+            // return response()->json([
+            //     'check_tax_date' => $check_tax_date,
+            //     'today' => $today,
+            //     'tax_date' => $request->tax_date,
+            // ]);
 
             if ($request->type == 'option') {
                 $user = Auth::user();
@@ -7228,7 +7239,14 @@ class WarehousingController extends Controller
 
                 $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general', 't_import_expected', 't_import'])->where('rgd_no', $request->rgd_no)->first();
 
-                CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $user, null, 'settle_payment', null);
+                if($check_tax_date == 1){
+                    CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $user, null, 'settle_payment', null);
+                }
+
+                $api = [
+                    'message' => '',
+                    'txt' => '',
+                ];
 
                 $i = 0;
 
@@ -7255,9 +7273,9 @@ class WarehousingController extends Controller
                         $id = $tid_->first()->tid_no;
 
                         //$tax_number = CommonFunc::generate_tax_number($id,$request->rgd_no);
-
-                        $api = $this->update_tax_invoice_api($rgd, $user, $tid, $tid['tid_number'], null, $request['company'], $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null);
-
+                        if($check_tax_date == 1){
+                            $api = $this->update_tax_invoice_api($rgd, $user, $tid, $tid['tid_number'], null, $request['company'], $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null);
+                        }
                         if ($key == 0) {
                             $cbh = CancelBillHistory::insertGetId([
                                 'rgd_no' => $request->rgd_no,
@@ -7296,58 +7314,77 @@ class WarehousingController extends Controller
 
                         $tax_number = CommonFunc::generate_tax_number($id, $request->rgd_no);
 
-                        $api = $this->tax_invoice_api($rgd, $user, $tid, $tax_number, null, null, $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null);
+                        if($check_tax_date == 1){
+                            $api = $this->tax_invoice_api($rgd, $user, $tid, $tax_number, null, null, $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null);
 
+                            if ($rgd['rgd_status6'] == 'paid' && $i == 0) {
+                                CancelBillHistory::insertGetId([
+                                    'rgd_no' => $rgd['rgd_no'],
+                                    'mb_no' => $user->mb_no,
+                                    'cbh_type' => 'tax',
+                                    'cbh_status_before' => $rgd['rgd_status8'],
+                                    'cbh_status_after' => 'completed'
+                                ]);
+    
+                                ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
+                                    'rgd_status8' => 'completed',
+                                ]);
+    
+                                //UPDATE EST BILL
+                                $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
+                                if ($est_rgd->rgd_status8 != 'completed') {
+                                    ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
+                                        'rgd_status8' => 'completed',
+                                    ]);
+                                    CancelBillHistory::insertGetId([
+                                        'rgd_no' => $est_rgd->rgd_no,
+                                        'mb_no' => $user->mb_no,
+                                        'cbh_type' => 'tax',
+                                        'cbh_status_before' => $est_rgd->rgd_status8,
+                                        'cbh_status_after' => 'completed'
+                                    ]);
+                                }
+                            }
+                        }
                         TaxInvoiceDivide::where('tid_no', $id)->update([
                             'tid_number' => $tax_number ? $tax_number : null,
                         ]);
-
-                        if ($rgd['rgd_status6'] == 'paid' && $i == 0) {
-                            CancelBillHistory::insertGetId([
-                                'rgd_no' => $rgd['rgd_no'],
-                                'mb_no' => $user->mb_no,
-                                'cbh_type' => 'tax',
-                                'cbh_status_before' => $rgd['rgd_status8'],
-                                'cbh_status_after' => 'completed'
-                            ]);
-
-                            ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
-                                'rgd_status8' => 'completed',
-                            ]);
-
-                            //UPDATE EST BILL
-                            $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
-                            if ($est_rgd->rgd_status8 != 'completed') {
-                                ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
-                                    'rgd_status8' => 'completed',
-                                ]);
-                                CancelBillHistory::insertGetId([
-                                    'rgd_no' => $est_rgd->rgd_no,
-                                    'mb_no' => $user->mb_no,
-                                    'cbh_type' => 'tax',
-                                    'cbh_status_before' => $est_rgd->rgd_status8,
-                                    'cbh_status_after' => 'completed'
-                                ]);
-                            }
-                        }
-
                         $i++;
                     }
                     $ids[] = $id;
                 }
 
-                if ($request->is_edit == 'y' && $request->tid_list[0]['tid_type'] == 'add_all') {
-                    ReceivingGoodsDelivery::where('tid_no', $request->tid_list[0]['tid_no'])->update([
-                        'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
-                        'rgd_status7' => 'taxed',
-                        'rgd_tax_invoice_number' => isset($tax_number) ? $tax_number : (isset($api['tax_number']) ? $api['tax_number'] : null),
-                    ]);
-                } else {
-                    ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-                        'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
-                        'rgd_status7' => 'taxed',
-                        'rgd_tax_invoice_number' => isset($tax_number) ? $tax_number : (isset($api['tax_number']) ? $api['tax_number'] : null),
-                    ]);
+                if($check_tax_date == 1){
+
+                    if ($request->is_edit == 'y' && $request->tid_list[0]['tid_type'] == 'add_all') {
+                        ReceivingGoodsDelivery::where('tid_no', $request->tid_list[0]['tid_no'])->update([
+                            'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
+                            'rgd_status7' => 'taxed',
+                            'rgd_tax_invoice_number' => isset($tax_number) ? $tax_number : (isset($api['tax_number']) ? $api['tax_number'] : null),
+                        ]);
+                    } else {
+                        ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                            'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
+                            'rgd_status7' => 'taxed',
+                            'rgd_tax_invoice_number' => isset($tax_number) ? $tax_number : (isset($api['tax_number']) ? $api['tax_number'] : null),
+                        ]);
+                    }
+                }else {
+                    if ($request->is_edit == 'y' && $request->tid_list[0]['tid_type'] == 'add_all') {
+                        ReceivingGoodsDelivery::where('tid_no', $request->tid_list[0]['tid_no'])->update([
+                           
+                            'rgd_status7' => 'request_taxed',
+                            
+                            'rgd_schedule_issue_tax_invoice' => $request->tax_date
+                        ]);
+                    } else {
+                        ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+
+                            'rgd_status7' => 'request_taxed',
+               
+                            'rgd_schedule_issue_tax_invoice' => $request->tax_date
+                        ]);
+                    }
                 }
 
                 TaxInvoiceDivide::where('rgd_no', $request->rgd_no)
@@ -7366,157 +7403,67 @@ class WarehousingController extends Controller
                     'api_message' => isset($api['txt']) ? $api['txt'] : null,
                 ]);
             }
-            // NOT USE MORE
-            // else if ($request->type == 'receipt') {
-            //     $user = Auth::user();
-
-            //     $tids = CashReceipt::where('rgd_no', $request->rgd_no)->get();
-            //     $tax_number = CommonFunc::generate_tax_number($request->rgd_no);
-
-            //     $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-            //         'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
-            //         'rgd_tax_invoice_number' => $tax_number ? $tax_number : null,
-            //         'rgd_status7' => 'receipted',
-            //     ]);
-
-            //     foreach ($request->tid_list as $tid) {
-            //         if (isset($tid['cr_no'])) {
-            //             // if(false){
-            //             $tid_ = CashReceipt::where('cr_no', $tid['cr_no']);
-            //             $tid_->update([
-            //                 'cr_supply_price' => $tid['tid_supply_price'],
-            //                 'cr_vat' => $tid['tid_vat'],
-            //                 'cr_sum' => $tid['tid_sum'],
-            //                 'rgd_no' => isset($tid['rgd_no']) ? $tid['rgd_no'] : $request->rgd_no,
-            //                 'cr_number' => isset($tid['tid_number']) ? $tid['tid_number'] : null,
-            //                 'co_license' => $request['company']['co_license'],
-            //                 'co_owner' => $request['company']['co_owner'],
-            //                 'co_name' => $request['company']['co_name'],
-            //                 'co_major' => $request['company']['co_major'],
-            //                 'co_address' => $request['company']['co_address'],
-            //                 'rgd_number' => $tax_number ? $tax_number : null,
-            //                 'mb_no' => $user->mb_no,
-            //             ]);
-            //             $id = $tid_->first()->tid_no;
-
-            //             $cbh = CancelBillHistory::insertGetId([
-            //                 'rgd_no' => $request->rgd_no,
-            //                 'mb_no' => $user->mb_no,
-            //                 'cbh_type' => 'tax',
-            //                 'cbh_status_after' => 'edited'
-            //             ]);
-            //         } else {
-            //             $id = CashReceipt::insertGetId([
-            //                 'cr_supply_price' => $tid['tid_supply_price'],
-            //                 'cr_vat' => $tid['tid_vat'],
-            //                 'cr_sum' => $tid['tid_sum'],
-            //                 'rgd_no' => isset($tid['rgd_no']) ? $tid['rgd_no'] : $request->rgd_no,
-            //                 'cr_number' => isset($tid['tid_number']) ? $tid['tid_number'] : null,
-            //                 'co_license' => $request['company']['co_license'],
-            //                 'co_owner' => $request['company']['co_owner'],
-            //                 'co_name' => $request['company']['co_name'],
-            //                 'co_major' => $request['company']['co_major'],
-            //                 'co_address' => $request['company']['co_address'],
-            //                 'rgd_number' => $tax_number ? $tax_number : null,
-            //                 'mb_no' => $user->mb_no,
-            //             ]);
-
-            //             $cbh = CancelBillHistory::insertGetId([
-            //                 'rgd_no' => $request->rgd_no,
-            //                 'mb_no' => $user->mb_no,
-            //                 'cbh_type' => 'tax',
-            //                 'cbh_status_after' => 'taxed'
-            //             ]);
-
-            //             if ($rgd['rgd_status6'] == 'paid') {
-            //                 CancelBillHistory::insertGetId([
-            //                     'rgd_no' => $rgd['rgd_no'],
-            //                     'mb_no' => $user->mb_no,
-            //                     'cbh_type' => 'tax',
-            //                     'cbh_status_before' => $rgd['rgd_status8'],
-            //                     'cbh_status_after' => 'completed'
-            //                 ]);
-
-            //                 ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
-            //                     'rgd_status8' => 'completed',
-            //                 ]);
-
-            //                 //UPDATE EST BILL
-            //                 $est_rgd = ReceivingGoodsDelivery::where('rgd_no', $rgd->rgd_parent_no)->first();
-            //                 if ($est_rgd->rgd_status8 != 'completed') {
-            //                     ReceivingGoodsDelivery::where('rgd_no', $est_rgd->rgd_no)->update([
-            //                         'rgd_status8' => 'completed',
-            //                     ]);
-            //                     CancelBillHistory::insertGetId([
-            //                         'rgd_no' => $est_rgd->rgd_no,
-            //                         'mb_no' => $user->mb_no,
-            //                         'cbh_type' => 'tax',
-            //                         'cbh_status_before' => $est_rgd->rgd_status8,
-            //                         'cbh_status_after' => 'completed'
-            //                     ]);
-            //                 }
-            //             }
-            //         }
-            //         $ids[] = $id;
-            //     }
-            //     CashReceipt::where('rgd_no', $request->rgd_no)
-            //         ->whereNotIn('cr_no', $ids)->delete();
-
-            //     DB::commit();
-            //     return response()->json([
-            //         'message' => Messages::MSG_0007,
-            //         'cr_list' => $tids,
-            //     ]);
-            // }
             else if ($request->type == 'add_all') {
                 $user = Auth::user();
+
+                $api = [
+                    'message' => '',
+                    'txt' => '',
+                ];
 
                 if ($request->is_edit == 'y') {
                     $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general'])->where('rgd_no', $request->rgd_no)->first();
 
-                    $tax = Tax::where('t_mgtnum', $rgd->rgd_tax_invoice_number)->first();
+                    if($check_tax_date == 1){
 
-                    $pieces = explode('_', $tax->t_mgtnum);
-                    $last_word = array_pop($pieces);
-                    $count_last_word = ((int)$last_word + 1);
+                        $tax = Tax::where('t_mgtnum', $rgd->rgd_tax_invoice_number)->first();
 
-                    $tax_number =  substr_replace($tax->t_mgtnum, $count_last_word, -1);
+                        $pieces = explode('_', $tax->t_mgtnum);
+                        $last_word = array_pop($pieces);
+                        $count_last_word = ((int)$last_word + 1);
 
-                    TaxInvoiceDivide::where('tid_number',  $rgd->rgd_tax_invoice_number)->update([
-                        'tid_number' => $tax_number ? $tax_number : null,
-                    ]);
+                        $tax_number =  substr_replace($tax->t_mgtnum, $count_last_word, -1);
 
-                    $BaroService_URL = 'https://testws.baroservice.com/TI.asmx?wsdl';
+                        TaxInvoiceDivide::where('tid_number',  $rgd->rgd_tax_invoice_number)->update([
+                            'tid_number' => $tax_number ? $tax_number : null,
+                        ]);
 
-                    $CERTKEY = '813FD596-7CBB-490A-84D2-31570487790E';
-                    //인증키
-                    $BaroService_TI = new SoapClient($BaroService_URL, array(
-                        'trace'        => 'true',
-                        'encoding'    => 'UTF-8'
-                    ));
-                    //Cancel old invoice
+                        $BaroService_URL = 'https://testws.baroservice.com/TI.asmx?wsdl';
 
-                    $procType = "ISSUE_CANCEL";
+                        $CERTKEY = '813FD596-7CBB-490A-84D2-31570487790E';
+                        //인증키
+                        $BaroService_TI = new SoapClient($BaroService_URL, array(
+                            'trace'        => 'true',
+                            'encoding'    => 'UTF-8'
+                        ));
+                        //Cancel old invoice
 
-                    $Result = $BaroService_TI->ProcTaxInvoice(array(
-                        'CERTKEY'    => $CERTKEY,
-                        'CorpNum'    => '2168142360',
-                        'MgtKey'    => $rgd->rgd_tax_invoice_number,
-                        'ProcType'    => $procType,
-                    ))->ProcTaxInvoiceResult;
+                        $procType = "ISSUE_CANCEL";
 
-                    if ($Result < 0) { // 호출 실패
-                        DB::rollBack();
-                        return response()->json([
-                            'message' => Messages::MSG_0007,
-                            'api' => "tax_err",
-                            'api_message' => $Result,
+                        $Result = $BaroService_TI->ProcTaxInvoice(array(
+                            'CERTKEY'    => $CERTKEY,
+                            'CorpNum'    => '2168142360',
+                            'MgtKey'    => $rgd->rgd_tax_invoice_number,
+                            'ProcType'    => $procType,
+                        ))->ProcTaxInvoiceResult;
+
+                        if ($Result < 0) { // 호출 실패
+                            DB::rollBack();
+                            return response()->json([
+                                'message' => Messages::MSG_0007,
+                                'api' => "tax_err",
+                                'api_message' => $Result,
+                            ]);
+                        }
+
+                        Tax::where('t_mgtnum', $rgd->rgd_tax_invoice_number)->update([
+                            't_status' => 0,
+                        ]);
+                    }else {
+                        ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                            'rgd_schedule_issue_tax_invoice' => $request->tax_date
                         ]);
                     }
-
-                    Tax::where('t_mgtnum', $rgd->rgd_tax_invoice_number)->update([
-                        't_status' => 0,
-                    ]);
                 } else {
                     $id = TaxInvoiceDivide::insertGetId([
                         'tid_supply_price' => $request->supply_price,
@@ -7543,21 +7490,25 @@ class WarehousingController extends Controller
 
                 $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general', 't_import_expected', 't_import'])->where('rgd_no', $request->rgd_no)->first();
 
-                $api = $this->tax_invoice_api($rgd, $user, null, $tax_number, $request->rgds, null, $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null);
+                if($check_tax_date == 1){
+                    $api = $this->tax_invoice_api($rgd, $user, null, $tax_number, $request->rgds, null, $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null);
+                }
 
                 foreach ($request->rgds as $rgd) {
 
 
                     $rgd_ = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
-                        'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
+                        'rgd_tax_invoice_date' => $check_tax_date == 1 ? Carbon::now()->toDateTimeString() : null,
                         'rgd_tax_invoice_number' => $tax_number ? $tax_number : null,
-                        'rgd_status7' => 'taxed',
+                        'rgd_status7' => $check_tax_date == 1 ? 'taxed' : 'request_taxed',
                         'tid_no' => $request->is_edit == 'y' ? $rgd['tid_no'] : $id
                     ]);
 
                     $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general', 't_import_expected'])->where('rgd_no', $rgd['rgd_no'])->first();
-
-                    CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $user, null, 'settle_payment', null);
+                    
+                    if($check_tax_date == 1){
+                        CommonFunc::insert_alarm('[공통] 계산서발행 안내', $rgd, $user, null, 'settle_payment', null);
+                    }
 
                     $cbh = CancelBillHistory::insertGetId([
                         'rgd_no' => $rgd['rgd_no'],
@@ -7566,7 +7517,7 @@ class WarehousingController extends Controller
                         'cbh_status_after' => 'taxed'
                     ]);
 
-                    if ($rgd['rgd_status6'] == 'paid') {
+                    if ($rgd['rgd_status6'] == 'paid' && $check_tax_date == 1) {
                         CancelBillHistory::insertGetId([
                             'rgd_no' => $rgd['rgd_no'],
                             'mb_no' => $user->mb_no,
@@ -7593,6 +7544,10 @@ class WarehousingController extends Controller
                                 'cbh_status_after' => 'completed'
                             ]);
                         }
+                    }else {
+                        ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                            'rgd_schedule_issue_tax_invoice' => $request->tax_date
+                        ]);
                     }
                 }
 
