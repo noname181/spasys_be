@@ -1349,34 +1349,34 @@ class SendEmailController extends Controller
         $pdf->save($file_name_download);
 
         try {
-            // $push = SendEmailHistory::insertGetId([
-            //     'mb_no' => Auth::user()->mb_no,
-            //     'rm_no' => isset($validated['rm_no']) ? $validated['rm_no'] : null,
-            //     'rmd_no' => isset($validated['rmd_no']) ? $validated['rmd_no'] : null,
-            //     'se_email_cc' => $validated['se_email_cc'],
-            //     'se_email_receiver' => $validated['se_email_receiver'],
-            //     'se_name_receiver' => $validated['se_name_receiver'],
-            //     'se_title' => $validated['se_title'],
-            //     'se_content' => $validated['se_content'],
-            //     'se_rmd_number' => isset($validated['rmd_number']) ? $validated['rmd_number'] : null,
-            //     'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
-            //     'updated_at' => Carbon::now()->format('Y-m-d H:i:s')
-            // ]);
-            // $mail_details = [
-            //     'title' => $validated['se_title'],
-            //     'body' => nl2br($validated['se_content']),
-            // ];
-            // $path2 = '/var/www/html/' . $file_name_download;
-            // Mail::send('emails.quotation', ['details' => $mail_details], function ($message) use ($validated, $path2) {
-            //     $message->to($validated['se_email_receiver'])->from('Bonded_Logistics_Platform@spasysone.com');
-            //     if ($validated['se_email_cc']) {
-            //         $message->cc([$validated['se_email_cc']]);
-            //     }
-            //     $message->subject($validated['se_title']);
+            $push = SendEmailHistory::insertGetId([
+                'mb_no' => Auth::user()->mb_no,
+                'rm_no' => isset($validated['rm_no']) ? $validated['rm_no'] : null,
+                'rmd_no' => isset($validated['rmd_no']) ? $validated['rmd_no'] : null,
+                'se_email_cc' => $validated['se_email_cc'],
+                'se_email_receiver' => $validated['se_email_receiver'],
+                'se_name_receiver' => $validated['se_name_receiver'],
+                'se_title' => $validated['se_title'],
+                'se_content' => $validated['se_content'],
+                'se_rmd_number' => isset($validated['rmd_number']) ? $validated['rmd_number'] : null,
+                'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                'updated_at' => Carbon::now()->format('Y-m-d H:i:s')
+            ]);
+            $mail_details = [
+                'title' => $validated['se_title'],
+                'body' => nl2br($validated['se_content']),
+            ];
+            $path2 = '/var/www/html/' . $file_name_download;
+            Mail::send('emails.quotation', ['details' => $mail_details], function ($message) use ($validated, $path2) {
+                $message->to($validated['se_email_receiver'])->from('Bonded_Logistics_Platform@spasysone.com');
+                if ($validated['se_email_cc']) {
+                    $message->cc([$validated['se_email_cc']]);
+                }
+                $message->subject($validated['se_title']);
 
 
-            //     $message->attach($path2);
-            // });
+                $message->attach($path2);
+            });
 
             return response()->json([
                 'message' => Messages::MSG_0007,

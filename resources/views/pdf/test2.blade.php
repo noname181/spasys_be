@@ -2282,9 +2282,12 @@
     @endif
     @endif
   </div>
-  <div style="border-bottom:1px solid #ddd">
+  <div>
     <table id="custom_table">
       <thead>
+        <tr>
+          <td colspan="5">합계</td>
+        </tr>
         <tr>
           <th>항목</th>
           <th>공급가</th>
@@ -2352,9 +2355,12 @@
 
   @if($rate_data_general['rdg_sum1'] && $rate_data_general['rdg_sum1'] > 0 )
 
-  <div style="margin-top:20px;border-bottom:1px solid #ddd">
+  <div style="margin-top:10px">
     <table id="custom_table">
       <thead>
+        <tr>
+          <td colspan="9">입/출고료</td>
+        </tr>
         <tr>
           <td colspan="2">항목</td>
           <td>단위</td>
@@ -2747,9 +2753,12 @@
   @endif
   @if($rate_data_general['rdg_sum2'] && $rate_data_general['rdg_sum2'] > 0 )
   <div class="page-break"></div>
-  <div style="border-bottom:1px solid #ddd">
+  <div>
     <table id="custom_table">
       <thead>
+        <tr>
+          <td colspan="9">국내운송료</td>
+        </tr>
         <tr>
           <td colspan="2">항목</td>
           <td>단위</td>
@@ -2873,9 +2882,12 @@
   @endif
   @if($rate_data_general['rdg_sum3'] && $rate_data_general['rdg_sum3'] > 0 )
 
-  <div style="margin-top:20px;border-bottom:1px solid #ddd">
+  <div style="margin-top:10px">
     <table id="custom_table">
       <thead>
+        <tr>
+          <td colspan="9">해외운송료</td>
+        </tr>
         <tr>
           <td colspan="2">항목</td>
           <td>단위</td>
@@ -2973,9 +2985,12 @@
   @endif
   @if($rate_data_general['rdg_sum4'] && $rate_data_general['rdg_sum4'] > 0 )
 
-  <div style="margin-top:20px;border-bottom:1px solid #ddd">
+  <div style="margin-top:10px">
     <table id="custom_table">
       <thead>
+        <tr>
+          <td colspan="9">보관</td>
+        </tr>
         <tr>
           <td colspan="2">항목</td>
           <td>단위</td>
@@ -3182,9 +3197,12 @@
   @endif
   @if($rate_data_general['rdg_sum5'] && $rate_data_general['rdg_sum5'] > 0 )
 
-  <div style="margin-top:20px;border-bottom:1px solid #ddd">
+  <div style="margin-top:10px">
     <table id="custom_table">
       <thead>
+        <tr>
+          <td colspan="9">부자재</td>
+        </tr>
         <tr>
           <td colspan="2">항목</td>
           <td>단위</td>
@@ -3322,9 +3340,12 @@
     @endif
     @endif
   </div>
-  <div style="border-bottom:1px solid #ddd">
+  <div>
     <table id="custom_table">
       <thead>
+        <tr>
+          <th colspan="5">합계</th>
+        </tr>
         <tr>
           <th>항목</th>
           <th>공급가</th>
@@ -3364,9 +3385,12 @@
   </div>
   @if($rate_data_general['rdg_sum1'] && $rate_data_general['rdg_sum1'] > 0 )
 
-  <div style="margin-top:20px;border-bottom:1px solid #ddd">
+  <div style="margin-top:10px">
     <table id="custom_table">
       <thead>
+        <tr>
+          <th colspan="9">작업료</th>
+        </tr>
         <tr>
           <td colspan="2">항목</td>
           <td>단위</td>
@@ -3987,9 +4011,12 @@
   @endif
   @if($rate_data_general['rdg_sum2'] && $rate_data_general['rdg_sum2'] > 0 )
   <div class="page-break"></div>
-  <div style="border-bottom:1px solid #ddd">
+  <div>
     <table id="custom_table">
       <thead>
+        <tr>
+          <th colspan="9">보관료</th>
+        </tr>
         <tr>
           <td colspan="2">항목</td>
           <td>단위</td>
