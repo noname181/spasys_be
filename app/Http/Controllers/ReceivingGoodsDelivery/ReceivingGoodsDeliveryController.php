@@ -849,7 +849,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     $token_request_data = array(
                         'callback' => '07046597289',
                         'contents' => $url,
-                        'receiverTelNo' => '01075582547',
+                        'receiverTelNo' => $phone,
                         'userKey' => $sms_no,
                     );
 
@@ -868,6 +868,14 @@ class ReceivingGoodsDeliveryController extends Controller
 
                     $response = curl_exec($ch);
                     curl_close($ch);
+
+                    $RES_STR  = json_decode($response, TRUE);
+
+                    if(isset($RES_STR['code']) && $RES_STR['code'] != false){
+                        Sms::where('sms_no', $sms_no)->update([
+                            'status' => $RES_STR['code'],
+                        ]);
+                    }
 
                     $message_url["phone"] = $phone;
                     $message_url["url"] = $url;
@@ -5033,7 +5041,6 @@ class ReceivingGoodsDeliveryController extends Controller
                     $phone = trim($dataSubmit['reciever_contract']);
                     $url = "https://blp.spasysone.com/delivery_confirm/".$dataSubmit['is_no'].'param'.$rgd['rgd_no'];
 
-                    
                     $sms_no = Sms::insertGetId([
                         'mb_no' => $member->mb_no,
                         'callback' => "07046597289",
@@ -5051,7 +5058,7 @@ class ReceivingGoodsDeliveryController extends Controller
                     $token_request_data = array(
                         'callback' => '07046597289',
                         'contents' => $url,
-                        'receiverTelNo' => '01075582547',
+                        'receiverTelNo' => $phone,
                         'userKey' => $sms_no,
                     );
 
@@ -5071,6 +5078,14 @@ class ReceivingGoodsDeliveryController extends Controller
                     $response = curl_exec($ch);
                     curl_close($ch);
 
+                    $RES_STR  = json_decode($response, TRUE);
+                    
+                    if(isset($RES_STR['code']) && $RES_STR['code'] != false){
+                        Sms::where('sms_no', $sms_no)->update([
+                            'status' => $RES_STR['code'],
+                        ]);
+                    }
+                    
                     $message_url["phone"] = $phone;
                     $message_url["url"] = $url;
                 }
