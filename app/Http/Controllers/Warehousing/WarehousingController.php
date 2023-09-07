@@ -7256,6 +7256,7 @@ class WarehousingController extends Controller
 
                         //$tax_number = CommonFunc::generate_tax_number($id,$request->rgd_no);
 
+                        $rgd['tax_date'] = $request->tax_date;
                         $api = $this->update_tax_invoice_api($rgd, $user, $tid, $tid['tid_number'], null, $request['company'], $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null);
 
                         if ($key == 0) {
@@ -7296,6 +7297,7 @@ class WarehousingController extends Controller
 
                         $tax_number = CommonFunc::generate_tax_number($id, $request->rgd_no);
 
+                        $rgd['tax_date'] = $request->tax_date;
                         $api = $this->tax_invoice_api($rgd, $user, $tid, $tax_number, null, null, $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null);
 
                         TaxInvoiceDivide::where('tid_no', $id)->update([
@@ -7338,13 +7340,13 @@ class WarehousingController extends Controller
 
                 if ($request->is_edit == 'y' && $request->tid_list[0]['tid_type'] == 'add_all') {
                     ReceivingGoodsDelivery::where('tid_no', $request->tid_list[0]['tid_no'])->update([
-                        'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
+                        'rgd_tax_invoice_date' => Carbon::createFromFormat('Ymd', $request->tax_date)->toDateTimeString(),
                         'rgd_status7' => 'taxed',
                         'rgd_tax_invoice_number' => isset($tax_number) ? $tax_number : (isset($api['tax_number']) ? $api['tax_number'] : null),
                     ]);
                 } else {
                     ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
-                        'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
+                        'rgd_tax_invoice_date' => Carbon::createFromFormat('Ymd', $request->tax_date)->toDateTimeString(),
                         'rgd_status7' => 'taxed',
                         'rgd_tax_invoice_number' => isset($tax_number) ? $tax_number : (isset($api['tax_number']) ? $api['tax_number'] : null),
                     ]);
@@ -7543,13 +7545,14 @@ class WarehousingController extends Controller
 
                 $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general', 't_import_expected', 't_import'])->where('rgd_no', $request->rgd_no)->first();
 
+                $rgd['tax_date'] = $request->tax_date;
                 $api = $this->tax_invoice_api($rgd, $user, null, $tax_number, $request->rgds, null, $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null);
 
                 foreach ($request->rgds as $rgd) {
 
 
                     $rgd_ = ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
-                        'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
+                        'rgd_tax_invoice_date' => Carbon::createFromFormat('Ymd', $request->tax_date)->toDateTimeString(),
                         'rgd_tax_invoice_number' => $tax_number ? $tax_number : null,
                         'rgd_status7' => 'taxed',
                         'tid_no' => $request->is_edit == 'y' ? $rgd['tid_no'] : $id
@@ -7645,6 +7648,7 @@ class WarehousingController extends Controller
 
                     $tax_number = CommonFunc::generate_tax_number($id, $rgd['rgd_no']);
 
+                    $rgd['tax_date'] = $request->tax_date;
                     $api = $this->tax_invoice_api($rgd, $user, null, $tax_number, null, null, isset($ag['ag_email']) ? $ag['ag_email'] : null);
 
                     TaxInvoiceDivide::where('tid_no', $id)->update([
@@ -7652,7 +7656,7 @@ class WarehousingController extends Controller
                     ]);
 
                     ReceivingGoodsDelivery::where('rgd_no', $rgd['rgd_no'])->update([
-                        'rgd_tax_invoice_date' => Carbon::now()->toDateTimeString(),
+                        'rgd_tax_invoice_date' => Carbon::createFromFormat('Ymd', $request->tax_date)->toDateTimeString(),
                         'rgd_status7' => 'taxed',
                         'rgd_tax_invoice_number' => $tax_number ? $tax_number : null,
                     ]);
@@ -9799,7 +9803,7 @@ class WarehousingController extends Controller
         $Remark3 = '';
 
 
-        $WriteDate = '';
+        $WriteDate = $rgd['tax_date'];
 
 
         //-------------------------------------------
@@ -10469,7 +10473,7 @@ class WarehousingController extends Controller
         $Remark3 = '';
 
 
-        $WriteDate = '';
+        $WriteDate = $rgd['tax_date'];
 
 
         //-------------------------------------------
