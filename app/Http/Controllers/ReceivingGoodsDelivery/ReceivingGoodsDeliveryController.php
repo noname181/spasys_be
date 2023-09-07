@@ -620,7 +620,6 @@ class ReceivingGoodsDeliveryController extends Controller
             DB::beginTransaction();
 
             
-
             //return $response;
             $user = Auth::user();
             $co_no = Auth::user()->co_no ? Auth::user()->co_no : null;
