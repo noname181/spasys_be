@@ -4610,7 +4610,7 @@ class RateDataController extends Controller
                 $final_rgd->mb_no = $user->mb_no;
                 $final_rgd->save();
 
-                RateDataGeneral::where('rgd_no_expectation', $previous_rgd->rgd_no)->where(function($q) use($previous_rgd) {
+                RateDataGeneral::where('rgd_no_expectation', $previous_rgd->rgd_no)->where(function ($q) use ($previous_rgd) {
                     $q->whereNull('rgd_no')->orwhere('rgd_no', $previous_rgd->rgd_no);
                 })->update([
                     'rgd_no' => $final_rgd->rgd_no,
@@ -11184,6 +11184,7 @@ class RateDataController extends Controller
             'rm_biz_name' => $rate_meta['rm_biz_name'], 'rm_biz_number' => $rate_meta['rm_biz_number'], 'rm_biz_address' => $rate_meta['rm_biz_address'],
             'rm_owner_name' => $rate_meta['rm_owner_name'], 'rm_biz_email' => $rate_meta['rm_biz_email'], 'rmd_mail_detail1a' => nl2br($rmd_last['rmd_mail_detail1a']),
             'rmd_mail_detail1b' => nl2br($rmd_last['rmd_mail_detail1b']), 'rmd_mail_detail1c' => nl2br($rmd_last['rmd_mail_detail1c']),
+            'rm_mail_detail2' => nl2br($rate_meta['rm_mail_detail2']), 'rm_mail_detail3' => nl2br($rate_meta['rm_mail_detail3']),
             'co_name' => $co_info['co_name'], 'co_address' => $co_info['co_address'], 'co_address_detail' => $co_info['co_address_detail'], 'co_tel' => $co_info['co_tel'], 'co_email' => $co_info['co_email'], 'date' => Date('Y-m-d', strtotime($rmd_last['created_at']))
         ]);
         $pdf->save($file_name_download);
@@ -12148,22 +12149,31 @@ class RateDataController extends Controller
                 $sheet->setCellValue('B' . ($current_row + $count1 + $count2), '라벨');
             }
 
+            $sheet->getStyle('B' . ($current_row + $count1 + $count2 + $count3 + $count4 +  1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT)->setWrapText(true);
+            $sheet->getStyle('B' . ($current_row + $count1 + $count2 + $count3 + $count4 +  1) . ':Z' . ($current_row + $count1 + $count2 + $count3 + $count4 +  7))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+            $sheet->getStyle('B' . ($current_row + $count1 + $count2 + $count3 + $count4 +  1) . ':Z' . ($current_row + $count1 + $count2 + $count3 + $count4 +  7))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('EDEDED'));
+            $sheet->mergeCells('B' . ($current_row + $count1 + $count2 + $count3 + $count4 +  1) . ':Z' . ($current_row + $count1 + $count2 + $count3 + $count4 +  7));
 
-            $sheet->setCellValue('B' . ($current_row + $count1 + $count2 + $count3 + $count4 +  1), '1 이 요율표의 유효기간은 제출일자로부터 1개월 입니다.');
-            $sheet->setCellValue('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 2), '2 이 견적 금액은 부가가치세 별도 금액입니다.');
-            $sheet->setCellValue('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 3), '3 상세 업무 내역에 따라 제공 요율은 변경될 수 있습니다.');
+            $sheet->setCellValue('B' . ($current_row + $count1 + $count2 + $count3 + $count4 +  1), $rate_meta['rm_mail_detail3']);
+
+
+
+
+            $sheet->setCellValue('B' . ($current_row + $count1 + $count2 + $count3 + $count4 +  9), '1 이 요율표의 유효기간은 제출일자로부터 1개월 입니다.');
+            $sheet->setCellValue('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 10), '2 이 견적 금액은 부가가치세 별도 금액입니다.');
+            $sheet->setCellValue('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 11), '3 상세 업무 내역에 따라 제공 요율은 변경될 수 있습니다.');
             // $sheet->getStyle('B'. ($current_row+$count1+$count2 + $count3 + $count4 + 5). ':Z'. ($current_row+$count1+$count2 + $count3 + $count4 + 9))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('EDEDED'));
-            $sheet->getStyle('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 5) . ':R' . ($current_row + $count1 + $count2 + $count3 + $count4 + 9))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
-            $sheet->mergeCells('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 5) . ':Z' . ($current_row + $count1 + $count2 + $count3 + $count4 + 5));
-            $sheet->setCellValue('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 5), $co_info->co_name);
-            $sheet->mergeCells('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 6) . ':Z' . ($current_row + $count1 + $count2 + $count3 + $count4 + 6));
-            $sheet->setCellValue('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 6), $co_info->co_address . ' ' . $co_info->co_address_detail);
-            $sheet->mergeCells('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 7) . ':Z' . ($current_row + $count1 + $count2 + $count3 + $count4 + 7));
-            $sheet->setCellValue('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 7), $co_info->co_tel);
-            $sheet->mergeCells('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 8) . ':Z' . ($current_row + $count1 + $count2 + $count3 + $count4 + 8));
-            $sheet->setCellValue('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 8), $co_info->co_email);
-            $sheet->mergeCells('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 9) . ':Z' . ($current_row + $count1 + $count2 + $count3 + $count4 + 9));
-            $sheet->setCellValue('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 9), Date('Y-m-d', strtotime($rmd_last->created_at)));
+            $sheet->getStyle('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 13) . ':R' . ($current_row + $count1 + $count2 + $count3 + $count4 + 17))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+            $sheet->mergeCells('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 13) . ':Z' . ($current_row + $count1 + $count2 + $count3 + $count4 + 13));
+            $sheet->setCellValue('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 13), $co_info->co_name);
+            $sheet->mergeCells('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 14) . ':Z' . ($current_row + $count1 + $count2 + $count3 + $count4 + 14));
+            $sheet->setCellValue('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 14), $co_info->co_address . ' ' . $co_info->co_address_detail);
+            $sheet->mergeCells('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 15) . ':Z' . ($current_row + $count1 + $count2 + $count3 + $count4 + 15));
+            $sheet->setCellValue('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 15), $co_info->co_tel);
+            $sheet->mergeCells('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 16) . ':Z' . ($current_row + $count1 + $count2 + $count3 + $count4 + 16));
+            $sheet->setCellValue('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 16), $co_info->co_email);
+            $sheet->mergeCells('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 17) . ':Z' . ($current_row + $count1 + $count2 + $count3 + $count4 + 17));
+            $sheet->setCellValue('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 17), Date('Y-m-d', strtotime($rmd_last->created_at)));
         }
         if (!empty($rate_data_send_meta['rate_data2']) && count($rate_data_send_meta['rate_data2']) > 0) {
             $sheet->getStyle('B13')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('EDEDED');
@@ -12395,23 +12405,28 @@ class RateDataController extends Controller
                 $sheet->setCellValue('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5), '부자재');
             }
 
+            $sheet->getStyle('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 1))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT)->setWrapText(true);
+            $sheet->getStyle('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 1) . ':Z' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 +  7))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+            $sheet->getStyle('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 1) . ':Z' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 +  7))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('EDEDED'));
+            $sheet->mergeCells('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 1) . ':Z' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 +  7));
 
+            $sheet->setCellValue('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 1), $rate_meta['rm_mail_detail2']);
 
-            $sheet->setCellValue('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 1), '1 이 요율표의 유효기간은 제출일자로부터 1개월 입니다.');
-            $sheet->setCellValue('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 2), '2 이 견적 금액은 부가가치세 별도 금액입니다.');
-            $sheet->setCellValue('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 3), '3 상세 업무 내역에 따라 제공 요율은 변경될 수 있습니다.');
+            $sheet->setCellValue('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 9), '1 이 요율표의 유효기간은 제출일자로부터 1개월 입니다.');
+            $sheet->setCellValue('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 10), '2 이 견적 금액은 부가가치세 별도 금액입니다.');
+            $sheet->setCellValue('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 11), '3 상세 업무 내역에 따라 제공 요율은 변경될 수 있습니다.');
             // $sheet->getStyle('B'. ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 5). ':Z'. ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 9))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('EDEDED'));
-            $sheet->getStyle('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 5) . ':R' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 9))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
-            $sheet->mergeCells('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 5) . ':Z' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 5));
-            $sheet->setCellValue('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 5), $co_info->co_name);
-            $sheet->mergeCells('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 6) . ':Z' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 6));
-            $sheet->setCellValue('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 6), $co_info->co_address . ' ' . $co_info->co_address_detail);
-            $sheet->mergeCells('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 7) . ':Z' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 7));
-            $sheet->setCellValue('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 7), $co_info->co_tel);
-            $sheet->mergeCells('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 8) . ':Z' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 8));
-            $sheet->setCellValue('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 8), $co_info->co_email);
-            $sheet->mergeCells('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 9) . ':Z' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 9));
-            $sheet->setCellValue('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 9), Date('Y-m-d', strtotime($rmd_last->created_at)));
+            $sheet->getStyle('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 13) . ':R' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 17))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+            $sheet->mergeCells('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 13) . ':Z' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 13));
+            $sheet->setCellValue('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 13), $co_info->co_name);
+            $sheet->mergeCells('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 14) . ':Z' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 14));
+            $sheet->setCellValue('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 14), $co_info->co_address . ' ' . $co_info->co_address_detail);
+            $sheet->mergeCells('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 15) . ':Z' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 15));
+            $sheet->setCellValue('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 15), $co_info->co_tel);
+            $sheet->mergeCells('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 16) . ':Z' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 16));
+            $sheet->setCellValue('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 16), $co_info->co_email);
+            $sheet->mergeCells('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 17) . ':Z' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 17));
+            $sheet->setCellValue('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 17), Date('Y-m-d', strtotime($rmd_last->created_at)));
         }
 
         $Excel_writer = new Xlsx($spreadsheet);

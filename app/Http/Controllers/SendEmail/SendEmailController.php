@@ -347,6 +347,7 @@ class SendEmailController extends Controller
             'rm_biz_name' => $rate_meta['rm_biz_name'], 'rm_biz_number' => $rate_meta['rm_biz_number'], 'rm_biz_address' => $rate_meta['rm_biz_address'],
             'rm_owner_name' => $rate_meta['rm_owner_name'], 'rm_biz_email' => $rate_meta['rm_biz_email'], 'rmd_mail_detail1a' => nl2br($rmd_last['rmd_mail_detail1a']),
             'rmd_mail_detail1b' => nl2br($rmd_last['rmd_mail_detail1b']), 'rmd_mail_detail1c' => nl2br($rmd_last['rmd_mail_detail1c']),
+            'rm_mail_detail2' => nl2br($rate_meta['rm_mail_detail2']), 'rm_mail_detail3' => nl2br($rate_meta['rm_mail_detail3']),
             'co_name' => $co_info['co_name'], 'co_address' => $co_info['co_address'], 'co_address_detail' => $co_info['co_address_detail'], 'co_tel' => $co_info['co_tel'], 'co_email' => $co_info['co_email'], 'date' => Date('Y-m-d', strtotime($rmd_last['created_at']))
         ]);
         $pdf->save($file_name_download);
