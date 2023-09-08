@@ -147,7 +147,7 @@
       </table>
    </div>
    @if($rmd_mail_detail1a)
-   <div style='margin:10px 0px;border:1px solid black;padding: 20px;text-align:left;font-family: "unbatang", Times, serif'>
+   <div style='margin:10px 0px;border:1px solid black;padding: 20px;text-align:left;font-family: "unbatang", Times, serif;text-wrap: wrap;overflow-wrap: break-word;'>
       {!! $rmd_mail_detail1a !!}
    </div>
    @endif
@@ -259,7 +259,7 @@
       </table>
    </div>
    @if($rmd_mail_detail1b)
-   <div style='margin:10px 0px;border:1px solid black;padding: 20px;text-align:left;font-family: "unbatang", Times, serif'>
+   <div style='margin:10px 0px;border:1px solid black;padding: 20px;text-align:left;font-family: "unbatang", Times, serif;text-wrap: wrap;overflow-wrap: break-word;'>
       {!! $rmd_mail_detail1b !!}
    </div>
    @endif
@@ -371,7 +371,7 @@
       </table>
    </div>
    @if($rmd_mail_detail1c)
-   <div style='margin:10px 0px;border:1px solid black;padding: 20px;text-align:left;font-family: "unbatang", Times, serif'>
+   <div style='margin:10px 0px;border:1px solid black;padding: 20px;text-align:left;font-family: "unbatang", Times, serif;text-wrap: wrap;overflow-wrap: break-word;'>
       {!! $rmd_mail_detail1c !!}
    </div>
    @endif
@@ -905,7 +905,7 @@
       </table>
    </div>
    @if($rm_mail_detail2)
-   <div style='margin:10px 0px;border:1px solid black;padding: 20px;text-align:left;font-family: "unbatang", Times, serif'>
+   <div style='margin:10px 0px;border:1px solid black;padding: 20px;text-align:left;font-family: "unbatang", Times, serif;text-wrap: wrap;overflow-wrap: break-word;'>
       {!! $rm_mail_detail2 !!}
    </div>
    @endif
@@ -1307,7 +1307,7 @@
       </table>
    </div>
    @if($rm_mail_detail3)
-   <div style='margin:10px 0px;border:1px solid black;padding: 20px;text-align:left;font-family: "unbatang", Times, serif'>
+   <div style='margin:10px 0px;border:1px solid black;padding: 20px;text-align:left;font-family: "unbatang", Times, serif;text-wrap: wrap;overflow-wrap: break-word;'>
       {!! $rm_mail_detail3 !!}
    </div>
    @endif
