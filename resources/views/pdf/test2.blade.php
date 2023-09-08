@@ -2773,7 +2773,7 @@
       <tbody>
         <tr>
           <td rowspan="3" style='font-family: "unbatang", Times, serif'>
-            입고
+            국내운송
           </td>
           <td style='font-family: "unbatang", Times, serif'>
             픽업료

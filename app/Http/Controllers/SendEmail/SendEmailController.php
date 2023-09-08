@@ -505,7 +505,7 @@ class SendEmailController extends Controller
             $rate_data_general = RateDataGeneral::where('rmd_no', $validated['rmd_no'])->where('rdg_set_type', 'estimated_costs')->first();
         } else if ((isset($validated['rmd_service']) && $validated['rmd_service'] == 0) || (!isset($validated['rmd_service']) || !$validated['rmd_service'])) {
             $service = '보세화물';
-            if ($validated['rmd_tab_child'] == '창고화물' || $rmd_last['rmd_tab_child'] == '창고화물') {
+            if ((isset($validated['rmd_tab_child']) && $validated['rmd_tab_child'] == '창고화물') || $rmd_last['rmd_tab_child'] == '창고화물') {
                 if (Auth::user()->mb_type == 'spasys' || $co_no['contract']['c_integrated_calculate_yn'] == 'n' || $co_no['contract']['c_integrated_calculate_yn'] == '') {
                     $bonded1a = $rate_data = RateData::where('rmd_no', $validated['rmd_no'])->where(function ($q) {
                         $q->where('rd_cate_meta1', 'bonded1a');
@@ -769,7 +769,7 @@ class SendEmailController extends Controller
                         $sum5[] = $total7_5;
                     }
                 }
-            } else if ($validated['rmd_tab_child'] == '온도화물' || $rmd_last['rmd_tab_child'] == '온도화물') {
+            } else if ((isset($validated['rmd_tab_child']) && $validated['rmd_tab_child'] == '온도화물') || $rmd_last['rmd_tab_child'] == '온도화물') {
                 if (Auth::user()->mb_type == 'spasys' || $co_no['contract']['c_integrated_calculate_yn'] == 'n' || $co_no['contract']['c_integrated_calculate_yn'] == '') {
                     $bonded1b = $rate_data = RateData::where('rmd_no', $validated['rmd_no'])->where(function ($q) {
                         $q->where('rd_cate_meta1', 'bonded1b');
@@ -1032,7 +1032,7 @@ class SendEmailController extends Controller
                         $sum5[] = $total7_5;
                     }
                 }
-            } else if ($validated['rmd_tab_child'] == '위험물' || $rmd_last['rmd_tab_child'] == '위험물') {
+            } else if ((isset($validated['rmd_tab_child']) && $validated['rmd_tab_child'] == '위험물') || $rmd_last['rmd_tab_child'] == '위험물') {
                 if (Auth::user()->mb_type == 'spasys' || $co_no['contract']['c_integrated_calculate_yn'] == 'n' || $co_no['contract']['c_integrated_calculate_yn'] == '') {
                     $bonded1c = $rate_data = RateData::where('rmd_no', $validated['rmd_no'])->where(function ($q) {
                         $q->where('rd_cate_meta1', 'bonded1c');
@@ -1317,7 +1317,7 @@ class SendEmailController extends Controller
         $file_name_download = $path . '예상비용 미리보기_' . $rmd_name_file . '.pdf';
         if ($validated['rmd_service'] == 0) {
             $pdf = Pdf::loadView('pdf.test2', [
-                'rate_data_general' => $rate_data_general, 'rate_data' => $rate_data, 'service' => $service, 'bonded1a' => $bonded1a, 'bonded1b' => $bonded1b, 'bonded1c' => $bonded1c, 'tab_child' => $validated['rmd_tab_child'] ? $validated['rmd_tab_child'] : $rmd_last['rmd_tab_child'],
+                'rate_data_general' => $rate_data_general, 'rate_data' => $rate_data, 'service' => $service, 'bonded1a' => $bonded1a, 'bonded1b' => $bonded1b, 'bonded1c' => $bonded1c, 'tab_child' => isset($validated['rmd_tab_child']) ? $validated['rmd_tab_child'] : $rmd_last['rmd_tab_child'],
                 'count3' => $count3, 'count2' => $count2, 'count1' => $count1, 'total_1' => $total_1, 'total_2' => $total_2, 'total_3' => $total_3, 'mb_type' => Auth::user()->mb_type, 'bonded2a' => $bonded2a, 'count4_2' => $count4_2, 'count3_2' => $count3_2, 'count1_2' => $count1_2, 'count2_2' => $count2_2, 'count_arr2' => $count_arr2, 'arr2' => $arr2,
                 'count_arr3' => $count_arr3, 'arr3' => $arr3, 'bonded3a' => $bonded3a, 'sum3' => $sum3, 'sum2' => $sum2,
                 'count_arr4' => $count_arr4, 'arr4' => $arr4, 'bonded4a' => $bonded4a, 'sum4' => $sum4,
