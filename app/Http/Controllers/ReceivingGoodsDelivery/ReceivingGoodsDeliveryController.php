@@ -828,7 +828,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 }
 
                 
-                if (isset($location['rgd_delivery_man_hp']) && $location['rgd_delivery_man_hp'] != "" && $location['rgd_status3'] == "배송준비"){
+                if (isset($location['rgd_delivery_man_hp']) && $location['rgd_delivery_man_hp'] != "" && $location['rgd_status3'] == "배송중"){
                     $phone = trim($location['rgd_delivery_man_hp']);
                     $url = "https://blp.spasysone.com/delivery_confirm/".$request->w_no.'param'.$rgd_data->rgd_no;
 
@@ -5169,7 +5169,8 @@ class ReceivingGoodsDeliveryController extends Controller
                     'signature_url' => $request->signature
                 ]);
                 ReceivingGoodsDelivery::where('w_no', $request->w_no)->orwhere('is_no', $request->w_no)->update([
-                    'rgd_status3' => "배송완료"
+                    'rgd_status3' => "배송완료",
+                    'rgd_arrive_day' => Carbon::now()->toDateTimeString()
                 ]);
                 $status = 1;
             }else{
