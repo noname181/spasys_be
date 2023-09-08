@@ -828,8 +828,8 @@ class ReceivingGoodsDeliveryController extends Controller
                 }
 
                 
-                if (isset($package['reciever_contract'])){
-                    $phone = trim($package['reciever_contract']);
+                if (isset($location['rgd_delivery_man_hp'])){
+                    $phone = trim($location['rgd_delivery_man_hp']);
                     $url = "https://blp.spasysone.com/delivery_confirm/".$request->w_no.'param'.$rgd_data->rgd_no;
 
                     $sms_no = Sms::insertGetId([
@@ -5037,8 +5037,8 @@ class ReceivingGoodsDeliveryController extends Controller
                 );
 
                 //message
-                if (isset($dataSubmit['reciever_contract'])){
-                    $phone = trim($dataSubmit['reciever_contract']);
+                if (isset($dataSubmit['rgd_delivery_man_hp'])){
+                    $phone = trim($dataSubmit['rgd_delivery_man_hp']);
                     $url = "https://blp.spasysone.com/delivery_confirm/".$dataSubmit['is_no'].'param'.$rgd['rgd_no'];
 
                     $sms_no = Sms::insertGetId([

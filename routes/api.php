@@ -43,7 +43,7 @@ Route::get('/update_tax_status', [\App\Http\Controllers\Warehousing\WarehousingC
 
 Route::get('/get_warehousing_offline/{w_no}', [\App\Http\Controllers\Warehousing\WarehousingController::class, 'getWarehousingById']);
 Route::post('get_rgd_package_offline', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'get_rgd_package'])->name('get_rgd_package_offline');
-Route::get('receiving_goods_delivery/get_rgd_warehousing_offline/{w_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'getReceivingGoodsDeliveryWarehousing']);
+Route::get('receiving_goods_delivery/get_rgd_warehousing_offline/{rgd_no}', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'getReceivingGoodsDeliveryWarehousing']);
 Route::post('receiving_goods_delivery/package_delivery_offline/rgd', [\App\Http\Controllers\ReceivingGoodsDelivery\ReceivingGoodsDeliveryController::class, 'create_package_delivery_offline'])->name('package_delivery_offline');
 
 Route::prefix('payment')->name('payment.')->group(function () {
