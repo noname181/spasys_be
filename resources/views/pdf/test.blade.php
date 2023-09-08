@@ -34,8 +34,8 @@
 </head>
 
 <body>
-   <div style="width: 100%;border:1px solid black;text-align: center;padding: 20px 0;">
-      <p style='font-size:16px;padding:0px;font-family: "unbatang", Times, serif'>{{$rm_biz_name}}</p>
+   <div style="width: 100%;border:1px solid black;text-align: center;padding: 10px 0;">
+      <p style='font-size:30px;padding:0px;font-family: "unbatang", Times, serif'>{{$rm_biz_name}}</p>
    </div>
    <div style="width: 100%;margin-top:10px;margin-bottom:10px;text-align: right;">
       <p style='margin:0px;font-size:12px;margin-top:5px;padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>사업자번호 : {{$rm_biz_number}}</p>
@@ -904,6 +904,11 @@
          </tbody>
       </table>
    </div>
+   @if($rm_mail_detail2)
+   <div style='margin:10px 0px;border:1px solid black;padding: 20px;text-align:left;font-family: "unbatang", Times, serif'>
+      {!! $rm_mail_detail2 !!}
+   </div>
+   @endif
    @endif
 
 
@@ -1301,7 +1306,13 @@
          </tbody>
       </table>
    </div>
+   @if($rm_mail_detail3)
+   <div style='margin:10px 0px;border:1px solid black;padding: 20px;text-align:left;font-family: "unbatang", Times, serif'>
+      {!! $rm_mail_detail3 !!}
+   </div>
    @endif
+   @endif
+
    <div style="margin:10px 0px;">
       <p style='margin:0px;font-size:12px;margin-top:5px;padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>1. 이 요율표의 유효기간은 제출일자로부터 1개월 입니다.</p>
       <p style='margin:0px;font-size:12px;margin-top:5px;padding:0px;margin-bottom:5px;font-family: "unbatang", Times, serif'>2. 이 견적 금액은 부가가치세 별도 금액입니다.</p>

@@ -29,15 +29,15 @@
 
 <body>
   @if($service == '보세화물' && $mb_type == 'spasys')
-  <div style="width: 100%;border:1px solid black;text-align: center;padding: 20px 0;">
+  <div style="width: 100%;border:1px solid black;text-align: center;padding: 10px 0;">
     @if($tab_child == '창고화물')
-    <p style='font-size:16px;padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_sum1}}) 예상비용_No{{$rmd_number}}</p>
+    <p style='font-size:30px;padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_sum1}}) 예상비용_No{{$rmd_number}}</p>
     @endif
     @if($tab_child == '위험물')
-    <p style='font-size:16px;padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_vat1}}) 예상비용_No{{$rmd_number}}</p>
+    <p style='font-size:30px;padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_vat1}}) 예상비용_No{{$rmd_number}}</p>
     @endif
     @if($tab_child == '온도화물')
-    <p style='font-size:16px;padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_supply_price1}}) 예상비용_No{{$rmd_number}}</p>
+    <p style='font-size:30px;padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_supply_price1}}) 예상비용_No{{$rmd_number}}</p>
     @endif
   </div>
   <div style="width: 100%;margin-bottom:10px;margin-top:10px;text-align: right;">
@@ -544,15 +544,15 @@
   @endif
 
   @if($service == '보세화물' && $mb_type != 'spasys')
-  <div style="width: 100%;border:1px solid black;text-align: center;padding: 20px 0;">
+  <div style="width: 100%;border:1px solid black;text-align: center;padding: 10px 0;">
     @if($tab_child == '창고화물')
-    <p style='font-size:16px;padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_sum1}}) 예상비용_No{{$rmd_number}}</p>
+    <p style='font-size:30px;padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_sum1}}) 예상비용_No{{$rmd_number}}</p>
     @endif
     @if($tab_child == '위험물')
-    <p style='font-size:16px;padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_vat1}}) 예상비용_No{{$rmd_number}}</p>
+    <p style='font-size:30px;padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_vat1}}) 예상비용_No{{$rmd_number}}</p>
     @endif
     @if($tab_child == '온도화물')
-    <p style='font-size:16px;padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_supply_price1}}) 예상비용_No{{$rmd_number}}</p>
+    <p style='font-size:30px;padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>보세화물({{$rdg_supply_price1}}) 예상비용_No{{$rmd_number}}</p>
     @endif
   </div>
   <div style="width: 100%;margin-top:10px;margin-bottom:10px;text-align: right;">
@@ -2265,9 +2265,9 @@
   @endif
 
   @if($service == '수입풀필먼트')
-  <div style="width: 100%;border:1px solid black;text-align: center;padding: 20px 0;">
+  <div style="width: 100%;border:1px solid black;text-align: center;padding: 10px 0;">
 
-    <p style='font-size:16px;padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>수입풀필먼트 예상비용_No{{$rmd_number}}</p>
+    <p style='font-size:30px;padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>수입풀필먼트 예상비용_No{{$rmd_number}}</p>
 
   </div>
   <div style="width: 100%;margin-bottom:10px;margin-top:10px;text-align: right;">
@@ -3323,9 +3323,9 @@
   </div>
   @endif
   @if($service == '유통가공')
-  <div style="width: 100%;border:1px solid black;text-align: center;padding: 20px 0;">
+  <div style="width: 100%;border:1px solid black;text-align: center;padding: 10px 0;">
 
-    <p style='font-size:16px;padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>유통가공 예상비용_No{{$rmd_number}}</p>
+    <p style='font-size:30px;padding:0px;font-family: "unbatang", Times, serif;font-weight:bold'>유통가공 예상비용_No{{$rmd_number}}</p>
 
   </div>
   <div style="width: 100%;margin-bottom:10px;margin-top:10px;text-align: right;">
@@ -4010,8 +4010,8 @@
   </div>
   @endif
   @if($rate_data_general['rdg_sum2'] && $rate_data_general['rdg_sum2'] > 0 )
-  <div class="page-break"></div>
-  <div>
+  <!-- <div class="page-break"></div> -->
+  <div style="margin-top:10px">
     <table id="custom_table">
       <thead>
         <tr>
