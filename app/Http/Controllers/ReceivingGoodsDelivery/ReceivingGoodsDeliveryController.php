@@ -828,7 +828,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 }
 
                 
-                if (isset($location['rgd_delivery_man_hp'])){
+                if (isset($location['rgd_delivery_man_hp']) && $location['rgd_status3'] == "배송준비"){
                     $phone = trim($location['rgd_delivery_man_hp']);
                     $url = "https://blp.spasysone.com/delivery_confirm/".$request->w_no.'param'.$rgd_data->rgd_no;
 
@@ -5037,7 +5037,7 @@ class ReceivingGoodsDeliveryController extends Controller
                 );
 
                 //message
-                if (isset($dataSubmit['rgd_delivery_man_hp'])){
+                if (isset($dataSubmit['rgd_delivery_man_hp']) && $dataSubmit['rgd_status3'] == "배송중"){
                     $phone = trim($dataSubmit['rgd_delivery_man_hp']);
                     $url = "https://blp.spasysone.com/delivery_confirm/".$dataSubmit['is_no'].'param'.$rgd['rgd_no'];
 
