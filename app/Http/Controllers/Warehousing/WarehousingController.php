@@ -7488,9 +7488,9 @@ class WarehousingController extends Controller
                         'tid_number' => $tax_number ? $tax_number : null,
                     ]);
 
-                    $BaroService_URL = 'https://ws.baroservice.com/TI.asmx?wsdl';
+                    $BaroService_URL = 'https://testws.baroservice.com/TI.asmx?wsdl';
 
-                    $CERTKEY = '985417C4-240F-4FA4-B9AD-EA54E25C0F7E';
+                    $CERTKEY = '813FD596-7CBB-490A-84D2-31570487790E';
                     //인증키
                     $BaroService_TI = new SoapClient($BaroService_URL, array(
                         'trace'        => 'true',
@@ -7720,15 +7720,15 @@ class WarehousingController extends Controller
 
     public function check_tax_status(Request $request) //page277
     {
-        $BaroService_URL = 'https://ws.baroservice.com/TI.asmx?wsdl';    //테스트베드용
-        //$BaroService_URL = 'https://ws.baroservice.com/TI.asmx?WSDL';		//실서비스용
+        $BaroService_URL = 'https://testws.baroservice.com/TI.asmx?wsdl';    //테스트베드용
+        //$BaroService_URL = 'https://testws.baroservice.com/TI.asmx?WSDL';		//실서비스용
 
         $BaroService_TI = new SoapClient($BaroService_URL, array(
             'trace'        => 'true',
             'encoding'    => 'UTF-8'
         ));
 
-        $CERTKEY = '985417C4-240F-4FA4-B9AD-EA54E25C0F7E';
+        $CERTKEY = '813FD596-7CBB-490A-84D2-31570487790E';
         $CorpNum = $request->CorpNum;
         $MgtKey = $request->MgtKey;
 
@@ -7748,15 +7748,15 @@ class WarehousingController extends Controller
 
     public function print_tax_invoice(Request $request) //page277
     {
-        $BaroService_URL = 'https://ws.baroservice.com/TI.asmx?wsdl';    //테스트베드용
-        //$BaroService_URL = 'https://ws.baroservice.com/TI.asmx?WSDL';		//실서비스용
+        $BaroService_URL = 'https://testws.baroservice.com/TI.asmx?wsdl';    //테스트베드용
+        //$BaroService_URL = 'https://testws.baroservice.com/TI.asmx?WSDL';		//실서비스용
 
         $BaroService_TI = new SoapClient($BaroService_URL, array(
             'trace'        => 'true',
             'encoding'    => 'UTF-8'
         ));
 
-        $CERTKEY = '985417C4-240F-4FA4-B9AD-EA54E25C0F7E';
+        $CERTKEY = '813FD596-7CBB-490A-84D2-31570487790E';
         $MgtKey = $request->MgtKey;
 
         $Result = $BaroService_TI->GetTaxInvoicePrintURL([
@@ -7778,9 +7778,9 @@ class WarehousingController extends Controller
         DB::beginTransaction();
 
         try {
-            $CERTKEY = '985417C4-240F-4FA4-B9AD-EA54E25C0F7E';
-            $BaroService_URL = 'https://ws.baroservice.com/TI.asmx?wsdl';    //테스트베드용
-            //$BaroService_URL = 'https://ws.baroservice.com/TI.asmx?WSDL';		//실서비스용
+            $CERTKEY = '813FD596-7CBB-490A-84D2-31570487790E';
+            $BaroService_URL = 'https://testws.baroservice.com/TI.asmx?wsdl';    //테스트베드용
+            //$BaroService_URL = 'https://testws.baroservice.com/TI.asmx?WSDL';		//실서비스용
 
             $BaroService_TI = new SoapClient($BaroService_URL, array(
                 'trace'        => 'true',
@@ -9683,8 +9683,8 @@ class WarehousingController extends Controller
         // issued
 
 
-        $BaroService_URL = 'https://ws.baroservice.com/TI.asmx?wsdl';    //테스트베드용
-        //$BaroService_URL = 'https://ws.baroservice.com/TI.asmx?WSDL';		//실서비스용
+        $BaroService_URL = 'https://testws.baroservice.com/TI.asmx?wsdl';    //테스트베드용
+        //$BaroService_URL = 'https://testws.baroservice.com/TI.asmx?WSDL';		//실서비스용
 
         $BaroService_TI = new SoapClient($BaroService_URL, array(
             'trace'        => 'true',
@@ -9693,12 +9693,12 @@ class WarehousingController extends Controller
 
 
         // GetTaxInvoiceStatesEX.php 파일에서도 수정해야 함
-        $CERTKEY = '985417C4-240F-4FA4-B9AD-EA54E25C0F7E';                            //인증키
+        $CERTKEY = '813FD596-7CBB-490A-84D2-31570487790E';                            //인증키
 
         // 사업자등록증 확인 프로세스
         // 바로빌 연동서비스 웹서비스 참조(WebService Reference) URL
-        $BaroService_URL_staus = 'https://ws.baroservice.com/CORPSTATE.asmx?wsdl';    //테스트베드용
-        // $BaroService_URL_staus = 'https://ws.baroservice.com/CORPSTATE.asmx?WSDL';	//실서비스용
+        $BaroService_URL_staus = 'https://testws.baroservice.com/CORPSTATE.asmx?wsdl';    //테스트베드용
+        // $BaroService_URL_staus = 'https://testws.baroservice.com/CORPSTATE.asmx?WSDL';	//실서비스용
 
         $BaroService_CORPSTATE = new SoapClient($BaroService_URL_staus, array(
             'trace' => 'true',
@@ -10324,8 +10324,8 @@ class WarehousingController extends Controller
         // issued
 
 
-        $BaroService_URL = 'https://ws.baroservice.com/TI.asmx?wsdl';    //테스트베드용
-        //$BaroService_URL = 'https://ws.baroservice.com/TI.asmx?WSDL';		//실서비스용
+        $BaroService_URL = 'https://testws.baroservice.com/TI.asmx?wsdl';    //테스트베드용
+        //$BaroService_URL = 'https://testws.baroservice.com/TI.asmx?WSDL';		//실서비스용
 
         $BaroService_TI = new SoapClient($BaroService_URL, array(
             'trace'        => 'true',
@@ -10334,12 +10334,12 @@ class WarehousingController extends Controller
 
 
         // GetTaxInvoiceStatesEX.php 파일에서도 수정해야 함
-        $CERTKEY = '985417C4-240F-4FA4-B9AD-EA54E25C0F7E';                            //인증키
+        $CERTKEY = '813FD596-7CBB-490A-84D2-31570487790E';                            //인증키
 
         // 사업자등록증 확인 프로세스
         // 바로빌 연동서비스 웹서비스 참조(WebService Reference) URL
-        $BaroService_URL_staus = 'https://ws.baroservice.com/CORPSTATE.asmx?wsdl';    //테스트베드용
-        // $BaroService_URL_staus = 'https://ws.baroservice.com/CORPSTATE.asmx?WSDL';	//실서비스용
+        $BaroService_URL_staus = 'https://testws.baroservice.com/CORPSTATE.asmx?wsdl';    //테스트베드용
+        // $BaroService_URL_staus = 'https://testws.baroservice.com/CORPSTATE.asmx?WSDL';	//실서비스용
 
         $BaroService_CORPSTATE = new SoapClient($BaroService_URL_staus, array(
             'trace' => 'true',
