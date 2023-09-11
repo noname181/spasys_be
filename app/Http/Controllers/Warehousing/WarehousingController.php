@@ -7509,10 +7509,11 @@ class WarehousingController extends Controller
 
                     if ($Result < 0) { // 호출 실패
                         DB::rollBack();
+                        $api_message = WarehousingController::getErrStr($BaroService_TI, $CERTKEY, $Result);
                         return response()->json([
                             'message' => Messages::MSG_0007,
                             'api' => "tax_err",
-                            'api_message' => $Result,
+                            'api_message' => $api_message,
                         ]);
                     }
 
