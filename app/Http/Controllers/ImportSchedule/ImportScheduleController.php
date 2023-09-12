@@ -18,6 +18,7 @@ use App\Utils\Messages;
 use App\Models\Warehousing;
 use App\Models\ReceivingGoodsDelivery;
 use App\Models\File;
+use App\Models\Package;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
@@ -427,7 +428,7 @@ class ImportScheduleController extends Controller
                     //     $join->on('t_export.te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
                     // })
                     ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
-                $sub_5 = ReceivingGoodsDelivery::select('is_no', 'rgd_status3', 'rgd_status1','rgd_address')->groupBy('is_no');
+                $sub_5 = ReceivingGoodsDelivery::select('rgd_no','is_no', 'rgd_status3', 'rgd_status1','rgd_address')->groupBy('is_no');
 
                 $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
                     $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
@@ -471,7 +472,7 @@ class ImportScheduleController extends Controller
                     //     $join->on('t_export.te_carry_out_number', '=', 'receiving_goods_delivery.is_no');
                     // })
                     ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
-                $sub_5 = ReceivingGoodsDelivery::select('is_no', 'rgd_status3', 'rgd_status1','rgd_address')->groupBy('is_no');
+                $sub_5 = ReceivingGoodsDelivery::select('rgd_no','is_no', 'rgd_status3', 'rgd_status1','rgd_address')->groupBy('is_no');
 
                 $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
                     $leftJoin->on('aaa.tie_logistic_manage_number', '=', 'bbb.ti_logistic_manage_number');
@@ -532,7 +533,7 @@ class ImportScheduleController extends Controller
                     // })
                     ->groupBy(['te_logistic_manage_number', 'te_carry_out_number', 'te_e_date', 'te_carry_in_number', 'te_e_order', 'te_e_number']);
 
-                $sub_5 = ReceivingGoodsDelivery::select('is_no', 'rgd_status3', 'rgd_status1','rgd_address')->groupBy('is_no');
+                $sub_5 = ReceivingGoodsDelivery::select('rgd_no','is_no', 'rgd_status3', 'rgd_status1','rgd_address')->groupBy('is_no');
 
 
                 $import_schedule = DB::query()->fromSub($sub, 'aaa')->leftJoinSub($sub_2, 'bbb', function ($leftJoin) {
@@ -677,7 +678,7 @@ class ImportScheduleController extends Controller
             $import_schedule->setCollection(
                 $import_schedule->getCollection()->map(function ($item) {
                     if (isset($item->te_e_number)) {
-                      $item->number = $item->te_e_number;
+                        $item->number = $item->te_e_number;
                       } else if (isset($item->ti_i_number)) {
                         $item->number =  $item->ti_i_number;
                       } else if (isset($item->tie_is_number)) {
@@ -691,6 +692,16 @@ class ImportScheduleController extends Controller
                     } else if(isset($item->tie_logistic_manage_number) && $item->ti_carry_in_number == null && $item->te_carry_out_number == null){
                         $file = File::where('file_table_key', $item->tie_logistic_manage_number)->get();
                     }
+
+                    if(isset($item->te_carry_out_number)){
+                        $package = Package::where('w_no', $item->te_carry_out_number)->first();
+                    } else if(isset($item->ti_carry_in_number) && $item->te_carry_out_number == null) {
+                        $package = Package::where('w_no', $item->ti_carry_in_number)->first();
+                    } else if(isset($item->tie_logistic_manage_number) && $item->ti_carry_in_number == null && $item->te_carry_out_number == null){
+                        $package = Package::where('w_no', $item->tie_logistic_manage_number)->first();
+                    }
+
+                    $item->package = $package;
                     $item->files = $file;
                     return $item;
                 })
