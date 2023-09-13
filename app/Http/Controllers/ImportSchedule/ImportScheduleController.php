@@ -653,7 +653,7 @@ class ImportScheduleController extends Controller
 
                 if ($validated['rgd_status3'] == "배송준비") {
                     $import_schedule->where(function ($query) {
-                        $query->Where('rgd_status3', '=', '배송준비');
+                        $query->whereNull('rgd_status3')->orWhere('rgd_status3', '=', '배송준비');
                         $query->where('rgd_status1', '!=', '반입');
                     });
                 } else {
@@ -706,6 +706,7 @@ class ImportScheduleController extends Controller
                     return $item;
                 })
             );
+            
             $status = DB::table('t_import_expected')
                 ->select('tie_status_2')
                 ->groupBy('tie_status_2')
