@@ -9943,7 +9943,7 @@ class WarehousingController extends Controller
                 }
 
                 $items[] = array(
-                    'PurchaseExpiry' => Carbon::now()->format('Ymd'),            //YYYYMMDD
+                    'PurchaseExpiry' => $rgd['tax_date'] ? $rgd['tax_date'] : Carbon::now()->format('Ymd'),            //YYYYMMDD
                     'Name'            => $item_name,
                     'Information'    => '',
                     'ChargeableUnit' => '',
@@ -9992,7 +9992,7 @@ class WarehousingController extends Controller
             }
 
             $items[] = array(
-                'PurchaseExpiry' => Carbon::now()->format('Ymd'),            //YYYYMMDD
+                'PurchaseExpiry' => $rgd['tax_date'] ? $rgd['tax_date'] : Carbon::now()->format('Ymd'),            //YYYYMMDD
                 'Name'            => isset($price['rgd_number']) ? $price['rgd_number'] : $item_name,
                 'Information'    => '',
                 'ChargeableUnit' => '',
@@ -10047,7 +10047,7 @@ class WarehousingController extends Controller
             }
 
             $items[] = array(
-                'PurchaseExpiry' => Carbon::now()->format('Ymd'),            //YYYYMMDD
+                'PurchaseExpiry' => $rgd['tax_date'] ? $rgd['tax_date'] : Carbon::now()->format('Ymd'),            //YYYYMMDD
                 'Name'            => $item_name,
                 'Information'    => '',
                 'ChargeableUnit' => '',
@@ -10606,7 +10606,7 @@ class WarehousingController extends Controller
                 }
 
                 $items[] = array(
-                    'PurchaseExpiry' => Carbon::now()->format('Ymd'),            //YYYYMMDD
+                    'PurchaseExpiry' => $rgd['tax_date'] ? $rgd['tax_date'] : Carbon::now()->format('Ymd'),            //YYYYMMDD
                     'Name'            => $item_name,
                     'Information'    => '',
                     'ChargeableUnit' => '',
@@ -10652,7 +10652,7 @@ class WarehousingController extends Controller
             }
 
             $items[] = array(
-                'PurchaseExpiry' => Carbon::now()->format('Ymd'),            //YYYYMMDD
+                'PurchaseExpiry' => $rgd['tax_date'] ? $rgd['tax_date'] : Carbon::now()->format('Ymd'),            //YYYYMMDD
                 'Name'            => isset($price['rgd_number']) ? $price['rgd_number'] : $item_name,
                 'Information'    => '',
                 'ChargeableUnit' => '',
@@ -10703,7 +10703,7 @@ class WarehousingController extends Controller
             }
 
             $items[] = array(
-                'PurchaseExpiry' => Carbon::now()->format('Ymd'),            //YYYYMMDD
+                'PurchaseExpiry' => $rgd['tax_date'] ? $rgd['tax_date'] : Carbon::now()->format('Ymd'),            //YYYYMMDD
                 'Name'            => $item_name,
                 'Information'    => '',
                 'ChargeableUnit' => '',
