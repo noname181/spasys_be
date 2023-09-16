@@ -7248,6 +7248,11 @@ class WarehousingController extends Controller
                 if ($count > 1) {
                     $request->type = 'add_all';
                     $request->rgds = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general', 't_import_expected'])->where('rgd_tax_invoice_number', $rgd->rgd_tax_invoice_number)->get();
+
+                    $request->supply_price = $request->tid_list[0]['tid_supply_price'];
+                    $request->sum = $request->tid_list[0]['tid_sum'];
+                    $request->vat = $request->tid_list[0]['tid_vat'];
+                    $request->rgd_number = $request->tid_list[0]['rgd_number'];
                 }
             }
 
@@ -7579,7 +7584,15 @@ class WarehousingController extends Controller
                 $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general', 't_import_expected', 't_import'])->where('rgd_no', $request->rgd_no)->first();
 
                 $rgd['tax_date'] = $request->tax_date;
-                $api = $this->tax_invoice_api($rgd, $user, null, $tax_number, $request->rgds, null, $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null);
+
+                $tid = [
+                    'tid_supply_price' => $request->supply_price,
+                    'tid_sum' => $request->sum,
+                    'tid_vat' => $request->vat,
+                    'rgd_number' => $request->rgd_number,
+                ];
+
+                $api = $this->tax_invoice_api($rgd, $user, $tid, $tax_number, $request->rgds, null, $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null);
 
                 foreach ($request->rgds as $rgd) {
 
@@ -7634,6 +7647,20 @@ class WarehousingController extends Controller
 
                 if ($api['message'] == "tax_err") {
                     DB::rollBack();
+
+                    DB::beginTransaction();
+
+                    if($request->is_edit == 'y'){
+                        $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+
+                        TaxInvoiceDivide::where('tid_number',  $rgd->rgd_tax_invoice_number)->delete();
+                        ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                            'rgd_status7' => 'cancel',
+                            'rgd_tax_invoice_date' => null,
+                        ]);
+                    }
+
+                    DB::commit();
                 } else {
                     DB::commit();
                 }
@@ -7682,6 +7709,7 @@ class WarehousingController extends Controller
                     $tax_number = CommonFunc::generate_tax_number($id, $rgd['rgd_no']);
 
                     $rgd['tax_date'] = $request->tax_date;
+                    
                     $api = $this->tax_invoice_api($rgd, $user, null, $tax_number, null, null, isset($ag['ag_email']) ? $ag['ag_email'] : null);
 
                     TaxInvoiceDivide::where('tid_no', $id)->update([
@@ -9973,18 +10001,19 @@ class WarehousingController extends Controller
                     $total_price += $rgdp['rate_data_general']['rdg_sum4'];
                     $vat_price += $rgdp['rate_data_general']['rdg_vat4'];
                 }
-
-                $items[] = array(
-                    'PurchaseExpiry' => $rgd['tax_date'] ? $rgd['tax_date'] : Carbon::now()->format('Ymd'),            //YYYYMMDD
-                    'Name'            => $item_name,
-                    'Information'    => '',
-                    'ChargeableUnit' => '',
-                    'UnitPrice'        => '',
-                    'Amount'        => $amount_price,
-                    'Tax'            => $vat_price,
-                    'Description'    => $description 
-                );
             }
+
+            $items[] = array(
+                'PurchaseExpiry' => $rgd['tax_date'] ? $rgd['tax_date'] : Carbon::now()->format('Ymd'),            //YYYYMMDD
+                'Name'            => $price['rgd_number'],
+                'Information'    => '',
+                'ChargeableUnit' => '',
+                'UnitPrice'        => '',
+                'Amount'        => $price['tid_supply_price'],
+                'Tax'            => $price['tid_vat'],
+                'Description'    => ''
+            );
+
         } else if($price) {
             $amount_price = 0;
             $total_price = 0;
