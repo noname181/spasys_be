@@ -7647,6 +7647,20 @@ class WarehousingController extends Controller
 
                 if ($api['message'] == "tax_err") {
                     DB::rollBack();
+
+                    DB::beginTransaction();
+
+                    if($request->is_edit == 'y'){
+                        $rgd = ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->first();
+
+                        TaxInvoiceDivide::where('tid_number',  $rgd->rgd_tax_invoice_number)->delete();
+                        ReceivingGoodsDelivery::where('rgd_no', $request->rgd_no)->update([
+                            'rgd_status7' => 'cancel',
+                            'rgd_tax_invoice_date' => null,
+                        ]);
+                    }
+
+                    DB::commit();
                 } else {
                     DB::commit();
                 }
