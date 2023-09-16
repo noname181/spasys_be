@@ -62,7 +62,7 @@ class NoticeController extends Controller
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
-            $notice = Notice::with('files')->where('notice_title', 'like', '%'. $request->keyword .'%')->paginate($per_page, ['*'], 'page', $page);
+            $notice = Notice::with('files')->where('notice_title', 'like', '%' . $request->keyword . '%')->paginate($per_page, ['*'], 'page', $page);
 
             // foreach ($notice->items() as $d) {
             //     $d['files'] = $d->files()->get();
@@ -98,8 +98,8 @@ class NoticeController extends Controller
             $path = join('/', ['files', 'notice', $notice_no]);
 
             $files = [];
-            if(isset($validated['files'])){
-                foreach($validated['files'] as $key => $file) {
+            if (isset($validated['files'])) {
+                foreach ($validated['files'] as $key => $file) {
                     $url = Storage::disk('public')->put($path, $file);
                     $files[] = [
                         'file_table' => 'notice',
@@ -114,7 +114,7 @@ class NoticeController extends Controller
                 }
                 File::insert($files);
             }
-            
+
 
 
             DB::commit();
@@ -141,15 +141,18 @@ class NoticeController extends Controller
         $notice = Notice::with('files')->find($notice_no);
         if (!empty($notice)) {
             return response()->json(
-                ['message' => Messages::MSG_0007,
-                 'data' => $notice
-                ], 200);
+                [
+                    'message' => Messages::MSG_0007,
+                    'data' => $notice
+                ],
+                200
+            );
         } else {
             return response()->json(['message' => CommonFunc::renderMessage(Messages::MSG_0016, ['Notice'])], 400);
         }
     }
 
-        /**
+    /**
      * Update Notice by id
      * @param  Notice $notice
      * @param  QnaUpdateRequest $request
@@ -166,7 +169,7 @@ class NoticeController extends Controller
                     'notice_title' => $validated['notice_title'],
                     'notice_content' => $validated['notice_content'],
                     'notice_target' => $validated['notice_target'],
-            ]);
+                ]);
 
             //FILE PART
 
@@ -174,25 +177,25 @@ class NoticeController extends Controller
 
             // remove old image
 
-            if($request->remove_files){
-                foreach($request->remove_files as $key => $file_no) {
+            if ($request->remove_files) {
+                foreach ($request->remove_files as $key => $file_no) {
                     $file = File::where('file_no', $file_no)->get()->first();
-                    $url = Storage::disk('public')->delete($path. '/' . $file->file_name);
+                    $url = Storage::disk('public')->delete($path . '/' . $file->file_name);
                     $file->delete();
                 }
             }
 
 
-            if($request->hasFile('files')){
+            if ($request->hasFile('files')) {
                 $files = [];
 
                 $max_position_file = File::where('file_table', 'notice')->where('file_table_key', $validated['notice_no'])->orderBy('file_position', 'DESC')->get()->first();
-                if($max_position_file)
+                if ($max_position_file)
                     $i = $max_position_file->file_position + 1;
                 else
                     $i = 0;
 
-                foreach($validated['files'] as $key => $file) {
+                foreach ($validated['files'] as $key => $file) {
                     $url = Storage::disk('public')->put($path, $file);
                     $files[] = [
                         'file_table' => 'notice',
@@ -207,8 +210,7 @@ class NoticeController extends Controller
                     $i++;
                 }
 
-               File::insert($files);
-
+                File::insert($files);
             }
 
 
@@ -221,7 +223,7 @@ class NoticeController extends Controller
         }
     }
 
-     /**
+    /**
      * Get Notice
      * @param  NoticeSearchRequest $request
      */
@@ -236,38 +238,35 @@ class NoticeController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
 
-            if($user->mb_type == 'shop'){
-                $notices = Notice::with(['files','member'])->where(function ($q) use ($user){
-                    $q ->where(function ($q) use ($user){
+            if ($user->mb_type == 'shop') {
+                $notices = Notice::with(['files', 'member'])->where(function ($q) use ($user) {
+                    $q->where(function ($q) use ($user) {
                         $q->where(function ($q) {
-                            $q->where('notice_target', '=' , '가맹점')->orWhere('notice_target','=','전체');
+                            $q->where('notice_target', '=', '가맹점')->orWhere('notice_target', '=', '전체');
                         })
-                        ->whereHas('member.company',function($q) use ($user){
-                            $q->where('co_no', $user->company->co_parent->co_no);
-                        });
-                    })->orWhere(function ($q) use ($user){
-                        $q ->where(function ($q) use ($user){
-                            $q->where('notice_target', '=' , '화주');
-                        })->whereHas('member.company',function($q) use ($user){
+                            ->whereHas('member.company', function ($q) use ($user) {
+                                $q->where('co_no', $user->company->co_parent->co_no);
+                            });
+                    })->orWhere(function ($q) use ($user) {
+                        $q->where(function ($q) use ($user) {
+                            $q->where('notice_target', '=', '화주');
+                        })->whereHas('member.company', function ($q) use ($user) {
                             $q->where('co_no', $user->company->co_no);
                         });
                     });
                 })->orderBy('notice_no', 'DESC');
-
-            }
-            else if($user->mb_type == 'shipper'){
-                $notices = Notice::with(['files','member'])->where(function ($q) use ($user){
-                    $q->where(function ($q){
-                        $q->where('notice_target' , '=' , '화주')->orWhere('notice_target', '=','전체');
+            } else if ($user->mb_type == 'shipper') {
+                $notices = Notice::with(['files', 'member'])->where(function ($q) use ($user) {
+                    $q->where(function ($q) {
+                        $q->where('notice_target', '=', '화주')->orWhere('notice_target', '=', '전체');
                     });
-                })->whereHas('member.company',function($q) use ($user){
+                })->whereHas('member.company', function ($q) use ($user) {
                     $q->where('co_no', $user->company->co_parent->co_no)
-                    ->orWhere('co_no', $user->company->co_parent->co_parent->co_no);
+                        ->orWhere('co_no', $user->company->co_parent->co_parent->co_no);
                 })->orderBy('notice_no', 'DESC');
-
-            } else if ($user->mb_type == 'spasys'){
-                $notices = Notice::with(['files','member'])->whereHas('member',function ($q) use ($user){
-                    $q->where('mb_no',$user->mb_no);
+            } else if ($user->mb_type == 'spasys') {
+                $notices = Notice::with(['files', 'member'])->whereHas('member', function ($q) use ($user) {
+                    $q->where('mb_no', $user->mb_no);
                 })->orderBy('notice_no', 'DESC');
             }
 
@@ -277,11 +276,11 @@ class NoticeController extends Controller
             }
 
             if (isset($validated['to_date'])) {
-                $notices->where('created_at', '<=', date('Y-m-d 23:59:00', strtotime($validated['to_date'])));
+                $notices->where('created_at', '<=', date('Y-m-d 23:59:59', strtotime($validated['to_date'])));
             }
 
             if (isset($validated['search_string'])) {
-                $notices->where(function($query) use ($validated) {
+                $notices->where(function ($query) use ($validated) {
                     $query->where('notice_title', 'like', '%' . $validated['search_string'] . '%');
                     $query->orWhere('notice_content', 'like', '%' . $validated['search_string'] . '%');
                 });
@@ -319,16 +318,17 @@ class NoticeController extends Controller
             $notice->delete();
             File::where('file_table', 'notice')->where('file_table_key', $request->notice_no)->delete();
             return response()->json(['message' => Messages::MSG_0007], 200);
-
         }
     }
 
-    private function formatDate($dateStr) {
+    private function formatDate($dateStr)
+    {
         return DateTime::createFromFormat('j/n/Y', $dateStr)->format('Y-m-d');
     }
 
-    public function deleteNotices(Request $request){
-        $check = Notice::where('notice_no',$request->notice_no)->delete();
-        return response()->json(['status'=> $check]);
+    public function deleteNotices(Request $request)
+    {
+        $check = Notice::where('notice_no', $request->notice_no)->delete();
+        return response()->json(['status' => $check]);
     }
 }
