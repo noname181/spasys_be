@@ -120,7 +120,7 @@ class AlarmController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
 
             $user = Auth::user();
-            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
             // if($user->mb_type == 'shop'){
             //     // ->whereHas('member.company',function($q) use ($user){
             //     //     $q->where('co_no', $user->company->co_parent->co_no);
@@ -394,7 +394,7 @@ class AlarmController extends Controller
             }
 
             $alarm = $alarm->groupBy('alarm_no')->limit(3)->get();
-            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
             return response()->json($alarm);
         } catch (\Exception $e) {
             Log::error($e);
@@ -427,7 +427,7 @@ class AlarmController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
 
             $user = Auth::user();
-            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
             if ($user->mb_type == 'shop') {
                 // ->whereHas('member.company',function($q) use ($user){
                 //     $q->where('co_no', $user->company->co_parent->co_no);
@@ -590,7 +590,7 @@ class AlarmController extends Controller
             }
 
             $alarm = $alarm->groupBy('alarm_no')->paginate($per_page, ['*'], 'page', $page);
-            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
             return response()->json($alarm);
         } catch (\Exception $e) {
             Log::error($e);
@@ -608,7 +608,7 @@ class AlarmController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
 
             $user = Auth::user();
-            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
             if ($user->mb_type == 'shop') {
                 // ->whereHas('member.company',function($q) use ($user){
                 //     $q->where('co_no', $user->company->co_parent->co_no);
@@ -951,7 +951,7 @@ class AlarmController extends Controller
                 }
             }
             $alarm = $alarm->groupBy('alarm_no')->paginate($per_page, ['*'], 'page', $page);
-            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
             return response()->json($alarm);
         } catch (\Exception $e) {
             Log::error($e);
@@ -970,7 +970,7 @@ class AlarmController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
 
             $user = Auth::user();
-            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
             if ($user->mb_type == 'shop') {
                 $alarm = Alarm::select('t_import.ti_no', 't_export.te_no', 'alarm.*', 't_import_expected.tie_h_bl', 'company_spasys.co_name as company_spasys_coname', 'company_shop.co_name as company_shop_coname', 'company_shop_parent.co_name as shop_parent_name', 'company_spasys_parent.co_name as spasys_parent_name')->with('schedule_shipment', 'warehousing', 'member', 'alarm_data')->leftjoin('t_import_expected', function ($join) {
                     $join->on('alarm.alarm_h_bl', '=', 't_import_expected.tie_h_bl');
@@ -1267,7 +1267,7 @@ class AlarmController extends Controller
                 }
             }
             $alarm = $alarm->groupBy('alarm_no')->paginate($per_page, ['*'], 'page', $page);
-            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
             return response()->json($alarm);
         } catch (\Exception $e) {
             Log::error($e);
@@ -1279,7 +1279,7 @@ class AlarmController extends Controller
     public function searchAlarms_send(AlarmSearchRequest $request)
     {
         $validated = $request->validated();
-        DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+        DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
         try {
             // If per_page is null set default data = 15
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 15;
@@ -1427,7 +1427,7 @@ class AlarmController extends Controller
                 }
             }
             $alarm = $alarm->groupBy('alarm_no')->paginate($per_page, ['*'], 'page', $page);
-            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
 
             return response()->json($alarm);
         } catch (\Exception $e) {

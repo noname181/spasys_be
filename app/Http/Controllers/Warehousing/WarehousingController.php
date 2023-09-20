@@ -1195,7 +1195,7 @@ class WarehousingController extends Controller
     {
         try {
             DB::beginTransaction();
-            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
             $f = Storage::disk('public')->put('files/tmp', $request['file']);
             $user = Auth::user();
             $path = storage_path('app/public') . '/' . $f;
@@ -1466,7 +1466,7 @@ class WarehousingController extends Controller
                 }
             }
 
-            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
             if ($check_error == true) {
                 DB::rollback();
                 return response()->json([
@@ -2246,7 +2246,7 @@ class WarehousingController extends Controller
                 // If page is null set default data = 1
                 $page = isset($validated['page']) ? $validated['page'] : 1;
 
-                DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+                DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
                 $user = Auth::user();
                 if ($user->mb_type == 'shop') {
 
@@ -2535,7 +2535,7 @@ class WarehousingController extends Controller
 
                 $import_schedule = $custom->merge($import_schedule);
 
-                DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+                DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
                 //return DB::getQueryLog();
                 return response()->json($import_schedule);
             } else if ($validated['service'] == "전체") {
@@ -2813,7 +2813,7 @@ class WarehousingController extends Controller
                     }
                 }
 
-                DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+                DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
                 $user = Auth::user();
                 if ($user->mb_type == 'shop') {
                     $sub = ImportExpected::select('company.co_type', 't_import_expected.tie_status_2 as import_expected', 'parent_spasys.co_name as co_name_spasys', 'parent_spasys.co_no as co_no_spasys', 'parent_shop.co_name as co_name_shop', 'parent_shop.co_no as co_no_shop', 'company.co_no', 'company.co_name', 't_import_expected.*')
@@ -3085,7 +3085,7 @@ class WarehousingController extends Controller
                 $data = $this->paginate($final4, $validated['per_page'], $validated['page']);
                 //$final = $final->paginate($per_page, ['*'], 'page', $page);
 
-                DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+                DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
 
                 return $data;
             }
@@ -3302,7 +3302,7 @@ class WarehousingController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
 
-            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
             $user = Auth::user();
             if ($user->mb_type == 'shop') {
                 $import_schedule = ImportExpected::with(['import', 'company', 'receiving_goods_delivery'])->whereHas('company.co_parent', function ($q) use ($user) {
@@ -3413,7 +3413,7 @@ class WarehousingController extends Controller
 
             $import_schedule = $custom->merge($import_schedule);
 
-            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
             //return DB::getQueryLog();
             return response()->json($import_schedule);
         } catch (\Exception $e) {
@@ -6180,7 +6180,7 @@ class WarehousingController extends Controller
     {
         try {
             DB::enableQueryLog();
-            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
 
             $validated = $request->validated();
 
@@ -6353,7 +6353,7 @@ class WarehousingController extends Controller
                     return $item;
                 })
             );
-            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
             return response()->json($warehousing);
         } catch (\Exception $e) {
             Log::error($e);
@@ -6860,7 +6860,7 @@ class WarehousingController extends Controller
 
             $sum_sum = $arr_data->sum('sum_sum');
 
-            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
             $x = clone ($warehousing);
             $y = clone ($warehousing);
 
@@ -6868,7 +6868,7 @@ class WarehousingController extends Controller
 
             $issued_tax_bill = $y->where('rgd_status7', 'taxed')->groupby('receiving_goods_delivery.rgd_tax_invoice_number')->get()->count();
 
-            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
 
 
             $custom = collect([
@@ -8433,7 +8433,7 @@ class WarehousingController extends Controller
                 $end_stock = isset($end_stock) ? $end_stock : 0;
 
                 if (Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date))->format('Y-m-d') == Carbon::now()->format('Y-m-d')) {
-                    DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+                    DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
                     $item = StockStatusBad::with(['item_status_bad'])->whereHas('item_status_bad', function ($q) use ($user, $request) {
                         $q->whereHas('ContractWms.company', function ($k) use ($request) {
                             $k->where('co_no', $request->co_no);
@@ -8455,7 +8455,7 @@ class WarehousingController extends Controller
                         }
                         return ['total_amount' => $count_total];
                     })->sum('total_amount');
-                    DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+                    DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
                 }
             } else if ($user->mb_type == 'spasys') {
 
@@ -8481,7 +8481,7 @@ class WarehousingController extends Controller
                 }
 
                 if (Carbon::parse(Carbon::createFromFormat('Y-m-d', $request->to_date))->format('Y-m-d') == Carbon::now()->format('Y-m-d')) {
-                    DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+                    DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
                     $item = StockStatusBad::with(['item_status_bad'])->whereHas('item_status_bad', function ($q) use ($user, $request) {
                         $q->whereHas('ContractWms.company.co_parent', function ($k) use ($request) {
                             $k->where('co_no', $request->co_no);
@@ -8503,7 +8503,7 @@ class WarehousingController extends Controller
                         }
                         return ['total_amount' => $count_total];
                     })->sum('total_amount');
-                    DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+                    DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
                 }
             }
 
@@ -8958,7 +8958,7 @@ class WarehousingController extends Controller
             $page = isset($validated['page']) ? $validated['page'] : 1;
 
 
-            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
             $user = Auth::user();
             DB::enableQueryLog();
             if ($user->mb_type == 'shop') {
@@ -9454,7 +9454,7 @@ class WarehousingController extends Controller
             // $custom = collect(['status_filter' => $status]);
             // $import_schedule = $custom->merge($import_schedule);
 
-            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
 
             return $data;
         } catch (\Exception $e) {
@@ -9611,7 +9611,7 @@ class WarehousingController extends Controller
         $import_schedule = $import_schedule->whereNull('ddd.te_logistic_manage_number')->get();
 
 
-        //DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+        //DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
         $id = [];
         foreach ($import_schedule as $te) {
             $id[] = $te->tie_logistic_manage_number;

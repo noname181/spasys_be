@@ -203,7 +203,7 @@ class ExportExcelController extends Controller
         $validated = $request->validated();
         try {
             DB::enableQueryLog();
-            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
             $per_page = isset($validated['per_page']) ? $validated['per_page'] : 10000;
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
@@ -482,7 +482,7 @@ class ExportExcelController extends Controller
             array_map('unlink', glob($mask));
             $file_name_download = $path.'FulfillmentStockList-'.date('YmdHis').'.Xlsx';
             $Excel_writer->save($file_name_download);
-            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
             return response()->json([
                 'status' => 1,
                 'link_download' => $file_name_download,
@@ -1058,7 +1058,7 @@ class ExportExcelController extends Controller
     }
     public function download_bonded_cargo(ImportScheduleSearchRequest $request){
         try {
-            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
             DB::enableQueryLog();
             $validated = $request->validated();
             $user = Auth::user();
@@ -1533,6 +1533,8 @@ class ExportExcelController extends Controller
                 $sheet->setCellValue('AC'.$num_row, $value_ac);
                 $num_row++;
             }
+
+            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
 
             $Excel_writer = new Xlsx($spreadsheet);
             if(isset($user->mb_no)){

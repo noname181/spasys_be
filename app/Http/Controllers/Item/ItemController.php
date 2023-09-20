@@ -1002,7 +1002,7 @@ class ItemController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
             $user = Auth::user();
-            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
             if ($user->mb_type == 'shop') {
                 // $item = Item::with(['file', 'company', 'item_channels', 'item_info', 'ContractWms'])->select('item.*', 'stock_status_bad.stock')
                 //     ->leftjoin(DB::raw('stock_status_bad'), function ($leftJoin) {
@@ -1220,7 +1220,7 @@ class ItemController extends Controller
             $data = $custom->merge($item);
             return $data;
 
-            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
             return response()->json($data);
         } catch (\Exception $e) {
             Log::error($e);
@@ -2768,7 +2768,7 @@ class ItemController extends Controller
 
             DB::beginTransaction();
 
-            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
 
             $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number', 't_import_expected.update_api_time', 't_import_expected.tie_h_bl', 't_import_expected.tie_co_license')
 
@@ -2801,9 +2801,7 @@ class ItemController extends Controller
             //$this->createBondedSettlement();
 
             //return $import_schedule;
-            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
-
-
+            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
 
             foreach ($import_schedule as $value) {
                 if (isset($value->tie_logistic_manage_number)) {
@@ -3011,7 +3009,7 @@ class ItemController extends Controller
 
             DB::beginTransaction();
 
-            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
             // $user = Auth::user();
             // if ($user->mb_type == 'shop') {
 
@@ -3144,7 +3142,7 @@ class ItemController extends Controller
             //$this->createBondedSettlement();
 
             //return $import_schedule;
-            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
 
 
 
@@ -3277,7 +3275,8 @@ class ItemController extends Controller
             }
 
 
-
+            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
+            
             DB::commit();
             return response()->json([
                 'message' => Messages::MSG_0007,
@@ -3841,7 +3840,7 @@ class ItemController extends Controller
     {
         try {
 
-            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
 
 
             //FIX NOT WORK 'with'

@@ -983,7 +983,8 @@ class BannerController extends Controller
     public function CaculateService2($request)
     {
         $user = Auth::user();
-        DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+        
+        DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
         if ($user->mb_type == 'shop') {
             $warehousing2 = Warehousing::join(
                 DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
@@ -1350,7 +1351,7 @@ class BannerController extends Controller
         return [
             'countcharta' => $userArra, 'countchartb' => $userArrd, 'warehousinga' => $warehousinga, 'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'counte_2' => $counte_2, 'a' => $a, 'b' => $b, 'b_2' => $b_2, 'c' => $c, 'd' => $d, 'e' => $e, 'f' => $f, 'h' => $h, 'g' => $g,
         ];
-        DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+        DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
     }
 
     public function subquery($sub, $sub_2, $sub_4)
@@ -1367,7 +1368,7 @@ class BannerController extends Controller
     public function CaculateService1(Request $request)
     {
         $user = Auth::user();
-        DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+        DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
         if ($user->mb_type == 'shop') {
 
             $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number', 'tie_is_date', 'tie_status_2')
@@ -1631,13 +1632,13 @@ class BannerController extends Controller
             'data' => $tie_logistic_manage_number, 'countcharta' => $userArrb, 'countchartb' => $userArrd, 'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'countg' => $countg, 'countg_2' => $countg_2
         ];
 
-        DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+        DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
     }
 
     public function CaculateService1Shop(Request $request)
     {
         //$user = Auth::user();
-        DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+        DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
         $countchartb = [];
         $countchartd = [];
         if ($request->servicechart == "보세화물") {
@@ -1825,13 +1826,12 @@ class BannerController extends Controller
                 $userArrd['data2'][] = 0;
             }
         }
-
-
+        
         return [
             'countcharta' => $userArrb, 'countchartb' => $userArrd
         ];
 
-        DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+        DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
     }
 
     public function CaculateInvoice($request)
@@ -2522,7 +2522,7 @@ class BannerController extends Controller
     public function CaculateChartService1(Request $request)
     {
         $user = Auth::user();
-        DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+        DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
         if ($user->mb_type == 'shop') {
 
             $sub = ImportExpected::select('t_import_expected.tie_logistic_manage_number', 'tie_is_date', 'tie_status_2')
@@ -2655,13 +2655,13 @@ class BannerController extends Controller
             'counta' => $userArrb, 'countb' => $userArrd
         ];
 
-        DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+        DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
     }
 
     public function CaculateChartService2(Request $request)
     {
         $user = Auth::user();
-        DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+        DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
         if ($user->mb_type == 'shop') {
             $warehousing2 = Warehousing::join(
                 DB::raw('( SELECT max(w_no) as w_no, w_import_no FROM warehousing where w_type = "EW" and w_cancel_yn != "y" GROUP by w_import_no ) m'),
@@ -2852,7 +2852,7 @@ class BannerController extends Controller
             'counta' => $userArra, 'countb' => $userArrb, //'countc' => $userArrd
         ];
 
-        DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+        DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
     }
 
     public function CaculateChartService3(Request $request)
@@ -3087,7 +3087,7 @@ class BannerController extends Controller
 
     public function SQL()
     {
-        //DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+        //DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
         $user = Auth::user();
         if ($user->mb_type == 'shop') {
 
@@ -3189,7 +3189,7 @@ class BannerController extends Controller
         $import_schedule = $import_schedule->whereNull('ddd.te_logistic_manage_number')->get();
 
 
-        //DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+        //DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
         $id = [];
         foreach ($import_schedule as $te) {
             $id[] = $te->tie_logistic_manage_number;

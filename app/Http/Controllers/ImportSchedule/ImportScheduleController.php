@@ -84,7 +84,7 @@ class ImportScheduleController extends Controller
             left outer join (SELECT te_logistic_manage_number, te_carry_out_number, te_e_date, te_carry_in_number, te_e_order, te_e_number
             FROM t_export group by te_logistic_manage_number, te_carry_out_number, te_e_date, te_carry_in_number, te_e_order, te_e_number ) as ddd on ddd.te_logistic_manage_number = ccc.tec_logistic_manage_number and ddd.te_carry_in_number = bbb.ti_carry_in_number;";
 
-            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
             $user = Auth::user();
 
             if ($user->mb_type == 'shop') {
@@ -376,7 +376,7 @@ class ImportScheduleController extends Controller
 
             $import_schedule = $custom->merge($import_schedule);
 
-            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
 
             return response()->json($import_schedule);
         } catch (\Exception $e) {
@@ -397,7 +397,7 @@ class ImportScheduleController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
 
-            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
             $user = Auth::user();
 
             DB::enableQueryLog();
@@ -716,7 +716,7 @@ class ImportScheduleController extends Controller
 
             $import_schedule = $custom->merge($import_schedule);
 
-            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
 
             return response()->json($import_schedule);
         } catch (\Exception $e) {
@@ -737,7 +737,7 @@ class ImportScheduleController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
 
-            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
             $user = Auth::user();
 
             DB::enableQueryLog();
@@ -981,7 +981,7 @@ class ImportScheduleController extends Controller
 
             $import_schedule = $custom->merge($import_schedule);
 
-            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
 
             return response()->json($import_schedule);
         } catch (\Exception $e) {
@@ -1140,7 +1140,7 @@ class ImportScheduleController extends Controller
             $import_schedule = $import_schedule->whereNull('ddd.te_logistic_manage_number')->get();
 
 
-            //DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            //DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
             $id = [];
             foreach($import_schedule as $te){
                 $id[] = $te->tie_logistic_manage_number;
@@ -1160,7 +1160,7 @@ class ImportScheduleController extends Controller
             // If page is null set default data = 1
             $page = isset($validated['page']) ? $validated['page'] : 1;
 
-            DB::statement("set session sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
             $user = Auth::user();
 
             DB::enableQueryLog();
@@ -1459,7 +1459,7 @@ class ImportScheduleController extends Controller
 
             $import_schedule = $custom->merge($import_schedule);
 
-            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'");
+            DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
 
             return response()->json($import_schedule);
         } catch (\Exception $e) {
