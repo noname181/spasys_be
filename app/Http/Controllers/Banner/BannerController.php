@@ -1534,27 +1534,26 @@ class BannerController extends Controller
         $countg = 0;
         $countg_2 = 0;
         $tie_logistic_manage_number = $this->SQL();
-        $warehousingb2 = $this->subquery($sub, $sub_2, $sub_4)->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->get()->count();
-        // $warehousingd2 = $this->subquery($sub, $sub_2, $sub_4)->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->get()->count();
+        $countc = $this->subquery($sub, $sub_2, $sub_4)->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->count();
+        // $warehousingd2 = $this->subquery($sub, $sub_2, $sub_4)->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->count();
 
         if ($request->time1 == 'day') {
-            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereBetween('bbb.ti_i_date', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get()->count();
-            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('ddd.te_e_date', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get()->count();
+            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereBetween('bbb.ti_i_date', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->count();
+            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('ddd.te_e_date', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->count();
         } elseif ($request->time1 == 'week') {
-            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereBetween('bbb.ti_i_date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get()->count();
-            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('ddd.te_e_date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get()->count();
+            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereBetween('bbb.ti_i_date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->count();
+            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('ddd.te_e_date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->count();
         } elseif ($request->time1 == 'month') {
-            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereBetween('bbb.ti_i_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get()->count();
-            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('ddd.te_e_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get()->count();
+            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereBetween('bbb.ti_i_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->count();
+            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('ddd.te_e_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->count();
         } elseif ($request->time1 == '6month') {
-            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereBetween('bbb.ti_i_date', [Carbon::now()->subMonths(5)->startOfMonth(), Carbon::now()->endOfMonth()])->get()->count();
-            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('ddd.te_e_date', [Carbon::now()->subMonths(5)->startOfMonth(), Carbon::now()->endOfMonth()])->get()->count();
+            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereBetween('bbb.ti_i_date', [Carbon::now()->subMonths(5)->startOfMonth(), Carbon::now()->endOfMonth()])->count();
+            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('ddd.te_e_date', [Carbon::now()->subMonths(5)->startOfMonth(), Carbon::now()->endOfMonth()])->count();
         }
 
-        $counta = $warehousinga->whereNotNull('aaa.tie_logistic_manage_number')->whereNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->get()->count();
-        $countc = $warehousingb2;
-        $counte = $warehousinge->where('aaa.tie_status_2', '=', '수입신고접수')->orwhere('aaa.tie_status_2', '=', '수입신고정정접수')->get()->count();
-        $countg = $warehousingg->get()->count();
+        $counta = $warehousinga->whereNotNull('aaa.tie_logistic_manage_number')->whereNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->count();
+        $counte = $warehousinge->where('aaa.tie_status_2', '=', '수입신고접수')->orwhere('aaa.tie_status_2', '=', '수입신고정정접수')->count();
+        $countg = $warehousingg->count();
         foreach ($warehousingg->get() as $i) {
             $countg_2 += isset($i->rate_data_general->rdg_sum7) ? $i->rate_data_general->rdg_sum7 : 0;
         }
