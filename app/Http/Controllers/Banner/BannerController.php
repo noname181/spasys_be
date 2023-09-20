@@ -801,27 +801,27 @@ class BannerController extends Controller
         $warehousingh = $warehousing_distribution;
 
         if ($request->time3 == 'day') {  
-            $warehousingb = $warehousingb->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()]);    
-            $warehousingd = $warehousingd->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()]); 
-            $warehousingg = $warehousingg->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()]);
+            $warehousingb = $warehousingb->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get();    
+            $warehousingd = $warehousingd->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get(); 
+            $warehousingg = $warehousingg->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get();
         } elseif ($request->time3 == 'week') {
-            $warehousingb = $warehousingb->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-            $warehousingd = $warehousingd->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-            $warehousingg = $warehousingg->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
+            $warehousingb = $warehousingb->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get();
+            $warehousingd = $warehousingd->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get();
+            $warehousingg = $warehousingg->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get();
         } elseif ($request->time3 == 'month') { 
-            $warehousingb = $warehousingb->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()]);
-            $warehousingd = $warehousingd->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()]);
-            $warehousingg = $warehousingg->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()]);
+            $warehousingb = $warehousingb->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get();
+            $warehousingd = $warehousingd->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get();
+            $warehousingg = $warehousingg->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get();
         } elseif ($request->time3 == '6month') { 
-            $warehousingb = $warehousingb->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->subMonths(5)->startOfMonth(), Carbon::now()->endOfMonth()]);
-            $warehousingd = $warehousingd->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->subMonths(5)->startOfMonth(), Carbon::now()->endOfMonth()]);
-            $warehousingg = $warehousingg->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->subMonths(5)->startOfMonth(), Carbon::now()->endOfMonth()]);
+            $warehousingb = $warehousingb->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->subMonths(5)->startOfMonth(), Carbon::now()->endOfMonth()])->get();
+            $warehousingd = $warehousingd->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->subMonths(5)->startOfMonth(), Carbon::now()->endOfMonth()])->get();
+            $warehousingg = $warehousingg->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->whereBetween('warehousing.w_completed_day', [Carbon::now()->subMonths(5)->startOfMonth(), Carbon::now()->endOfMonth()])->get();
         }
 
-        $warehousinga = $warehousinga->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소');
-        $warehousingc = $warehousingc->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소');
-        $warehousinge = $warehousinge->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소');
-        $warehousingf = $warehousingf->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소');
+        $warehousinga = $warehousinga->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
+        $warehousingc = $warehousingc->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
+        $warehousinge = $warehousinge->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
+        $warehousingf = $warehousingf->where('rgd_status1', '!=', '입고예정 취소')->where('rgd_status1', '!=', '출고예정 취소')->get();
 
         $counta = 0;
         $countb = 0;
@@ -1209,24 +1209,27 @@ class BannerController extends Controller
 
 
         if ($request->time2 == 'day') {
-            $warehousinga = $warehousinga->whereBetween('created_at', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()]);
-           
-            $warehousingd = $warehousingd->whereBetween('created_at', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()]);
+            $warehousinga = $warehousinga->whereBetween('created_at', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get();
+            $warehousingb = $warehousingb->get();
+            $warehousingc = $warehousingc->get();
+            $warehousingd = $warehousingd->whereBetween('created_at', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get();
         } elseif ($request->time2 == 'week') {
-            $warehousinga = $warehousinga->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-            
-            $warehousingd = $warehousingd->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
+            $warehousinga = $warehousinga->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get();
+            $warehousingb = $warehousingb->get();
+            $warehousingc = $warehousingc->get();
+            $warehousingd = $warehousingd->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get();
         } else {
-            $warehousinga = $warehousinga->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()]);
-    
-            $warehousingd = $warehousingd->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()]);
+            $warehousinga = $warehousinga->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get();
+            $warehousingb = $warehousingb->get();
+            $warehousingc = $warehousingc->get();
+            $warehousingd = $warehousingd->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get();
         }
 
         $counta = $warehousinga->count();
         $countb = $warehousingb->count();
         $countc = $warehousingc->count();
         $countd = $warehousingd->count();
-        $counte = $warehousinge->count();
+        $counte = $warehousinge->get()->count();
         foreach ($warehousinge->get() as $i) {
             $counte_2 += isset($i->rate_data_general->rdg_sum6) ? $i->rate_data_general->rdg_sum6 : 0;
         }
@@ -1531,27 +1534,27 @@ class BannerController extends Controller
         $countg = 0;
         $countg_2 = 0;
         $tie_logistic_manage_number = $this->SQL();
-        $warehousingb2 = $this->subquery($sub, $sub_2, $sub_4)->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->count();
+        $warehousingb2 = $this->subquery($sub, $sub_2, $sub_4)->whereNotNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->get()->count();
         // $warehousingd2 = $this->subquery($sub, $sub_2, $sub_4)->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->get()->count();
 
         if ($request->time1 == 'day') {
-            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereBetween('bbb.ti_i_date', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->count();
-            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('ddd.te_e_date', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->count();
+            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereBetween('bbb.ti_i_date', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get()->count();
+            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('ddd.te_e_date', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get()->count();
         } elseif ($request->time1 == 'week') {
-            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereBetween('bbb.ti_i_date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->count();
-            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('ddd.te_e_date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->count();
+            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereBetween('bbb.ti_i_date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get()->count();
+            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('ddd.te_e_date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->get()->count();
         } elseif ($request->time1 == 'month') {
-            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereBetween('bbb.ti_i_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->count();
-            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('ddd.te_e_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->count();
+            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereBetween('bbb.ti_i_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get()->count();
+            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('ddd.te_e_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get()->count();
         } elseif ($request->time1 == '6month') {
-            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereBetween('bbb.ti_i_date', [Carbon::now()->subMonths(5)->startOfMonth(), Carbon::now()->endOfMonth()])->count();
-            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('ddd.te_e_date', [Carbon::now()->subMonths(5)->startOfMonth(), Carbon::now()->endOfMonth()])->count();
+            $countb = $warehousingb->whereNotNull('bbb.ti_logistic_manage_number')->whereBetween('bbb.ti_i_date', [Carbon::now()->subMonths(5)->startOfMonth(), Carbon::now()->endOfMonth()])->get()->count();
+            $countd = $warehousingd->whereNotIn('tie_logistic_manage_number', $tie_logistic_manage_number)->whereBetween('ddd.te_e_date', [Carbon::now()->subMonths(5)->startOfMonth(), Carbon::now()->endOfMonth()])->get()->count();
         }
 
-        $counta = $warehousinga->whereNotNull('aaa.tie_logistic_manage_number')->whereNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->count();
+        $counta = $warehousinga->whereNotNull('aaa.tie_logistic_manage_number')->whereNull('bbb.ti_logistic_manage_number')->whereNull('ddd.te_logistic_manage_number')->get()->count();
         $countc = $warehousingb2;
-        $counte = $warehousinge->where('aaa.tie_status_2', '=', '수입신고접수')->orwhere('aaa.tie_status_2', '=', '수입신고정정접수')->count();
-        $countg = $warehousingg->count();
+        $counte = $warehousinge->where('aaa.tie_status_2', '=', '수입신고접수')->orwhere('aaa.tie_status_2', '=', '수입신고정정접수')->get()->count();
+        $countg = $warehousingg->get()->count();
         foreach ($warehousingg->get() as $i) {
             $countg_2 += isset($i->rate_data_general->rdg_sum7) ? $i->rate_data_general->rdg_sum7 : 0;
         }
@@ -1626,7 +1629,7 @@ class BannerController extends Controller
         }
 
         return [
-            'countcharta' => $userArrb, 'countchartb' => $userArrd, 'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'countg' => $countg, 'countg_2' => $countg_2
+            'data' => $tie_logistic_manage_number, 'countcharta' => $userArrb, 'countchartb' => $userArrd, 'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'countg' => $countg, 'countg_2' => $countg_2
         ];
 
         DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
@@ -1823,6 +1826,7 @@ class BannerController extends Controller
                 $userArrd['data2'][] = 0;
             }
         }
+
 
         return [
             'countcharta' => $userArrb, 'countchartb' => $userArrd
@@ -3084,7 +3088,7 @@ class BannerController extends Controller
 
     public function SQL()
     {
-        //DB::statement("set session sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
+        
         $user = Auth::user();
         if ($user->mb_type == 'shop') {
 
@@ -3186,7 +3190,7 @@ class BannerController extends Controller
         $import_schedule = $import_schedule->whereNull('ddd.te_logistic_manage_number')->get();
 
 
-        //DB::statement("set session sql_mode='ONLY_FULL_GROUP_BY'");
+        
         $id = [];
         foreach ($import_schedule as $te) {
             $id[] = $te->tie_logistic_manage_number;
