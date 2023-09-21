@@ -7201,6 +7201,8 @@ class WarehousingController extends Controller
                 $company = Company::with(['co_parent', 'adjustment_group'])->where('co_no', $rgd['warehousing']['company']['co_parent']['co_no'])->first();
             }
 
+            $company['co_address'] = $company['co_address'] . ' ' . $company['co_address_detail'];
+
             return response()->json([
                 'tid' => $tid,
                 'company' => $company
@@ -7294,7 +7296,7 @@ class WarehousingController extends Controller
                         //$tax_number = CommonFunc::generate_tax_number($id,$request->rgd_no);
 
                         $rgd['tax_date'] = $request->tax_date;
-                        $api = $this->update_tax_invoice_api($rgd, $user, $tid, $tid['tid_number'], null, $request['company'], $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null);
+                        $api = $this->update_tax_invoice_api($rgd, $user, $tid, $tid['tid_number'], null, $request['company'], $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null, $request['company']);
 
                         if ($key == 0) {
                             $cbh = CancelBillHistory::insertGetId([
@@ -7335,7 +7337,7 @@ class WarehousingController extends Controller
                         $tax_number = CommonFunc::generate_tax_number($id, $request->rgd_no);
 
                         $rgd['tax_date'] = $request->tax_date;
-                        $api = $this->tax_invoice_api($rgd, $user, $tid, $tax_number, null, null, $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null);
+                        $api = $this->tax_invoice_api($rgd, $user, $tid, $tax_number, null, null, $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null, $request['company']);
 
                         TaxInvoiceDivide::where('tid_no', $id)->update([
                             'tid_number' => $tax_number ? $tax_number : null,
@@ -7557,6 +7559,25 @@ class WarehousingController extends Controller
                     Tax::where('t_mgtnum', $rgd->rgd_tax_invoice_number)->update([
                         't_status' => 0,
                     ]);
+
+                    foreach ($request->tid_list as $key => $tid) {
+                        $tid_ = TaxInvoiceDivide::where('tid_no', $tid['tid_no']);
+                        $tid_->update([
+                            'tid_supply_price' => $tid['tid_supply_price'],
+                            'tid_vat' => $tid['tid_vat'],
+                            'tid_sum' => $tid['tid_sum'],
+                            'rgd_no' => isset($tid['rgd_no']) ? $tid['rgd_no'] : $request->rgd_no,
+                            'rgd_number' => isset($tid['rgd_number']) ? $tid['rgd_number'] : $rgd->rgd_settlement_number,
+                            'co_license' => $request['company']['co_license'],
+                            'co_owner' => $request['company']['co_owner'],
+                            'co_name' => $request['company']['co_name'],
+                            'co_major' => $request['company']['co_major'],
+                            'co_address' => $request['company']['co_address'],
+                            'co_email' => $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null,
+                            'co_email2' => $request['ag']['ag_email2'] ? $request['ag']['ag_email2'] : null,
+                            'mb_no' => $user->mb_no,
+                        ]);
+                    }
                 } else {
                     $id = TaxInvoiceDivide::insertGetId([
                         'tid_supply_price' => $request->supply_price,
@@ -7592,7 +7613,7 @@ class WarehousingController extends Controller
                     'rgd_number' => $request->rgd_number,
                 ];
 
-                $api = $this->tax_invoice_api($rgd, $user, $tid, $tax_number, $request->rgds, null, $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null);
+                $api = $this->tax_invoice_api($rgd, $user, $tid, $tax_number, $request->rgds, null, $request['ag']['ag_email'] ? $request['ag']['ag_email'] : null, $request['company']);
 
                 foreach ($request->rgds as $rgd) {
 
@@ -7680,11 +7701,15 @@ class WarehousingController extends Controller
 
                     $rgd = ReceivingGoodsDelivery::with(['warehousing', 'rate_data_general'])->where('rgd_no', $rgd['rgd_no'])->first();
 
-                    if ($user->mb_type == 'spasys' && $rgd->service_korean_name == '수입풀필먼트') {
+                    if ($rgd->service_korean_name == '수입풀필먼트') {
                         $company = Company::with(['co_parent', 'adjustment_group'])->where('co_no', $rgd['warehousing']['co_no'])->first();
-                    } else {
+                    } else if($user->mb_type == 'spasys') {
                         $company = Company::with(['co_parent', 'adjustment_group'])->where('co_no', $rgd['warehousing']['company']['co_parent']['co_no'])->first();
+                    } else {
+                        $company = Company::with(['co_parent', 'adjustment_group'])->where('co_no', $rgd['warehousing']['co_no'])->first();
                     }
+
+                    $company['co_address'] = $company['co_address'] . ' ' . $company['co_address_detail'];
 
                     $ag = AdjustmentGroup::where('ag_no', $rgd->rate_data_general->ag_no)->first();
 
@@ -7710,7 +7735,7 @@ class WarehousingController extends Controller
 
                     $rgd['tax_date'] = $request->tax_date;
                     
-                    $api = $this->tax_invoice_api($rgd, $user, null, $tax_number, null, null, isset($ag['ag_email']) ? $ag['ag_email'] : null);
+                    $api = $this->tax_invoice_api($rgd, $user, null, $tax_number, null, null, isset($ag['ag_email']) ? $ag['ag_email'] : null, $company);
 
                     TaxInvoiceDivide::where('tid_no', $id)->update([
                         'tid_number' => $tax_number ? $tax_number : null,
@@ -9620,7 +9645,7 @@ class WarehousingController extends Controller
     }
 
 
-    public static function tax_invoice_api($rgd, $user, $price, $tax_number, $rgds, $is_check, $custom_email = null) //$company1, $company2, $total_price, $b_no
+    public static function tax_invoice_api($rgd, $user, $price, $tax_number, $rgds, $is_check, $custom_email = null, $company) //$company1, $company2, $total_price, $b_no
     {
 
         // issuer
@@ -9720,7 +9745,7 @@ class WarehousingController extends Controller
         // issuer
         $cc_name1 = $issuer_company->co_name;
         $cc_ceo1 = $issuer_company->co_owner ? $issuer_company->co_owner : '모상희';
-        $cc_address1 = $issuer_company->co_address;
+        $cc_address1 = $issuer_company->co_address . ' ' . $issuer_company->co_address_detail;
         $cc_service1 = "창고업"; //$issuer_company->co_service;
         $cc_service2 = "서비스 운수 및 창고업";
 
@@ -9733,7 +9758,7 @@ class WarehousingController extends Controller
         $cc_license2 = $receiver_company->co_license;
         $cc_name2 = $receiver_company->co_name;
         $cc_ceo2 = $receiver_company->co_owner;
-        $cc_address2 = $receiver_company->co_address;
+        $cc_address2 = isset($company['co_address']) ? $company['co_address'] : $receiver_company->co_address  . ' ' . $receiver_company->co_address_detail;
 
         $s_type = "";
         $t_type = "차주발행";
@@ -10268,7 +10293,7 @@ class WarehousingController extends Controller
         }
     }
 
-    public static function update_tax_invoice_api($rgd, $user, $price, $tax_number, $rgds, $company = null, $custom_email = null) //$company1, $company2, $total_price, $b_no
+    public static function update_tax_invoice_api($rgd, $user, $price, $tax_number, $rgds, $company = null, $custom_email = null, $company_edit) //$company1, $company2, $total_price, $b_no
     {
 
         // issuer
@@ -10362,7 +10387,7 @@ class WarehousingController extends Controller
         // issuer
         $cc_name1 = $issuer_company->co_name;
         $cc_ceo1 = $issuer_company->co_owner ? $issuer_company->co_owner : '모상희';
-        $cc_address1 = $issuer_company->co_address;
+        $cc_address1 = $issuer_company->co_address . ' ' . $issuer_company->co_address_detail;
         $cc_service1 = "창고업"; //$issuer_company->co_service;
         $cc_service2 = "서비스 운수 및 창고업";
 
@@ -10375,7 +10400,7 @@ class WarehousingController extends Controller
         $cc_license2 = $company['co_license'] ? $company['co_license'] : $receiver_company->co_license;
         $cc_name2 = $company['co_name'] ? $company['co_name'] :  $receiver_company->co_name;
         $cc_ceo2 = $company['co_owner'] ? $company['co_owner'] : $receiver_company->co_owner;
-        $cc_address2 = $company['co_address'] ? $company['co_address'] : $receiver_company->co_address;
+        $cc_address2 = isset($company_edit['co_address']) ? $company_edit['co_address'] : $receiver_company->co_address;
 
         $s_type = "";
         $t_type = "차주발행";
