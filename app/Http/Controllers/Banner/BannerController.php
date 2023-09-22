@@ -1676,7 +1676,6 @@ class BannerController extends Controller
         }
 
         return [
-            'data' => $warehousingg->get(),
             'countcharta' => $userArrb, 'countchartb' => $userArrd, 'counta' => $counta, 'countb' => $countb, 'countc' => $countc, 'countd' => $countd, 'counte' => $counte, 'countg' => $countg, 'countg_2' => $countg_2
         ];
 
