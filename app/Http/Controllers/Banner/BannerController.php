@@ -1954,11 +1954,27 @@ class BannerController extends Controller
                 ->whereHas('warehousing', function ($query) {
                     $query->where('w_category_name', '=', '보세화물');
                 })
-                ->where(function ($q4) {
-                    $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
-                })
-                ->where(function ($q4) {
-                    $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                ->where(function ($q) {
+                    $q->where('rgd_calculate_deadline_yn', 'y')->where(function ($q2) {
+                        $q2->where('rgd_status4', '예상경비청구서')
+                            ->where('service_korean_name', '보세화물')
+                            ->where('rgd_bill_type', 'not like', '%' . 'month' . '%')
+                            ->where(function ($q4) {
+                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                            })
+                            ->where(function ($q4) {
+                                $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                            });          
+                    })->orWhere(function ($q3) {
+                        $q3->where('rgd_calculate_deadline_yn', 'y')->where(function ($q4) {
+                            $q4->Where('rgd_status5', 'confirmed');
+                        })->where(function ($q4) {
+                            $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                        })
+                            ->where(function ($q4) {
+                                $q4->where('rgd_status4', '추가청구서')->orWhere('rgd_status4', '확정청구서');
+                            });
+                    });
                 })
                 ->where('rgd_status7', 'taxed')
                 ->where('rgd_is_show', 'y');
@@ -1970,11 +1986,26 @@ class BannerController extends Controller
                 ->whereHas('warehousing', function ($query) {
                     $query->where('w_category_name', '=', '보세화물');
                 })
-                ->where(function ($q4) {
-                    $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
-                })
-                ->where(function ($q4) {
-                    $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                ->where(function ($q) {
+                    $q->where('rgd_calculate_deadline_yn', 'y')->where(function ($q2) {
+                        $q2->where('rgd_status4', '예상경비청구서')
+                            ->where('service_korean_name', '수입풀필먼트')
+                            ->where('rgd_bill_type', 'not like', '%' . 'month' . '%')
+                            ->where(function ($q4) {
+                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                            })
+                            ->whereNull('rgd_status6');
+                    })->orWhere(function ($q3) {
+                        $q3->where('rgd_calculate_deadline_yn', 'y')->where(function ($q4) {
+                            $q4->Where('rgd_status5', 'confirmed');
+                        })
+                            ->where(function ($q4) {
+                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                            })
+                            ->where(function ($q4) {
+                                $q4->where('rgd_status4', '추가청구서')->orWhere('rgd_status4', '확정청구서');
+                            });
+                    });
                 })
                 ->where('rgd_status7', 'taxed')
                 ->where('rgd_is_show', 'y');
@@ -1986,11 +2017,26 @@ class BannerController extends Controller
                 ->whereHas('warehousing', function ($query) {
                     $query->where('w_category_name', '=', '보세화물');
                 })
-                ->where(function ($q4) {
-                    $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
-                })
-                ->where(function ($q4) {
-                    $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
+                ->where(function ($q) {
+                    $q->where('rgd_calculate_deadline_yn', 'y')->where(function ($q2) {
+                        $q2->where('rgd_status4', '예상경비청구서')
+                            ->where('service_korean_name', '유통가공')
+                            ->where('rgd_bill_type', 'not like', '%' . 'month' . '%')
+                            ->where(function ($q4) {
+                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                            })
+                            ->whereNull('rgd_status6');
+                    })->orWhere(function ($q3) {
+                        $q3->where('rgd_calculate_deadline_yn', 'y')->where(function ($q4) {
+                            $q4->Where('rgd_status5', 'confirmed');
+                        })
+                            ->where(function ($q4) {
+                                $q4->whereNull('rgd_status5')->orWhere('rgd_status5', '!=', 'cancel');
+                            })
+                            ->where(function ($q4) {
+                                $q4->where('rgd_status4', '추가청구서')->orWhere('rgd_status4', '확정청구서');
+                            });
+                    });
                 })
                 ->where('rgd_status7', 'taxed')
                 ->where('rgd_is_show', 'y');
