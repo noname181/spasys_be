@@ -494,6 +494,7 @@ class BannerController extends Controller
 
     public function CaculateService3($request)
     {
+        
         $user = Auth::user();
         if ($user->mb_type == 'shop') {
             $warehousinga = ReceivingGoodsDelivery::with(['w_no'])->whereNull('rgd_parent_no')->whereHas('w_no', function ($query) use ($user) {
@@ -2277,7 +2278,7 @@ class BannerController extends Controller
 
     public function banner_count(Request $request)
     {
-        //return "dsada";
+        set_time_limit(180);
         try {
 
             //DB::enableQueryLog();
@@ -2367,7 +2368,7 @@ class BannerController extends Controller
 
     public function banner_count1(Request $request)
     {
-        //return "dsada";
+        set_time_limit(180);
         try {
 
             //DB::enableQueryLog();
@@ -2434,7 +2435,7 @@ class BannerController extends Controller
 
     public function banner_count2(Request $request)
     {
-        //return "dsada";
+        set_time_limit(180);
         try {
 
             //DB::enableQueryLog();
@@ -2499,7 +2500,7 @@ class BannerController extends Controller
 
     public function banner_count3(Request $request)
     {
-        //return "dsada";
+        set_time_limit(180);
         try {
 
             //DB::enableQueryLog();
@@ -2565,7 +2566,7 @@ class BannerController extends Controller
 
     public function banner_count_invoice(Request $request)
     {
-
+        set_time_limit(180);
         try {
 
             //DB::enableQueryLog();
