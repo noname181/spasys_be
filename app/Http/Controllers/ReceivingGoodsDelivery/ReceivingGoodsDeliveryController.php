@@ -3904,7 +3904,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                             $tax_number = CommonFunc::generate_tax_number($tid, $rgd->rgd_no);
 
-                            $api = WarehousingController::tax_invoice_api($rgd, $user, $tid, $tax_number, null, true, $ag->ag_email);
+                            $api = WarehousingController::tax_invoice_api($rgd, $user, $tid, $tax_number, null, true, $ag->ag_email, $company);
 
                             TaxInvoiceDivide::where('tid_no', $tid)->update([
                                 'tid_number' => $tax_number ? $tax_number : null,
@@ -4042,7 +4042,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                                 $tax_number = CommonFunc::generate_tax_number($tid, $rgd->rgd_no);
 
-                                $api = WarehousingController::tax_invoice_api($rgd, $user, $tid, $tax_number, null, true, $ag->ag_email);
+                                $api = WarehousingController::tax_invoice_api($rgd, $user, $tid, $tax_number, null, true, $ag->ag_email, $company);
 
                                 TaxInvoiceDivide::where('tid_no', $tid)->update([
                                     'tid_number' => $tax_number ? $tax_number : null,
@@ -4180,7 +4180,7 @@ class ReceivingGoodsDeliveryController extends Controller
 
                                 $tax_number = CommonFunc::generate_tax_number($tid, $rgd->rgd_no);
 
-                                $api = WarehousingController::tax_invoice_api($rgd, $user, $tid, $tax_number, null, true, $ag->ag_email);
+                                $api = WarehousingController::tax_invoice_api($rgd, $user, $tid, $tax_number, null, true, $ag->ag_email, $company);
 
                                 TaxInvoiceDivide::where('tid_no', $tid)->update([
                                     'tid_number' => $tax_number ? $tax_number : null,
