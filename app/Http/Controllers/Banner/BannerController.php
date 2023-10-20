@@ -807,6 +807,8 @@ class BannerController extends Controller
                         ->where(function ($q4) {
                             $q4->where('rgd_status4', '추가청구서')->orWhere('rgd_status4', '확정청구서');
                         });
+                })->where(function ($q4) {
+                    $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
                 });
             })
             ->where('rgd_status7', 'taxed')
@@ -1209,6 +1211,8 @@ class BannerController extends Controller
                         ->where(function ($q4) {
                             $q4->where('rgd_status4', '추가청구서')->orWhere('rgd_status4', '확정청구서');
                         });
+                })->where(function ($q4) {
+                    $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
                 });
             })
 
@@ -1565,6 +1569,8 @@ class BannerController extends Controller
                         ->where(function ($q4) {
                             $q4->where('rgd_status4', '추가청구서')->orWhere('rgd_status4', '확정청구서');
                         });
+                })->where(function ($q4) {
+                    $q4->whereNull('rgd_status6')->orWhere('rgd_status6', '!=', 'paid');
                 });
             })
 
