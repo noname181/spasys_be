@@ -12002,9 +12002,9 @@ class RateDataController extends Controller
                     }
                 }
                 if ($i == 2) {
-                    $sheet->setCellValue('B' . ($line3[11] - $count3 - $data - $count4 - $count5 + 9), '1 이 요율표의 유효기간은 제출일자로부터 1개월 입니다.');
-                    $sheet->setCellValue('B' . ($line3[11] - $count3 - $data - $count4 - $count5 + 10), '2 이 견적 금액은 부가가치세 별도 금액입니다.');
-                    $sheet->setCellValue('B' . ($line3[11] - $count3 - $data - $count4 - $count5 + 11), '3 상세 업무 내역에 따라 제공 요율은 변경될 수 있습니다.');
+                    $sheet->setCellValue('B' . ($line3[11] - $count3 - $data - $count4 - $count5 + 9), '1. 이 요율표의 유효기간은 제출일자로부터 1개월 입니다.');
+                    $sheet->setCellValue('B' . ($line3[11] - $count3 - $data - $count4 - $count5 + 10), '2. 이 견적 금액은 부가가치세 별도 금액입니다.');
+                    $sheet->setCellValue('B' . ($line3[11] - $count3 - $data - $count4 - $count5 + 11), '3. 상세 업무 내역에 따라 제공 요율은 변경될 수 있습니다.');
                     // $sheet->getStyle('B'. ($line3[11]-$count3-$data-$count4-$count5 + 5). ':Z'. ($line3[11]-$count3-$data-$count4-$count5 + 9))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('EDEDED'));
                     $sheet->getStyle('B' . ($line3[11] - $count3 - $data - $count4 - $count5 + 13) . ':Z' . ($line3[11] - $count3 - $data - $count4 - $count5 + 17))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
                     $sheet->mergeCells('B' . ($line3[11] - $count3 - $data - $count4 - $count5 + 13) . ':Z' . ($line3[11] - $count3 - $data - $count4 - $count5 + 13));
@@ -12159,9 +12159,9 @@ class RateDataController extends Controller
 
 
 
-            $sheet->setCellValue('B' . ($current_row + $count1 + $count2 + $count3 + $count4 +  9), '1 이 요율표의 유효기간은 제출일자로부터 1개월 입니다.');
-            $sheet->setCellValue('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 10), '2 이 견적 금액은 부가가치세 별도 금액입니다.');
-            $sheet->setCellValue('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 11), '3 상세 업무 내역에 따라 제공 요율은 변경될 수 있습니다.');
+            $sheet->setCellValue('B' . ($current_row + $count1 + $count2 + $count3 + $count4 +  9), '1. 이 요율표의 유효기간은 제출일자로부터 1개월 입니다.');
+            $sheet->setCellValue('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 10), '2. 이 견적 금액은 부가가치세 별도 금액입니다.');
+            $sheet->setCellValue('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 11), '3. 상세 업무 내역에 따라 제공 요율은 변경될 수 있습니다.');
             // $sheet->getStyle('B'. ($current_row+$count1+$count2 + $count3 + $count4 + 5). ':Z'. ($current_row+$count1+$count2 + $count3 + $count4 + 9))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('EDEDED'));
             $sheet->getStyle('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 13) . ':R' . ($current_row + $count1 + $count2 + $count3 + $count4 + 17))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
             $sheet->mergeCells('B' . ($current_row + $count1 + $count2 + $count3 + $count4 + 13) . ':Z' . ($current_row + $count1 + $count2 + $count3 + $count4 + 13));
@@ -12412,9 +12412,9 @@ class RateDataController extends Controller
 
             $sheet->setCellValue('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 1), $rate_meta['rm_mail_detail2']);
 
-            $sheet->setCellValue('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 9), '1 이 요율표의 유효기간은 제출일자로부터 1개월 입니다.');
-            $sheet->setCellValue('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 10), '2 이 견적 금액은 부가가치세 별도 금액입니다.');
-            $sheet->setCellValue('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 11), '3 상세 업무 내역에 따라 제공 요율은 변경될 수 있습니다.');
+            $sheet->setCellValue('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 9), '1. 이 요율표의 유효기간은 제출일자로부터 1개월 입니다.');
+            $sheet->setCellValue('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 10), '2. 이 견적 금액은 부가가치세 별도 금액입니다.');
+            $sheet->setCellValue('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 11), '3. 상세 업무 내역에 따라 제공 요율은 변경될 수 있습니다.');
             // $sheet->getStyle('B'. ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 5). ':Z'. ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 9))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('EDEDED'));
             $sheet->getStyle('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 13) . ':R' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 17))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
             $sheet->mergeCells('B' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 13) . ':Z' . ($current_row + $count1 + $count2  + $count3 + $count4 + $count5 + $count6 + 13));
